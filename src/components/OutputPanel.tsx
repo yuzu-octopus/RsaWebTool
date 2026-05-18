@@ -8,6 +8,7 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  TextField,
 } from '@mui/material';
 import { ExpandLess, ExpandMore, ContentCopy, CheckCircle, Cancel } from '@mui/icons-material';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -32,6 +33,17 @@ export function OutputPanel({ width, onWidthChange }: { width: number; onWidthCh
   const { outputResult, outputError, history } = useAppContext();
   const [conversionResult, setConversionResult] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [notepadOpen, setNotepadOpen] = useState(false);
+  const [notepadText, setNotepadText] = useState(() => {
+    try {
+      const stored = localStorage.getItem('notepad');
+      if (stored) {
+        const { text, timestamp } = JSON.parse(stored);
+        if (Date.now() - timestamp < 3600000) return text;
+      }
+    } catch { /* ignore */ }
+    return '';
+  });
   const isDragging = useRef(false);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -74,6 +86,13 @@ export function OutputPanel({ width, onWidthChange }: { width: number; onWidthCh
       setConversionResult('Copied to clipboard!');
       setTimeout(() => setConversionResult(prevResult), 2000);
     }
+  };
+
+  const handleNotepadChange = (text: string) => {
+    setNotepadText(text);
+    try {
+      localStorage.setItem('notepad', JSON.stringify({ text, timestamp: Date.now() }));
+    } catch { /* ignore */ }
   };
 
   return (
@@ -169,6 +188,47 @@ export function OutputPanel({ width, onWidthChange }: { width: number; onWidthCh
             Run an attack to see results here
           </Typography>
         )}
+      </Box>
+
+      <Divider sx={{ borderColor: draculaColors.comment }} />
+
+      <Box sx={{ px: 2 }}>
+        <Button
+          fullWidth
+          onClick={() => setNotepadOpen(!notepadOpen)}
+          sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', monospace", justifyContent: 'space-between' }}
+          endIcon={notepadOpen ? <ExpandLess /> : <ExpandMore />}
+        >
+          Notepad
+        </Button>
+
+        <Collapse in={notepadOpen}>
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            value={notepadText}
+            onChange={e => handleNotepadChange(e.target.value)}
+            placeholder="Take notes here..."
+            variant="outlined"
+            sx={{
+              mt: 1,
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: draculaColors.currentLine,
+                color: draculaColors.foreground,
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '0.8rem',
+                '& fieldset': { borderColor: draculaColors.comment },
+                '&:hover fieldset': { borderColor: draculaColors.purple },
+                '&.Mui-focused fieldset': { borderColor: draculaColors.purple },
+              },
+              '& .MuiInputBase-input': {
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '0.8rem',
+              },
+            }}
+          />
+        </Collapse>
       </Box>
 
       <Divider sx={{ borderColor: draculaColors.comment }} />

@@ -158,11 +158,13 @@ export function useSageMathParallel() {
   const executeAll = async (
     codes: string[],
     concurrency = 3,
-    timeoutMs = 35000
+    timeoutMs = 35000,
+    onResult?: (index: number, result: SageResult) => boolean
   ): Promise<(SageResult & { index: number })[]> => {
     const results: (SageResult & { index: number })[] = [];
     const queue = codes.map((code, index) => ({ code, index }));
     const inProgress = new Set<number>();
+    const controller = new AbortController();
 
     return new Promise((resolve) => {
       const { execute } = createSageMathExecutor();
@@ -177,9 +179,16 @@ export function useSageMathParallel() {
           const item = queue.shift()!;
           inProgress.add(item.index);
 
-          execute(item.code, timeoutMs)
+          execute(item.code, timeoutMs, controller.signal)
             .then((result) => {
               results.push({ ...result, index: item.index });
+              if (onResult && onResult(item.index, result)) {
+                controller.abort();
+                while (queue.length > 0) {
+                  const remaining = queue.shift()!;
+                  results.push({ success: false, stdout: '', error: 'Aborted', index: remaining.index });
+                }
+              }
             })
             .catch((err: unknown) => {
               const message = err instanceof Error ? err.message : 'Unknown error';

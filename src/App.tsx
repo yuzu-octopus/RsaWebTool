@@ -7,6 +7,7 @@ import { InputPanel } from './components/InputPanel';
 import { OutputPanel } from './components/OutputPanel';
 import { MagicPanel } from './components/MagicPanel';
 import { ProofIndex } from './components/ProofIndex';
+import { RsaCalculator } from './components/RsaCalculator';
 import { setFactorDBProxy } from './utils/factordb';
 import { FACTORDB_PROXY_URL } from './config';
 
@@ -43,6 +44,7 @@ function App() {
               <InputPanel />
               <MagicPanel />
               <ProofIndex />
+              <RsaCalculator />
             </Box>
             <OutputPanel width={outputWidth} onWidthChange={handleWidthChange} />
           </Box>

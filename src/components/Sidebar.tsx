@@ -10,7 +10,7 @@ import {
   Divider,
   Link,
 } from '@mui/material';
-import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, Calculate } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { CATEGORIES, attacksByCategory, attacks } from '../data/attacks';
 import { useAppContext } from '../context/AppContext';
@@ -129,6 +129,21 @@ export function Sidebar() {
           <ListItemText
             primary="Proofs Index"
             slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.85rem' } } }}
+          />
+        </ListItemButton>
+
+        <ListItemButton
+          onClick={() => setViewMode('calculator')}
+          sx={{
+            mx: 1,
+            mt: 0.5,
+            '&:hover': { backgroundColor: draculaColors.background },
+          }}
+        >
+          <Calculate sx={{ color: draculaColors.cyan, mr: 1, fontSize: '1.1rem' }} />
+          <ListItemText
+            primary="Calculator"
+            slotProps={{ primary: { sx: { color: draculaColors.cyan, fontSize: '0.85rem' } } }}
           />
         </ListItemButton>
       </List>

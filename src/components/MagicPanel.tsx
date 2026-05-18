@@ -10,7 +10,7 @@ import {
   ListItemText,
   Divider,
 } from '@mui/material';
-import { AutoFixHigh, Science, CheckCircle, Cancel, HourglassEmpty } from '@mui/icons-material';
+import { AutoFixHigh, Science, CheckCircle, Cancel, HourglassEmpty, SkipNext } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../context/AppContext';
 import { useSageMathParallel } from '../hooks/useSageMath';
@@ -49,7 +49,7 @@ const inputSx = {
 interface MagicJob {
   attackId: string;
   attackName: string;
-  status: 'running' | 'success' | 'error';
+  status: 'running' | 'success' | 'error' | 'aborted';
   result?: string;
   error?: string;
 }
@@ -60,12 +60,14 @@ export function MagicPanel() {
   const [rawInput, setRawInput] = useState('');
   const [jobs, setJobs] = useState<MagicJob[]>([]);
   const [running, setRunning] = useState(false);
+  const [earlyStop, setEarlyStop] = useState(false);
 
   if (viewMode !== 'magic') return null;
 
   const handleCrack = async () => {
     setRunning(true);
     setJobs([]);
+    setEarlyStop(false);
     setOutputResult(null);
     setOutputError(null);
 
@@ -82,7 +84,10 @@ export function MagicPanel() {
       try { return a.applicableCheck(params); } catch { return false; }
     });
 
-    const initialJobs: MagicJob[] = applicable.map(a => ({
+    const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
+    const sorted = [...applicable].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+
+    const initialJobs: MagicJob[] = sorted.map(a => ({
       attackId: a.id,
       attackName: a.name,
       status: 'running',
@@ -90,7 +95,7 @@ export function MagicPanel() {
     setJobs(initialJobs);
 
     const preCheckResults = await Promise.all(
-      applicable.map(async (a, i) => {
+      sorted.map(async (a, i) => {
         if (a.frontendCheck) {
           try {
             const result = await a.frontendCheck(params);
@@ -105,18 +110,26 @@ export function MagicPanel() {
       }),
     );
 
-    const remaining: { attack: typeof applicable[0]; originalIndex: number }[] = [];
+    const remaining: { attack: typeof sorted[0]; originalIndex: number }[] = [];
 
-    for (let i = 0; i < applicable.length; i++) {
+    for (let i = 0; i < sorted.length; i++) {
       if (!preCheckResults[i]) {
-        remaining.push({ attack: applicable[i], originalIndex: i });
+        remaining.push({ attack: sorted[i], originalIndex: i });
       }
     }
 
     const codes = remaining.map(r => r.attack.sageTemplate(params));
 
     try {
-      const results = await executeAll(codes, 3);
+      const results = await executeAll(codes, 3, 35000, (_index, result) => {
+        if (result.success) {
+          setEarlyStop(true);
+          return true;
+        }
+        return false;
+      });
+
+      setJobs(prev => prev.map(j => j.status === 'running' ? { ...j, status: 'aborted' as const } : j));
 
       const updatedJobs = initialJobs.map((job, i) => {
         const pre = preCheckResults[i];
@@ -128,7 +141,7 @@ export function MagicPanel() {
           const r = results[ri];
           return {
             ...job,
-            status: (r.success ? 'success' : 'error') as 'success' | 'error',
+            status: (r.success ? 'success' : r.error === 'Aborted' ? 'aborted' : 'error') as 'success' | 'error' | 'aborted',
             result: r.stdout,
             error: r.error,
           };
@@ -154,6 +167,7 @@ export function MagicPanel() {
   const statusIcon = (status: MagicJob['status']) => {
     if (status === 'success') return <CheckCircle sx={{ color: draculaColors.green, fontSize: '1rem', mr: 0.5 }} />;
     if (status === 'error') return <Cancel sx={{ color: draculaColors.red, fontSize: '1rem', mr: 0.5 }} />;
+    if (status === 'aborted') return <SkipNext sx={{ color: draculaColors.comment, fontSize: '1rem', mr: 0.5 }} />;
     return <HourglassEmpty sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5 }} />;
   };
 
@@ -202,6 +216,12 @@ export function MagicPanel() {
           {running && (
             <Typography variant="body2" sx={{ color: draculaColors.comment, mt: 1, textAlign: 'center' }}>
               Trying {jobs.length} attacks in parallel...
+            </Typography>
+          )}
+
+          {earlyStop && (
+            <Typography variant="body2" sx={{ color: draculaColors.green, mt: 1, textAlign: 'center' }}>
+              Found result — stopping early
             </Typography>
           )}
 

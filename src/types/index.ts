@@ -34,8 +34,8 @@ export interface HistoryEntry {
 export interface AppContextType {
   selectedAttack: Attack | null;
   setSelectedAttack: (attack: Attack | null) => void;
-  viewMode: 'attack' | 'magic' | 'proofs';
-  setViewMode: (mode: 'attack' | 'magic' | 'proofs') => void;
+  viewMode: 'attack' | 'magic' | 'proofs' | 'calculator';
+  setViewMode: (mode: 'attack' | 'magic' | 'proofs' | 'calculator') => void;
   outputResult: string | null;
   setOutputResult: (result: string | null) => void;
   outputError: string | null;
