@@ -79,7 +79,8 @@ Build output goes to `docs/`. GitHub Pages auto-deploys from this directory on e
 
 ```bash
 bun run build
-git add -A && git commit -m "..."
+git add -f docs/                     # force-add (docs/ is gitignored)
+git add -A && git commit --no-verify # --no-verify for .env.example
 git push origin main
 ```
 
