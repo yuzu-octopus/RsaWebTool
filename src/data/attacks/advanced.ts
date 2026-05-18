@@ -575,4 +575,191 @@ n_i = g_{ij} \\cdot \\frac{n_i}{g_{ij}}, \\quad n_j = g_{ij} \\cdot \\frac{n{n_j
     priority: 'high',
     applicableCheck: (p: Record<string, string>) => !!(p.moduli_list && p.moduli_list.trim().split('\\n').filter(x => x.trim()).length >= 2),
   },
+  {
+    id: 'phi-leak',
+    name: 'Phi(n) Leak',
+    description: 'Recovers prime factors when Euler\'s totient function phi(n) is leaked.',
+    category: 'Advanced',
+    inputs: [
+      { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
+      { name: 'phi', label: 'phi(n) (Euler totient)', placeholder: 'Enter phi(n)...', multiline: true, rows: 3 },
+    ],
+    sageTemplate: (vals: Record<string, string>) => `n = Integer(${vals.n})
+phi = Integer(${vals.phi})
+
+print("Phi(n) leak attack")
+print(f"n = {n}")
+print(f"phi(n) = {phi}")
+print()
+
+# For n = p*q: phi(n) = (p-1)(q-1) = pq - p - q + 1 = n - p - q + 1
+# So: p + q = n - phi + 1
+# And: p * q = n
+# We solve: x^2 - (p+q)x + pq = 0
+# i.e.: x^2 - (n - phi + 1)x + n = 0
+
+sum_pq = n - phi + 1
+print(f"p + q = {sum_pq}")
+print(f"p * q = {n}")
+print()
+
+# Solve quadratic: x^2 - sum_pq * x + n = 0
+discriminant = sum_pq^2 - 4*n
+print(f"Discriminant = {discriminant}")
+
+if discriminant < 0:
+    print("ERROR: Negative discriminant. phi(n) is inconsistent with n.")
+elif discriminant == 0:
+    print("ERROR: p = q. n is a perfect square (not valid RSA).")
+else:
+    sqrt_disc = isqrt(discriminant)
+    if sqrt_disc^2 == discriminant:
+        p = (sum_pq - sqrt_disc) // 2
+        q = (sum_pq + sqrt_disc) // 2
+        print(f"SUCCESS! Factors recovered:")
+        print(f"p = {p}")
+        print(f"q = {q}")
+        print(f"Verification: p * q = {p * q}")
+        print(f"Verification: (p-1)*(q-1) = {(p-1)*(q-1)}")
+
+        try:
+            e_val = Integer(${vals.e || '0'})
+            if e_val > 0:
+                d = inverse_mod(e_val, phi)
+                print(f"d (private exponent) = {d}")
+        except:
+            pass
+    else:
+        print(f"Discriminant is not a perfect square: {discriminant}")
+        print("phi(n) may be incorrect, or n has more than 2 prime factors.")
+`,
+    proof: `\\textbf{Theorem:} If $n = pq$ and $\\phi(n)$ is known, then $n$ can be factored in polynomial time.
+
+\\textbf{Derivation:}
+\\begin{align*}
+\\phi(n) &= (p-1)(q-1) = pq - p - q + 1 = n - (p + q) + 1 \\\\
+p + q &= n - \\phi(n) + 1 \\\\
+pq &= n
+\\end{align*}
+
+Given $s = p + q$ and $pq = n$, we solve the quadratic:
+\\begin{equation*}
+x^2 - sx + n = 0
+\\end{equation*}
+
+The discriminant is $\\Delta = s^2 - 4n = (p-q)^2$, so:
+\\begin{equation*}
+p = \\frac{s - \\sqrt{\\Delta}}{2}, \\quad q = \\frac{s + \\sqrt{\\Delta}}{2}
+\\end{equation*}
+
+\\textbf{Complexity:} $O(\\log^2 n)$ for the arithmetic operations.
+
+\\textbf{Implication:} Knowing $\\phi(n)$ is equivalent to factoring $n$. This is why $\\phi(n)$ must be kept secret in RSA.
+
+\\textbf{References:} RSA original paper (Rivest, Shamir, Adleman, 1978); Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2`,
+    priority: 'high',
+    applicableCheck: (p: Record<string, string>) => !!(p.n && p.phi),
+  },
+  {
+    id: 'parity-oracle',
+    name: 'Parity Oracle Attack',
+    description: 'Recovers plaintext bit-by-bit using an oracle that reveals parity of decrypted message.',
+    category: 'Advanced',
+    inputs: [
+      { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
+      { name: 'e', label: 'e (public exponent)', placeholder: '65537', multiline: false },
+      { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
+      { name: 'oracle_responses', label: 'Oracle responses (comma-separated, LSB of each query)', placeholder: '1,0,1,1,0,...', multiline: false },
+    ],
+    sageTemplate: (vals: Record<string, string>) => `n = Integer(${vals.n})
+e = Integer(${vals.e || '65537'})
+c = Integer(${vals.c})
+responses_str = "${vals.oracle_responses || ''}".replace(' ', '')
+responses = [int(x) for x in responses_str.split(',') if x]
+
+print("Parity oracle attack on RSA")
+print(f"n = {n}")
+print(f"e = {e}")
+print(f"c = {c}")
+print(f"Oracle responses: {len(responses)} bits")
+print()
+
+n_bits = n.nbits()
+if len(responses) < n_bits:
+    print(f"WARNING: Need {n_bits} responses for {n_bits}-bit modulus.")
+    print(f"Got {len(responses)}. Attack may be incomplete.")
+    print()
+
+# Binary search using parity oracle
+lower = Integer(0)
+upper = Integer(n)
+
+print("Binary search iterations:")
+for i, parity in enumerate(responses):
+    mid = (lower + upper) // 2
+
+    # Multiply ciphertext by 2^e mod n
+    c = (c * power_mod(2, e, n)) % n
+
+    if parity == 0:
+        # 2m mod n >= n, so m is in upper half
+        lower = mid
+    else:
+        # 2m mod n < n, so m is in lower half
+        upper = mid
+
+    if i < 10 or i % 50 == 0:
+        print(f"  Step {i+1}: parity={parity}, range bits = {(upper - lower).nbits()}")
+
+print()
+print(f"Estimated m in range [{lower}, {upper}]")
+print(f"Range size: {upper - lower}")
+
+if upper - lower < 10:
+    orig_c = Integer(${vals.c})
+    for candidate in range(int(lower), int(upper) + 1):
+        m = Integer(candidate)
+        if power_mod(m, e, n) == orig_c:
+            print(f"FOUND! m = {m}")
+            try:
+                m_bytes = bytes.fromhex(hex(m)[2:].zfill(2))
+                print(f"m as text: {m_bytes.decode('utf-8', errors='replace')}")
+            except:
+                print(f"m as hex: {hex(m)}")
+            break
+    else:
+        print("Verification failed. Oracle responses may be inconsistent.")
+else:
+    print(f"Range too large. Need more oracle responses.")
+    print(f"Current uncertainty: {(upper - lower).nbits()} bits")
+`,
+    proof: `\\textbf{Theorem: (Bleichenbacher, 1998)} Given access to a parity oracle that returns the least significant bit of $m = c^d \\bmod n$, the full plaintext $m$ can be recovered in $\\log_2 n$ queries.
+
+\\textbf{Key Insight:} Multiplying the ciphertext by $2^e \\bmod n$ corresponds to doubling the plaintext modulo $n$:
+\\begin{equation*}
+(c \\cdot 2^e)^d \\equiv m \\cdot 2 \\pmod{n}
+\\end{equation*}
+
+\\textbf{Binary Search:}
+\\begin{enumerate}
+\\item If $2m < n$, the parity oracle returns $2m \\bmod 2 = 0$ (even).
+\\item If $2m \\geq n$, the parity oracle returns $(2m - n) \\bmod 2 = 1$ (since $n$ is odd).
+\\item Each query halves the search interval for $m$.
+\\item After $\\log_2 n$ queries, $m$ is determined exactly.
+\\end{enumerate}
+
+\\textbf{Interval refinement:}
+\\begin{itemize}
+\\item Start with $m \\in [0, n)$.
+\\item If parity is 0: $m \\in [0, n/2)$.
+\\item If parity is 1: $m \\in [n/2, n)$.
+\\item After each step, multiply $c$ by $2^e$ and repeat.
+\\end{itemize}
+
+\\textbf{Complexity:} $O(\\log n)$ oracle queries, each taking $O(\\log^3 n)$ time.
+
+\\textbf{References:} D. Bleichenbacher, "Generating ElGamal Signatures Without Knowing the Secret Key", Eurocrypt 1998; Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP)", CRYPTO 2001`,
+    priority: 'medium',
+    applicableCheck: (p: Record<string, string>) => !!(p.n && p.e && p.c && p.oracle_responses),
+  },
 ];
