@@ -114,74 +114,76 @@ export function MagicPanel() {
 
   return (
     <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <Box sx={{ p: 2, overflow: 'auto', flex: 1 }}>
-        <Typography variant="h2" sx={{ color: draculaColors.purple, mb: 1 }}>
-          🪄 Magic Cracker
-        </Typography>
-        <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 3 }}>
-          Paste everything you have — we'll figure out which attacks to try
-        </Typography>
-
-        <TextField
-          fullWidth
-          multiline
-          rows={8}
-          label="Raw input (PEM, hex, decimal, key=value pairs...)"
-          value={rawInput}
-          onChange={e => setRawInput(e.target.value)}
-          variant="outlined"
-          sx={inputSx}
-        />
-
-        <Button
-          fullWidth
-          variant="contained"
-          onClick={handleCrack}
-          disabled={running || !rawInput.trim()}
-          sx={{
-            mt: 2,
-            backgroundColor: draculaColors.purple,
-            fontFamily: "'JetBrainsMono Nerd Font', monospace",
-            '&:hover': { backgroundColor: '#a575f6' },
-            '&:disabled': { backgroundColor: draculaColors.comment },
-          }}
-        >
-          {running ? <CircularProgress size={24} sx={{ color: draculaColors.foreground }} /> : '🔮 Crack It'}
-        </Button>
-
-        {running && (
-          <Typography variant="body2" sx={{ color: draculaColors.comment, mt: 1, textAlign: 'center' }}>
-            Trying {jobs.length} attacks in parallel...
+      <Box sx={{ p: 2, overflow: 'auto', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box sx={{ width: '100%', maxWidth: 640 }}>
+          <Typography variant="h2" sx={{ color: draculaColors.purple, mb: 1 }}>
+            🪄 Magic Cracker
           </Typography>
-        )}
+          <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 3 }}>
+            Paste everything you have — we'll figure out which attacks to try
+          </Typography>
 
-        {jobs.length > 0 && (
-          <>
-            <Divider sx={{ borderColor: draculaColors.comment, my: 2 }} />
-            <List dense>
-              {jobs.map(job => (
-                <ListItem key={job.attackId} sx={{ px: 0 }}>
-                  <ListItemText
-                    primary={
-                      <Typography sx={{
-                        fontFamily: "'JetBrainsMono Nerd Font', monospace",
-                        fontSize: '0.8rem',
-                        color: job.status === 'success' ? draculaColors.green : job.status === 'error' ? draculaColors.red : draculaColors.orange,
-                      }}>
-                        {job.status === 'success' ? '✅' : job.status === 'error' ? '❌' : '⏳'} {job.attackName}
-                      </Typography>
-                    }
-                    secondary={job.error && (
-                      <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: "'JetBrainsMono Nerd Font', monospace" }}>
-                        {job.error}
-                      </Typography>
-                    )}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </>
-        )}
+          <TextField
+            fullWidth
+            multiline
+            rows={8}
+            label="Raw input (PEM, hex, decimal, key=value pairs...)"
+            value={rawInput}
+            onChange={e => setRawInput(e.target.value)}
+            variant="outlined"
+            sx={inputSx}
+          />
+
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={handleCrack}
+            disabled={running || !rawInput.trim()}
+            sx={{
+              mt: 2,
+              backgroundColor: draculaColors.purple,
+              fontFamily: "'JetBrainsMono Nerd Font', monospace",
+              '&:hover': { backgroundColor: '#a575f6' },
+              '&:disabled': { backgroundColor: draculaColors.comment },
+            }}
+          >
+            {running ? <CircularProgress size={24} sx={{ color: draculaColors.foreground }} /> : '🔮 Crack It'}
+          </Button>
+
+          {running && (
+            <Typography variant="body2" sx={{ color: draculaColors.comment, mt: 1, textAlign: 'center' }}>
+              Trying {jobs.length} attacks in parallel...
+            </Typography>
+          )}
+
+          {jobs.length > 0 && (
+            <>
+              <Divider sx={{ borderColor: draculaColors.comment, my: 2 }} />
+              <List dense>
+                {jobs.map(job => (
+                  <ListItem key={job.attackId} sx={{ px: 0 }}>
+                    <ListItemText
+                      primary={
+                        <Typography sx={{
+                          fontFamily: "'JetBrainsMono Nerd Font', monospace",
+                          fontSize: '0.8rem',
+                          color: job.status === 'success' ? draculaColors.green : job.status === 'error' ? draculaColors.red : draculaColors.orange,
+                        }}>
+                          {job.status === 'success' ? '✅' : job.status === 'error' ? '❌' : '⏳'} {job.attackName}
+                        </Typography>
+                      }
+                      secondary={job.error && (
+                        <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: "'JetBrainsMono Nerd Font', monospace" }}>
+                          {job.error}
+                        </Typography>
+                      )}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </>
+          )}
+        </Box>
       </Box>
     </Box>
   );

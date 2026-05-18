@@ -93,52 +93,54 @@ export function InputPanel() {
       </Tabs>
 
       {tab === 0 && (
-        <Box sx={{ p: 2, overflow: 'auto', flex: 1 }}>
-          <Typography variant="h4" sx={{ color: draculaColors.cyan, mb: 1 }}>
-            {selectedAttack.name}
-          </Typography>
-          <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 3 }}>
-            {selectedAttack.description}
-          </Typography>
-
-          {selectedAttack.inputs.map(field => (
-            <Box key={field.name} sx={{ mb: 2 }}>
-              <TextField
-                fullWidth
-                label={field.label}
-                placeholder={field.placeholder}
-                value={inputValues[field.name] || ''}
-                onChange={e => handleInputChange(field.name, e.target.value)}
-                multiline={field.multiline}
-                rows={field.rows || 1}
-                variant="outlined"
-                size="small"
-                sx={inputSx}
-              />
-            </Box>
-          ))}
-
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={handleRun}
-            disabled={loading}
-            sx={{
-              mt: 2,
-              backgroundColor: draculaColors.purple,
-              fontFamily: "'JetBrainsMono Nerd Font', monospace",
-              '&:hover': { backgroundColor: '#a575f6' },
-              '&:disabled': { backgroundColor: draculaColors.comment },
-            }}
-          >
-            {loading ? <CircularProgress size={24} sx={{ color: draculaColors.foreground }} /> : 'Run'}
-          </Button>
-
-          {loading && (
-            <Typography variant="body2" sx={{ color: draculaColors.comment, mt: 1, textAlign: 'center' }}>
-              Computing in SageMathCell...
+        <Box sx={{ p: 2, overflow: 'auto', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Box sx={{ width: '100%', maxWidth: 640 }}>
+            <Typography variant="h4" sx={{ color: draculaColors.cyan, mb: 1 }}>
+              {selectedAttack.name}
             </Typography>
-          )}
+            <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 3 }}>
+              {selectedAttack.description}
+            </Typography>
+
+            {selectedAttack.inputs.map(field => (
+              <Box key={field.name} sx={{ mb: 2 }}>
+                <TextField
+                  fullWidth
+                  label={field.label}
+                  placeholder={field.placeholder}
+                  value={inputValues[field.name] || ''}
+                  onChange={e => handleInputChange(field.name, e.target.value)}
+                  multiline={field.multiline}
+                  rows={field.rows || 1}
+                  variant="outlined"
+                  size="small"
+                  sx={inputSx}
+                />
+              </Box>
+            ))}
+
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleRun}
+              disabled={loading}
+              sx={{
+                mt: 2,
+                backgroundColor: draculaColors.purple,
+                fontFamily: "'JetBrainsMono Nerd Font', monospace",
+                '&:hover': { backgroundColor: '#a575f6' },
+                '&:disabled': { backgroundColor: draculaColors.comment },
+              }}
+            >
+              {loading ? <CircularProgress size={24} sx={{ color: draculaColors.foreground }} /> : 'Run'}
+            </Button>
+
+            {loading && (
+              <Typography variant="body2" sx={{ color: draculaColors.comment, mt: 1, textAlign: 'center' }}>
+                Computing in SageMathCell...
+              </Typography>
+            )}
+          </Box>
         </Box>
       )}
 

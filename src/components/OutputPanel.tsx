@@ -45,7 +45,7 @@ export function OutputPanel() {
 
   return (
     <Box sx={{ width: '40%', minWidth: 300, display: 'flex', flexDirection: 'column', borderLeft: `1px solid ${draculaColors.comment}`, overflow: 'hidden' }}>
-      <Box sx={{ p: 2 }}>
+      <Box sx={{ p: 2, overflow: 'auto', flex: 1 }}>
         <Typography variant="h3" sx={{ color: draculaColors.purple, mb: 2 }}>
           Results
         </Typography>

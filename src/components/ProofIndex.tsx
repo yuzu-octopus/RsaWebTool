@@ -51,55 +51,59 @@ export function ProofIndex() {
 
   return (
     <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <Box sx={{ p: 2 }}>
-        <Typography variant="h2" sx={{ color: draculaColors.purple, mb: 2 }}>
-          📚 Proof Index
-        </Typography>
+      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box sx={{ width: '100%', maxWidth: 640 }}>
+          <Typography variant="h2" sx={{ color: draculaColors.purple, mb: 2 }}>
+            📚 Proof Index
+          </Typography>
 
-        <TextField
-          fullWidth
-          label="Search proofs..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          variant="outlined"
-          size="small"
-          sx={{ ...inputSx, mb: 2 }}
-        />
+          <TextField
+            fullWidth
+            label="Search proofs..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            variant="outlined"
+            size="small"
+            sx={{ ...inputSx, mb: 2 }}
+          />
 
-        <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 1 }}>
-          {filtered.length} of {attacks.length} attacks
-        </Typography>
+          <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 1 }}>
+            {filtered.length} of {attacks.length} attacks
+          </Typography>
+        </Box>
       </Box>
 
       <Divider sx={{ borderColor: draculaColors.comment }} />
 
-      <List sx={{ flex: 1, overflow: 'auto', px: 2 }}>
-        {filtered.map(attack => (
-          <ListItem key={attack.id} disablePadding sx={{ mb: 1 }}>
-            <ListItemButton
-              onClick={() => handleClick(attack)}
-              sx={{
-                borderRadius: 1,
-                border: `1px solid ${draculaColors.comment}`,
-                '&:hover': { backgroundColor: draculaColors.background, borderColor: draculaColors.purple },
-              }}
-            >
-              <ListItemText
-                primary={
-                  <Typography sx={{ color: draculaColors.cyan, fontFamily: "'JetBrainsMono Nerd Font', monospace", fontWeight: 600 }}>
-                    {attack.name}
-                  </Typography>
-                }
-                secondary={
-                  <Typography sx={{ color: draculaColors.comment, fontFamily: "'JetBrainsMono Nerd Font', monospace", fontSize: '0.75rem' }}>
-                    [{attack.category}] {attack.description}
-                  </Typography>
-                }
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center' }}>
+        <List sx={{ width: '100%', maxWidth: 640, px: 2 }}>
+          {filtered.map(attack => (
+            <ListItem key={attack.id} disablePadding sx={{ mb: 1 }}>
+              <ListItemButton
+                onClick={() => handleClick(attack)}
+                sx={{
+                  borderRadius: 1,
+                  border: `1px solid ${draculaColors.comment}`,
+                  '&:hover': { backgroundColor: draculaColors.background, borderColor: draculaColors.purple },
+                }}
+              >
+                <ListItemText
+                  primary={
+                    <Typography sx={{ color: draculaColors.cyan, fontFamily: "'JetBrainsMono Nerd Font', monospace", fontWeight: 600 }}>
+                      {attack.name}
+                    </Typography>
+                  }
+                  secondary={
+                    <Typography sx={{ color: draculaColors.comment, fontFamily: "'JetBrainsMono Nerd Font', monospace", fontSize: '0.75rem' }}>
+                      [{attack.category}] {attack.description}
+                    </Typography>
+                  }
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Box>
     </Box>
   );
 }
