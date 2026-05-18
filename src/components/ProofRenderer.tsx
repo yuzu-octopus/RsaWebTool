@@ -239,7 +239,8 @@ export function ProofRenderer({ latex }: { latex: string }) {
               for (let j = 0; j < paragraphs.length; j++) {
                 const para = paragraphs[j];
                 // Detect heading patterns like "Theorem:", "Prerequisites:", "Proof:", "References:"
-                const headingMatch = para.match(/^(Theorem|Prerequisites|Proof|References):\s*(.*)/s);
+                // Handle both plain "References:" and "\textbf{References:}" variants
+                const headingMatch = para.match(/^(?:\\textbf\{)?(Theorem|Prerequisites|Proof|References)(?:\})?:\s*(.*)/s);
                 if (headingMatch && headingMatch[1] === 'References') {
                   skipRest = true;
                   break;

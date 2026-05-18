@@ -9,6 +9,7 @@ import {
   ListItemText,
   Divider,
 } from '@mui/material';
+import { MenuBook } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../context/AppContext';
 import { attacks } from '../data/attacks';
@@ -53,8 +54,8 @@ export function ProofIndex() {
     <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Typography variant="h2" sx={{ color: draculaColors.purple, mb: 2 }}>
-            📚 Proof Index
+          <Typography variant="h2" sx={{ color: draculaColors.purple, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <MenuBook sx={{ fontSize: 'inherit' }} /> Proof Index
           </Typography>
 
           <TextField
