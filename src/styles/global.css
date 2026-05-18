@@ -1,0 +1,4 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'JetBrains Mono', monospace; background-color: #282a36; color: #f8f8f2; }
+code { font-family: 'JetBrains Mono', monospace; }
