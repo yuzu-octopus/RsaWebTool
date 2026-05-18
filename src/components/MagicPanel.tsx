@@ -10,6 +10,7 @@ import {
   ListItemText,
   Divider,
 } from '@mui/material';
+import { AutoFixHigh, Science, CheckCircle, Cancel, HourglassEmpty } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../context/AppContext';
 import { useSageMathParallel } from '../hooks/useSageMath';
@@ -150,12 +151,18 @@ export function MagicPanel() {
     }
   };
 
+  const statusIcon = (status: MagicJob['status']) => {
+    if (status === 'success') return <CheckCircle sx={{ color: draculaColors.green, fontSize: '1rem', mr: 0.5 }} />;
+    if (status === 'error') return <Cancel sx={{ color: draculaColors.red, fontSize: '1rem', mr: 0.5 }} />;
+    return <HourglassEmpty sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5 }} />;
+  };
+
   return (
     <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <Box sx={{ p: 2, overflow: 'auto', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Typography variant="h2" sx={{ color: draculaColors.purple, mb: 1 }}>
-            🪄 Magic Cracker
+          <Typography variant="h2" sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <AutoFixHigh sx={{ fontSize: 'inherit' }} /> Magic Cracker
           </Typography>
           <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 3 }}>
             Paste everything you have — we'll figure out which attacks to try
@@ -185,7 +192,11 @@ export function MagicPanel() {
               '&:disabled': { backgroundColor: draculaColors.comment },
             }}
           >
-            {running ? <CircularProgress size={24} sx={{ color: draculaColors.foreground }} /> : '🔮 Crack It'}
+            {running ? <CircularProgress size={24} sx={{ color: draculaColors.foreground }} /> : (
+              <>
+                <Science sx={{ mr: 1 }} /> Crack It
+              </>
+            )}
           </Button>
 
           {running && (
@@ -203,11 +214,13 @@ export function MagicPanel() {
                     <ListItemText
                       primary={
                         <Typography sx={{
+                          display: 'flex',
+                          alignItems: 'center',
                           fontFamily: "'JetBrains Mono', monospace",
                           fontSize: '0.8rem',
                           color: job.status === 'success' ? draculaColors.green : job.status === 'error' ? draculaColors.red : draculaColors.orange,
                         }}>
-                          {job.status === 'success' ? '✅' : job.status === 'error' ? '❌' : '⏳'} {job.attackName}
+                          {statusIcon(job.status)} {job.attackName}
                         </Typography>
                       }
                       secondary={job.error && (

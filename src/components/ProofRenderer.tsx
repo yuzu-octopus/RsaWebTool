@@ -234,27 +234,32 @@ export function ProofRenderer({ latex }: { latex: string }) {
             if (segment.type === 'text') {
               // Split by paragraphs (double newlines)
               const paragraphs = segment.content.split(/\n\n+/).filter(p => p.trim());
-              return (
-                <Box key={i}>
-                  {paragraphs.map((para, j) => {
-                    // Detect heading patterns like "Theorem:", "Proof:", "References:"
-                    const headingMatch = para.match(/^(Theorem|Prerequisites|Proof|References):\s*(.*)/s);
-                    if (headingMatch) {
-                      return (
-                        <Typography key={j} variant="body1" sx={{ my: 1 }}>
-                          <strong>{headingMatch[1]}:</strong>{' '}
-                          <InlineMath text={headingMatch[2]} />
-                        </Typography>
-                      );
-                    }
-                    return (
-                      <Typography key={j} variant="body1" sx={{ my: 1 }}>
-                        <InlineMath text={para} />
-                      </Typography>
-                    );
-                  })}
-                </Box>
-              );
+              let skipRest = false;
+              const rendered: React.ReactNode[] = [];
+              for (let j = 0; j < paragraphs.length; j++) {
+                const para = paragraphs[j];
+                // Detect heading patterns like "Theorem:", "Prerequisites:", "Proof:", "References:"
+                const headingMatch = para.match(/^(Theorem|Prerequisites|Proof|References):\s*(.*)/s);
+                if (headingMatch && headingMatch[1] === 'References') {
+                  skipRest = true;
+                  break;
+                }
+                if (headingMatch) {
+                  rendered.push(
+                    <Typography key={j} variant="body1" sx={{ my: 1 }}>
+                      <strong>{headingMatch[1]}:</strong>{' '}
+                      <InlineMath text={headingMatch[2]} />
+                    </Typography>
+                  );
+                } else {
+                  rendered.push(
+                    <Typography key={j} variant="body1" sx={{ my: 1 }}>
+                      <InlineMath text={para} />
+                    </Typography>
+                  );
+                }
+              }
+              return skipRest && rendered.length === 0 ? null : <Box key={i}>{rendered}</Box>;
             }
 
             return null;

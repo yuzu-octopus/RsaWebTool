@@ -10,7 +10,7 @@ import {
   Divider,
   Link,
 } from '@mui/material';
-import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { CATEGORIES, attacksByCategory, attacks } from '../data/attacks';
 import { useAppContext } from '../context/AppContext';
@@ -110,8 +110,9 @@ export function Sidebar() {
             '&:hover': { backgroundColor: draculaColors.background },
           }}
         >
+          <AutoFixHigh sx={{ color: draculaColors.purple, mr: 1, fontSize: '1.1rem' }} />
           <ListItemText
-            primary="🪄 Magic"
+            primary="Magic"
             slotProps={{ primary: { sx: { color: draculaColors.purple, fontWeight: 600, fontSize: '0.85rem' } } }}
           />
         </ListItemButton>
@@ -124,8 +125,9 @@ export function Sidebar() {
             '&:hover': { backgroundColor: draculaColors.background },
           }}
         >
+          <MenuBook sx={{ color: draculaColors.foreground, mr: 1, fontSize: '1.1rem' }} />
           <ListItemText
-            primary="📚 Proofs Index"
+            primary="Proofs Index"
             slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.85rem' } } }}
           />
         </ListItemButton>

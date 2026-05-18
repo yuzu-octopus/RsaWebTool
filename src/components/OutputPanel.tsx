@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -9,7 +9,7 @@ import {
   ListItemText,
   Divider,
 } from '@mui/material';
-import { ExpandLess, ExpandMore, ContentCopy } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, ContentCopy, CheckCircle, Cancel } from '@mui/icons-material';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula as draculaStyle } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import type { SyntaxHighlighterProps } from 'react-syntax-highlighter';
@@ -25,10 +25,41 @@ const utilBtnSx = {
   '&:hover': { backgroundColor: draculaColors.purple, color: draculaColors.background },
 };
 
-export function OutputPanel() {
+const MIN_WIDTH = 200;
+const MAX_WIDTH = 600;
+
+export function OutputPanel({ width, onWidthChange }: { width: number; onWidthChange: (w: number) => void }) {
   const { outputResult, outputError, history } = useAppContext();
   const [conversionResult, setConversionResult] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const isDragging = useRef(false);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isDragging.current = true;
+    const startX = e.clientX;
+    const startWidth = width;
+
+    const handleMouseMove = (ev: MouseEvent) => {
+      if (!isDragging.current) return;
+      const delta = startX - ev.clientX;
+      const newWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startWidth + delta));
+      onWidthChange(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      isDragging.current = false;
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }, [width, onWidthChange]);
 
   const handleConvert = (fn: (s: string) => string) => {
     if (outputResult) {
@@ -46,7 +77,23 @@ export function OutputPanel() {
   };
 
   return (
-    <Box sx={{ flex: '0 0 300px', display: 'flex', flexDirection: 'column', overflow: 'hidden', borderLeft: `1px solid ${draculaColors.comment}`, pl: 2 }}>
+    <Box sx={{ width, flexShrink: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderLeft: `1px solid ${draculaColors.comment}`, pl: 2, position: 'relative' }}>
+      <Box
+        sx={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: '4px',
+          cursor: 'col-resize',
+          zIndex: 10,
+          '&:hover, &.active': {
+            backgroundColor: draculaColors.purple,
+          },
+        }}
+        onMouseDown={handleMouseDown}
+      />
+
       <Box sx={{ p: 2, overflow: 'auto', flex: 1 }}>
         <Typography variant="h6" sx={{ color: draculaColors.purple, mb: 2, fontWeight: 700 }}>
           Results
@@ -142,8 +189,8 @@ export function OutputPanel() {
               <ListItem key={i} sx={{ px: 0 }}>
                 <ListItemText
                   primary={
-                    <Typography sx={{ color: entry.success ? draculaColors.green : draculaColors.red, fontSize: '0.75rem', fontFamily: "'JetBrains Mono', monospace" }}>
-                      {entry.success ? '✅' : '❌'} {entry.attackName}
+                    <Typography sx={{ display: 'flex', alignItems: 'center', color: entry.success ? draculaColors.green : draculaColors.red, fontSize: '0.75rem', fontFamily: "'JetBrains Mono', monospace" }}>
+                      {entry.success ? <CheckCircle sx={{ fontSize: '1rem', mr: 0.5 }} /> : <Cancel sx={{ fontSize: '1rem', mr: 0.5 }} />} {entry.attackName}
                     </Typography>
                   }
                   secondary={
