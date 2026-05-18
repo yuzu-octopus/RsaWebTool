@@ -33,16 +33,19 @@ export const draculaTheme = createTheme({
     },
   },
   typography: {
-    fontFamily: "'JetBrainsMono Nerd Font', monospace",
-    h1: { fontFamily: "'JetBrainsMono Nerd Font', monospace", fontWeight: 700 },
-    h2: { fontFamily: "'JetBrainsMono Nerd Font', monospace", fontWeight: 700 },
-    h3: { fontFamily: "'JetBrainsMono Nerd Font', monospace", fontWeight: 700 },
-    body1: { fontFamily: "'JetBrainsMono Nerd Font', monospace" },
-    body2: { fontFamily: "'JetBrainsMono Nerd Font', monospace" },
+    fontFamily: "'JetBrains Mono', monospace",
+    h1: { fontFamily: "'JetBrains Mono', monospace", fontWeight: 700 },
+    h2: { fontFamily: "'JetBrains Mono', monospace", fontWeight: 700 },
+    h3: { fontFamily: "'JetBrains Mono', monospace", fontWeight: 700 },
+    body1: { fontFamily: "'JetBrains Mono', monospace" },
+    body2: { fontFamily: "'JetBrains Mono', monospace" },
   },
   components: {
     MuiCssBaseline: {
       styleOverrides: {
+        '*, *::before, *::after': { padding: 0 },
+        html: { scrollBehavior: 'smooth' },
+        code: { fontFamily: "'JetBrains Mono', monospace" },
         body: {
           backgroundColor: draculaColors.background,
           color: draculaColors.foreground,

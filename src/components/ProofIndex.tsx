@@ -17,18 +17,18 @@ const inputSx = {
   '& .MuiOutlinedInput-root': {
     backgroundColor: draculaColors.currentLine,
     color: draculaColors.foreground,
-    fontFamily: "'JetBrainsMono Nerd Font', monospace",
+    fontFamily: "'JetBrains Mono', monospace",
     '& fieldset': { borderColor: draculaColors.comment },
     '&:hover fieldset': { borderColor: draculaColors.purple },
     '&.Mui-focused fieldset': { borderColor: draculaColors.purple },
   },
   '& .MuiInputLabel-root': {
     color: draculaColors.comment,
-    fontFamily: "'JetBrainsMono Nerd Font', monospace",
+    fontFamily: "'JetBrains Mono', monospace",
     '&.Mui-focused': { color: draculaColors.purple },
   },
   '& .MuiInputBase-input': {
-    fontFamily: "'JetBrainsMono Nerd Font', monospace",
+    fontFamily: "'JetBrains Mono', monospace",
   },
 };
 
@@ -89,12 +89,12 @@ export function ProofIndex() {
               >
                 <ListItemText
                   primary={
-                    <Typography sx={{ color: draculaColors.cyan, fontFamily: "'JetBrainsMono Nerd Font', monospace", fontWeight: 600 }}>
+                    <Typography sx={{ color: draculaColors.cyan, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>
                       {attack.name}
                     </Typography>
                   }
                   secondary={
-                    <Typography sx={{ color: draculaColors.comment, fontFamily: "'JetBrainsMono Nerd Font', monospace", fontSize: '0.75rem' }}>
+                    <Typography sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.75rem' }}>
                       [{attack.category}] {attack.description}
                     </Typography>
                   }

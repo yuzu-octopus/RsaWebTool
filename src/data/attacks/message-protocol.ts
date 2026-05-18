@@ -1,4 +1,5 @@
 import type { Attack } from '../../types';
+import { gcd } from '../../utils/bigint';
 
 export const messageProtocolAttacks: Attack[] = [
   {
@@ -46,27 +47,28 @@ v2 = power_mod(m, e2, n)
 print(f"Verification: m^e1 mod n = {v1} (should equal c1 = {c1})")
 print(f"Verification: m^e2 mod n = {v2} (should equal c2 = {c2})")
 `,
-    proof: `\\textbf{Theorem:} Let n be an RSA modulus and let e_1, e_2 be coprime public exponents. If the same message m is encrypted as c_1 \\equiv m^{e_1} \\pmod{n} and c_2 \\equiv m^{e_2} \\pmod{n}, then m can be recovered without factoring n.
+    proof: `\\textbf{Theorem:} Let n be an RSA modulus and e_1, e_2 be coprime exponents. Given c_1 \\equiv m^{e_1} \\pmod{n} and c_2 \\equiv m^{e_2} \\pmod{n}, recover m via Bezout coefficients.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item \\gcd(e_1, e_2) = 1 (coprime exponents)
-\\item Extended Euclidean algorithm (Bezout's identity)
-\\item Same message m encrypted under both exponents
-\\item m \\in \\mathbb{Z}_n^*
+\\item n, e_1, e_2, c_1, c_2 (modulus, two exponents, two ciphertexts)
+\\item \\gcd(e_1, e_2) = 1
+\\item Same m encrypted under both exponents
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Since } \\gcd(e_1, e_2) = 1, \\text{ by Bezout's identity } \\exists a, b \\in \\mathbb{Z} &: \\\\
+\\gcd(e_1, e_2) = 1 \\implies \\exists a, b \\in \\mathbb{Z} &: \\\\
 a \\cdot e_1 + b \\cdot e_2 &= 1 \\\\
-\\text{Compute: } c_1^a \\cdot c_2^b &\\equiv (m^{e_1})^a \\cdot (m^{e_2})^b \\pmod{n} \\\\
-&\\equiv m^{a \\cdot e_1 + b \\cdot e_2} \\pmod{n} \\\\
-&\\equiv m^1 \\equiv m \\pmod{n} \\\\
-\\text{If } a < 0, \\text{ compute } c_1^{-1} \\pmod{n} \\text{ and use } |a|. & \\\\
-\\text{Similarly for } b < 0. & \\\\
-\\text{Thus } m = c_1^a \\cdot c_2^b \\pmod{n}. & \\qed
+c_1^a \\cdot c_2^b &\\equiv (m^{e_1})^a \\cdot (m^{e_2})^b \\pmod{n} \\\\
+&\\equiv m^{a e_1 + b e_2} \\pmod{n} \\\\
+&\\equiv m \\\\
+a < 0 \\implies c_1^a &= (c_1^{-1})^{|a|} \\pmod{n} \\\\
+b < 0 \\implies c_2^b &= (c_2^{-1})^{|b|} \\pmod{n} \\\\
+m &= c_1^a \\cdot c_2^b \\pmod{n} \\qed
 \\end{align*}
+
+\\textbf{Explanation:} Find Bezout coefficients a, b such that a·e₁ + b·e₂ = 1. Compute c₁ᵃ · c₂ᵇ mod n, using modular inverses for negative coefficients. The exponents cancel to leave m.
 
 \\textbf{References:} Simmons & Norris, "Preliminary Comments on the MIT Public Key Cryptosystem", 1977; Boneh, "Twenty Years of Attacks on RSA", 1999`,
     priority: 'high',
@@ -123,28 +125,26 @@ else:
         print(f"Approximate root: m = {m}")
         print("Warning: m^e was not a perfect e-th power. Message may be padded.")
 `,
-    proof: `\\textbf{Theorem: (Hastad, 1988)} Let m be a message encrypted with e different RSA public keys (n_i, e) using the same small exponent e. If e \\leq k (number of ciphertexts) and m^e < \\prod_{i=1}^{k} n_i, then m can be recovered by computing the integer e-th root of the CRT result.
+    proof: `\\textbf{Theorem:} Let c_i \\equiv m^e \\pmod{n_i} for i = 1, \\ldots, k with \\gcd(n_i, n_j) = 1. If m^e < \\prod n_i and k \\geq e, recover m via CRT + e-th root.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item Same message m encrypted: c_i \\equiv m^e \\pmod{n_i} for i = 1, \\ldots, k
-\\item Same public exponent e for all keys (typically e = 3)
-\\item Moduli n_i are pairwise coprime
-\\item m^e < \\prod_{i=1}^{k} n_i (message not padded)
-\\item Chinese Remainder Theorem
+\\item k pairs of (n_i, c_i) with pairwise coprime moduli
+\\item Same exponent e for all, same message m
+\\item k \\geq e, m^e < \\prod_{i=1}^{k} n_i
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Given } c_i &\\equiv m^e \\pmod{n_i} \\text{ for } i = 1, \\ldots, k \\\\
-\\text{By CRT, } \\exists! C \\in \\mathbb{Z}_N \\text{ where } N = \\prod_{i=1}^{k} n_i &: \\\\
-C &\\equiv c_i \\pmod{n_i} \\text{ for all } i \\\\
-\\text{Since } c_i \\equiv m^e \\pmod{n_i}, \\text{ we have } C &\\equiv m^e \\pmod{N} \\\\
-\\text{If } m^e < N, \\text{ then } C &= m^e \\text{ over } \\mathbb{Z} \\text{ (not just modulo)} \\\\
-\\text{Compute integer } e\\text{-th root: } m &= \\sqrt[e]{C} \\\\
-\\text{This recovers m exactly.} & \\\\
-\\text{Requirement: } k \\geq e \\text{ ciphertexts to ensure } N > m^e. & \\qed
+c_i &\\equiv m^e \\pmod{n_i}, \\quad i = 1, \\ldots, k \\\\
+N &= \\prod_{i=1}^{k} n_i \\\\
+C &\\equiv c_i \\pmod{n_i} \\quad \\text{(CRT)} \\\\
+C &\\equiv m^e \\pmod{N} \\\\
+m^e < N \\implies C &= m^e \\quad \\text{(over } \\mathbb{Z}\\text{)} \\\\
+m &= \\sqrt[e]{C} \\qed
 \\end{align*}
+
+\\textbf{Explanation:} Combine ciphertexts via CRT to get C ≡ mᵉ (mod N). When mᵉ < N, the congruence becomes an exact equality over integers. Take the integer e-th root to recover m.
 
 \\textbf{References:} J. Hastad, "Solving Linear Equations Modulo Divisors: On Factoring Given Any Bits", Eurocrypt 1988; Boneh, "Twenty Years of Attacks on RSA", 1999`,
     priority: 'high',
@@ -199,29 +199,27 @@ else:
     print(f"GCD has degree {g.degree()}, cannot extract unique solution.")
     print(f"GCD: {g}")
 `,
-    proof: `\\textbf{Theorem: (Franklin & Reiter, 1996)} Let (n, e) be an RSA public key. Given c_1 \\equiv m^e \\pmod{n} and c_2 \\equiv (am + b)^e \\pmod{n} where a, b are known, the message m can be recovered in time O(e^2 \\log^2 n) by computing the GCD of two polynomials over \\mathbb{Z}/n\\mathbb{Z}.
+    proof: `\\textbf{Theorem:} Given c_1 \\equiv m^e \\pmod{n} and c_2 \\equiv (am + b)^e \\pmod{n} with known a, b, recover m via polynomial GCD over \\mathbb{Z}/n\\mathbb{Z}.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item Two ciphertexts of related messages: c_1 = m^e \\bmod n, c_2 = (am + b)^e \\bmod n
-\\item Known linear relation f(m) = am + b between the messages
-\\item Polynomial ring over \\mathbb{Z}/n\\mathbb{Z}
-\\item Euclidean algorithm for polynomial GCD
+\\item n, e, c_1, c_2, a, b (modulus, exponent, two ciphertexts, linear relation)
+\\item m_2 = a \\cdot m_1 + b (known affine relation)
+\\item \\gcd(a, n) = 1
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Define polynomials over } \\mathbb{Z}/n\\mathbb{Z}[x]: & \\\\
-f_1(x) &= x^e - c_1 \\\\
-f_2(x) &= (ax + b)^e - c_2 \\\\
-\\text{Both } f_1 \\text{ and } f_2 \\text{ have } x = m \\text{ as a root:} & \\\\
+f_1(x) &= x^e - c_1 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
+f_2(x) &= (ax + b)^e - c_2 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
 f_1(m) &= m^e - c_1 \\equiv 0 \\pmod{n} \\\\
 f_2(m) &= (am + b)^e - c_2 \\equiv 0 \\pmod{n} \\\\
-\\text{Thus } (x - m) \\text{ divides } \\gcd(f_1, f_2). & \\\\
-\\text{For generic } a, b, \\text{ the GCD is exactly } (x - m). & \\\\
-\\text{Compute } g(x) = \\gcd(f_1, f_2) \\text{ via Euclidean algorithm.} & \\\\
-\\text{If } \\deg(g) = 1, \\text{ then } g(x) = x - m, \\text{ so } m = -g[0]/g[1]. & \\qed
+(x - m) \\mid \\gcd(f_1, f_2) & \\\\
+g(x) = \\gcd(f_1, f_2), \\quad \\deg(g) = 1 &\\implies g(x) = x - m \\\\
+m &= -g[0] / g[1] \\qed
 \\end{align*}
+
+\\textbf{Explanation:} Build two polynomials that both have m as a root. Their GCD is (x − m) for generic a, b. Extract m from the linear GCD's coefficients.
 
 \\textbf{References:} M. Franklin & M. Reiter, "On the Security of RSA Padding", 1996; Boneh, "Twenty Years of Attacks on RSA", 1999`,
     priority: 'high',
@@ -243,72 +241,73 @@ e = Integer(${vals.e})
 c1 = Integer(${vals.c1})
 c2 = Integer(${vals.c2})
 
-R.<x, y> = PolynomialRing(Zmod(n))
+print(f"Coppersmith Short Pad Attack")
+print(f"n = {n}, e = {e}")
+print()
 
-# f(x, y) = (x + y)^e - c2  (c2 encrypts m + delta)
-# g(x) = x^e - c1           (c1 encrypts m)
-# We eliminate x using resultant
+# The attack: c1 = m^e mod n, c2 = (m + delta)^e mod n
+# We want to find delta, then use Franklin-Reiter
 
-# f1(x) = x^e - c1
-# f2(x) = (x + delta)^e - c2 where delta is unknown but small
-# Resultant of f1 and f2 w.r.t. x gives polynomial in delta
+# Method: Compute resultant of x^e - c1 and (x+y)^e - c2 as polynomials in x over Zmod(n)[y]
+# The resultant eliminates x and gives a polynomial in delta
 
-f1 = x^e - c1
-f2 = (x + y)^e - c2
+# Build proper polynomial ring hierarchy
+Q.<y> = PolynomialRing(Zmod(n))
+R2.<x2> = PolynomialRing(Q)
+f1_x = x2^e - c1
+f2_x = (x2 + y)^e - c2
 
-# Compute resultant w.r.t. x
 print("Computing resultant...")
-res = f1.resultant(f2, x)
-print(f"Resultant degree in y: {res.degree(y)}")
+res = f1_x.resultant(f2_x, x2)
+print(f"Resultant degree: {res.degree()}")
 
-# Find small roots of resultant
-# delta is typically small (short padding)
-R2.<z> = PolynomialRing(Zmod(n))
-res_z = res(z)
-
-# Bound for short pad: typically < n^(1/e^2)
-bound = ZZ(n^(1 / (e^2)))
+# Find small roots of the resultant polynomial
+bound = ZZ(n^(1/e^2))
 print(f"Small root bound: {bound}")
 
-roots = res_z.small_roots(X=bound, beta=0.5)
+roots = res.small_roots(X=bound, beta=0.5)
 if roots:
     delta = roots[0]
     print(f"Found padding difference: delta = {delta}")
 
-    # Now use Franklin-Reiter with a=1, b=delta
-    f1_fr = x^e - c1
-    f2_fr = (x + delta)^e - c2
-    g = gcd(f1_fr, f2_fr)
+    # Franklin-Reiter with a=1, b=delta
+    P.<x> = PolynomialRing(Zmod(n))
+    f1 = x^e - c1
+    g = gcd(f1, (x + delta)^e - c2)
     if g.degree() == 1:
         m = -g[0] / g[1]
         print(f"Recovered message: m = {m}")
+
+        # Verify
+        v1 = power_mod(Integer(m), e, n)
+        v2 = power_mod(Integer(m) + delta, e, n)
+        print(f"Verification: m^e mod n = {v1} (c1 = {c1})")
+        print(f"Verification: (m+delta)^e mod n = {v2} (c2 = {c2})")
     else:
         print(f"GCD has degree {g.degree()}, cannot extract unique solution.")
 else:
     print("No small roots found. Padding may be too large.")
 `,
-    proof: `\\textbf{Theorem: (Coppersmith, 1997)} Let m be encrypted twice with RSA using the same public key (n, e) but with different random pads \\delta_1, \\delta_2. If |\\delta_1 - \\delta_2| < n^{1/e^2}, the message m can be recovered in polynomial time.
+    proof: `\\textbf{Theorem:} Given c_1 \\equiv (m + \\delta_1)^e \\pmod{n} and c_2 \\equiv (m + \\delta_2)^e \\pmod{n} with |\\delta_1 - \\delta_2| < n^{1/e^2}, recover m via resultant + Coppersmith.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item c_1 \\equiv (m + \\delta_1)^e \\pmod{n} and c_2 \\equiv (m + \\delta_2)^e \\pmod{n}
-\\item \\Delta = \\delta_2 - \\delta_1 is small (short padding)
-\\item Resultant of polynomials to eliminate m
-\\item Coppersmith's small_roots method
+\\item n, e, c_1, c_2 (modulus, exponent, two ciphertexts)
+\\item |\\delta_2 - \\delta_1| < n^{1/e^2} (short padding)
+\\item Same base message m under both encryptions
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Define: } f_1(x) &= x^e - c_1 \\equiv 0 \\pmod{n} \\\\
-f_2(x) &= (x + \\Delta)^e - c_2 \\equiv 0 \\pmod{n} \\\\
-\\text{where } x = m + \\delta_1 \\text{ and } \\Delta = \\delta_2 - \\delta_1. & \\\\
-\\text{Compute resultant } r(\\Delta) = \\text{Res}_x(f_1, f_2) &\\equiv 0 \\pmod{n} \\\\
-\\text{This eliminates } x \\text{ and gives a polynomial in } \\Delta. & \\\\
-\\text{Since } \\Delta \\text{ is small, use Coppersmith's } small\\_roots &\\text{ to find } \\Delta. \\\\
-\\text{Once } \\Delta \\text{ is known, apply Franklin-Reiter:} & \\\\
+f_1(x) &= x^e - c_1 \\\\
+f_2(x) &= (x + \\Delta)^e - c_2, \\quad \\Delta = \\delta_2 - \\delta_1 \\\\
+r(\\Delta) &= \\text{Res}_x(f_1, f_2) \\equiv 0 \\pmod{n} \\\\
+|\\Delta| < n^{1/e^2} &\\implies \\Delta \\text{ found via } small\\_roots \\\\
 \\gcd(x^e - c_1, (x + \\Delta)^e - c_2) &= x - (m + \\delta_1) \\\\
-\\text{Recover } m + \\delta_1, \\text{ then } m. & \\qed
+m &= \\text{root} - \\delta_1 \\qed
 \\end{align*}
+
+\\textbf{Explanation:} Compute the resultant of two polynomials to eliminate x, yielding a polynomial in Δ. Use Coppersmith's small_roots to find the small padding difference. Apply Franklin-Reiter with known Δ to recover m.
 
 \\textbf{References:} D. Coppersmith, "Small Solutions to Polynomial Equations and Low Exponent RSA Vulnerabilities", J. Cryptology, 1997; Boneh, "Twenty Years of Attacks on RSA", 1999`,
     priority: 'medium',
@@ -345,71 +344,91 @@ print(f"Public exponent: e = {e}")
 if len(triples) < e:
     print(f"ERROR: Need at least {e} ciphertexts for e = {e}")
 else:
-    # CRT with linear padding
+    # General Hastad with linear padding:
     # c_i = (a_i * m + b_i)^e mod n_i
-    # Need to find m using Coppersmith
+    #
+    # Strategy: For each i, we have (a_i * m + b_i)^e = c_i mod n_i
+    # Use CRT to combine, then solve for m
 
-    # First, compute N = product of all n_i
+    # Step 1: Compute combined modulus N = prod(n_i)
     N = prod([t[0] for t in triples])
     print(f"Combined modulus N has {N.nbits()} bits")
 
-    # For each triple, we have (a_i * m + b_i)^e = c_i mod n_i
-    # Use polynomial approach
+    # Step 2: For each triple, define polynomial f_i(x) = (a_i*x + b_i)^e - c_i mod n_i
+    # We want x = m such that f_i(m) = 0 mod n_i for all i
+
+    # Step 3: Use CRT to combine the polynomial system
+    # Build polynomial over Zmod(N): F(x) such that F(x) = 0 mod n_i for all i
+    # This is done by: F(x) = sum_i [ CRT_coeff_i * f_i(x) ] mod N
+    # where CRT_coeff_i = (N/n_i) * inverse(N/n_i, n_i)
+
     R.<x> = PolynomialRing(Zmod(N))
 
-    # Build polynomial system and use CRT
-    # For simplicity, use the approach:
-    # Find C such that C = c_i mod n_i, then C = (a*m + b)^e mod N
-    # This requires all a_i = 1, b_i = 0 for standard CRT
+    # Build the combined polynomial
+    F = 0
+    for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
+        # CRT coefficient for this modulus
+        Ni = N // n_i
+        coeff = Ni * inverse_mod(Ni, n_i)
+        # f_i(x) = (a_i*x + b_i)^e - c_i
+        fi = (a_i*x + b_i)^e - c_i
+        F += coeff * fi
 
-    # General approach: use Coppersmith on the system
-    # For e = 3 with 3 triples, solve directly
-    if e == 3 and len(triples) >= 3:
-        # Use the specific construction for e=3
-        n1, c1, a1, b1 = triples[0]
-        n2, c2, a2, b2 = triples[1]
-        n3, c3, a3, b3 = triples[2]
+    F = F % N
+    print(f"Combined polynomial degree: {F.degree()}")
 
-        # CRT on c_i values
-        C = crt([c1, c2, c3], [n1, n2, n3])
-        print(f"CRT result: C = {C}")
+    # Step 4: Find small roots of F(x) = 0 mod N
+    # m is small compared to N (since N = prod(n_i) and m < min(n_i))
+    bound = ZZ(min(t[0] for t in triples))
+    print(f"Small root bound: {bound}")
 
-        # C = (a*m + b)^e mod N for some combined a, b
-        # For a_i = 1, b_i = 0: C = m^e
-        # Compute e-th root
-        m, exact = C.nth_root(e, truncate_mode=True)
-        if exact:
-            print(f"Recovered message: m = {m}")
-        else:
-            print(f"Approximate root: m = {m}")
-            print("Message may have padding. Try Coppersmith small_roots.")
+    roots = F.small_roots(X=bound, beta=1.0, epsilon=0.05)
+    if roots:
+        m = roots[0]
+        print(f"Recovered message: m = {m}")
+
+        # Verify against all triples
+        for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
+            v = power_mod(a_i * Integer(m) + b_i, e, n_i)
+            status = "OK" if v == c_i else "FAIL"
+            print(f"  Verify {i+1}: (a*m+b)^e mod n{i+1} = {v} (c{i+1} = {c_i}) [{status}]")
     else:
-        print("General case requires more complex polynomial solving.")
-        print("Consider reducing to standard Hastad if a_i=1, b_i=0.")
+        print("No small roots found. Try increasing epsilon or check inputs.")
+        print("Fallback: try standard Hastad if all a_i=1, b_i=0.")
+
+        # Fallback for standard case
+        all_simple = all(t[2] == 1 and t[3] == 0 for t in triples)
+        if all_simple:
+            print("All a_i=1, b_i=0. Using standard Hastad CRT approach...")
+            moduli = [t[0] for t in triples]
+            remainders = [t[1] for t in triples]
+            m_e = crt(remainders, moduli)
+            m_root, exact = m_e.nth_root(e, truncate_mode=True)
+            if exact:
+                print(f"Recovered message: m = {m_root}")
+            else:
+                print(f"Approximate root: m = {m_root}")
 `,
-    proof: `\\textbf{Theorem: (Hastad, extended)} Let m be encrypted with e different RSA public keys where each ciphertext uses a known affine transform: c_i \\equiv (a_i m + b_i)^e \\pmod{n_i}. If e \\leq k and the transforms are known, m can be recovered.
+    proof: `\\textbf{Theorem:} Given c_i \\equiv (a_i m + b_i)^e \\pmod{n_i} for i = 1, \\ldots, k with known a_i, b_i and k \\geq e, recover m via CRT + Coppersmith.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item c_i \\equiv (a_i m + b_i)^e \\pmod{n_i} for i = 1, \\ldots, k
-\\item Known coefficients a_i, b_i for each recipient
-\\item e \\leq k (enough ciphertexts)
-\\item Moduli n_i are pairwise coprime
-\\item Chinese Remainder Theorem and Coppersmith's method
+\\item k triples (n_i, c_i, a_i, b_i) with pairwise coprime moduli
+\\item k \\geq e, known affine transforms
+\\item m < \\min(n_i)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Given } c_i &\\equiv (a_i m + b_i)^e \\pmod{n_i} \\\\
-\\text{For } a_i = 1, b_i = 0, \\text{ this reduces to standard Hastad.} & \\\\
-\\text{For general } a_i, b_i: \\text{ define } y_i &= a_i m + b_i \\\\
-\\text{Then } c_i &\\equiv y_i^e \\pmod{n_i} \\\\
-\\text{Apply CRT: } C &\\equiv c_i \\pmod{n_i} \\implies C = Y^e \\text{ over } \\mathbb{Z} \\\\
-\\text{where } Y \\equiv y_i \\pmod{n_i}. & \\\\
-\\text{Recover } Y = \\sqrt[e]{C}, \\text{ then solve the linear system:} & \\\\
-Y &\\equiv a_i m + b_i \\pmod{n_i} \\\\
-\\text{For multiple equations, recover } m \\text{ via CRT.} & \\qed
+f_i(x) &= (a_i x + b_i)^e - c_i \\in (\\mathbb{Z}/n_i\\mathbb{Z})[x] \\\\
+N &= \\prod_{i=1}^{k} n_i \\\\
+N_i &= N / n_i, \\quad t_i = N_i \\cdot N_i^{-1} \\bmod n_i \\\\
+F(x) &= \\sum_{i=1}^{k} t_i \\cdot f_i(x) \\pmod{N} \\\\
+F(m) &\\equiv 0 \\pmod{N} \\\\
+m &= small\\_roots(F, X = \\min(n_i)) \\qed
 \\end{align*}
+
+\\textbf{Explanation:} Build a polynomial per ciphertext, combine via CRT coefficients into F(x) over Zmod(N). The message m is a small root of F. Use Coppersmith's small_roots to extract it.
 
 \\textbf{References:} J. Hastad, "Solving Linear Equations Modulo Divisors", Eurocrypt 1988; Coppersmith et al., "Cryptanalysis of RSA with Related Messages", 1996`,
     priority: 'medium',
@@ -465,30 +484,31 @@ v = power_mod(m, e, n)
 print(f"Verification: m^e mod n = {v}")
 print(f"Original c = {c}")
 `,
-    proof: `\\textbf{Theorem: (Bit Security of RSA)} If an oracle reveals the least significant bit of RSA decryption, the entire message m can be recovered using O(\\log n) oracle queries via binary search.
+    proof: `\\textbf{Theorem:} An oracle \\mathcal{O}(c) = \\text{LSB}(c^d \\bmod n) recovers m in O(\\log n) queries via binary search.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item Oracle: \\mathcal{O}(c) = \\text{LSB}(c^d \\bmod n) = c^d \\bmod 2
-\\item RSA homomorphic property: (c_1 \\cdot c_2)^d \\equiv m_1 \\cdot m_2 \\pmod{n}
-\\item Multiplication by 2^e in ciphertext space corresponds to doubling in plaintext
-\\item Binary search on interval [0, n)
+\\item n, e, c (modulus, exponent, ciphertext)
+\\item Oracle returning LSB(c^d mod n) per query
+\\item c_i = c \\cdot (2^i)^e \\bmod n for iteration i
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Let } m &= c^d \\bmod n. \\text{ We want to recover } m. \\\\
-\\text{Query } \\mathcal{O}(c): \\text{ if LSB}(m) = 0, \\text{ then } m &\\text{ is even, so } m < n \\text{ (since } n \\text{ is odd)} \\\\
-\\text{if LSB}(m) = 1, \\text{ then } m &\\text{ is odd.} \\\\
-\\text{Key insight: } \\mathcal{O}(c \\cdot 2^e \\bmod n) &= \\text{LSB}((2m) \\bmod n) \\\\
-\\text{If } 2m < n, \\text{ then } (2m) \\bmod n = 2m &\\text{ (even, LSB = 0)} \\\\
-\\text{If } 2m \\geq n, \\text{ then } (2m) \\bmod n = 2m - n &\\text{ (odd, LSB = 1)} \\\\
-\\text{Each query halves the interval containing } m: & \\\\
-\\text{Start: } m \\in [0, n) & \\\\
-\\text{After query } i: m \\in [\\ell_i, u_i) &\\text{ where } u_i - \\ell_i = n/2^i \\\\
-\\text{After } \\log_2 n \\text{ queries, the interval has size 1,} & \\\\
-\\text{uniquely determining } m. & \\qed
+m &= c^d \\bmod n \\\\
+\\mathcal{O}(c \\cdot 2^e \\bmod n) &= \\text{LSB}((2m) \\bmod n) \\\\
+2m < n &\\implies \\text{LSB} = 0 \\implies m \\in [0, n/2) \\\\
+2m \\geq n &\\implies \\text{LSB} = 1 \\implies m \\in [n/2, n) \\\\
+[\\ell_0, u_0) &= [0, n) \\\\
+[\\ell_{i+1}, u_{i+1}) &= \\begin{cases}
+[\\ell_i, \\tfrac{\\ell_i + u_i}{2}) & \\text{if bit}_i = 0 \\\\
+[\\tfrac{\\ell_i + u_i}{2}, u_i) & \\text{if bit}_i = 1
+\\end{cases} \\\\
+u_k - \\ell_k &= n / 2^k \\xrightarrow{k = \\lceil \\log_2 n \\rceil} 1 \\\\
+m &= \\ell_k \\qed
 \\end{align*}
+
+\\textbf{Explanation:} Each oracle query on c·(2ⁱ)ᵉ reveals whether 2ⁱ·m mod n is even or odd, halving the interval containing m. After log₂(n) queries the interval shrinks to a single value.
 
 \\textbf{References:} Goldwasser, Micali, "Probabilistic Encryption", 1982; Boneh, "Twenty Years of Attacks on RSA", 1999`,
     priority: 'medium',
@@ -556,28 +576,27 @@ if 1 < g < n:
 else:
     print("GCD did not reveal a factor. The fault may not be a CRT fault.")
 `,
-    proof: `\\textbf{Theorem: (Bellcore, 1997)} A single faulty RSA-CRT signature on a known message is sufficient to factor the modulus n = pq. If s' is the faulty signature, then \\gcd(s'^e - m, n) reveals one of the prime factors.
+    proof: `\\textbf{Theorem:} A single faulty RSA-CRT signature s' on known message m factors n via \\gcd(s'^e - m, n).
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item RSA-CRT: signature computed as s_p = m^d \\bmod p, s_q = m^d \\bmod q
-\\item Fault occurs in one component (say s_q is computed incorrectly as s_q')
-\\item Final signature s' reconstructed via CRT from (s_p, s_q')
+\\item n, e, m, s_{valid}, s_{faulty} (modulus, exponent, message, valid and faulty signatures)
+\\item n = pq, fault in one CRT component only
 \\item s' \\equiv s \\pmod{p} but s' \\not\\equiv s \\pmod{q}
-\\item Known message m (or can be recovered from valid signature)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Correct signature: } s &\\equiv m^d \\pmod{n} \\\\
-\\text{Faulty signature: } s' &\\equiv s \\pmod{p} \\text{ (correct mod p)} \\\\
-s' &\\not\\equiv s \\pmod{q} \\text{ (faulty mod q)} \\\\
-\\text{Then } s'^e &\\equiv s^e \\equiv m \\pmod{p} \\\\
+s &\\equiv m^d \\pmod{n} \\\\
+s' &\\equiv s \\pmod{p}, \\quad s' \\not\\equiv s \\pmod{q} \\\\
+s'^e &\\equiv s^e \\equiv m \\pmod{p} \\\\
 s'^e &\\not\\equiv m \\pmod{q} \\\\
-\\text{Thus } p | (s'^e - m) \\text{ but } q &\\nmid (s'^e - m) \\\\
+p \\mid (s'^e - m), \\quad q &\\nmid (s'^e - m) \\\\
 \\gcd(s'^e - m, n) &= p \\\\
-\\text{Recover } q = n/p. &\\text{ Full factorization achieved with one fault.} \\qed
+q &= n / p \\qed
 \\end{align*}
+
+\\textbf{Explanation:} A CRT fault makes the signature correct mod one prime but wrong mod the other. Raising the faulty signature to e and subtracting m yields a value divisible by exactly one prime factor. GCD with n extracts it.
 
 \\textbf{References:} Boneh, DeMillo, Lipton, "On the Importance of Checking Cryptographic Protocols for Faults", Eurocrypt 1997; Joye, "Fault Injection Attacks on CRT-RSA", 2012`,
     priority: 'medium',
@@ -634,8 +653,8 @@ else:
         # Find all e-th roots mod p
         Fp = GF(p)
         cp = Fp(c)
-        roots_p = [r for r in Fp if r^e == cp]
-    print(f"e-th roots mod p: {roots_p}")
+        roots_p = cp.nth_root(e, all=True)
+    print(f"e-th roots mod p: {[Integer(r) for r in roots_p]}")
 
     # mod q
     gq = gcd(e, q - 1)
@@ -648,8 +667,8 @@ else:
     else:
         Fq = GF(q)
         cq = Fq(c)
-        roots_q = [r for r in Fq if r^e == cq]
-    print(f"e-th roots mod q: {roots_q}")
+        roots_q = cq.nth_root(e, all=True)
+    print(f"e-th roots mod q: {[Integer(r) for r in roots_q]}")
 
     # CRT combine all pairs
     print(f"\\nAll possible plaintexts ({len(roots_p) * len(roots_q)} total):")
@@ -661,29 +680,27 @@ else:
             v = power_mod(m, e, n)
             print(f"    m^e mod n = {v} (c = {c})")
 `,
-    proof: `\\textbf{Theorem:} When \\gcd(e, \\varphi(n)) = g > 1, the RSA encryption function x \\mapsto x^e \\bmod n is not injective. Each ciphertext has exactly g preimages, which can be found by computing e-th roots modulo p and q separately.
+    proof: `\\textbf{Theorem:} When \\gcd(e, \\varphi(n)) = g > 1, each ciphertext has g preimages found via e-th roots mod p, mod q + CRT.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n = pq with known factorization
+\\item n, e, c, p, q (modulus, exponent, ciphertext, both prime factors)
 \\item \\gcd(e, \\varphi(n)) = g > 1
-\\item Structure of (\\mathbb{Z}/n\\mathbb{Z})^* \\cong (\\mathbb{Z}/p\\mathbb{Z})^* \\times (\\mathbb{Z}/q\\mathbb{Z})^*
-\\item e-th roots in finite fields
-\\item Chinese Remainder Theorem
+\\item g_p = \\gcd(e, p-1), g_q = \\gcd(e, q-1)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Let } g_p = \\gcd(e, p-1), \\quad g_q &= \\gcd(e, q-1) \\\\
-\\text{In } \\mathbb{F}_p^*, \\text{ the map } x \\mapsto x^e \\text{ has } g_p &\\text{-to-1 mapping} \\\\
-\\text{In } \\mathbb{F}_q^*, \\text{ the map } x \\mapsto x^e \\text{ has } g_q &\\text{-to-1 mapping} \\\\
-\\text{By CRT, total preimages: } g_p \\cdot g_q &= \\gcd(e, \\varphi(n)) = g \\\\
-\\text{Algorithm:} & \\\\
-1. \\text{ Find all } e\\text{-th roots of } c \\bmod p &: \\{r_{p,1}, \\ldots, r_{p,g_p}\\} \\\\
-2. \\text{ Find all } e\\text{-th roots of } c \\bmod q &: \\{r_{q,1}, \\ldots, r_{q,g_q}\\} \\\\
-3. \\text{ CRT combine each pair } (r_{p,i}, r_{q,j}) &\\text{ to get } m_{i,j} \\\\
-4. \\text{ All } g \\text{ values satisfy } m_{i,j}^e &\\equiv c \\pmod{n} \\qed
+g_p &= \\gcd(e, p-1), \\quad g_q = \\gcd(e, q-1) \\\\
+x \\mapsto x^e \\text{ in } \\mathbb{F}_p^* &: g_p\\text{-to-1} \\\\
+x \\mapsto x^e \\text{ in } \\mathbb{F}_q^* &: g_q\\text{-to-1} \\\\
+\\{r_{p,1}, \\ldots, r_{p,g_p}\\} &= \\{x \\in \\mathbb{F}_p : x^e = c\\} \\\\
+\\{r_{q,1}, \\ldots, r_{q,g_q}\\} &= \\{x \\in \\mathbb{F}_q : x^e = c\\} \\\\
+m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\\\
+m_{i,j}^e &\\equiv c \\pmod{n}, \\quad \\#\\text{solutions} = g_p \\cdot g_q = g \\qed
 \\end{align*}
+
+\\textbf{Explanation:} The map x ↦ xᵉ is g-to-1 when gcd(e, φ(n)) > 1. Find all e-th roots in each field separately, then CRT-combine every pair to get all g preimages.
 
 \\textbf{References:} Williams, "Modification of the RSA Public-Key Encryption Procedure", 1980; May, "New RSA Vulnerabilities Using Lattice Reduction Methods", 2003`,
     priority: 'low',
@@ -722,14 +739,14 @@ if g != 3:
 print(f"\\nFinding cube roots mod p...")
 Fp = GF(p)
 cp = Fp(c)
-roots_p = [r for r in Fp if r^3 == cp]
+roots_p = cp.nth_root(3, all=True)
 print(f"Cube roots mod p: {[Integer(r) for r in roots_p]}")
 
 # Cube roots mod q
 print(f"Finding cube roots mod q...")
 Fq = GF(q)
 cq = Fq(c)
-roots_q = [r for r in Fq if r^3 == cq]
+roots_q = cq.nth_root(3, all=True)
 print(f"Cube roots mod q: {[Integer(r) for r in roots_q]}")
 
 # CRT combine
@@ -746,29 +763,26 @@ if len(roots_p) * len(roots_q) == 1:
 elif len(roots_p) * len(roots_q) == 9:
     print("\\n9 solutions (3 mod p × 3 mod q). Additional context needed to identify correct m.")
 `,
-    proof: `\\textbf{Theorem:} When e = 3 and \\gcd(3, \\varphi(n)) = 3, the cubic map x \\mapsto x^3 \\bmod n has exactly 9 preimages. These are found by computing cube roots in \\mathbb{F}_p and \\mathbb{F}_q separately and combining via CRT.
+    proof: `\\textbf{Theorem:} When e = 3 and p \\equiv q \\equiv 1 \\pmod{3}, the map x ↦ x³ mod n has 9 preimages via cube roots mod p, mod q + CRT.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item e = 3 and p \\equiv q \\equiv 1 \\pmod{3} (so 3 | (p-1) and 3 | (q-1))
-\\item n = pq with known factorization
-\\item Cube roots in finite fields \\mathbb{F}_p, \\mathbb{F}_q
-\\item Each field has exactly 3 cube roots when p \\equiv 1 \\pmod{3}
-\\item Chinese Remainder Theorem
+\\item n, c, p, q (modulus, ciphertext, both prime factors)
+\\item e = 3, p \\equiv q \\equiv 1 \\pmod{3}
+\\item 3 \\mid (p-1) and 3 \\mid (q-1)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Since } p \\equiv 1 \\pmod{3}, \\text{ the group } \\mathbb{F}_p^* &\\text{ has order } p-1 \\text{ divisible by 3.} \\\\
-\\text{The map } x \\mapsto x^3 \\text{ in } \\mathbb{F}_p^* \\text{ is 3-to-1.} & \\\\
-\\text{Similarly for } \\mathbb{F}_q^*. & \\\\
-\\text{Given } c, \\text{ find cube roots:} & \\\\
+p \\equiv 1 \\pmod{3} &\\implies 3 \\mid (p-1) \\\\
+x \\mapsto x^3 \\text{ in } \\mathbb{F}_p^* &: \\text{3-to-1} \\\\
 \\{r_{p,1}, r_{p,2}, r_{p,3}\\} &= \\{x \\in \\mathbb{F}_p : x^3 = c\\} \\\\
 \\{r_{q,1}, r_{q,2}, r_{q,3}\\} &= \\{x \\in \\mathbb{F}_q : x^3 = c\\} \\\\
-\\text{By CRT, each pair } (r_{p,i}, r_{q,j}) &\\text{ gives a unique } m_{i,j} \\bmod n \\\\
-\\text{Total: } 3 \\times 3 = 9 \\text{ solutions.} & \\\\
-\\text{In practice, additional constraints (padding, format) identify the correct } m. & \\qed
+m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\\\
+\\#\\text{solutions} &= 3 \\times 3 = 9 \\qed
 \\end{align*}
+
+\\textbf{Explanation:} When p ≡ q ≡ 1 (mod 3), each field has exactly 3 cube roots of c. CRT-combine all 9 pairs to get all preimages. The correct m is identified by padding or format constraints.
 
 \\textbf{References:} Williams, "Modification of the RSA Public-Key Encryption Procedure", 1980; Rabin, "Digitalized Signatures and Public-Key Functions as Intractable as Factorization", 1979`,
     priority: 'low',
@@ -822,27 +836,54 @@ else:
     # c/p^e = k^e mod q (if p^e | c)
     # This requires knowing e
 `,
-    proof: `\\textbf{Theorem:} If \\gcd(c, n) > 1 where c = m^e \\bmod n, then the message m shares a common factor with n. This immediately reveals the factorization of n.
+    frontendCheck: async (vals: Record<string, string>) => {
+      try {
+        const n = BigInt(vals.n);
+        const c = BigInt(vals.c);
+        const g = gcd(c, n);
+
+        if (g === 1n) {
+          return "gcd(c, n) = 1. No common factor. Message is not a multiple of p or q.\nThis attack does not apply.";
+        }
+        if (g === n) {
+          return "gcd(c, n) = n. c is a multiple of n (c = 0 mod n).\nThe message m was 0 or a multiple of n.";
+        }
+
+        const p = g;
+        const q = n / g;
+        return [
+          `Common Factor Attack (browser-side, BigInt)`,
+          `n = ${n}`,
+          `c = ${c}`,
+          `gcd(c, n) = ${g}`,
+          ``,
+          `Common factor found!`,
+          `p = ${p}`,
+          `q = ${q}`,
+          `Verification: p * q = ${p * q}`,
+        ].join('\n');
+      } catch {
+        return null;
+      }
+    },
+    proof: `\\textbf{Theorem:} If \\gcd(c, n) > 1 where c = m^e \\bmod n, then \\gcd(c, n) reveals a factor of n.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n = pq is an RSA modulus
-\\item c \\equiv m^e \\pmod{n}
+\\item n, c (modulus, ciphertext)
 \\item \\gcd(m, n) > 1 (message is a multiple of p or q)
-\\item Euclidean algorithm for GCD computation
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{If } p | m, \\text{ then } m &\\equiv 0 \\pmod{p} \\\\
-c = m^e &\\equiv 0^e \\equiv 0 \\pmod{p} \\\\
-\\text{Thus } p | c. \\text{ Since also } p | n, & \\\\
-p | \\gcd(c, n). & \\\\
-\\text{If } \\gcd(c, n) < n, \\text{ then } \\gcd(c, n) &= p \\text{ (or } q\\text{).} \\\\
-\\text{Recover the other factor: } q &= n / \\gcd(c, n). \\\\
-\\text{This is a degenerate case: the message should never be} & \\\\
-\\text{a multiple of a prime factor in proper RSA usage.} & \\qed
+p \\mid m &\\implies m \\equiv 0 \\pmod{p} \\\\
+c = m^e &\\equiv 0 \\pmod{p} \\\\
+p \\mid c, \\quad p \\mid n &\\implies p \\mid \\gcd(c, n) \\\\
+\\gcd(c, n) < n &\\implies \\gcd(c, n) = p \\text{ (or } q\\text{)} \\\\
+q &= n / \\gcd(c, n) \\qed
 \\end{align*}
+
+\\textbf{Explanation:} If the message shares a factor with n, the ciphertext does too. GCD(c, n) extracts that prime factor directly, factoring n. This is a degenerate case — proper RSA padding prevents it.
 
 \\textbf{References:} Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2; Boneh, "Twenty Years of Attacks on RSA", 1999`,
     priority: 'low',
@@ -924,30 +965,28 @@ if not found:
     print("Could not factor target_m from oracle pairs using simple multiplication.")
     print("Try more complex factorizations or additional oracle queries.")
 `,
-    proof: `\\textbf{Theorem:} Textbook RSA signatures are multiplicatively homomorphic: if s_1 = m_1^d \\bmod n and s_2 = m_2^d \\bmod n, then s_1 \\cdot s_2 \\bmod n is a valid signature for m_1 \\cdot m_2 \\bmod n.
+    proof: `\\textbf{Theorem:} Textbook RSA is multiplicatively homomorphic: s_1 \\cdot s_2 \\bmod n is a valid signature for m_1 \\cdot m_2 \\bmod n.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item Textbook RSA (no padding): s = m^d \\bmod n
-\\item Verification: s^e \\equiv m \\pmod{n}
-\\item Multiplicative homomorphism: (m_1 \\cdot m_2)^d \\equiv m_1^d \\cdot m_2^d \\pmod{n}
-\\item Oracle providing signatures on chosen messages
+\\item n, e (modulus, public exponent)
+\\item Oracle pairs (m_i, s_i) where s_i = m_i^d \\bmod n
+\\item Target m^* factors as m^* = \\prod m_i \\pmod{n}
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Given: } s_1 &= m_1^d \\bmod n, \\quad s_2 = m_2^d \\bmod n \\\\
-\\text{Compute: } s &= s_1 \\cdot s_2 \\bmod n \\\\
-\\text{Verify: } s^e &= (s_1 \\cdot s_2)^e \\bmod n \\\\
+s_1 &= m_1^d \\bmod n, \\quad s_2 = m_2^d \\bmod n \\\\
+s &= s_1 \\cdot s_2 \\bmod n \\\\
+s^e &= (s_1 \\cdot s_2)^e \\bmod n \\\\
 &= s_1^e \\cdot s_2^e \\bmod n \\\\
 &= m_1 \\cdot m_2 \\bmod n \\\\
-\\text{Thus } s \\text{ is a valid signature for } m_1 \\cdot m_2. & \\\\
-\\text{To forge a signature on } m^*: & \\\\
-1. \\text{ Factor } m^* = m_1 \\cdot m_2 \\cdots m_k \\pmod{n} & \\\\
-2. \\text{ Query oracle for } s_i = m_i^d \\bmod n & \\\\
-3. \\text{ Compute } s^* = \\prod_{i=1}^{k} s_i \\bmod n & \\\\
-4. \\text{ Then } (s^*)^e &= m^* \\bmod n \\qed
+m^* &= \\prod_{i=1}^{k} m_i \\pmod{n} \\\\
+s^* &= \\prod_{i=1}^{k} s_i \\bmod n \\\\
+(s^*)^e &= m^* \\bmod n \\qed
 \\end{align*}
+
+\\textbf{Explanation:} Factor the target message into a product of oracle-signed messages. Multiply the corresponding signatures to forge a valid signature on the target. This works because (ab)ᵈ ≡ aᵈ·bᵈ (mod n).
 
 \\textbf{References:} Rivest, Shamir, Adleman, "A Method for Obtaining Digital Signatures", 1978; Boneh, "Twenty Years of Attacks on RSA", 1999`,
     priority: 'low',
@@ -1023,29 +1062,26 @@ print("\\nFor a complete implementation, see:")
 print("  - Bleichenbacher's original paper (Crypto 2006)")
 print("  - 'Forging PKCS#1 v1.5 Signatures with e=3'")
 `,
-    proof: `\\textbf{Theorem: (Bleichenbacher, 2006)} PKCS#1 v1.5 signature verification with e = 3 is vulnerable to forgery. An attacker can construct a signature S such that S^3 \\bmod n has the correct PKCS#1 format without knowing the private key.
+    proof: `\\textbf{Theorem:} PKCS#1 v1.5 verification with e = 3 is forgeable: construct S such that S³ mod n has valid format without the private key.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item e = 3 (small public exponent)
-\\item PKCS#1 v1.5 signature format: 0x00 || 0x01 || PS || 0x00 || DER(HASH) || HASH
-\\item Some implementations do not verify padding bytes strictly
-\\item Integer cube root computation
+\\item n (modulus), e = 3
+\\item Target hash H (hex)
+\\item Verifier does not strictly check all padding bytes
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{PKCS#1 v1.5 encoded message: } EM &= \\text{0x00} || \\text{0x01} || \\underbrace{\\text{0xFF} \\cdots \\text{0xFF}}_{\\text{padding}} || \\text{0x00} || \\text{DER} || H \\\\
-\\text{For } e = 3, \\text{ the signature } S &= \\sqrt[3]{EM} \\text{ (approximately)} \\\\
-\\text{If } EM < n, \\text{ then } S^3 &= EM \\text{ exactly (no modular reduction)} \\\\
-\\text{The attack constructs } S \\text{ such that:} & \\\\
-S^3 &= \\text{0x0001FFFF} \\cdots \\text{00[DER][HASH]} \\pmod{n} \\\\
-\\text{Key insight: if the verifier only checks that the hash} & \\\\
-\\text{appears at the right position (not full padding),} & \\\\
-\\text{we can set the high bits of } S^3 \\text{ arbitrarily.} & \\\\
-\\text{Set } S = \\lfloor n^{1/3} \\rfloor + \\delta \\text{ and adjust } \\delta &\\text{ to get correct hash suffix.} \\\\
-\\text{This produces a valid-looking signature.} & \\qed
+EM &= \\text{0x00} || \\text{0x01} || \\text{FF} \\cdots \\text{FF} || \\text{0x00} || \\text{DER} || H \\\\
+S &= \\lfloor n^{1/3} \\rfloor + \\delta \\\\
+S^3 &\\equiv EM \\pmod{n} \\\\
+EM < n &\\implies S^3 = EM \\quad \\text{(exact, no mod reduction)} \\\\
+\\text{Adjust } \\delta &\\text{ so } S^3 \\text{ ends with } H \\\\
+\\text{Verifier checks hash suffix only} &\\implies \\text{forgery accepted} \\qed
 \\end{align*}
+
+\\textbf{Explanation:} Construct S ≈ ∛n and adjust lower bits so S³ ends with the target hash. If the verifier only checks that the hash appears at the correct position (not full padding), the forged signature passes. Requires e = 3 and lax verification.
 
 \\textbf{References:} D. Bleichenbacher, "Forging PKCS#1 v1.5 Signatures", Crypto 2006 rump session; Halderman et al., "Low-Exponent RSA Signatures", 2006`,
     priority: 'medium',

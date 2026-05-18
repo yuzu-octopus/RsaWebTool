@@ -12,14 +12,15 @@ import {
 import { ExpandLess, ExpandMore, ContentCopy } from '@mui/icons-material';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula as draculaStyle } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import type { SyntaxHighlighterProps } from 'react-syntax-highlighter';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../context/AppContext';
-import { hexToBytes, hexToAscii, decToHex, decToBytes, base64ToText } from '../utils/converters';
+import { hexToBytes, hexToAscii, decToHex, decToAscii, base64ToText } from '../utils/converters';
 
 const utilBtnSx = {
   borderColor: draculaColors.purple,
   color: draculaColors.purple,
-  fontFamily: "'JetBrainsMono Nerd Font', monospace",
+  fontFamily: "'JetBrains Mono', monospace",
   fontSize: '0.7rem',
   '&:hover': { backgroundColor: draculaColors.purple, color: draculaColors.background },
 };
@@ -38,15 +39,16 @@ export function OutputPanel() {
   const handleCopy = () => {
     if (outputResult) {
       navigator.clipboard.writeText(outputResult);
+      const prevResult = conversionResult;
       setConversionResult('Copied to clipboard!');
-      setTimeout(() => setConversionResult(null), 2000);
+      setTimeout(() => setConversionResult(prevResult), 2000);
     }
   };
 
   return (
-    <Box sx={{ width: '40%', minWidth: 300, display: 'flex', flexDirection: 'column', borderLeft: `1px solid ${draculaColors.comment}`, overflow: 'hidden' }}>
+    <Box sx={{ flex: '0 0 300px', display: 'flex', flexDirection: 'column', overflow: 'hidden', borderLeft: `1px solid ${draculaColors.comment}`, pl: 2 }}>
       <Box sx={{ p: 2, overflow: 'auto', flex: 1 }}>
-        <Typography variant="h3" sx={{ color: draculaColors.purple, mb: 2 }}>
+        <Typography variant="h6" sx={{ color: draculaColors.purple, mb: 2, fontWeight: 700 }}>
           Results
         </Typography>
 
@@ -60,7 +62,7 @@ export function OutputPanel() {
             }}>
               <SyntaxHighlighter
                 language="text"
-                style={draculaStyle as any}
+                style={draculaStyle as NonNullable<SyntaxHighlighterProps['style']>}
                 customStyle={{ margin: 0, borderRadius: 'inherit', fontSize: '0.8rem' }}
               >
                 {outputResult}
@@ -80,8 +82,8 @@ export function OutputPanel() {
               <Button size="small" variant="outlined" onClick={() => handleConvert(decToHex)} sx={utilBtnSx}>
                 Dec→Hex
               </Button>
-              <Button size="small" variant="outlined" onClick={() => handleConvert(decToBytes)} sx={utilBtnSx}>
-                Dec→Bytes
+              <Button size="small" variant="outlined" onClick={() => handleConvert(decToAscii)} sx={utilBtnSx}>
+                Dec→ASCII
               </Button>
               <Button size="small" variant="outlined" onClick={() => handleConvert(base64ToText)} sx={utilBtnSx}>
                 Base64→Text
@@ -95,7 +97,7 @@ export function OutputPanel() {
                 borderRadius: 1,
                 backgroundColor: draculaColors.currentLine,
                 border: `1px solid ${draculaColors.purple}`,
-                fontFamily: "'JetBrainsMono Nerd Font', monospace",
+                fontFamily: "'JetBrains Mono', monospace",
                 fontSize: '0.8rem',
                 color: draculaColors.foreground,
                 whiteSpace: 'pre-wrap',
@@ -110,7 +112,7 @@ export function OutputPanel() {
         )}
 
         {outputError && (
-          <Typography sx={{ color: draculaColors.red, fontFamily: "'JetBrainsMono Nerd Font', monospace", fontSize: '0.85rem', whiteSpace: 'pre-wrap' }}>
+          <Typography sx={{ color: draculaColors.red, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem', whiteSpace: 'pre-wrap' }}>
             {outputError}
           </Typography>
         )}
@@ -128,7 +130,7 @@ export function OutputPanel() {
         <Button
           fullWidth
           onClick={() => setHistoryOpen(!historyOpen)}
-          sx={{ color: draculaColors.comment, fontFamily: "'JetBrainsMono Nerd Font', monospace", justifyContent: 'space-between' }}
+          sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', monospace", justifyContent: 'space-between' }}
           endIcon={historyOpen ? <ExpandLess /> : <ExpandMore />}
         >
           History ({history.length})
@@ -140,7 +142,7 @@ export function OutputPanel() {
               <ListItem key={i} sx={{ px: 0 }}>
                 <ListItemText
                   primary={
-                    <Typography sx={{ color: entry.success ? draculaColors.green : draculaColors.red, fontSize: '0.75rem', fontFamily: "'JetBrainsMono Nerd Font', monospace" }}>
+                    <Typography sx={{ color: entry.success ? draculaColors.green : draculaColors.red, fontSize: '0.75rem', fontFamily: "'JetBrains Mono', monospace" }}>
                       {entry.success ? '✅' : '❌'} {entry.attackName}
                     </Typography>
                   }

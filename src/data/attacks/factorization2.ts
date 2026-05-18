@@ -1,4 +1,5 @@
 import type { Attack } from '../../types';
+import { gcd } from '../../utils/bigint';
 
 export const factorization2Attacks: Attack[] = [
   {
@@ -56,7 +57,7 @@ def squfof(n):
                         if 1 < g < n:
                             return g, n // g
                         break
-                    Qprev = Q
+                    Qprev = Qnew
                     P = Pnew
                 break
         Qprev = Q
@@ -73,30 +74,29 @@ if result:
 else:
     print("SQUFOF did not find a factor. Try a different method.")
 `,
-    proof: `\\textbf{Theorem: (Shanks, 1975)} The Square Forms Factorization (SQUFOF) algorithm factors a composite integer n by searching for a square form in the cycle of reduced binary quadratic forms of discriminant D = kn.
+    proof: `\\textbf{Theorem:} SQUFOF factors a composite integer n by finding a square form in the cycle of reduced binary quadratic forms of discriminant D = kn.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item Binary quadratic forms: f(x, y) = ax^2 + bxy + cy^2 with discriminant D = b^2 - 4ac
-\\item Reduction theory: every form is equivalent to a unique reduced form
-\\item The cycle of reduced forms has length O(\\sqrt{n})
-\\item A square form in the cycle reveals a factor of n
-\\item Kronecker symbol for finding suitable multiplier k
+\\item n — composite integer to factor (semiprime works best)
+\\item k — multiplier with \\left(\\frac{k}{n}\\right) = -1 (Kronecker symbol)
+\\item D = kn — discriminant of the binary quadratic forms
+\\item Reduction operator \\rho(a, b, c) = (c, b', (b'^2 - D)/(4c)) where b' \\equiv -b \\pmod{2c}
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Let } n = pq \\text{ be a semiprime. Choose } k \\text{ with } \\left(\\frac{k}{n}\\right) &= -1. \\\\
-\\text{Set } D = kn. \\text{ Consider forms } (a, b, c) \\text{ of discriminant } D. & \\\\
-\\text{The reduction operator } \\rho(a, b, c) &= (c, b', (b'^2 - D)/(4c)) \\\\
-\\text{where } b' \\equiv -b \\pmod{2c}, \\quad |b'| &\\leq \\sqrt{D}. \\\\
-\\text{Starting from the principal form, iterate } \\rho \\text{ to traverse the cycle.} & \\\\
-\\text{If a form } (a, b, c) \\text{ has } c = q^2 \\text{ a perfect square,} & \\\\
-\\text{compute the inverse square root and continue the cycle.} & \\\\
-\\text{When the cycle returns to a form with the same middle coefficient,} & \\\\
-\\text{the preceding } c \\text{ value satisfies } \\gcd(c, n) &= p \\text{ or } q. \\\\
-\\text{Expected runtime: } O(n^{1/4}) \\text{ with small constant.} & \\qed
+n = pq, \\quad \\left(\\frac{k}{n}\\right) &= -1, \\quad D = kn \\\\
+f(x, y) = ax^2 + bxy + cy^2, \\quad D &= b^2 - 4ac \\\\
+\\rho(a, b, c) &= \\left(c,\\; b' \\bmod 2c,\\; \\frac{b'^2 - D}{4c}\\right), \\quad |b'| \\leq \\sqrt{D} \\\\
+(a_0, b_0, c_0) &\\xrightarrow{\\rho} (a_1, b_1, c_1) \\xrightarrow{\\rho} \\cdots \\xrightarrow{\\rho} (a_L, b_L, c_L) = (a_0, b_0, c_0) \\\\
+\\exists i: c_i &= q^2 \\text{ (perfect square)} \\\\
+\\text{Let } s = \\sqrt{c_i}, \\quad (a', b', s^2) &\\xrightarrow{\\rho^{\\text{inv}}} \\cdots \\xrightarrow{\\rho} (s, b^*, s) \\\\
+\\gcd(s, n) &= p \\text{ or } q \\\\
+\\text{Runtime: } O(n^{1/4}) &
 \\end{align*}
+
+\\textbf{Explanation:} SQUFOF traverses the cycle of reduced binary quadratic forms of discriminant D = kn. When a form with a square coefficient c is found, the inverse square root is computed and the cycle is continued until a factor emerges via GCD.
 
 \\textbf{References:} D. Shanks, "SQUFOF: A Quadratic Form Factorization Algorithm", 1975; Gower & Wagstaff, "Square Form Factorization", Mathematics of Computation, 2008`,
     priority: 'medium',
@@ -155,29 +155,27 @@ if product == n:
         if val > 1:
             print(f"  {val} (is prime: {val.is_prime()})")
 `,
-    proof: `\\textbf{Theorem:} If n = pq and the binary polynomial f(x) representing n factors as f(x) = g(x)h(x) over \\mathbb{Z}[x], then evaluating at x = 2 gives n = g(2)h(2), potentially revealing the factors.
+    proof: `\\textbf{Theorem:} If n's binary polynomial f(x) factors over \\mathbb{Z}[x] as f(x) = g(x)h(x), then n = g(2)h(2).
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item Binary representation: n = \\sum_{i=0}^{k} b_i 2^i with b_i \\in \\{0, 1\\}
-\\item Polynomial ring \\mathbb{Z}[x] and unique factorization
-\\item Evaluation homomorphism: \\text{ev}_2: \\mathbb{Z}[x] \\to \\mathbb{Z}, f(x) \\mapsto f(2)
-\\item If f(x) = g(x)h(x), then f(2) = g(2)h(2)
+\\item n — integer to factor, with binary digits b_i \\in \\{0, 1\\}
+\\item f(x) = \\sum b_i x^i \\in \\mathbb{Z}[x] — polynomial with f(2) = n
+\\item Unique factorization in \\mathbb{Z}[x]
+\\item Evaluation homomorphism \\text{ev}_2: \\mathbb{Z}[x] \\to \\mathbb{Z}
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Given } n = \\sum_{i=0}^{k} b_i 2^i, \\text{ define } f(x) &= \\sum_{i=0}^{k} b_i x^i \\in \\mathbb{Z}[x]. \\\\
-\\text{Clearly } f(2) &= n. \\\\
-\\text{If } f(x) \\text{ is reducible over } \\mathbb{Z}[x], \\text{ factor it:} & \\\\
-f(x) &= g_1(x)^{e_1} g_2(x)^{e_2} \\cdots g_r(x)^{e_r}. \\\\
-\\text{Evaluating at } x = 2: \\quad n &= g_1(2)^{e_1} g_2(2)^{e_2} \\cdots g_r(2)^{e_r}. \\\\
-\\text{If the factorization of } f(x) \\text{ "aligns" with the factorization of } n, & \\\\
-\\text{then some } g_i(2) &= p \\text{ or } q. \\\\
-\\text{However, this is NOT guaranteed: polynomial factors may not} & \\\\
-\\text{correspond to integer factors of } n. \\text{ Each } g_i(2) &\\text{ must be tested.} \\\\
-\\text{This method works best when } p, q \\text{ have structured binary patterns.} & \\qed
+n &= \\sum_{i=0}^{k} b_i 2^i, \\quad b_i \\in \\{0, 1\\} \\\\
+f(x) &= \\sum_{i=0}^{k} b_i x^i \\in \\mathbb{Z}[x], \\quad f(2) = n \\\\
+f(x) &= g_1(x)^{e_1} g_2(x)^{e_2} \\cdots g_r(x)^{e_r} \\\\
+n = f(2) &= g_1(2)^{e_1} g_2(2)^{e_2} \\cdots g_r(2)^{e_r} \\\\
+\\exists i: g_i(2) &= p \\text{ or } q \\quad \\text{(when factorization aligns)} \\\\
+\\text{Test each } g_i(2) &\\text{ for divisibility of } n
 \\end{align*}
+
+\\textbf{Explanation:} Convert n to a polynomial by treating its binary digits as coefficients. Factor this polynomial over the integers, then evaluate each factor at x=2. If the polynomial factorization aligns with the integer factorization, the evaluations reveal p and q. Works best when p and q have structured binary patterns.
 
 \\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen & Gerhard, "Modern Computer Algebra", Chapter 5`,
     priority: 'low',
@@ -241,29 +239,29 @@ if not found:
     print(f"No small fraction found with denominator up to {max_den}.")
     print("p/q may not be close to a small rational.")
 `,
-    proof: `\\textbf{Theorem:} If p/q \\approx a/b for small integers a, b, then q \\approx \\sqrt{nb/a} and Coppersmith's method can recover the exact value of q.
+    proof: `\\textbf{Theorem:} If p/q \\approx a/b for small a, b, then q \\approx \\sqrt{nb/a} and Coppersmith recovers q from the approximation.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item RSA: n = pq with p \\leq q
-\\item Rational approximation: p/q \\approx a/b with small a, b
-\\item Coppersmith's method for finding small roots of modular equations
-\\item If q = q_0 + x with |x| < n^{1/4}, Coppersmith finds x
+\\item n = pq — RSA modulus with p \\leq q
+\\item a, b — small integers such that p/q \\approx a/b
+\\item q_0 = \\lfloor\\sqrt{nb/a}\\rfloor — initial approximation of q
+\\item Coppersmith bound: |x| < n^{1/4} for modular root finding
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Given } \\frac{p}{q} &\\approx \\frac{a}{b} \\text{ for small } a, b. \\\\
-\\text{Then } p &\\approx \\frac{a}{b} q, \\text{ and } n = pq \\approx \\frac{a}{b} q^2. \\\\
-\\text{So } q &\\approx \\sqrt{\\frac{nb}{a}} = q_0. \\\\
-\\text{Write } q = q_0 + x \\text{ where } x \\text{ is small.} & \\\\
-\\text{Since } q | n, \\text{ we have } q_0 + x &\\equiv 0 \\pmod{q}. \\\\
-\\text{Equivalently, } f(x) = q_0 + x &\\equiv 0 \\pmod{q}. \\\\
-\\text{Apply Coppersmith's method with } X = n^{1/4} \\text{ and } \\beta &= 0.5. \\\\
-\\text{If } |x| < q^{\\beta^2} = q^{0.25} \\approx n^{1/4}, &\\text{ the root is recovered.} \\\\
-\\text{Search over all } a/b \\text{ with } b &\\leq B \\text{ for some bound } B. \\\\
-\\text{Total complexity: } O(B^2 \\cdot \\text{poly}(\\log n)). & \\qed
+\\frac{p}{q} &\\approx \\frac{a}{b}, \\quad \\gcd(a, b) = 1 \\\\
+n = pq &\\approx \\frac{a}{b} q^2 \\\\
+q &\\approx \\sqrt{\\frac{nb}{a}} = q_0 \\\\
+q &= q_0 + x, \\quad |x| \\ll q_0 \\\\
+f(x) = q_0 + x &\\equiv 0 \\pmod{q} \\\\
+\\text{Coppersmith: } |x| &< q^{\\beta^2} = q^{0.25} \\approx n^{1/4} \\\\
+\\text{Search: } 1 \\leq b &\\leq B, \\quad 1 \\leq a \\leq b \\\\
+\\text{Complexity: } O(B^2 &\\cdot \\text{poly}(\\log n))
 \\end{align*}
+
+\\textbf{Explanation:} When the ratio p/q is close to a small rational a/b, we can approximate q as \\sqrt{nb/a}. Coppersmith's method then finds the small correction x such that q = q_0 + x. The search iterates over small denominators b up to a bound.
 
 \\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", Eurocrypt 1996; May, "Using Coppersmith's Method to Attack RSA", 2009`,
     priority: 'medium',
@@ -320,33 +318,97 @@ for i, n in enumerate(n_list):
 print()
 print("Batch GCD complete.")
 `,
-    proof: `\\textbf{Theorem:} Given a set of RSA moduli \\{n_1, n_2, \\ldots, n_k\\}, if any two share a prime factor, computing \\gcd(n_i, \\prod_{j \\neq i} n_j) reveals the shared factor efficiently.
+    frontendCheck: async (vals: Record<string, string>) => {
+      try {
+        const raw = (vals.n_values || '').trim();
+        if (!raw) return null;
+
+        const moduli = raw.split(/[\n,]+/)
+          .map(s => s.trim())
+          .filter(s => s.length > 0)
+          .map(s => BigInt(s));
+
+        if (moduli.length < 2) {
+          return 'Need at least 2 moduli for Batch GCD attack.';
+        }
+
+        let product = 1n;
+        for (const n of moduli) {
+          product *= n;
+        }
+
+        const lines: string[] = [
+          `Batch GCD Attack (browser-side, BigInt)`,
+          `Processing ${moduli.length} moduli...`,
+          ``,
+        ];
+
+        let foundAny = false;
+
+        for (let i = 0; i < moduli.length; i++) {
+          const n = moduli[i];
+          if (n <= 1n) continue;
+
+          const others = product / n;
+          const g = gcd(n, others);
+
+          if (g > 1n && g < n) {
+            foundAny = true;
+            const p = g;
+            const q = n / g;
+            lines.push(`n[${i}] = ${n}`);
+            lines.push(`  Shared factor found: p = ${p}`);
+            lines.push(`  q = ${q}`);
+            lines.push(`  Verification: p * q = ${p * q}`);
+            lines.push('');
+          } else if (g === n) {
+            lines.push(`n[${i}] = ${n}`);
+            lines.push(`  WARNING: n divides product of others (duplicate or fully shared)`);
+            lines.push('');
+          }
+        }
+
+        if (!foundAny) {
+          lines.push('No shared factors found among the provided moduli.');
+          lines.push('');
+        }
+
+        lines.push('Batch GCD complete.');
+        return lines.join('\n');
+      } catch {
+        return null;
+      }
+    },
+    proof: `\\textbf{Theorem:} Given moduli \\{n_1, \\ldots, n_k\\}, if any two share a prime, \\gcd(n_i, \\prod_{j \\neq i} n_j) reveals it.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item RSA moduli: n_i = p_i q_i for distinct primes p_i, q_i
-\\item If p_i = p_j for some i \\neq j, then p_i | \\gcd(n_i, n_j)
-\\item Product tree: \\prod_{j \\neq i} n_j is divisible by all shared factors of n_i
-\\item Euclidean algorithm: \\gcd(a, b) runs in O(\\log^2(\\max(a, b)))
+\\item \\{n_1, \\ldots, n_k\\} — set of RSA moduli, n_i = p_i q_i
+\\item Shared prime: p_i = p_j for some i \\neq j
+\\item Product tree for efficient computation of \\prod_{j \\neq i} n_j \\bmod n_i
+\\item Euclidean GCD: O(\\log^2(\\max(a, b)))
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Given } n_1, n_2, \\ldots, n_k \\text{ where } n_i &= p_i q_i. \\\\
-\\text{Suppose } p_1 = p_2 = p \\text{ (shared prime).} & \\\\
-\\text{Then } p | n_1 \\text{ and } p | n_2, \\text{ so } p &| \\gcd(n_1, n_2). \\\\
-\\text{More generally, compute } g_i = \\gcd\\left(n_i, \\prod_{j \\neq i} n_j\\right). & \\\\
-\\text{If } g_i > 1, \\text{ then } g_i \\text{ is a shared prime factor.} & \\\\
-\\text{Efficient computation using product tree:} & \\\\
-\\text{Build tree T with leaves } n_1, \\ldots, n_k. & \\\\
-\\text{Compute products bottom-up, then descend to find } &\\prod_{j \\neq i} n_j \\bmod n_i. \\\\
-\\text{Total time: } O(M(k \\log N) \\log k) \\text{ where } M(x) &\\text{ is multiplication cost.} \\\\
-\\text{This is much faster than O(k^2) pairwise GCDs.} & \\qed
+n_i &= p_i q_i, \\quad i = 1, \\ldots, k \\\\
+p_1 = p_2 = p &\\implies p \\mid n_1 \\land p \\mid n_2 \\\\
+p &\\mid \\gcd(n_1, n_2) \\\\
+g_i = \\gcd\\left(n_i, \\prod_{j \\neq i} n_j\\right) & \\\\
+g_i > 1 &\\implies g_i \\text{ is a shared prime factor} \\\\
+\\text{Product tree: } T &= \\text{tree}(n_1, \\ldots, n_k), \\quad \\text{depth } O(\\log k) \\\\
+\\text{Time: } O(M(k \\log N) &\\log k) \\quad \\text{vs } O(k^2) \\text{ pairwise}
 \\end{align*}
+
+\\textbf{Explanation:} If two RSA moduli share a prime factor, computing the GCD of each modulus against the product of all others exposes the shared factor. A product tree makes this efficient — O(k \\log k) instead of O(k^2) pairwise comparisons.
 
 \\textbf{References:} Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012; Bernstein, "How to Find Small Factors of Products", 2004`,
     priority: 'high',
-    applicableCheck: (p: Record<string, string>) => !!p.n_values,
+    applicableCheck: (p: Record<string, string>) => {
+      const vals = (p.n_values || '').trim();
+      if (!vals) return false;
+      return vals.split(/[\n,]+/).filter(x => x.trim()).length >= 2;
+    },
   },
   {
     id: 'multi-prime',
@@ -387,8 +449,12 @@ if len(prime_factors) > 2:
         print(f"  p[{i+1}] = {p} ({p.nbits()} bits, prime: {p.is_prime()})")
     print()
 
-    # Compute phi(n) for multi-prime
-    phi = prod(p - 1 for p in prime_factors)
+    # Compute phi(n) for multi-prime (handles repeated factors)
+    from collections import Counter
+    factor_counts = Counter(prime_factors)
+    phi = 1
+    for p, k in factor_counts.items():
+        phi *= p^(k-1) * (p - 1)
     print(f"phi(n) = {phi}")
 else:
     print("Standard 2-prime RSA.")
@@ -398,30 +464,28 @@ else:
         print(f"q = {q}")
         print(f"phi(n) = {(p-1)*(q-1)}")
 `,
-    proof: `\\textbf{Theorem:} Multi-prime RSA uses n = p_1 p_2 \\cdots p_r with r > 2 primes. The totient is \\varphi(n) = \\prod_{i=1}^{r} (p_i - 1).
+    proof: `\\textbf{Theorem:} Multi-prime RSA uses n = \\prod_{i=1}^{r} p_i with r > 2 primes and \\varphi(n) = \\prod (p_i - 1).
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item Multi-prime RSA: n = p_1 p_2 \\cdots p_r with r \\geq 3 distinct primes
-\\item Euler's totient: \\varphi(n) = \\prod_{i=1}^{r} (p_i - 1) for distinct primes
+\\item n = p_1 p_2 \\cdots p_r — product of r \\geq 3 distinct primes
+\\item Euler's totient: \\varphi(n) = \\prod_{i=1}^{r} (p_i - 1)
 \\item RSA: ed \\equiv 1 \\pmod{\\varphi(n)}
-\\item Decryption: m = c^d \\pmod{n}, can use CRT for speedup
-\\item Security: smaller individual primes make factorization easier
+\\item CRT decryption: m_i = c^d \\bmod p_i, then combine
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Let } n = p_1 p_2 \\cdots p_r \\text{ with } r \\geq 3 \\text{ distinct primes.} & \\\\
-\\text{By the multiplicative property of } \\varphi: \\quad \\varphi(n) &= \\prod_{i=1}^{r} \\varphi(p_i) = \\prod_{i=1}^{r} (p_i - 1). \\\\
-\\text{The public exponent } e \\text{ satisfies } \\gcd(e, \\varphi(n)) &= 1. \\\\
-\\text{The private exponent } d \\text{ satisfies } ed &\\equiv 1 \\pmod{\\varphi(n)}. \\\\
-\\text{Decryption: } m = c^d \\bmod n. \\text{ Using CRT:} & \\\\
-m_i &= c^d \\bmod p_i \\quad \\text{for each } i = 1, \\ldots, r \\\\
-m &= \\text{CRT}(m_1, m_2, \\ldots, m_r; p_1, p_2, \\ldots, p_r). \\\\
-\\text{Security concern: each } p_i \\approx n^{1/r} \\text{ is smaller,} & \\\\
-\\text{making ECM, QS, and other methods more effective.} & \\\\
-\\text{For r = 3 and 2048-bit n, each prime is only } \\approx 683 &\\text{ bits.} \\qed
+n &= p_1 p_2 \\cdots p_r, \\quad r \\geq 3 \\\\
+\\varphi(n) &= \\prod_{i=1}^{r} \\varphi(p_i) = \\prod_{i=1}^{r} (p_i - 1) \\\\
+ed &\\equiv 1 \\pmod{\\varphi(n)} \\\\
+m &= c^d \\bmod n \\\\
+m_i &= c^d \\bmod p_i, \\quad i = 1, \\ldots, r \\\\
+m &= \\text{CRT}(m_1, \\ldots, m_r; p_1, \\ldots, p_r) \\\\
+p_i &\\approx n^{1/r} \\implies \\text{ECM, QS more effective}
 \\end{align*}
+
+\\textbf{Explanation:} Multi-prime RSA splits n into more than two primes for faster CRT-based decryption. However, each prime is smaller (n^{1/r} bits), making factorization easier. For a 2048-bit modulus with r=3, each prime is only ~683 bits.
 
 \\textbf{References:} Simmons & Norris, "Preliminary Comments on the MIT Public Key Cryptosystem", 1976; Boneh, "Twenty Years of Attacks on RSA", 1999`,
     priority: 'medium',
@@ -466,7 +530,7 @@ for p in primes_list:
 
 # 3. Fermat primes: 2^(2^k) + 1
 print("\\nChecking Fermat primes (2^(2^k) + 1)...")
-for k in range(0, 6):
+for k in range(0, 5):
     fermat = 2^(2^k) + 1
     if n % fermat == 0:
         print(f"  Found Fermat prime factor: 2^(2^{k}) + 1 = {fermat}")
@@ -498,30 +562,29 @@ if not found:
     print("No gimmicky prime factors found.")
     print("The factors are likely standard randomly-generated primes.")
 `,
-    proof: `\\textbf{Theorem:} Some CTF challenges use primes with special mathematical structure (Mersenne, primorial, Fermat, Fibonacci, repunit). Testing divisibility by known special-form primes can quickly factor such moduli.
+    proof: `\\textbf{Theorem:} Special-form primes (Mersenne, primorial, Fermat, Fibonacci, repunit) appear in small known lists and can be tested by direct divisibility.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item Mersenne primes: M_p = 2^p - 1 where p is prime
-\\item Primorial primes: p\\# \\pm 1 where p\\# = \\prod_{q \\leq p} q
-\\item Fermat primes: F_k = 2^{2^k} + 1 (only known: k = 0, 1, 2, 3, 4)
-\\item Fibonacci primes: F_n where F_n is prime (rare)
-\\item Repunit primes: R_n = (10^n - 1)/9 with n prime
+\\item n = pq — RSA modulus to test
+\\item Mersenne: M_p = 2^p - 1 (51 known as of 2024)
+\\item Primorial: p\\# \\pm 1 where p\\# = \\prod_{q \\leq p} q
+\\item Fermat: F_k = 2^{2^k} + 1 (only 5 known: k = 0..4)
+\\item Fibonacci: F_n prime (very few known)
+\\item Repunit: R_n = (10^n - 1)/9
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{If } n = p \\cdot q \\text{ and } p \\text{ is a special-form prime,} & \\\\
-\\text{then } p \\text{ appears in a known list of such primes.} & \\\\
-\\text{Testing } n \\bmod p_i = 0 \\text{ for each known special prime } p_i &\\text{ is O(1) per test.} \\\\
-\\text{The total number of known special primes is small,} & \\\\
-\\text{making this a fast check.} & \\\\
-\\text{Mersenne primes: only 51 known as of 2024.} & \\\\
-\\text{Fermat primes: only 5 known (F_0 \\text{ through } F_4). & \\\\
-\\text{Primorial primes: a few dozen known.} & \\\\
-\\text{Fibonacci primes: very few known.} & \\\\
-\\text{This attack exploits poor randomness in CTF key generation.} & \\qed
+n &= p \\cdot q, \\quad p \\in \\mathcal{S} \\text{ (special-form set)} \\\\
+\\mathcal{S} &= \\{M_{p_1}, \\ldots\\} \\cup \\{p\\# \\pm 1\\} \\cup \\{F_0, \\ldots, F_4\\} \\cup \\{\\text{Fib primes}\\} \\cup \\{R_n\\} \\\\
+|\\mathcal{S}| &\\ll 100 \\quad \\text{(very small)} \\\\
+n \\bmod s &= 0, \\quad s \\in \\mathcal{S} \\\\
+\\text{If } n \\bmod s = 0 &\\implies s \\mid n, \\quad q = n/s \\\\
+\\text{Cost: } O(|\\mathcal{S}| \\cdot \\log^2 n) &
 \\end{align*}
+
+\\textbf{Explanation:} Some CTF challenges use primes with recognizable mathematical structure. Since the total number of known special-form primes is very small, testing divisibility against all of them is fast. This exploits poor randomness in CTF key generation.
 
 \\textbf{References:} Caldwell, "The Prime Pages" (primes.utm.edu); Ribenboim, "The New Book of Prime Number Records", 1996`,
     priority: 'low',
@@ -546,7 +609,7 @@ a = isqrt(n) + 1
 b2 = a^2 - n
 
 # Extended iteration limit for larger prime gaps
-max_iter = 10^7  # Much larger than standard Fermat
+max_iter = 10**7  # Much larger than standard Fermat
 print(f"Max iterations: {max_iter}")
 
 for i in range(max_iter):
@@ -567,28 +630,29 @@ else:
     print(f"Close-prime attack failed after {max_iter} iterations.")
     print("The prime gap may be too large. Try a different method.")
 `,
-    proof: `\\textbf{Theorem: (Londahl)} Fermat's factorization can be extended to handle larger prime gaps by increasing the iteration bound, exploiting structured gaps between primes.
+    proof: `\\textbf{Theorem:} Fermat factorization extended with larger iteration bounds handles structured prime gaps up to O(n^{1/3}).
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item Fermat factorization: n = a^2 - b^2 where a = (p+q)/2, b = (q-p)/2
-\\item Starting point: a_0 = \\lceil\\sqrt{n}\\rceil
-\\item Number of iterations: b = (q-p)/2
-\\item For |p - q| < 2n^{1/4}, Fermat runs in polynomial time
-\\item Extended bound handles gaps up to O(n^{1/3})
+\\item n = pq — RSA modulus with p \\leq q
+\\item a = (p + q)/2, b = (q - p)/2
+\\item a_0 = \\lceil\\sqrt{n}\\rceil — starting point
+\\item Gap: |p - q| determines iterations needed
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Same as Fermat factorization. Let } a &= \\frac{p + q}{2}, \\quad b = \\frac{q - p}{2}. \\\\
-\\text{Then } a^2 - b^2 &= n, \\text{ so } n = (a - b)(a + b) = pq. \\\\
-\\text{Starting from } a_0 = \\lceil\\sqrt{n}\\rceil, \\text{ iterate: } a_{i+1} &= a_i + 1. \\\\
-\\text{Check if } a_i^2 - n &= b_i^2 \\text{ is a perfect square.} \\\\
-\\text{The number of iterations equals } b = \\frac{q - p}{2}. & \\\\
-\\text{Standard Fermat: efficient when } b &< n^{1/4}. \\\\
-\\text{Londahl variant: extends to } b < n^{1/3} \\text{ with larger iteration bound.} & \\\\
-\\text{Runtime: } O(b) = O(|p - q|). & \\qed
+n &= pq = (a - b)(a + b) = a^2 - b^2 \\\\
+a &= \\frac{p + q}{2}, \\quad b = \\frac{q - p}{2} \\\\
+a_0 &= \\lceil\\sqrt{n}\\rceil \\\\
+a_{i+1} &= a_i + 1, \\quad b_i^2 = a_i^2 - n \\\\
+b_i^2 &= \\square \\implies b = \\sqrt{b_i^2}, \\quad p = a - b, \\quad q = a + b \\\\
+\\text{Iterations: } b &= \\frac{|q - p|}{2} \\\\
+\\text{Standard: } b < n^{1/4}, \\quad \\text{Extended: } b &< n^{1/3} \\\\
+\\text{Runtime: } O(|p - q|) &
 \\end{align*}
+
+\\textbf{Explanation:} The close-prime attack is Fermat factorization with an extended iteration limit. It works when |p - q| is small enough that iterating from \\sqrt{n} finds a perfect square within the bound. The Londahl variant increases the bound to handle larger gaps.
 
 \\textbf{References:} Londahl, "Close-Prime Factorization", CTF writeup; Menezes et al., "Handbook of Applied Cryptography", Algorithm 3.21`,
     priority: 'medium',
@@ -633,11 +697,12 @@ for bits in [64, 128, 256, 512, 1024, 2048]:
 
 # Check primes near common constants
 print("\\nChecking primes near common constants...")
-import math
+# Use Sage's high-precision real field
+RF = RealField(200)
 constants = [
-    ("pi", Integer(str(math.pi).replace('.', '')[:50])),
-    ("e", Integer(str(math.e).replace('.', '')[:50])),
-    ("sqrt(2)", Integer(str(math.sqrt(2)).replace('.', '')[:50])),
+    ("pi", Integer(str(RF(pi()).str(digits=60)).replace('.', '')[:55])),
+    ("e", Integer(str(RF(exp(1)).str(digits=60)).replace('.', '')[:55])),
+    ("sqrt(2)", Integer(str(RF(2).sqrt().str(digits=60)).replace('.', '')[:55])),
 ]
 
 for name, const in constants:
@@ -659,28 +724,27 @@ if known_ctf_primes:
 
 print("\\nNovelty prime check complete.")
 `,
-    proof: `\\textbf{Theorem:} CTF challenges sometimes reuse primes from previous problems or use primes with recognizable structure (near powers of 2, mathematical constants). Checking against a database of known primes can quickly factor such moduli.
+    proof: `\\textbf{Theorem:} CTF challenges may reuse primes from previous problems or use primes near structured values, enabling factorization by database lookup.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item CTF problems may reuse primes for simplicity or oversight
-\\item Some primes appear frequently: near 2^k, derived from constants
-\\item A database of known CTF primes enables quick divisibility checks
-\\item Primality testing (Miller-Rabin) for candidate verification
+\\item n = pq — RSA modulus to test
+\\item \\mathcal{P} = \\{p_1, \\ldots, p_m\\} — database of known CTF primes
+\\item Structured candidates: 2^k + \\delta, \\text{constant} + \\delta for small |\\delta|
+\\item Primality test (Miller-Rabin) for candidate verification
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Let } \\mathcal{P} = \\{p_1, p_2, \\ldots, p_m\\} \\text{ be a set of known CTF primes.} & \\\\
-\\text{Given n, check } n \\bmod p_i = 0 \\text{ for each } p_i &\\in \\mathcal{P}. \\\\
-\\text{If } n \\bmod p_i = 0, \\text{ then } p_i | n \\text{ and we factor } n &= p_i \\cdot (n/p_i). \\\\
-\\text{Additionally, search for primes near structured values:} & \\\\
-p &\\approx 2^k + \\delta \\quad \\text{for small } |\\delta| \\\\
-p &\\approx \\text{constant} + \\delta \\\\
-\\text{For each candidate, test primality and divisibility.} & \\\\
-\\text{This exploits poor key generation in CTF challenges.} & \\\\
-\\text{Runtime: } O(m \\cdot \\log^2 n + W \\cdot \\text{primality}) \\text{ where } W &\\text{ is search window.} \\qed
+\\mathcal{P} &= \\{p_1, \\ldots, p_m\\} \\quad \\text{(known CTF primes)} \\\\
+n \\bmod p_i &= 0 \\implies p_i \\mid n, \\quad q = n/p_i \\\\
+p &\\approx 2^k + \\delta, \\quad |\\delta| \\leq W \\\\
+p &\\approx C + \\delta, \\quad C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
+\\text{Candidate } c &= C + \\delta, \\quad \\text{isPrime}(c) \\land (n \\bmod c = 0) \\\\
+\\text{Cost: } O(m \\log^2 n + W \\cdot \\text{primality}) &
 \\end{align*}
+
+\\textbf{Explanation:} CTF challenges sometimes reuse primes or generate primes near recognizable values (powers of 2, mathematical constants). Checking divisibility against a database of known primes and searching small windows around structured values can quickly factor such moduli.
 
 \\textbf{References:} Various CTF writeups; cryptohack.org challenges; RSA CTF problem databases`,
     priority: 'low',

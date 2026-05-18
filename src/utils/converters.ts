@@ -38,7 +38,7 @@ export function decToHex(dec: string): string {
   }
 }
 
-export function decToBytes(dec: string): string {
+export function decToAscii(dec: string): string {
   try {
     const hex = BigInt(dec.trim()).toString(16);
     return hexToAscii(hex);
@@ -55,19 +55,15 @@ export function base64ToText(b64: string): string {
   }
 }
 
-export function textToBase64(text: string): string {
-  try {
-    return btoa(text);
-  } catch {
-    return 'Error: Cannot encode to base64';
-  }
-}
-
 export type DetectedFormat = 'hex' | 'decimal' | 'base64' | 'ascii' | 'unknown';
 
 export function detectFormat(input: string): DetectedFormat {
-  const trimmed = input.trim();
-  if (/^[0-9a-fA-F]+$/.test(trimmed) && /[a-fA-F]/.test(trimmed) && trimmed.length % 2 === 0) {
+  const raw = input.trim();
+  // Explicit 0x prefix → always hex
+  if (/^0x[0-9a-fA-F]+$/i.test(raw)) return 'hex';
+
+  const trimmed = raw.replace(/^0x/i, '');
+  if (/^[0-9a-fA-F]+$/.test(trimmed) && /[a-fA-F]/.test(trimmed)) {
     return 'hex';
   }
   if (/^[0-9]+$/.test(trimmed)) {

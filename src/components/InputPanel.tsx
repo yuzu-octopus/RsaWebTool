@@ -17,18 +17,18 @@ const inputSx = {
   '& .MuiOutlinedInput-root': {
     backgroundColor: draculaColors.currentLine,
     color: draculaColors.foreground,
-    fontFamily: "'JetBrainsMono Nerd Font', monospace",
+    fontFamily: "'JetBrains Mono', monospace",
     '& fieldset': { borderColor: draculaColors.comment },
     '&:hover fieldset': { borderColor: draculaColors.purple },
     '&.Mui-focused fieldset': { borderColor: draculaColors.purple },
   },
   '& .MuiInputLabel-root': {
     color: draculaColors.comment,
-    fontFamily: "'JetBrainsMono Nerd Font', monospace",
+    fontFamily: "'JetBrains Mono', monospace",
     '&.Mui-focused': { color: draculaColors.purple },
   },
   '& .MuiInputBase-input': {
-    fontFamily: "'JetBrainsMono Nerd Font', monospace",
+    fontFamily: "'JetBrains Mono', monospace",
   },
 };
 
@@ -60,6 +60,16 @@ export function InputPanel() {
     setOutputResult(null);
     setOutputError(null);
     try {
+      if (selectedAttack.frontendCheck) {
+        const preResult = await selectedAttack.frontendCheck(inputValues);
+        if (preResult !== null) {
+          setOutputResult(preResult);
+          addToHistory(selectedAttack.id, selectedAttack.name, preResult, true);
+          setLoading(false);
+          return;
+        }
+      }
+
       const code = selectedAttack.sageTemplate(inputValues);
       const result = await execute(code);
       if (result.success) {
@@ -69,9 +79,10 @@ export function InputPanel() {
         setOutputError(result.error || 'Unknown error');
         addToHistory(selectedAttack.id, selectedAttack.name, result.error || 'Unknown error', false);
       }
-    } catch (err: any) {
-      setOutputError(err.message || 'Execution failed');
-      addToHistory(selectedAttack.id, selectedAttack.name, err.message || 'Execution failed', false);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Execution failed';
+      setOutputError(message);
+      addToHistory(selectedAttack.id, selectedAttack.name, message, false);
     } finally {
       setLoading(false);
     }
@@ -79,22 +90,50 @@ export function InputPanel() {
 
   return (
     <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      {/* Tabs at top-left */}
       <Tabs
         value={tab}
         onChange={(_, v) => setTab(v)}
         sx={{
-          '& .MuiTab-root': { color: draculaColors.comment, fontFamily: "'JetBrainsMono Nerd Font', monospace" },
+          minHeight: 40,
+          px: 2,
+          pt: 2,
+          '& .MuiTabs-flexContainer': {
+            justifyContent: 'flex-start',
+          },
+          '& .MuiTab-root': {
+            color: draculaColors.comment,
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '0.85rem',
+            textTransform: 'none',
+            minHeight: 40,
+            px: 3,
+          },
           '& .Mui-selected': { color: draculaColors.purple },
           '& .MuiTabs-indicator': { backgroundColor: draculaColors.purple },
         }}
       >
-        <Tab label="Run Attack" />
-        <Tab label="Proof" />
+        <Tab label="Explanation" />
+        <Tab label="Input" />
       </Tabs>
 
+      {/* Explanation tab - left aligned */}
       {tab === 0 && (
-        <Box sx={{ p: 2, overflow: 'auto', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Box sx={{ width: '100%', maxWidth: 640 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+          {selectedAttack.proof ? (
+            <ProofRenderer latex={selectedAttack.proof} />
+          ) : (
+            <Typography variant="body2" sx={{ color: draculaColors.comment, fontStyle: 'italic' }}>
+              No proof available.
+            </Typography>
+          )}
+        </Box>
+      )}
+
+      {/* Input tab - center aligned */}
+      {tab === 1 && (
+        <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }}>
+          <Box sx={{ width: '100%', maxWidth: 500 }}>
             <Typography variant="h4" sx={{ color: draculaColors.cyan, mb: 1 }}>
               {selectedAttack.name}
             </Typography>
@@ -127,7 +166,7 @@ export function InputPanel() {
               sx={{
                 mt: 2,
                 backgroundColor: draculaColors.purple,
-                fontFamily: "'JetBrainsMono Nerd Font', monospace",
+                fontFamily: "'JetBrains Mono', monospace",
                 '&:hover': { backgroundColor: '#a575f6' },
                 '&:disabled': { backgroundColor: draculaColors.comment },
               }}
@@ -142,10 +181,6 @@ export function InputPanel() {
             )}
           </Box>
         </Box>
-      )}
-
-      {tab === 1 && selectedAttack.proof && (
-        <ProofRenderer latex={selectedAttack.proof} />
       )}
     </Box>
   );

@@ -20,8 +20,7 @@ export interface Attack {
   proof: string;
   priority: 'high' | 'medium' | 'low';
   applicableCheck: (params: Record<string, string>) => boolean;
-  outputFormat?: string;
-  sageCode?: string;
+  frontendCheck?: (vals: Record<string, string>) => Promise<string | null>;
 }
 
 export interface HistoryEntry {
@@ -30,20 +29,6 @@ export interface HistoryEntry {
   timestamp: Date;
   result: string;
   success: boolean;
-}
-
-export interface MagicResult {
-  success: boolean;
-  stdout: string;
-  error?: string;
-  format: string;
-  duration: number;
-}
-
-export interface SageResult {
-  success: boolean;
-  stdout: string;
-  error?: string;
 }
 
 export interface AppContextType {
@@ -57,17 +42,4 @@ export interface AppContextType {
   setOutputError: (error: string | null) => void;
   history: HistoryEntry[];
   addToHistory: (attackId: string, attackName: string, result: string, success: boolean) => void;
-}
-
-export interface DetectedFormat {
-  type: 'hex' | 'decimal' | 'base64' | 'ascii' | 'unknown';
-  confidence: number;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  attacks: Attack[];
 }

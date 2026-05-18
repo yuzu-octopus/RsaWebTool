@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SageCell + FactorDB API Test</title>
+  <script src="https://sagecell.sagemath.org/static/embedded_sagecell.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      background: #282a36;
+      color: #f8f8f2;
+      padding: 24px;
+    }
+    h1 { color: #bd93f9; margin-bottom: 24px; font-size: 1.4rem; }
+    h2 { color: #8be9fd; margin-bottom: 8px; font-size: 1.1rem; }
+    .section {
+      background: #44475a;
+      border: 1px solid #6272a4;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .test-case {
+      background: #1d1d2e;
+      border: 1px solid #6272a4;
+      border-radius: 4px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .test-case p { color: #6272a4; font-size: 0.8rem; margin-bottom: 8px; }
+    .result {
+      padding: 8px 12px;
+      margin-top: 6px;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      font-size: 0.8rem;
+      background: #282a36;
+      border: 1px solid #6272a4;
+    }
+    .pass { border-color: #50fa7b; color: #50fa7b; }
+    .fail { border-color: #ff5555; color: #ff5555; }
+    .info { border-color: #8be9fd; color: #8be9fd; }
+    .warn { border-color: #f1fa8c; color: #f1fa8c; }
+    button {
+      background: #bd93f9;
+      color: #282a36;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: bold;
+      font-size: 0.8rem;
+      margin-right: 6px;
+    }
+    button:hover { background: #a575f6; }
+    button:disabled { background: #6272a4; cursor: not-allowed; }
+    #log {
+      background: #1d1d2e;
+      border: 1px solid #6272a4;
+      border-radius: 4px;
+      padding: 12px;
+      max-height: 200px;
+      overflow: auto;
+      font-size: 0.75rem;
+      color: #6272a4;
+    }
+    #log .entry { margin-bottom: 3px; }
+    #log .entry::before { content: '> '; color: #50fa7b; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      margin-left: 8px;
+    }
+    .badge.online { background: #1d3a1d; color: #50fa7b; border: 1px solid #50fa7b; }
+    .badge.offline { background: #3d1d1d; color: #ff5555; border: 1px solid #ff5555; }
+    .badge.testing { background: #3a351d; color: #f1fa8c; border: 1px solid #f1fa8c; }
+  </style>
+</head>
+<body>
+  <h1>🧪 SageCell + FactorDB API Test Suite</h1>
+
+  <!-- ===== SECTION 1: SAGECELL API ===== -->
+  <div class="section">
+    <h2>1. Custom SageCell API <span id="sage-status" class="badge testing">Loading...</span></h2>
+    <p style="color:#6272a4;font-size:0.8rem;margin-bottom:12px;">
+      Uses <code>makeSagecell</code> with off-screen container, watches <code>.sagecell_stdout</code> for output.
+    </p>
+
+    <div class="test-case">
+      <p>Test 1a: Basic print</p>
+      <button onclick="sageTest('1a', 'print(2+2)', (o) => o.includes('4'))">Run</button>
+      <div id="r-sage-1a" class="result info">─</div>
+    </div>
+
+    <div class="test-case">
+      <p>Test 1b: Math — factor(n)</p>
+      <button onclick="sageTest('1b', 'factor(123456789)', (o) => o.includes('3607') && o.includes('3803'))">Run</button>
+      <div id="r-sage-1b" class="result info">─</div>
+    </div>
+
+    <div class="test-case">
+      <p>Test 1c: RSA — full key recovery</p>
+      <button onclick="sageTest('1c', `n=12193263111263526900818315368178917264745516385927276970387483023804977558314478131\ne=65537\np=factor(n)[0][0]\nq=factor(n)[1][0]\nphi=(p-1)*(q-1)\nd=inverse_mod(e,phi)\nprint(p)\nprint(q)\nprint(d)`, (o) => o.includes('1093289') && o.includes('1128789'))">Run</button>
+      <div id="r-sage-1c" class="result info">─</div>
+    </div>
+
+    <div class="test-case">
+      <p>Test 1d: Timeout (sleep 40s) — should timeout at ~35s</p>
+      <button onclick="sageTest('1d', 'import time\ntime.sleep(40)', (o) => false, 40000)">Run</button>
+      <div id="r-sage-1d" class="result info">─</div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION 2: FACTORDB API ===== -->
+  <div class="section">
+    <h2>2. FactorDB API <span id="factordb-status" class="badge testing">Testing...</span></h2>
+    <p style="color:#6272a4;font-size:0.8rem;margin-bottom:12px;">
+      Uses <code>GET https://factordb.com/api?query=&lt;n&gt;</code> — returns JSON with factorization status.
+    </p>
+
+    <div class="test-case">
+      <p>Test 2a: Query known number (123456789)</p>
+      <button onclick="factordbTest('2a', '123456789', (d) => d.status==='FF' && d.factors?.length>0)">Run</button>
+      <div id="r-fdb-2a" class="result info">─</div>
+    </div>
+
+    <div class="test-case">
+      <p>Test 2b: Query known number (2^127-1, Mersenne prime)</p>
+      <button onclick="factordbTest('2b', '170141183460469231731687303715884105727', (d) => d.status==='FF')">Run</button>
+      <div id="r-fdb-2b" class="result info">─</div>
+    </div>
+
+    <div class="test-case">
+      <p>Test 2c: Query composite factor (RSA-100)</p>
+      <button onclick="factordbTest('2c', '1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139', (d) => d.id)">Run</button>
+      <div id="r-fdb-2c" class="result info">─</div>
+    </div>
+
+    <div class="test-case">
+      <p>Test 2d: Query unknown/random large number</p>
+      <button onclick="factordbTest('2d', '12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901', (d) => d.id)">Run</button>
+      <div id="r-fdb-2d" class="result info">─</div>
+    </div>
+  </div>
+
+  <h2 style="margin-top: 8px;">Live Log</h2>
+  <div id="log"></div>
+
+  <script>
+    const log = (msg, type = 'info') => {
+      const el = document.getElementById('log');
+      const entry = document.createElement('div');
+      entry.className = `entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      el.appendChild(entry);
+      el.scrollTop = el.scrollHeight;
+    };
+
+    const setResult = (id, msg, type) => {
+      const el = document.getElementById(id);
+      el.className = `result ${type}`;
+      el.textContent = msg;
+    };
+
+    // ===========================
+    // 1. SageCell API
+    // ===========================
+    function waitForSageCell(timeoutMs = 10000) {
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error('SageCell script failed to load')), timeoutMs);
+        const check = setInterval(() => {
+          if (window.sagecell) {
+            clearInterval(check);
+            clearTimeout(timer);
+            resolve();
+          }
+        }, 50);
+      });
+    }
+
+    async function sageRun(code, timeoutMs = 35000) {
+      await waitForSageCell();
+
+      const containerId = `sc-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+      const container = document.createElement('div');
+      container.id = containerId;
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.top = '-9999px';
+      container.style.width = '1px';
+      container.style.height = '1px';
+      container.style.overflow = 'hidden';
+      container.style.opacity = '0';
+      container.style.pointerEvents = 'none';
+      document.body.appendChild(container);
+
+      const script = document.createElement('script');
+      script.type = 'text/x-sage';
+      script.textContent = code;
+      container.appendChild(script);
+
+      return new Promise((resolve) => {
+        let resolved = false;
+        const cleanup = () => {
+          try { document.body.removeChild(container); } catch {}
+        };
+
+        const timeout = setTimeout(() => {
+          if (!resolved) {
+            resolved = true;
+            cleanup();
+            resolve({ success: false, stdout: '', error: 'Timed out' });
+          }
+        }, timeoutMs);
+
+        const observer = new MutationObserver(() => {
+          if (resolved) return;
+          const stdoutDiv = container.querySelector('.sagecell_stdout');
+          if (!stdoutDiv) return;
+
+          setTimeout(() => {
+            if (resolved) return;
+            const text = stdoutDiv.textContent || '';
+            if (!text.trim()) return;
+
+            resolved = true;
+            clearTimeout(timeout);
+            observer.disconnect();
+            cleanup();
+
+            resolve({ success: true, stdout: text.trim() });
+          }, 500);
+        });
+
+        observer.observe(container, { childList: true, subtree: true });
+
+        try {
+          window.sagecell.makeSagecell({
+            inputLocation: `#${containerId}`,
+            template: window.sagecell.templates.minimal,
+            evalButtonText: 'Evaluate',
+            autoeval: true,
+            hide: ['editor', 'evalButton'],
+          });
+        } catch (err) {
+          if (!resolved) {
+            resolved = true;
+            clearTimeout(timeout);
+            observer.disconnect();
+            cleanup();
+            resolve({ success: false, stdout: '', error: err.message });
+          }
+        }
+      });
+    }
+
+    async function sageTest(id, code, checkFn, customTimeout) {
+      const btn = event.target;
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = 'Running...';
+
+      setResult(`r-sage-${id}`, 'Running...', 'info');
+      log(`Sage ${id}: running code: ${code.substring(0, 60)}...`);
+
+      const start = Date.now();
+      try {
+        const result = await sageRun(code, customTimeout);
+        const elapsed = ((Date.now() - start) / 1000).toFixed(2);
+
+        if (result.success && checkFn(result.stdout)) {
+          setResult(`r-sage-${id}`, `✅ PASS (${elapsed}s)\nstdout:\n${result.stdout}`, 'pass');
+          log(`Sage ${id}: PASSED (${elapsed}s)`, 'pass');
+        } else if (result.error && result.error === 'Timed out') {
+          setResult(`r-sage-${id}`, `⏱ TIMEOUT (${elapsed}s) — expected behavior`, 'warn');
+          log(`Sage ${id}: TIMEOUT (${elapsed}s)`, 'warn');
+        } else {
+          setResult(`r-sage-${id}`, `❌ FAIL (${elapsed}s)\nsuccess: ${result.success}\nstdout: ${result.stdout}\nerror: ${result.error}`, 'fail');
+          log(`Sage ${id}: FAILED (${elapsed}s)`, 'fail');
+        }
+      } catch (err) {
+        setResult(`r-sage-${id}`, `❌ ERROR: ${err.message}`, 'fail');
+        log(`Sage ${id}: ERROR — ${err.message}`, 'fail');
+      }
+
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+
+    // ===========================
+    // 2. FactorDB API
+    // ===========================
+    const FACTORDB_URL = 'https://factordb.com/api';
+
+    async function factordbQuery(n) {
+      const url = `${FACTORDB_URL}?query=${encodeURIComponent(n)}`;
+      log(`FactorDB: GET ${url.substring(0, 100)}...`);
+
+      const res = await fetch(url, {
+        headers: { 'Accept': 'application/json' },
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+
+      const data = await res.json();
+      log(`FactorDB: status=${data.status}, factors=${data.factors ? data.factors.length : '?'}`);
+      return data;
+    }
+
+    async function factordbTest(id, n, checkFn) {
+      const btn = event.target;
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = 'Querying...';
+
+      setResult(`r-fdb-${id}`, 'Querying...', 'info');
+      log(`FactorDB ${id}: querying ${n.substring(0, 40)}...`);
+
+      const start = Date.now();
+      try {
+        const data = await factordbQuery(n);
+        const elapsed = ((Date.now() - start) / 1000).toFixed(2);
+
+        let output = `⏱ ${elapsed}s | Status: ${data.status || 'N/A'}`;
+        if (data.factors && data.factors.length > 0) {
+          const factorStr = data.factors.map(f => {
+            if (Array.isArray(f)) return `${f[0]}^${f[1]}`;
+            return f;
+          }).join(' × ');
+          output += `\nFactors: ${factorStr}`;
+        }
+        if (data.id) {
+          output += `\nID: ${data.id}`;
+        }
+        output += `\nRaw: ${JSON.stringify(data)}`;
+
+        if (checkFn(data)) {
+          setResult(`r-fdb-${id}`, `✅ PASS\n${output}`, 'pass');
+          log(`FactorDB ${id}: PASSED (${elapsed}s)`, 'pass');
+        } else {
+          setResult(`r-fdb-${id}`, `⚠ PARTIAL\n${output}`, data.status ? 'warn' : 'fail');
+          log(`FactorDB ${id}: PARTIAL (${elapsed}s)`, 'info');
+        }
+      } catch (err) {
+        const elapsed = ((Date.now() - start) / 1000).toFixed(2);
+        setResult(`r-fdb-${id}`, `❌ ERROR (${elapsed}s): ${err.message}`, 'fail');
+        log(`FactorDB ${id}: ERROR — ${err.message}`, 'fail');
+      }
+
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
+
+    // ===========================
+    // 3. Bootstrap checks
+    // ===========================
+    window.addEventListener('load', () => {
+      // SageCell loaded?
+      if (window.sagecell) {
+        document.getElementById('sage-status').textContent = '✅ Ready';
+        document.getElementById('sage-status').className = 'badge online';
+        log('SageCell script loaded', 'pass');
+      } else {
+        document.getElementById('sage-status').textContent = '❌ Not loaded';
+        document.getElementById('sage-status').className = 'badge offline';
+        log('SageCell script NOT loaded', 'fail');
+      }
+
+      // FactorDB reachable?
+      factordbQuery('12345')
+        .then(data => {
+          if (data.status) {
+            document.getElementById('factordb-status').textContent = '✅ Online';
+            document.getElementById('factordb-status').className = 'badge online';
+            log('FactorDB API online', 'pass');
+          } else {
+            document.getElementById('factordb-status').textContent = '⚠ Responded';
+            document.getElementById('factordb-status').className = 'badge warn';
+            log('FactorDB API responded but unexpected format', 'warn');
+          }
+        })
+        .catch(err => {
+          document.getElementById('factordb-status').textContent = '❌ Unreachable';
+          document.getElementById('factordb-status').className = 'badge offline';
+          log(`FactorDB API unreachable: ${err.message}`, 'fail');
+        });
+
+      log('Ready — click Run buttons to test', 'info');
+    });
+  </script>
+</body>
+</html>

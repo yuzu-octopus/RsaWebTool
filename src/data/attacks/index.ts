@@ -15,8 +15,6 @@ export const attacks: Attack[] = [
   ...advancedAttacks,
 ];
 
-export const attackById = new Map(attacks.map(a => [a.id, a]));
-
 export const CATEGORIES = [
   'Factorization',
   'Partial Key / Lattice',

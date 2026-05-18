@@ -18,7 +18,7 @@ import { detectFormat } from '../utils/converters';
 
 function detectParams(input: string): Record<string, string> {
   const params: Record<string, string> = {};
-  const kvRegex = /(n|e|c|d|p|q|dp|dq|qinv|dLow|nearp|bound|k|B|a|b|e1|e2|c1|c2|hash_hex|target_m|sig_valid|sig_faulty|k_phi|base|bitOffset|bitLength|num_primes|knownBits|bitPosition|oracle_responses|oracle_runs)\s*=\s*([0-9a-fA-F,\n]+)/g;
+  const kvRegex = /(n|e|c|d|p|q|dp|dq|qinv|dLow|nearp|bound|k|B|a|b|e1|e2|c1|c2|hash_hex|target_m|sig_valid|sig_faulty|k_phi|base|bitOffset|bitLength|num_primes|knownBits|bitPosition|oracle_responses|oracle_runs|phi|moduli_list|n_values|pairs|triples|oracle_pairs|known_prefix)\s*=\s*([0-9a-fA-F,\n]+)/g;
   let match;
   while ((match = kvRegex.exec(input)) !== null) {
     params[match[1]] = match[2].trim();
@@ -30,18 +30,18 @@ const inputSx = {
   '& .MuiOutlinedInput-root': {
     backgroundColor: draculaColors.currentLine,
     color: draculaColors.foreground,
-    fontFamily: "'JetBrainsMono Nerd Font', monospace",
+    fontFamily: "'JetBrains Mono', monospace",
     '& fieldset': { borderColor: draculaColors.comment },
     '&:hover fieldset': { borderColor: draculaColors.purple },
     '&.Mui-focused fieldset': { borderColor: draculaColors.purple },
   },
   '& .MuiInputLabel-root': {
     color: draculaColors.comment,
-    fontFamily: "'JetBrainsMono Nerd Font', monospace",
+    fontFamily: "'JetBrains Mono', monospace",
     '&.Mui-focused': { color: draculaColors.purple },
   },
   '& .MuiInputBase-input': {
-    fontFamily: "'JetBrainsMono Nerd Font', monospace",
+    fontFamily: "'JetBrains Mono', monospace",
   },
 };
 
@@ -77,7 +77,9 @@ export function MagicPanel() {
       params.n = rawInput.trim();
     }
 
-    const applicable = attacks.filter(a => a.applicableCheck(params));
+    const applicable = attacks.filter(a => {
+      try { return a.applicableCheck(params); } catch { return false; }
+    });
 
     const initialJobs: MagicJob[] = applicable.map(a => ({
       attackId: a.id,
@@ -86,17 +88,52 @@ export function MagicPanel() {
     }));
     setJobs(initialJobs);
 
-    const codes = applicable.map(a => a.sageTemplate(params));
+    const preCheckResults = await Promise.all(
+      applicable.map(async (a, i) => {
+        if (a.frontendCheck) {
+          try {
+            const result = await a.frontendCheck(params);
+            if (result !== null) {
+              return { index: i, result };
+            }
+          } catch {
+            /* fall through to SageCell */
+          }
+        }
+        return null;
+      }),
+    );
+
+    const remaining: { attack: typeof applicable[0]; originalIndex: number }[] = [];
+
+    for (let i = 0; i < applicable.length; i++) {
+      if (!preCheckResults[i]) {
+        remaining.push({ attack: applicable[i], originalIndex: i });
+      }
+    }
+
+    const codes = remaining.map(r => r.attack.sageTemplate(params));
 
     try {
       const results = await executeAll(codes, 3);
 
-      const updatedJobs = results.map((r, i) => ({
-        ...initialJobs[i],
-        status: (r.success ? 'success' : 'error') as 'success' | 'error',
-        result: r.stdout,
-        error: r.error,
-      }));
+      const updatedJobs = initialJobs.map((job, i) => {
+        const pre = preCheckResults[i];
+        if (pre) {
+          return { ...job, status: 'success' as const, result: pre.result };
+        }
+        const ri = remaining.findIndex(r => r.originalIndex === i);
+        if (ri >= 0 && ri < results.length) {
+          const r = results[ri];
+          return {
+            ...job,
+            status: (r.success ? 'success' : 'error') as 'success' | 'error',
+            result: r.stdout,
+            error: r.error,
+          };
+        }
+        return job;
+      });
 
       setJobs(updatedJobs);
 
@@ -105,8 +142,9 @@ export function MagicPanel() {
         setOutputResult(firstSuccess.result || '');
         addToHistory(firstSuccess.attackId, firstSuccess.attackName, firstSuccess.result || '', true);
       }
-    } catch (err: any) {
-      setOutputError(err.message || 'Magic cracker failed');
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Magic cracker failed';
+      setOutputError(message);
     } finally {
       setRunning(false);
     }
@@ -142,7 +180,7 @@ export function MagicPanel() {
             sx={{
               mt: 2,
               backgroundColor: draculaColors.purple,
-              fontFamily: "'JetBrainsMono Nerd Font', monospace",
+              fontFamily: "'JetBrains Mono', monospace",
               '&:hover': { backgroundColor: '#a575f6' },
               '&:disabled': { backgroundColor: draculaColors.comment },
             }}
@@ -165,7 +203,7 @@ export function MagicPanel() {
                     <ListItemText
                       primary={
                         <Typography sx={{
-                          fontFamily: "'JetBrainsMono Nerd Font', monospace",
+                          fontFamily: "'JetBrains Mono', monospace",
                           fontSize: '0.8rem',
                           color: job.status === 'success' ? draculaColors.green : job.status === 'error' ? draculaColors.red : draculaColors.orange,
                         }}>
@@ -173,7 +211,7 @@ export function MagicPanel() {
                         </Typography>
                       }
                       secondary={job.error && (
-                        <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: "'JetBrainsMono Nerd Font', monospace" }}>
+                        <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>
                           {job.error}
                         </Typography>
                       )}
