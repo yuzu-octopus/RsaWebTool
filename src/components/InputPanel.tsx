@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -8,10 +8,12 @@ import {
   Tab,
   CircularProgress,
 } from '@mui/material';
+import { Stop, Casino } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../context/AppContext';
 import { useSageMath } from '../hooks/useSageMath';
 import { ProofRenderer } from './ProofRenderer';
+import { testcaseGenerators } from '../attacks';
 
 const inputSx = {
   '& .MuiOutlinedInput-root': {
@@ -38,6 +40,8 @@ export function InputPanel() {
   const [tab, setTab] = useState(0);
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
 
   if (viewMode !== 'attack') return null;
 
@@ -55,7 +59,27 @@ export function InputPanel() {
     setInputValues(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleStop = () => {
+    abortControllerRef.current?.abort();
+  };
+
+  const handleGenerateTestcase = () => {
+    if (!selectedAttack) return;
+    const gen = testcaseGenerators[selectedAttack.id];
+    if (!gen) {
+      setTestcaseMsg('No testcase generator for this attack');
+      setTimeout(() => setTestcaseMsg(null), 2000);
+      return;
+    }
+    const values = gen();
+    setInputValues(values);
+    setTestcaseMsg('Testcase generated');
+    setTimeout(() => setTestcaseMsg(null), 2000);
+  };
+
   const handleRun = async () => {
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
     setLoading(true);
     setOutputResult(null);
     setOutputError(null);
@@ -71,7 +95,7 @@ export function InputPanel() {
       }
 
       const code = selectedAttack.sageTemplate(inputValues);
-      const result = await execute(code);
+      const result = await execute(code, 35000, controller.signal);
       if (result.success) {
         setOutputResult(result.stdout);
         addToHistory(selectedAttack.id, selectedAttack.name, result.stdout, true);
@@ -85,6 +109,7 @@ export function InputPanel() {
       addToHistory(selectedAttack.id, selectedAttack.name, message, false);
     } finally {
       setLoading(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -158,26 +183,68 @@ export function InputPanel() {
               </Box>
             ))}
 
-            <Button
-              fullWidth
-              variant="contained"
-              onClick={handleRun}
-              disabled={loading}
-              sx={{
-                mt: 2,
-                backgroundColor: draculaColors.purple,
-                fontFamily: "'JetBrains Mono', monospace",
-                '&:hover': { backgroundColor: '#a575f6' },
-                '&:disabled': { backgroundColor: draculaColors.comment },
-              }}
-            >
-              {loading ? <CircularProgress size={24} sx={{ color: draculaColors.foreground }} /> : 'Run'}
-            </Button>
+            {selectedAttack && (
+              <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={handleGenerateTestcase}
+                  sx={{
+                    borderColor: draculaColors.cyan,
+                    color: draculaColors.cyan,
+                    fontFamily: "'JetBrains Mono', monospace",
+                    fontSize: '0.8rem',
+                    '&:hover': { backgroundColor: draculaColors.cyan, color: draculaColors.background },
+                  }}
+                  startIcon={<Casino sx={{ fontSize: '1rem' }} />}
+                >
+                  Generate Testcase
+                </Button>
+              </Box>
+            )}
 
-            {loading && (
-              <Typography variant="body2" sx={{ color: draculaColors.comment, mt: 1, textAlign: 'center' }}>
-                Computing in SageMathCell...
+            {testcaseMsg && (
+              <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, textAlign: 'center', fontSize: '0.75rem' }}>
+                {testcaseMsg}
               </Typography>
+            )}
+
+            {loading ? (
+              <>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={handleStop}
+                  sx={{
+                    mt: 2,
+                    borderColor: draculaColors.red,
+                    color: draculaColors.red,
+                    fontFamily: "'JetBrains Mono', monospace",
+                    '&:hover': { backgroundColor: draculaColors.red, color: draculaColors.background },
+                  }}
+                >
+                  <Stop sx={{ mr: 1 }} /> Stop
+                </Button>
+                <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                  <CircularProgress size={16} sx={{ color: draculaColors.orange }} />
+                  Running... click Stop to cancel
+                </Typography>
+              </>
+            ) : (
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={handleRun}
+                sx={{
+                  mt: 2,
+                  borderColor: draculaColors.purple,
+                  color: draculaColors.purple,
+                  fontFamily: "'JetBrains Mono', monospace",
+                  '&:hover': { backgroundColor: draculaColors.purple, color: draculaColors.background },
+                }}
+              >
+                Run
+              </Button>
             )}
           </Box>
         </Box>

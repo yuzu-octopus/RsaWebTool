@@ -1,0 +1,112 @@
+import type { Attack } from '../types';
+import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
+
+export const attack: Attack = {
+  id: 'hastad',
+  name: "Hastad's Broadcast Attack",
+  category: 'Message / Protocol',
+  description: 'Recovers m from e encryptions with small e. Use when same m encrypted under e different moduli with exponent e.',
+  inputs: [
+    { name: 'pairs', label: 'Pairs (n1,c1 per line)', placeholder: 'n1,c1\\nn2,c2\\nn3,c3...', multiline: true, rows: 5 },
+    { name: 'e', label: 'e (public exponent)', placeholder: 'Enter exponent e (e.g., 3)...', multiline: false },
+  ],
+  sageTemplate: (vals: Record<string, string>) => {
+    if (!vals.pairs || !vals.e) {
+      return `print("ERROR: Missing required inputs (pairs, e)")
+print("HASTAD=FAILED")`;
+    }
+    return `try:
+    e = Integer(${vals.e})
+
+    # Parse pairs
+    pairs_str = """${vals.pairs}""".strip()
+    pairs = []
+    for line in pairs_str.split('\\n'):
+        line = line.strip()
+        if not line:
+            continue
+        parts = line.split(',')
+        if len(parts) < 2:
+            continue
+        n_i = Integer(parts[0].strip())
+        c_i = Integer(parts[1].strip())
+        pairs.append((n_i, c_i))
+
+    print(f"Number of ciphertexts: {len(pairs)}")
+    print(f"Public exponent: e = {e}")
+
+    if len(pairs) < e:
+        print(f"ERROR: Need at least {e} ciphertexts for e = {e}, got {len(pairs)}")
+        print("HASTAD=FAILED")
+    else:
+        # Chinese Remainder Theorem
+        moduli = [p[0] for p in pairs]
+        remainders = [p[1] for p in pairs]
+
+        print("Applying CRT...")
+        m_e = crt(remainders, moduli)
+        print(f"m^e = {m_e}")
+
+        # Integer e-th root
+        print(f"Computing integer {e}-th root...")
+        m, exact = m_e.nth_root(e, truncate_mode=True)
+
+        if exact:
+            print(f"Recovered message: m = {m}")
+            # Verify
+            all_ok = True
+            for i, (n_i, c_i) in enumerate(pairs):
+                v = power_mod(m, e, n_i)
+                ok = v == c_i
+                if not ok:
+                    all_ok = False
+                print(f"  Verify {i+1}: m^e mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
+            if all_ok:
+                print("HASTAD=SUCCESS")
+            else:
+                print("HASTAD=FAILED")
+        else:
+            print(f"Approximate root: m = {m}")
+            print("Warning: m^e was not a perfect e-th power. Message may be padded.")
+            print("HASTAD=FAILED")
+except Exception as e:
+    print(f"ERROR: {e}")
+    print("HASTAD=FAILED")
+`;
+  },
+  proof: `\\textbf{Theorem:} Let c_i \\equiv m^e \\pmod{n_i} for i = 1, \\ldots, k with \\gcd(n_i, n_j) = 1. If m^e < \\prod n_i and k \\geq e, recover m via CRT + e-th root.
+
+\\textbf{Prerequisites:}
+\\begin{itemize}
+\\item k pairs of (n_i, c_i) with pairwise coprime moduli
+\\item Same exponent e for all, same message m
+\\item k \\geq e, m^e < \\prod_{i=1}^{k} n_i
+\\end{itemize}
+
+\\textbf{Proof:}
+\\begin{align*}
+c_i &\\equiv m^e \\pmod{n_i}, \\quad i = 1, \\ldots, k \\\\
+N &= \\prod_{i=1}^{k} n_i \\\\
+C &\\equiv c_i \\pmod{n_i} \\quad \\text{(CRT)} \\\\
+C &\\equiv m^e \\pmod{N} \\\\
+m^e < N \\implies C &= m^e \\quad \\text{(over } \\mathbb{Z}\\text{)} \\\\
+m &= \\sqrt[e]{C} \\qed
+\\end{align*}
+
+\\textbf{Explanation:} Combine ciphertexts via CRT to get C ≡ mᵉ (mod N). When mᵉ < N, the congruence becomes an exact equality over integers. Take the integer e-th root to recover m.
+
+\\textbf{References:} J. Hastad, "Solving Linear Equations Modulo Divisors: On Factoring Given Any Bits", Eurocrypt 1988; Boneh, "Twenty Years of Attacks on RSA", 1999`,
+  priority: 'high',
+  applicableCheck: (p: Record<string, string>) => !!p.pairs && !!p.e,
+};
+
+export const generateTestcase = (): Record<string, string> => {
+  const e = 3n;
+  const m = BigInt(Math.floor(Math.random() * 1000000) + 42);
+  const pairs: string[] = [];
+  for (let i = 0; i < 3; i++) {
+    const { n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+    pairs.push(`${n},${encrypt(m, n, e)}`);
+  }
+  return { pairs: pairs.join('\n'), e: e.toString() };
+};

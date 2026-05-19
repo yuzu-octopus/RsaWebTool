@@ -58,12 +58,25 @@ const tabSx = {
   },
 };
 
-function parseBigInt(input: string): bigint {
+function parseBigInt(input: string): bigint | null {
   const trimmed = input.trim();
-  if (!trimmed) return 0n;
-  const fmt = detectFormat(trimmed);
-  if (fmt === 'hex') return BigInt('0x' + trimmed.replace(/^0x/, ''));
-  return BigInt(trimmed);
+  if (!trimmed) return null;
+  try {
+    const fmt = detectFormat(trimmed);
+    if (fmt === 'hex') return BigInt('0x' + trimmed.replace(/^0x/, ''));
+    if (fmt === 'base64') {
+      const raw = atob(trimmed);
+      const hex = Array.from(raw).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
+      return BigInt('0x' + hex);
+    }
+    if (fmt === 'ascii') {
+      const hex = Array.from(trimmed).map(c => c.charCodeAt(0).toString(16).padStart(2, '0')).join('');
+      return BigInt('0x' + hex);
+    }
+    return BigInt(trimmed);
+  } catch {
+    return null;
+  }
 }
 
 function toHex(n: bigint): string {
@@ -131,12 +144,20 @@ export function RsaCalculator() {
     const q = parseBigInt(kgQ);
     const e = parseBigInt(kgE);
 
+    if (p === null || q === null) {
+      setKgError('p and q must be valid numbers');
+      return;
+    }
     if (p <= 1n || q <= 1n) {
       setKgError('p and q must be > 1');
       return;
     }
-    if (e === 0n) {
-      setKgError('e must be provided');
+    if (e === null) {
+      setKgError('e must be a valid number');
+      return;
+    }
+    if (e <= 0n) {
+      setKgError('e must be positive');
       return;
     }
 
@@ -161,8 +182,20 @@ export function RsaCalculator() {
     const n = parseBigInt(encN);
     const e = parseBigInt(encE);
 
-    if (n === 0n || e === 0n) {
-      setEncError('n and e must be provided');
+    if (m === null || n === null || e === null) {
+      setEncError('m, n, and e must be valid numbers');
+      return;
+    }
+    if (n <= 1n) {
+      setEncError('n must be > 1');
+      return;
+    }
+    if (e <= 0n) {
+      setEncError('e must be positive');
+      return;
+    }
+    if (m >= n) {
+      setEncError('m must be < n');
       return;
     }
 
@@ -185,8 +218,16 @@ export function RsaCalculator() {
     const c = parseBigInt(decC);
     const n = parseBigInt(decN);
 
-    if (n === 0n) {
-      setDecError('n must be provided');
+    if (c === null || n === null) {
+      setDecError('c and n must be valid numbers');
+      return;
+    }
+    if (n <= 1n) {
+      setDecError('n must be > 1');
+      return;
+    }
+    if (c >= n) {
+      setDecError('c must be < n');
       return;
     }
 
@@ -200,21 +241,25 @@ export function RsaCalculator() {
 
       if (dProvided) {
         const d = parseBigInt(decD);
-        m = modPow(c, d, n);
-      }
-
-      if ((m === null || m === 0n) && pProvided && qProvided && eProvided) {
-        const p = parseBigInt(decP);
-        const q = parseBigInt(decQ);
-        const e = parseBigInt(decE);
-        const phi = (p - 1n) * (q - 1n);
-        const dComputed = modInverse(e, phi);
-        if (dComputed !== null) {
-          m = modPow(c, dComputed, n);
+        if (d !== null && d > 0n) {
+          m = modPow(c, d, n);
         }
       }
 
-      if (m === null || m === 0n) {
+      if (m === null && pProvided && qProvided && eProvided) {
+        const p = parseBigInt(decP);
+        const q = parseBigInt(decQ);
+        const e = parseBigInt(decE);
+        if (p !== null && q !== null && e !== null && p > 1n && q > 1n && e > 0n) {
+          const phi = (p - 1n) * (q - 1n);
+          const dComputed = modInverse(e, phi);
+          if (dComputed !== null) {
+            m = modPow(c, dComputed, n);
+          }
+        }
+      }
+
+      if (m === null) {
         setDecError('Provide d, or p+q+e');
         setComputing(false);
         return;

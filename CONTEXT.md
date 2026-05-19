@@ -50,7 +50,8 @@ Use embedded `makeSagecell` JS for all SageMath computation.
 type Attack = {
   id, name, category, description, inputs: InputField[],
   sageTemplate: (vals) => string, proof: string,
-  frontendCheck?, applicableCheck, priority
+  frontendCheck?, applicableCheck, priority,
+  generateTestcase?: () => Record<string, string>
 }
 ```
 
@@ -64,13 +65,54 @@ Optional async function `(vals: Record<string, string>) => Promise<string | null
 ### Attacks with FrontendCheck (4 total)
 | Attack | File | Implementation |
 |--------|------|----------------|
-| FactorDB Lookup | `advanced.ts` | `queryFactorDB` → format result |
-| Phi(n) Leak | `advanced.ts` | BigInt quadratic solver (discriminant + `isqrt`) |
-| Batch GCD | `factorization2.ts` | BigInt GCD across multiple moduli |
-| Common Factor | `message-protocol.ts` | BigInt `gcd(c, n)` |
+| FactorDB Lookup | `factordb-lookup.ts` | `queryFactorDB` → format result |
+| Phi(n) Leak | `phi-leak.ts` | BigInt quadratic solver (discriminant + `isqrt`) |
+| Batch GCD | `batch-gcd.ts` | BigInt GCD across multiple moduli |
+| Common Factor | `common-factor.ts` | BigInt `gcd(c, n)` |
 
 ### Attacks Without FrontendCheck
-All other attacks (43) use SageCell only.
+All other attacks (48) use SageCell only.
+
+## Attack File Structure
+
+Each attack is a self-contained file in `src/attacks/` — all metadata, exploit template, proof, and testcase generator in one place:
+
+```
+src/attacks/
+  index.ts              — Barrel export: aggregates all 52 attacks, CATEGORIES, attacksByCategory, testcaseGenerators
+  fermat.ts             — { attack: Attack, generateTestcase: () => Record<string, string> }
+  wiener.ts             — Same pattern (all 52 attacks follow this)
+```
+
+Each attack file exports:
+- `attack: Attack` — full Attack object (id, name, inputs, sageTemplate, proof, priority, applicableCheck, frontendCheck, generateTestcase?)
+- `generateTestcase: () => Record<string, string>` — attack-specific testcase generator
+
+**UI is completely decoupled** — components import from `src/attacks` and see only the aggregated `attacks[]` array. Adding a new attack = 1 file + 1 import line. Zero UI changes needed.
+
+Testcase bit size is centralized in `src/utils/testcases/core.ts`:
+```ts
+export const TESTCASE_BITS = { p: 128, q: 128 }; // n ≈ 256-bit, change here affects ALL attacks
+```
+
+### Total: 52 attacks across 5 categories
+
+| Category | Count | Files |
+|----------|-------|-------|
+| Factorization | 18 | `fermat.ts` through `common-prime-rsa.ts` |
+| Partial Key / Lattice | 9 | `simple-lattice.ts` through `implicit-key-exposure.ts` |
+| Message / Protocol | 14 | `common-modulus.ts` through `hastad-broadcast.ts` |
+| Oracle | 3 | `bleichenbacher.ts` through `biased-lsb.ts` |
+| Advanced | 8 | `roca.ts` through `parity-oracle.ts` |
+
+### New Attacks Added (2026-05-19)
+| Attack | Category | Description |
+|--------|----------|-------------|
+| Partial Key Exposure | Partial Key / Lattice | Recovers p from known MSBs via Coppersmith |
+| Implicit Key Exposure | Partial Key / Lattice | Recovers p from a^p mod n leak via Fermat's little theorem |
+| Related Message | Message / Protocol | Recovers m from c1=m^e, c2=(a·m+b)^e via polynomial GCD |
+| Common Prime RSA | Factorization | Factors two moduli sharing a prime via gcd(n1, n2) |
+| Hastad Broadcast | Message / Protocol | Recovers m from e broadcasts via CRT + e-th root |
 
 ## Source Structure
 
@@ -83,61 +125,36 @@ src/
   types/index.ts                   — Attack, InputField, HistoryEntry, AppContextType
   context/AppContext.tsx           — React context: selectedAttack, viewMode, output, history (cap 50)
   theme/dracula.ts                 — MUI Dracula theme + scrollbar overrides
-  hooks/useSageMath.ts             — SageMath executor (single + parallel with concurrency=3)
+  hooks/useSageMath.ts             — SageMath executor: `createSageMathExecutor()`, `useSageMath()`, `useSageMathParallel()` (concurrency=3)
   utils/bigint.ts                  — gcd(a,b) + isqrt(x) BigInt utilities + modPow + modInverse + extendedGcd
-  utils/converters.ts              — hex/dec/base64 converters + detectFormat()
+  utils/converters.ts              — hex/dec/base64 converters + detectFormat() + parsePEM()
   utils/factordb.ts                — FactorDB client (query, format, proxy setter, 10s timeout)
+  utils/testcases/core.ts          — randomPrime(), generateKeyPair(), encrypt(), TESTCASE_BITS
   vite-env.d.ts                    — Vite env type declarations
   components/
-    InputPanel.tsx                 — Attack input form + run button + proof tab (frontendCheck → SageCell)
+    InputPanel.tsx                 — Attack input form + Generate Testcase + Run/Stop + proof tab
     OutputPanel.tsx                — Results display (Prism/Dracula) + converters + copy + history
                                      resizable via left-edge drag handle (200-600px, 1px visible line, 4px grab area)
                                      receives width + onWidthChange props from App.tsx
                                      includes Notepad (drag-resizable textarea, 80-200px, 1h localStorage expiry)
-    MagicPanel.tsx                 — Auto-detect format, applicableCheck filter, priority-ordered parallel execution
-                                     with early stop (concurrency=3, aborts remaining on first success)
+    MagicPanel.tsx                 — Generate Testcase + auto-detect format, applicableCheck filter,
+                                     priority-ordered parallel execution with early stop
+                                     Stop button, progress bar, applicable preview, results summary
     Sidebar.tsx                    — Collapsible category tree + Magic/Proofs/Calculator buttons + service status
     RsaCalculator.tsx              — Pure BigInt calculator: Key Gen / Encrypt / Decrypt tabs
     ProofIndex.tsx                 — Searchable index of all attacks ("Proofs Index" title)
     ProofRenderer.tsx              — KaTeX renderer: parseProof → segments (text/displayMath/list) → render
                                      hides References section, handles $...$ and \(...\) delimiters
-  data/attacks/
-    index.ts                       — Aggregates all attacks, CATEGORIES, attacksByCategory
-    factorization.ts               — 9 attacks: Fermat, Wiener, Boneh-Durfee, ECM, ECM2,
-                                     Pollard p-1, Pollard rho, Williams p+1, Quadratic Sieve
-    factorization2.ts              — 8 attacks: SQUFOF, Binary Poly Factor, Small Fraction,
-                                     Batch GCD, Multi-Prime, Gimmicky Primes, Close-Prime, Novelty Primes
-    partial-key.ts                 — 7 attacks: Simple Lattice, Partial D, Partial p/q Bits,
-                                     Small CRT Exp, dp/dq Leak, Linearly Related, Dependent Prime
-    message-protocol.ts            — 12 attacks: Common Modulus, Hastad, Franklin-Reiter,
-                                     Coppersmith Short Pad, Hastad Linear Pad, LSB Oracle,
-                                     RSA-CRT Fault, Non-Coprime Exp, Cube Root CRT, Common Factor,
-                                     Homomorphic Forgery, Bleichenbacher Sig
-    oracle.ts                      — 3 attacks: Bleichenbacher PKCS#1, Manger OAEP, Biased LSB
-    advanced.ts                    — 8 attacks: ROCA, Nitros, FactorDB Lookup, Known Plaintext,
-                                     Small Public Exp, Multi-Prime GCD, Phi(n) Leak, Parity Oracle
+  attacks/
+    index.ts                       — Barrel export: aggregates all 52 attacks, CATEGORIES, attacksByCategory, testcaseGenerators
+    fermat.ts                      — { attack, generateTestcase } — close primes
+    wiener.ts                      — { attack, generateTestcase } — small d
+    ... (52 individual attack files, flat directory)
 ```
-
-### Total: 47 attacks across 5 categories
-
-| Category | Count | Files |
-|----------|-------|-------|
-| Factorization | 17 | `factorization.ts` (9) + `factorization2.ts` (8) |
-| Partial Key / Lattice | 7 | `partial-key.ts` |
-| Message / Protocol | 12 | `message-protocol.ts` |
-| Oracle | 3 | `oracle.ts` |
-| Advanced | 8 | `advanced.ts` |
-
 ## Workers Directory (core files tracked in git)
 
-| File | Purpose |
-|------|---------|
-| `workers/factordb-proxy.js` | Cloudflare Worker — CORS proxy for FactorDB API |
-| `workers/package.json` | wrangler ^4.0.0 devDependency, deploy/dev scripts |
-| `workers/wrangler.toml` | Worker name: `factordb-proxy`, main: `factordb-proxy.js` |
-| `workers/DEPLOY.md` | Deployment instructions |
-
 Gitignored: `workers/node_modules/`, `workers/.wrangler/`, `workers/bun.lock`
+Tracked: `factordb-proxy.js`, `wrangler.toml`, `package.json`, `DEPLOY.md`
 
 ## Relevant Files
 
@@ -150,16 +167,15 @@ Gitignored: `workers/node_modules/`, `workers/.wrangler/`, `workers/bun.lock`
 | `src/utils/bigint.ts` | `gcd()`, `isqrt()`, `modPow()`, `modInverse()`, `extendedGcd()` BigInt utilities |
 | `src/utils/factordb.ts` | FactorDB client (query + format) |
 | `src/utils/converters.ts` | Hex/dec/base64 converters + `detectFormat()` |
+| `src/utils/testcases/core.ts` | `randomPrime()`, `generateKeyPair()`, `encrypt()`, `TESTCASE_BITS` |
 | `src/types/index.ts` | `Attack` type with `frontendCheck`, `applicableCheck` |
-| `src/data/attacks/advanced.ts` | FactorDB + Phi(n) Leak with frontendCheck |
-| `src/data/attacks/factorization2.ts` | Batch GCD with frontendCheck |
-| `src/data/attacks/message-protocol.ts` | Common Factor with frontendCheck |
-| `src/components/InputPanel.tsx` | Runs frontendCheck before SageCell |
-| `src/components/MagicPanel.tsx` | Priority-ordered parallel execution, early stop on first success |
+| `src/attacks/index.ts` | Barrel export: all 52 attacks, CATEGORIES, attacksByCategory, testcaseGenerators |
+| `src/components/InputPanel.tsx` | Imports from `../attacks`, runs frontendCheck before SageCell, Generate Testcase button |
+| `src/components/MagicPanel.tsx` | Imports from `../attacks`, priority-ordered parallel execution, early stop, Generate Testcase |
 | `src/components/ProofRenderer.tsx` | KaTeX proof renderer (handles `$...$` and `\(...\)` inline math, hides References) |
-| `src/components/ProofIndex.tsx` | Searchable proof index |
+| `src/components/ProofIndex.tsx` | Imports from `../attacks`, searchable proof index |
 | `src/components/OutputPanel.tsx` | Results display + converters + history + drag-resize handle + Notepad |
-| `src/components/Sidebar.tsx` | Navigation tree (Material Icons) + service status indicators |
+| `src/components/Sidebar.tsx` | Imports from `../attacks`, navigation tree (Material Icons) + service status indicators |
 | `src/components/RsaCalculator.tsx` | Pure BigInt calculator: Key Gen / Encrypt / Decrypt tabs |
 | `src/hooks/useSageMath.ts` | Embedded makeSagecell executor |
 | `src/context/AppContext.tsx` | App state provider |

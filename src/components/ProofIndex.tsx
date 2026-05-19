@@ -12,7 +12,7 @@ import {
 import { MenuBook } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../context/AppContext';
-import { attacks } from '../data/attacks';
+import { attacks } from '../attacks';
 
 const inputSx = {
   '& .MuiOutlinedInput-root': {

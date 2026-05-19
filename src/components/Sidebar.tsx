@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, Calculate, CheckCircle, ErrorOutlined } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
-import { CATEGORIES, attacksByCategory, attacks } from '../data/attacks';
+import { CATEGORIES, attacksByCategory, attacks } from '../attacks';
 import { useAppContext } from '../context/AppContext';
 import { FACTORDB_PROXY_URL } from '../config';
 
@@ -29,6 +29,9 @@ export function Sidebar() {
   const [status, setStatus] = useState<ServiceStatus>({ factordb: 'checking', sagecell: 'checking' });
 
   useEffect(() => {
+    let timer: ReturnType<typeof setInterval> | undefined;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+
     // Check FactorDB proxy
     if (FACTORDB_PROXY_URL) {
       fetch(`${FACTORDB_PROXY_URL}?query=15`, { signal: AbortSignal.timeout(5000) })
@@ -44,14 +47,14 @@ export function Sidebar() {
       if (typeof window !== 'undefined' && window.sagecell) {
         setStatus(prev => ({ ...prev, sagecell: 'ok' }));
       } else {
-        const timer = setInterval(() => {
+        timer = setInterval(() => {
           if (window.sagecell) {
-            clearInterval(timer);
+            clearInterval(timer!);
             setStatus(prev => ({ ...prev, sagecell: 'ok' }));
           }
         }, 200);
-        setTimeout(() => {
-          clearInterval(timer);
+        timeout = setTimeout(() => {
+          clearInterval(timer!);
           if (!window.sagecell) {
             setStatus(prev => ({ ...prev, sagecell: 'error' }));
           }
@@ -59,6 +62,11 @@ export function Sidebar() {
       }
     };
     checkSageCell();
+
+    return () => {
+      if (timer) clearInterval(timer);
+      if (timeout) clearTimeout(timeout);
+    };
   }, []);
 
   const toggleCat = (cat: string) => {
@@ -145,8 +153,6 @@ export function Sidebar() {
           onClick={() => setViewMode('magic')}
           sx={{
             mx: 1,
-            border: `1px solid ${draculaColors.purple}`,
-            borderRadius: 1,
             '&:hover': { backgroundColor: draculaColors.background },
           }}
         >

@@ -159,12 +159,13 @@ export function useSageMathParallel() {
     codes: string[],
     concurrency = 3,
     timeoutMs = 35000,
-    onResult?: (index: number, result: SageResult) => boolean
+    onResult?: (index: number, result: SageResult) => boolean,
+    externalController?: AbortController
   ): Promise<(SageResult & { index: number })[]> => {
     const results: (SageResult & { index: number })[] = [];
     const queue = codes.map((code, index) => ({ code, index }));
     const inProgress = new Set<number>();
-    const controller = new AbortController();
+    const controller = externalController ?? new AbortController();
 
     return new Promise((resolve) => {
       const { execute } = createSageMathExecutor();
@@ -205,5 +206,5 @@ export function useSageMathParallel() {
     });
   };
 
-  return { executeAll };
+  return { executeAll, createController: () => new AbortController() };
 }

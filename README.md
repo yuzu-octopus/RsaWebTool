@@ -29,35 +29,42 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 
 ## Architecture
 
+### Attack System
+
+All 47 attacks live in `src/attacks/` as individual self-contained files. Each file exports:
+- `attack: Attack` — full attack metadata (id, name, inputs, sageTemplate, proof, priority, applicableCheck, frontendCheck?)
+- `generateTestcase: () => Record<string, string>` — attack-specific testcase generator
+
+`src/attacks/index.ts` aggregates everything into:
+- `attacks: Attack[]` — flat array for UI consumption
+- `testcaseGenerators: Record<string, () => Record<string, string>>` — keyed by attack id
+- `CATEGORIES` — ordered category list
+- `attacksByCategory` — Map of category → attacks
+
+Adding a new attack = 1 file + 1 import line in `index.ts`. Zero UI changes needed.
+
+### Directory Structure
+
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    Browser (GitHub Pages)                │
-│  ┌──────────┐  ┌──────────┐  ┌───────────────────────┐  │
-│  │ Sidebar  │  │ Input/   │  │ OutputPanel           │  │
-│  │          │  │ Magic    │  │ Results + Converters  │  │
-│  │ Attack   │→ │ Panel    │→ │ History               │  │
-│  │ Tree     │  │          │  │                       │  │
-│  └──────────┘  └────┬─────┘  └───────────────────────┘  │
-│                     │                                    │
-│          ┌──────────┴──────────┐                        │
-│          │                     │                        │
-│   ┌──────▼──────┐    ┌────────▼─────────┐              │
-│   │ frontendCheck│    │ SageMathCell     │              │
-│   │ (browser)   │    │ (embedded JS)    │              │
-│   │             │    │                  │              │
-│   │ • FactorDB  │    │ Pure math code   │              │
-│   │ • Phi(n)    │    │ No internet      │              │
-│   │ • Batch GCD │    │ (firewall 2021)  │              │
-│   │ • Common F. │    │                  │              │
-│   └─────────────┘    └──────────────────┘              │
-└─────────────────────────────────────────────────────────┘
-         │
-         │ CORS proxy (Cloudflare Worker)
-         ▼
-┌──────────────────┐
-│ FactorDB API     │
-│ factordb.com/api │
-└──────────────────┘
+src/
+  attacks/
+    index.ts              — Barrel export: aggregates all 47 attacks, CATEGORIES, attacksByCategory
+    categories.ts         — CATEGORIES constant + attacksByCategory Map
+    fermat.ts             — { attack: Attack, generateTestcase: () => Record<string, string> }
+    wiener.ts             — Same pattern (all 47 attacks follow this)
+    ... (47 individual attack files, flat directory)
+  utils/testcases/
+    core.ts               — Shared utilities: randomPrime(), generateKeyPair(), encrypt(), TESTCASE_BITS
+  context/AppContext.tsx  — React context: selectedAttack, viewMode, output, history (cap 50)
+  hooks/useSageMath.ts    — SageMath executor (single + parallel with concurrency=3)
+  components/
+    InputPanel.tsx        — Attack input form + Generate Testcase + Run/Stop + proof tab
+    OutputPanel.tsx       — Results display + converters + copy + history + Notepad
+    MagicPanel.tsx        — Generate Testcase + auto-detect format, priority-ordered parallel execution
+    Sidebar.tsx           — Collapsible category tree + Magic/Proofs/Calculator buttons + service status
+    RsaCalculator.tsx     — Pure BigInt calculator: Key Gen / Encrypt / Decrypt tabs
+    ProofIndex.tsx        — Searchable index of all attacks
+    ProofRenderer.tsx     — KaTeX renderer: parseProof → segments → render
 ```
 
 ### Key Design Decisions

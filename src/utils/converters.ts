@@ -82,3 +82,111 @@ export function detectFormat(input: string): DetectedFormat {
   }
   return 'unknown';
 }
+
+function skipDerLength(bytes: number[], offset: number): number {
+  if (bytes[offset] < 0x80) return offset + 1;
+  const numBytes = bytes[offset] & 0x7f;
+  return offset + 1 + numBytes;
+}
+
+function parseDerInteger(
+  bytes: number[],
+  offset: number,
+): { value: number[]; newOffset: number } {
+  const length =
+    bytes[offset] < 0x80
+      ? bytes[offset]
+      : (() => {
+          const numBytes = bytes[offset] & 0x7f;
+          let len = 0;
+          for (let i = 0; i < numBytes; i++) {
+            len = (len << 8) | bytes[offset + 1 + i];
+          }
+          return len;
+        })();
+  const valueStart =
+    bytes[offset] < 0x80
+      ? offset + 1
+      : offset + 1 + (bytes[offset] & 0x7f);
+  const value = bytes.slice(valueStart, valueStart + length);
+  const newOffset = valueStart + length;
+  return { value, newOffset };
+}
+
+function bytesToHex(bytes: number[]): string {
+  return bytes.map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+export function parsePEM(input: string): { n: string; e: string } | null {
+  const spkiRegex =
+    /-----BEGIN PUBLIC KEY-----(.+?)-----END PUBLIC KEY-----/s;
+  const pkcs1Regex =
+    /-----BEGIN RSA PUBLIC KEY-----(.+?)-----END RSA PUBLIC KEY-----/s;
+
+  let bytes: number[];
+  let isPkcs1 = false;
+
+  const spkiMatch = spkiRegex.exec(input);
+  const pkcs1Match = pkcs1Regex.exec(input);
+
+  if (pkcs1Match) {
+    isPkcs1 = true;
+    const b64 = pkcs1Match[1].replace(/\s/g, '');
+    const der = atob(b64);
+    bytes = Array.from(der).map((c) => c.charCodeAt(0));
+  } else if (spkiMatch) {
+    const b64 = spkiMatch[1].replace(/\s/g, '');
+    const der = atob(b64);
+    bytes = Array.from(der).map((c) => c.charCodeAt(0));
+  } else {
+    return null;
+  }
+
+  try {
+    let offset = 0;
+
+    if (bytes[offset++] !== 0x30) return null;
+    offset = skipDerLength(bytes, offset);
+
+    if (isPkcs1) {
+      // PKCS#1: SEQUENCE { INTEGER n, INTEGER e } — n and e directly
+      if (bytes[offset++] !== 0x02) return null;
+      const { value: nBytes, newOffset: nEnd } = parseDerInteger(bytes, offset);
+      const n = bytesToHex(nBytes);
+      offset = nEnd;
+
+      if (bytes[offset++] !== 0x02) return null;
+      const { value: eBytes } = parseDerInteger(bytes, offset);
+      const e = bytesToHex(eBytes);
+
+      return { n, e };
+    } else {
+      // SPKI: SEQUENCE { AlgorithmIdentifier, BIT STRING { SEQUENCE { INTEGER n, INTEGER e } } }
+      // Skip AlgorithmIdentifier (SEQUENCE + OID + NULL)
+      if (bytes[offset++] !== 0x30) return null;
+      offset = skipDerLength(bytes, offset);
+
+      // Skip BIT STRING wrapper
+      if (bytes[offset++] !== 0x03) return null;
+      offset = skipDerLength(bytes, offset);
+      offset++; // skip unused bits byte
+
+      // Now at inner SEQUENCE { n, e }
+      if (bytes[offset++] !== 0x30) return null;
+      offset = skipDerLength(bytes, offset);
+
+      if (bytes[offset++] !== 0x02) return null;
+      const { value: nBytes, newOffset: nEnd } = parseDerInteger(bytes, offset);
+      const n = bytesToHex(nBytes);
+      offset = nEnd;
+
+      if (bytes[offset++] !== 0x02) return null;
+      const { value: eBytes } = parseDerInteger(bytes, offset);
+      const e = bytesToHex(eBytes);
+
+      return { n, e };
+    }
+  } catch {
+    return null;
+  }
+}

@@ -21,6 +21,7 @@ export interface Attack {
   priority: 'high' | 'medium' | 'low';
   applicableCheck: (params: Record<string, string>) => boolean;
   frontendCheck?: (vals: Record<string, string>) => Promise<string | null>;
+  generateTestcase?: () => Record<string, string>;
 }
 
 export interface HistoryEntry {
