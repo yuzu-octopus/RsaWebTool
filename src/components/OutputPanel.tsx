@@ -8,7 +8,6 @@ import {
   ListItem,
   ListItemText,
   Divider,
-  TextField,
 } from '@mui/material';
 import { ExpandLess, ExpandMore, ContentCopy, CheckCircle, Cancel } from '@mui/icons-material';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -34,6 +33,13 @@ export function OutputPanel({ width, onWidthChange }: { width: number; onWidthCh
   const [conversionResult, setConversionResult] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [notepadOpen, setNotepadOpen] = useState(false);
+  const [notepadHeight, setNotepadHeight] = useState(() => {
+    try {
+      const h = localStorage.getItem('notepadHeight');
+      if (h) { const n = parseInt(h, 10); if (n >= 80 && n <= 200) return n; }
+    } catch { /* ignore */ }
+    return 80;
+  });
   const [notepadText, setNotepadText] = useState(() => {
     try {
       const stored = localStorage.getItem('notepad');
@@ -45,6 +51,35 @@ export function OutputPanel({ width, onWidthChange }: { width: number; onWidthCh
     return '';
   });
   const isDragging = useRef(false);
+  const isNotepadDragging = useRef(false);
+
+  const handleNotepadResizeMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isNotepadDragging.current = true;
+    const startY = e.clientY;
+    const startHeight = notepadHeight;
+
+    const handleMouseMove = (ev: MouseEvent) => {
+      if (!isNotepadDragging.current) return;
+      const delta = ev.clientY - startY;
+      const newHeight = Math.min(200, Math.max(80, startHeight - delta));
+      setNotepadHeight(newHeight);
+      try { localStorage.setItem('notepadHeight', String(newHeight)); } catch { /* ignore */ }
+    };
+
+    const handleMouseUp = () => {
+      isNotepadDragging.current = false;
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+  }, [notepadHeight]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -96,7 +131,7 @@ export function OutputPanel({ width, onWidthChange }: { width: number; onWidthCh
   };
 
   return (
-    <Box sx={{ width, flexShrink: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderLeft: `1px solid ${draculaColors.comment}`, pl: 2, position: 'relative' }}>
+    <Box sx={{ width, flexShrink: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', pl: 2, position: 'relative' }}>
       <Box
         sx={{
           position: 'absolute',
@@ -106,9 +141,18 @@ export function OutputPanel({ width, onWidthChange }: { width: number; onWidthCh
           width: '4px',
           cursor: 'col-resize',
           zIndex: 10,
-          '&:hover, &.active': {
-            backgroundColor: draculaColors.purple,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          '&::after': {
+            content: '""',
+            display: 'block',
+            width: '1px',
+            height: '100%',
+            backgroundColor: draculaColors.comment,
+            transition: 'background-color 0.15s',
           },
+          '&:hover::after, &.active::after': { backgroundColor: draculaColors.purple },
         }}
         onMouseDown={handleMouseDown}
       />
@@ -190,9 +234,26 @@ export function OutputPanel({ width, onWidthChange }: { width: number; onWidthCh
         )}
       </Box>
 
-      <Divider sx={{ borderColor: draculaColors.comment }} />
+      <Box
+        onMouseDown={handleNotepadResizeMouseDown}
+        sx={{
+          height: '4px',
+          cursor: 'row-resize',
+          display: 'flex',
+          alignItems: 'center',
+          '&::after': {
+            content: '""',
+            display: 'block',
+            width: '100%',
+            height: '1px',
+            backgroundColor: draculaColors.comment,
+            transition: 'background-color 0.15s',
+          },
+          '&:hover::after': { backgroundColor: draculaColors.purple },
+        }}
+      />
 
-      <Box sx={{ px: 2 }}>
+      <Box sx={{ px: 2, pb: 2 }}>
         <Button
           fullWidth
           onClick={() => setNotepadOpen(!notepadOpen)}
@@ -203,37 +264,34 @@ export function OutputPanel({ width, onWidthChange }: { width: number; onWidthCh
         </Button>
 
         <Collapse in={notepadOpen}>
-          <TextField
-            fullWidth
-            multiline
-            rows={4}
+          <textarea
             value={notepadText}
             onChange={e => handleNotepadChange(e.target.value)}
             placeholder="Take notes here..."
-            variant="outlined"
-            sx={{
-              mt: 1,
-              '& .MuiOutlinedInput-root': {
-                backgroundColor: draculaColors.currentLine,
-                color: draculaColors.foreground,
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '0.8rem',
-                '& fieldset': { borderColor: draculaColors.comment },
-                '&:hover fieldset': { borderColor: draculaColors.purple },
-                '&.Mui-focused fieldset': { borderColor: draculaColors.purple },
-              },
-              '& .MuiInputBase-input': {
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '0.8rem',
-              },
+            style={{
+              width: '100%',
+              height: `${notepadHeight}px`,
+              resize: 'none',
+              marginTop: '8px',
+              padding: '8px 12px',
+              backgroundColor: draculaColors.currentLine,
+              color: draculaColors.foreground,
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: '0.8rem',
+              border: `1px solid ${draculaColors.comment}`,
+              borderRadius: '4px',
+              outline: 'none',
+              boxSizing: 'border-box',
             }}
+            onFocus={e => (e.target.style.borderColor = draculaColors.purple)}
+            onBlur={e => (e.target.style.borderColor = draculaColors.comment)}
           />
         </Collapse>
       </Box>
 
       <Divider sx={{ borderColor: draculaColors.comment }} />
 
-      <Box sx={{ px: 2 }}>
+      <Box sx={{ px: 2, pb: 2 }}>
         <Button
           fullWidth
           onClick={() => setHistoryOpen(!historyOpen)}

@@ -84,17 +84,20 @@ src/
   context/AppContext.tsx           — React context: selectedAttack, viewMode, output, history (cap 50)
   theme/dracula.ts                 — MUI Dracula theme + scrollbar overrides
   hooks/useSageMath.ts             — SageMath executor (single + parallel with concurrency=3)
-  utils/bigint.ts                  — gcd(a,b) + isqrt(x) BigInt utilities
+  utils/bigint.ts                  — gcd(a,b) + isqrt(x) BigInt utilities + modPow + modInverse + extendedGcd
   utils/converters.ts              — hex/dec/base64 converters + detectFormat()
   utils/factordb.ts                — FactorDB client (query, format, proxy setter, 10s timeout)
   vite-env.d.ts                    — Vite env type declarations
   components/
     InputPanel.tsx                 — Attack input form + run button + proof tab (frontendCheck → SageCell)
     OutputPanel.tsx                — Results display (Prism/Dracula) + converters + copy + history
-                                     resizable via left-edge drag handle (200-600px)
+                                     resizable via left-edge drag handle (200-600px, 1px visible line, 4px grab area)
                                      receives width + onWidthChange props from App.tsx
-    MagicPanel.tsx                 — Auto-detect format, applicableCheck filter, parallel frontendCheck + SageCell
-    Sidebar.tsx                    — Collapsible category tree + Magic/Proofs buttons + footer
+                                     includes Notepad (drag-resizable textarea, 80-200px, 1h localStorage expiry)
+    MagicPanel.tsx                 — Auto-detect format, applicableCheck filter, priority-ordered parallel execution
+                                     with early stop (concurrency=3, aborts remaining on first success)
+    Sidebar.tsx                    — Collapsible category tree + Magic/Proofs/Calculator buttons + service status
+    RsaCalculator.tsx              — Pure BigInt calculator: Key Gen / Encrypt / Decrypt tabs
     ProofIndex.tsx                 — Searchable index of all attacks ("Proofs Index" title)
     ProofRenderer.tsx              — KaTeX renderer: parseProof → segments (text/displayMath/list) → render
                                      hides References section, handles $...$ and \(...\) delimiters
@@ -144,7 +147,7 @@ Gitignored: `workers/node_modules/`, `workers/.wrangler/`, `workers/bun.lock`
 | `workers/package.json` | wrangler deps + deploy script |
 | `workers/wrangler.toml` | Worker config |
 | `src/config.ts` | `FACTORDB_PROXY_URL` constant |
-| `src/utils/bigint.ts` | `gcd()`, `isqrt()` BigInt utilities |
+| `src/utils/bigint.ts` | `gcd()`, `isqrt()`, `modPow()`, `modInverse()`, `extendedGcd()` BigInt utilities |
 | `src/utils/factordb.ts` | FactorDB client (query + format) |
 | `src/utils/converters.ts` | Hex/dec/base64 converters + `detectFormat()` |
 | `src/types/index.ts` | `Attack` type with `frontendCheck`, `applicableCheck` |
@@ -152,11 +155,12 @@ Gitignored: `workers/node_modules/`, `workers/.wrangler/`, `workers/bun.lock`
 | `src/data/attacks/factorization2.ts` | Batch GCD with frontendCheck |
 | `src/data/attacks/message-protocol.ts` | Common Factor with frontendCheck |
 | `src/components/InputPanel.tsx` | Runs frontendCheck before SageCell |
-| `src/components/MagicPanel.tsx` | Runs frontendCheck on all attacks in parallel |
+| `src/components/MagicPanel.tsx` | Priority-ordered parallel execution, early stop on first success |
 | `src/components/ProofRenderer.tsx` | KaTeX proof renderer (handles `$...$` and `\(...\)` inline math, hides References) |
 | `src/components/ProofIndex.tsx` | Searchable proof index |
-| `src/components/OutputPanel.tsx` | Results display + converters + history + drag-resize handle |
-| `src/components/Sidebar.tsx` | Navigation tree (Material Icons) |
+| `src/components/OutputPanel.tsx` | Results display + converters + history + drag-resize handle + Notepad |
+| `src/components/Sidebar.tsx` | Navigation tree (Material Icons) + service status indicators |
+| `src/components/RsaCalculator.tsx` | Pure BigInt calculator: Key Gen / Encrypt / Decrypt tabs |
 | `src/hooks/useSageMath.ts` | Embedded makeSagecell executor |
 | `src/context/AppContext.tsx` | App state provider |
 | `src/theme/dracula.ts` | Dracula theme + CssBaseline overrides |
@@ -200,6 +204,30 @@ Gitignored: `workers/node_modules/`, `workers/.wrangler/`, `workers/bun.lock`
 
 ### MagicPanel
 - `applicableCheck` wrapped in try/catch to prevent single bad check from crashing the filter
+- Attacks sorted by priority (high→medium→low) before execution
+- `executeAll` accepts `onResult` callback — returns `true` to abort remaining via AbortController
+- Concurrency=3, early stop on first success, remaining jobs marked as `aborted`
+
+### Notepad
+- Collapsible textarea in OutputPanel above History section
+- Drag-resizable via 4px grab bar above "Notepad" button (80-200px range)
+- localStorage persistence with 1h expiry (`notepad` key: `{text, timestamp}`)
+- Height persisted separately (`notepadHeight` key)
+
+### RSA Calculator
+- New `calculator` viewMode, pure BigInt (no SageCell)
+- 3 tabs: Key Gen (p,q,e → n,φ,d), Encrypt (m,n,e → c), Decrypt (c,n,d or c,n,p,q,e → m)
+- Decrypt tries `d` first, falls back to computing from `p,q,e` if not provided
+- Auto-detects hex/decimal input format
+
+### Service Status
+- Sidebar shows FactorDB proxy and SageMathCell availability on mount
+- FactorDB: 5s timeout fetch to `?query=15`
+- SageMathCell: polls for `window.sagecell` with 8s timeout
+
+### Scrollbar Styling
+- 12px width with `border: 2px solid transparent` + `backgroundClip: padding-box` for visual padding
+- OutputPanel left-edge drag handle: 4px grab area, 1px visible line via `::after` pseudo-element
 
 ## What's Blocked
 - None. Proxy is deployed, builds pass, app is live on GitHub Pages.

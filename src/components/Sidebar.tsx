@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Drawer,
   List,
@@ -10,16 +10,56 @@ import {
   Divider,
   Link,
 } from '@mui/material';
-import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, Calculate } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, Calculate, CheckCircle, ErrorOutlined } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { CATEGORIES, attacksByCategory, attacks } from '../data/attacks';
 import { useAppContext } from '../context/AppContext';
+import { FACTORDB_PROXY_URL } from '../config';
 
 export const drawerWidth = 220;
+
+interface ServiceStatus {
+  factordb: 'checking' | 'ok' | 'error';
+  sagecell: 'checking' | 'ok' | 'error';
+}
 
 export function Sidebar() {
   const { selectedAttack, setSelectedAttack, setViewMode } = useAppContext();
   const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set(CATEGORIES));
+  const [status, setStatus] = useState<ServiceStatus>({ factordb: 'checking', sagecell: 'checking' });
+
+  useEffect(() => {
+    // Check FactorDB proxy
+    if (FACTORDB_PROXY_URL) {
+      fetch(`${FACTORDB_PROXY_URL}?query=15`, { signal: AbortSignal.timeout(5000) })
+        .then(r => r.json())
+        .then(() => setStatus(prev => ({ ...prev, factordb: 'ok' })))
+        .catch(() => setStatus(prev => ({ ...prev, factordb: 'error' })));
+    } else {
+      setStatus(prev => ({ ...prev, factordb: 'error' }));
+    }
+
+    // Check SageMathCell
+    const checkSageCell = () => {
+      if (typeof window !== 'undefined' && window.sagecell) {
+        setStatus(prev => ({ ...prev, sagecell: 'ok' }));
+      } else {
+        const timer = setInterval(() => {
+          if (window.sagecell) {
+            clearInterval(timer);
+            setStatus(prev => ({ ...prev, sagecell: 'ok' }));
+          }
+        }, 200);
+        setTimeout(() => {
+          clearInterval(timer);
+          if (!window.sagecell) {
+            setStatus(prev => ({ ...prev, sagecell: 'error' }));
+          }
+        }, 8000);
+      }
+    };
+    checkSageCell();
+  }, []);
 
   const toggleCat = (cat: string) => {
     setExpandedCats(prev => {
@@ -146,6 +186,38 @@ export function Sidebar() {
             slotProps={{ primary: { sx: { color: draculaColors.cyan, fontSize: '0.85rem' } } }}
           />
         </ListItemButton>
+
+        <Divider sx={{ borderColor: draculaColors.comment, my: 1 }} />
+
+        <Box sx={{ px: 2, py: 1 }}>
+          <Typography variant="caption" sx={{ color: draculaColors.comment, fontWeight: 600, fontSize: '0.7rem', display: 'block', mb: 0.5 }}>
+            SERVICE STATUS
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+            {status.factordb === 'ok' ? (
+              <CheckCircle sx={{ color: draculaColors.green, fontSize: '0.9rem' }} />
+            ) : status.factordb === 'error' ? (
+              <ErrorOutlined sx={{ color: draculaColors.red, fontSize: '0.9rem' }} />
+            ) : (
+              <Box sx={{ width: '0.9rem', height: '0.9rem', borderRadius: '50%', border: `2px solid ${draculaColors.comment}` }} />
+            )}
+            <Typography variant="caption" sx={{ color: draculaColors.foreground, fontSize: '0.7rem' }}>
+              FactorDB
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {status.sagecell === 'ok' ? (
+              <CheckCircle sx={{ color: draculaColors.green, fontSize: '0.9rem' }} />
+            ) : status.sagecell === 'error' ? (
+              <ErrorOutlined sx={{ color: draculaColors.red, fontSize: '0.9rem' }} />
+            ) : (
+              <Box sx={{ width: '0.9rem', height: '0.9rem', borderRadius: '50%', border: `2px solid ${draculaColors.comment}` }} />
+            )}
+            <Typography variant="caption" sx={{ color: draculaColors.foreground, fontSize: '0.7rem' }}>
+              SageMathCell
+            </Typography>
+          </Box>
+        </Box>
       </List>
 
       <Divider sx={{ borderColor: draculaColors.comment }} />

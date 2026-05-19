@@ -10,8 +10,11 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 - **Real-time SageMath execution** via embedded SageMathCell
 - **Browser-side pre-checks** — 4 attacks run entirely in the browser (no SageCell needed)
 - **FactorDB integration** — CORS-proxied API for instant factor lookups
-- **Magic Cracker** — paste any RSA parameters and auto-run all applicable attacks
+- **Magic Cracker** — paste any RSA parameters and auto-run all applicable attacks (priority-ordered, early stop)
+- **RSA Calculator** — pure BigInt Key Gen / Encrypt / Decrypt (no SageCell needed)
 - **Mathematical proofs** — every attack includes a formal proof rendered with KaTeX
+- **Notepad** — persistent scratchpad with drag-resizable height
+- **Service status** — live FactorDB proxy and SageMathCell availability indicators
 - **Dracula theme** — full dark mode with JetBrains Mono typography
 
 ## Attack Categories
