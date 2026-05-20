@@ -1,5 +1,6 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
+import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
+import { modInverse } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'partial-d',
@@ -18,7 +19,7 @@ export const attack: Attack = {
     if n <= 0 or e <= 0 or dLow < 0:
         print("PARTIAL_D=FAILED: invalid input values")
     else:
-        m = dLow.bit_length()
+        m = dLow.nbits()
         found = False
         for k in range(1, e + 1):
             d_approx = (k * n + 1) // e
@@ -28,7 +29,7 @@ export const attack: Attack = {
                 s = n - phi + 1
                 disc = s*s - 4*n
                 if disc >= 0:
-                    sqrt_disc = isqrt(disc)
+                    sqrt_disc = ZZ(disc).isqrt()
                     if sqrt_disc * sqrt_disc == disc:
                         p = (s + sqrt_disc) // 2
                         q = (s - sqrt_disc) // 2
@@ -44,13 +45,47 @@ export const attack: Attack = {
             print("PARTIAL_D=FAILED: no valid d found")
 except Exception as ex:
     print(f"PARTIAL_D=FAILED: {ex}")`,
-  proof: '\\textbf{Theorem:} If low bits of $d$ are known, full $d$ can be recovered when $d$ is small.\\newline\\newline\\textbf{Prerequisites:} Hensel lifting, RSA key equation\\newline\\newline\\textbf{Proof:}\\begin{align*}ed &\\equiv 1 \\pmod{\\varphi(n)} \\\\ d &= d_{\\text{high}} \\cdot 2^m + d_{\\text{low}} \\\\ \\text{For each } k: \\quad d &\\approx \\frac{k \\cdot n}{e} \\\\ \\text{Check if } d \\bmod 2^m &= d_{\\text{low}}\\end{align*}\\newline\\textbf{References:} Boneh, Durfee, Frankel (1998)',
+  proof: `\\textbf{Theorem:} If the low $m$ bits of $d$ are known and $d < n$, the full $d$ can be recovered by iterating $k$ in the RSA key equation.
+
+\\textbf{Prerequisites:}
+\\begin{itemize}
+\\item RSA key equation: $ed \\equiv 1 \\pmod{\\varphi(n)}$
+\\item $ed - 1 = k\\varphi(n)$ for some integer $k$
+\\item Known low $m$ bits of $d$: $d_{\\text{low}} = d \\bmod 2^m$
+\\item $\\varphi(n) = n - (p + q) + 1 \\approx n$
+\\end{itemize}
+
+\\textbf{Proof:}
+\\begin{align*}
+ed - 1 &= k\\varphi(n) \\\\
+d &= \\frac{k\\varphi(n) + 1}{e} \\approx \\frac{kn + 1}{e} \\\\
+d_{\\text{approx}} &= \\left\\lfloor \\frac{kn + 1}{e} \\right\\rfloor \\\\
+\\text{Check: } d_{\\text{approx}} \\bmod 2^m &\\stackrel{?}{=} d_{\\text{low}} \\\\
+\\text{If match: } \\varphi &= (ed - 1)/k \\\\
+x^2 - (n - \\varphi + 1)x + n &= 0 \\implies p, q \\qed
+\\end{align*}
+
+\\textbf{Explanation:} For each candidate $k \\in [1, e]$, compute $d_{\\text{approx}} = \\lfloor(kn + 1)/e\\rfloor$. If the low $m$ bits match the leaked $d_{\\text{low}}$, recover $\\varphi(n) = (ed - 1)/k$ and solve the quadratic $x^2 - (n - \\varphi + 1)x + n = 0$ to find $p$ and $q$.
+
+\\textbf{References:} D. Boneh, R. DeMillo, R. Lipton, "On the Importance of Checking Cryptographic Protocols for Faults", EUROCRYPT 1997`,
   priority: 'high',
   applicableCheck: (p) => !!p.n && !!p.e && !!p.dLow,
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n, e, d } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+  // Construct RSA key with small d so the k-iteration attack works
+  // d must be small enough that k = (ed-1)/phi is in range [1, e]
+  const p = randomPrime(TESTCASE_BITS.p);
+  const q = randomPrime(TESTCASE_BITS.q);
+  const n = p * q;
+  const phi = (p - 1n) * (q - 1n);
+  // Pick small d and derive e from it
+  let d = BigInt(100 + Math.floor(Math.random() * 10000));
+  while (modInverse(d, phi) === null) {
+    d += 1n;
+  }
+  const e = modInverse(d, phi)!;
+  // Leak low 20 bits of d
   const dLow = d & ((1n << 20n) - 1n);
   return { n: n.toString(), e: e.toString(), dLow: dLow.toString() };
 };

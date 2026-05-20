@@ -80,4 +80,4 @@ export function encrypt(m: bigint, n: bigint, e: bigint): bigint {
 }
 
 // Testcase generation defaults — change here to affect ALL attacks
-export const TESTCASE_BITS = { p: 128, q: 128 }; // n ≈ 256-bit
+export const TESTCASE_BITS = { p: 256, q: 256 }; // n ≈ 512-bit

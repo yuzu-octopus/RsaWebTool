@@ -99,16 +99,17 @@ p &\\mid \\gcd(a^M - 1, n) \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Build ~128-bit p where p-1 is B-smooth
+  // Build ~256-bit p where p-1 is B-smooth (all prime factors ≤ 71)
+  // B=10000 covers all factors with huge margin
   const smallPrimes = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n, 67n, 71n];
-  let pMinus1 = 1n;
+  let pMinus1 = 2n;
   for (const sp of smallPrimes) {
     const exp = Math.floor(Math.random() * 4) + 1;
     pMinus1 *= sp ** BigInt(exp);
   }
-  while (pMinus1 < (1n << 127n)) pMinus1 *= 2n;
+  while (pMinus1 < (1n << 255n)) pMinus1 *= 2n;
   let p = pMinus1 + 1n;
   while (!isPrimeMR(p)) { pMinus1 *= 2n; p = pMinus1 + 1n; }
   const q = randomPrime(TESTCASE_BITS.q);
-  return { n: (p * q).toString() };
+  return { n: (p * q).toString(), B: '10000' };
 };

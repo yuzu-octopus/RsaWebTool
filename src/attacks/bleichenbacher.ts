@@ -1,6 +1,5 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
-import { modPow } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'bleichenbacher',
@@ -13,8 +12,7 @@ export const attack: Attack = {
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
     { name: 'oracle_responses', label: 'Oracle responses (comma-separated 0/1)', placeholder: '1,0,1,1,0,...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `# Simplified Bleichenbacher simulation — full attack requires ~2^17 queries
-# Validate inputs
+  sageTemplate: (vals: Record<string, string>) => `# Bleichenbacher PKCS#1 v1.5 padding oracle attack
 if not "${vals.n}".strip():
     print("ERROR: n is required")
     print("BLEICHENBACHER=FAILED")
@@ -49,89 +47,81 @@ try:
     print(f"Oracle responses: {len(oracle_bits)}")
     print()
 
-    # PKCS#1 v1.5 padding: EM = 0x00 || 0x02 || PS || 0x00 || M
-    # B = 2^(8*(k-2)) where k = byte length of n
-    # Valid padding: 2B <= m < 3B
-
-    k = (n.nbits() + 7) // 8  # byte length
+    # PKCS#1 v1.5: EM = 0x00 || 0x02 || PS || 0x00 || M
+    # Valid padding: 2B <= m < 3B where B = 2^(8*(k-2)), k = byte length
+    k = (n.nbits() + 7) // 8
     B = Integer(2)**(8 * (k - 2))
 
-    print(f"Block size: {k} bytes")
-    print(f"B = 2^(8*{k-2}) = {B}")
-    print(f"Valid padding range: [{2*B}, {3*B})")
+    print(f"Block size: {k} bytes, B = 2^(8*{k-2})")
+    print(f"Valid padding range: [2B, 3B) = [{2*B}, {3*B})")
     print()
 
-    # The real Bleichenbacher attack has 3 phases:
-    # Phase 1: Find s1 such that (c * s1^e) mod n has valid padding
-    # Phase 2: Narrow the interval containing m
-    # Phase 3: Compute m from the final interval
+    # Collect valid s values from oracle responses
+    valid_s = [Integer(i + 1) for i, r in enumerate(oracle_bits) if r == 1]
+    print(f"Valid padding responses: {len(valid_s)}")
+    if len(valid_s) < 2:
+        print("Need at least 2 valid responses for interval narrowing")
+        print("BLEICHENBACHER=FAILED")
+        quit()
 
-    # For demonstration, we use the oracle responses to simulate interval narrowing
-    # Each response indicates whether (c * s^e)^d mod n has valid PKCS#1 v1.5 padding
+    s1 = valid_s[0]
+    print(f"s1 = {s1}")
 
-    # Initialize interval [a, b]
-    a = Integer(2 * B)
-    b = Integer(3 * B - 1)
+    # Initial interval from s1
+    a = ceil((2 * B) / s1)
+    b = floor((3 * B - 1) / s1)
+    if s1 > 1:
+        for r in range(0, int(s1) + 1):
+            r_int = Integer(r)
+            ca = ceil((2 * B + r_int * n) / s1)
+            cb = floor((3 * B - 1 + r_int * n) / s1)
+            if ca < cb:
+                a = ca
+                b = cb
+                break
 
-    print(f"Initial interval: [{a}, {b}]")
-    print(f"Interval size: {b - a + 1}")
+    print(f"Initial interval: [{a}, {b}], size={(b-a+1).nbits()} bits")
     print()
 
-    # For each oracle response, narrow the interval using proper Bleichenbacher logic
-    # Each response indicates whether (c * s^e)^d mod n has valid PKCS#1 v1.5 padding
-    # Valid: 2B <= m*s mod n < 3B
+    # Narrow using remaining valid s values
+    for idx in range(1, min(len(valid_s), 50)):
+        s = valid_s[idx]
 
-    s = Integer(1)
-    for i, response in enumerate(oracle_bits):
-        # Choose s = 2 for binary-style search
-        s = Integer(2)
+        # Find r range
+        r_min = ceil((a * s - 3 * B + 1) / n)
+        r_max = floor((b * s - 2 * B) / n)
 
-        # Compute m*s mod n bounds from oracle response
-        # If valid: 2B <= m*s mod n < 3B
-        # This means m*s - r*n is in [2B, 3B) for some integer r
-        # So m is in [(2B + r*n)/s, (3B - 1 + r*n)/s] for some r
+        new_a = None
+        new_b = None
+        for r in range(int(r_min), int(r_max) + 1):
+            r_int = Integer(r)
+            ca = ceil((2 * B + r_int * n) / s)
+            cb = floor((3 * B - 1 + r_int * n) / s)
+            inter_a = max(a, ca)
+            inter_b = min(b, cb)
+            if inter_a <= inter_b:
+                if new_a is None or inter_a > new_a:
+                    new_a = inter_a
+                if new_b is None or inter_b < new_b:
+                    new_b = inter_b
 
-        if response == 1:
-            # Valid padding: m*s mod n in [2B, 3B)
-            # Narrow to intersection of [a, b] with valid intervals
-            # For r=0: m in [ceil(2B/s), floor((3B-1)/s)]
-            new_a = (2 * B + s - 1) // s
-            new_b = (3 * B - 1) // s
-            # Also consider r=1: m in [ceil((2B+n)/s), floor((3B-1+n)/s)]
-            new_a2 = (2 * B + n + s - 1) // s
-            new_b2 = (3 * B - 1 + n) // s
-            # Intersect with current interval
-            if new_b >= a and new_a <= b:
-                a = max(a, new_a)
-                b = min(b, new_b)
-            elif new_b2 >= a and new_a2 <= b:
-                a = max(a, new_a2)
-                b = min(b, new_b2)
+        if new_a is not None and new_b is not None:
+            a = new_a
+            b = new_b
+            if idx < 5 or b - a < (B) // 10:
+                print(f"Step {idx}: s={s}, interval=[{a}, {b}], size={(b-a+1).nbits()} bits")
         else:
-            # Invalid padding: m*s mod n NOT in [2B, 3B)
-            # Shift interval to exclude the valid range
-            mid = (a + b) // 2
-            if (mid * s) % n >= 2 * B and (mid * s) % n < 3 * B:
-                # Mid is in valid range but oracle says invalid, so m is elsewhere
-                a = mid + 1
-            else:
-                a = a + (b - a + 1) // 4
+            print(f"Step {idx}: s={s}, no valid interval intersection")
 
-        # Update c for next iteration
-        c = (c * power_mod(s, e, n)) % n
-
-        if i < 5 or i >= len(oracle_bits) - 3:
-            print(f"Step {i+1}: response={response}, interval=[{a}, {b}], size bits={max(0, (b-a+1).nbits())}")
-
-    # Final estimate
+    print()
     if a == b:
         m = a
-        print(f"\\nExact message recovered: m = {m}")
+        print(f"Exact message recovered: m = {m}")
     else:
         m = (a + b) // 2
-        print(f"\\nEstimated message: m = {m}")
+        print(f"Estimated message: m = {m}")
         print(f"Final interval: [{a}, {b}]")
-        print(f"Uncertainty: {b - a + 1} ({(b-a+1).nbits()} bits)")
+        print(f"Uncertainty: {(b-a+1).nbits()} bits")
 
     # Verify
     v = power_mod(m, e, n)
@@ -180,19 +170,38 @@ M_i &= \\bigcup_r \\left[ \\left\\lceil \\frac{2B + r n}{s_i} \\right\\rceil, \\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n, e, d } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+  const { n, e } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
   const k = Math.ceil(n.toString(2).length / 8);
   const B = 256n ** BigInt(k - 2);
   const lower = 2n * B;
   const upper = 3n * B;
-  const m = lower + BigInt(Math.floor(Math.random() * Number(upper - lower)));
+  const range = upper - lower;
+  const m = lower + (BigInt(Math.floor(Math.random() * 1000000)) * (range / 1000000n));
   const c = encrypt(m, n, e);
-  const responses: string[] = [];
-  let curC = c;
-  for (let i = 0; i < 256; i++) {
-    const dec = modPow(curC, d, n);
-    responses.push(dec >= lower && dec < upper ? '1' : '0');
-    curC = (curC * modPow(2n, e, n)) % n;
+
+  // Compute valid s positions: m*s mod n ∈ [2B, 3B)
+  // For wrapping round r: s ∈ [ceil((r·n+2B)/m), floor((r·n+3B-1)/m)]
+  // Use maxS = 2^18 = 262144 to get ~4 valid responses
+  const maxS = 262144;
+  const validPositions = new Set<number>();
+  validPositions.add(1); // s=1 always valid
+
+  for (let r = 1; r <= 8; r++) {
+    const rBig = BigInt(r);
+    const sMin = Number((rBig * n + lower + m - 1n) / m);
+    const sMax = Number((rBig * n + upper - 1n) / m);
+    const lo = Math.max(2, sMin);
+    const hi = Math.min(maxS, sMax);
+    for (let s = lo; s <= hi; s++) {
+      validPositions.add(s);
+    }
   }
-  return { n: n.toString(), e: e.toString(), c: c.toString(), oracle_responses: responses.join(',') };
+
+  // Build response string: "1,0,0,1,0,..."
+  const parts: string[] = [];
+  for (let s = 1; s <= maxS; s++) {
+    parts.push(validPositions.has(s) ? '1' : '0');
+  }
+
+  return { n: n.toString(), e: e.toString(), c: c.toString(), oracle_responses: parts.join(',') };
 };

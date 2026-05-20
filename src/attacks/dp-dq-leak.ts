@@ -19,25 +19,45 @@ export const attack: Attack = {
         print("DP_DQ_LEAK=FAILED: invalid input values")
     else:
         found = False
+        num = dp * e - 1
         for k in range(1, e):
-            num = dp * e - 1
             if num % k == 0:
                 p_candidate = num // k + 1
                 if n % p_candidate == 0:
                     q = n // p_candidate
                     print(f"Verification: p * q = {p_candidate * q}")
-                    if p_candidate * q == n:
-                        print(f"DP_DQ_LEAK=SUCCESS")
-                        print(f"dp={dp}")
-                        print(f"p={p_candidate}")
-                        print(f"q={q}")
-                        found = True
-                        break
+                    print(f"DP_DQ_LEAK=SUCCESS")
+                    print(f"dp={dp}")
+                    print(f"p={p_candidate}")
+                    print(f"q={q}")
+                    found = True
+                    break
         if not found:
             print("DP_DQ_LEAK=FAILED: no valid p found")
 except Exception as ex:
     print(f"DP_DQ_LEAK=FAILED: {ex}")`,
-  proof: '\\textbf{Theorem:} Given $d_p = d \\bmod (p-1)$, factor $n$ by iterating $k$.\\newline\\newline\\textbf{Prerequisites:} RSA-CRT parameters\\newline\\newline\\textbf{Proof:}\\begin{align*}d_p \\cdot e &\\equiv 1 \\pmod{p-1} \\\\ d_p \\cdot e - 1 &= k(p-1) \\\\ p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\ \\text{Since } d_p < p-1, &\\text{ we have } k < e \\\\ \\text{Iterate } k = 1, \\ldots, e-1 &\\text{ and check } p \\mid n\\end{align*}\\newline\\textbf{References:} Standard RSA-CRT analysis',
+  proof: `\\textbf{Theorem:} Given $d_p = d \\bmod (p-1)$, factor $n$ by iterating $k$ in the equation $d_p \\cdot e - 1 = k(p-1)$.
+
+\\textbf{Prerequisites:}
+\\begin{itemize}
+\\item RSA-CRT: $d_p = d \\bmod (p-1)$ satisfies $d_p \\cdot e \\equiv 1 \\pmod{p-1}$
+\\item $d_p \\cdot e - 1 = k(p-1)$ for some integer $k \\in [1, e)$
+\\item $n = p \\cdot q$ is the RSA modulus
+\\end{itemize}
+
+\\textbf{Proof:}
+\\begin{align*}
+d_p \\cdot e &\\equiv 1 \\pmod{p-1} \\\\
+d_p \\cdot e - 1 &= k(p-1) \\\\
+p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
+\\text{Since } d_p < p-1, \\quad k &= \\frac{d_p \\cdot e - 1}{p-1} < e \\\\
+\\text{Iterate } k = 1, \\ldots, e-1: \\quad &\\text{check if } k \\mid (d_p \\cdot e - 1) \\\\
+p &= (d_p \\cdot e - 1)/k + 1, \\quad \\text{check } p \\mid n \\qed
+\\end{align*}
+
+\\textbf{Explanation:} Compute $\\text{num} = d_p \\cdot e - 1$. For each $k \\in [1, e)$, check if $k$ divides num. If so, compute $p = \\text{num}/k + 1$ and verify $p \\mid n$. Since $d_p < p-1$, we have $k < e$, so at most 65536 iterations for standard $e = 65537$.
+
+\\textbf{References:} Standard RSA-CRT analysis`,
   priority: 'high',
   applicableCheck: (p) => !!p.n && !!p.e && !!p.dp,
 };

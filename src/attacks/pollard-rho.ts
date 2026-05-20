@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
+import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'pollard-rho',
@@ -91,6 +91,9 @@ x \\equiv y \\pmod{p} &\\implies \\gcd(x - y, n) = p \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
-  return { n: n.toString() };
+  // Generate n with one SMALL factor (≤40 bits) so rho succeeds quickly
+  // Rho runs in O(sqrt(p)) — with p=40 bits, ~2^20 iterations, well within limits
+  const p = randomPrime(40);
+  const q = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 40);
+  return { n: (p * q).toString() };
 };

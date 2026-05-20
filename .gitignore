@@ -2,6 +2,8 @@ node_modules
 dist
 docs
 .DS_Store
+src/.DS_Store
+.github/.DS_Store
 .env
 .env.local
 .env.*.local
@@ -15,5 +17,5 @@ bun.lockb
 workers/node_modules/
 workers/.wrangler/
 workers/bun.lock
-src/.DS_Store
-.github/.DS_Store
+test-*.ts
+HANDOFF.md

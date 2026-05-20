@@ -147,7 +147,7 @@ p &\\mid \\gcd(n_1, n_2) \\\\
 g_i = \\gcd\\left(n_i, \\prod_{j \\neq i} n_j\\right) & \\\\
 g_i > 1 &\\implies g_i \\text{ is a shared prime factor} \\\\
 \\text{Product tree: } T &= \\text{tree}(n_1, \\ldots, n_k), \\quad \\text{depth } O(\\log k) \\\\
-\\text{Time: } O(M(k \\log N) &\\log k) \\quad \\text{vs } O(k^2) \\text{ pairwise}
+\\text{Time: } O(M(k \\log N) &\\log k) \\quad \\text{vs } O(k^2) \\text{ pairwise} \\qed
 \\end{align*}
 
 \\textbf{Explanation:} If two RSA moduli share a prime factor, computing the GCD of each modulus against the product of all others exposes the shared factor. A product tree makes this efficient — O(k \\log k) instead of O(k^2) pairwise comparisons.

@@ -8,15 +8,18 @@ export const attack: Attack = {
   description: 'Forges signature with weak PKCS#1 v1.5 verification. Use when e=3 and padding check is loose.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
+    { name: 'e', label: 'e (public exponent)', placeholder: '3', multiline: false, defaultValue: '3' },
     { name: 'hash_hex', label: 'Hash (hex)', placeholder: 'Enter hash in hex (e.g., SHA256)...', multiline: false },
   ],
-  sageTemplate: (v) => `n = Integer(${v.n})
-hash_hex = "${v.hash_hex || 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}".strip()
+  sageTemplate: (v) => {
+    const eVal = v.e || '3';
+    return `n = Integer(${v.n})
+e = Integer(${eVal})
+hash_hex = "${v.hash_hex || 'dead'}".strip()
 if not hash_hex:
     print("ERROR: hash_hex is empty")
     print("BLEICHENBACHER_SIG=FAILED")
     return
-e = Integer(${v.e || '3'})
 
 if n < 2:
     print("Invalid input")
@@ -34,50 +37,52 @@ if e != 3:
     print("BLEICHENBACHER_SIG=FAILED")
     return
 
-# Construct EM: 0x00 || 0x01 || 0xFF*padding || 0x00 || DER_prefix || hash
-# Simplified: EM = 0x0001FFFF...00[DER][hash]
+# Construct EM: 0x00 || 0x01 || 0xFF...FF || 0x00 || hash
 n_bytes = (n.nbits() + 7) // 8
 hash_int = Integer("0x" + hash_hex)
 hash_bytes = (hash_int.nbits() + 7) // 8
 
-# PKCS#1 v1.5 signature format: 00 01 FF...FF 00 <hash>
-# EM = 0x0001 * 256^(n_bytes-2-hash_bytes) + (256^hash_bytes - 1) * 256^hash_bytes + hash_int
-# Simplified: place hash at the end, fill middle with 0xFF
-em = (2**(8 * (n_bytes - 2)) - 2**(8 * (hash_bytes + 2))) + (hash_int)
-# Add 0x0001 prefix
-em = em + (2**(8 * (n_bytes - 2)) - 2**(8 * (n_bytes - hash_bytes - 2)))
+# Padding: at least 8 bytes of 0xFF
+pad_len = max(8, n_bytes - 3 - hash_bytes)
+em_len = 2 + pad_len + hash_bytes
 
-print(f"EM has {em.nbits()} bits")
+# EM = 0x0001 || 0xFF*pad_len || 0x00 || hash
+em = (Integer(1) << (8 * (em_len - 2))) + ((Integer(1) << (8 * pad_len)) - 1) * (Integer(1) << (8 * hash_bytes)) + hash_int
 
-# Compute integer cube root
-S, exact = em.nth_root(3, truncate_mode=True)
-if exact:
-    print(f"Forged signature: S = {S}")
+print(f"EM has {em.nbits()} bits, n has {n.nbits()} bits")
+
+if em >= n:
+    print("ERROR: EM >= n. Hash too large for this modulus.")
+    print("BLEICHENBACHER_SIG=FAILED")
+    return
+
+# Bleichenbacher: find S near n^(1/3) such that S^3 mod n ends with hash
+n_cbrt = n.nth_root(3, truncate_mode=True)[0]
+print(f"n^(1/3) = {n_cbrt}")
+
+found = False
+search_range = 100000
+for delta in range(-search_range, search_range + 1):
+    S = n_cbrt + delta
     check = power_mod(S, 3, n)
-    print(f"S^3 mod n = {check}")
-    check_hex = hex(check)[2:]
-    if hash_hex in check_hex:
-        print(f"Hash found in forged signature!")
-        print("BLEICHENBACHER_SIG=SUCCESS")
-    else:
-        print("Hash not found in forged signature.")
-        print("BLEICHENBACHER_SIG=FAILED")
+    check_hex = hex(check)[2:].zfill(len(hash_hex))
+    if check_hex.endswith(hash_hex):
+        print(f"Found with delta={delta}")
+        print(f"Forged signature: S = {S}")
+        print(f"S^3 mod n = {check}")
+        print(f"S^3 mod n (hex) = ...{check_hex[-len(hash_hex):]}")
+        print(f"Hash found at end of forged signature!")
+        found = True
+        break
+
+if found:
+    print("BLEICHENBACHER_SIG=SUCCESS")
 else:
-    # Try Coppersmith-style: S = floor(n^(1/3)) + delta
-    n_root = n.nth_root(3, truncate_mode=True)[0]
-    for delta in range(-1000, 1001):
-        S = n_root + delta
-        check = power_mod(S, 3, n)
-        check_hex = hex(check)[2:]
-        if hash_hex in check_hex[-len(hash_hex):]:
-            print(f"Found with delta={delta}")
-            print(f"Forged signature: S = {S}")
-            print("BLEICHENBACHER_SIG=SUCCESS")
-            break
-    else:
-        print("No valid forgery found in search range.")
-        print("BLEICHENBACHER_SIG=FAILED")
-`,
+    print(f"No valid forgery found in range +/- {search_range}.")
+    print("Try a shorter hash or increase search range.")
+    print("BLEICHENBACHER_SIG=FAILED")
+`;
+  },
   proof: `\\textbf{Theorem:} PKCS#1 v1.5 verification with e = 3 is forgeable: construct S such that S³ mod n has valid format without the private key.
 
 \\textbf{Prerequisites:}
@@ -106,5 +111,5 @@ EM < n &\\implies S^3 = EM \\quad \\text{(exact, no mod reduction)} \\\\
 
 export const generateTestcase = (): Record<string, string> => {
   const { n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
-  return { n: n.toString(), hash_hex: 'a'.repeat(32) };
+  return { n: n.toString(), hash_hex: 'ab' };
 };

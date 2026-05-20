@@ -50,7 +50,7 @@ try:
             # q = q_approx + x where |x| is small
             P.<x> = PolynomialRing(Zmod(n))
             f = q_approx + x
-            bound = ZZ(q_approx**0.3)
+            bound = ZZ(n**0.25)
             try:
                 roots = f.small_roots(X=bound, beta=0.5)
                 for root in roots:
@@ -102,7 +102,7 @@ q &= q_0 + x, \\quad |x| \\ll q_0 \\\\
 f(x) = q_0 + x &\\equiv 0 \\pmod{q} \\\\
 \\text{Coppersmith: } |x| &< q^{\\beta^2} = q^{0.25} \\approx n^{1/4} \\\\
 \\text{Search: } 1 \\leq b &\\leq B, \\quad 1 \\leq a \\leq b \\\\
-\\text{Complexity: } O(B^2 &\\cdot \\text{poly}(\\log n))
+\\text{Complexity: } O(B^2 &\\cdot \\text{poly}(\\log n)) \\qed
 \\end{align*}
 
 \\textbf{Explanation:} When the ratio p/q is close to a small rational a/b, we can approximate q as \\sqrt{nb/a}. Coppersmith's method then finds the small correction x such that q = q_0 + x. The search iterates over small denominators b up to a bound.

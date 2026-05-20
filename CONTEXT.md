@@ -62,7 +62,7 @@ Optional async function `(vals: Record<string, string>) => Promise<string | null
 - If returns null, fall through to SageCell as before
 - Graceful degradation: if proxy is down/unconfigured, FactorDB frontendCheck returns null
 
-### Attacks with FrontendCheck (4 total)
+### Attacks with FRONTENDCheck (4 total)
 | Attack | File | Implementation |
 |--------|------|----------------|
 | FactorDB Lookup | `factordb-lookup.ts` | `queryFactorDB` → format result |
@@ -85,34 +85,25 @@ src/attacks/
 ```
 
 Each attack file exports:
-- `attack: Attack` — full Attack object (id, name, inputs, sageTemplate, proof, priority, applicableCheck, frontendCheck, generateTestcase?)
+- `attack: Attack` — full Attack object (id, name, inputs, sageTemplate, proof, priority, applicableCheck, frontendCheck?, generateTestcase?)
 - `generateTestcase: () => Record<string, string>` — attack-specific testcase generator
 
 **UI is completely decoupled** — components import from `src/attacks` and see only the aggregated `attacks[]` array. Adding a new attack = 1 file + 1 import line. Zero UI changes needed.
 
 Testcase bit size is centralized in `src/utils/testcases/core.ts`:
 ```ts
-export const TESTCASE_BITS = { p: 128, q: 128 }; // n ≈ 256-bit, change here affects ALL attacks
+export const TESTCASE_BITS = { p: 256, q: 256 }; // n ≈ 512-bit
 ```
 
 ### Total: 52 attacks across 5 categories
 
 | Category | Count | Files |
 |----------|-------|-------|
-| Factorization | 18 | `fermat.ts` through `common-prime-rsa.ts` |
-| Partial Key / Lattice | 9 | `simple-lattice.ts` through `implicit-key-exposure.ts` |
-| Message / Protocol | 14 | `common-modulus.ts` through `hastad-broadcast.ts` |
+| Factorization | 17 | `fermat.ts` through `novelty-primes.ts` |
+| Partial Key / Lattice | 7 | `simple-lattice.ts` through `dependent-prime.ts` |
+| Message / Protocol | 12 | `common-modulus.ts` through `bleichenbacher-sig.ts` |
 | Oracle | 3 | `bleichenbacher.ts` through `biased-lsb.ts` |
 | Advanced | 8 | `roca.ts` through `parity-oracle.ts` |
-
-### New Attacks Added (2026-05-19)
-| Attack | Category | Description |
-|--------|----------|-------------|
-| Partial Key Exposure | Partial Key / Lattice | Recovers p from known MSBs via Coppersmith |
-| Implicit Key Exposure | Partial Key / Lattice | Recovers p from a^p mod n leak via Fermat's little theorem |
-| Related Message | Message / Protocol | Recovers m from c1=m^e, c2=(a·m+b)^e via polynomial GCD |
-| Common Prime RSA | Factorization | Factors two moduli sharing a prime via gcd(n1, n2) |
-| Hastad Broadcast | Message / Protocol | Recovers m from e broadcasts via CRT + e-th root |
 
 ## Source Structure
 
@@ -121,7 +112,7 @@ src/
   App.tsx                          — Root: ThemeProvider, CssBaseline, AppProvider, layout
                                      manages outputWidth state (200-600px, persisted in localStorage)
   main.tsx                         — Entry point (StrictMode)
-  config.ts                        — FACTORDB_PROXY_URL (env-aware)
+  config.ts                        — FACTORDB_PROXY_URL constant
   types/index.ts                   — Attack, InputField, HistoryEntry, AppContextType
   context/AppContext.tsx           — React context: selectedAttack, viewMode, output, history (cap 50)
   theme/dracula.ts                 — MUI Dracula theme + scrollbar overrides
@@ -129,7 +120,7 @@ src/
   utils/bigint.ts                  — gcd(a,b) + isqrt(x) BigInt utilities + modPow + modInverse + extendedGcd
   utils/converters.ts              — hex/dec/base64 converters + detectFormat() + parsePEM()
   utils/factordb.ts                — FactorDB client (query, format, proxy setter, 10s timeout)
-  utils/testcases/core.ts          — randomPrime(), generateKeyPair(), encrypt(), TESTCASE_BITS
+  utils/testcases/core.ts          — randomPrime(), generateKeyPair(), encrypt(), isPrimeMR(), TESTCASE_BITS
   vite-env.d.ts                    — Vite env type declarations
   components/
     InputPanel.tsx                 — Attack input form + Generate Testcase + Run/Stop + proof tab
@@ -146,11 +137,12 @@ src/
     ProofRenderer.tsx              — KaTeX renderer: parseProof → segments (text/displayMath/list) → render
                                      hides References section, handles $...$ and \(...\) delimiters
   attacks/
-    index.ts                       — Barrel export: aggregates all 52 attacks, CATEGORIES, attacksByCategory, testcaseGenerators
+    index.ts                       — Barrel export: all 52 attacks, CATEGORIES, attacksByCategory, testcaseGenerators
     fermat.ts                      — { attack, generateTestcase } — close primes
     wiener.ts                      — { attack, generateTestcase } — small d
     ... (52 individual attack files, flat directory)
 ```
+
 ## Workers Directory (core files tracked in git)
 
 Gitignored: `workers/node_modules/`, `workers/.wrangler/`, `workers/bun.lock`
@@ -167,8 +159,8 @@ Tracked: `factordb-proxy.js`, `wrangler.toml`, `package.json`, `DEPLOY.md`
 | `src/utils/bigint.ts` | `gcd()`, `isqrt()`, `modPow()`, `modInverse()`, `extendedGcd()` BigInt utilities |
 | `src/utils/factordb.ts` | FactorDB client (query + format) |
 | `src/utils/converters.ts` | Hex/dec/base64 converters + `detectFormat()` |
-| `src/utils/testcases/core.ts` | `randomPrime()`, `generateKeyPair()`, `encrypt()`, `TESTCASE_BITS` |
-| `src/types/index.ts` | `Attack` type with `frontendCheck`, `applicableCheck` |
+| `src/utils/testcases/core.ts` | `randomPrime()`, `generateKeyPair()`, `encrypt()`, `isPrimeMR()`, `TESTCASE_BITS` |
+| `src/types/index.ts` | `Attack` type with `frontendCheck`, `applicableCheck`, `generateTestcase?` |
 | `src/attacks/index.ts` | Barrel export: all 52 attacks, CATEGORIES, attacksByCategory, testcaseGenerators |
 | `src/components/InputPanel.tsx` | Imports from `../attacks`, runs frontendCheck before SageCell, Generate Testcase button |
 | `src/components/MagicPanel.tsx` | Imports from `../attacks`, priority-ordered parallel execution, early stop, Generate Testcase |
@@ -195,12 +187,13 @@ Tracked: `factordb-proxy.js`, `wrangler.toml`, `package.json`, `DEPLOY.md`
 - Build output to `docs/` for GitHub Pages
 - `docs/` is in `.gitignore` but must be force-committed: `git add -f docs/`
 - Pre-commit hook blocks `.env.example` — use `git commit --no-verify`
+- `TESTCASE_BITS = { p: 256, q: 256 }` → n ≈ 512-bit
 
 ## Known Patterns & Gotchas
 
 ### SageMath Syntax
 - `^` is **XOR** for Python ints in SageMath — always use `**` for exponentiation
-- SageMath `Integer` type has `.bits()` returning bit positions list, not bit count
+- SageMath `Integer` type has `.bits()` returning bit positions list, not bit count — use `.nbits()` for bit count
 - `small_roots(X=..., beta=...)` — `beta` should be `0.5` when looking for factor of size `sqrt(n)`
 - Use `prime_range(start, end)` instead of `range(start, end)` + `is_prime()` for performance
 
@@ -244,6 +237,16 @@ Tracked: `factordb-proxy.js`, `wrangler.toml`, `package.json`, `DEPLOY.md`
 ### Scrollbar Styling
 - 12px width with `border: 2px solid transparent` + `backgroundClip: padding-box` for visual padding
 - OutputPanel left-edge drag handle: 4px grab area, 1px visible line via `::after` pseudo-element
+
+### Testcase Generation at 512-bit
+- Factorization attacks that would timeout on random 512-bit semiprimes generate n with at least one small factor:
+  - Pollard's rho: 40-bit factor
+  - ECM/ecm2: 60-bit factor
+  - Quadratic Sieve: 60-bit factor
+  - SQUFOF: 16-bit factor (trial division bound)
+- Coppersmith attacks: bound is N^(beta^2/deg). For 512-bit N, beta=0.5 gives N^0.25 ≈ 2^128
+- ROCA/Nitros: need proper M construction with 5000+ retry attempts for prime generation
+- Parity oracle: needs 512 responses for 512-bit n (one per bit)
 
 ## What's Blocked
 - None. Proxy is deployed, builds pass, app is live on GitHub Pages.

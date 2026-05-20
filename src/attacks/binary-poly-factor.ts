@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
+import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'binary-poly-factor',
@@ -102,7 +102,7 @@ f(x) &= \\sum_{i=0}^{k} b_i x^i \\in \\mathbb{Z}[x], \\quad f(2) = n \\\\
 f(x) &= g_1(x)^{e_1} g_2(x)^{e_2} \\cdots g_r(x)^{e_r} \\\\
 n = f(2) &= g_1(2)^{e_1} g_2(2)^{e_2} \\cdots g_r(2)^{e_r} \\\\
 \\exists i: g_i(2) &= p \\text{ or } q \\quad \\text{(when factorization aligns)} \\\\
-\\text{Test each } g_i(2) &\\text{ for divisibility of } n
+\\text{Test each } g_i(2) &\\text{ for divisibility of } n \\qed
 \\end{align*}
 
 \\textbf{Explanation:} Convert n to a polynomial by treating its binary digits as coefficients. Factor this polynomial over the integers, then evaluate each factor at x=2. If the polynomial factorization aligns with the integer factorization, the evaluations reveal p and q. Works best when p and q have structured binary patterns.
@@ -113,6 +113,27 @@ n = f(2) &= g_1(2)^{e_1} g_2(2)^{e_2} \\cdots g_r(2)^{e_r} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
-  return { n: n.toString() };
+  // Construct primes with sparse binary patterns (more likely to yield factorable polynomials)
+  // Build p = 2^a + 2^b + 1 with random a, b positions
+  const trySparsePrime = (bits: number): bigint => {
+    for (let attempt = 0; attempt < 200; attempt++) {
+      let val = (1n << BigInt(bits - 1)) | 1n; // top and bottom bits set
+      const numOnes = 3 + Math.floor(Math.random() * 4); // 3-6 bits set
+      const positions = new Set<number>();
+      positions.add(bits - 1);
+      positions.add(0);
+      while (positions.size < numOnes) {
+        positions.add(1 + Math.floor(Math.random() * (bits - 2)));
+      }
+      for (const pos of positions) {
+        val |= (1n << BigInt(pos));
+      }
+      if (isPrimeMR(val)) return val;
+    }
+    return randomPrime(bits);
+  };
+
+  const p = trySparsePrime(TESTCASE_BITS.p);
+  const q = trySparsePrime(TESTCASE_BITS.q);
+  return { n: (p * q).toString() };
 };

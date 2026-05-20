@@ -35,6 +35,7 @@ try:
     n = Integer(${vals.n})
     e = Integer(${vals.e})
     c = Integer(${vals.c})
+    orig_c = Integer(${vals.c})
 
     # Parse oracle runs (multiple response strings, newline-separated)
     runs_str = """${vals.oracle_runs}""".strip()
@@ -54,11 +55,9 @@ try:
     print()
 
     # Per-bit majority voting, then binary search
-    # Each run gives noisy LSB responses
-    # Majority vote across runs for each bit position
-
     num_bits = min(len(r) for r in runs)
-    print(f"Using {num_bits} bit positions")
+    n_bits = n.nbits()
+    print(f"Using {num_bits} bit positions (n has {n_bits} bits)")
 
     # Majority voting
     voted_bits = []
@@ -92,8 +91,8 @@ try:
     # Verify
     v = power_mod(m, e, n)
     print(f"Verification: m^e mod n = {v}")
-    print(f"Original c = {c}")
-    if v == Integer(${vals.c}):
+    print(f"Original c = {orig_c}")
+    if v == orig_c:
         print("VERIFICATION PASSED!")
         print("BIASED_LSB=SUCCESS")
     else:
@@ -136,16 +135,19 @@ b_i = 1 \\implies [a_{i+1}, b_{i+1}] &= [(a_i + b_i)/2, b_i) \\\\
 
 export const generateTestcase = (): Record<string, string> => {
   const { n, e, d } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
-  const m = BigInt(Math.floor(Math.random() * 1000000) + 42);
+  const nBits = n.toString(2).length;
+  const m = BigInt('0x' + Array.from(crypto.getRandomValues(new Uint8Array(Math.ceil(nBits / 8))))
+    .map(b => b.toString(16).padStart(2, '0')).join('')) % (n / 2n);
   const c = encrypt(m, n, e);
   const runs: string[] = [];
-  for (let run = 0; run < 5; run++) {
+  const numRuns = 21;
+  for (let run = 0; run < numRuns; run++) {
     const bits: string[] = [];
     let curC = c;
-    for (let i = 0; i < 256; i++) {
+    for (let i = 0; i < nBits; i++) {
       const dec = modPow(curC, d, n);
       const trueBit = (dec % 2n).toString();
-      const noisy = Math.random() < 0.7 ? trueBit : (trueBit === '0' ? '1' : '0');
+      const noisy = Math.random() < 0.75 ? trueBit : (trueBit === '0' ? '1' : '0');
       bits.push(noisy);
       curC = (curC * modPow(2n, e, n)) % n;
     }

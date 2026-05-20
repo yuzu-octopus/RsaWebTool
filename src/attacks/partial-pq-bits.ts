@@ -21,12 +21,12 @@ export const attack: Attack = {
         print("PARTIAL_PQ_BITS=FAILED: bitPosition must be 'msb' or 'lsb'")
     elif bitPosition == "msb":
         k = n.nbits() // 2 - knownBits.nbits()
-        if k < 0:
-            print("PARTIAL_PQ_BITS=FAILED: knownBits has more bits than half of n")
+        if k <= 0:
+            print("PARTIAL_PQ_BITS=FAILED: not enough unknown bits for Coppersmith")
         else:
             R.<x> = PolynomialRing(Zmod(n))
             f = (knownBits << k) + x
-            bound = 2**k
+            bound = 2^k
             print(f"Using bound X = {bound}")
             roots = f.small_roots(X=bound, beta=0.5)
             if roots:
@@ -46,29 +46,54 @@ export const attack: Attack = {
                 print("PARTIAL_PQ_BITS=FAILED: no roots found")
     elif bitPosition == "lsb":
         m = knownBits.nbits()
-        R.<x> = PolynomialRing(Zmod(n))
-        f = x * (2**m) + knownBits
-        bound = 2**(n.nbits()//2 - m)
-        print(f"Using bound X = {bound}")
-        roots = f.small_roots(X=bound, beta=0.5)
-        if roots:
-            p = Integer(roots[0] * (2**m) + knownBits)
-            if n % p == 0:
-                q = n // p
-                print(f"Verification: p * q = {p * q}")
-                if p * q == n:
-                    print(f"PARTIAL_PQ_BITS=SUCCESS")
-                    print(f"p={p}")
-                    print(f"q={q}")
-                else:
-                    print("PARTIAL_PQ_BITS=FAILED: verification mismatch")
-            else:
-                print("PARTIAL_PQ_BITS=FAILED: recovered p does not divide n")
+        if m <= 0:
+            print("PARTIAL_PQ_BITS=FAILED: knownBits is zero")
         else:
-            print("PARTIAL_PQ_BITS=FAILED: no roots found")
+            R.<x> = PolynomialRing(Zmod(n))
+            f = x * (2^m) + knownBits
+            bound = 2^(n.nbits() // 2 - m)
+            print(f"Using bound X = {bound}")
+            roots = f.small_roots(X=bound, beta=0.5)
+            if roots:
+                p = Integer(roots[0] * (2^m) + knownBits)
+                if n % p == 0:
+                    q = n // p
+                    print(f"Verification: p * q = {p * q}")
+                    if p * q == n:
+                        print(f"PARTIAL_PQ_BITS=SUCCESS")
+                        print(f"p={p}")
+                        print(f"q={q}")
+                    else:
+                        print("PARTIAL_PQ_BITS=FAILED: verification mismatch")
+                else:
+                    print("PARTIAL_PQ_BITS=FAILED: recovered p does not divide n")
+            else:
+                print("PARTIAL_PQ_BITS=FAILED: no roots found")
 except Exception as ex:
     print(f"PARTIAL_PQ_BITS=FAILED: {ex}")`,
-  proof: '\\textbf{Theorem:} If half the bits of $p$ are known, Coppersmith recovers the full factorization.\\newline\\newline\\textbf{Prerequisites:} Coppersmith method, polynomial rings over $\\mathbb{Z}/n\\mathbb{Z}$\\newline\\newline\\textbf{Proof:}\\begin{align*}\\text{MSB: } p &= p_{\\text{known}} \\cdot 2^k + x \\\\ \\text{LSB: } p &= x \\cdot 2^m + p_{\\text{known}} \\\\ f(x) &\\equiv 0 \\pmod{p} \\implies f(x) \\mid n \\\\ \\text{Coppersmith finds } x &\\text{ when } |x| < n^{1/4}\\end{align*}\\newline\\textbf{References:} Coppersmith (1996), Howgrave-Graham (1997)',
+  proof: `\\textbf{Theorem:} If at least half the bits of $p$ are known (as MSBs or LSBs), Coppersmith's method recovers the full factorization of $n$.
+
+\\textbf{Prerequisites:}
+\\begin{itemize}
+\\item $n = p \\cdot q$ with balanced primes ($p \\approx q \\approx \\sqrt{n}$)
+\\item Known MSBs: $p = p_{\\text{known}} \\cdot 2^k + x$ where $|x| < 2^k$
+\\item Known LSBs: $p = x \\cdot 2^m + p_{\\text{known}}$ where $|x| < 2^{\\text{bits}(p) - m}$
+\\item Coppersmith's bound: small roots found when $|x| < n^{1/4}$
+\\end{itemize}
+
+\\textbf{Proof:}
+\\begin{align*}
+\\text{MSB case:} \\quad p &= p_{\\text{known}} \\cdot 2^k + x \\\\
+f(x) &= p_{\\text{known}} \\cdot 2^k + x \\equiv 0 \\pmod{p} \\\\
+\\text{LSB case:} \\quad p &= x \\cdot 2^m + p_{\\text{known}} \\\\
+f(x) &= x \\cdot 2^m + p_{\\text{known}} \\equiv 0 \\pmod{p} \\\\
+\\text{Coppersmith finds } x &\\text{ when } |x| < n^{1/4} \\quad (\\beta = 0.5) \\\\
+p &= f(x_0), \\quad q = n / p \\qed
+\\end{align*}
+
+\\textbf{Explanation:} Construct a linear polynomial $f(x)$ over $\\mathbb{Z}/n\\mathbb{Z}$ such that $f(x) \\equiv 0 \\pmod{p}$. For MSBs, $f(x) = p_{\\text{known}} \\cdot 2^k + x$. For LSBs, $f(x) = x \\cdot 2^m + p_{\\text{known}}$. Coppersmith's method finds the small root $x_0$, giving $p = f(x_0)$ and $q = n/p$.
+
+\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996; N. Howgrave-Graham, "Approximate Integer Common Divisors", 1997`,
   priority: 'high',
   applicableCheck: (p) => !!p.n && !!p.knownBits && !!p.bitPosition,
 };
@@ -76,7 +101,8 @@ except Exception as ex:
 export const generateTestcase = (): Record<string, string> => {
   const { p, n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
   const bitLen = p.toString(2).length;
-  const keepBits = Math.ceil(bitLen * 0.55);
+  // Keep 60% of MSBs — enough for Coppersmith (needs > 50%)
+  const keepBits = Math.ceil(bitLen * 0.6);
   const knownBits = p >> BigInt(bitLen - keepBits);
   return { n: n.toString(), knownBits: knownBits.toString(), bitPosition: 'msb' };
 };

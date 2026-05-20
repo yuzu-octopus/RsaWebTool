@@ -41,7 +41,7 @@ if n.is_square():
 
 # Optimized Fermat (RsaCtfTool algorithm)
 # Uses incremental update: b2 += c, c += 2 instead of recomputing a^2 - n
-a, rem = isqrt_rem(n)
+a, rem = n.sqrtrem()
 b2 = -rem
 c = (a << 1) + 1
 max_iter = 10**6

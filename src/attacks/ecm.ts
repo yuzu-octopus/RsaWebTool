@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
+import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'ecm',
@@ -35,17 +35,17 @@ if n.is_square():
     return
 
 try:
-    # Use Sage's ecm.find_factor
-    result = ecm.find_factor(n)
-    if result:
-        p = Integer(result[0])
+    # Use SageMath's Integer.ecm() method
+    p = n.ecm()
+    if p > 1 and p < n:
         q = n // p
         print(f"p = {p}")
         print(f"q = {q}")
         print(f"Verification: p * q = {p * q}")
+        print(f"p is prime: {p.is_prime()}")
         print("ECM=SUCCESS")
     else:
-        print("ECM found no factors")
+        print("ECM found no non-trivial factors")
         print("ECM=FAILED")
 except Exception as ex:
     print(f"ECM failed: {ex}")
@@ -84,6 +84,8 @@ M \\cdot P &= \\mathcal{O} \\text{ in } E(\\mathbb{F}_p) \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
-  return { n: n.toString() };
+  // Generate n with one small factor (≤60 bits) so ECM succeeds quickly
+  const p = randomPrime(60);
+  const q = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 60);
+  return { n: (p * q).toString() };
 };

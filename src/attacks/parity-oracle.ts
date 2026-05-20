@@ -132,7 +132,8 @@ export const generateTestcase = (): Record<string, string> => {
   const c = encrypt(m, n, e);
   const responses: string[] = [];
   let curC = c;
-  for (let i = 0; i < 256; i++) {
+  const nBits = TESTCASE_BITS.p + TESTCASE_BITS.q;
+  for (let i = 0; i < nBits; i++) {
     responses.push((modPow(curC, d, n) % 2n).toString());
     curC = (curC * modPow(2n, e, n)) % n;
   }

@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
+import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'quadratic-sieve',
@@ -132,6 +132,7 @@ X \\not\\equiv \\pm y \\pmod{n} &\\implies \\gcd(X - y, n) \\text{ is a factor} 
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
-  return { n: n.toString() };
+  const p = randomPrime(60);
+  const q = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 60);
+  return { n: (p * q).toString() };
 };

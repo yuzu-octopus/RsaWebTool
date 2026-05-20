@@ -6,7 +6,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 
 ## Features
 
-- **47 attack implementations** across 5 categories
+- **52 attack implementations** across 5 categories
 - **Real-time SageMath execution** via embedded SageMathCell
 - **Browser-side pre-checks** — 4 attacks run entirely in the browser (no SageCell needed)
 - **FactorDB integration** — CORS-proxied API for instant factor lookups
@@ -16,6 +16,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 - **Notepad** — persistent scratchpad with drag-resizable height
 - **Service status** — live FactorDB proxy and SageMathCell availability indicators
 - **Dracula theme** — full dark mode with JetBrains Mono typography
+- **512-bit modulus support** — all testcase generators produce 256-bit primes (n ≈ 512-bit)
 
 ## Attack Categories
 
@@ -31,8 +32,8 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 
 ### Attack System
 
-All 47 attacks live in `src/attacks/` as individual self-contained files. Each file exports:
-- `attack: Attack` — full attack metadata (id, name, inputs, sageTemplate, proof, priority, applicableCheck, frontendCheck?)
+All 52 attacks live in `src/attacks/` as individual self-contained files. Each file exports:
+- `attack: Attack` — full attack metadata (id, name, inputs, sageTemplate, proof, priority, applicableCheck, frontendCheck?, generateTestcase?)
 - `generateTestcase: () => Record<string, string>` — attack-specific testcase generator
 
 `src/attacks/index.ts` aggregates everything into:
@@ -48,13 +49,15 @@ Adding a new attack = 1 file + 1 import line in `index.ts`. Zero UI changes need
 ```
 src/
   attacks/
-    index.ts              — Barrel export: aggregates all 47 attacks, CATEGORIES, attacksByCategory
-    categories.ts         — CATEGORIES constant + attacksByCategory Map
+    index.ts              — Barrel export: aggregates all 52 attacks, CATEGORIES, attacksByCategory
     fermat.ts             — { attack: Attack, generateTestcase: () => Record<string, string> }
-    wiener.ts             — Same pattern (all 47 attacks follow this)
-    ... (47 individual attack files, flat directory)
+    wiener.ts             — Same pattern (all 52 attacks follow this)
+    ... (52 individual attack files, flat directory)
   utils/testcases/
     core.ts               — Shared utilities: randomPrime(), generateKeyPair(), encrypt(), TESTCASE_BITS
+  utils/bigint.ts         — BigInt utilities: gcd(), isqrt(), modPow(), modInverse(), extendedGcd()
+  utils/factordb.ts       — FactorDB client: queryFactorDB(), formatFactorDBResult()
+  utils/converters.ts     — Hex/dec/base64 converters + detectFormat() + parsePEM()
   context/AppContext.tsx  — React context: selectedAttack, viewMode, output, history (cap 50)
   hooks/useSageMath.ts    — SageMath executor (single + parallel with concurrency=3)
   components/
@@ -74,6 +77,7 @@ src/
 - **FactorDB CORS proxy** — FactorDB API has no CORS headers. A Cloudflare Worker at `factordb-proxy.octopusyuzu.workers.dev` adds `Access-Control-Allow-Origin: *`.
 - **frontendCheck pattern** — attacks can define an optional async pre-check that runs in the browser before falling back to SageCell. This enables instant results for FactorDB lookups, Phi(n) recovery, and BigInt GCD operations.
 - **Pure math templates** — SageMathCell has no internet access (firewall since 2021). All attack templates must be self-contained math code.
+- **512-bit testcases** — `TESTCASE_BITS = { p: 256, q: 256 }` produces n ≈ 512-bit. Factorization attacks that would timeout on random semiprimes generate n with at least one small factor.
 
 ## Local Development
 

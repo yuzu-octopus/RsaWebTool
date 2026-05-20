@@ -116,7 +116,7 @@ n \\bmod p_i &= 0 \\implies p_i \\mid n, \\quad q = n/p_i \\\\
 p &\\approx 2^k + \\delta, \\quad |\\delta| \\leq W \\\\
 p &\\approx C + \\delta, \\quad C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
 \\text{Candidate } c &= C + \\delta, \\quad \\text{isPrime}(c) \\land (n \\bmod c = 0) \\\\
-\\text{Cost: } O(m \\log^2 n + W \\cdot \\text{primality}) &
+\\text{Cost: } O(m \\log^2 n + W \\cdot \\text{primality}) & \\qed
 \\end{align*}
 
 \\textbf{Explanation:} CTF challenges sometimes reuse primes or generate primes near recognizable values (powers of 2, mathematical constants). Checking divisibility against a database of known primes and searching small windows around structured values can quickly factor such moduli.
@@ -128,10 +128,10 @@ p &\\approx C + \\delta, \\quad C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
 
 export const generateTestcase = (): Record<string, string> => {
   // Generate a prime near a power of 2
-  const bits = Math.min(TESTCASE_BITS.p, 64);
+  const bits = TESTCASE_BITS.p;
   const target = 1n << BigInt(bits);
   let p = 0n;
-  for (let delta = 0n; delta < 500n; delta += 1n) {
+  for (let delta = 0n; delta < 1000n; delta += 1n) {
     const candidate1 = target + delta;
     if (isPrimeMR(candidate1)) { p = candidate1; break; }
     const candidate2 = target - delta;

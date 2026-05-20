@@ -98,7 +98,7 @@ ed &\\equiv 1 \\pmod{\\varphi(n)} \\\\
 m &= c^d \\bmod n \\\\
 m_i &= c^d \\bmod p_i, \\quad i = 1, \\ldots, r \\\\
 m &= \\text{CRT}(m_1, \\ldots, m_r; p_1, \\ldots, p_r) \\\\
-p_i &\\approx n^{1/r} \\implies \\text{ECM, QS more effective}
+p_i &\\approx n^{1/r} \\implies \\text{ECM, QS more effective} \\qed
 \\end{align*}
 
 \\textbf{Explanation:} Multi-prime RSA splits n into more than two primes for faster CRT-based decryption. However, each prime is smaller (n^{1/r} bits), making factorization easier. For a 2048-bit modulus with r=3, each prime is only ~683 bits.

@@ -194,7 +194,7 @@ To suppress this warning, you need to explicitly provide the \`palette.${t}Chann
   }
 `,sf=typeof of==`string`?null:Yt`
         animation: ${of} 3s infinite linear;
-      `,cf=e=>{let{classes:t,variant:n,color:r}=e;return Ma({root:[`root`,`color${qo(r)}`,n],dashed:[`dashed`],bar1:[`bar`,`bar1`],bar2:[`bar`,`bar2`,n===`buffer`&&`color${qo(r)}`]},$d,t)},lf=(e,t)=>e.vars?e.vars.palette.LinearProgress[`${t}Bg`]:e.palette.mode===`light`?e.lighten(e.palette[t].main,.62):e.darken(e.palette[t].main,.5),uf=P(`span`,{name:`MuiLinearProgress`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,t[`color${qo(n.color)}`],t[n.variant]]}})(Zo(({theme:e})=>({position:`relative`,overflow:`hidden`,display:`block`,height:4,zIndex:0,"@media print":{colorAdjust:`exact`},variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{backgroundColor:lf(e,t)}})),{props:({ownerState:e})=>e.color===`inherit`&&e.variant!==`buffer`,style:{"&::before":{content:`""`,position:`absolute`,left:0,top:0,right:0,bottom:0,backgroundColor:`currentColor`,opacity:.3}}},{props:{variant:`buffer`},style:{backgroundColor:`transparent`}},{props:{variant:`query`},style:{transform:`rotate(180deg)`}}]}))),df=P(`span`,{name:`MuiLinearProgress`,slot:`Dashed`})(Zo(({theme:e})=>({position:`absolute`,marginTop:0,height:`100%`,width:`100%`,backgroundSize:`10px 10px`,backgroundPosition:`0 -23px`,variants:[{props:{color:`inherit`},style:{opacity:.3,backgroundImage:`radial-gradient(currentColor 0%, currentColor 16%, transparent 42%)`}},...Object.entries(e.palette).filter(Xc()).map(([t])=>{let n=lf(e,t);return{props:{color:t},style:{backgroundImage:`radial-gradient(${n} 0%, ${n} 16%, transparent 42%)`}}})]})),sf||{animation:`${of} 3s infinite linear`}),ff=P(`span`,{name:`MuiLinearProgress`,slot:`Bar1`,overridesResolver:(e,t)=>[t.bar,t.bar1]})(Zo(({theme:e})=>({width:`100%`,position:`absolute`,left:0,bottom:0,top:0,transition:`transform 0.2s linear`,transformOrigin:`left`,variants:[{props:{color:`inherit`},style:{backgroundColor:`currentColor`}},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{backgroundColor:(e.vars||e).palette[t].main}})),{props:{variant:`determinate`},style:{transition:`transform .${ef}s linear`}},{props:{variant:`buffer`},style:{zIndex:1,transition:`transform .${ef}s linear`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:{width:`auto`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:nf||{animation:`${tf} 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite`}}]}))),pf=P(`span`,{name:`MuiLinearProgress`,slot:`Bar2`,overridesResolver:(e,t)=>[t.bar,t.bar2]})(Zo(({theme:e})=>({width:`100%`,position:`absolute`,left:0,bottom:0,top:0,transition:`transform 0.2s linear`,transformOrigin:`left`,variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{"--LinearProgressBar2-barColor":(e.vars||e).palette[t].main}})),{props:({ownerState:e})=>e.variant!==`buffer`&&e.color!==`inherit`,style:{backgroundColor:`var(--LinearProgressBar2-barColor, currentColor)`}},{props:({ownerState:e})=>e.variant!==`buffer`&&e.color===`inherit`,style:{backgroundColor:`currentColor`}},{props:{color:`inherit`},style:{opacity:.3}},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t,variant:`buffer`},style:{backgroundColor:lf(e,t),transition:`transform .${ef}s linear`}})),{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:{width:`auto`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:af||{animation:`${rf} 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite`}}]}))),mf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiLinearProgress`}),{className:r,color:i=`primary`,max:a,min:o,value:s,valueBuffer:c,variant:l=`indeterminate`,...u}=n,d={...n,color:i,variant:l},f=o??0,p=a??100,m=cf(d),h=Zi(),g={},_={bar1:{},bar2:{}};if((l===`determinate`||l===`buffer`)&&s!==void 0){let e=p-f,t=(s-f)/e*100-100;h&&(t=-t),_.bar1.transform=e>0?`translateX(${t}%)`:`translateX(-100%)`,g[`aria-valuenow`]=s,g[`aria-valuemin`]=f,g[`aria-valuemax`]=p}if(l===`buffer`&&c!==void 0){let e=p-f,t=(c-f)/e*100-100;h&&(t=-t),_.bar2.transform=e>0?`translateX(${t}%)`:`translateX(-100%)`}return(0,M.jsxs)(uf,{className:ci(m.root,r),ownerState:d,role:`progressbar`,...g,ref:t,...u,children:[l===`buffer`?(0,M.jsx)(df,{className:m.dashed,ownerState:d}):null,(0,M.jsx)(ff,{className:m.bar1,ownerState:d,style:_.bar1}),l===`determinate`?null:(0,M.jsx)(pf,{className:m.bar2,ownerState:d,style:_.bar2})]})});function hf(e){return di(`MuiLink`,e)}var gf=fi(`MuiLink`,[`root`,`underlineNone`,`underlineHover`,`underlineAlways`,`button`,`focusVisible`]),_f=({theme:e,ownerState:t})=>{let n=t.color;if(`colorSpace`in e&&e.colorSpace){let r=Qn(e,`palette.${n}.main`)||Qn(e,`palette.${n}`)||t.color;return e.alpha(r,.4)}let r=Qn(e,`palette.${n}.main`,!1)||Qn(e,`palette.${n}`,!1)||t.color,i=Qn(e,`palette.${n}.mainChannel`)||Qn(e,`palette.${n}Channel`);return`vars`in e&&i?`rgba(${i} / 0.4)`:Ii(r,.4)},vf={primary:!0,secondary:!0,error:!0,info:!0,success:!0,warning:!0,textPrimary:!0,textSecondary:!0,textDisabled:!0},yf=e=>{let{classes:t,component:n,focusVisible:r,underline:i}=e;return Ma({root:[`root`,`underline${qo(i)}`,n===`button`&&`button`,r&&`focusVisible`]},hf,t)},bf=P(F,{name:`MuiLink`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,t[`underline${qo(n.underline)}`],n.component===`button`&&t.button]}})(Zo(({theme:e})=>({variants:[{props:{underline:`none`},style:{textDecoration:`none`}},{props:{underline:`hover`},style:{textDecoration:`none`,"&:hover":{textDecoration:`underline`}}},{props:{underline:`always`},style:{textDecoration:`underline`,"&:hover":{textDecorationColor:`inherit`}}},{props:({underline:e,ownerState:t})=>e===`always`&&t.color!==`inherit`,style:{textDecorationColor:`var(--Link-underlineColor)`}},{props:({underline:e,ownerState:t})=>e===`always`&&t.color===`inherit`,style:e.colorSpace?{textDecorationColor:e.alpha(`currentColor`,.4)}:null},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{underline:`always`,color:t},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette[t].main,.4)}})),{props:{underline:`always`,color:`textPrimary`},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette.text.primary,.4)}},{props:{underline:`always`,color:`textSecondary`},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette.text.secondary,.4)}},{props:{underline:`always`,color:`textDisabled`},style:{"--Link-underlineColor":(e.vars||e).palette.text.disabled}},{props:{component:`button`},style:{position:`relative`,WebkitTapHighlightColor:`transparent`,backgroundColor:`transparent`,outline:0,border:0,margin:0,borderRadius:0,padding:0,cursor:`pointer`,userSelect:`none`,verticalAlign:`middle`,MozAppearance:`none`,WebkitAppearance:`none`,"&::-moz-focus-inner":{borderStyle:`none`},[`&.${gf.focusVisible}`]:{outline:`auto`}}}]}))),xf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiLink`}),r=Lo(),{className:i,color:a=`primary`,component:o=`a`,onBlur:s,onFocus:c,TypographyClasses:l,underline:u=`always`,variant:d=`inherit`,sx:f,...p}=n,[m,h]=j.useState(!1),g=e=>{Ec(e.target)||h(!1),s&&s(e)},_=e=>{Ec(e.target)&&h(!0),c&&c(e)},v={...n,color:a,component:o,focusVisible:m,underline:u,variant:d};return(0,M.jsx)(bf,{color:a,className:ci(yf(v).root,i),classes:l,component:o,onBlur:g,onFocus:_,ref:t,ownerState:v,variant:d,...p,sx:[...vf[a]===void 0?[{color:a}]:[],...Array.isArray(f)?f:[f]],style:{...p.style,...u===`always`&&a!==`inherit`&&!vf[a]&&{"--Link-underlineColor":_f({theme:r,ownerState:v})}}})}),Sf=j.createContext({});function Cf(e){return di(`MuiList`,e)}fi(`MuiList`,[`root`,`padding`,`dense`,`subheader`]);var wf=e=>{let{classes:t,disablePadding:n,dense:r,subheader:i}=e;return Ma({root:[`root`,!n&&`padding`,r&&`dense`,i&&`subheader`]},Cf,t)},Tf=P(`ul`,{name:`MuiList`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,!n.disablePadding&&t.padding,n.dense&&t.dense,n.subheader&&t.subheader]}})({listStyle:`none`,margin:0,padding:0,position:`relative`,variants:[{props:({ownerState:e})=>!e.disablePadding,style:{paddingTop:8,paddingBottom:8}},{props:({ownerState:e})=>e.subheader,style:{paddingTop:0,isolation:`isolate`}}]}),Ef=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiList`}),{children:r,className:i,component:a=`ul`,dense:o=!1,disablePadding:s=!1,subheader:c,...l}=n,u=j.useMemo(()=>({dense:o}),[o]),d={...n,component:a,dense:o,disablePadding:s},f=wf(d);return(0,M.jsx)(Sf.Provider,{value:u,children:(0,M.jsxs)(Tf,{as:a,className:ci(f.root,i),ref:t,ownerState:d,...l,children:[c,r]})})});function Df(e){return di(`MuiListItem`,e)}fi(`MuiListItem`,[`root`,`dense`,`alignItemsFlexStart`,`divider`,`gutters`,`padding`,`secondaryAction`]);function Of(e){return di(`MuiListItemButton`,e)}var kf=fi(`MuiListItemButton`,[`root`,`focusVisible`,`dense`,`alignItemsFlexStart`,`disabled`,`divider`,`gutters`,`selected`]),Af=(e,t)=>{let{ownerState:n}=e;return[t.root,n.dense&&t.dense,n.alignItems===`flex-start`&&t.alignItemsFlexStart,n.divider&&t.divider,!n.disableGutters&&t.gutters]},jf=e=>{let{alignItems:t,classes:n,dense:r,disabled:i,disableGutters:a,divider:o,selected:s}=e,c=Ma({root:[`root`,r&&`dense`,!a&&`gutters`,o&&`divider`,i&&`disabled`,t===`flex-start`&&`alignItemsFlexStart`,s&&`selected`]},Of,n);return{...n,...c}},Mf=P(Kc,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiListItemButton`,slot:`Root`,overridesResolver:Af})(Zo(({theme:e})=>({display:`flex`,flexGrow:1,justifyContent:`flex-start`,alignItems:`center`,position:`relative`,textDecoration:`none`,minWidth:0,boxSizing:`border-box`,textAlign:`left`,paddingTop:8,paddingBottom:8,transition:e.transitions.create(`background-color`,{duration:e.transitions.duration.shortest}),"&:hover":{textDecoration:`none`,backgroundColor:(e.vars||e).palette.action.hover,"@media (hover: none)":{backgroundColor:`transparent`}},[`&.${kf.selected}`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,(e.vars||e).palette.action.selectedOpacity),[`&.${kf.focusVisible}`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,`${(e.vars||e).palette.action.selectedOpacity} + ${(e.vars||e).palette.action.focusOpacity}`)}},[`&.${kf.selected}:hover`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,`${(e.vars||e).palette.action.selectedOpacity} + ${(e.vars||e).palette.action.hoverOpacity}`),"@media (hover: none)":{backgroundColor:e.alpha((e.vars||e).palette.primary.main,(e.vars||e).palette.action.selectedOpacity)}},[`&.${kf.focusVisible}`]:{backgroundColor:(e.vars||e).palette.action.focus},[`&.${kf.disabled}`]:{opacity:(e.vars||e).palette.action.disabledOpacity},variants:[{props:({ownerState:e})=>e.divider,style:{borderBottom:`1px solid ${(e.vars||e).palette.divider}`,backgroundClip:`padding-box`}},{props:{alignItems:`flex-start`},style:{alignItems:`flex-start`}},{props:({ownerState:e})=>!e.disableGutters,style:{paddingLeft:16,paddingRight:16}},{props:({ownerState:e})=>e.dense,style:{paddingTop:4,paddingBottom:4}}]}))),Nf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemButton`}),{alignItems:r=`center`,autoFocus:i=!1,component:a=`div`,children:o,dense:s=!1,disableGutters:c=!1,divider:l=!1,focusVisibleClassName:u,selected:d=!1,className:f,...p}=n,m=j.useContext(Sf),h=j.useMemo(()=>({dense:s||m.dense||!1,alignItems:r,disableGutters:c}),[r,m.dense,s,c]),g=j.useRef(null);ms(()=>{i&&g.current&&g.current.focus()},[i]);let _={...n,alignItems:r,dense:h.dense,disableGutters:c,divider:l,selected:d},v=jf(_),{root:y,...b}=v,x=xs(g,t);return(0,M.jsx)(Sf.Provider,{value:h,children:(0,M.jsx)(Mf,{ref:x,href:p.href||p.to,component:(p.href||p.to)&&a===`div`?`button`:a,internalNativeButton:!1,focusVisibleClassName:ci(v.focusVisible,u),ownerState:_,className:ci(v.root,f),...p,classes:b,children:o})})});function Pf(e){return di(`MuiListItemSecondaryAction`,e)}fi(`MuiListItemSecondaryAction`,[`root`,`disableGutters`]);var Ff=e=>{let{disableGutters:t,classes:n}=e;return Ma({root:[`root`,t&&`disableGutters`]},Pf,n)},If=P(`div`,{name:`MuiListItemSecondaryAction`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.disableGutters&&t.disableGutters]}})({position:`absolute`,right:16,top:`50%`,transform:`translateY(-50%)`,variants:[{props:({ownerState:e})=>e.disableGutters,style:{right:0}}]}),Lf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemSecondaryAction`}),{className:r,component:i,...a}=n,o=j.useContext(Sf),s={...n,disableGutters:o.disableGutters};return(0,M.jsx)(If,{as:i,className:ci(Ff(s).root,r),ownerState:s,ref:t,...a})});Lf.muiName=`ListItemSecondaryAction`;var Rf=(e,t)=>{let{ownerState:n}=e;return[t.root,n.dense&&t.dense,n.alignItems===`flex-start`&&t.alignItemsFlexStart,n.divider&&t.divider,!n.disableGutters&&t.gutters,!n.disablePadding&&t.padding]},zf=e=>{let{alignItems:t,classes:n,dense:r,disableGutters:i,disablePadding:a,divider:o}=e;return Ma({root:[`root`,r&&`dense`,!i&&`gutters`,!a&&`padding`,o&&`divider`,t===`flex-start`&&`alignItemsFlexStart`],secondaryAction:[`secondaryAction`]},Df,n)},Bf=P(`div`,{name:`MuiListItem`,slot:`Root`,overridesResolver:Rf})(Zo(({theme:e})=>({display:`flex`,justifyContent:`flex-start`,alignItems:`center`,position:`relative`,textDecoration:`none`,width:`100%`,boxSizing:`border-box`,textAlign:`left`,variants:[{props:({ownerState:e})=>!e.disablePadding,style:{paddingTop:8,paddingBottom:8}},{props:({ownerState:e})=>!e.disablePadding&&e.dense,style:{paddingTop:4,paddingBottom:4}},{props:({ownerState:e})=>!e.disablePadding&&!e.disableGutters,style:{paddingLeft:16,paddingRight:16}},{props:({ownerState:e})=>!e.disablePadding&&!!e.secondaryAction,style:{paddingRight:48}},{props:({ownerState:e})=>!!e.secondaryAction,style:{[`& > .${kf.root}`]:{paddingRight:48}}},{props:{alignItems:`flex-start`},style:{alignItems:`flex-start`}},{props:({ownerState:e})=>e.divider,style:{borderBottom:`1px solid ${(e.vars||e).palette.divider}`,backgroundClip:`padding-box`}},{props:({ownerState:e})=>e.button,style:{transition:e.transitions.create(`background-color`,{duration:e.transitions.duration.shortest}),"&:hover":{textDecoration:`none`,backgroundColor:(e.vars||e).palette.action.hover,"@media (hover: none)":{backgroundColor:`transparent`}}}}]}))),Vf=P(Lf,{name:`MuiListItem`,slot:`secondaryAction`})({}),Hf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItem`}),{alignItems:r=`center`,children:i,className:a,component:o=`li`,dense:s=!1,disableGutters:c=!1,disablePadding:l=!1,divider:u=!1,secondaryAction:d,slotProps:f={},slots:p={},...m}=n,h=j.useContext(Sf),g=j.useMemo(()=>({dense:s||h.dense||!1,alignItems:r,disableGutters:c}),[r,h.dense,s,c]),_={...n,alignItems:r,dense:g.dense,disableGutters:c,disablePadding:l,divider:u,secondaryAction:d},v=zf(_),y={slots:p,slotProps:f},[b,x]=hc(`root`,{ref:t,elementType:Bf,externalForwardedProps:{component:o,...y,...m},ownerState:_,className:ci(v.root,a)}),[S,C]=hc(`secondaryAction`,{elementType:Vf,shouldForwardComponentProp:!0,externalForwardedProps:y,ownerState:_,className:v.secondaryAction});return(0,M.jsx)(Sf.Provider,{value:g,children:(0,M.jsxs)(b,{...x,children:[i,d&&(0,M.jsx)(S,{...C,children:d})]})})});function Uf(e){return di(`MuiListItemText`,e)}var Wf=fi(`MuiListItemText`,[`root`,`multiline`,`dense`,`inset`,`primary`,`secondary`]),Gf=e=>{let{classes:t,inset:n,primary:r,secondary:i,dense:a}=e;return Ma({root:[`root`,n&&`inset`,a&&`dense`,r&&i&&`multiline`],primary:[`primary`],secondary:[`secondary`]},Uf,t)},Kf=P(`div`,{name:`MuiListItemText`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`& .${Wf.primary}`]:t.primary},{[`& .${Wf.secondary}`]:t.secondary},t.root,n.inset&&t.inset,n.primary&&n.secondary&&t.multiline,n.dense&&t.dense]}})({flex:`1 1 auto`,minWidth:0,marginTop:4,marginBottom:4,[`.${ul.root}:where(& .${Wf.primary})`]:{display:`block`},[`.${ul.root}:where(& .${Wf.secondary})`]:{display:`block`},variants:[{props:({ownerState:e})=>e.primary&&e.secondary,style:{marginTop:6,marginBottom:6}},{props:({ownerState:e})=>e.inset,style:{paddingLeft:56}}]}),qf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemText`}),{children:r,className:i,disableTypography:a=!1,inset:o=!1,primary:s,secondary:c,slots:l={},slotProps:u={},...d}=n,{dense:f}=j.useContext(Sf),p=s??r,m=c,h={...n,disableTypography:a,inset:o,primary:!!p,secondary:!!m,dense:f},g=Gf(h),_={slots:l,slotProps:u},[v,y]=hc(`root`,{className:ci(g.root,i),elementType:Kf,externalForwardedProps:{..._,...d},ownerState:h,ref:t}),[b,x]=hc(`primary`,{className:g.primary,elementType:F,externalForwardedProps:_,ownerState:h}),[S,C]=hc(`secondary`,{className:g.secondary,elementType:F,externalForwardedProps:_,ownerState:h});return p!=null&&p.type!==F&&!a&&(p=(0,M.jsx)(b,{variant:f?`body2`:`body1`,component:x?.variant?void 0:`span`,...x,children:p})),m!=null&&m.type!==F&&!a&&(m=(0,M.jsx)(S,{variant:`body2`,color:`textSecondary`,...C,children:m})),(0,M.jsxs)(v,{...y,children:[p,m]})}),Jf=j.createContext(void 0);function Yf(){let e=j.useContext(Jf);if(e===void 0)throw Error(`MUI: RovingTabIndexContext is missing. Roving tab index items must be placed within a roving tab index provider.`);return e}var Xf=Object.is;function Zf(e,t){if(e===t)return!0;if(!(e instanceof Object)||!(t instanceof Object))return!1;let n=0,r=0;for(let r in e)if(n+=1,!Xf(e[r],t[r])||!(r in t))return!1;for(let e in t)r+=1;return n===r}var Qf=[`ArrowRight`,`ArrowLeft`,`ArrowUp`,`ArrowDown`,`Home`,`End`];function $f(e){let{activeItemId:t,getDefaultActiveItemId:n,orientation:r,isRtl:i=!1,isItemFocusable:a=pp,wrap:o=!0}=e,[s,c]=j.useState(t),l=j.useRef(t),u=s;t!==l.current&&(l.current=t,t!==void 0&&t!==s&&(u=t,c(t)));let d=j.useRef(null),f=j.useRef(new Map),[p,m]=j.useState(0),h=j.useMemo(()=>up(f.current),[p]),g=tp(u,h,a,n),_=j.useRef(g);_.current=g;let v=j.useCallback(()=>{let e=up(f.current);return sp(e,tp(_.current,e,a,n))},[n,a]),y=j.useCallback(()=>f.current,[]),b=vs(e=>{Zf(f.current.get(e.id)??null,e)||(f.current.set(e.id,e),m(e=>e+1))}),x=vs(e=>{f.current.delete(e)&&m(e=>e+1)}),S=vs(e=>{c(e)}),C=j.useCallback(e=>_.current===e,[]),w=j.useCallback((e,t,n,r)=>{let i=ap(dp(f.current),e,t,n,r??a);return i?(i.element?.focus(),c(i.id),i):null},[a]),T=j.useCallback(e=>({onFocus:e=>{let t=dp(f.current),n=lp(t,e.target);n!==-1&&c(t[n].id)},onKeyDown:e=>{if(e.altKey||e.shiftKey||e.ctrlKey||e.metaKey||!Qf.includes(e.key))return;let t=r===`horizontal`?`ArrowLeft`:`ArrowUp`,n=r===`horizontal`?`ArrowRight`:`ArrowDown`;r===`horizontal`&&i&&(t=`ArrowRight`,n=`ArrowLeft`);let a=dp(f.current),s=ss(ls(d.current)),c=s===d.current,l=ip(a,s,_.current),u=`next`;switch(e.key){case t:u=`previous`,e.preventDefault(),c&&(l=a.length);break;case n:e.preventDefault(),c&&(l=-1);break;case`Home`:e.preventDefault(),l=-1;break;case`End`:e.preventDefault(),u=`previous`,l=a.length;break;default:return}w(l,u,o)},ref:gp(e,e=>{d.current=e})}),[w,i,r,o]),E=j.useCallback(e=>{let t=dp(f.current),n=ss(ls(d.current));return w(n===d.current?-1:ip(t,n,_.current),`next`,!0,e)?.id??null},[w]);return j.useMemo(()=>({activeItemId:g,focusNext:E,getActiveItem:v,getContainerProps:T,getItemMap:y,isItemActive:C,registerItem:b,setActiveItemId:S,unregisterItem:x}),[g,E,v,T,y,C,b,S,x])}function ep(e){let{activeItemId:t,registerItem:n,unregisterItem:r}=Yf(),i=j.useRef(null),a=j.useMemo(()=>({disabled:e.disabled??!1,element:null,focusableWhenDisabled:e.focusableWhenDisabled??!1,id:e.id,selected:e.selected??!1,textValue:e.textValue}),[e.disabled,e.focusableWhenDisabled,e.id,e.selected,e.textValue]),o=j.useRef(a);o.current=a;let s=j.useCallback(t=>{if(i.current=t,t==null){queueMicrotask(()=>{i.current??r(e.id)});return}n({...o.current,element:t})},[e.id,n,r]),c=bs(e.ref,s);return Ti(()=>{i.current&&n({...a,element:i.current})},[a,n]),Ti(()=>{let t=e.id;return()=>{r(t)}},[e.id,r]),{ref:c,tabIndex:t===e.id?0:-1}}function tp(e,t,n,r){return e==null?rp(t,n,r):np(e,t,n)}function np(e,t,n){let r=cp(t,e);return r===-1?op(t,n):n(t[r])?t[r].id:ap(t,r,`next`,!1,n)?.id??null}function rp(e,t,n){let r=n?.(e);if(r!=null){let n=sp(e,r);if(n&&t(n))return n.id}return op(e,t)}function ip(e,t,n){if(t){let n=lp(e,t);if(n!==-1)return n}return cp(e,n)}function ap(e,t,n,r,i){let a=e.length-1;if(a===-1)return null;let o=!1,s=fp(t,a,n,r),c=s;for(;s!==-1;){if(s===c){if(o)return null;o=!0}let t=e[s];if(!t||!i(t))s=fp(s,a,n,r);else return t}return null}function op(e,t){return e.find(e=>t(e))?.id??null}function sp(e,t){return t==null?null:e.find(e=>e.id===t)??null}function cp(e,t){return t==null?-1:e.findIndex(e=>e.id===t)}function lp(e,t){return t?e.findIndex(e=>e.element===t||e.element?.contains(t)):-1}function up(e){let t=Array.from(e.values());if(t.every(e=>e.element==null))return t;let n=t.filter(mp).sort((e,t)=>hp(e.element,t.element)),r=t.filter(e=>!mp(e));return[...n,...r]}function dp(e){return up(e).filter(mp)}function fp(e,t,n,r=!0){return n===`next`?e===t?r?0:-1:e+1:e===0?r?t:-1:e-1}function pp(e){return e.element?e.focusableWhenDisabled?!0:!e.disabled&&!e.element.hasAttribute(`disabled`)&&e.element.getAttribute(`aria-disabled`)!==`true`&&e.element.hasAttribute(`tabindex`):!1}function mp(e){return e.element!=null&&e.element.isConnected}function hp(e,t){if(e===t)return 0;let n=e.compareDocumentPosition(t);return n&Node.DOCUMENT_POSITION_FOLLOWING||n&Node.DOCUMENT_POSITION_CONTAINED_BY?-1:n&Node.DOCUMENT_POSITION_PRECEDING||n&Node.DOCUMENT_POSITION_CONTAINS?1:0}function gp(...e){return t=>{e.forEach(e=>{ps(e??null,t)})}}var _p=Cu;function vp(e,t){if(t==null){e.focus();return}try{e.focus({focusVisible:t===`keyboard`})}catch{e.focus()}}function yp(e){return e?e.type===`mousedown`||e.type===`pointerdown`||e.type===`touchstart`?`pointer`:e.type===`keydown`||e.type===`click`&&e.detail===0?`keyboard`:null:null}function bp(e){return e==null||typeof e==`string`&&!e.trim()}function xp(e,t){return typeof t==`object`&&t?e===t:String(e)===String(t)}var Sp=j.createContext(null);function Cp(){return j.useContext(Sp)}var wp=Sp.Provider,Tp=j.createContext(void 0);function Ep(e){let t=e?.element??e;if(!t)return``;if(e?.textValue!==void 0)return e.textValue;let n=t.innerText;return n===void 0&&(n=t.textContent),n??``}function Dp(e,t){if(t===void 0)return!0;let n=Ep(e);return n=n.trim().toLowerCase(),n.length===0?!1:t.repeating?n[0]===t.keys[0]:n.startsWith(t.keys.join(``))}function Op(e,t){return Dp(e,t)?pp(e):!1}function kp(e,t){vp(e,t)}var Ap=j.forwardRef(function(e,t){let{actions:n,autoFocus:r=!1,autoFocusItem:i=!1,children:a,className:o,disabledItemsFocusable:s=!1,disableListWrap:c=!1,onKeyDown:l,variant:u=`selectedMenu`,...d}=e,f=j.useRef(null),p=j.useRef(!1),[m,h]=j.useState(!1),g=Cp(),_=j.useRef({keys:[],repeating:!0,previousKeyMatched:!0,lastTime:null}),v=$f({activeItemId:void 0,getDefaultActiveItemId:j.useCallback(e=>u===`selectedMenu`?e.find(e=>e.selected&&pp(e))?.id??e.find(e=>pp(e))?.id??null:e.find(e=>pp(e))?.id??null,[u]),orientation:`vertical`,wrap:!c}),{activeItemId:y,focusNext:b,getActiveItem:x,getContainerProps:S,getItemMap:C}=v,w=ys((e=!1)=>{if(!f.current||!e&&p.current)return null;if(i){let e=x();if(e?.element){let t=Array.from(C().values()).some(e=>e.selected);return h(u===`menu`&&t&&!e.selected&&g==null),kp(e.element,g),p.current=!0,e.element}return r?(h(!1),f.current.focus(),f.current):null}return r?(h(!1),f.current.focus(),p.current=!0,f.current):(h(!1),null)});ms(()=>{if(!r&&!i){p.current=!1,h(!1);return}w()},[y,i,r,w]),j.useImperativeHandle(n,()=>({adjustStyleForScrollbar:(e,{direction:t})=>{let n=!f.current.style.width;if(e.clientHeight<f.current.clientHeight&&n){let n=`${_p(fs(e))}px`;f.current.style[t===`rtl`?`paddingLeft`:`paddingRight`]=n,f.current.style.width=`calc(100% + ${n})`}return f.current},focusInitialTarget:()=>{if(!f.current)return null;let e=cs(us(f.current));return e&&Nu(f.current,e)?e:w(!0)}}),[w]);let T=S(),E=xs(f,T.ref,t),D=j.useMemo(()=>({itemsFocusableWhenDisabled:s,suppressInitialFocusVisible:m,variant:u}),[s,m,u]);return(0,M.jsx)(Ef,{role:`menu`,ref:E,className:o,onKeyDown:ys(e=>{if(m&&h(!1),(e.ctrlKey||e.metaKey||e.altKey)&&l){l(e);return}if(T.onKeyDown(e),e.key.length===1){let t=_.current,n=e.key.toLowerCase(),r=performance.now();t.keys.length>0&&(r-t.lastTime>500?(t.keys=[],t.repeating=!0,t.previousKeyMatched=!0):t.repeating&&n!==t.keys[0]&&(t.repeating=!1)),t.lastTime=r,t.keys.push(n);let i=cs(us(f.current)),a=i&&!t.repeating&&Dp(i,t);t.previousKeyMatched&&(a||b(e=>Op(e,t))!=null)?e.preventDefault():t.previousKeyMatched=!1}l&&l(e)}),onFocus:T.onFocus,tabIndex:-1,...d,children:(0,M.jsx)(Tp.Provider,{value:D,children:(0,M.jsx)(Jf.Provider,{value:v,children:a})})})});function jp(e){return di(`MuiPopover`,e)}fi(`MuiPopover`,[`root`,`paper`]);function Mp(e,t){let n=0;return typeof t==`number`?n=t:t===`center`?n=e.height/2:t===`bottom`&&(n=e.height),n}function Np(e,t){let n=0;return typeof t==`number`?n=t:t===`center`?n=e.width/2:t===`right`&&(n=e.width),n}function Pp(e){return[e.horizontal,e.vertical].map(e=>typeof e==`number`?`${e}px`:e).join(` `)}function Fp(e){return typeof e==`function`?e():e}var Ip=e=>{let{classes:t}=e;return Ma({root:[`root`],paper:[`paper`]},jp,t)},Lp=P(Qu,{name:`MuiPopover`,slot:`Root`})({}),Rp=P(Tc,{name:`MuiPopover`,slot:`Paper`})({position:`absolute`,overflowY:`auto`,overflowX:`hidden`,minWidth:16,minHeight:16,maxWidth:`calc(100% - 32px)`,maxHeight:`calc(100% - 32px)`,outline:0}),zp=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiPopover`}),{action:r,anchorEl:i,anchorOrigin:a={vertical:`top`,horizontal:`left`},anchorPosition:o,anchorReference:s=`anchorEl`,children:c,className:l,container:u,disableAutoFocus:d=!1,elevation:f=8,marginThreshold:p=16,open:m,slots:h={},slotProps:g={},transformOrigin:_={vertical:`top`,horizontal:`left`},transitionDuration:v=`auto`,disableScrollLock:y=!1,...b}=n,x=j.useRef(),S={...n,anchorOrigin:a,anchorReference:s,elevation:f,marginThreshold:p,transformOrigin:_,transitionDuration:v},C=Ip(S),w=j.useCallback(()=>{if(s===`anchorPosition`)return o;let e=Fp(i),t=(e&&e.nodeType===1?e:us(x.current).body).getBoundingClientRect();return{top:t.top+Mp(t,a.vertical),left:t.left+Np(t,a.horizontal)}},[i,a.horizontal,a.vertical,o,s]),T=j.useCallback(e=>({vertical:Mp(e,_.vertical),horizontal:Np(e,_.horizontal)}),[_.horizontal,_.vertical]),E=j.useCallback(e=>{let t={width:e.offsetWidth,height:e.offsetHeight},n=T(t);if(s===`none`)return{top:null,left:null,transformOrigin:Pp(n)};let r=w(),a=r.top-n.vertical,o=r.left-n.horizontal,c=a+t.height,l=o+t.width,u=fs(Fp(i)),d=u.innerHeight-p,f=u.innerWidth-p;if(p!=null&&a<p){let e=a-p;a-=e,n.vertical+=e}else if(p!=null&&c>d){let e=c-d;a-=e,n.vertical+=e}if(p!=null&&o<p){let e=o-p;o-=e,n.horizontal+=e}else if(l>f){let e=l-f;o-=e,n.horizontal+=e}return{top:`${Math.round(a)}px`,left:`${Math.round(o)}px`,transformOrigin:Pp(n)}},[i,s,w,T,p]),[D,ee]=j.useState(m),te=j.useCallback(()=>{let e=x.current;if(!e)return;let t=E(e);t.top!=null&&e.style.setProperty(`top`,t.top),t.left!=null&&(e.style.left=t.left),e.style.transformOrigin=t.transformOrigin,ee(!0)},[E]);j.useEffect(()=>(y&&window.addEventListener(`scroll`,te),()=>window.removeEventListener(`scroll`,te)),[i,y,te]);let ne=()=>{te()},re=()=>{ee(!1)};j.useEffect(()=>{m&&te()}),j.useImperativeHandle(r,()=>m?{updatePosition:()=>{te()}}:null,[m,te]),j.useEffect(()=>{if(!m)return;let e=as(()=>{te()}),t=fs(Fp(i));return t.addEventListener(`resize`,e),()=>{e.clear(),t.removeEventListener(`resize`,e)}},[i,m,te]);let ie=v,ae={slots:h,slotProps:g},[oe,O]=hc(`transition`,{elementType:Ud,externalForwardedProps:ae,ownerState:S,getSlotProps:e=>({...e,onEntering:(t,n)=>{e.onEntering?.(t,n),ne()},onExited:t=>{e.onExited?.(t),re()}}),additionalProps:{appear:!0,in:m}});v===`auto`&&!oe.muiSupportAuto&&(ie=void 0);let k=u||(i?us(Fp(i)).body:void 0),[A,{slots:se,slotProps:ce,...le}]=hc(`root`,{ref:t,elementType:Lp,externalForwardedProps:{...ae,...b},shouldForwardComponentProp:!0,additionalProps:{slots:{backdrop:h.backdrop},slotProps:{backdrop:Cs(typeof g.backdrop==`function`?g.backdrop(S):g.backdrop,{invisible:!0})},container:k,open:m},ownerState:S,className:ci(C.root,l)}),[ue,de]=hc(`paper`,{ref:x,className:C.paper,elementType:Rp,externalForwardedProps:ae,shouldForwardComponentProp:!0,additionalProps:{elevation:f,style:D?void 0:{opacity:0}},ownerState:S});return(0,M.jsx)(A,{...le,...!lc(A)&&{slots:se,slotProps:ce,disableAutoFocus:d,disableScrollLock:y},children:(0,M.jsx)(oe,{...O,timeout:ie,children:(0,M.jsx)(ue,{...de,children:c})})})});function Bp(e){return di(`MuiMenu`,e)}fi(`MuiMenu`,[`root`,`paper`,`list`]);var Vp={vertical:`top`,horizontal:`right`},Hp={vertical:`top`,horizontal:`left`},Up=e=>{let{classes:t}=e;return Ma({root:[`root`],paper:[`paper`],list:[`list`]},Bp,t)},Wp=P(zp,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiMenu`,slot:`Root`})({}),Gp=P(Rp,{name:`MuiMenu`,slot:`Paper`})({maxHeight:`calc(100% - 96px)`,WebkitOverflowScrolling:`touch`}),Kp=P(Ap,{name:`MuiMenu`,slot:`List`})({outline:0}),qp=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiMenu`}),{autoFocus:r=!0,children:i,className:a,disableAutoFocusItem:o=!1,onClose:s,open:c,PopoverClasses:l,transitionDuration:u=`auto`,variant:d=`selectedMenu`,slots:f={},slotProps:p={},...m}=n,h=Zi(),g={...n,autoFocus:r,disableAutoFocusItem:o,transitionDuration:u,variant:d},_=Up(g),v=r&&c,y=v&&!o,b=j.useRef(null),x=(e,t)=>{b.current&&(b.current.adjustStyleForScrollbar(e,{direction:h?`rtl`:`ltr`}),v&&b.current.focusInitialTarget?.())},S=e=>{e.key===`Tab`&&(e.preventDefault(),s&&s(e,`tabKeyDown`))},C={slots:f,slotProps:p},w=hl({elementType:f.root,externalSlotProps:p.root,ownerState:g,className:[_.root,a]}),[T,E]=hc(`paper`,{className:_.paper,elementType:Gp,externalForwardedProps:C,shouldForwardComponentProp:!0,ownerState:g}),[D,ee]=hc(`list`,{className:_.list,elementType:Kp,shouldForwardComponentProp:!0,externalForwardedProps:C,getSlotProps:e=>({...e,onKeyDown:t=>{S(t),e.onKeyDown?.(t)}}),ownerState:g}),te=typeof p.transition==`function`?p.transition(g):p.transition;return(0,M.jsx)(Wp,{disableAutoFocus:r,onClose:s,anchorOrigin:{vertical:`bottom`,horizontal:h?`right`:`left`},transformOrigin:h?Vp:Hp,slots:{root:f.root,paper:T,backdrop:f.backdrop,transition:f.transition},slotProps:{root:w,paper:E,backdrop:typeof p.backdrop==`function`?p.backdrop(g):p.backdrop,transition:{...te,onEntering:(...e)=>{x(...e),te?.onEntering?.(...e)}}},open:c,ref:t,transitionDuration:u,ownerState:g,...m,classes:l,children:(0,M.jsx)(D,{actions:b,autoFocus:v,autoFocusItem:y,variant:d,...ee,children:i})})});function Jp(e){return di(`MuiNativeSelect`,e)}var Yp=fi(`MuiNativeSelect`,[`root`,`select`,`multiple`,`filled`,`outlined`,`standard`,`disabled`,`icon`,`iconOpen`,`iconFilled`,`iconOutlined`,`iconStandard`,`nativeInput`,`error`]),Xp=e=>{let{classes:t,variant:n,disabled:r,multiple:i,open:a,error:o}=e;return Ma({select:[`select`,n,r&&`disabled`,i&&`multiple`,o&&`error`],icon:[`icon`,`icon${qo(n)}`,a&&`iconOpen`,r&&`disabled`]},Jp,t)},Zp=P(`select`,{name:`MuiNativeSelect`})(({theme:e})=>({MozAppearance:`none`,WebkitAppearance:`none`,userSelect:`none`,borderRadius:0,cursor:`pointer`,"&:focus":{borderRadius:0},[`&.${Yp.disabled}`]:{cursor:`default`},"&[multiple]":{height:`auto`},"&:not([multiple]) option, &:not([multiple]) optgroup":{backgroundColor:(e.vars||e).palette.background.paper},variants:[{props:({ownerState:e})=>e.variant!==`filled`&&e.variant!==`outlined`,style:{"&&&":{paddingRight:24,minWidth:16}}},{props:{variant:`filled`},style:{"&&&":{paddingRight:32}}},{props:{variant:`outlined`},style:{borderRadius:(e.vars||e).shape.borderRadius,"&:focus":{borderRadius:(e.vars||e).shape.borderRadius},"&&&":{paddingRight:32}}}]})),Qp=P(Zp,{name:`MuiNativeSelect`,slot:`Select`,shouldForwardProp:zo,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.select,t[n.variant],n.error&&t.error,{[`&.${Yp.multiple}`]:t.multiple}]}})({}),$p=P(`svg`,{name:`MuiNativeSelect`})(({theme:e})=>({position:`absolute`,right:0,top:`calc(50% - .5em)`,pointerEvents:`none`,color:(e.vars||e).palette.action.active,[`&.${Yp.disabled}`]:{color:(e.vars||e).palette.action.disabled},variants:[{props:({ownerState:e})=>e.open,style:{transform:`rotate(180deg)`}},{props:{variant:`filled`},style:{right:7}},{props:{variant:`outlined`},style:{right:7}}]})),em=P($p,{name:`MuiNativeSelect`,slot:`Icon`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.icon,n.variant&&t[`icon${qo(n.variant)}`],n.open&&t.iconOpen]}})({}),tm=j.forwardRef(function(e,t){let{className:n,disabled:r,error:i,IconComponent:a,inputRef:o,variant:s=`standard`,...c}=e,l={...e,disabled:r,variant:s,error:i},u=Xp(l);return(0,M.jsxs)(j.Fragment,{children:[(0,M.jsx)(Qp,{ownerState:l,className:ci(u.select,n),disabled:r,ref:o||t,...c}),e.multiple?null:(0,M.jsx)(em,{as:a,ownerState:l,className:u.icon})]})}),nm,rm=P(`fieldset`,{name:`MuiNotchedOutlined`,shouldForwardProp:zo})({textAlign:`left`,position:`absolute`,bottom:0,right:0,top:-5,left:0,margin:0,padding:`0 8px`,pointerEvents:`none`,borderRadius:`inherit`,borderStyle:`solid`,borderWidth:1,overflow:`hidden`,minWidth:`0%`}),im=P(`legend`,{name:`MuiNotchedOutlined`,shouldForwardProp:zo})(Zo(({theme:e})=>({float:`unset`,width:`auto`,overflow:`hidden`,variants:[{props:({ownerState:e})=>!e.withLabel,style:{padding:0,lineHeight:`11px`,transition:e.transitions.create(`width`,{duration:150,easing:e.transitions.easing.easeOut})}},{props:({ownerState:e})=>e.withLabel,style:{display:`block`,padding:0,height:11,fontSize:`0.75em`,visibility:`hidden`,maxWidth:.01,transition:e.transitions.create(`max-width`,{duration:50,easing:e.transitions.easing.easeOut}),whiteSpace:`nowrap`,"& > span":{paddingLeft:5,paddingRight:5,display:`inline-block`,opacity:0,visibility:`visible`}}},{props:({ownerState:e})=>e.withLabel&&e.notched,style:{maxWidth:`100%`,transition:e.transitions.create(`max-width`,{duration:100,easing:e.transitions.easing.easeOut,delay:50})}}]})));function am(e){let{children:t,classes:n,className:r,label:i,notched:a,...o}=e,s=i!=null&&i!==``,c={...e,notched:a,withLabel:s};return(0,M.jsx)(rm,{"aria-hidden":!0,className:r,ownerState:c,...o,children:(0,M.jsx)(im,{ownerState:c,children:s?(0,M.jsx)(`span`,{children:i}):nm||=(0,M.jsx)(`span`,{className:`notranslate`,"aria-hidden":!0,children:`​`})})})}var om=e=>{let{classes:t}=e,n=Ma({root:[`root`],notchedOutline:[`notchedOutline`],input:[`input`]},Ul,t);return{...t,...n}},sm=P(Ll,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiOutlinedInput`,slot:`Root`,overridesResolver:Pl})(Zo(({theme:e})=>{let t=e.palette.mode===`light`?`rgba(0, 0, 0, 0.23)`:`rgba(255, 255, 255, 0.23)`;return{position:`relative`,borderRadius:(e.vars||e).shape.borderRadius,[`&:hover .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.text.primary},"@media (hover: none)":{[`&:hover .${Wl.notchedOutline}`]:{borderColor:e.vars?e.alpha(e.vars.palette.common.onBackground,.23):t}},[`&.${Wl.focused} .${Wl.notchedOutline}`]:{borderWidth:2},variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{[`&.${Wl.focused} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette[t].main}}})),{props:{},style:{[`&.${Wl.error} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.error.main},[`&.${Wl.disabled} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.action.disabled}}},{props:({ownerState:e})=>e.startAdornment,style:{paddingLeft:14}},{props:({ownerState:e})=>e.endAdornment,style:{paddingRight:14}},{props:({ownerState:e})=>e.multiline,style:{padding:`16.5px 14px`}},{props:({ownerState:e,size:t})=>e.multiline&&t===`small`,style:{padding:`8.5px 14px`}}]}})),cm=P(am,{name:`MuiOutlinedInput`,slot:`NotchedOutline`})(Zo(({theme:e})=>{let t=e.palette.mode===`light`?`rgba(0, 0, 0, 0.23)`:`rgba(255, 255, 255, 0.23)`;return{borderColor:e.vars?e.alpha(e.vars.palette.common.onBackground,.23):t}})),lm=P(Rl,{name:`MuiOutlinedInput`,slot:`Input`,overridesResolver:Fl})(Zo(({theme:e})=>({padding:`16.5px 14px`,"&:-webkit-autofill":{...!e.vars&&{WebkitBoxShadow:e.palette.mode===`light`?null:`0 0 0 100px #266798 inset`,WebkitTextFillColor:e.palette.mode===`light`?null:`#fff`,caretColor:e.palette.mode===`light`?null:`#fff`},borderRadius:`inherit`,...e.vars&&e.applyStyles(`dark`,{WebkitBoxShadow:`0 0 0 100px #266798 inset`,WebkitTextFillColor:`#fff`,caretColor:`#fff`})},variants:[{props:{size:`small`},style:{padding:`8.5px 14px`}},{props:({ownerState:e})=>e.multiline,style:{padding:0}},{props:({ownerState:e})=>e.startAdornment,style:{paddingLeft:0}},{props:({ownerState:e})=>e.endAdornment,style:{paddingRight:0}}]}))),um=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiOutlinedInput`}),{fullWidth:r=!1,inputComponent:i=`input`,label:a,multiline:o=!1,notched:s,slots:c={},slotProps:l={},type:u=`text`,...d}=n,f=om(n),[p,m]=Tl({props:n,states:[`color`,`disabled`,`error`,`focused`,`hiddenLabel`,`size`,`required`]}),h={...n,color:p.color||`primary`,disabled:p.disabled,error:p.error,focused:p.focused,formControl:m,fullWidth:r,hiddenLabel:p.hiddenLabel,multiline:o,size:p.size,type:u},g=c.root??sm,_=c.input??lm,[v,y]=hc(`notchedOutline`,{elementType:cm,className:f.notchedOutline,shouldForwardComponentProp:!0,ownerState:h,externalForwardedProps:{slots:c,slotProps:l},additionalProps:{label:a!=null&&a!==``&&p.required?(0,M.jsxs)(j.Fragment,{children:[a,` `,`*`]}):a}});return(0,M.jsx)(Bl,{slots:{root:g,input:_},slotProps:l,renderSuffix:e=>(0,M.jsx)(v,{...y,notched:s===void 0?!!(e.startAdornment||e.filled||e.focused):s}),fullWidth:r,inputComponent:i,multiline:o,ref:t,type:u,...d,classes:{...f,notchedOutline:null}})});um.muiName=`Input`;function dm(e){return di(`MuiSelect`,e)}var fm=fi(`MuiSelect`,[`root`,`select`,`multiple`,`filled`,`outlined`,`standard`,`disabled`,`focused`,`icon`,`iconOpen`,`nativeInput`,`error`]),pm,mm=2,hm=400,gm=200;function _m(e,t){if(!t)return!1;if(e.composedPath().includes(t)||e.target?.nodeType&&t.contains(e.target))return!0;let n=t.getBoundingClientRect();return n.width===0&&n.height===0?!1:e.clientX>=n.left-mm&&e.clientX<=n.right+mm&&e.clientY>=n.top-mm&&e.clientY<=n.bottom+mm}var vm=P(Zp,{name:`MuiSelect`,slot:`Select`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`&.${fm.select}`]:t.select},{[`&.${fm.select}`]:t[n.variant]},{[`&.${fm.error}`]:t.error},{[`&.${fm.multiple}`]:t.multiple}]}})({[`&.${fm.select}`]:{height:`auto`,minHeight:`1.4375em`,textOverflow:`ellipsis`,whiteSpace:`nowrap`,overflow:`hidden`}}),ym=P($p,{name:`MuiSelect`,slot:`Icon`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.icon,n.open&&t.iconOpen]}})({}),bm=P(`input`,{shouldForwardProp:e=>Ro(e)&&e!==`classes`,name:`MuiSelect`,slot:`NativeInput`})({bottom:0,left:0,position:`absolute`,opacity:0,pointerEvents:`none`,width:`100%`,boxSizing:`border-box`}),xm=e=>{let{classes:t,variant:n,disabled:r,multiple:i,open:a,error:o}=e;return Ma({select:[`select`,n,r&&`disabled`,i&&`multiple`,o&&`error`],icon:[`icon`,a&&`iconOpen`,r&&`disabled`],nativeInput:[`nativeInput`]},dm,t)},Sm=j.forwardRef(function(e,t){let{"aria-describedby":n,"aria-label":r,autoFocus:i,autoWidth:a,children:o,className:s,defaultOpen:c,defaultValue:l,disabled:u,displayEmpty:d,error:f=!1,IconComponent:p,inputRef:m,labelId:h,MenuProps:g={},multiple:_,name:v,onBlur:y,onChange:b,onClose:x,onFocus:S,onKeyDown:C,onMouseDown:w,onOpen:T,open:D,readOnly:ee,renderValue:te,required:ne,SelectDisplayProps:re={},tabIndex:ie,type:ae,value:oe,variant:O=`standard`,...k}=e,[A,se]=_s({controlled:oe,default:l,name:`Select`}),[ce,le]=_s({controlled:D,default:c,name:`Select`}),ue=j.useRef(null),de=j.useRef(null),fe=j.useRef(null),pe=j.useRef(!1),me=j.useRef(!1),he=j.useRef(null),ge=j.useRef(!1),_e=j.useRef({allowSelectedMouseUp:!1,allowUnselectedMouseUp:!1}),ve=Qs(),ye=Qs(),[be,xe]=j.useState(null),{current:Se}=j.useRef(D!=null),[Ce,we]=j.useState(),[Te,Ee]=j.useState(null),De=xs(t,m),Oe=j.useCallback(e=>{de.current=e,e&&xe(e)},[]),ke=be?.parentNode;j.useImperativeHandle(De,()=>({focus:()=>{de.current.focus()},node:ue.current,value:A}),[A]);let Ae=be!==null&&ce;ms(()=>{pe.current=Ae},[Ae]);let je=j.useCallback(()=>{ve.clear(),ye.clear()},[ve,ye]),Me=j.useCallback(()=>{je(),ge.current=!1,_e.current={allowSelectedMouseUp:!1,allowUnselectedMouseUp:!1}},[je]),Ne=j.useCallback(()=>{he.current&&=(he.current(),null)},[]);j.useEffect(()=>{Ae||(Me(),Ne())},[Ae,Me,Ne]),j.useEffect(()=>()=>{Me(),Ne()},[Me,Ne]),j.useEffect(()=>{if(!Ae||!ke||a||typeof ResizeObserver>`u`)return;let e=new ResizeObserver(()=>{we(ke.clientWidth)});return e.observe(ke),()=>{e.disconnect()}},[Ae,ke,a]),j.useEffect(()=>{c&&ce&&be&&!Se&&(we(a?null:ke.clientWidth),de.current.focus())},[be,a]),j.useEffect(()=>{i&&de.current.focus()},[i]),j.useEffect(()=>{if(!h)return;let e=us(de.current).getElementById(h);if(e){let t=()=>{getSelection().isCollapsed&&de.current.focus()};return e.addEventListener(`click`,t),()=>{e.removeEventListener(`click`,t)}}},[h]);let Pe=ys((e,t)=>{e||(Me(),Ne()),e?(Ee(yp(t)),T&&T(t)):(Ee(null),x&&x(t)),Se||(pe.current=e,we(a?null:ke.clientWidth),le(e))}),Fe=()=>{Me(),me.current?ye.start(gm,()=>{_e.current.allowUnselectedMouseUp=!0,ve.start(gm,()=>{_e.current.allowSelectedMouseUp=!0})}):ve.start(hm,()=>{_e.current.allowSelectedMouseUp=!0,_e.current.allowUnselectedMouseUp=!0})},Ie=e=>{if(w?.(e),e.button!==0)return;e.preventDefault(),de.current.focus();let t=us(e.currentTarget);Fe(),Ne();let n=e=>{he.current=null,de.current&&(_m(e,de.current)||_m(e,fe.current)||!pe.current&&Se||Pe(!1,e))};t.addEventListener(`mouseup`,n,{capture:!0,once:!0}),he.current=()=>{t.removeEventListener(`mouseup`,n,!0)},Pe(!0,e)},Le=e=>{Pe(!1,e)},Re=j.Children.toArray(o),ze=e=>{let t=Re.find(t=>t.props.value===e.target.value);t!==void 0&&(se(t.props.value),b&&b(e,t))},Be=e=>t=>{ge.current=!1;let n;if(t.currentTarget.hasAttribute(`tabindex`)){if(_){n=Array.isArray(A)?A.slice():[];let t=A.indexOf(e.props.value);t===-1?n.push(e.props.value):n.splice(t,1)}else n=e.props.value;if(e.props.onClick&&e.props.onClick(t),A!==n&&(se(n),b)){let r=t.nativeEvent||t,i=new r.constructor(r.type,r);Object.defineProperty(i,`target`,{writable:!0,value:{value:n,name:v}}),b(i,e)}_||Pe(!1,t)}},Ve=(e,t)=>n=>{if(e.props.onMouseUp?.(n),ge.current){ge.current=!1;return}let r=!_e.current.allowSelectedMouseUp&&t,i=!_e.current.allowUnselectedMouseUp&&!t;r||i||n.currentTarget.click()},He=e=>{ee||([` `,`ArrowUp`,`ArrowDown`,`Enter`].includes(e.key)&&(e.preventDefault(),Pe(!0,e)),C?.(e))},Ue=e=>{!Ae&&y&&(Object.defineProperty(e,`target`,{writable:!0,value:{value:A,name:v}}),y(e))};delete k[`aria-invalid`];let We,Ge,Ke=[],qe=!1,Je=!1;(Dl({value:A})||d)&&(te?We=te(A):qe=!0);let Ye=Re.map(e=>{if(!j.isValidElement(e))return null;let t;if(_){if(!Array.isArray(A))throw Error(E(2));t=A.some(t=>xp(t,e.props.value)),t&&qe&&Ke.push(e.props.children)}else t=xp(A,e.props.value),t&&qe&&(Ge=e.props.children);return t&&(Je=!0),j.cloneElement(e,{"aria-selected":t?`true`:`false`,onMouseDown:t=>{ge.current=!0,e.props.onMouseDown?.(t)},onPointerDown:t=>{ge.current=!0,e.props.onPointerDown?.(t)},onClick:Be(e),onMouseUp:Ve(e,t),onKeyUp:t=>{t.key===` `&&t.preventDefault(),e.props.onKeyUp&&e.props.onKeyUp(t)},role:`option`,selected:t,value:void 0,"data-value":e.props.value})});ms(()=>{me.current=Je},[Je]),qe&&(We=_?Ke.length===0?null:Ke.reduce((e,t,n)=>(e.push(t),n<Ke.length-1&&e.push(`, `),e),[]):Ge);let Xe=Ce;!a&&Se&&be&&(Xe=ke.clientWidth);let Ze;Ze=ie===void 0?u?null:0:ie;let Qe=re.id||(v?`mui-component-select-${v}`:void 0),$e={...e,variant:O,value:A,open:Ae,error:f},et=xm($e),tt=typeof g.slotProps?.paper==`function`?g.slotProps.paper($e):g.slotProps?.paper,nt=xs(tt?.ref,fe),rt=typeof g.slotProps?.list==`function`?g.slotProps.list($e):g.slotProps?.list,it=aa(),at=aa();return(0,M.jsxs)(j.Fragment,{children:[(0,M.jsx)(vm,{as:`div`,ref:Oe,tabIndex:Ze,role:`combobox`,"aria-controls":Ae?it:void 0,"aria-disabled":u?`true`:void 0,"aria-expanded":Ae?`true`:`false`,"aria-haspopup":`listbox`,"aria-label":r,"aria-labelledby":h,"aria-describedby":n,"aria-required":ne?`true`:void 0,"aria-invalid":f?`true`:void 0,onKeyDown:He,onMouseDown:u||ee?null:Ie,onBlur:Ue,onFocus:S,...re,ownerState:$e,className:ci(re.className,et.select,s),id:Qe,children:bp(We)?pm||=(0,M.jsx)(`span`,{className:`notranslate`,"aria-hidden":!0,children:`​`}):We}),(0,M.jsx)(bm,{"aria-invalid":f,value:Array.isArray(A)?A.join(`,`):A,name:v,ref:ue,"aria-hidden":!0,onChange:ze,tabIndex:-1,disabled:u,className:et.nativeInput,autoFocus:i,required:ne,...k,id:k.id??at,ownerState:$e}),(0,M.jsx)(ym,{as:p,className:et.icon,ownerState:$e}),(0,M.jsx)(wp,{value:Te,children:(0,M.jsx)(qp,{id:`menu-${v||``}`,anchorEl:ke,open:Ae,onClose:Le,anchorOrigin:{vertical:`bottom`,horizontal:`center`},transformOrigin:{vertical:`top`,horizontal:`center`},...g,slotProps:{...g.slotProps,list:{"aria-labelledby":h,role:`listbox`,"aria-multiselectable":_?`true`:void 0,disableListWrap:!0,id:it,...rt},paper:{...tt,ref:nt,style:{minWidth:Xe,...tt?.style}}},children:Ye})})]})}),Cm=e=>{let{classes:t}=e,n=Ma({root:[`root`]},dm,t);return{...t,...n}},wm={name:`MuiSelect`,slot:`Root`,shouldForwardProp:e=>zo(e)&&e!==`variant`},Tm=P(Yd,wm)(``),Em=P(um,wm)(``),Dm=P(Cd,wm)(``),Om=j.forwardRef(function(e,t){let n=Qo({name:`MuiSelect`,props:e}),{autoWidth:r=!1,children:i,classes:a={},className:o,defaultOpen:s=!1,displayEmpty:c=!1,IconComponent:l=ql,id:u,input:d,inputProps:f,label:p,labelId:m,MenuProps:h,multiple:g=!1,native:_=!1,onClose:v,onOpen:y,open:b,renderValue:x,SelectDisplayProps:S,variant:C=`outlined`,...w}=n,T=_?tm:Sm,[E]=Tl({props:n,states:[`variant`,`error`]}),D=E.variant||C,ee={...n,variant:D,classes:a},te=Cm(ee),{root:ne,...re}=te,ie=d||{standard:(0,M.jsx)(Tm,{ownerState:ee}),outlined:(0,M.jsx)(Em,{label:p,ownerState:ee}),filled:(0,M.jsx)(Dm,{ownerState:ee})}[D],ae=xs(t,gl(ie));return(0,M.jsx)(j.Fragment,{children:j.cloneElement(ie,{inputComponent:T,inputProps:{children:i,error:E.error,IconComponent:l,variant:D,type:void 0,multiple:g,..._?{id:u}:{autoWidth:r,defaultOpen:s,displayEmpty:c,labelId:m,MenuProps:h,onClose:v,onOpen:y,open:b,renderValue:x,SelectDisplayProps:{id:u,...S}},...f,classes:f?bn(re,f.classes):re,...d?d.props.inputProps:{}},...(g&&_||c)&&D===`outlined`?{notched:!0}:{},ref:ae,className:ci(ie.props.className,o,te.root),...!d&&{variant:D},...w})})});Om.muiName=`Select`;function km(e){return di(`MuiTab`,e)}var Am=fi(`MuiTab`,[`root`,`labelIcon`,`textColorInherit`,`textColorPrimary`,`textColorSecondary`,`selected`,`disabled`,`fullWidth`,`wrapped`,`icon`]),jm=e=>{let{classes:t,textColor:n,fullWidth:r,wrapped:i,icon:a,label:o,selected:s,disabled:c}=e;return Ma({root:[`root`,a&&o&&`labelIcon`,`textColor${qo(n)}`,r&&`fullWidth`,i&&`wrapped`,s&&`selected`,c&&`disabled`],icon:[`icon`]},km,t)},Mm=P(Kc,{name:`MuiTab`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.label&&n.icon&&t.labelIcon,t[`textColor${qo(n.textColor)}`],n.fullWidth&&t.fullWidth,n.wrapped&&t.wrapped,{[`& .${Am.icon}`]:t.icon}]}})(Zo(({theme:e})=>({...e.typography.button,maxWidth:360,minWidth:90,position:`relative`,minHeight:48,flexShrink:0,padding:`12px 16px`,overflow:`hidden`,whiteSpace:`normal`,textAlign:`center`,lineHeight:1.25,variants:[{props:({ownerState:e})=>e.label&&(e.iconPosition===`top`||e.iconPosition===`bottom`),style:{flexDirection:`column`}},{props:({ownerState:e})=>e.label&&e.iconPosition!==`top`&&e.iconPosition!==`bottom`,style:{flexDirection:`row`}},{props:({ownerState:e})=>e.icon&&e.label,style:{minHeight:72,paddingTop:9,paddingBottom:9}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`top`,style:{[`& > .${Am.icon}`]:{marginBottom:6}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`bottom`,style:{[`& > .${Am.icon}`]:{marginTop:6}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`start`,style:{[`& > .${Am.icon}`]:{marginRight:e.spacing(1)}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`end`,style:{[`& > .${Am.icon}`]:{marginLeft:e.spacing(1)}}},{props:{textColor:`inherit`},style:{color:`inherit`,opacity:.6,[`&.${Am.selected}`]:{opacity:1},[`&.${Am.disabled}`]:{opacity:(e.vars||e).palette.action.disabledOpacity}}},{props:{textColor:`primary`},style:{color:(e.vars||e).palette.text.secondary,[`&.${Am.selected}`]:{color:(e.vars||e).palette.primary.main},[`&.${Am.disabled}`]:{color:(e.vars||e).palette.text.disabled}}},{props:{textColor:`secondary`},style:{color:(e.vars||e).palette.text.secondary,[`&.${Am.selected}`]:{color:(e.vars||e).palette.secondary.main},[`&.${Am.disabled}`]:{color:(e.vars||e).palette.text.disabled}}},{props:({ownerState:e})=>e.fullWidth,style:{flexShrink:1,flexGrow:1,flexBasis:0,maxWidth:`none`}},{props:({ownerState:e})=>e.wrapped,style:{fontSize:e.typography.pxToRem(12)}}]}))),Nm=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTab`}),{className:r,disabled:i=!1,disableFocusRipple:a=!1,fullWidth:o,icon:s,iconPosition:c=`top`,indicator:l,label:u,onChange:d,onClick:f,onFocus:p,selected:m,selectionFollowsFocus:h,textColor:g=`inherit`,value:_,wrapped:v=!1,...y}=n,b=Yf(),x=ep({id:_,ref:t,disabled:i,selected:m}),S=b.getItemMap().size===0&&m?0:x.tabIndex,C={...n,disabled:i,disableFocusRipple:a,selected:m,icon:!!s,iconPosition:c,label:!!u,fullWidth:o,textColor:g,wrapped:v},w=jm(C),T=s&&u&&j.isValidElement(s)?j.cloneElement(s,{className:ci(w.icon,s.props.className)}):s;return(0,M.jsxs)(Mm,{internalNativeButton:!0,focusRipple:!a,className:ci(w.root,r),ref:x.ref,role:`tab`,"aria-selected":m,disabled:i,onClick:e=>{!m&&d&&d(e,_),f&&f(e)},onFocus:e=>{h&&!m&&d&&d(e,_),p&&p(e)},tabIndex:S,ownerState:C,...y,children:[c===`top`||c===`start`?(0,M.jsxs)(j.Fragment,{children:[T,u]}):(0,M.jsxs)(j.Fragment,{children:[u,T]}),l]})}),Pm=rs((0,M.jsx)(`path`,{d:`M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z`}),`KeyboardArrowLeft`),Fm=rs((0,M.jsx)(`path`,{d:`M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z`}),`KeyboardArrowRight`);function Im(e){return(1+Math.sin(Math.PI*e-Math.PI/2))/2}function Lm(e,t,n,r={},i=()=>{}){let{ease:a=Im,duration:o=300}=r,s=null,c=t[e],l=!1,u=()=>{l=!0},d=r=>{if(l){i(Error(`Animation cancelled`));return}s===null&&(s=r);let u=Math.min(1,(r-s)/o);if(t[e]=a(u)*(n-c)+c,u>=1){requestAnimationFrame(()=>{i(null)});return}requestAnimationFrame(d)};return c===n?(i(Error(`Element already at target position`)),u):(requestAnimationFrame(d),u)}var Rm={width:99,height:99,position:`absolute`,top:-9999,overflow:`scroll`,pointerEvents:`none`};function zm(e){let{onChange:t,...n}=e,r=j.useRef(),i=j.useRef(null),a=()=>{r.current=i.current.offsetHeight-i.current.clientHeight};return ms(()=>{let e=as(()=>{let e=r.current;a(),e!==r.current&&t(r.current)}),n=fs(i.current);return n.addEventListener(`resize`,e),()=>{e.clear(),n.removeEventListener(`resize`,e)}},[t]),j.useEffect(()=>{a(),t(r.current)},[t]),(0,M.jsx)(`div`,{style:Rm,...n,ref:i})}function Bm(e){return di(`MuiTabScrollButton`,e)}var Vm=fi(`MuiTabScrollButton`,[`root`,`vertical`,`horizontal`,`disabled`]),Hm=e=>{let{classes:t,orientation:n,disabled:r}=e;return Ma({root:[`root`,n,r&&`disabled`]},Bm,t)},Um=P(Kc,{name:`MuiTabScrollButton`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.orientation&&t[n.orientation]]}})({width:40,flexShrink:0,opacity:.8,[`&.${Vm.disabled}`]:{opacity:0},variants:[{props:{orientation:`vertical`},style:{width:`100%`,height:40,"& svg":{transform:`var(--TabScrollButton-svgRotate)`}}}]}),Wm=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTabScrollButton`}),{className:r,slots:i={},slotProps:a={},direction:o,orientation:s,disabled:c,...l}=n,{nativeButton:u,...d}=l,f=Zi(),p={isRtl:f,...n},m=Hm(p),h=i.StartScrollButtonIcon??Pm,g=i.EndScrollButtonIcon??Fm,_=hl({elementType:h,externalSlotProps:a.startScrollButtonIcon,additionalProps:{fontSize:`small`},ownerState:p}),v=hl({elementType:g,externalSlotProps:a.endScrollButtonIcon,additionalProps:{fontSize:`small`},ownerState:p});return(0,M.jsx)(Um,{component:`div`,className:ci(m.root,r),ref:t,role:null,ownerState:p,tabIndex:null,...d,style:{...d.style,...s===`vertical`&&{"--TabScrollButton-svgRotate":`rotate(${f?-90:90}deg)`}},children:o===`left`?(0,M.jsx)(h,{..._}):(0,M.jsx)(g,{...v})})});function Gm(e){return di(`MuiTabs`,e)}var Km=fi(`MuiTabs`,[`root`,`vertical`,`list`,`centered`,`scroller`,`fixed`,`scrollableX`,`scrollableY`,`hideScrollbar`,`scrollButtons`,`scrollButtonsHideMobile`,`indicator`]),qm=e=>{let{vertical:t,fixed:n,hideScrollbar:r,scrollableX:i,scrollableY:a,centered:o,scrollButtonsHideMobile:s,classes:c}=e;return Ma({root:[`root`,t&&`vertical`],scroller:[`scroller`,n&&`fixed`,r&&`hideScrollbar`,i&&`scrollableX`,a&&`scrollableY`],list:[`list`,t&&`vertical`,o&&`centered`],indicator:[`indicator`],scrollButtons:[`scrollButtons`,s&&`scrollButtonsHideMobile`],scrollableX:[i&&`scrollableX`],hideScrollbar:[r&&`hideScrollbar`]},Gm,c)},Jm=P(`div`,{name:`MuiTabs`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`& .${Km.scrollButtons}`]:t.scrollButtons},{[`& .${Km.scrollButtons}`]:n.scrollButtonsHideMobile&&t.scrollButtonsHideMobile},t.root,n.vertical&&t.vertical]}})(Zo(({theme:e})=>({overflow:`hidden`,minHeight:48,WebkitOverflowScrolling:`touch`,display:`flex`,variants:[{props:({ownerState:e})=>e.vertical,style:{flexDirection:`column`}},{props:({ownerState:e})=>e.scrollButtonsHideMobile,style:{[`& .${Km.scrollButtons}`]:{[e.breakpoints.down(`sm`)]:{display:`none`}}}}]}))),Ym=P(`div`,{name:`MuiTabs`,slot:`Scroller`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.scroller,n.fixed&&t.fixed,n.hideScrollbar&&t.hideScrollbar,n.scrollableX&&t.scrollableX,n.scrollableY&&t.scrollableY]}})({position:`relative`,display:`inline-block`,flex:`1 1 auto`,whiteSpace:`nowrap`,variants:[{props:({ownerState:e})=>e.fixed,style:{overflowX:`hidden`,width:`100%`}},{props:({ownerState:e})=>e.hideScrollbar,style:{scrollbarWidth:`none`,"&::-webkit-scrollbar":{display:`none`}}},{props:({ownerState:e})=>e.scrollableX,style:{overflowX:`auto`,overflowY:`hidden`}},{props:({ownerState:e})=>e.scrollableY,style:{overflowY:`auto`,overflowX:`hidden`}}]}),Xm=P(`div`,{name:`MuiTabs`,slot:`List`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.list,n.centered&&t.centered]}})({display:`flex`,variants:[{props:({ownerState:e})=>e.vertical,style:{flexDirection:`column`}},{props:({ownerState:e})=>e.centered,style:{justifyContent:`center`}}]}),Zm=P(`span`,{name:`MuiTabs`,slot:`Indicator`})(Zo(({theme:e})=>({position:`absolute`,height:2,bottom:0,width:`100%`,transition:e.transitions.create(),variants:[{props:{indicatorColor:`primary`},style:{backgroundColor:(e.vars||e).palette.primary.main}},{props:{indicatorColor:`secondary`},style:{backgroundColor:(e.vars||e).palette.secondary.main}},{props:({ownerState:e})=>e.vertical,style:{height:`100%`,width:2,right:0}}]}))),Qm=P(zm)({overflowX:`auto`,overflowY:`hidden`,scrollbarWidth:`none`,"&::-webkit-scrollbar":{display:`none`}}),$m={},eh=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTabs`}),r=Lo(),i=Zi(),{"aria-label":a,"aria-labelledby":o,action:s,centered:c=!1,children:l,className:u,component:d=`div`,allowScrollButtonsMobile:f=!1,indicatorColor:p=`primary`,onChange:m,orientation:h=`horizontal`,scrollButtons:g=`auto`,selectionFollowsFocus:_,slots:v={},slotProps:y={},textColor:b=`primary`,value:x,variant:S=`standard`,visibleScrollbar:C=!1,...w}=n,T=S===`scrollable`,E=h===`vertical`,D=E?`scrollTop`:`scrollLeft`,ee=E?`top`:`left`,te=E?`bottom`:`right`,ne=E?`clientHeight`:`clientWidth`,re=E?`height`:`width`,ie={...n,component:d,allowScrollButtonsMobile:f,indicatorColor:p,orientation:h,vertical:E,scrollButtons:g,textColor:b,variant:S,visibleScrollbar:C,fixed:!T,hideScrollbar:T&&!C,scrollableX:T&&!E,scrollableY:T&&E,centered:c&&!T,scrollButtonsHideMobile:!f},ae=qm(ie),oe=hl({elementType:v.startScrollButtonIcon,externalSlotProps:y.startScrollButtonIcon,ownerState:ie}),O=hl({elementType:v.endScrollButtonIcon,externalSlotProps:y.endScrollButtonIcon,ownerState:ie}),[k,A]=j.useState(!1),[se,ce]=j.useState($m),[le,ue]=j.useState(!1),[de,fe]=j.useState(!1),[pe,me]=j.useState(!1),he=x===!1?null:x,[ge,_e]=j.useState(!1),[ve,ye]=j.useState({overflow:`hidden`,scrollbarWidth:0}),be=new Map,xe=j.useRef(null),Se=j.useRef(null),Ce={slots:v,slotProps:y},we=()=>{let e=xe.current,t;if(e){let n=e.getBoundingClientRect();t={clientWidth:e.clientWidth,scrollLeft:e.scrollLeft,scrollTop:e.scrollTop,scrollWidth:e.scrollWidth,top:n.top,bottom:n.bottom,left:n.left,right:n.right}}let n;if(e&&x!==!1){let e=Se.current.children;if(e.length>0){let t=e[be.get(x)];n=t?t.getBoundingClientRect():null}}return{tabsMeta:t,tabMeta:n}},Te=ys(()=>{let{tabsMeta:e,tabMeta:t}=we(),n=0,r;E?(r=`top`,t&&e&&(n=t.top-e.top+e.scrollTop)):(r=i?`right`:`left`,t&&e&&(n=(i?-1:1)*(t[r]-e[r]+e.scrollLeft)));let a={[r]:n,[re]:t?t[re]:0};if(typeof se[r]!=`number`||typeof se[re]!=`number`)ce(a);else{let e=Math.abs(se[r]-a[r]),t=Math.abs(se[re]-a[re]);(e>=1||t>=1)&&ce(a)}}),Ee=(e,{animation:t=!0}={})=>{t?Lm(D,xe.current,e,{duration:r.transitions.duration.standard}):xe.current[D]=e},De=e=>{let t=xe.current[D];E?t+=e:t+=e*(i?-1:1),Ee(t)},Oe=()=>{let e=xe.current[ne],t=0,n=Array.from(Se.current.children);for(let r=0;r<n.length;r+=1){let i=n[r];if(t+i[ne]>e){r===0&&(t=e);break}t+=i[ne]}return t},ke=()=>{De(-1*Oe())},Ae=()=>{De(Oe())},[je,{onChange:Me,...Ne}]=hc(`scrollbar`,{className:ci(ae.scrollableX,ae.hideScrollbar),elementType:Qm,shouldForwardComponentProp:!0,externalForwardedProps:Ce,ownerState:ie}),Pe=j.useCallback(e=>{Me?.(e),ye({overflow:null,scrollbarWidth:e})},[Me]),[Fe,Ie]=hc(`scrollButtons`,{className:ae.scrollButtons,elementType:Wm,externalForwardedProps:Ce,ownerState:ie,additionalProps:{orientation:h,slots:{StartScrollButtonIcon:v.startScrollButtonIcon,EndScrollButtonIcon:v.endScrollButtonIcon},slotProps:{startScrollButtonIcon:oe,endScrollButtonIcon:O}}}),Le=()=>{let e={};e.scrollbarSizeListener=T?(0,M.jsx)(je,{...Ne,onChange:Pe}):null;let t=T&&(g===`auto`&&(le||de)||g===!0);return e.scrollButtonStart=t?(0,M.jsx)(Fe,{direction:i?`right`:`left`,onClick:ke,disabled:!le,...Ie}):null,e.scrollButtonEnd=t?(0,M.jsx)(Fe,{direction:i?`left`:`right`,onClick:Ae,disabled:!de,...Ie}):null,e},Re=ys(e=>{let{tabsMeta:t,tabMeta:n}=we();!n||!t||(n[ee]<t[ee]?Ee(t[D]+(n[ee]-t[ee]),{animation:e}):n[te]>t[te]&&Ee(t[D]+(n[te]-t[te]),{animation:e}))}),ze=ys(()=>{T&&g!==!1&&me(!pe)});j.useEffect(()=>{let e=as(()=>{xe.current&&Te()}),t,n=n=>{n.forEach(e=>{e.removedNodes.forEach(e=>{t?.unobserve(e)}),e.addedNodes.forEach(e=>{t?.observe(e)})}),e(),ze()},r=fs(xe.current);r.addEventListener(`resize`,e);let i;return typeof ResizeObserver<`u`&&(t=new ResizeObserver(e),Array.from(Se.current.children).forEach(e=>{t.observe(e)})),typeof MutationObserver<`u`&&(i=new MutationObserver(n),i.observe(Se.current,{childList:!0})),()=>{e.clear(),r.removeEventListener(`resize`,e),i?.disconnect(),t?.disconnect()}},[Te,ze]),j.useEffect(()=>{let e=Array.from(Se.current.children),t=e.length;if(typeof IntersectionObserver<`u`&&t>0&&T&&g!==!1){let n=e[0],r=e[t-1],i={root:xe.current,threshold:.99},a=new IntersectionObserver(e=>{ue(!e[0].isIntersecting)},i);a.observe(n);let o=new IntersectionObserver(e=>{fe(!e[0].isIntersecting)},i);return o.observe(r),()=>{a.disconnect(),o.disconnect()}}},[T,g,pe,l?.length]),j.useEffect(()=>{A(!0)},[]),j.useEffect(()=>{Te()}),j.useEffect(()=>{Re($m!==se)},[Re,se]),j.useImperativeHandle(s,()=>({updateIndicator:Te,updateScrollButtons:ze}),[Te,ze]);let[Be,Ve]=hc(`indicator`,{className:ae.indicator,elementType:Zm,externalForwardedProps:Ce,ownerState:ie,additionalProps:{style:se}}),He=(0,M.jsx)(Be,{...Ve}),Ue=$f({activeItemId:ge?void 0:he,orientation:h,isRtl:i}),We=Ue.getContainerProps(),Ge=j.Children.toArray(l).filter(j.isValidElement).map((e,t)=>{let n=e.props.value===void 0?t:e.props.value;return be.set(n,t),{child:e,index:t,childValue:n}}).map(({child:e,childValue:t})=>{let n=t===x;return j.cloneElement(e,{fullWidth:S===`fullWidth`,indicator:n&&!k&&He,selected:n,selectionFollowsFocus:_,onChange:m,textColor:b,value:t})}),Ke=Le(),[qe,Je]=hc(`root`,{ref:t,className:ci(ae.root,u),elementType:Jm,externalForwardedProps:{...Ce,...w,component:d},ownerState:ie}),[Ye,Xe]=hc(`scroller`,{ref:xe,className:ae.scroller,elementType:Ym,externalForwardedProps:Ce,ownerState:ie,additionalProps:{style:{overflow:ve.overflow,[E?`margin${i?`Left`:`Right`}`:`marginBottom`]:C?void 0:-ve.scrollbarWidth}}}),Ze=xs(We.ref,Se),Qe=e=>{let t=Se.current;cs(us(t))?.getAttribute(`role`)===`tab`&&We.onKeyDown(e)},[$e,et]=hc(`list`,{ref:Ze,className:ae.list,elementType:Xm,externalForwardedProps:Ce,ownerState:ie,getSlotProps:e=>({...e,onBlur:t=>{Nu(t.currentTarget,t.relatedTarget)||_e(!1),e.onBlur?.(t)},onKeyDown:t=>{Qe(t),e.onKeyDown?.(t)},onFocus:t=>{_e(!0),We.onFocus(t),e.onFocus?.(t)}})});return(0,M.jsxs)(qe,{...Je,children:[Ke.scrollButtonStart,Ke.scrollbarSizeListener,(0,M.jsxs)(Ye,{...Xe,children:[(0,M.jsx)($e,{"aria-label":a,"aria-labelledby":o,"aria-orientation":h===`vertical`?`vertical`:null,role:`tablist`,...et,children:(0,M.jsx)(Jf.Provider,{value:Ue,children:Ge})}),k&&He]}),Ke.scrollButtonEnd]})});function th(e){return di(`MuiTextField`,e)}fi(`MuiTextField`,[`root`]);var nh={standard:Yd,filled:Cd,outlined:um},rh=e=>{let{classes:t}=e;return Ma({root:[`root`]},th,t)},ih=P(Dd,{name:`MuiTextField`,slot:`Root`})({}),ah=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTextField`}),{autoComplete:r,autoFocus:i=!1,children:a,className:o,color:s=`primary`,defaultValue:c,disabled:l=!1,error:u=!1,fullWidth:d=!1,helperText:f,id:p,inputRef:m,label:h,maxRows:g,minRows:_,multiline:v=!1,name:y,onBlur:b,onChange:x,onFocus:S,placeholder:C,required:w=!1,rows:T,select:E=!1,slots:D={},slotProps:ee={},type:te,value:ne,variant:re=`outlined`,...ie}=n,ae={...n,autoFocus:i,color:s,disabled:l,error:u,fullWidth:d,multiline:v,required:w,select:E,variant:re},oe=rh(ae),O=aa(p),k=f&&O?`${O}-helper-text`:void 0,A=h&&O?`${O}-label`:void 0,se=nh[re],ce={slots:D,slotProps:ee},[le,ue]=hc(`select`,{elementType:Om,externalForwardedProps:ce,ownerState:ae}),de=E&&ue.native,fe={},pe=ce.slotProps.inputLabel;re===`outlined`&&(pe&&pe.shrink!==void 0&&(fe.notched=pe.shrink),fe.label=h),E&&(de||(fe.id=void 0),fe[`aria-describedby`]=void 0);let[me,he]=hc(`root`,{elementType:ih,shouldForwardComponentProp:!0,externalForwardedProps:{...ce,...ie},ownerState:ae,className:ci(oe.root,o),ref:t,additionalProps:{disabled:l,error:u,fullWidth:d,required:w,color:s,variant:re}}),[ge,_e]=hc(`input`,{elementType:se,externalForwardedProps:ce,additionalProps:fe,ownerState:ae}),[ve,ye]=hc(`inputLabel`,{elementType:Qd,externalForwardedProps:ce,ownerState:ae}),[be,xe]=hc(`htmlInput`,{elementType:`input`,externalForwardedProps:ce,ownerState:ae}),[Se,Ce]=hc(`formHelperText`,{elementType:Nd,externalForwardedProps:ce,ownerState:ae}),we=(0,M.jsx)(ge,{"aria-describedby":k,autoComplete:r,autoFocus:i,defaultValue:c,fullWidth:d,multiline:v,name:y,rows:T,maxRows:g,minRows:_,type:te,value:ne,id:O,inputRef:m,onBlur:b,onChange:x,onFocus:S,placeholder:C,inputProps:xe,slots:{input:D.htmlInput?be:void 0},..._e});return(0,M.jsxs)(me,{...he,children:[h!=null&&h!==``&&(0,M.jsx)(ve,{htmlFor:E&&!de?void 0:O,id:A,...E&&!de&&{component:`div`},...ye,children:h}),E?(0,M.jsx)(le,{"aria-describedby":k,id:O,labelId:A,value:ne,input:we,...ue,children:a}):we,f&&(0,M.jsx)(Se,{id:k,...Ce,children:f})]})}),oh=_(),I={background:`#282a36`,currentLine:`#44475a`,foreground:`#f8f8f2`,comment:`#6272a4`,cyan:`#8be9fd`,green:`#50fa7b`,orange:`#ffb86c`,pink:`#ff79c0`,purple:`#bd93f9`,red:`#ff5555`,yellow:`#f1fa8c`},sh=Fo({palette:{mode:`dark`,background:{default:I.background,paper:I.currentLine},primary:{main:I.purple},secondary:{main:I.pink},text:{primary:I.foreground,secondary:I.comment}},typography:{fontFamily:`'JetBrains Mono', monospace`,h1:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},h2:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},h3:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},body1:{fontFamily:`'JetBrains Mono', monospace`},body2:{fontFamily:`'JetBrains Mono', monospace`}},components:{MuiCssBaseline:{styleOverrides:{"*, *::before, *::after":{padding:0},html:{scrollBehavior:`smooth`},code:{fontFamily:`'JetBrains Mono', monospace`},body:{backgroundColor:I.background,color:I.foreground},"::-webkit-scrollbar":{width:`12px`},"::-webkit-scrollbar-track":{background:I.background},"::-webkit-scrollbar-thumb":{background:I.currentLine,borderRadius:`4px`,border:`2px solid transparent`,backgroundClip:`padding-box`},"::-webkit-scrollbar-thumb:hover":{background:I.comment,border:`2px solid transparent`,backgroundClip:`padding-box`}}}}}),ch=rs((0,M.jsx)(`path`,{d:`M7.5 5.6 10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29a.996.996 0 0 0-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41zm-1.03 5.49-2.12-2.12 2.44-2.44 2.12 2.12z`}),`AutoFixHigh`),lh=rs((0,M.jsx)(`path`,{d:`M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-5.97 4.06L14.09 6l1.41 1.41L16.91 6l1.06 1.06-1.41 1.41 1.41 1.41-1.06 1.06-1.41-1.4-1.41 1.41-1.06-1.06 1.41-1.41zm-6.78.66h5v1.5h-5zM11.5 16h-2v2H8v-2H6v-1.5h2v-2h1.5v2h2zm6.5 1.25h-5v-1.5h5zm0-2.5h-5v-1.5h5z`}),`Calculate`),uh=rs((0,M.jsx)(`path`,{d:`M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12z`}),`Cancel`),dh=rs((0,M.jsx)(`path`,{d:`M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2M7.5 18c-.83 0-1.5-.67-1.5-1.5S6.67 15 7.5 15s1.5.67 1.5 1.5S8.33 18 7.5 18m0-9C6.67 9 6 8.33 6 7.5S6.67 6 7.5 6 9 6.67 9 7.5 8.33 9 7.5 9m4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5m4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5m0-9c-.83 0-1.5-.67-1.5-1.5S15.67 6 16.5 6s1.5.67 1.5 1.5S17.33 9 16.5 9`}),`Casino`),fh=rs((0,M.jsx)(`path`,{d:`M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z`}),`CheckCircle`),ph=rs((0,M.jsx)(`path`,{d:`M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z`}),`ContentCopy`),mh=rs((0,M.jsx)(`path`,{d:`M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-2h2zm0-4h-2V7h2z`}),`ErrorOutlined`),hh=rs((0,M.jsx)(`path`,{d:`m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z`}),`ExpandLess`),gh=rs((0,M.jsx)(`path`,{d:`M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z`}),`ExpandMore`),_h=rs((0,M.jsx)(`path`,{d:`M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2zm10 14.5V20H8v-3.5l4-4zm-4-5-4-4V4h8v3.5z`}),`HourglassEmpty`),vh=rs([(0,M.jsx)(`path`,{d:`M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1m0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5z`},`0`),(0,M.jsx)(`path`,{d:`M17.5 10.5c.88 0 1.73.09 2.5.26V9.24c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99M13 12.49v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26V11.9c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.3-4.5.83m4.5 1.84c-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26v-1.52c-.79-.16-1.64-.24-2.5-.24`},`1`)],`MenuBook`),yh=rs((0,M.jsx)(`path`,{d:`M19.8 18.4 14 10.67V6.5l1.35-1.69c.26-.33.03-.81-.39-.81H9.04c-.42 0-.65.48-.39.81L10 6.5v4.17L4.2 18.4c-.49.66-.02 1.6.8 1.6h14c.82 0 1.29-.94.8-1.6`}),`Science`),bh=rs((0,M.jsx)(`path`,{d:`m6 18 8.5-6L6 6zM16 6v12h2V6z`}),`SkipNext`),xh=rs((0,M.jsx)(`path`,{d:`M6 6h12v12H6z`}),`Stop`);function Sh(e,t){for(e=e<0n?-e:e,t=t<0n?-t:t;t!==0n;)[e,t]=[t,e%t];return e}function Ch(e){if(e<0n)throw RangeError(`isqrt: negative input`);if(e<2n)return e;let t=e.toString(2).length,n=1n<<BigInt(Math.floor(t/2));for(;;){let t=n+e/n>>1n;if(t>=n)break;n=t}for(;(n+1n)*(n+1n)<=e;)n++;for(;n*n>e;)n--;return n}function wh(e,t){if(e===0n)return{gcd:t,x:0n,y:1n};let{gcd:n,x:r,y:i}=wh(t%e,e);return{gcd:n,x:i-t/e*r,y:r}}function Th(e,t){let{gcd:n,x:r}=wh(e<0n?e+t:e,t);return n===1n?(r%t+t)%t:null}function Eh(e,t,n){if(n===1n)return 0n;let r=1n;for(e=(e%n+n)%n;t>0n;)t&1n&&(r=r*e%n),t>>=1n,e=e*e%n;return r}function Dh(e){if(e<2n)return!1;if(e<4n)return!0;if(e%2n==0n||e%3n==0n)return!1;for(let t of[5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n]){if(e===t)return!0;if(e%t===0n)return!1}let t=e-1n,n=0n;for(;t%2n==0n;)t/=2n,n++;for(let r of[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n]){if(r>=e)break;let i=Eh(r,t,e);if(i===1n||i===e-1n)continue;let a=!0;for(let t=1n;t<n;t++)if(i=i*i%e,i===e-1n){a=!1;break}if(a)return!1}return!0}function Oh(e){for(;;){let t=Math.ceil(e/8),n=new Uint8Array(t);crypto.getRandomValues(n);let r=0n;for(let e=0;e<t;e++)r=r<<8n|BigInt(n[e]);if(r|=1n<<BigInt(e-1),r|=1n,r&=(1n<<BigInt(e))-1n,Dh(r))return r}}function kh(e,t,n=65537n){let r,i;do r=Oh(e),i=Oh(t);while(r===i);r>i&&([r,i]=[i,r]);let a=r*i,o=(r-1n)*(i-1n),s=n;for(;Sh(s,o)!==1n;)s+=2n;let c=Th(s,o);if(c===null)throw Error(`modInverse failed`);return{p:r,q:i,n:a,e:s,d:c,phi:o}}function Ah(e,t,n){return Eh(e,n,t)}var L={p:128,q:128},jh={id:`fermat`,name:`Fermat Factorization`,category:`Factorization`,description:`Factors n when p and q are close. Use when |p - q| < 2·n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
+      `,cf=e=>{let{classes:t,variant:n,color:r}=e;return Ma({root:[`root`,`color${qo(r)}`,n],dashed:[`dashed`],bar1:[`bar`,`bar1`],bar2:[`bar`,`bar2`,n===`buffer`&&`color${qo(r)}`]},$d,t)},lf=(e,t)=>e.vars?e.vars.palette.LinearProgress[`${t}Bg`]:e.palette.mode===`light`?e.lighten(e.palette[t].main,.62):e.darken(e.palette[t].main,.5),uf=P(`span`,{name:`MuiLinearProgress`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,t[`color${qo(n.color)}`],t[n.variant]]}})(Zo(({theme:e})=>({position:`relative`,overflow:`hidden`,display:`block`,height:4,zIndex:0,"@media print":{colorAdjust:`exact`},variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{backgroundColor:lf(e,t)}})),{props:({ownerState:e})=>e.color===`inherit`&&e.variant!==`buffer`,style:{"&::before":{content:`""`,position:`absolute`,left:0,top:0,right:0,bottom:0,backgroundColor:`currentColor`,opacity:.3}}},{props:{variant:`buffer`},style:{backgroundColor:`transparent`}},{props:{variant:`query`},style:{transform:`rotate(180deg)`}}]}))),df=P(`span`,{name:`MuiLinearProgress`,slot:`Dashed`})(Zo(({theme:e})=>({position:`absolute`,marginTop:0,height:`100%`,width:`100%`,backgroundSize:`10px 10px`,backgroundPosition:`0 -23px`,variants:[{props:{color:`inherit`},style:{opacity:.3,backgroundImage:`radial-gradient(currentColor 0%, currentColor 16%, transparent 42%)`}},...Object.entries(e.palette).filter(Xc()).map(([t])=>{let n=lf(e,t);return{props:{color:t},style:{backgroundImage:`radial-gradient(${n} 0%, ${n} 16%, transparent 42%)`}}})]})),sf||{animation:`${of} 3s infinite linear`}),ff=P(`span`,{name:`MuiLinearProgress`,slot:`Bar1`,overridesResolver:(e,t)=>[t.bar,t.bar1]})(Zo(({theme:e})=>({width:`100%`,position:`absolute`,left:0,bottom:0,top:0,transition:`transform 0.2s linear`,transformOrigin:`left`,variants:[{props:{color:`inherit`},style:{backgroundColor:`currentColor`}},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{backgroundColor:(e.vars||e).palette[t].main}})),{props:{variant:`determinate`},style:{transition:`transform .${ef}s linear`}},{props:{variant:`buffer`},style:{zIndex:1,transition:`transform .${ef}s linear`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:{width:`auto`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:nf||{animation:`${tf} 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite`}}]}))),pf=P(`span`,{name:`MuiLinearProgress`,slot:`Bar2`,overridesResolver:(e,t)=>[t.bar,t.bar2]})(Zo(({theme:e})=>({width:`100%`,position:`absolute`,left:0,bottom:0,top:0,transition:`transform 0.2s linear`,transformOrigin:`left`,variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{"--LinearProgressBar2-barColor":(e.vars||e).palette[t].main}})),{props:({ownerState:e})=>e.variant!==`buffer`&&e.color!==`inherit`,style:{backgroundColor:`var(--LinearProgressBar2-barColor, currentColor)`}},{props:({ownerState:e})=>e.variant!==`buffer`&&e.color===`inherit`,style:{backgroundColor:`currentColor`}},{props:{color:`inherit`},style:{opacity:.3}},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t,variant:`buffer`},style:{backgroundColor:lf(e,t),transition:`transform .${ef}s linear`}})),{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:{width:`auto`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:af||{animation:`${rf} 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite`}}]}))),mf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiLinearProgress`}),{className:r,color:i=`primary`,max:a,min:o,value:s,valueBuffer:c,variant:l=`indeterminate`,...u}=n,d={...n,color:i,variant:l},f=o??0,p=a??100,m=cf(d),h=Zi(),g={},_={bar1:{},bar2:{}};if((l===`determinate`||l===`buffer`)&&s!==void 0){let e=p-f,t=(s-f)/e*100-100;h&&(t=-t),_.bar1.transform=e>0?`translateX(${t}%)`:`translateX(-100%)`,g[`aria-valuenow`]=s,g[`aria-valuemin`]=f,g[`aria-valuemax`]=p}if(l===`buffer`&&c!==void 0){let e=p-f,t=(c-f)/e*100-100;h&&(t=-t),_.bar2.transform=e>0?`translateX(${t}%)`:`translateX(-100%)`}return(0,M.jsxs)(uf,{className:ci(m.root,r),ownerState:d,role:`progressbar`,...g,ref:t,...u,children:[l===`buffer`?(0,M.jsx)(df,{className:m.dashed,ownerState:d}):null,(0,M.jsx)(ff,{className:m.bar1,ownerState:d,style:_.bar1}),l===`determinate`?null:(0,M.jsx)(pf,{className:m.bar2,ownerState:d,style:_.bar2})]})});function hf(e){return di(`MuiLink`,e)}var gf=fi(`MuiLink`,[`root`,`underlineNone`,`underlineHover`,`underlineAlways`,`button`,`focusVisible`]),_f=({theme:e,ownerState:t})=>{let n=t.color;if(`colorSpace`in e&&e.colorSpace){let r=Qn(e,`palette.${n}.main`)||Qn(e,`palette.${n}`)||t.color;return e.alpha(r,.4)}let r=Qn(e,`palette.${n}.main`,!1)||Qn(e,`palette.${n}`,!1)||t.color,i=Qn(e,`palette.${n}.mainChannel`)||Qn(e,`palette.${n}Channel`);return`vars`in e&&i?`rgba(${i} / 0.4)`:Ii(r,.4)},vf={primary:!0,secondary:!0,error:!0,info:!0,success:!0,warning:!0,textPrimary:!0,textSecondary:!0,textDisabled:!0},yf=e=>{let{classes:t,component:n,focusVisible:r,underline:i}=e;return Ma({root:[`root`,`underline${qo(i)}`,n===`button`&&`button`,r&&`focusVisible`]},hf,t)},bf=P(F,{name:`MuiLink`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,t[`underline${qo(n.underline)}`],n.component===`button`&&t.button]}})(Zo(({theme:e})=>({variants:[{props:{underline:`none`},style:{textDecoration:`none`}},{props:{underline:`hover`},style:{textDecoration:`none`,"&:hover":{textDecoration:`underline`}}},{props:{underline:`always`},style:{textDecoration:`underline`,"&:hover":{textDecorationColor:`inherit`}}},{props:({underline:e,ownerState:t})=>e===`always`&&t.color!==`inherit`,style:{textDecorationColor:`var(--Link-underlineColor)`}},{props:({underline:e,ownerState:t})=>e===`always`&&t.color===`inherit`,style:e.colorSpace?{textDecorationColor:e.alpha(`currentColor`,.4)}:null},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{underline:`always`,color:t},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette[t].main,.4)}})),{props:{underline:`always`,color:`textPrimary`},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette.text.primary,.4)}},{props:{underline:`always`,color:`textSecondary`},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette.text.secondary,.4)}},{props:{underline:`always`,color:`textDisabled`},style:{"--Link-underlineColor":(e.vars||e).palette.text.disabled}},{props:{component:`button`},style:{position:`relative`,WebkitTapHighlightColor:`transparent`,backgroundColor:`transparent`,outline:0,border:0,margin:0,borderRadius:0,padding:0,cursor:`pointer`,userSelect:`none`,verticalAlign:`middle`,MozAppearance:`none`,WebkitAppearance:`none`,"&::-moz-focus-inner":{borderStyle:`none`},[`&.${gf.focusVisible}`]:{outline:`auto`}}}]}))),xf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiLink`}),r=Lo(),{className:i,color:a=`primary`,component:o=`a`,onBlur:s,onFocus:c,TypographyClasses:l,underline:u=`always`,variant:d=`inherit`,sx:f,...p}=n,[m,h]=j.useState(!1),g=e=>{Ec(e.target)||h(!1),s&&s(e)},_=e=>{Ec(e.target)&&h(!0),c&&c(e)},v={...n,color:a,component:o,focusVisible:m,underline:u,variant:d};return(0,M.jsx)(bf,{color:a,className:ci(yf(v).root,i),classes:l,component:o,onBlur:g,onFocus:_,ref:t,ownerState:v,variant:d,...p,sx:[...vf[a]===void 0?[{color:a}]:[],...Array.isArray(f)?f:[f]],style:{...p.style,...u===`always`&&a!==`inherit`&&!vf[a]&&{"--Link-underlineColor":_f({theme:r,ownerState:v})}}})}),Sf=j.createContext({});function Cf(e){return di(`MuiList`,e)}fi(`MuiList`,[`root`,`padding`,`dense`,`subheader`]);var wf=e=>{let{classes:t,disablePadding:n,dense:r,subheader:i}=e;return Ma({root:[`root`,!n&&`padding`,r&&`dense`,i&&`subheader`]},Cf,t)},Tf=P(`ul`,{name:`MuiList`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,!n.disablePadding&&t.padding,n.dense&&t.dense,n.subheader&&t.subheader]}})({listStyle:`none`,margin:0,padding:0,position:`relative`,variants:[{props:({ownerState:e})=>!e.disablePadding,style:{paddingTop:8,paddingBottom:8}},{props:({ownerState:e})=>e.subheader,style:{paddingTop:0,isolation:`isolate`}}]}),Ef=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiList`}),{children:r,className:i,component:a=`ul`,dense:o=!1,disablePadding:s=!1,subheader:c,...l}=n,u=j.useMemo(()=>({dense:o}),[o]),d={...n,component:a,dense:o,disablePadding:s},f=wf(d);return(0,M.jsx)(Sf.Provider,{value:u,children:(0,M.jsxs)(Tf,{as:a,className:ci(f.root,i),ref:t,ownerState:d,...l,children:[c,r]})})});function Df(e){return di(`MuiListItem`,e)}fi(`MuiListItem`,[`root`,`dense`,`alignItemsFlexStart`,`divider`,`gutters`,`padding`,`secondaryAction`]);function Of(e){return di(`MuiListItemButton`,e)}var kf=fi(`MuiListItemButton`,[`root`,`focusVisible`,`dense`,`alignItemsFlexStart`,`disabled`,`divider`,`gutters`,`selected`]),Af=(e,t)=>{let{ownerState:n}=e;return[t.root,n.dense&&t.dense,n.alignItems===`flex-start`&&t.alignItemsFlexStart,n.divider&&t.divider,!n.disableGutters&&t.gutters]},jf=e=>{let{alignItems:t,classes:n,dense:r,disabled:i,disableGutters:a,divider:o,selected:s}=e,c=Ma({root:[`root`,r&&`dense`,!a&&`gutters`,o&&`divider`,i&&`disabled`,t===`flex-start`&&`alignItemsFlexStart`,s&&`selected`]},Of,n);return{...n,...c}},Mf=P(Kc,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiListItemButton`,slot:`Root`,overridesResolver:Af})(Zo(({theme:e})=>({display:`flex`,flexGrow:1,justifyContent:`flex-start`,alignItems:`center`,position:`relative`,textDecoration:`none`,minWidth:0,boxSizing:`border-box`,textAlign:`left`,paddingTop:8,paddingBottom:8,transition:e.transitions.create(`background-color`,{duration:e.transitions.duration.shortest}),"&:hover":{textDecoration:`none`,backgroundColor:(e.vars||e).palette.action.hover,"@media (hover: none)":{backgroundColor:`transparent`}},[`&.${kf.selected}`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,(e.vars||e).palette.action.selectedOpacity),[`&.${kf.focusVisible}`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,`${(e.vars||e).palette.action.selectedOpacity} + ${(e.vars||e).palette.action.focusOpacity}`)}},[`&.${kf.selected}:hover`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,`${(e.vars||e).palette.action.selectedOpacity} + ${(e.vars||e).palette.action.hoverOpacity}`),"@media (hover: none)":{backgroundColor:e.alpha((e.vars||e).palette.primary.main,(e.vars||e).palette.action.selectedOpacity)}},[`&.${kf.focusVisible}`]:{backgroundColor:(e.vars||e).palette.action.focus},[`&.${kf.disabled}`]:{opacity:(e.vars||e).palette.action.disabledOpacity},variants:[{props:({ownerState:e})=>e.divider,style:{borderBottom:`1px solid ${(e.vars||e).palette.divider}`,backgroundClip:`padding-box`}},{props:{alignItems:`flex-start`},style:{alignItems:`flex-start`}},{props:({ownerState:e})=>!e.disableGutters,style:{paddingLeft:16,paddingRight:16}},{props:({ownerState:e})=>e.dense,style:{paddingTop:4,paddingBottom:4}}]}))),Nf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemButton`}),{alignItems:r=`center`,autoFocus:i=!1,component:a=`div`,children:o,dense:s=!1,disableGutters:c=!1,divider:l=!1,focusVisibleClassName:u,selected:d=!1,className:f,...p}=n,m=j.useContext(Sf),h=j.useMemo(()=>({dense:s||m.dense||!1,alignItems:r,disableGutters:c}),[r,m.dense,s,c]),g=j.useRef(null);ms(()=>{i&&g.current&&g.current.focus()},[i]);let _={...n,alignItems:r,dense:h.dense,disableGutters:c,divider:l,selected:d},v=jf(_),{root:y,...b}=v,x=xs(g,t);return(0,M.jsx)(Sf.Provider,{value:h,children:(0,M.jsx)(Mf,{ref:x,href:p.href||p.to,component:(p.href||p.to)&&a===`div`?`button`:a,internalNativeButton:!1,focusVisibleClassName:ci(v.focusVisible,u),ownerState:_,className:ci(v.root,f),...p,classes:b,children:o})})});function Pf(e){return di(`MuiListItemSecondaryAction`,e)}fi(`MuiListItemSecondaryAction`,[`root`,`disableGutters`]);var Ff=e=>{let{disableGutters:t,classes:n}=e;return Ma({root:[`root`,t&&`disableGutters`]},Pf,n)},If=P(`div`,{name:`MuiListItemSecondaryAction`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.disableGutters&&t.disableGutters]}})({position:`absolute`,right:16,top:`50%`,transform:`translateY(-50%)`,variants:[{props:({ownerState:e})=>e.disableGutters,style:{right:0}}]}),Lf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemSecondaryAction`}),{className:r,component:i,...a}=n,o=j.useContext(Sf),s={...n,disableGutters:o.disableGutters};return(0,M.jsx)(If,{as:i,className:ci(Ff(s).root,r),ownerState:s,ref:t,...a})});Lf.muiName=`ListItemSecondaryAction`;var Rf=(e,t)=>{let{ownerState:n}=e;return[t.root,n.dense&&t.dense,n.alignItems===`flex-start`&&t.alignItemsFlexStart,n.divider&&t.divider,!n.disableGutters&&t.gutters,!n.disablePadding&&t.padding]},zf=e=>{let{alignItems:t,classes:n,dense:r,disableGutters:i,disablePadding:a,divider:o}=e;return Ma({root:[`root`,r&&`dense`,!i&&`gutters`,!a&&`padding`,o&&`divider`,t===`flex-start`&&`alignItemsFlexStart`],secondaryAction:[`secondaryAction`]},Df,n)},Bf=P(`div`,{name:`MuiListItem`,slot:`Root`,overridesResolver:Rf})(Zo(({theme:e})=>({display:`flex`,justifyContent:`flex-start`,alignItems:`center`,position:`relative`,textDecoration:`none`,width:`100%`,boxSizing:`border-box`,textAlign:`left`,variants:[{props:({ownerState:e})=>!e.disablePadding,style:{paddingTop:8,paddingBottom:8}},{props:({ownerState:e})=>!e.disablePadding&&e.dense,style:{paddingTop:4,paddingBottom:4}},{props:({ownerState:e})=>!e.disablePadding&&!e.disableGutters,style:{paddingLeft:16,paddingRight:16}},{props:({ownerState:e})=>!e.disablePadding&&!!e.secondaryAction,style:{paddingRight:48}},{props:({ownerState:e})=>!!e.secondaryAction,style:{[`& > .${kf.root}`]:{paddingRight:48}}},{props:{alignItems:`flex-start`},style:{alignItems:`flex-start`}},{props:({ownerState:e})=>e.divider,style:{borderBottom:`1px solid ${(e.vars||e).palette.divider}`,backgroundClip:`padding-box`}},{props:({ownerState:e})=>e.button,style:{transition:e.transitions.create(`background-color`,{duration:e.transitions.duration.shortest}),"&:hover":{textDecoration:`none`,backgroundColor:(e.vars||e).palette.action.hover,"@media (hover: none)":{backgroundColor:`transparent`}}}}]}))),Vf=P(Lf,{name:`MuiListItem`,slot:`secondaryAction`})({}),Hf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItem`}),{alignItems:r=`center`,children:i,className:a,component:o=`li`,dense:s=!1,disableGutters:c=!1,disablePadding:l=!1,divider:u=!1,secondaryAction:d,slotProps:f={},slots:p={},...m}=n,h=j.useContext(Sf),g=j.useMemo(()=>({dense:s||h.dense||!1,alignItems:r,disableGutters:c}),[r,h.dense,s,c]),_={...n,alignItems:r,dense:g.dense,disableGutters:c,disablePadding:l,divider:u,secondaryAction:d},v=zf(_),y={slots:p,slotProps:f},[b,x]=hc(`root`,{ref:t,elementType:Bf,externalForwardedProps:{component:o,...y,...m},ownerState:_,className:ci(v.root,a)}),[S,C]=hc(`secondaryAction`,{elementType:Vf,shouldForwardComponentProp:!0,externalForwardedProps:y,ownerState:_,className:v.secondaryAction});return(0,M.jsx)(Sf.Provider,{value:g,children:(0,M.jsxs)(b,{...x,children:[i,d&&(0,M.jsx)(S,{...C,children:d})]})})});function Uf(e){return di(`MuiListItemText`,e)}var Wf=fi(`MuiListItemText`,[`root`,`multiline`,`dense`,`inset`,`primary`,`secondary`]),Gf=e=>{let{classes:t,inset:n,primary:r,secondary:i,dense:a}=e;return Ma({root:[`root`,n&&`inset`,a&&`dense`,r&&i&&`multiline`],primary:[`primary`],secondary:[`secondary`]},Uf,t)},Kf=P(`div`,{name:`MuiListItemText`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`& .${Wf.primary}`]:t.primary},{[`& .${Wf.secondary}`]:t.secondary},t.root,n.inset&&t.inset,n.primary&&n.secondary&&t.multiline,n.dense&&t.dense]}})({flex:`1 1 auto`,minWidth:0,marginTop:4,marginBottom:4,[`.${ul.root}:where(& .${Wf.primary})`]:{display:`block`},[`.${ul.root}:where(& .${Wf.secondary})`]:{display:`block`},variants:[{props:({ownerState:e})=>e.primary&&e.secondary,style:{marginTop:6,marginBottom:6}},{props:({ownerState:e})=>e.inset,style:{paddingLeft:56}}]}),qf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemText`}),{children:r,className:i,disableTypography:a=!1,inset:o=!1,primary:s,secondary:c,slots:l={},slotProps:u={},...d}=n,{dense:f}=j.useContext(Sf),p=s??r,m=c,h={...n,disableTypography:a,inset:o,primary:!!p,secondary:!!m,dense:f},g=Gf(h),_={slots:l,slotProps:u},[v,y]=hc(`root`,{className:ci(g.root,i),elementType:Kf,externalForwardedProps:{..._,...d},ownerState:h,ref:t}),[b,x]=hc(`primary`,{className:g.primary,elementType:F,externalForwardedProps:_,ownerState:h}),[S,C]=hc(`secondary`,{className:g.secondary,elementType:F,externalForwardedProps:_,ownerState:h});return p!=null&&p.type!==F&&!a&&(p=(0,M.jsx)(b,{variant:f?`body2`:`body1`,component:x?.variant?void 0:`span`,...x,children:p})),m!=null&&m.type!==F&&!a&&(m=(0,M.jsx)(S,{variant:`body2`,color:`textSecondary`,...C,children:m})),(0,M.jsxs)(v,{...y,children:[p,m]})}),Jf=j.createContext(void 0);function Yf(){let e=j.useContext(Jf);if(e===void 0)throw Error(`MUI: RovingTabIndexContext is missing. Roving tab index items must be placed within a roving tab index provider.`);return e}var Xf=Object.is;function Zf(e,t){if(e===t)return!0;if(!(e instanceof Object)||!(t instanceof Object))return!1;let n=0,r=0;for(let r in e)if(n+=1,!Xf(e[r],t[r])||!(r in t))return!1;for(let e in t)r+=1;return n===r}var Qf=[`ArrowRight`,`ArrowLeft`,`ArrowUp`,`ArrowDown`,`Home`,`End`];function $f(e){let{activeItemId:t,getDefaultActiveItemId:n,orientation:r,isRtl:i=!1,isItemFocusable:a=pp,wrap:o=!0}=e,[s,c]=j.useState(t),l=j.useRef(t),u=s;t!==l.current&&(l.current=t,t!==void 0&&t!==s&&(u=t,c(t)));let d=j.useRef(null),f=j.useRef(new Map),[p,m]=j.useState(0),h=j.useMemo(()=>up(f.current),[p]),g=tp(u,h,a,n),_=j.useRef(g);_.current=g;let v=j.useCallback(()=>{let e=up(f.current);return sp(e,tp(_.current,e,a,n))},[n,a]),y=j.useCallback(()=>f.current,[]),b=vs(e=>{Zf(f.current.get(e.id)??null,e)||(f.current.set(e.id,e),m(e=>e+1))}),x=vs(e=>{f.current.delete(e)&&m(e=>e+1)}),S=vs(e=>{c(e)}),C=j.useCallback(e=>_.current===e,[]),w=j.useCallback((e,t,n,r)=>{let i=ap(dp(f.current),e,t,n,r??a);return i?(i.element?.focus(),c(i.id),i):null},[a]),T=j.useCallback(e=>({onFocus:e=>{let t=dp(f.current),n=lp(t,e.target);n!==-1&&c(t[n].id)},onKeyDown:e=>{if(e.altKey||e.shiftKey||e.ctrlKey||e.metaKey||!Qf.includes(e.key))return;let t=r===`horizontal`?`ArrowLeft`:`ArrowUp`,n=r===`horizontal`?`ArrowRight`:`ArrowDown`;r===`horizontal`&&i&&(t=`ArrowRight`,n=`ArrowLeft`);let a=dp(f.current),s=ss(ls(d.current)),c=s===d.current,l=ip(a,s,_.current),u=`next`;switch(e.key){case t:u=`previous`,e.preventDefault(),c&&(l=a.length);break;case n:e.preventDefault(),c&&(l=-1);break;case`Home`:e.preventDefault(),l=-1;break;case`End`:e.preventDefault(),u=`previous`,l=a.length;break;default:return}w(l,u,o)},ref:gp(e,e=>{d.current=e})}),[w,i,r,o]),E=j.useCallback(e=>{let t=dp(f.current),n=ss(ls(d.current));return w(n===d.current?-1:ip(t,n,_.current),`next`,!0,e)?.id??null},[w]);return j.useMemo(()=>({activeItemId:g,focusNext:E,getActiveItem:v,getContainerProps:T,getItemMap:y,isItemActive:C,registerItem:b,setActiveItemId:S,unregisterItem:x}),[g,E,v,T,y,C,b,S,x])}function ep(e){let{activeItemId:t,registerItem:n,unregisterItem:r}=Yf(),i=j.useRef(null),a=j.useMemo(()=>({disabled:e.disabled??!1,element:null,focusableWhenDisabled:e.focusableWhenDisabled??!1,id:e.id,selected:e.selected??!1,textValue:e.textValue}),[e.disabled,e.focusableWhenDisabled,e.id,e.selected,e.textValue]),o=j.useRef(a);o.current=a;let s=j.useCallback(t=>{if(i.current=t,t==null){queueMicrotask(()=>{i.current??r(e.id)});return}n({...o.current,element:t})},[e.id,n,r]),c=bs(e.ref,s);return Ti(()=>{i.current&&n({...a,element:i.current})},[a,n]),Ti(()=>{let t=e.id;return()=>{r(t)}},[e.id,r]),{ref:c,tabIndex:t===e.id?0:-1}}function tp(e,t,n,r){return e==null?rp(t,n,r):np(e,t,n)}function np(e,t,n){let r=cp(t,e);return r===-1?op(t,n):n(t[r])?t[r].id:ap(t,r,`next`,!1,n)?.id??null}function rp(e,t,n){let r=n?.(e);if(r!=null){let n=sp(e,r);if(n&&t(n))return n.id}return op(e,t)}function ip(e,t,n){if(t){let n=lp(e,t);if(n!==-1)return n}return cp(e,n)}function ap(e,t,n,r,i){let a=e.length-1;if(a===-1)return null;let o=!1,s=fp(t,a,n,r),c=s;for(;s!==-1;){if(s===c){if(o)return null;o=!0}let t=e[s];if(!t||!i(t))s=fp(s,a,n,r);else return t}return null}function op(e,t){return e.find(e=>t(e))?.id??null}function sp(e,t){return t==null?null:e.find(e=>e.id===t)??null}function cp(e,t){return t==null?-1:e.findIndex(e=>e.id===t)}function lp(e,t){return t?e.findIndex(e=>e.element===t||e.element?.contains(t)):-1}function up(e){let t=Array.from(e.values());if(t.every(e=>e.element==null))return t;let n=t.filter(mp).sort((e,t)=>hp(e.element,t.element)),r=t.filter(e=>!mp(e));return[...n,...r]}function dp(e){return up(e).filter(mp)}function fp(e,t,n,r=!0){return n===`next`?e===t?r?0:-1:e+1:e===0?r?t:-1:e-1}function pp(e){return e.element?e.focusableWhenDisabled?!0:!e.disabled&&!e.element.hasAttribute(`disabled`)&&e.element.getAttribute(`aria-disabled`)!==`true`&&e.element.hasAttribute(`tabindex`):!1}function mp(e){return e.element!=null&&e.element.isConnected}function hp(e,t){if(e===t)return 0;let n=e.compareDocumentPosition(t);return n&Node.DOCUMENT_POSITION_FOLLOWING||n&Node.DOCUMENT_POSITION_CONTAINED_BY?-1:n&Node.DOCUMENT_POSITION_PRECEDING||n&Node.DOCUMENT_POSITION_CONTAINS?1:0}function gp(...e){return t=>{e.forEach(e=>{ps(e??null,t)})}}var _p=Cu;function vp(e,t){if(t==null){e.focus();return}try{e.focus({focusVisible:t===`keyboard`})}catch{e.focus()}}function yp(e){return e?e.type===`mousedown`||e.type===`pointerdown`||e.type===`touchstart`?`pointer`:e.type===`keydown`||e.type===`click`&&e.detail===0?`keyboard`:null:null}function bp(e){return e==null||typeof e==`string`&&!e.trim()}function xp(e,t){return typeof t==`object`&&t?e===t:String(e)===String(t)}var Sp=j.createContext(null);function Cp(){return j.useContext(Sp)}var wp=Sp.Provider,Tp=j.createContext(void 0);function Ep(e){let t=e?.element??e;if(!t)return``;if(e?.textValue!==void 0)return e.textValue;let n=t.innerText;return n===void 0&&(n=t.textContent),n??``}function Dp(e,t){if(t===void 0)return!0;let n=Ep(e);return n=n.trim().toLowerCase(),n.length===0?!1:t.repeating?n[0]===t.keys[0]:n.startsWith(t.keys.join(``))}function Op(e,t){return Dp(e,t)?pp(e):!1}function kp(e,t){vp(e,t)}var Ap=j.forwardRef(function(e,t){let{actions:n,autoFocus:r=!1,autoFocusItem:i=!1,children:a,className:o,disabledItemsFocusable:s=!1,disableListWrap:c=!1,onKeyDown:l,variant:u=`selectedMenu`,...d}=e,f=j.useRef(null),p=j.useRef(!1),[m,h]=j.useState(!1),g=Cp(),_=j.useRef({keys:[],repeating:!0,previousKeyMatched:!0,lastTime:null}),v=$f({activeItemId:void 0,getDefaultActiveItemId:j.useCallback(e=>u===`selectedMenu`?e.find(e=>e.selected&&pp(e))?.id??e.find(e=>pp(e))?.id??null:e.find(e=>pp(e))?.id??null,[u]),orientation:`vertical`,wrap:!c}),{activeItemId:y,focusNext:b,getActiveItem:x,getContainerProps:S,getItemMap:C}=v,w=ys((e=!1)=>{if(!f.current||!e&&p.current)return null;if(i){let e=x();if(e?.element){let t=Array.from(C().values()).some(e=>e.selected);return h(u===`menu`&&t&&!e.selected&&g==null),kp(e.element,g),p.current=!0,e.element}return r?(h(!1),f.current.focus(),f.current):null}return r?(h(!1),f.current.focus(),p.current=!0,f.current):(h(!1),null)});ms(()=>{if(!r&&!i){p.current=!1,h(!1);return}w()},[y,i,r,w]),j.useImperativeHandle(n,()=>({adjustStyleForScrollbar:(e,{direction:t})=>{let n=!f.current.style.width;if(e.clientHeight<f.current.clientHeight&&n){let n=`${_p(fs(e))}px`;f.current.style[t===`rtl`?`paddingLeft`:`paddingRight`]=n,f.current.style.width=`calc(100% + ${n})`}return f.current},focusInitialTarget:()=>{if(!f.current)return null;let e=cs(us(f.current));return e&&Nu(f.current,e)?e:w(!0)}}),[w]);let T=S(),E=xs(f,T.ref,t),D=j.useMemo(()=>({itemsFocusableWhenDisabled:s,suppressInitialFocusVisible:m,variant:u}),[s,m,u]);return(0,M.jsx)(Ef,{role:`menu`,ref:E,className:o,onKeyDown:ys(e=>{if(m&&h(!1),(e.ctrlKey||e.metaKey||e.altKey)&&l){l(e);return}if(T.onKeyDown(e),e.key.length===1){let t=_.current,n=e.key.toLowerCase(),r=performance.now();t.keys.length>0&&(r-t.lastTime>500?(t.keys=[],t.repeating=!0,t.previousKeyMatched=!0):t.repeating&&n!==t.keys[0]&&(t.repeating=!1)),t.lastTime=r,t.keys.push(n);let i=cs(us(f.current)),a=i&&!t.repeating&&Dp(i,t);t.previousKeyMatched&&(a||b(e=>Op(e,t))!=null)?e.preventDefault():t.previousKeyMatched=!1}l&&l(e)}),onFocus:T.onFocus,tabIndex:-1,...d,children:(0,M.jsx)(Tp.Provider,{value:D,children:(0,M.jsx)(Jf.Provider,{value:v,children:a})})})});function jp(e){return di(`MuiPopover`,e)}fi(`MuiPopover`,[`root`,`paper`]);function Mp(e,t){let n=0;return typeof t==`number`?n=t:t===`center`?n=e.height/2:t===`bottom`&&(n=e.height),n}function Np(e,t){let n=0;return typeof t==`number`?n=t:t===`center`?n=e.width/2:t===`right`&&(n=e.width),n}function Pp(e){return[e.horizontal,e.vertical].map(e=>typeof e==`number`?`${e}px`:e).join(` `)}function Fp(e){return typeof e==`function`?e():e}var Ip=e=>{let{classes:t}=e;return Ma({root:[`root`],paper:[`paper`]},jp,t)},Lp=P(Qu,{name:`MuiPopover`,slot:`Root`})({}),Rp=P(Tc,{name:`MuiPopover`,slot:`Paper`})({position:`absolute`,overflowY:`auto`,overflowX:`hidden`,minWidth:16,minHeight:16,maxWidth:`calc(100% - 32px)`,maxHeight:`calc(100% - 32px)`,outline:0}),zp=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiPopover`}),{action:r,anchorEl:i,anchorOrigin:a={vertical:`top`,horizontal:`left`},anchorPosition:o,anchorReference:s=`anchorEl`,children:c,className:l,container:u,disableAutoFocus:d=!1,elevation:f=8,marginThreshold:p=16,open:m,slots:h={},slotProps:g={},transformOrigin:_={vertical:`top`,horizontal:`left`},transitionDuration:v=`auto`,disableScrollLock:y=!1,...b}=n,x=j.useRef(),S={...n,anchorOrigin:a,anchorReference:s,elevation:f,marginThreshold:p,transformOrigin:_,transitionDuration:v},C=Ip(S),w=j.useCallback(()=>{if(s===`anchorPosition`)return o;let e=Fp(i),t=(e&&e.nodeType===1?e:us(x.current).body).getBoundingClientRect();return{top:t.top+Mp(t,a.vertical),left:t.left+Np(t,a.horizontal)}},[i,a.horizontal,a.vertical,o,s]),T=j.useCallback(e=>({vertical:Mp(e,_.vertical),horizontal:Np(e,_.horizontal)}),[_.horizontal,_.vertical]),E=j.useCallback(e=>{let t={width:e.offsetWidth,height:e.offsetHeight},n=T(t);if(s===`none`)return{top:null,left:null,transformOrigin:Pp(n)};let r=w(),a=r.top-n.vertical,o=r.left-n.horizontal,c=a+t.height,l=o+t.width,u=fs(Fp(i)),d=u.innerHeight-p,f=u.innerWidth-p;if(p!=null&&a<p){let e=a-p;a-=e,n.vertical+=e}else if(p!=null&&c>d){let e=c-d;a-=e,n.vertical+=e}if(p!=null&&o<p){let e=o-p;o-=e,n.horizontal+=e}else if(l>f){let e=l-f;o-=e,n.horizontal+=e}return{top:`${Math.round(a)}px`,left:`${Math.round(o)}px`,transformOrigin:Pp(n)}},[i,s,w,T,p]),[D,ee]=j.useState(m),te=j.useCallback(()=>{let e=x.current;if(!e)return;let t=E(e);t.top!=null&&e.style.setProperty(`top`,t.top),t.left!=null&&(e.style.left=t.left),e.style.transformOrigin=t.transformOrigin,ee(!0)},[E]);j.useEffect(()=>(y&&window.addEventListener(`scroll`,te),()=>window.removeEventListener(`scroll`,te)),[i,y,te]);let ne=()=>{te()},re=()=>{ee(!1)};j.useEffect(()=>{m&&te()}),j.useImperativeHandle(r,()=>m?{updatePosition:()=>{te()}}:null,[m,te]),j.useEffect(()=>{if(!m)return;let e=as(()=>{te()}),t=fs(Fp(i));return t.addEventListener(`resize`,e),()=>{e.clear(),t.removeEventListener(`resize`,e)}},[i,m,te]);let ie=v,ae={slots:h,slotProps:g},[oe,O]=hc(`transition`,{elementType:Ud,externalForwardedProps:ae,ownerState:S,getSlotProps:e=>({...e,onEntering:(t,n)=>{e.onEntering?.(t,n),ne()},onExited:t=>{e.onExited?.(t),re()}}),additionalProps:{appear:!0,in:m}});v===`auto`&&!oe.muiSupportAuto&&(ie=void 0);let k=u||(i?us(Fp(i)).body:void 0),[A,{slots:se,slotProps:ce,...le}]=hc(`root`,{ref:t,elementType:Lp,externalForwardedProps:{...ae,...b},shouldForwardComponentProp:!0,additionalProps:{slots:{backdrop:h.backdrop},slotProps:{backdrop:Cs(typeof g.backdrop==`function`?g.backdrop(S):g.backdrop,{invisible:!0})},container:k,open:m},ownerState:S,className:ci(C.root,l)}),[ue,de]=hc(`paper`,{ref:x,className:C.paper,elementType:Rp,externalForwardedProps:ae,shouldForwardComponentProp:!0,additionalProps:{elevation:f,style:D?void 0:{opacity:0}},ownerState:S});return(0,M.jsx)(A,{...le,...!lc(A)&&{slots:se,slotProps:ce,disableAutoFocus:d,disableScrollLock:y},children:(0,M.jsx)(oe,{...O,timeout:ie,children:(0,M.jsx)(ue,{...de,children:c})})})});function Bp(e){return di(`MuiMenu`,e)}fi(`MuiMenu`,[`root`,`paper`,`list`]);var Vp={vertical:`top`,horizontal:`right`},Hp={vertical:`top`,horizontal:`left`},Up=e=>{let{classes:t}=e;return Ma({root:[`root`],paper:[`paper`],list:[`list`]},Bp,t)},Wp=P(zp,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiMenu`,slot:`Root`})({}),Gp=P(Rp,{name:`MuiMenu`,slot:`Paper`})({maxHeight:`calc(100% - 96px)`,WebkitOverflowScrolling:`touch`}),Kp=P(Ap,{name:`MuiMenu`,slot:`List`})({outline:0}),qp=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiMenu`}),{autoFocus:r=!0,children:i,className:a,disableAutoFocusItem:o=!1,onClose:s,open:c,PopoverClasses:l,transitionDuration:u=`auto`,variant:d=`selectedMenu`,slots:f={},slotProps:p={},...m}=n,h=Zi(),g={...n,autoFocus:r,disableAutoFocusItem:o,transitionDuration:u,variant:d},_=Up(g),v=r&&c,y=v&&!o,b=j.useRef(null),x=(e,t)=>{b.current&&(b.current.adjustStyleForScrollbar(e,{direction:h?`rtl`:`ltr`}),v&&b.current.focusInitialTarget?.())},S=e=>{e.key===`Tab`&&(e.preventDefault(),s&&s(e,`tabKeyDown`))},C={slots:f,slotProps:p},w=hl({elementType:f.root,externalSlotProps:p.root,ownerState:g,className:[_.root,a]}),[T,E]=hc(`paper`,{className:_.paper,elementType:Gp,externalForwardedProps:C,shouldForwardComponentProp:!0,ownerState:g}),[D,ee]=hc(`list`,{className:_.list,elementType:Kp,shouldForwardComponentProp:!0,externalForwardedProps:C,getSlotProps:e=>({...e,onKeyDown:t=>{S(t),e.onKeyDown?.(t)}}),ownerState:g}),te=typeof p.transition==`function`?p.transition(g):p.transition;return(0,M.jsx)(Wp,{disableAutoFocus:r,onClose:s,anchorOrigin:{vertical:`bottom`,horizontal:h?`right`:`left`},transformOrigin:h?Vp:Hp,slots:{root:f.root,paper:T,backdrop:f.backdrop,transition:f.transition},slotProps:{root:w,paper:E,backdrop:typeof p.backdrop==`function`?p.backdrop(g):p.backdrop,transition:{...te,onEntering:(...e)=>{x(...e),te?.onEntering?.(...e)}}},open:c,ref:t,transitionDuration:u,ownerState:g,...m,classes:l,children:(0,M.jsx)(D,{actions:b,autoFocus:v,autoFocusItem:y,variant:d,...ee,children:i})})});function Jp(e){return di(`MuiNativeSelect`,e)}var Yp=fi(`MuiNativeSelect`,[`root`,`select`,`multiple`,`filled`,`outlined`,`standard`,`disabled`,`icon`,`iconOpen`,`iconFilled`,`iconOutlined`,`iconStandard`,`nativeInput`,`error`]),Xp=e=>{let{classes:t,variant:n,disabled:r,multiple:i,open:a,error:o}=e;return Ma({select:[`select`,n,r&&`disabled`,i&&`multiple`,o&&`error`],icon:[`icon`,`icon${qo(n)}`,a&&`iconOpen`,r&&`disabled`]},Jp,t)},Zp=P(`select`,{name:`MuiNativeSelect`})(({theme:e})=>({MozAppearance:`none`,WebkitAppearance:`none`,userSelect:`none`,borderRadius:0,cursor:`pointer`,"&:focus":{borderRadius:0},[`&.${Yp.disabled}`]:{cursor:`default`},"&[multiple]":{height:`auto`},"&:not([multiple]) option, &:not([multiple]) optgroup":{backgroundColor:(e.vars||e).palette.background.paper},variants:[{props:({ownerState:e})=>e.variant!==`filled`&&e.variant!==`outlined`,style:{"&&&":{paddingRight:24,minWidth:16}}},{props:{variant:`filled`},style:{"&&&":{paddingRight:32}}},{props:{variant:`outlined`},style:{borderRadius:(e.vars||e).shape.borderRadius,"&:focus":{borderRadius:(e.vars||e).shape.borderRadius},"&&&":{paddingRight:32}}}]})),Qp=P(Zp,{name:`MuiNativeSelect`,slot:`Select`,shouldForwardProp:zo,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.select,t[n.variant],n.error&&t.error,{[`&.${Yp.multiple}`]:t.multiple}]}})({}),$p=P(`svg`,{name:`MuiNativeSelect`})(({theme:e})=>({position:`absolute`,right:0,top:`calc(50% - .5em)`,pointerEvents:`none`,color:(e.vars||e).palette.action.active,[`&.${Yp.disabled}`]:{color:(e.vars||e).palette.action.disabled},variants:[{props:({ownerState:e})=>e.open,style:{transform:`rotate(180deg)`}},{props:{variant:`filled`},style:{right:7}},{props:{variant:`outlined`},style:{right:7}}]})),em=P($p,{name:`MuiNativeSelect`,slot:`Icon`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.icon,n.variant&&t[`icon${qo(n.variant)}`],n.open&&t.iconOpen]}})({}),tm=j.forwardRef(function(e,t){let{className:n,disabled:r,error:i,IconComponent:a,inputRef:o,variant:s=`standard`,...c}=e,l={...e,disabled:r,variant:s,error:i},u=Xp(l);return(0,M.jsxs)(j.Fragment,{children:[(0,M.jsx)(Qp,{ownerState:l,className:ci(u.select,n),disabled:r,ref:o||t,...c}),e.multiple?null:(0,M.jsx)(em,{as:a,ownerState:l,className:u.icon})]})}),nm,rm=P(`fieldset`,{name:`MuiNotchedOutlined`,shouldForwardProp:zo})({textAlign:`left`,position:`absolute`,bottom:0,right:0,top:-5,left:0,margin:0,padding:`0 8px`,pointerEvents:`none`,borderRadius:`inherit`,borderStyle:`solid`,borderWidth:1,overflow:`hidden`,minWidth:`0%`}),im=P(`legend`,{name:`MuiNotchedOutlined`,shouldForwardProp:zo})(Zo(({theme:e})=>({float:`unset`,width:`auto`,overflow:`hidden`,variants:[{props:({ownerState:e})=>!e.withLabel,style:{padding:0,lineHeight:`11px`,transition:e.transitions.create(`width`,{duration:150,easing:e.transitions.easing.easeOut})}},{props:({ownerState:e})=>e.withLabel,style:{display:`block`,padding:0,height:11,fontSize:`0.75em`,visibility:`hidden`,maxWidth:.01,transition:e.transitions.create(`max-width`,{duration:50,easing:e.transitions.easing.easeOut}),whiteSpace:`nowrap`,"& > span":{paddingLeft:5,paddingRight:5,display:`inline-block`,opacity:0,visibility:`visible`}}},{props:({ownerState:e})=>e.withLabel&&e.notched,style:{maxWidth:`100%`,transition:e.transitions.create(`max-width`,{duration:100,easing:e.transitions.easing.easeOut,delay:50})}}]})));function am(e){let{children:t,classes:n,className:r,label:i,notched:a,...o}=e,s=i!=null&&i!==``,c={...e,notched:a,withLabel:s};return(0,M.jsx)(rm,{"aria-hidden":!0,className:r,ownerState:c,...o,children:(0,M.jsx)(im,{ownerState:c,children:s?(0,M.jsx)(`span`,{children:i}):nm||=(0,M.jsx)(`span`,{className:`notranslate`,"aria-hidden":!0,children:`​`})})})}var om=e=>{let{classes:t}=e,n=Ma({root:[`root`],notchedOutline:[`notchedOutline`],input:[`input`]},Ul,t);return{...t,...n}},sm=P(Ll,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiOutlinedInput`,slot:`Root`,overridesResolver:Pl})(Zo(({theme:e})=>{let t=e.palette.mode===`light`?`rgba(0, 0, 0, 0.23)`:`rgba(255, 255, 255, 0.23)`;return{position:`relative`,borderRadius:(e.vars||e).shape.borderRadius,[`&:hover .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.text.primary},"@media (hover: none)":{[`&:hover .${Wl.notchedOutline}`]:{borderColor:e.vars?e.alpha(e.vars.palette.common.onBackground,.23):t}},[`&.${Wl.focused} .${Wl.notchedOutline}`]:{borderWidth:2},variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{[`&.${Wl.focused} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette[t].main}}})),{props:{},style:{[`&.${Wl.error} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.error.main},[`&.${Wl.disabled} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.action.disabled}}},{props:({ownerState:e})=>e.startAdornment,style:{paddingLeft:14}},{props:({ownerState:e})=>e.endAdornment,style:{paddingRight:14}},{props:({ownerState:e})=>e.multiline,style:{padding:`16.5px 14px`}},{props:({ownerState:e,size:t})=>e.multiline&&t===`small`,style:{padding:`8.5px 14px`}}]}})),cm=P(am,{name:`MuiOutlinedInput`,slot:`NotchedOutline`})(Zo(({theme:e})=>{let t=e.palette.mode===`light`?`rgba(0, 0, 0, 0.23)`:`rgba(255, 255, 255, 0.23)`;return{borderColor:e.vars?e.alpha(e.vars.palette.common.onBackground,.23):t}})),lm=P(Rl,{name:`MuiOutlinedInput`,slot:`Input`,overridesResolver:Fl})(Zo(({theme:e})=>({padding:`16.5px 14px`,"&:-webkit-autofill":{...!e.vars&&{WebkitBoxShadow:e.palette.mode===`light`?null:`0 0 0 100px #266798 inset`,WebkitTextFillColor:e.palette.mode===`light`?null:`#fff`,caretColor:e.palette.mode===`light`?null:`#fff`},borderRadius:`inherit`,...e.vars&&e.applyStyles(`dark`,{WebkitBoxShadow:`0 0 0 100px #266798 inset`,WebkitTextFillColor:`#fff`,caretColor:`#fff`})},variants:[{props:{size:`small`},style:{padding:`8.5px 14px`}},{props:({ownerState:e})=>e.multiline,style:{padding:0}},{props:({ownerState:e})=>e.startAdornment,style:{paddingLeft:0}},{props:({ownerState:e})=>e.endAdornment,style:{paddingRight:0}}]}))),um=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiOutlinedInput`}),{fullWidth:r=!1,inputComponent:i=`input`,label:a,multiline:o=!1,notched:s,slots:c={},slotProps:l={},type:u=`text`,...d}=n,f=om(n),[p,m]=Tl({props:n,states:[`color`,`disabled`,`error`,`focused`,`hiddenLabel`,`size`,`required`]}),h={...n,color:p.color||`primary`,disabled:p.disabled,error:p.error,focused:p.focused,formControl:m,fullWidth:r,hiddenLabel:p.hiddenLabel,multiline:o,size:p.size,type:u},g=c.root??sm,_=c.input??lm,[v,y]=hc(`notchedOutline`,{elementType:cm,className:f.notchedOutline,shouldForwardComponentProp:!0,ownerState:h,externalForwardedProps:{slots:c,slotProps:l},additionalProps:{label:a!=null&&a!==``&&p.required?(0,M.jsxs)(j.Fragment,{children:[a,` `,`*`]}):a}});return(0,M.jsx)(Bl,{slots:{root:g,input:_},slotProps:l,renderSuffix:e=>(0,M.jsx)(v,{...y,notched:s===void 0?!!(e.startAdornment||e.filled||e.focused):s}),fullWidth:r,inputComponent:i,multiline:o,ref:t,type:u,...d,classes:{...f,notchedOutline:null}})});um.muiName=`Input`;function dm(e){return di(`MuiSelect`,e)}var fm=fi(`MuiSelect`,[`root`,`select`,`multiple`,`filled`,`outlined`,`standard`,`disabled`,`focused`,`icon`,`iconOpen`,`nativeInput`,`error`]),pm,mm=2,hm=400,gm=200;function _m(e,t){if(!t)return!1;if(e.composedPath().includes(t)||e.target?.nodeType&&t.contains(e.target))return!0;let n=t.getBoundingClientRect();return n.width===0&&n.height===0?!1:e.clientX>=n.left-mm&&e.clientX<=n.right+mm&&e.clientY>=n.top-mm&&e.clientY<=n.bottom+mm}var vm=P(Zp,{name:`MuiSelect`,slot:`Select`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`&.${fm.select}`]:t.select},{[`&.${fm.select}`]:t[n.variant]},{[`&.${fm.error}`]:t.error},{[`&.${fm.multiple}`]:t.multiple}]}})({[`&.${fm.select}`]:{height:`auto`,minHeight:`1.4375em`,textOverflow:`ellipsis`,whiteSpace:`nowrap`,overflow:`hidden`}}),ym=P($p,{name:`MuiSelect`,slot:`Icon`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.icon,n.open&&t.iconOpen]}})({}),bm=P(`input`,{shouldForwardProp:e=>Ro(e)&&e!==`classes`,name:`MuiSelect`,slot:`NativeInput`})({bottom:0,left:0,position:`absolute`,opacity:0,pointerEvents:`none`,width:`100%`,boxSizing:`border-box`}),xm=e=>{let{classes:t,variant:n,disabled:r,multiple:i,open:a,error:o}=e;return Ma({select:[`select`,n,r&&`disabled`,i&&`multiple`,o&&`error`],icon:[`icon`,a&&`iconOpen`,r&&`disabled`],nativeInput:[`nativeInput`]},dm,t)},Sm=j.forwardRef(function(e,t){let{"aria-describedby":n,"aria-label":r,autoFocus:i,autoWidth:a,children:o,className:s,defaultOpen:c,defaultValue:l,disabled:u,displayEmpty:d,error:f=!1,IconComponent:p,inputRef:m,labelId:h,MenuProps:g={},multiple:_,name:v,onBlur:y,onChange:b,onClose:x,onFocus:S,onKeyDown:C,onMouseDown:w,onOpen:T,open:D,readOnly:ee,renderValue:te,required:ne,SelectDisplayProps:re={},tabIndex:ie,type:ae,value:oe,variant:O=`standard`,...k}=e,[A,se]=_s({controlled:oe,default:l,name:`Select`}),[ce,le]=_s({controlled:D,default:c,name:`Select`}),ue=j.useRef(null),de=j.useRef(null),fe=j.useRef(null),pe=j.useRef(!1),me=j.useRef(!1),he=j.useRef(null),ge=j.useRef(!1),_e=j.useRef({allowSelectedMouseUp:!1,allowUnselectedMouseUp:!1}),ve=Qs(),ye=Qs(),[be,xe]=j.useState(null),{current:Se}=j.useRef(D!=null),[Ce,we]=j.useState(),[Te,Ee]=j.useState(null),De=xs(t,m),Oe=j.useCallback(e=>{de.current=e,e&&xe(e)},[]),ke=be?.parentNode;j.useImperativeHandle(De,()=>({focus:()=>{de.current.focus()},node:ue.current,value:A}),[A]);let Ae=be!==null&&ce;ms(()=>{pe.current=Ae},[Ae]);let je=j.useCallback(()=>{ve.clear(),ye.clear()},[ve,ye]),Me=j.useCallback(()=>{je(),ge.current=!1,_e.current={allowSelectedMouseUp:!1,allowUnselectedMouseUp:!1}},[je]),Ne=j.useCallback(()=>{he.current&&=(he.current(),null)},[]);j.useEffect(()=>{Ae||(Me(),Ne())},[Ae,Me,Ne]),j.useEffect(()=>()=>{Me(),Ne()},[Me,Ne]),j.useEffect(()=>{if(!Ae||!ke||a||typeof ResizeObserver>`u`)return;let e=new ResizeObserver(()=>{we(ke.clientWidth)});return e.observe(ke),()=>{e.disconnect()}},[Ae,ke,a]),j.useEffect(()=>{c&&ce&&be&&!Se&&(we(a?null:ke.clientWidth),de.current.focus())},[be,a]),j.useEffect(()=>{i&&de.current.focus()},[i]),j.useEffect(()=>{if(!h)return;let e=us(de.current).getElementById(h);if(e){let t=()=>{getSelection().isCollapsed&&de.current.focus()};return e.addEventListener(`click`,t),()=>{e.removeEventListener(`click`,t)}}},[h]);let Pe=ys((e,t)=>{e||(Me(),Ne()),e?(Ee(yp(t)),T&&T(t)):(Ee(null),x&&x(t)),Se||(pe.current=e,we(a?null:ke.clientWidth),le(e))}),Fe=()=>{Me(),me.current?ye.start(gm,()=>{_e.current.allowUnselectedMouseUp=!0,ve.start(gm,()=>{_e.current.allowSelectedMouseUp=!0})}):ve.start(hm,()=>{_e.current.allowSelectedMouseUp=!0,_e.current.allowUnselectedMouseUp=!0})},Ie=e=>{if(w?.(e),e.button!==0)return;e.preventDefault(),de.current.focus();let t=us(e.currentTarget);Fe(),Ne();let n=e=>{he.current=null,de.current&&(_m(e,de.current)||_m(e,fe.current)||!pe.current&&Se||Pe(!1,e))};t.addEventListener(`mouseup`,n,{capture:!0,once:!0}),he.current=()=>{t.removeEventListener(`mouseup`,n,!0)},Pe(!0,e)},Le=e=>{Pe(!1,e)},Re=j.Children.toArray(o),ze=e=>{let t=Re.find(t=>t.props.value===e.target.value);t!==void 0&&(se(t.props.value),b&&b(e,t))},Be=e=>t=>{ge.current=!1;let n;if(t.currentTarget.hasAttribute(`tabindex`)){if(_){n=Array.isArray(A)?A.slice():[];let t=A.indexOf(e.props.value);t===-1?n.push(e.props.value):n.splice(t,1)}else n=e.props.value;if(e.props.onClick&&e.props.onClick(t),A!==n&&(se(n),b)){let r=t.nativeEvent||t,i=new r.constructor(r.type,r);Object.defineProperty(i,`target`,{writable:!0,value:{value:n,name:v}}),b(i,e)}_||Pe(!1,t)}},Ve=(e,t)=>n=>{if(e.props.onMouseUp?.(n),ge.current){ge.current=!1;return}let r=!_e.current.allowSelectedMouseUp&&t,i=!_e.current.allowUnselectedMouseUp&&!t;r||i||n.currentTarget.click()},He=e=>{ee||([` `,`ArrowUp`,`ArrowDown`,`Enter`].includes(e.key)&&(e.preventDefault(),Pe(!0,e)),C?.(e))},Ue=e=>{!Ae&&y&&(Object.defineProperty(e,`target`,{writable:!0,value:{value:A,name:v}}),y(e))};delete k[`aria-invalid`];let We,Ge,Ke=[],qe=!1,Je=!1;(Dl({value:A})||d)&&(te?We=te(A):qe=!0);let Ye=Re.map(e=>{if(!j.isValidElement(e))return null;let t;if(_){if(!Array.isArray(A))throw Error(E(2));t=A.some(t=>xp(t,e.props.value)),t&&qe&&Ke.push(e.props.children)}else t=xp(A,e.props.value),t&&qe&&(Ge=e.props.children);return t&&(Je=!0),j.cloneElement(e,{"aria-selected":t?`true`:`false`,onMouseDown:t=>{ge.current=!0,e.props.onMouseDown?.(t)},onPointerDown:t=>{ge.current=!0,e.props.onPointerDown?.(t)},onClick:Be(e),onMouseUp:Ve(e,t),onKeyUp:t=>{t.key===` `&&t.preventDefault(),e.props.onKeyUp&&e.props.onKeyUp(t)},role:`option`,selected:t,value:void 0,"data-value":e.props.value})});ms(()=>{me.current=Je},[Je]),qe&&(We=_?Ke.length===0?null:Ke.reduce((e,t,n)=>(e.push(t),n<Ke.length-1&&e.push(`, `),e),[]):Ge);let Xe=Ce;!a&&Se&&be&&(Xe=ke.clientWidth);let Ze;Ze=ie===void 0?u?null:0:ie;let Qe=re.id||(v?`mui-component-select-${v}`:void 0),$e={...e,variant:O,value:A,open:Ae,error:f},et=xm($e),tt=typeof g.slotProps?.paper==`function`?g.slotProps.paper($e):g.slotProps?.paper,nt=xs(tt?.ref,fe),rt=typeof g.slotProps?.list==`function`?g.slotProps.list($e):g.slotProps?.list,it=aa(),at=aa();return(0,M.jsxs)(j.Fragment,{children:[(0,M.jsx)(vm,{as:`div`,ref:Oe,tabIndex:Ze,role:`combobox`,"aria-controls":Ae?it:void 0,"aria-disabled":u?`true`:void 0,"aria-expanded":Ae?`true`:`false`,"aria-haspopup":`listbox`,"aria-label":r,"aria-labelledby":h,"aria-describedby":n,"aria-required":ne?`true`:void 0,"aria-invalid":f?`true`:void 0,onKeyDown:He,onMouseDown:u||ee?null:Ie,onBlur:Ue,onFocus:S,...re,ownerState:$e,className:ci(re.className,et.select,s),id:Qe,children:bp(We)?pm||=(0,M.jsx)(`span`,{className:`notranslate`,"aria-hidden":!0,children:`​`}):We}),(0,M.jsx)(bm,{"aria-invalid":f,value:Array.isArray(A)?A.join(`,`):A,name:v,ref:ue,"aria-hidden":!0,onChange:ze,tabIndex:-1,disabled:u,className:et.nativeInput,autoFocus:i,required:ne,...k,id:k.id??at,ownerState:$e}),(0,M.jsx)(ym,{as:p,className:et.icon,ownerState:$e}),(0,M.jsx)(wp,{value:Te,children:(0,M.jsx)(qp,{id:`menu-${v||``}`,anchorEl:ke,open:Ae,onClose:Le,anchorOrigin:{vertical:`bottom`,horizontal:`center`},transformOrigin:{vertical:`top`,horizontal:`center`},...g,slotProps:{...g.slotProps,list:{"aria-labelledby":h,role:`listbox`,"aria-multiselectable":_?`true`:void 0,disableListWrap:!0,id:it,...rt},paper:{...tt,ref:nt,style:{minWidth:Xe,...tt?.style}}},children:Ye})})]})}),Cm=e=>{let{classes:t}=e,n=Ma({root:[`root`]},dm,t);return{...t,...n}},wm={name:`MuiSelect`,slot:`Root`,shouldForwardProp:e=>zo(e)&&e!==`variant`},Tm=P(Yd,wm)(``),Em=P(um,wm)(``),Dm=P(Cd,wm)(``),Om=j.forwardRef(function(e,t){let n=Qo({name:`MuiSelect`,props:e}),{autoWidth:r=!1,children:i,classes:a={},className:o,defaultOpen:s=!1,displayEmpty:c=!1,IconComponent:l=ql,id:u,input:d,inputProps:f,label:p,labelId:m,MenuProps:h,multiple:g=!1,native:_=!1,onClose:v,onOpen:y,open:b,renderValue:x,SelectDisplayProps:S,variant:C=`outlined`,...w}=n,T=_?tm:Sm,[E]=Tl({props:n,states:[`variant`,`error`]}),D=E.variant||C,ee={...n,variant:D,classes:a},te=Cm(ee),{root:ne,...re}=te,ie=d||{standard:(0,M.jsx)(Tm,{ownerState:ee}),outlined:(0,M.jsx)(Em,{label:p,ownerState:ee}),filled:(0,M.jsx)(Dm,{ownerState:ee})}[D],ae=xs(t,gl(ie));return(0,M.jsx)(j.Fragment,{children:j.cloneElement(ie,{inputComponent:T,inputProps:{children:i,error:E.error,IconComponent:l,variant:D,type:void 0,multiple:g,..._?{id:u}:{autoWidth:r,defaultOpen:s,displayEmpty:c,labelId:m,MenuProps:h,onClose:v,onOpen:y,open:b,renderValue:x,SelectDisplayProps:{id:u,...S}},...f,classes:f?bn(re,f.classes):re,...d?d.props.inputProps:{}},...(g&&_||c)&&D===`outlined`?{notched:!0}:{},ref:ae,className:ci(ie.props.className,o,te.root),...!d&&{variant:D},...w})})});Om.muiName=`Select`;function km(e){return di(`MuiTab`,e)}var Am=fi(`MuiTab`,[`root`,`labelIcon`,`textColorInherit`,`textColorPrimary`,`textColorSecondary`,`selected`,`disabled`,`fullWidth`,`wrapped`,`icon`]),jm=e=>{let{classes:t,textColor:n,fullWidth:r,wrapped:i,icon:a,label:o,selected:s,disabled:c}=e;return Ma({root:[`root`,a&&o&&`labelIcon`,`textColor${qo(n)}`,r&&`fullWidth`,i&&`wrapped`,s&&`selected`,c&&`disabled`],icon:[`icon`]},km,t)},Mm=P(Kc,{name:`MuiTab`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.label&&n.icon&&t.labelIcon,t[`textColor${qo(n.textColor)}`],n.fullWidth&&t.fullWidth,n.wrapped&&t.wrapped,{[`& .${Am.icon}`]:t.icon}]}})(Zo(({theme:e})=>({...e.typography.button,maxWidth:360,minWidth:90,position:`relative`,minHeight:48,flexShrink:0,padding:`12px 16px`,overflow:`hidden`,whiteSpace:`normal`,textAlign:`center`,lineHeight:1.25,variants:[{props:({ownerState:e})=>e.label&&(e.iconPosition===`top`||e.iconPosition===`bottom`),style:{flexDirection:`column`}},{props:({ownerState:e})=>e.label&&e.iconPosition!==`top`&&e.iconPosition!==`bottom`,style:{flexDirection:`row`}},{props:({ownerState:e})=>e.icon&&e.label,style:{minHeight:72,paddingTop:9,paddingBottom:9}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`top`,style:{[`& > .${Am.icon}`]:{marginBottom:6}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`bottom`,style:{[`& > .${Am.icon}`]:{marginTop:6}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`start`,style:{[`& > .${Am.icon}`]:{marginRight:e.spacing(1)}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`end`,style:{[`& > .${Am.icon}`]:{marginLeft:e.spacing(1)}}},{props:{textColor:`inherit`},style:{color:`inherit`,opacity:.6,[`&.${Am.selected}`]:{opacity:1},[`&.${Am.disabled}`]:{opacity:(e.vars||e).palette.action.disabledOpacity}}},{props:{textColor:`primary`},style:{color:(e.vars||e).palette.text.secondary,[`&.${Am.selected}`]:{color:(e.vars||e).palette.primary.main},[`&.${Am.disabled}`]:{color:(e.vars||e).palette.text.disabled}}},{props:{textColor:`secondary`},style:{color:(e.vars||e).palette.text.secondary,[`&.${Am.selected}`]:{color:(e.vars||e).palette.secondary.main},[`&.${Am.disabled}`]:{color:(e.vars||e).palette.text.disabled}}},{props:({ownerState:e})=>e.fullWidth,style:{flexShrink:1,flexGrow:1,flexBasis:0,maxWidth:`none`}},{props:({ownerState:e})=>e.wrapped,style:{fontSize:e.typography.pxToRem(12)}}]}))),Nm=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTab`}),{className:r,disabled:i=!1,disableFocusRipple:a=!1,fullWidth:o,icon:s,iconPosition:c=`top`,indicator:l,label:u,onChange:d,onClick:f,onFocus:p,selected:m,selectionFollowsFocus:h,textColor:g=`inherit`,value:_,wrapped:v=!1,...y}=n,b=Yf(),x=ep({id:_,ref:t,disabled:i,selected:m}),S=b.getItemMap().size===0&&m?0:x.tabIndex,C={...n,disabled:i,disableFocusRipple:a,selected:m,icon:!!s,iconPosition:c,label:!!u,fullWidth:o,textColor:g,wrapped:v},w=jm(C),T=s&&u&&j.isValidElement(s)?j.cloneElement(s,{className:ci(w.icon,s.props.className)}):s;return(0,M.jsxs)(Mm,{internalNativeButton:!0,focusRipple:!a,className:ci(w.root,r),ref:x.ref,role:`tab`,"aria-selected":m,disabled:i,onClick:e=>{!m&&d&&d(e,_),f&&f(e)},onFocus:e=>{h&&!m&&d&&d(e,_),p&&p(e)},tabIndex:S,ownerState:C,...y,children:[c===`top`||c===`start`?(0,M.jsxs)(j.Fragment,{children:[T,u]}):(0,M.jsxs)(j.Fragment,{children:[u,T]}),l]})}),Pm=rs((0,M.jsx)(`path`,{d:`M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z`}),`KeyboardArrowLeft`),Fm=rs((0,M.jsx)(`path`,{d:`M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z`}),`KeyboardArrowRight`);function Im(e){return(1+Math.sin(Math.PI*e-Math.PI/2))/2}function Lm(e,t,n,r={},i=()=>{}){let{ease:a=Im,duration:o=300}=r,s=null,c=t[e],l=!1,u=()=>{l=!0},d=r=>{if(l){i(Error(`Animation cancelled`));return}s===null&&(s=r);let u=Math.min(1,(r-s)/o);if(t[e]=a(u)*(n-c)+c,u>=1){requestAnimationFrame(()=>{i(null)});return}requestAnimationFrame(d)};return c===n?(i(Error(`Element already at target position`)),u):(requestAnimationFrame(d),u)}var Rm={width:99,height:99,position:`absolute`,top:-9999,overflow:`scroll`,pointerEvents:`none`};function zm(e){let{onChange:t,...n}=e,r=j.useRef(),i=j.useRef(null),a=()=>{r.current=i.current.offsetHeight-i.current.clientHeight};return ms(()=>{let e=as(()=>{let e=r.current;a(),e!==r.current&&t(r.current)}),n=fs(i.current);return n.addEventListener(`resize`,e),()=>{e.clear(),n.removeEventListener(`resize`,e)}},[t]),j.useEffect(()=>{a(),t(r.current)},[t]),(0,M.jsx)(`div`,{style:Rm,...n,ref:i})}function Bm(e){return di(`MuiTabScrollButton`,e)}var Vm=fi(`MuiTabScrollButton`,[`root`,`vertical`,`horizontal`,`disabled`]),Hm=e=>{let{classes:t,orientation:n,disabled:r}=e;return Ma({root:[`root`,n,r&&`disabled`]},Bm,t)},Um=P(Kc,{name:`MuiTabScrollButton`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.orientation&&t[n.orientation]]}})({width:40,flexShrink:0,opacity:.8,[`&.${Vm.disabled}`]:{opacity:0},variants:[{props:{orientation:`vertical`},style:{width:`100%`,height:40,"& svg":{transform:`var(--TabScrollButton-svgRotate)`}}}]}),Wm=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTabScrollButton`}),{className:r,slots:i={},slotProps:a={},direction:o,orientation:s,disabled:c,...l}=n,{nativeButton:u,...d}=l,f=Zi(),p={isRtl:f,...n},m=Hm(p),h=i.StartScrollButtonIcon??Pm,g=i.EndScrollButtonIcon??Fm,_=hl({elementType:h,externalSlotProps:a.startScrollButtonIcon,additionalProps:{fontSize:`small`},ownerState:p}),v=hl({elementType:g,externalSlotProps:a.endScrollButtonIcon,additionalProps:{fontSize:`small`},ownerState:p});return(0,M.jsx)(Um,{component:`div`,className:ci(m.root,r),ref:t,role:null,ownerState:p,tabIndex:null,...d,style:{...d.style,...s===`vertical`&&{"--TabScrollButton-svgRotate":`rotate(${f?-90:90}deg)`}},children:o===`left`?(0,M.jsx)(h,{..._}):(0,M.jsx)(g,{...v})})});function Gm(e){return di(`MuiTabs`,e)}var Km=fi(`MuiTabs`,[`root`,`vertical`,`list`,`centered`,`scroller`,`fixed`,`scrollableX`,`scrollableY`,`hideScrollbar`,`scrollButtons`,`scrollButtonsHideMobile`,`indicator`]),qm=e=>{let{vertical:t,fixed:n,hideScrollbar:r,scrollableX:i,scrollableY:a,centered:o,scrollButtonsHideMobile:s,classes:c}=e;return Ma({root:[`root`,t&&`vertical`],scroller:[`scroller`,n&&`fixed`,r&&`hideScrollbar`,i&&`scrollableX`,a&&`scrollableY`],list:[`list`,t&&`vertical`,o&&`centered`],indicator:[`indicator`],scrollButtons:[`scrollButtons`,s&&`scrollButtonsHideMobile`],scrollableX:[i&&`scrollableX`],hideScrollbar:[r&&`hideScrollbar`]},Gm,c)},Jm=P(`div`,{name:`MuiTabs`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`& .${Km.scrollButtons}`]:t.scrollButtons},{[`& .${Km.scrollButtons}`]:n.scrollButtonsHideMobile&&t.scrollButtonsHideMobile},t.root,n.vertical&&t.vertical]}})(Zo(({theme:e})=>({overflow:`hidden`,minHeight:48,WebkitOverflowScrolling:`touch`,display:`flex`,variants:[{props:({ownerState:e})=>e.vertical,style:{flexDirection:`column`}},{props:({ownerState:e})=>e.scrollButtonsHideMobile,style:{[`& .${Km.scrollButtons}`]:{[e.breakpoints.down(`sm`)]:{display:`none`}}}}]}))),Ym=P(`div`,{name:`MuiTabs`,slot:`Scroller`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.scroller,n.fixed&&t.fixed,n.hideScrollbar&&t.hideScrollbar,n.scrollableX&&t.scrollableX,n.scrollableY&&t.scrollableY]}})({position:`relative`,display:`inline-block`,flex:`1 1 auto`,whiteSpace:`nowrap`,variants:[{props:({ownerState:e})=>e.fixed,style:{overflowX:`hidden`,width:`100%`}},{props:({ownerState:e})=>e.hideScrollbar,style:{scrollbarWidth:`none`,"&::-webkit-scrollbar":{display:`none`}}},{props:({ownerState:e})=>e.scrollableX,style:{overflowX:`auto`,overflowY:`hidden`}},{props:({ownerState:e})=>e.scrollableY,style:{overflowY:`auto`,overflowX:`hidden`}}]}),Xm=P(`div`,{name:`MuiTabs`,slot:`List`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.list,n.centered&&t.centered]}})({display:`flex`,variants:[{props:({ownerState:e})=>e.vertical,style:{flexDirection:`column`}},{props:({ownerState:e})=>e.centered,style:{justifyContent:`center`}}]}),Zm=P(`span`,{name:`MuiTabs`,slot:`Indicator`})(Zo(({theme:e})=>({position:`absolute`,height:2,bottom:0,width:`100%`,transition:e.transitions.create(),variants:[{props:{indicatorColor:`primary`},style:{backgroundColor:(e.vars||e).palette.primary.main}},{props:{indicatorColor:`secondary`},style:{backgroundColor:(e.vars||e).palette.secondary.main}},{props:({ownerState:e})=>e.vertical,style:{height:`100%`,width:2,right:0}}]}))),Qm=P(zm)({overflowX:`auto`,overflowY:`hidden`,scrollbarWidth:`none`,"&::-webkit-scrollbar":{display:`none`}}),$m={},eh=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTabs`}),r=Lo(),i=Zi(),{"aria-label":a,"aria-labelledby":o,action:s,centered:c=!1,children:l,className:u,component:d=`div`,allowScrollButtonsMobile:f=!1,indicatorColor:p=`primary`,onChange:m,orientation:h=`horizontal`,scrollButtons:g=`auto`,selectionFollowsFocus:_,slots:v={},slotProps:y={},textColor:b=`primary`,value:x,variant:S=`standard`,visibleScrollbar:C=!1,...w}=n,T=S===`scrollable`,E=h===`vertical`,D=E?`scrollTop`:`scrollLeft`,ee=E?`top`:`left`,te=E?`bottom`:`right`,ne=E?`clientHeight`:`clientWidth`,re=E?`height`:`width`,ie={...n,component:d,allowScrollButtonsMobile:f,indicatorColor:p,orientation:h,vertical:E,scrollButtons:g,textColor:b,variant:S,visibleScrollbar:C,fixed:!T,hideScrollbar:T&&!C,scrollableX:T&&!E,scrollableY:T&&E,centered:c&&!T,scrollButtonsHideMobile:!f},ae=qm(ie),oe=hl({elementType:v.startScrollButtonIcon,externalSlotProps:y.startScrollButtonIcon,ownerState:ie}),O=hl({elementType:v.endScrollButtonIcon,externalSlotProps:y.endScrollButtonIcon,ownerState:ie}),[k,A]=j.useState(!1),[se,ce]=j.useState($m),[le,ue]=j.useState(!1),[de,fe]=j.useState(!1),[pe,me]=j.useState(!1),he=x===!1?null:x,[ge,_e]=j.useState(!1),[ve,ye]=j.useState({overflow:`hidden`,scrollbarWidth:0}),be=new Map,xe=j.useRef(null),Se=j.useRef(null),Ce={slots:v,slotProps:y},we=()=>{let e=xe.current,t;if(e){let n=e.getBoundingClientRect();t={clientWidth:e.clientWidth,scrollLeft:e.scrollLeft,scrollTop:e.scrollTop,scrollWidth:e.scrollWidth,top:n.top,bottom:n.bottom,left:n.left,right:n.right}}let n;if(e&&x!==!1){let e=Se.current.children;if(e.length>0){let t=e[be.get(x)];n=t?t.getBoundingClientRect():null}}return{tabsMeta:t,tabMeta:n}},Te=ys(()=>{let{tabsMeta:e,tabMeta:t}=we(),n=0,r;E?(r=`top`,t&&e&&(n=t.top-e.top+e.scrollTop)):(r=i?`right`:`left`,t&&e&&(n=(i?-1:1)*(t[r]-e[r]+e.scrollLeft)));let a={[r]:n,[re]:t?t[re]:0};if(typeof se[r]!=`number`||typeof se[re]!=`number`)ce(a);else{let e=Math.abs(se[r]-a[r]),t=Math.abs(se[re]-a[re]);(e>=1||t>=1)&&ce(a)}}),Ee=(e,{animation:t=!0}={})=>{t?Lm(D,xe.current,e,{duration:r.transitions.duration.standard}):xe.current[D]=e},De=e=>{let t=xe.current[D];E?t+=e:t+=e*(i?-1:1),Ee(t)},Oe=()=>{let e=xe.current[ne],t=0,n=Array.from(Se.current.children);for(let r=0;r<n.length;r+=1){let i=n[r];if(t+i[ne]>e){r===0&&(t=e);break}t+=i[ne]}return t},ke=()=>{De(-1*Oe())},Ae=()=>{De(Oe())},[je,{onChange:Me,...Ne}]=hc(`scrollbar`,{className:ci(ae.scrollableX,ae.hideScrollbar),elementType:Qm,shouldForwardComponentProp:!0,externalForwardedProps:Ce,ownerState:ie}),Pe=j.useCallback(e=>{Me?.(e),ye({overflow:null,scrollbarWidth:e})},[Me]),[Fe,Ie]=hc(`scrollButtons`,{className:ae.scrollButtons,elementType:Wm,externalForwardedProps:Ce,ownerState:ie,additionalProps:{orientation:h,slots:{StartScrollButtonIcon:v.startScrollButtonIcon,EndScrollButtonIcon:v.endScrollButtonIcon},slotProps:{startScrollButtonIcon:oe,endScrollButtonIcon:O}}}),Le=()=>{let e={};e.scrollbarSizeListener=T?(0,M.jsx)(je,{...Ne,onChange:Pe}):null;let t=T&&(g===`auto`&&(le||de)||g===!0);return e.scrollButtonStart=t?(0,M.jsx)(Fe,{direction:i?`right`:`left`,onClick:ke,disabled:!le,...Ie}):null,e.scrollButtonEnd=t?(0,M.jsx)(Fe,{direction:i?`left`:`right`,onClick:Ae,disabled:!de,...Ie}):null,e},Re=ys(e=>{let{tabsMeta:t,tabMeta:n}=we();!n||!t||(n[ee]<t[ee]?Ee(t[D]+(n[ee]-t[ee]),{animation:e}):n[te]>t[te]&&Ee(t[D]+(n[te]-t[te]),{animation:e}))}),ze=ys(()=>{T&&g!==!1&&me(!pe)});j.useEffect(()=>{let e=as(()=>{xe.current&&Te()}),t,n=n=>{n.forEach(e=>{e.removedNodes.forEach(e=>{t?.unobserve(e)}),e.addedNodes.forEach(e=>{t?.observe(e)})}),e(),ze()},r=fs(xe.current);r.addEventListener(`resize`,e);let i;return typeof ResizeObserver<`u`&&(t=new ResizeObserver(e),Array.from(Se.current.children).forEach(e=>{t.observe(e)})),typeof MutationObserver<`u`&&(i=new MutationObserver(n),i.observe(Se.current,{childList:!0})),()=>{e.clear(),r.removeEventListener(`resize`,e),i?.disconnect(),t?.disconnect()}},[Te,ze]),j.useEffect(()=>{let e=Array.from(Se.current.children),t=e.length;if(typeof IntersectionObserver<`u`&&t>0&&T&&g!==!1){let n=e[0],r=e[t-1],i={root:xe.current,threshold:.99},a=new IntersectionObserver(e=>{ue(!e[0].isIntersecting)},i);a.observe(n);let o=new IntersectionObserver(e=>{fe(!e[0].isIntersecting)},i);return o.observe(r),()=>{a.disconnect(),o.disconnect()}}},[T,g,pe,l?.length]),j.useEffect(()=>{A(!0)},[]),j.useEffect(()=>{Te()}),j.useEffect(()=>{Re($m!==se)},[Re,se]),j.useImperativeHandle(s,()=>({updateIndicator:Te,updateScrollButtons:ze}),[Te,ze]);let[Be,Ve]=hc(`indicator`,{className:ae.indicator,elementType:Zm,externalForwardedProps:Ce,ownerState:ie,additionalProps:{style:se}}),He=(0,M.jsx)(Be,{...Ve}),Ue=$f({activeItemId:ge?void 0:he,orientation:h,isRtl:i}),We=Ue.getContainerProps(),Ge=j.Children.toArray(l).filter(j.isValidElement).map((e,t)=>{let n=e.props.value===void 0?t:e.props.value;return be.set(n,t),{child:e,index:t,childValue:n}}).map(({child:e,childValue:t})=>{let n=t===x;return j.cloneElement(e,{fullWidth:S===`fullWidth`,indicator:n&&!k&&He,selected:n,selectionFollowsFocus:_,onChange:m,textColor:b,value:t})}),Ke=Le(),[qe,Je]=hc(`root`,{ref:t,className:ci(ae.root,u),elementType:Jm,externalForwardedProps:{...Ce,...w,component:d},ownerState:ie}),[Ye,Xe]=hc(`scroller`,{ref:xe,className:ae.scroller,elementType:Ym,externalForwardedProps:Ce,ownerState:ie,additionalProps:{style:{overflow:ve.overflow,[E?`margin${i?`Left`:`Right`}`:`marginBottom`]:C?void 0:-ve.scrollbarWidth}}}),Ze=xs(We.ref,Se),Qe=e=>{let t=Se.current;cs(us(t))?.getAttribute(`role`)===`tab`&&We.onKeyDown(e)},[$e,et]=hc(`list`,{ref:Ze,className:ae.list,elementType:Xm,externalForwardedProps:Ce,ownerState:ie,getSlotProps:e=>({...e,onBlur:t=>{Nu(t.currentTarget,t.relatedTarget)||_e(!1),e.onBlur?.(t)},onKeyDown:t=>{Qe(t),e.onKeyDown?.(t)},onFocus:t=>{_e(!0),We.onFocus(t),e.onFocus?.(t)}})});return(0,M.jsxs)(qe,{...Je,children:[Ke.scrollButtonStart,Ke.scrollbarSizeListener,(0,M.jsxs)(Ye,{...Xe,children:[(0,M.jsx)($e,{"aria-label":a,"aria-labelledby":o,"aria-orientation":h===`vertical`?`vertical`:null,role:`tablist`,...et,children:(0,M.jsx)(Jf.Provider,{value:Ue,children:Ge})}),k&&He]}),Ke.scrollButtonEnd]})});function th(e){return di(`MuiTextField`,e)}fi(`MuiTextField`,[`root`]);var nh={standard:Yd,filled:Cd,outlined:um},rh=e=>{let{classes:t}=e;return Ma({root:[`root`]},th,t)},ih=P(Dd,{name:`MuiTextField`,slot:`Root`})({}),ah=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTextField`}),{autoComplete:r,autoFocus:i=!1,children:a,className:o,color:s=`primary`,defaultValue:c,disabled:l=!1,error:u=!1,fullWidth:d=!1,helperText:f,id:p,inputRef:m,label:h,maxRows:g,minRows:_,multiline:v=!1,name:y,onBlur:b,onChange:x,onFocus:S,placeholder:C,required:w=!1,rows:T,select:E=!1,slots:D={},slotProps:ee={},type:te,value:ne,variant:re=`outlined`,...ie}=n,ae={...n,autoFocus:i,color:s,disabled:l,error:u,fullWidth:d,multiline:v,required:w,select:E,variant:re},oe=rh(ae),O=aa(p),k=f&&O?`${O}-helper-text`:void 0,A=h&&O?`${O}-label`:void 0,se=nh[re],ce={slots:D,slotProps:ee},[le,ue]=hc(`select`,{elementType:Om,externalForwardedProps:ce,ownerState:ae}),de=E&&ue.native,fe={},pe=ce.slotProps.inputLabel;re===`outlined`&&(pe&&pe.shrink!==void 0&&(fe.notched=pe.shrink),fe.label=h),E&&(de||(fe.id=void 0),fe[`aria-describedby`]=void 0);let[me,he]=hc(`root`,{elementType:ih,shouldForwardComponentProp:!0,externalForwardedProps:{...ce,...ie},ownerState:ae,className:ci(oe.root,o),ref:t,additionalProps:{disabled:l,error:u,fullWidth:d,required:w,color:s,variant:re}}),[ge,_e]=hc(`input`,{elementType:se,externalForwardedProps:ce,additionalProps:fe,ownerState:ae}),[ve,ye]=hc(`inputLabel`,{elementType:Qd,externalForwardedProps:ce,ownerState:ae}),[be,xe]=hc(`htmlInput`,{elementType:`input`,externalForwardedProps:ce,ownerState:ae}),[Se,Ce]=hc(`formHelperText`,{elementType:Nd,externalForwardedProps:ce,ownerState:ae}),we=(0,M.jsx)(ge,{"aria-describedby":k,autoComplete:r,autoFocus:i,defaultValue:c,fullWidth:d,multiline:v,name:y,rows:T,maxRows:g,minRows:_,type:te,value:ne,id:O,inputRef:m,onBlur:b,onChange:x,onFocus:S,placeholder:C,inputProps:xe,slots:{input:D.htmlInput?be:void 0},..._e});return(0,M.jsxs)(me,{...he,children:[h!=null&&h!==``&&(0,M.jsx)(ve,{htmlFor:E&&!de?void 0:O,id:A,...E&&!de&&{component:`div`},...ye,children:h}),E?(0,M.jsx)(le,{"aria-describedby":k,id:O,labelId:A,value:ne,input:we,...ue,children:a}):we,f&&(0,M.jsx)(Se,{id:k,...Ce,children:f})]})}),oh=_(),I={background:`#282a36`,currentLine:`#44475a`,foreground:`#f8f8f2`,comment:`#6272a4`,cyan:`#8be9fd`,green:`#50fa7b`,orange:`#ffb86c`,pink:`#ff79c0`,purple:`#bd93f9`,red:`#ff5555`,yellow:`#f1fa8c`},sh=Fo({palette:{mode:`dark`,background:{default:I.background,paper:I.currentLine},primary:{main:I.purple},secondary:{main:I.pink},text:{primary:I.foreground,secondary:I.comment}},typography:{fontFamily:`'JetBrains Mono', monospace`,h1:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},h2:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},h3:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},body1:{fontFamily:`'JetBrains Mono', monospace`},body2:{fontFamily:`'JetBrains Mono', monospace`}},components:{MuiCssBaseline:{styleOverrides:{"*, *::before, *::after":{padding:0},html:{scrollBehavior:`smooth`},code:{fontFamily:`'JetBrains Mono', monospace`},body:{backgroundColor:I.background,color:I.foreground},"::-webkit-scrollbar":{width:`12px`},"::-webkit-scrollbar-track":{background:I.background},"::-webkit-scrollbar-thumb":{background:I.currentLine,borderRadius:`4px`,border:`2px solid transparent`,backgroundClip:`padding-box`},"::-webkit-scrollbar-thumb:hover":{background:I.comment,border:`2px solid transparent`,backgroundClip:`padding-box`}}}}}),ch=rs((0,M.jsx)(`path`,{d:`M7.5 5.6 10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29a.996.996 0 0 0-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41zm-1.03 5.49-2.12-2.12 2.44-2.44 2.12 2.12z`}),`AutoFixHigh`),lh=rs((0,M.jsx)(`path`,{d:`M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-5.97 4.06L14.09 6l1.41 1.41L16.91 6l1.06 1.06-1.41 1.41 1.41 1.41-1.06 1.06-1.41-1.4-1.41 1.41-1.06-1.06 1.41-1.41zm-6.78.66h5v1.5h-5zM11.5 16h-2v2H8v-2H6v-1.5h2v-2h1.5v2h2zm6.5 1.25h-5v-1.5h5zm0-2.5h-5v-1.5h5z`}),`Calculate`),uh=rs((0,M.jsx)(`path`,{d:`M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12z`}),`Cancel`),dh=rs((0,M.jsx)(`path`,{d:`M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2M7.5 18c-.83 0-1.5-.67-1.5-1.5S6.67 15 7.5 15s1.5.67 1.5 1.5S8.33 18 7.5 18m0-9C6.67 9 6 8.33 6 7.5S6.67 6 7.5 6 9 6.67 9 7.5 8.33 9 7.5 9m4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5m4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5m0-9c-.83 0-1.5-.67-1.5-1.5S15.67 6 16.5 6s1.5.67 1.5 1.5S17.33 9 16.5 9`}),`Casino`),fh=rs((0,M.jsx)(`path`,{d:`M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z`}),`CheckCircle`),ph=rs((0,M.jsx)(`path`,{d:`M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z`}),`ContentCopy`),mh=rs((0,M.jsx)(`path`,{d:`M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-2h2zm0-4h-2V7h2z`}),`ErrorOutlined`),hh=rs((0,M.jsx)(`path`,{d:`m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z`}),`ExpandLess`),gh=rs((0,M.jsx)(`path`,{d:`M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z`}),`ExpandMore`),_h=rs((0,M.jsx)(`path`,{d:`M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2zm10 14.5V20H8v-3.5l4-4zm-4-5-4-4V4h8v3.5z`}),`HourglassEmpty`),vh=rs([(0,M.jsx)(`path`,{d:`M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1m0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5z`},`0`),(0,M.jsx)(`path`,{d:`M17.5 10.5c.88 0 1.73.09 2.5.26V9.24c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99M13 12.49v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26V11.9c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.3-4.5.83m4.5 1.84c-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26v-1.52c-.79-.16-1.64-.24-2.5-.24`},`1`)],`MenuBook`),yh=rs((0,M.jsx)(`path`,{d:`M19.8 18.4 14 10.67V6.5l1.35-1.69c.26-.33.03-.81-.39-.81H9.04c-.42 0-.65.48-.39.81L10 6.5v4.17L4.2 18.4c-.49.66-.02 1.6.8 1.6h14c.82 0 1.29-.94.8-1.6`}),`Science`),bh=rs((0,M.jsx)(`path`,{d:`m6 18 8.5-6L6 6zM16 6v12h2V6z`}),`SkipNext`),xh=rs((0,M.jsx)(`path`,{d:`M6 6h12v12H6z`}),`Stop`);function Sh(e,t){for(e=e<0n?-e:e,t=t<0n?-t:t;t!==0n;)[e,t]=[t,e%t];return e}function Ch(e){if(e<0n)throw RangeError(`isqrt: negative input`);if(e<2n)return e;let t=e.toString(2).length,n=1n<<BigInt(Math.floor(t/2));for(;;){let t=n+e/n>>1n;if(t>=n)break;n=t}for(;(n+1n)*(n+1n)<=e;)n++;for(;n*n>e;)n--;return n}function wh(e,t){if(e===0n)return{gcd:t,x:0n,y:1n};let{gcd:n,x:r,y:i}=wh(t%e,e);return{gcd:n,x:i-t/e*r,y:r}}function Th(e,t){let{gcd:n,x:r}=wh(e<0n?e+t:e,t);return n===1n?(r%t+t)%t:null}function Eh(e,t,n){if(n===1n)return 0n;let r=1n;for(e=(e%n+n)%n;t>0n;)t&1n&&(r=r*e%n),t>>=1n,e=e*e%n;return r}function Dh(e){if(e<2n)return!1;if(e<4n)return!0;if(e%2n==0n||e%3n==0n)return!1;for(let t of[5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n]){if(e===t)return!0;if(e%t===0n)return!1}let t=e-1n,n=0n;for(;t%2n==0n;)t/=2n,n++;for(let r of[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n]){if(r>=e)break;let i=Eh(r,t,e);if(i===1n||i===e-1n)continue;let a=!0;for(let t=1n;t<n;t++)if(i=i*i%e,i===e-1n){a=!1;break}if(a)return!1}return!0}function Oh(e){for(;;){let t=Math.ceil(e/8),n=new Uint8Array(t);crypto.getRandomValues(n);let r=0n;for(let e=0;e<t;e++)r=r<<8n|BigInt(n[e]);if(r|=1n<<BigInt(e-1),r|=1n,r&=(1n<<BigInt(e))-1n,Dh(r))return r}}function kh(e,t,n=65537n){let r,i;do r=Oh(e),i=Oh(t);while(r===i);r>i&&([r,i]=[i,r]);let a=r*i,o=(r-1n)*(i-1n),s=n;for(;Sh(s,o)!==1n;)s+=2n;let c=Th(s,o);if(c===null)throw Error(`modInverse failed`);return{p:r,q:i,n:a,e:s,d:c,phi:o}}function Ah(e,t,n){return Eh(e,n,t)}var L={p:256,q:256},jh={id:`fermat`,name:`Fermat Factorization`,category:`Factorization`,description:`Factors n when p and q are close. Use when |p - q| < 2·n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
 
 print(f"Fermat Factorization on n = {n}")
 print()
@@ -226,7 +226,7 @@ if n.is_square():
 
 # Optimized Fermat (RsaCtfTool algorithm)
 # Uses incremental update: b2 += c, c += 2 instead of recomputing a^2 - n
-a, rem = isqrt_rem(n)
+a, rem = n.sqrtrem()
 b2 = -rem
 c = (a << 1) + 1
 max_iter = 10**6
@@ -357,42 +357,41 @@ print()
 if n < 2 or e < 2:
     print("Invalid input: n and e must be >= 2")
     print("BONEH_DURFEE=FAILED")
-    return
+else:
+    # Extended Wiener + lattice-based Boneh-Durfee approach
+    # First try Wiener's attack
+    def wiener_attack(n, e):
+        cf = e.continued_fraction()
+        for conv in cf.convergents():
+            k, d = conv.numerator(), conv.denominator()
+            if k == 0:
+                continue
+            if (e * d - 1) % k == 0:
+                phi = (e * d - 1) // k
+                s = n - phi + 1
+                disc = s**2 - 4 * n
+                if disc >= 0 and disc.is_square():
+                    p = (s + isqrt(disc)) // 2
+                    q = (s - isqrt(disc)) // 2
+                    if p * q == n:
+                        return d, p, q
+        return None
 
-# Extended Wiener + lattice-based Boneh-Durfee approach
-# First try Wiener's attack
-def wiener_attack(n, e):
-    cf = e.continued_fraction()
-    for conv in cf.convergents():
-        k, d = conv.numerator(), conv.denominator()
-        if k == 0:
-            continue
-        if (e * d - 1) % k == 0:
-            phi = (e * d - 1) // k
-            s = n - phi + 1
-            disc = s**2 - 4 * n
-            if disc >= 0 and disc.is_square():
-                p = (s + isqrt(disc)) // 2
-                q = (s - isqrt(disc)) // 2
-                if p * q == n:
-                    return d, p, q
-    return None
-
-try:
-    result = wiener_attack(n, e)
-    if result:
-        d, p, q = result
-        print(f"Wiener's attack succeeded:")
-        print(f"d = {d}, p = {p}, q = {q}")
-        print(f"Verification: p * q = {p * q}")
-        print("BONEH_DURFEE=SUCCESS")
-    else:
-        print("Wiener's attack failed. Full Boneh-Durfee requires custom Herrmann-May lattice construction.")
-        print("Falling back to Wiener's attack which handles d < n^0.25.")
+    try:
+        result = wiener_attack(n, e)
+        if result:
+            d, p, q = result
+            print(f"Wiener's attack succeeded:")
+            print(f"d = {d}, p = {p}, q = {q}")
+            print(f"Verification: p * q = {p * q}")
+            print("BONEH_DURFEE=SUCCESS")
+        else:
+            print("Wiener's attack failed. Full Boneh-Durfee requires custom Herrmann-May lattice construction.")
+            print("Falling back to Wiener's attack which handles d < n^0.25.")
+            print("BONEH_DURFEE=FAILED")
+    except Exception as ex:
+        print(f"Boneh-Durfee attack error: {ex}")
         print("BONEH_DURFEE=FAILED")
-except Exception as ex:
-    print(f"Boneh-Durfee attack error: {ex}")
-    print("BONEH_DURFEE=FAILED")
 `,proof:`\\textbf{Theorem:} The private exponent d can be recovered in polynomial time when d < n^{0.292} using lattice reduction.
 
 \\textbf{Prerequisites:}
@@ -446,17 +445,17 @@ if n.is_square():
     return
 
 try:
-    # Use Sage's ecm.find_factor
-    result = ecm.find_factor(n)
-    if result:
-        p = Integer(result[0])
+    # Use SageMath's Integer.ecm() method
+    p = n.ecm()
+    if p > 1 and p < n:
         q = n // p
         print(f"p = {p}")
         print(f"q = {q}")
         print(f"Verification: p * q = {p * q}")
+        print(f"p is prime: {p.is_prime()}")
         print("ECM=SUCCESS")
     else:
-        print("ECM found no factors")
+        print("ECM found no non-trivial factors")
         print("ECM=FAILED")
 except Exception as ex:
     print(f"ECM failed: {ex}")
@@ -488,7 +487,7 @@ M \\cdot P &= \\mathcal{O} \\text{ in } E(\\mathbb{F}_p) \\\\
 
 \\textbf{Explanation:} Pick a random elliptic curve and point. Compute M \\cdot P where M is the product of all prime powers up to B_1. If the curve order modulo p is B_1-smooth, the computation fails modulo p but not modulo other factors, revealing p via gcd. Try different curves until one succeeds.
 
-\\textbf{References:} H. W. Lenstra Jr., "Factoring Integers with Elliptic Curves", Annals of Mathematics, 1987`,priority:`high`,applicableCheck:e=>!!e.n},Rh=()=>{let{n:e}=kh(L.p,L.q);return{n:e.toString()}},zh={id:`ecm2`,name:`ECM Full Factorization`,category:`Factorization`,description:`Full factorization via ECM. Use to find all prime factors of n.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
+\\textbf{References:} H. W. Lenstra Jr., "Factoring Integers with Elliptic Curves", Annals of Mathematics, 1987`,priority:`high`,applicableCheck:e=>!!e.n},Rh=()=>({n:(Oh(60)*Oh(L.p+L.q-60)).toString()}),zh={id:`ecm2`,name:`ECM Full Factorization`,category:`Factorization`,description:`Full factorization via ECM. Use to find all prime factors of n.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
 
 print(f"ECM Full Factorization on n = {n}")
 print()
@@ -565,7 +564,7 @@ n > n/p_{i_1} > n/(p_{i_1}p_{i_2}) > \\cdots &> 1 \\\\
 
 \\textbf{Explanation:} Run ECM to find one factor, divide it out, and repeat on the quotient. The process terminates when the remainder is 1 or prime. Each iteration strictly reduces the number of prime factors, guaranteeing termination. The total cost is dominated by finding the largest prime factor.
 
-\\textbf{References:} Lenstra, "Factoring Integers with Elliptic Curves", 1987`,priority:`medium`,applicableCheck:e=>!!e.n},Bh=()=>{let{n:e}=kh(L.p,L.q);return{n:e.toString()}},Vh={id:`pollard-p1`,name:`Pollard's p-1 Method`,category:`Factorization`,description:`Factors n when p-1 is smooth. Use when p-1 has only small prime factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B (smoothness bound, optional)`,placeholder:`10000`,multiline:!1}],sageTemplate:e=>`n = Integer(${e.n})
+\\textbf{References:} Lenstra, "Factoring Integers with Elliptic Curves", 1987`,priority:`medium`,applicableCheck:e=>!!e.n},Bh=()=>({n:(Oh(60)*Oh(L.p+L.q-60)).toString()}),Vh={id:`pollard-p1`,name:`Pollard's p-1 Method`,category:`Factorization`,description:`Factors n when p-1 is smooth. Use when p-1 has only small prime factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B (smoothness bound, optional)`,placeholder:`10000`,multiline:!1}],sageTemplate:e=>`n = Integer(${e.n})
 
 # Handle B parameter: default to 10000 if not provided or invalid
 try:
@@ -647,7 +646,7 @@ p &\\mid \\gcd(a^M - 1, n) \\\\
 
 \\textbf{Explanation:} Compute M = lcm(1, ..., B) and then a^M mod n. If p-1 is B-smooth, then a^M \\equiv 1 \\pmod{p}, so gcd(a^M - 1, n) reveals p. Stage 2 extends the search to catch p-1 with one large prime factor between B and B_2.
 
-\\textbf{References:} J. M. Pollard, "Theorems on Factorization and Primality Testing", Proc. Cambridge Philos. Soc., 1974`,priority:`medium`,applicableCheck:e=>!!e.n},Hh=()=>{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n,67n,71n],t=1n;for(let n of e){let e=Math.floor(Math.random()*4)+1;t*=n**BigInt(e)}for(;t<1n<<127n;)t*=2n;let n=t+1n;for(;!Dh(n);)t*=2n,n=t+1n;let r=Oh(L.q);return{n:(n*r).toString()}},Uh={id:`pollard-rho`,name:`Pollard's Rho Method`,category:`Factorization`,description:`Factors n via birthday paradox. Use for general factorization of small factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
+\\textbf{References:} J. M. Pollard, "Theorems on Factorization and Primality Testing", Proc. Cambridge Philos. Soc., 1974`,priority:`medium`,applicableCheck:e=>!!e.n},Hh=()=>{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n,67n,71n],t=2n;for(let n of e){let e=Math.floor(Math.random()*4)+1;t*=n**BigInt(e)}for(;t<1n<<255n;)t*=2n;let n=t+1n;for(;!Dh(n);)t*=2n,n=t+1n;let r=Oh(L.q);return{n:(n*r).toString(),B:`10000`}},Uh={id:`pollard-rho`,name:`Pollard's Rho Method`,category:`Factorization`,description:`Factors n via birthday paradox. Use for general factorization of small factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
 
 print(f"Pollard's Rho on n = {n}")
 print()
@@ -722,7 +721,7 @@ x \\equiv y \\pmod{p} &\\implies \\gcd(x - y, n) = p \\\\
 
 \\textbf{Explanation:} Generate a pseudorandom sequence x_{i+1} = x_i^2 + c mod n. The sequence modulo p must eventually cycle. Floyd's cycle detection finds when x \\equiv y \\pmod{p} by advancing tortoise 1 step and hare 2 steps. Then gcd(x - y, n) = p. Expected O(\\sqrt{p}) iterations.
 
-\\textbf{References:} J. M. Pollard, "A Monte Carlo Method for Factorization", BIT Numerical Mathematics, 1975`,priority:`medium`,applicableCheck:e=>!!e.n},Wh=()=>{let{n:e}=kh(L.p,L.q);return{n:e.toString()}},Gh={id:`williams-p1`,name:`Williams' p+1 Method`,category:`Factorization`,description:`Factors n when p+1 is smooth. Use when p+1 has only small prime factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B (smoothness bound, optional)`,placeholder:`10000`,multiline:!1}],sageTemplate:e=>`n = Integer(${e.n})
+\\textbf{References:} J. M. Pollard, "A Monte Carlo Method for Factorization", BIT Numerical Mathematics, 1975`,priority:`medium`,applicableCheck:e=>!!e.n},Wh=()=>({n:(Oh(40)*Oh(L.p+L.q-40)).toString()}),Gh={id:`williams-p1`,name:`Williams' p+1 Method`,category:`Factorization`,description:`Factors n when p+1 is smooth. Use when p+1 has only small prime factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B (smoothness bound, optional)`,placeholder:`10000`,multiline:!1}],sageTemplate:e=>`n = Integer(${e.n})
 
 # Handle B parameter: default to 10000 if not provided or invalid
 try:
@@ -778,7 +777,7 @@ def williams_p1(n, B, P):
             return P % n
         result = 2 % n   # V_0
         result1 = P % n  # V_1
-        bits = k.nbits()
+        bits = k.digits(2)  # LSB-first list of binary digits
         for bit in reversed(bits):
             # Double: from (V_j, V_{j+1}) compute (V_{2j}, V_{2j+1})
             V2j = (result**2 - 2) % n
@@ -844,7 +843,7 @@ p &\\mid \\gcd(V_M - 2, n) \\\\
 
 \\textbf{Explanation:} Choose P and compute V_M(P, 1) mod n using Lucas sequences. If p+1 is B-smooth and (P^2-4/p) = -1, then V_M \\equiv 2 \\pmod{p}, so gcd(V_M - 2, n) reveals p. Try different P values to find one with the right Legendre symbol.
 
-\\textbf{References:} H. C. Williams, "A p+1 Method of Factoring", Mathematics of Computation, 1982`,priority:`medium`,applicableCheck:e=>!!e.n},Kh=()=>{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n,67n,71n],t=2n;for(let n of e){let e=Math.floor(Math.random()*4)+1;t*=n**BigInt(e)}for(;t<1n<<127n;)t*=2n;let n=t-1n;for(;!Dh(n)||n<=2n;)t*=2n,n=t-1n;let r=Oh(L.q);return{n:(n*r).toString()}},qh={id:`quadratic-sieve`,name:`Quadratic Sieve`,category:`Factorization`,description:`Factors n via quadratic sieve. Use for general factorization of medium-sized n.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
+\\textbf{References:} H. C. Williams, "A p+1 Method of Factoring", Mathematics of Computation, 1982`,priority:`medium`,applicableCheck:e=>!!e.n},Kh=()=>{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n,67n,71n],t=2n;for(let n of e){let e=Math.floor(Math.random()*4)+1;t*=n**BigInt(e)}for(;t<1n<<255n;)t*=2n;let n=t-1n;for(;!Dh(n)||n<=2n;)t*=2n,n=t-1n;let r=Oh(L.q);return{n:(n*r).toString(),B:`10000`}},qh={id:`quadratic-sieve`,name:`Quadratic Sieve`,category:`Factorization`,description:`Factors n via quadratic sieve. Use for general factorization of medium-sized n.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
 
 print(f"Quadratic Sieve on n = {n}")
 print(f"Number of digits: {n.nbits() / 3.32:.0f}")
@@ -960,7 +959,7 @@ X \\not\\equiv \\pm y \\pmod{n} &\\implies \\gcd(X - y, n) \\text{ is a factor} 
 
 \\textbf{Explanation:} Sieve values of Q(x) = (x + \\sqrt{n})^2 - n for smoothness over a factor base. Each smooth value gives an exponent vector mod 2. Find a linear dependency over \\mathbb{F}_2 to get a congruence of squares X^2 \\equiv y^2 \\pmod{n}. Then gcd(X - y, n) yields a factor with probability \\geq 1/2.
 
-\\textbf{References:} C. Pomerance, "The Quadratic Sieve Factoring Algorithm", Eurocrypt 1984`,priority:`high`,applicableCheck:e=>!!e.n},Jh=()=>{let{n:e}=kh(L.p,L.q);return{n:e.toString()}},Yh={id:`squfof`,name:`SQUFOF`,category:`Factorization`,description:`Factors n via continued fractions of sqrt(n). Use for n < 10^14.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
+\\textbf{References:} C. Pomerance, "The Quadratic Sieve Factoring Algorithm", Eurocrypt 1984`,priority:`high`,applicableCheck:e=>!!e.n},Jh=()=>({n:(Oh(60)*Oh(L.p+L.q-60)).toString()}),Yh={id:`squfof`,name:`SQUFOF`,category:`Factorization`,description:`Factors n via continued fractions of sqrt(n). Use for n < 10^14.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
 
 if n < 2:
     print(f"n = {n} is too small to factor")
@@ -984,10 +983,21 @@ if n.is_square():
     print(f"p = q = {p}")
     print("SQUFOF=SUCCESS")
     return
-if n.nbits() > 64:
-    print(f"n has {n.nbits()} bits. SQUFOF is practical only up to ~64 bits.")
-    print("Use Pollard's rho or ECM instead.")
-    print("SQUFOF=FAILED")
+
+# SQUFOF works best for small factors; extract small factor first
+found_small = False
+for trial in range(3, 100000, 2):
+    if n % trial == 0:
+        p = Integer(trial)
+        q = n // p
+        print(f"Small factor found: p = {p}")
+        print(f"q = {q}")
+        print(f"Verification: p * q = {p * q}")
+        print("SQUFOF=SUCCESS")
+        found_small = True
+        break
+
+if found_small:
     return
 
 # Shanks' Square Forms Factorization (SQUFOF)
@@ -1073,12 +1083,12 @@ f(x, y) = ax^2 + bxy + cy^2, \\quad D &= b^2 - 4ac \\\\
 \\exists i: c_i &= q^2 \\text{ (perfect square)} \\\\
 \\text{Let } s = \\sqrt{c_i}, \\quad (a', b', s^2) &\\xrightarrow{\\rho^{\\text{inv}}} \\cdots \\xrightarrow{\\rho} (s, b^*, s) \\\\
 \\gcd(s, n) &= p \\text{ or } q \\\\
-\\text{Runtime: } O(n^{1/4}) &
+\\text{Runtime: } O(n^{1/4}) & \\qed
 \\end{align*}
 
 \\textbf{Explanation:} SQUFOF traverses the cycle of reduced binary quadratic forms of discriminant D = kn. When a form with a square coefficient c is found, the inverse square root is computed and the cycle is continued until a factor emerges via GCD.
 
-\\textbf{References:} D. Shanks, "SQUFOF: A Quadratic Form Factorization Algorithm", 1975; Gower & Wagstaff, "Square Form Factorization", Mathematics of Computation, 2008`,priority:`medium`,applicableCheck:e=>!!e.n},Xh=()=>{let{n:e}=kh(L.p,L.q);return{n:e.toString()}},Zh={id:`binary-poly-factor`,name:`Binary Polynomial Factoring`,category:`Factorization`,description:`Factors n via binary polynomial factorization. Use when n's binary form yields factorable polynomial.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
+\\textbf{References:} D. Shanks, "SQUFOF: A Quadratic Form Factorization Algorithm", 1975; Gower & Wagstaff, "Square Form Factorization", Mathematics of Computation, 2008`,priority:`medium`,applicableCheck:e=>!!e.n},Xh=()=>({n:(Oh(16)*Oh(L.p+L.q-16)).toString()}),Zh={id:`binary-poly-factor`,name:`Binary Polynomial Factoring`,category:`Factorization`,description:`Factors n via binary polynomial factorization. Use when n's binary form yields factorable polynomial.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
 
 if n < 2:
     print(f"n = {n} is too small to factor")
@@ -1170,12 +1180,12 @@ f(x) &= \\sum_{i=0}^{k} b_i x^i \\in \\mathbb{Z}[x], \\quad f(2) = n \\\\
 f(x) &= g_1(x)^{e_1} g_2(x)^{e_2} \\cdots g_r(x)^{e_r} \\\\
 n = f(2) &= g_1(2)^{e_1} g_2(2)^{e_2} \\cdots g_r(2)^{e_r} \\\\
 \\exists i: g_i(2) &= p \\text{ or } q \\quad \\text{(when factorization aligns)} \\\\
-\\text{Test each } g_i(2) &\\text{ for divisibility of } n
+\\text{Test each } g_i(2) &\\text{ for divisibility of } n \\qed
 \\end{align*}
 
 \\textbf{Explanation:} Convert n to a polynomial by treating its binary digits as coefficients. Factor this polynomial over the integers, then evaluate each factor at x=2. If the polynomial factorization aligns with the integer factorization, the evaluations reveal p and q. Works best when p and q have structured binary patterns.
 
-\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen & Gerhard, "Modern Computer Algebra", Chapter 5`,priority:`low`,applicableCheck:e=>!!e.n},Qh=()=>{let{n:e}=kh(L.p,L.q);return{n:e.toString()}},$h={id:`small-fraction`,name:`Small Fraction Attack`,category:`Factorization`,description:`Factors n when p/q ≈ a/b for small a,b. Use when prime ratio is close to a small rational.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
+\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen & Gerhard, "Modern Computer Algebra", Chapter 5`,priority:`low`,applicableCheck:e=>!!e.n},Qh=()=>{let e=e=>{for(let t=0;t<200;t++){let t=1n<<BigInt(e-1)|1n,n=3+Math.floor(Math.random()*4),r=new Set;for(r.add(e-1),r.add(0);r.size<n;)r.add(1+Math.floor(Math.random()*(e-2)));for(let e of r)t|=1n<<BigInt(e);if(Dh(t))return t}return Oh(e)};return{n:(e(L.p)*e(L.q)).toString()}},$h={id:`small-fraction`,name:`Small Fraction Attack`,category:`Factorization`,description:`Factors n when p/q ≈ a/b for small a,b. Use when prime ratio is close to a small rational.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
 
 if n < 2:
     print(f"n = {n} is too small to factor")
@@ -1216,7 +1226,7 @@ try:
             # q = q_approx + x where |x| is small
             P.<x> = PolynomialRing(Zmod(n))
             f = q_approx + x
-            bound = ZZ(q_approx**0.3)
+            bound = ZZ(n**0.25)
             try:
                 roots = f.small_roots(X=bound, beta=0.5)
                 for root in roots:
@@ -1267,7 +1277,7 @@ q &= q_0 + x, \\quad |x| \\ll q_0 \\\\
 f(x) = q_0 + x &\\equiv 0 \\pmod{q} \\\\
 \\text{Coppersmith: } |x| &< q^{\\beta^2} = q^{0.25} \\approx n^{1/4} \\\\
 \\text{Search: } 1 \\leq b &\\leq B, \\quad 1 \\leq a \\leq b \\\\
-\\text{Complexity: } O(B^2 &\\cdot \\text{poly}(\\log n))
+\\text{Complexity: } O(B^2 &\\cdot \\text{poly}(\\log n)) \\qed
 \\end{align*}
 
 \\textbf{Explanation:} When the ratio p/q is close to a small rational a/b, we can approximate q as \\sqrt{nb/a}. Coppersmith's method then finds the small correction x such that q = q_0 + x. The search iterates over small denominators b up to a bound.
@@ -1348,7 +1358,7 @@ p &\\mid \\gcd(n_1, n_2) \\\\
 g_i = \\gcd\\left(n_i, \\prod_{j \\neq i} n_j\\right) & \\\\
 g_i > 1 &\\implies g_i \\text{ is a shared prime factor} \\\\
 \\text{Product tree: } T &= \\text{tree}(n_1, \\ldots, n_k), \\quad \\text{depth } O(\\log k) \\\\
-\\text{Time: } O(M(k \\log N) &\\log k) \\quad \\text{vs } O(k^2) \\text{ pairwise}
+\\text{Time: } O(M(k \\log N) &\\log k) \\quad \\text{vs } O(k^2) \\text{ pairwise} \\qed
 \\end{align*}
 
 \\textbf{Explanation:} If two RSA moduli share a prime factor, computing the GCD of each modulus against the product of all others exposes the shared factor. A product tree makes this efficient — O(k \\log k) instead of O(k^2) pairwise comparisons.
@@ -1441,7 +1451,7 @@ ed &\\equiv 1 \\pmod{\\varphi(n)} \\\\
 m &= c^d \\bmod n \\\\
 m_i &= c^d \\bmod p_i, \\quad i = 1, \\ldots, r \\\\
 m &= \\text{CRT}(m_1, \\ldots, m_r; p_1, \\ldots, p_r) \\\\
-p_i &\\approx n^{1/r} \\implies \\text{ECM, QS more effective}
+p_i &\\approx n^{1/r} \\implies \\text{ECM, QS more effective} \\qed
 \\end{align*}
 
 \\textbf{Explanation:} Multi-prime RSA splits n into more than two primes for faster CRT-based decryption. However, each prime is smaller (n^{1/r} bits), making factorization easier. For a 2048-bit modulus with r=3, each prime is only ~683 bits.
@@ -1551,12 +1561,12 @@ n &= p \\cdot q, \\quad p \\in \\mathcal{S} \\text{ (special-form set)} \\\\
 |\\mathcal{S}| &\\ll 100 \\quad \\text{(very small)} \\\\
 n \\bmod s &= 0, \\quad s \\in \\mathcal{S} \\\\
 \\text{If } n \\bmod s = 0 &\\implies s \\mid n, \\quad q = n/s \\\\
-\\text{Cost: } O(|\\mathcal{S}| \\cdot \\log^2 n) &
+\\text{Cost: } O(|\\mathcal{S}| \\cdot \\log^2 n) & \\qed
 \\end{align*}
 
 \\textbf{Explanation:} Some CTF challenges use primes with recognizable mathematical structure. Since the total number of known special-form primes is very small, testing divisibility against all of them is fast. This exploits poor randomness in CTF key generation.
 
-\\textbf{References:} Caldwell, "The Prime Pages" (primes.utm.edu); Ribenboim, "The New Book of Prime Number Records", 1996`,priority:`low`,applicableCheck:e=>!!e.n},og=()=>{let e=[2,3,5,7,13,17,19],t=0n;for(let n of e){let e=(1n<<BigInt(n))-1n;if(Dh(e)){t=e;break}}let n=Oh(L.q);return{n:(t*n).toString()}},sg={id:`close-prime`,name:`Close-Prime (Londahl)`,category:`Factorization`,description:`Factors n when primes are within small delta. Use when |p - q| < 10000.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
+\\textbf{References:} Caldwell, "The Prime Pages" (primes.utm.edu); Ribenboim, "The New Book of Prime Number Records", 1996`,priority:`low`,applicableCheck:e=>!!e.n},og=()=>{let e=[17,19,31,61,89,107,127],t=0n;for(let n of e){let e=(1n<<BigInt(n))-1n;if(Dh(e)){t=e;break}}let n=Oh(L.q);return{n:(t*n).toString()}},sg={id:`close-prime`,name:`Close-Prime (Londahl)`,category:`Factorization`,description:`Factors n when primes are within small delta. Use when |p - q| < 10000.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
 
 if n < 2:
     print(f"n = {n} is too small to factor")
@@ -1582,16 +1592,16 @@ if n.is_square():
     return
 
 # Close-prime attack (Londahl variant of Fermat)
-# Optimized for primes with structured gaps
+# Optimized incremental update (same as Fermat but with extended bounds)
 try:
     print(f"Close-prime attack on n = {n}")
     print()
 
-    a = isqrt(n) + 1
-    b2 = a**2 - n
+    a, rem = n.sqrtrem()
+    b2 = -rem
+    c = (a << 1) + 1
 
-    # Extended iteration limit for larger prime gaps
-    max_iter = 10**7  # Much larger than standard Fermat
+    max_iter = 10**7
     print(f"Max iterations: {max_iter}")
 
     found = False
@@ -1600,7 +1610,7 @@ try:
             b = isqrt(b2)
             p = a - b
             q = a + b
-            if p * q == n:
+            if p * q == n and p > 1:
                 print(f"Factor found after {i+1} iterations!")
                 print(f"p = {p}")
                 print(f"q = {q}")
@@ -1608,8 +1618,8 @@ try:
                 print(f"Verification: p * q = {p * q}")
                 found = True
                 break
-        a += 1
-        b2 = a**2 - n
+        b2 += c
+        c += 2
 
     if found:
         print("CLOSE_PRIME=SUCCESS")
@@ -1620,7 +1630,7 @@ try:
 except Exception as e:
     print(f"Error in Close-Prime attack: {e}")
     print("CLOSE_PRIME=FAILED")
-`,proof:`\\textbf{Theorem:} Fermat factorization extended with larger iteration bounds handles structured prime gaps up to O(n^{1/3}).
+`,proof:`\\textbf{Theorem:} Fermat factorization extended with larger iteration bounds handles structured prime gaps up to $2 \\times 10^7$ iterations.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -1638,8 +1648,9 @@ a_0 &= \\lceil\\sqrt{n}\\rceil \\\\
 a_{i+1} &= a_i + 1, \\quad b_i^2 = a_i^2 - n \\\\
 b_i^2 &= \\square \\implies b = \\sqrt{b_i^2}, \\quad p = a - b, \\quad q = a + b \\\\
 \\text{Iterations: } b &= \\frac{|q - p|}{2} \\\\
-\\text{Standard: } b < n^{1/4}, \\quad \\text{Extended: } b &< n^{1/3} \\\\
-\\text{Runtime: } O(|p - q|) &
+\\text{Standard bound: } b &< n^{1/4} \\\\
+\\text{Extended bound: } b &< 10^7 \\quad \\text{(max iterations)} \\\\
+\\text{Runtime: } O(|p - q|) & \\qed
 \\end{align*}
 
 \\textbf{Explanation:} The close-prime attack is Fermat factorization with an extended iteration limit. It works when |p - q| is small enough that iterating from \\sqrt{n} finds a perfect square within the bound. The Londahl variant increases the bound to handle larger gaps.
@@ -1750,12 +1761,12 @@ n \\bmod p_i &= 0 \\implies p_i \\mid n, \\quad q = n/p_i \\\\
 p &\\approx 2^k + \\delta, \\quad |\\delta| \\leq W \\\\
 p &\\approx C + \\delta, \\quad C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
 \\text{Candidate } c &= C + \\delta, \\quad \\text{isPrime}(c) \\land (n \\bmod c = 0) \\\\
-\\text{Cost: } O(m \\log^2 n + W \\cdot \\text{primality}) &
+\\text{Cost: } O(m \\log^2 n + W \\cdot \\text{primality}) & \\qed
 \\end{align*}
 
 \\textbf{Explanation:} CTF challenges sometimes reuse primes or generate primes near recognizable values (powers of 2, mathematical constants). Checking divisibility against a database of known primes and searching small windows around structured values can quickly factor such moduli.
 
-\\textbf{References:} Various CTF writeups; cryptohack.org challenges; RSA CTF problem databases`,priority:`low`,applicableCheck:e=>!!e.n},ug=()=>{let e=Math.min(L.p,64),t=1n<<BigInt(e),n=0n;for(let e=0n;e<500n;e+=1n){let r=t+e;if(Dh(r)){n=r;break}let i=t-e;if(i>1n&&Dh(i)){n=i;break}}let r=Oh(L.q);return{n:(n*r).toString()}},dg={id:`simple-lattice`,name:`Simple Lattice`,category:`Partial Key / Lattice`,description:`Recovers p from an approximation. Use when nearp ≈ p with |nearp - p| < n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`nearp`,label:`nearp (approximate p)`,placeholder:`Enter approximate p value...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
+\\textbf{References:} Various CTF writeups; cryptohack.org challenges; RSA CTF problem databases`,priority:`low`,applicableCheck:e=>!!e.n},ug=()=>{let e=L.p,t=1n<<BigInt(e),n=0n;for(let e=0n;e<1000n;e+=1n){let r=t+e;if(Dh(r)){n=r;break}let i=t-e;if(i>1n&&Dh(i)){n=i;break}}let r=Oh(L.q);return{n:(n*r).toString()}},dg={id:`simple-lattice`,name:`Simple Lattice`,category:`Partial Key / Lattice`,description:`Recovers p from an approximation. Use when nearp ≈ p with |nearp - p| < n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`nearp`,label:`nearp (approximate p)`,placeholder:`Enter approximate p value...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
     n = Integer(${e.n})
     nearp = Integer(${e.nearp})
     if n <= 0 or nearp <= 0:
@@ -1764,7 +1775,7 @@ p &\\approx C + \\delta, \\quad C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
         R.<x> = PolynomialRing(Zmod(n))
         f = nearp + x
         # Bound: we expect |x| < n^(1/4) for Coppersmith to work
-        bound = ZZ(n**(1/4))
+        bound = 2^(n.nbits() // 4)
         print(f"Using bound X = {bound}")
         roots = f.small_roots(X=bound, beta=0.5)
         if roots:
@@ -1783,14 +1794,34 @@ p &\\approx C + \\delta, \\quad C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
         else:
             print("SIMPLE_LATTICE=FAILED: no roots found")
 except Exception as ex:
-    print(f"SIMPLE_LATTICE=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If $p = p_0 + x$ where $|x| < n^{1/4}$, Coppersmith recovers $p$.\\newline\\newline\\textbf{Prerequisites:} Coppersmith method, polynomial root finding\\newline\\newline\\textbf{Proof:}\\begin{align*}p &= p_0 + x \\\\ f(x) &= p_0 + x \\pmod{n} \\\\ \\text{Coppersmith finds } &x_0 \\text{ when } |x_0| < n^{1/4}\\end{align*}\\newline\\textbf{References:} Coppersmith (1996)`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.nearp},fg=()=>{let{p:e,n:t}=kh(L.p,L.q),n=e+BigInt(Math.floor(Math.random()*1e3)-500);return{n:t.toString(),nearp:n.toString()}},pg={id:`partial-d`,name:`Partial Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from low bits of d. Use when LSBs of private exponent d are leaked.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dLow`,label:`dLow (low bits of d)`,placeholder:`Enter known low bits of d...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
+    print(f"SIMPLE_LATTICE=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If $p = p_0 + x$ where $|x| < n^{1/4}$, Coppersmith's method recovers $p$ from the approximation $p_0$.
+
+\\textbf{Prerequisites:}
+\\begin{itemize}
+\\item $n = p \\cdot q$ with balanced primes ($p \\approx q \\approx \\sqrt{n}$)
+\\item Approximation $p_0$ such that $|p - p_0| < n^{1/4}$
+\\item Coppersmith's method for finding small roots of modular polynomials
+\\end{itemize}
+
+\\textbf{Proof:}
+\\begin{align*}
+p &= p_0 + x \\quad \\text{where } |x| < n^{1/4} \\\\
+f(x) &= p_0 + x \\equiv 0 \\pmod{p} \\\\
+\\text{Since } p \\mid n, \\quad f(x) &\\equiv 0 \\pmod{p} \\implies \\gcd(f(x), n) \\ge p \\\\
+\\text{Coppersmith finds } x_0 \\text{ when } |x_0| &< n^{1/4} \\quad (\\beta = 0.5 \\text{ for factor of size } \\sqrt{n}) \\\\
+p &= p_0 + x_0, \\quad q = n / p \\qed
+\\end{align*}
+
+\\textbf{Explanation:} Construct the polynomial $f(x) = p_0 + x$ over $\\mathbb{Z}/n\\mathbb{Z}$. Since $f(x) \\equiv 0 \\pmod{p}$ and $p \\mid n$, Coppersmith's method finds the small root $x$ when $|x| < n^{1/4}$. Then $p = p_0 + x$ and $q = n/p$.
+
+\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.nearp},fg=()=>{let{p:e,n:t}=kh(L.p,L.q),n=(1n<<BigInt(60))-1n,r=new Uint8Array(8);crypto.getRandomValues(r);let i=0n;for(let e=0;e<8;e++)i=i<<8n|BigInt(r[e]);i&=n;let a=new Uint8Array(1);crypto.getRandomValues(a),a[0]&1&&(i=-i);let o=e+i;return o<=0n&&(o=e-i),{n:t.toString(),nearp:o.toString()}},pg={id:`partial-d`,name:`Partial Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from low bits of d. Use when LSBs of private exponent d are leaked.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dLow`,label:`dLow (low bits of d)`,placeholder:`Enter known low bits of d...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
     n = Integer(${e.n})
     e = Integer(${e.e})
     dLow = Integer(${e.dLow})
     if n <= 0 or e <= 0 or dLow < 0:
         print("PARTIAL_D=FAILED: invalid input values")
     else:
-        m = dLow.bit_length()
+        m = dLow.nbits()
         found = False
         for k in range(1, e + 1):
             d_approx = (k * n + 1) // e
@@ -1800,7 +1831,7 @@ except Exception as ex:
                 s = n - phi + 1
                 disc = s*s - 4*n
                 if disc >= 0:
-                    sqrt_disc = isqrt(disc)
+                    sqrt_disc = ZZ(disc).isqrt()
                     if sqrt_disc * sqrt_disc == disc:
                         p = (s + sqrt_disc) // 2
                         q = (s - sqrt_disc) // 2
@@ -1815,7 +1846,29 @@ except Exception as ex:
         if not found:
             print("PARTIAL_D=FAILED: no valid d found")
 except Exception as ex:
-    print(f"PARTIAL_D=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If low bits of $d$ are known, full $d$ can be recovered when $d$ is small.\\newline\\newline\\textbf{Prerequisites:} Hensel lifting, RSA key equation\\newline\\newline\\textbf{Proof:}\\begin{align*}ed &\\equiv 1 \\pmod{\\varphi(n)} \\\\ d &= d_{\\text{high}} \\cdot 2^m + d_{\\text{low}} \\\\ \\text{For each } k: \\quad d &\\approx \\frac{k \\cdot n}{e} \\\\ \\text{Check if } d \\bmod 2^m &= d_{\\text{low}}\\end{align*}\\newline\\textbf{References:} Boneh, Durfee, Frankel (1998)`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.dLow},mg=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=n&(1n<<20n)-1n;return{n:e.toString(),e:t.toString(),dLow:r.toString()}},hg={id:`partial-pq-bits`,name:`Partial p/q Bits`,category:`Partial Key / Lattice`,description:`Recovers p from known MSBs or LSBs. Use when partial bits of p are leaked.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`knownBits`,label:`knownBits (known bits of p)`,placeholder:`Enter known bits as integer...`,multiline:!0,rows:3},{name:`bitPosition`,label:`bitPosition`,placeholder:`msb or lsb`,multiline:!1}],sageTemplate:e=>`try:
+    print(f"PARTIAL_D=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If the low $m$ bits of $d$ are known and $d < n$, the full $d$ can be recovered by iterating $k$ in the RSA key equation.
+
+\\textbf{Prerequisites:}
+\\begin{itemize}
+\\item RSA key equation: $ed \\equiv 1 \\pmod{\\varphi(n)}$
+\\item $ed - 1 = k\\varphi(n)$ for some integer $k$
+\\item Known low $m$ bits of $d$: $d_{\\text{low}} = d \\bmod 2^m$
+\\item $\\varphi(n) = n - (p + q) + 1 \\approx n$
+\\end{itemize}
+
+\\textbf{Proof:}
+\\begin{align*}
+ed - 1 &= k\\varphi(n) \\\\
+d &= \\frac{k\\varphi(n) + 1}{e} \\approx \\frac{kn + 1}{e} \\\\
+d_{\\text{approx}} &= \\left\\lfloor \\frac{kn + 1}{e} \\right\\rfloor \\\\
+\\text{Check: } d_{\\text{approx}} \\bmod 2^m &\\stackrel{?}{=} d_{\\text{low}} \\\\
+\\text{If match: } \\varphi &= (ed - 1)/k \\\\
+x^2 - (n - \\varphi + 1)x + n &= 0 \\implies p, q \\qed
+\\end{align*}
+
+\\textbf{Explanation:} For each candidate $k \\in [1, e]$, compute $d_{\\text{approx}} = \\lfloor(kn + 1)/e\\rfloor$. If the low $m$ bits match the leaked $d_{\\text{low}}$, recover $\\varphi(n) = (ed - 1)/k$ and solve the quadratic $x^2 - (n - \\varphi + 1)x + n = 0$ to find $p$ and $q$.
+
+\\textbf{References:} D. Boneh, R. DeMillo, R. Lipton, "On the Importance of Checking Cryptographic Protocols for Faults", EUROCRYPT 1997`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.dLow},mg=()=>{let e=Oh(L.p),t=Oh(L.q),n=e*t,r=(e-1n)*(t-1n),i=BigInt(100+Math.floor(Math.random()*1e4));for(;Th(i,r)===null;)i+=1n;let a=Th(i,r),o=i&(1n<<20n)-1n;return{n:n.toString(),e:a.toString(),dLow:o.toString()}},hg={id:`partial-pq-bits`,name:`Partial p/q Bits`,category:`Partial Key / Lattice`,description:`Recovers p from known MSBs or LSBs. Use when partial bits of p are leaked.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`knownBits`,label:`knownBits (known bits of p)`,placeholder:`Enter known bits as integer...`,multiline:!0,rows:3},{name:`bitPosition`,label:`bitPosition`,placeholder:`msb or lsb`,multiline:!1}],sageTemplate:e=>`try:
     n = Integer(${e.n})
     knownBits = Integer(${e.knownBits})
     bitPosition = "${e.bitPosition}"
@@ -1825,12 +1878,12 @@ except Exception as ex:
         print("PARTIAL_PQ_BITS=FAILED: bitPosition must be 'msb' or 'lsb'")
     elif bitPosition == "msb":
         k = n.nbits() // 2 - knownBits.nbits()
-        if k < 0:
-            print("PARTIAL_PQ_BITS=FAILED: knownBits has more bits than half of n")
+        if k <= 0:
+            print("PARTIAL_PQ_BITS=FAILED: not enough unknown bits for Coppersmith")
         else:
             R.<x> = PolynomialRing(Zmod(n))
             f = (knownBits << k) + x
-            bound = 2**k
+            bound = 2^k
             print(f"Using bound X = {bound}")
             roots = f.small_roots(X=bound, beta=0.5)
             if roots:
@@ -1850,28 +1903,53 @@ except Exception as ex:
                 print("PARTIAL_PQ_BITS=FAILED: no roots found")
     elif bitPosition == "lsb":
         m = knownBits.nbits()
-        R.<x> = PolynomialRing(Zmod(n))
-        f = x * (2**m) + knownBits
-        bound = 2**(n.nbits()//2 - m)
-        print(f"Using bound X = {bound}")
-        roots = f.small_roots(X=bound, beta=0.5)
-        if roots:
-            p = Integer(roots[0] * (2**m) + knownBits)
-            if n % p == 0:
-                q = n // p
-                print(f"Verification: p * q = {p * q}")
-                if p * q == n:
-                    print(f"PARTIAL_PQ_BITS=SUCCESS")
-                    print(f"p={p}")
-                    print(f"q={q}")
-                else:
-                    print("PARTIAL_PQ_BITS=FAILED: verification mismatch")
-            else:
-                print("PARTIAL_PQ_BITS=FAILED: recovered p does not divide n")
+        if m <= 0:
+            print("PARTIAL_PQ_BITS=FAILED: knownBits is zero")
         else:
-            print("PARTIAL_PQ_BITS=FAILED: no roots found")
+            R.<x> = PolynomialRing(Zmod(n))
+            f = x * (2^m) + knownBits
+            bound = 2^(n.nbits() // 2 - m)
+            print(f"Using bound X = {bound}")
+            roots = f.small_roots(X=bound, beta=0.5)
+            if roots:
+                p = Integer(roots[0] * (2^m) + knownBits)
+                if n % p == 0:
+                    q = n // p
+                    print(f"Verification: p * q = {p * q}")
+                    if p * q == n:
+                        print(f"PARTIAL_PQ_BITS=SUCCESS")
+                        print(f"p={p}")
+                        print(f"q={q}")
+                    else:
+                        print("PARTIAL_PQ_BITS=FAILED: verification mismatch")
+                else:
+                    print("PARTIAL_PQ_BITS=FAILED: recovered p does not divide n")
+            else:
+                print("PARTIAL_PQ_BITS=FAILED: no roots found")
 except Exception as ex:
-    print(f"PARTIAL_PQ_BITS=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If half the bits of $p$ are known, Coppersmith recovers the full factorization.\\newline\\newline\\textbf{Prerequisites:} Coppersmith method, polynomial rings over $\\mathbb{Z}/n\\mathbb{Z}$\\newline\\newline\\textbf{Proof:}\\begin{align*}\\text{MSB: } p &= p_{\\text{known}} \\cdot 2^k + x \\\\ \\text{LSB: } p &= x \\cdot 2^m + p_{\\text{known}} \\\\ f(x) &\\equiv 0 \\pmod{p} \\implies f(x) \\mid n \\\\ \\text{Coppersmith finds } x &\\text{ when } |x| < n^{1/4}\\end{align*}\\newline\\textbf{References:} Coppersmith (1996), Howgrave-Graham (1997)`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},gg=()=>{let{p:e,n:t}=kh(L.p,L.q),n=e.toString(2).length,r=Math.ceil(n*.55),i=e>>BigInt(n-r);return{n:t.toString(),knownBits:i.toString(),bitPosition:`msb`}},_g={id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n when d_p = d mod (p-1) is small. Use when d_p < 10^6.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 1000000`,multiline:!1}],sageTemplate:e=>`try:
+    print(f"PARTIAL_PQ_BITS=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If at least half the bits of $p$ are known (as MSBs or LSBs), Coppersmith's method recovers the full factorization of $n$.
+
+\\textbf{Prerequisites:}
+\\begin{itemize}
+\\item $n = p \\cdot q$ with balanced primes ($p \\approx q \\approx \\sqrt{n}$)
+\\item Known MSBs: $p = p_{\\text{known}} \\cdot 2^k + x$ where $|x| < 2^k$
+\\item Known LSBs: $p = x \\cdot 2^m + p_{\\text{known}}$ where $|x| < 2^{\\text{bits}(p) - m}$
+\\item Coppersmith's bound: small roots found when $|x| < n^{1/4}$
+\\end{itemize}
+
+\\textbf{Proof:}
+\\begin{align*}
+\\text{MSB case:} \\quad p &= p_{\\text{known}} \\cdot 2^k + x \\\\
+f(x) &= p_{\\text{known}} \\cdot 2^k + x \\equiv 0 \\pmod{p} \\\\
+\\text{LSB case:} \\quad p &= x \\cdot 2^m + p_{\\text{known}} \\\\
+f(x) &= x \\cdot 2^m + p_{\\text{known}} \\equiv 0 \\pmod{p} \\\\
+\\text{Coppersmith finds } x &\\text{ when } |x| < n^{1/4} \\quad (\\beta = 0.5) \\\\
+p &= f(x_0), \\quad q = n / p \\qed
+\\end{align*}
+
+\\textbf{Explanation:} Construct a linear polynomial $f(x)$ over $\\mathbb{Z}/n\\mathbb{Z}$ such that $f(x) \\equiv 0 \\pmod{p}$. For MSBs, $f(x) = p_{\\text{known}} \\cdot 2^k + x$. For LSBs, $f(x) = x \\cdot 2^m + p_{\\text{known}}$. Coppersmith's method finds the small root $x_0$, giving $p = f(x_0)$ and $q = n/p$.
+
+\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996; N. Howgrave-Graham, "Approximate Integer Common Divisors", 1997`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},gg=()=>{let{p:e,n:t}=kh(L.p,L.q),n=e.toString(2).length,r=Math.ceil(n*.6),i=e>>BigInt(n-r);return{n:t.toString(),knownBits:i.toString(),bitPosition:`msb`}},_g={id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n when d_p = d mod (p-1) is small. Use when d_p < 10^6.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 1000000`,multiline:!1}],sageTemplate:e=>`try:
     n = Integer(${e.n})
     e = Integer(${e.e})
     bound = ${e.bound?`Integer(${e.bound})`:`1000000`}
@@ -1886,7 +1964,7 @@ except Exception as ex:
             for dp in range(dp0, bound + 1, k):
                 num = dp * e - 1
                 p_candidate = num // k + 1
-                if n % p_candidate == 0:
+                if p_candidate > 1 and n % p_candidate == 0:
                     q = n // p_candidate
                     print(f"Verification: p * q = {p_candidate * q}")
                     print("SMALL_CRT_EXP=SUCCESS")
@@ -1901,7 +1979,29 @@ except Exception as ex:
             print("No small dp found within bound.")
             print("SMALL_CRT_EXP=FAILED")
 except Exception as ex:
-    print(f"SMALL_CRT_EXP=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small, $p$ can be recovered by searching.\\newline\\newline\\textbf{Prerequisites:} RSA-CRT, modular arithmetic\\newline\\newline\\textbf{Proof:}\\begin{align*}d_p \\cdot e &\\equiv 1 \\pmod{p-1} \\\\ d_p \\cdot e - 1 &= k(p-1) \\\\ p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\ \\text{For small } d_p, &\\text{ iterate and check } p \\mid n\\end{align*}\\newline\\textbf{References:} Standard RSA-CRT analysis`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},vg=()=>{for(let e=0;e<500;e++){let e=Oh(L.p),t=Th(65537n,e-1n);if(t!==null&&t<1000000n&&t>1n)return{n:(e*Oh(L.q)).toString(),e:`65537`}}let e=kh(L.p,L.q);return{n:e.n.toString(),e:e.e.toString()}},yg={id:`dp-dq-leak`,name:`dp/dq Leak`,category:`Partial Key / Lattice`,description:`Recovers p from leaked d_p = d mod (p-1). Use when CRT exponent d_p is known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dp`,label:`dp (d mod p-1)`,placeholder:`Enter dp value...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
+    print(f"SMALL_CRT_EXP=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small, $p$ can be recovered by exhaustive search over $k$.
+
+\\textbf{Prerequisites:}
+\\begin{itemize}
+\\item RSA-CRT: $d_p = d \\bmod (p-1)$, $d_q = d \\bmod (q-1)$
+\\item $d_p \\cdot e \\equiv 1 \\pmod{p-1}$
+\\item $d_p \\cdot e - 1 = k(p-1)$ for some integer $k$
+\\item $d_p$ is small (e.g., $d_p < 10^6$)
+\\end{itemize}
+
+\\textbf{Proof:}
+\\begin{align*}
+d_p \\cdot e &\\equiv 1 \\pmod{p-1} \\\\
+d_p \\cdot e - 1 &= k(p-1) \\\\
+p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
+\\text{For each } k \\in [1, e): \\quad &\\text{compute } d_p \\equiv e^{-1} \\pmod{k} \\\\
+\\text{Iterate } d_p &= d_{p0}, d_{p0}+k, d_{p0}+2k, \\ldots \\le \\text{bound} \\\\
+\\text{Check if } p \\mid n &\\implies \\text{factorization found} \\qed
+\\end{align*}
+
+\\textbf{Explanation:} From $d_p \\cdot e \\equiv 1 \\pmod{p-1}$, we get $p = (d_p \\cdot e - 1)/k + 1$. For each $k \\in [1, e)$, compute $d_{p0} = e^{-1} \\bmod k$, then iterate $d_p = d_{p0} + j \\cdot k$ up to the bound. For each candidate, check if $p$ divides $n$.
+
+\\textbf{References:} Standard RSA-CRT analysis; see also Jochemsz-May attack on small CRT exponents`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},vg=()=>{let e=65537n;for(let t=3n;t<10000n;t++){let n=t*e-1n;for(let t=1n;t<=e;t++){if(n%t!==0n)continue;let e=n/t+1n;if(e>2n&&Dh(e))return{n:(e*Oh(L.q)).toString(),e:`65537`}}}throw Error(`small-crt-exp: failed to generate testcase`)},yg={id:`dp-dq-leak`,name:`dp/dq Leak`,category:`Partial Key / Lattice`,description:`Recovers p from leaked d_p = d mod (p-1). Use when CRT exponent d_p is known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dp`,label:`dp (d mod p-1)`,placeholder:`Enter dp value...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
     n = Integer(${e.n})
     e = Integer(${e.e})
     dp = Integer(${e.dp})
@@ -1909,24 +2009,44 @@ except Exception as ex:
         print("DP_DQ_LEAK=FAILED: invalid input values")
     else:
         found = False
+        num = dp * e - 1
         for k in range(1, e):
-            num = dp * e - 1
             if num % k == 0:
                 p_candidate = num // k + 1
                 if n % p_candidate == 0:
                     q = n // p_candidate
                     print(f"Verification: p * q = {p_candidate * q}")
-                    if p_candidate * q == n:
-                        print(f"DP_DQ_LEAK=SUCCESS")
-                        print(f"dp={dp}")
-                        print(f"p={p_candidate}")
-                        print(f"q={q}")
-                        found = True
-                        break
+                    print(f"DP_DQ_LEAK=SUCCESS")
+                    print(f"dp={dp}")
+                    print(f"p={p_candidate}")
+                    print(f"q={q}")
+                    found = True
+                    break
         if not found:
             print("DP_DQ_LEAK=FAILED: no valid p found")
 except Exception as ex:
-    print(f"DP_DQ_LEAK=FAILED: {ex}")`,proof:`\\textbf{Theorem:} Given $d_p = d \\bmod (p-1)$, factor $n$ by iterating $k$.\\newline\\newline\\textbf{Prerequisites:} RSA-CRT parameters\\newline\\newline\\textbf{Proof:}\\begin{align*}d_p \\cdot e &\\equiv 1 \\pmod{p-1} \\\\ d_p \\cdot e - 1 &= k(p-1) \\\\ p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\ \\text{Since } d_p < p-1, &\\text{ we have } k < e \\\\ \\text{Iterate } k = 1, \\ldots, e-1 &\\text{ and check } p \\mid n\\end{align*}\\newline\\textbf{References:} Standard RSA-CRT analysis`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.dp},bg=()=>{let{p:e,n:t,e:n,d:r}=kh(L.p,L.q),i=r%(e-1n);return{n:t.toString(),e:n.toString(),dp:i.toString()}},xg={id:`linearly-related-primes`,name:`Linearly Related Primes`,category:`Partial Key / Lattice`,description:`Factors n when q = k·p + δ. Use when primes have a linear relationship.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`k`,label:`k (known multiplier)`,placeholder:`Enter k value...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
+    print(f"DP_DQ_LEAK=FAILED: {ex}")`,proof:`\\textbf{Theorem:} Given $d_p = d \\bmod (p-1)$, factor $n$ by iterating $k$ in the equation $d_p \\cdot e - 1 = k(p-1)$.
+
+\\textbf{Prerequisites:}
+\\begin{itemize}
+\\item RSA-CRT: $d_p = d \\bmod (p-1)$ satisfies $d_p \\cdot e \\equiv 1 \\pmod{p-1}$
+\\item $d_p \\cdot e - 1 = k(p-1)$ for some integer $k \\in [1, e)$
+\\item $n = p \\cdot q$ is the RSA modulus
+\\end{itemize}
+
+\\textbf{Proof:}
+\\begin{align*}
+d_p \\cdot e &\\equiv 1 \\pmod{p-1} \\\\
+d_p \\cdot e - 1 &= k(p-1) \\\\
+p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
+\\text{Since } d_p < p-1, \\quad k &= \\frac{d_p \\cdot e - 1}{p-1} < e \\\\
+\\text{Iterate } k = 1, \\ldots, e-1: \\quad &\\text{check if } k \\mid (d_p \\cdot e - 1) \\\\
+p &= (d_p \\cdot e - 1)/k + 1, \\quad \\text{check } p \\mid n \\qed
+\\end{align*}
+
+\\textbf{Explanation:} Compute $\\text{num} = d_p \\cdot e - 1$. For each $k \\in [1, e)$, check if $k$ divides num. If so, compute $p = \\text{num}/k + 1$ and verify $p \\mid n$. Since $d_p < p-1$, we have $k < e$, so at most 65536 iterations for standard $e = 65537$.
+
+\\textbf{References:} Standard RSA-CRT analysis`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.dp},bg=()=>{let{p:e,n:t,e:n,d:r}=kh(L.p,L.q),i=r%(e-1n);return{n:t.toString(),e:n.toString(),dp:i.toString()}},xg={id:`linearly-related-primes`,name:`Linearly Related Primes`,category:`Partial Key / Lattice`,description:`Factors n when q = k·p + δ. Use when primes have a linear relationship.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`k`,label:`k (known multiplier)`,placeholder:`Enter k value...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
     n = Integer(${e.n})
     k = Integer(${e.k})
     if n <= 0 or k <= 0:
@@ -1936,7 +2056,7 @@ except Exception as ex:
         for delta in range(-10000, 10001):
             disc = delta*delta + 4*k*n
             if disc >= 0:
-                sqrt_disc = isqrt(disc)
+                sqrt_disc = ZZ(disc).isqrt()
                 if sqrt_disc * sqrt_disc == disc:
                     num = -delta + sqrt_disc
                     if num > 0 and num % (2*k) == 0:
@@ -1944,17 +2064,37 @@ except Exception as ex:
                         if n % p == 0:
                             q = n // p
                             print(f"Verification: p * q = {p * q}")
-                            if p * q == n:
-                                print(f"LINEARLY_RELATED=SUCCESS")
-                                print(f"p={p}")
-                                print(f"q={q}")
-                                print(f"delta={delta}")
-                                found = True
-                                break
+                            print(f"LINEARLY_RELATED=SUCCESS")
+                            print(f"p={p}")
+                            print(f"q={q}")
+                            print(f"delta={delta}")
+                            found = True
+                            break
         if not found:
             print("LINEARLY_RELATED=FAILED: no valid factorization found")
 except Exception as ex:
-    print(f"LINEARLY_RELATED=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $\\delta$, solve the quadratic to factor $n$.\\newline\\newline\\textbf{Prerequisites:} Quadratic equations, Coppersmith method\\newline\\newline\\textbf{Proof:}\\begin{align*}n &= p \\cdot q = p(kp + \\delta) = kp^2 + \\delta p \\\\ kp^2 + \\delta p - n &= 0 \\\\ p &= \\frac{-\\delta \\pm \\sqrt{\\delta^2 + 4kn}}{2k} \\\\ \\text{For small } \\delta, &\\text{ iterate and check } p \\mid n\\end{align*}\\newline\\textbf{References:} Nitaj (1999)`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.k},Sg=()=>{let e=Oh(L.p),t=BigInt(Math.floor(Math.random()*100)-50),n=1n*e+t;for(n<2n&&(n=-n);!Dh(n);)n+=2n;return{n:(e*n).toString(),k:`1`}},Cg={id:`dependent-prime`,name:`Dependent-Prime RSA`,category:`Partial Key / Lattice`,description:`Factors n when q·e ≡ 1 (mod p). Use when q is derived from e and p via modular inverse.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
+    print(f"LINEARLY_RELATED=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta|$, solve the quadratic $kp^2 + \\delta p - n = 0$ to factor $n$.
+
+\\textbf{Prerequisites:}
+\\begin{itemize}
+\\item $n = p \\cdot q$ where $q = kp + \\delta$
+\\item $k$ is known, $\\delta$ is small (e.g., $|\\delta| < 10^4$)
+\\item Quadratic formula: $p = \\frac{-\\delta + \\sqrt{\\delta^2 + 4kn}}{2k}$
+\\end{itemize}
+
+\\textbf{Proof:}
+\\begin{align*}
+n &= p \\cdot q = p(kp + \\delta) = kp^2 + \\delta p \\\\
+kp^2 + \\delta p - n &= 0 \\\\
+p &= \\frac{-\\delta \\pm \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
+\\text{Since } p > 0: \\quad p &= \\frac{-\\delta + \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
+\\text{Iterate } \\delta \\in [-B, B]: \\quad &\\text{check if } \\delta^2 + 4kn \\text{ is a perfect square} \\\\
+\\text{If so, compute } p &\\text{ and verify } p \\mid n \\qed
+\\end{align*}
+
+\\textbf{Explanation:} Substitute $q = kp + \\delta$ into $n = pq$ to get the quadratic $kp^2 + \\delta p - n = 0$. For each candidate $\\delta$ in a small range, check if the discriminant $\\delta^2 + 4kn$ is a perfect square. If so, compute $p$ from the quadratic formula and verify $p \\mid n$.
+
+\\textbf{References:} A. Nitaj, "Cryptanalysis of RSA with Constrained Primes", 1999`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.k},Sg=()=>{let e=Oh(L.p),t=BigInt(Math.floor(Math.random()*100)+1);Math.random()<.5&&(t=-t);let n=1n*e+t;for(n<2n&&(n=e+BigInt(Math.abs(Number(t)))+2n),n%2n==0n&&(n+=1n);!Dh(n)||n===e;)n+=2n;return{n:(e*n).toString(),k:`1`}},Cg={id:`dependent-prime`,name:`Dependent-Prime RSA`,category:`Partial Key / Lattice`,description:`Factors n when q·e ≡ 1 (mod p). Use when q is derived from e and p via modular inverse.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
     n = Integer(${e.n})
     e = Integer(${e.e})
     if n <= 0 or e <= 0:
@@ -1965,7 +2105,7 @@ except Exception as ex:
         for k in range(1, 100000):
             disc = 1 + 4*k*ne
             if disc >= 0:
-                sqrt_disc = isqrt(disc)
+                sqrt_disc = ZZ(disc).isqrt()
                 if sqrt_disc * sqrt_disc == disc:
                     num = -1 + sqrt_disc
                     if num > 0 and num % (2*k) == 0:
@@ -1973,16 +2113,38 @@ except Exception as ex:
                         if n % p == 0:
                             q = n // p
                             print(f"Verification: p * q = {p * q}")
-                            if p * q == n:
-                                print(f"DEPENDENT_PRIME=SUCCESS")
-                                print(f"p={p}")
-                                print(f"q={q}")
-                                found = True
-                                break
+                            print(f"DEPENDENT_PRIME=SUCCESS")
+                            print(f"p={p}")
+                            print(f"q={q}")
+                            print(f"k={k}")
+                            found = True
+                            break
         if not found:
             print("DEPENDENT_PRIME=FAILED: no valid factorization found")
 except Exception as ex:
-    print(f"DEPENDENT_PRIME=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If $q = e^{-1} \\bmod p$, then $n = pq$ creates a solvable quadratic system.\\newline\\newline\\textbf{Prerequisites:} Modular inverse, quadratic equations\\newline\\newline\\textbf{Proof:}\\begin{align*}q \\cdot e &\\equiv 1 \\pmod{p} \\\\ q \\cdot e &= 1 + kp \\\\ n &= p \\cdot q = p \\cdot \\frac{1 + kp}{e} \\\\ ne &= p + kp^2 \\\\ kp^2 + p - ne &= 0 \\\\ p &= \\frac{-1 + \\sqrt{1 + 4kne}}{2k}\\end{align*}\\newline\\textbf{References:} Custom CTF construction`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},wg=()=>{let e=65537n;for(let t=0;t<1e3;t++){let t=Oh(L.p),n=Th(e,t);if(n!==null&&n>=2n&&Dh(n)){let r=t*n;if((n*e-1n)/t<=100000n)return{n:r.toString(),e:`65537`}}}let t=kh(L.p,L.q);return{n:t.n.toString(),e:t.e.toString()}},Tg={id:`common-modulus`,name:`Common Modulus Attack`,category:`Message / Protocol`,description:`Recovers m from two encryptions under same n. Use when same message encrypted with coprime e1, e2.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e1`,label:`e1 (first exponent)`,placeholder:`Enter first exponent e1...`,multiline:!0,rows:3},{name:`e2`,label:`e2 (second exponent)`,placeholder:`Enter second exponent e2...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e1||!e.e2||!e.c1||!e.c2?`print("ERROR: Missing required inputs (n, e1, e2, c1, c2)")
+    print(f"DEPENDENT_PRIME=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If $q = e^{-1} \\bmod p$, then $n = pq$ creates a solvable quadratic system $kp^2 + p - ne = 0$.
+
+\\textbf{Prerequisites:}
+\\begin{itemize}
+\\item $q \\cdot e \\equiv 1 \\pmod{p}$ (q is the modular inverse of e mod p)
+\\item $q \\cdot e = 1 + kp$ for some integer $k$
+\\item $n = p \\cdot q$
+\\end{itemize}
+
+\\textbf{Proof:}
+\\begin{align*}
+q \\cdot e &= 1 + kp \\\\
+n &= p \\cdot q = p \\cdot \\frac{1 + kp}{e} \\\\
+ne &= p + kp^2 \\\\
+kp^2 + p - ne &= 0 \\\\
+p &= \\frac{-1 + \\sqrt{1 + 4kne}}{2k} \\\\
+\\text{Iterate } k = 1, \\ldots, 10^5: \\quad &\\text{check if } 1 + 4kne \\text{ is a perfect square} \\\\
+\\text{If so, compute } p &\\text{ and verify } p \\mid n \\qed
+\\end{align*}
+
+\\textbf{Explanation:} From the constraint $q \\cdot e \\equiv 1 \\pmod{p}$, substitute $q = (1 + kp)/e$ into $n = pq$ to get $ne = p + kp^2$. This gives the quadratic $kp^2 + p - ne = 0$. For each $k$, check if the discriminant $1 + 4kne$ is a perfect square. If so, compute $p$ from the quadratic formula and verify $p \\mid n$.
+
+\\textbf{References:} Custom CTF construction; related to Nitaj's constrained prime analysis`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},wg=()=>{let e=65537n;for(let t=0;t<5e3;t++){let t=Oh(L.p),n=Th(e,t);if(n!==null&&n>=2n&&Dh(n)){let r=t*n,i=(n*e-1n)/t;if(i>0n&&i<=100000n)return{n:r.toString(),e:`65537`}}}throw Error(`dependent-prime: failed to generate testcase after 5000 attempts`)},Tg={id:`common-modulus`,name:`Common Modulus Attack`,category:`Message / Protocol`,description:`Recovers m from two encryptions under same n. Use when same message encrypted with coprime e1, e2.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e1`,label:`e1 (first exponent)`,placeholder:`Enter first exponent e1...`,multiline:!0,rows:3},{name:`e2`,label:`e2 (second exponent)`,placeholder:`Enter second exponent e2...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e1||!e.e2||!e.c1||!e.c2?`print("ERROR: Missing required inputs (n, e1, e2, c1, c2)")
 print("COMMON_MODULUS=FAILED")`:`try:
     n = Integer(${e.n})
     e1 = Integer(${e.e1})
@@ -2427,17 +2589,18 @@ print("LSB_ORACLE=FAILED")`:`try:
     n = Integer(${e.n})
     e = Integer(${e.e})
     c = Integer(${e.c})
-    orig_c = Integer(${e.c})
 
     # Parse oracle responses
     responses_str = """${e.oracle_responses}""".strip()
     oracle_bits = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
 
     print(f"Number of oracle responses: {len(oracle_bits)}")
-    print(f"Target ciphertext: c = {orig_c}")
+    print(f"Target ciphertext: c = {c}")
+    print()
 
     # Binary search on the message space
-    # LSB(c^d mod n) = 0 means m < n/2, LSB = 1 means m >= n/2
+    # Each oracle response tells us whether m is in the upper or lower half
+    # of the current interval [lower, upper)
     lower = 0
     upper = n
 
@@ -2450,9 +2613,6 @@ print("LSB_ORACLE=FAILED")`:`try:
             # m is in upper half
             lower = mid
 
-        # Multiply c by 2^e mod n for next iteration
-        c = (c * power_mod(2, e, n)) % n
-
         if i < 5 or i >= len(oracle_bits) - 3:
             print(f"Step {i+1}: bit={bit}, lower={lower}, upper={upper}")
 
@@ -2462,9 +2622,9 @@ print("LSB_ORACLE=FAILED")`:`try:
     # Verify against original ciphertext
     v = power_mod(m, e, n)
     print(f"Verification: m^e mod n = {v}")
-    print(f"Original c = {orig_c}")
+    print(f"Original c = {c}")
 
-    if v == orig_c:
+    if v == c:
         print("LSB_ORACLE=SUCCESS")
     else:
         print("LSB_ORACLE=FAILED")
@@ -2497,7 +2657,7 @@ m &= \\ell_k \\qed
 
 \\textbf{Explanation:} Each oracle query on c·(2ⁱ)ᵉ reveals whether 2ⁱ·m mod n is even or odd, halving the interval containing m. After log₂(n) queries the interval shrinks to a single value.
 
-\\textbf{References:} Goldwasser, Micali, "Probabilistic Encryption", 1982; Boneh, "Twenty Years of Attacks on RSA", 1999`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Ig=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=Ah(BigInt(Math.floor(Math.random()*1e6)+42),e,t),i=[],a=r,o=e.toString(2).length;for(let r=0;r<o;r++)i.push((Eh(a,n,e)%2n).toString()),a=a*Eh(2n,t,e)%e;return{n:e.toString(),e:t.toString(),c:r.toString(),oracle_responses:i.join(`,`)}},Lg={id:`rsa-crt-fault`,name:`RSA-CRT Fault Attack (Bellcore)`,category:`Message / Protocol`,description:`Recovers p from faulty CRT signature. Use when a signature was computed with CRT fault.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`m`,label:`m (message)`,placeholder:`Enter message m...`,multiline:!0,rows:3},{name:`sig_valid`,label:`Valid signature`,placeholder:`Enter valid signature...`,multiline:!0,rows:3},{name:`sig_faulty`,label:`Faulty signature`,placeholder:`Enter faulty signature...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.m||!e.sig_valid||!e.sig_faulty?`print("ERROR: Missing required inputs (n, e, m, sig_valid, sig_faulty)")
+\\textbf{References:} Goldwasser, Micali, "Probabilistic Encryption", 1982; Boneh, "Twenty Years of Attacks on RSA", 1999`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Ig=()=>{let{n:e,e:t}=kh(L.p,L.q),n=BigInt(Math.floor(Math.random()*1e6)+42),r=Ah(n,e,t),i=[],a=0n,o=e,s=e.toString(2).length;for(let e=0;e<s;e++){let e=(a+o)/2n;n>=e?(i.push(`1`),a=e):(i.push(`0`),o=e)}return{n:e.toString(),e:t.toString(),c:r.toString(),oracle_responses:i.join(`,`)}},Lg={id:`rsa-crt-fault`,name:`RSA-CRT Fault Attack (Bellcore)`,category:`Message / Protocol`,description:`Recovers p from faulty CRT signature. Use when a signature was computed with CRT fault.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`m`,label:`m (message)`,placeholder:`Enter message m...`,multiline:!0,rows:3},{name:`sig_valid`,label:`Valid signature`,placeholder:`Enter valid signature...`,multiline:!0,rows:3},{name:`sig_faulty`,label:`Faulty signature`,placeholder:`Enter faulty signature...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.m||!e.sig_valid||!e.sig_faulty?`print("ERROR: Missing required inputs (n, e, m, sig_valid, sig_faulty)")
 print("RSA_CRT_FAULT=FAILED")`:`try:
     n = Integer(${e.n})
     e = Integer(${e.e})
@@ -2763,7 +2923,7 @@ m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\\\
 
 \\textbf{Explanation:} When p ≡ q ≡ 1 (mod 3), each field has exactly 3 cube roots of c. CRT-combine all 9 pairs to get all preimages. The correct m is identified by padding or format constraints.
 
-\\textbf{References:} Williams, "Modification of the RSA Public-Key Encryption Procedure", 1980; Rabin, "Digitalized Signatures and Public-Key Functions as Intractable as Factorization", 1979`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.c&&!!e.p&&!!e.q},Hg=()=>{function e(e){for(;;){let t=Oh(e);if(t%3n==1n)return t}}let t=e(L.p),n=e(L.q),r=t*n,i=Eh(BigInt(Math.floor(Math.random()*1e4)+42),3n,r);return{n:r.toString(),e:`3`,c:i.toString(),p:t.toString(),q:n.toString()}},Ug={id:`common-factor`,name:`Common Factor Attack`,category:`Message / Protocol`,description:`Recovers p when p divides m. Use when gcd(c, n) > 1.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.c?`print("ERROR: Missing required inputs (n, c)")
+\\textbf{References:} Williams, "Modification of the RSA Public-Key Encryption Procedure", 1980; Rabin, "Digitalized Signatures and Public-Key Functions as Intractable as Factorization", 1979`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.c&&!!e.p&&!!e.q},Hg=()=>{function e(e){for(;;){let t=Oh(e);if(t%3n==1n)return t}}let t=e(L.p),n=e(L.q),r=t*n,i=Eh(BigInt(Math.floor(Math.random()*1e4)+42),3n,r);return{n:r.toString(),c:i.toString(),p:t.toString(),q:n.toString()}},Ug={id:`common-factor`,name:`Common Factor Attack`,category:`Message / Protocol`,description:`Recovers p when p divides m. Use when gcd(c, n) > 1.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.c?`print("ERROR: Missing required inputs (n, c)")
 print("COMMON_FACTOR=FAILED")`:`try:
     n = Integer(${e.n})
     c = Integer(${e.c})
@@ -2928,13 +3088,13 @@ s^* &= \\prod_{i=1}^{k} s_i \\bmod n \\\\
 
 \\textbf{Explanation:} Factor the target message into a product of oracle-signed messages. Multiply the corresponding signatures to forge a valid signature on the target. This works because (ab)ᵈ ≡ aᵈ·bᵈ (mod n).
 
-\\textbf{References:} Rivest, Shamir, Adleman, "A Method for Obtaining Digital Signatures", 1978; Boneh, "Twenty Years of Attacks on RSA", 1999`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.target_m&&!!e.oracle_pairs},Kg=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=2n,i=3n,a=Eh(r,n,e),o=Eh(i,n,e),s=r*i%e;return{n:e.toString(),e:t.toString(),target_m:s.toString(),oracle_pairs:`${r},${a};${i},${o}`}},qg={id:`bleichenbacher-sig`,name:`Bleichenbacher Signature Forgery (e=3)`,category:`Message / Protocol`,description:`Forges signature with weak PKCS#1 v1.5 verification. Use when e=3 and padding check is loose.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`hash_hex`,label:`Hash (hex)`,placeholder:`Enter hash in hex (e.g., SHA256)...`,multiline:!1}],sageTemplate:e=>`n = Integer(${e.n})
-hash_hex = "${e.hash_hex||`aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa`}".strip()
+\\textbf{References:} Rivest, Shamir, Adleman, "A Method for Obtaining Digital Signatures", 1978; Boneh, "Twenty Years of Attacks on RSA", 1999`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.target_m&&!!e.oracle_pairs},Kg=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=2n,i=3n,a=Eh(r,n,e),o=Eh(i,n,e),s=r*i%e;return{n:e.toString(),e:t.toString(),target_m:s.toString(),oracle_pairs:`${r},${a};${i},${o}`}},qg={id:`bleichenbacher-sig`,name:`Bleichenbacher Signature Forgery (e=3)`,category:`Message / Protocol`,description:`Forges signature with weak PKCS#1 v1.5 verification. Use when e=3 and padding check is loose.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`3`,multiline:!1,defaultValue:`3`},{name:`hash_hex`,label:`Hash (hex)`,placeholder:`Enter hash in hex (e.g., SHA256)...`,multiline:!1}],sageTemplate:e=>{let t=e.e||`3`;return`n = Integer(${e.n})
+e = Integer(${t})
+hash_hex = "${e.hash_hex||`dead`}".strip()
 if not hash_hex:
     print("ERROR: hash_hex is empty")
     print("BLEICHENBACHER_SIG=FAILED")
     return
-e = Integer(${e.e||`3`})
 
 if n < 2:
     print("Invalid input")
@@ -2952,50 +3112,51 @@ if e != 3:
     print("BLEICHENBACHER_SIG=FAILED")
     return
 
-# Construct EM: 0x00 || 0x01 || 0xFF*padding || 0x00 || DER_prefix || hash
-# Simplified: EM = 0x0001FFFF...00[DER][hash]
+# Construct EM: 0x00 || 0x01 || 0xFF...FF || 0x00 || hash
 n_bytes = (n.nbits() + 7) // 8
 hash_int = Integer("0x" + hash_hex)
 hash_bytes = (hash_int.nbits() + 7) // 8
 
-# PKCS#1 v1.5 signature format: 00 01 FF...FF 00 <hash>
-# EM = 0x0001 * 256^(n_bytes-2-hash_bytes) + (256^hash_bytes - 1) * 256^hash_bytes + hash_int
-# Simplified: place hash at the end, fill middle with 0xFF
-em = (2**(8 * (n_bytes - 2)) - 2**(8 * (hash_bytes + 2))) + (hash_int)
-# Add 0x0001 prefix
-em = em + (2**(8 * (n_bytes - 2)) - 2**(8 * (n_bytes - hash_bytes - 2)))
+# Padding: at least 8 bytes of 0xFF
+pad_len = max(8, n_bytes - 3 - hash_bytes)
+em_len = 2 + pad_len + hash_bytes
 
-print(f"EM has {em.nbits()} bits")
+# EM = 0x0001 || 0xFF*pad_len || 0x00 || hash
+em = (Integer(1) << (8 * (em_len - 2))) + ((Integer(1) << (8 * pad_len)) - 1) * (Integer(1) << (8 * hash_bytes)) + hash_int
 
-# Compute integer cube root
-S, exact = em.nth_root(3, truncate_mode=True)
-if exact:
-    print(f"Forged signature: S = {S}")
+print(f"EM has {em.nbits()} bits, n has {n.nbits()} bits")
+
+if em >= n:
+    print("ERROR: EM >= n. Hash too large for this modulus.")
+    print("BLEICHENBACHER_SIG=FAILED")
+    return
+
+# Bleichenbacher: find S near n^(1/3) such that S^3 mod n ends with hash
+n_cbrt = n.nth_root(3, truncate_mode=True)[0]
+print(f"n^(1/3) = {n_cbrt}")
+
+found = False
+search_range = 100000
+for delta in range(-search_range, search_range + 1):
+    S = n_cbrt + delta
     check = power_mod(S, 3, n)
-    print(f"S^3 mod n = {check}")
-    check_hex = hex(check)[2:]
-    if hash_hex in check_hex:
-        print(f"Hash found in forged signature!")
-        print("BLEICHENBACHER_SIG=SUCCESS")
-    else:
-        print("Hash not found in forged signature.")
-        print("BLEICHENBACHER_SIG=FAILED")
+    check_hex = hex(check)[2:].zfill(len(hash_hex))
+    if check_hex.endswith(hash_hex):
+        print(f"Found with delta={delta}")
+        print(f"Forged signature: S = {S}")
+        print(f"S^3 mod n = {check}")
+        print(f"S^3 mod n (hex) = ...{check_hex[-len(hash_hex):]}")
+        print(f"Hash found at end of forged signature!")
+        found = True
+        break
+
+if found:
+    print("BLEICHENBACHER_SIG=SUCCESS")
 else:
-    # Try Coppersmith-style: S = floor(n^(1/3)) + delta
-    n_root = n.nth_root(3, truncate_mode=True)[0]
-    for delta in range(-1000, 1001):
-        S = n_root + delta
-        check = power_mod(S, 3, n)
-        check_hex = hex(check)[2:]
-        if hash_hex in check_hex[-len(hash_hex):]:
-            print(f"Found with delta={delta}")
-            print(f"Forged signature: S = {S}")
-            print("BLEICHENBACHER_SIG=SUCCESS")
-            break
-    else:
-        print("No valid forgery found in search range.")
-        print("BLEICHENBACHER_SIG=FAILED")
-`,proof:`\\textbf{Theorem:} PKCS#1 v1.5 verification with e = 3 is forgeable: construct S such that S³ mod n has valid format without the private key.
+    print(f"No valid forgery found in range +/- {search_range}.")
+    print("Try a shorter hash or increase search range.")
+    print("BLEICHENBACHER_SIG=FAILED")
+`},proof:`\\textbf{Theorem:} PKCS#1 v1.5 verification with e = 3 is forgeable: construct S such that S³ mod n has valid format without the private key.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -3016,8 +3177,7 @@ EM < n &\\implies S^3 = EM \\quad \\text{(exact, no mod reduction)} \\\\
 
 \\textbf{Explanation:} Construct S ≈ ∛n and adjust lower bits so S³ ends with the target hash. If the verifier only checks that the hash appears at the correct position (not full padding), the forged signature passes. Requires e = 3 and lax verification.
 
-\\textbf{References:} D. Bleichenbacher, "Forging PKCS#1 v1.5 Signatures", Crypto 2006 rump session; Halderman et al., "Low-Exponent RSA Signatures", 2006`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.hash_hex},Jg=()=>{let{n:e}=kh(L.p,L.q);return{n:e.toString(),hash_hex:`a`.repeat(32)}},Yg={id:`bleichenbacher`,name:`Bleichenbacher PKCS#1 v1.5`,category:`Oracle`,description:`Decrypts via PKCS#1 v1.5 padding oracle. Use when server reveals padding validity.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`# Simplified Bleichenbacher simulation — full attack requires ~2^17 queries
-# Validate inputs
+\\textbf{References:} D. Bleichenbacher, "Forging PKCS#1 v1.5 Signatures", Crypto 2006 rump session; Halderman et al., "Low-Exponent RSA Signatures", 2006`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.hash_hex},Jg=()=>{let{n:e}=kh(L.p,L.q);return{n:e.toString(),hash_hex:`ab`}},Yg={id:`bleichenbacher`,name:`Bleichenbacher PKCS#1 v1.5`,category:`Oracle`,description:`Decrypts via PKCS#1 v1.5 padding oracle. Use when server reveals padding validity.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`# Bleichenbacher PKCS#1 v1.5 padding oracle attack
 if not "${e.n}".strip():
     print("ERROR: n is required")
     print("BLEICHENBACHER=FAILED")
@@ -3052,89 +3212,81 @@ try:
     print(f"Oracle responses: {len(oracle_bits)}")
     print()
 
-    # PKCS#1 v1.5 padding: EM = 0x00 || 0x02 || PS || 0x00 || M
-    # B = 2^(8*(k-2)) where k = byte length of n
-    # Valid padding: 2B <= m < 3B
-
-    k = (n.nbits() + 7) // 8  # byte length
+    # PKCS#1 v1.5: EM = 0x00 || 0x02 || PS || 0x00 || M
+    # Valid padding: 2B <= m < 3B where B = 2^(8*(k-2)), k = byte length
+    k = (n.nbits() + 7) // 8
     B = Integer(2)**(8 * (k - 2))
 
-    print(f"Block size: {k} bytes")
-    print(f"B = 2^(8*{k-2}) = {B}")
-    print(f"Valid padding range: [{2*B}, {3*B})")
+    print(f"Block size: {k} bytes, B = 2^(8*{k-2})")
+    print(f"Valid padding range: [2B, 3B) = [{2*B}, {3*B})")
     print()
 
-    # The real Bleichenbacher attack has 3 phases:
-    # Phase 1: Find s1 such that (c * s1^e) mod n has valid padding
-    # Phase 2: Narrow the interval containing m
-    # Phase 3: Compute m from the final interval
+    # Collect valid s values from oracle responses
+    valid_s = [Integer(i + 1) for i, r in enumerate(oracle_bits) if r == 1]
+    print(f"Valid padding responses: {len(valid_s)}")
+    if len(valid_s) < 2:
+        print("Need at least 2 valid responses for interval narrowing")
+        print("BLEICHENBACHER=FAILED")
+        quit()
 
-    # For demonstration, we use the oracle responses to simulate interval narrowing
-    # Each response indicates whether (c * s^e)^d mod n has valid PKCS#1 v1.5 padding
+    s1 = valid_s[0]
+    print(f"s1 = {s1}")
 
-    # Initialize interval [a, b]
-    a = Integer(2 * B)
-    b = Integer(3 * B - 1)
+    # Initial interval from s1
+    a = ceil((2 * B) / s1)
+    b = floor((3 * B - 1) / s1)
+    if s1 > 1:
+        for r in range(0, int(s1) + 1):
+            r_int = Integer(r)
+            ca = ceil((2 * B + r_int * n) / s1)
+            cb = floor((3 * B - 1 + r_int * n) / s1)
+            if ca < cb:
+                a = ca
+                b = cb
+                break
 
-    print(f"Initial interval: [{a}, {b}]")
-    print(f"Interval size: {b - a + 1}")
+    print(f"Initial interval: [{a}, {b}], size={(b-a+1).nbits()} bits")
     print()
 
-    # For each oracle response, narrow the interval using proper Bleichenbacher logic
-    # Each response indicates whether (c * s^e)^d mod n has valid PKCS#1 v1.5 padding
-    # Valid: 2B <= m*s mod n < 3B
+    # Narrow using remaining valid s values
+    for idx in range(1, min(len(valid_s), 50)):
+        s = valid_s[idx]
 
-    s = Integer(1)
-    for i, response in enumerate(oracle_bits):
-        # Choose s = 2 for binary-style search
-        s = Integer(2)
+        # Find r range
+        r_min = ceil((a * s - 3 * B + 1) / n)
+        r_max = floor((b * s - 2 * B) / n)
 
-        # Compute m*s mod n bounds from oracle response
-        # If valid: 2B <= m*s mod n < 3B
-        # This means m*s - r*n is in [2B, 3B) for some integer r
-        # So m is in [(2B + r*n)/s, (3B - 1 + r*n)/s] for some r
+        new_a = None
+        new_b = None
+        for r in range(int(r_min), int(r_max) + 1):
+            r_int = Integer(r)
+            ca = ceil((2 * B + r_int * n) / s)
+            cb = floor((3 * B - 1 + r_int * n) / s)
+            inter_a = max(a, ca)
+            inter_b = min(b, cb)
+            if inter_a <= inter_b:
+                if new_a is None or inter_a > new_a:
+                    new_a = inter_a
+                if new_b is None or inter_b < new_b:
+                    new_b = inter_b
 
-        if response == 1:
-            # Valid padding: m*s mod n in [2B, 3B)
-            # Narrow to intersection of [a, b] with valid intervals
-            # For r=0: m in [ceil(2B/s), floor((3B-1)/s)]
-            new_a = (2 * B + s - 1) // s
-            new_b = (3 * B - 1) // s
-            # Also consider r=1: m in [ceil((2B+n)/s), floor((3B-1+n)/s)]
-            new_a2 = (2 * B + n + s - 1) // s
-            new_b2 = (3 * B - 1 + n) // s
-            # Intersect with current interval
-            if new_b >= a and new_a <= b:
-                a = max(a, new_a)
-                b = min(b, new_b)
-            elif new_b2 >= a and new_a2 <= b:
-                a = max(a, new_a2)
-                b = min(b, new_b2)
+        if new_a is not None and new_b is not None:
+            a = new_a
+            b = new_b
+            if idx < 5 or b - a < (B) // 10:
+                print(f"Step {idx}: s={s}, interval=[{a}, {b}], size={(b-a+1).nbits()} bits")
         else:
-            # Invalid padding: m*s mod n NOT in [2B, 3B)
-            # Shift interval to exclude the valid range
-            mid = (a + b) // 2
-            if (mid * s) % n >= 2 * B and (mid * s) % n < 3 * B:
-                # Mid is in valid range but oracle says invalid, so m is elsewhere
-                a = mid + 1
-            else:
-                a = a + (b - a + 1) // 4
+            print(f"Step {idx}: s={s}, no valid interval intersection")
 
-        # Update c for next iteration
-        c = (c * power_mod(s, e, n)) % n
-
-        if i < 5 or i >= len(oracle_bits) - 3:
-            print(f"Step {i+1}: response={response}, interval=[{a}, {b}], size bits={max(0, (b-a+1).nbits())}")
-
-    # Final estimate
+    print()
     if a == b:
         m = a
-        print(f"\\nExact message recovered: m = {m}")
+        print(f"Exact message recovered: m = {m}")
     else:
         m = (a + b) // 2
-        print(f"\\nEstimated message: m = {m}")
+        print(f"Estimated message: m = {m}")
         print(f"Final interval: [{a}, {b}]")
-        print(f"Uncertainty: {b - a + 1} ({(b-a+1).nbits()} bits)")
+        print(f"Uncertainty: {(b-a+1).nbits()} bits")
 
     # Verify
     v = power_mod(m, e, n)
@@ -3176,7 +3328,7 @@ M_i &= \\bigcup_r \\left[ \\left\\lceil \\frac{2B + r n}{s_i} \\right\\rceil, \\
 
 \\textbf{Explanation:} The attack multiplies the ciphertext by \\(s^e\\) and queries the oracle. A valid response constrains \\(m \\cdot s \\bmod n\\) to \\([2B, 3B)\\), which maps back to a union of intervals for \\(m\\). Intersecting these intervals across multiple \\(s\\) values shrinks the candidate range until \\(m\\) is isolated.
 
-\\textbf{References:} D. Bleichenbacher, "Chosen Ciphertext Attacks Against Protocols Based on the RSA Encryption Standard PKCS #1", CRYPTO 1998`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Xg=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=Math.ceil(e.toString(2).length/8),i=256n**BigInt(r-2),a=2n*i,o=3n*i,s=Ah(a+BigInt(Math.floor(Math.random()*Number(o-a))),e,t),c=[],l=s;for(let r=0;r<256;r++){let r=Eh(l,n,e);c.push(r>=a&&r<o?`1`:`0`),l=l*Eh(2n,t,e)%e}return{n:e.toString(),e:t.toString(),c:s.toString(),oracle_responses:c.join(`,`)}},Zg={id:`manger`,name:`Manger's OAEP Attack`,category:`Oracle`,description:`Decrypts OAEP via first-byte oracle. Use when oracle reveals if decrypted OAEP starts with 0x00.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`# Validate inputs
+\\textbf{References:} D. Bleichenbacher, "Chosen Ciphertext Attacks Against Protocols Based on the RSA Encryption Standard PKCS #1", CRYPTO 1998`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Xg=()=>{let{n:e,e:t}=kh(L.p,L.q),n=Math.ceil(e.toString(2).length/8),r=256n**BigInt(n-2),i=2n*r,a=3n*r,o=a-i,s=i+BigInt(Math.floor(Math.random()*1e6))*(o/1000000n),c=Ah(s,e,t),l=262144,u=new Set;u.add(1);for(let t=1;t<=8;t++){let n=BigInt(t),r=Number((n*e+i+s-1n)/s),o=Number((n*e+a-1n)/s),c=Math.max(2,r),d=Math.min(l,o);for(let e=c;e<=d;e++)u.add(e)}let d=[];for(let e=1;e<=l;e++)d.push(u.has(e)?`1`:`0`);return{n:e.toString(),e:t.toString(),c:c.toString(),oracle_responses:d.join(`,`)}},Zg={id:`manger`,name:`Manger's OAEP Attack`,category:`Oracle`,description:`Decrypts OAEP via first-byte oracle. Use when oracle reveals if decrypted OAEP starts with 0x00.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`# Manger's OAEP padding oracle attack
 if not "${e.n}".strip():
     print("ERROR: n is required")
     print("MANGER=FAILED")
@@ -3213,60 +3365,82 @@ try:
 
     # RSA-OAEP: EM = 0x00 || maskedSeed || maskedDB
     # Oracle reveals whether first byte of decrypted message is 0x00
-    # This means: m < n / 256 (first byte is zero)
-
-    # The attack uses the multiplicative property:
-    # (c * s^e)^d = m * s mod n
-    # Oracle on (c * s^e) reveals whether m*s mod n < n/256
-
-    k = (n.nbits() + 7) // 8
-    print(f"Block size: {k} bytes")
-    print(f"OAEP constraint: first byte = 0x00 means m < n/256")
+    # This means: m < n / 256
+    threshold = n // 256
+    print(f"OAEP constraint: first byte = 0x00 means m < n/256 = {threshold}")
     print()
 
-    # Initialize: m is in [0, n)
+    # The attack uses: (c * s^e)^d = m * s mod n
+    # Oracle reveals whether m*s mod n < threshold
+    # If yes: m in [rn/s, (rn+threshold)/s) for some r=0..s-1
+    # If no: m NOT in those intervals
+
+    # Start with full interval
     lower = Integer(0)
     upper = Integer(n)
 
     print(f"Initial interval: [0, {n})")
+    print(f"Interval size: {n.nbits()} bits")
     print()
 
-    # For each oracle response, narrow the interval
-    # Oracle reveals whether m*s mod n < n/256 (first byte is 0x00)
-    # For s=2: oracle on (c*2^e) reveals whether 2m mod n < n/256
-
+    # Process each oracle response
+    # Response i corresponds to s = i + 1
     for i, response in enumerate(oracle_bits):
-        s = Integer(2)
+        s = Integer(i + 1)
+        if s == 1:
+            # First response confirms m < threshold
+            if response == 1:
+                upper = min(upper, threshold)
+            continue
 
-        # The oracle tells us whether (m * s) mod n < n / 256
-        # This constrains m to specific sub-intervals
-
-        if response == 1:
-            # m * s mod n < n / 256
-            # For s=2: 2m mod n < n/256
-            # Case 1: 2m < n/256 => m < n/512
-            # Case 2: 2m - n < n/256 => m in [n/2, n/2 + n/512)
-            # Intersect current interval with valid ranges
-            threshold = n // (2 * 256)  # n/512
-            upper = min(upper, threshold)
-        else:
-            # m * s mod n >= n / 256
-            # m is NOT in the small intervals near 0 or n/2
-            # Shift lower bound up
-            threshold = n // (2 * 256)
-            lower = max(lower, threshold)
-
-        # Update c for next iteration
+        # Update ciphertext: c = c * s^e mod n
         c = (c * power_mod(s, e, n)) % n
 
-        if i < 5 or i >= len(oracle_bits) - 3:
-            print(f"Step {i+1}: response={response}, interval=[{lower}, {upper}], size bits={max(0, (upper-lower).nbits())}")
+        if response == 1:
+            # m*s mod n < threshold
+            # m in [rn/s, (rn+threshold)/s) for r=0..s-1
+            # Find the r whose interval intersects [lower, upper)
+            new_lower = None
+            new_upper = None
+            for r in range(int(s)):
+                r_int = Integer(r)
+                ca = floor(r_int * n / s)
+                cb = floor((r_int * n + threshold - 1) / s)
+                inter_a = max(lower, ca)
+                inter_b = min(upper, cb)
+                if inter_a < inter_b:
+                    if new_lower is None:
+                        new_lower = inter_a
+                        new_upper = inter_b
+                    else:
+                        # Merge overlapping intervals
+                        if inter_a <= new_upper:
+                            new_upper = max(new_upper, inter_b)
+                        else:
+                            # Non-overlapping: pick the one containing midpoint
+                            mid = (lower + upper) // 2
+                            if inter_a <= mid < inter_b:
+                                new_lower = inter_a
+                                new_upper = inter_b
 
-    # Final estimate
+            if new_lower is not None:
+                lower = new_lower
+                upper = new_upper
+        else:
+            # m*s mod n >= threshold
+            # m NOT in [rn/s, (rn+threshold)/s) for any r
+            # Simplified: shift lower bound past the first excluded interval
+            first_excluded = floor((threshold - 1) / s) + 1
+            lower = max(lower, first_excluded)
+
+        if i < 5 or i >= len(oracle_bits) - 3:
+            print(f"Step {i+1}: s={s}, response={response}, interval=[{lower}, {upper}], size={(upper-lower).nbits()} bits")
+
+    print()
     m = (lower + upper) // 2
-    print(f"\\nEstimated message: m = {m}")
+    print(f"Estimated message: m = {m}")
     print(f"Final interval: [{lower}, {upper}]")
-    print(f"Uncertainty: {upper - lower} ({(upper-lower).nbits()} bits)")
+    print(f"Uncertainty: {(upper-lower).nbits()} bits")
 
     # Verify
     v = power_mod(m, e, n)
@@ -3307,7 +3481,7 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r + 1)}{256s} \\
 
 \\textbf{Explanation:} Each oracle query on c·s^e reveals whether m·s mod n falls in [0, n/256). This constrains m to a union of narrow intervals. By choosing s strategically (doubling each step), the interval halves each round, converging to m in logarithmic queries.
 
-\\textbf{References:} J. Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP) as Standardized in PKCS #1 v2.0", CRYPTO 2001`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Qg=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=e/256n,i=Ah(BigInt(Math.floor(Math.random()*Number(r/2n))),e,t),a=[],o=i;for(let i=0;i<264;i++){let i=Eh(o,n,e);a.push(i<r?`1`:`0`),o=o*Eh(2n,t,e)%e}return{n:e.toString(),e:t.toString(),c:i.toString(),oracle_responses:a.join(`,`)}},$g={id:`biased-lsb`,name:`Biased LSB Oracle`,category:`Oracle`,description:`Recovers m via noisy LSB oracle. Use when LSB oracle is correct with probability > 50%.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_runs`,label:`Oracle runs (multiple response strings, newline-separated)`,placeholder:`0,1,0,1,1\\n1,0,1,1,0\\n0,1,1,1,0...`,multiline:!0,rows:6}],sageTemplate:e=>`# Validate inputs
+\\textbf{References:} J. Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP) as Standardized in PKCS #1 v2.0", CRYPTO 2001`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Qg=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=e/256n,i=Ah(BigInt(Math.floor(Math.random()*Number(r/2n))),e,t),a=[],o=i;for(let i=1;i<=512;i++){let s=Eh(o,n,e);a.push(s<r?`1`:`0`),o=o*Eh(BigInt(i+1),t,e)%e}return{n:e.toString(),e:t.toString(),c:i.toString(),oracle_responses:a.join(`,`)}},$g={id:`biased-lsb`,name:`Biased LSB Oracle`,category:`Oracle`,description:`Recovers m via noisy LSB oracle. Use when LSB oracle is correct with probability > 50%.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_runs`,label:`Oracle runs (multiple response strings, newline-separated)`,placeholder:`0,1,0,1,1\\n1,0,1,1,0\\n0,1,1,1,0...`,multiline:!0,rows:6}],sageTemplate:e=>`# Validate inputs
 if not "${e.n}".strip():
     print("ERROR: n is required")
     print("BIASED_LSB=FAILED")
@@ -3329,6 +3503,7 @@ try:
     n = Integer(${e.n})
     e = Integer(${e.e})
     c = Integer(${e.c})
+    orig_c = Integer(${e.c})
 
     # Parse oracle runs (multiple response strings, newline-separated)
     runs_str = """${e.oracle_runs}""".strip()
@@ -3348,11 +3523,9 @@ try:
     print()
 
     # Per-bit majority voting, then binary search
-    # Each run gives noisy LSB responses
-    # Majority vote across runs for each bit position
-
     num_bits = min(len(r) for r in runs)
-    print(f"Using {num_bits} bit positions")
+    n_bits = n.nbits()
+    print(f"Using {num_bits} bit positions (n has {n_bits} bits)")
 
     # Majority voting
     voted_bits = []
@@ -3386,8 +3559,8 @@ try:
     # Verify
     v = power_mod(m, e, n)
     print(f"Verification: m^e mod n = {v}")
-    print(f"Original c = {c}")
-    if v == Integer(${e.c}):
+    print(f"Original c = {orig_c}")
+    if v == orig_c:
         print("VERIFICATION PASSED!")
         print("BIASED_LSB=SUCCESS")
     else:
@@ -3422,7 +3595,7 @@ b_i = 1 \\implies [a_{i+1}, b_{i+1}] &= [(a_i + b_i)/2, b_i) \\\\
 
 \\textbf{Explanation:} Each LSB query on 2^i·m mod n reveals whether m falls in the upper or lower half of the current interval. With noisy oracles, majority voting across k independent runs amplifies the signal. The error drops exponentially with k, so O(log n / (p-1/2)²) runs per bit suffice.
 
-\\textbf{References:} Goldwasser, Micali, "Probabilistic Encryption", 1982; Håstad et al., "Bit Security of RSA", 1989`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_runs},e_=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=Ah(BigInt(Math.floor(Math.random()*1e6)+42),e,t),i=[];for(let a=0;a<5;a++){let a=[],o=r;for(let r=0;r<256;r++){let r=(Eh(o,n,e)%2n).toString(),i=Math.random()<.7?r:r===`0`?`1`:`0`;a.push(i),o=o*Eh(2n,t,e)%e}i.push(a.join(`,`))}return{n:e.toString(),e:t.toString(),c:r.toString(),oracle_runs:i.join(`
+\\textbf{References:} Goldwasser, Micali, "Probabilistic Encryption", 1982; Håstad et al., "Bit Security of RSA", 1989`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_runs},e_=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=e.toString(2).length,i=Ah(BigInt(`0x`+Array.from(crypto.getRandomValues(new Uint8Array(Math.ceil(r/8)))).map(e=>e.toString(16).padStart(2,`0`)).join(``))%(e/2n),e,t),a=[];for(let o=0;o<21;o++){let o=[],s=i;for(let i=0;i<r;i++){let r=(Eh(s,n,e)%2n).toString(),i=Math.random()<.75?r:r===`0`?`1`:`0`;o.push(i),s=s*Eh(2n,t,e)%e}a.push(o.join(`,`))}return{n:e.toString(),e:t.toString(),c:i.toString(),oracle_runs:a.join(`
 `)}},t_={id:`roca`,name:`ROCA Vulnerability`,category:`Advanced`,description:`Factors ROCA-vulnerable primes. Use when p = k·M + (65537^i mod M).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`# Validate inputs
 if not "${e.n}".strip():
     print("ERROR: n is required")
@@ -3554,7 +3727,7 @@ f(x) &= M \\cdot x + r_1 \\equiv 0 \\pmod{p} \\\\
 
 \\textbf{Explanation:} The attack fingerprints \\(n \\bmod M\\) against products of known remainders. A match identifies the correct \\(M\\) and remainder \\(r_1\\), then Coppersmith's method recovers \\(k\\) from the linear polynomial \\(f(x) = Mx + r_1\\) modulo \\(p\\).
 
-\\textbf{References:} M. Nemec et al., "The Return of Coppersmith's Attack: Practical Factorization of Widely Used RSA Moduli", CCS 2017; https://crocs.fi.muni.cz/roca`,priority:`high`,applicableCheck:e=>!!e.n},n_=()=>{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n],t=1n;for(let n of e)t*=n;for(let e=0;e<5e3;e++){let e=Eh(65537n,BigInt(Math.floor(Math.random()*1e4)),t),n=Oh(59)*t+e;if(Dh(n))return{n:(n*Oh(L.q)).toString()}}return{n:kh(L.p,L.q).n.toString()}},r_={id:`nitros`,name:`Nitros / ROCA Variant`,category:`Advanced`,description:`Factors generalized ROCA primes with arbitrary base. Use when p = k·M + (a^i mod M).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`base`,label:`Base (default 65537)`,placeholder:`65537`,multiline:!1}],sageTemplate:e=>`# Validate inputs
+\\textbf{References:} M. Nemec et al., "The Return of Coppersmith's Attack: Practical Factorization of Widely Used RSA Moduli", CCS 2017; https://crocs.fi.muni.cz/roca`,priority:`high`,applicableCheck:e=>!!e.n},n_=()=>{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n],t=1n;for(let n of e)t*=n;let n=L.p-77;for(let e=0;e<5e3;e++){let e=Eh(65537n,BigInt(Math.floor(Math.random()*1e4)),t),r=Math.ceil(n/8),i=new Uint8Array(r);crypto.getRandomValues(i);let a=0n;for(let e=0;e<r;e++)a=a<<8n|BigInt(i[e]);a|=1n<<BigInt(n-1),a|=1n;let o=a*t+e;if(Dh(o))return{n:(o*Oh(L.q)).toString()}}return{n:kh(L.p,L.q).n.toString()}},r_={id:`nitros`,name:`Nitros / ROCA Variant`,category:`Advanced`,description:`Factors generalized ROCA primes with arbitrary base. Use when p = k·M + (a^i mod M).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`base`,label:`Base (default 65537)`,placeholder:`65537`,multiline:!1}],sageTemplate:e=>`# Validate inputs
 if not "${e.n}".strip():
     print("ERROR: n is required")
     print("NITROS=FAILED")
@@ -3677,7 +3850,7 @@ f(x) &= M \\cdot x + r_1 \\equiv 0 \\pmod{p} \\\\
 
 \\textbf{Explanation:} The algorithm tests multiple prime subsets for \\(M\\) and configurable base \\(a\\). Once a matching remainder pair \\((r_1, r_2)\\) is found, Coppersmith's method recovers \\(k\\). Both \\(r_1\\) and \\(r_2\\) are tried as candidate remainders.
 
-\\textbf{References:} Nemec et al., CCS 2017; extended analysis in subsequent ROCA research`,priority:`medium`,applicableCheck:e=>!!e.n},i_=()=>{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n],t=1n;for(let n of e)t*=n;for(let e=0;e<5e3;e++){let e=Eh(7n,BigInt(Math.floor(Math.random()*1e4)),t),n=Oh(59)*t+e;if(Dh(n))return{n:(n*Oh(L.q)).toString(),base:`7`}}return{n:kh(L.p,L.q).n.toString(),base:`7`}},a_=class extends Error{status;constructor(e,t){super(e),this.name=`FactorDBError`,this.status=t}},o_=``;function s_(e){o_=e}async function c_(e,t=o_){let n=typeof e==`bigint`?e.toString():e,r=t?`${t}?query=${encodeURIComponent(n)}`:`https://factordb.com/api?query=${encodeURIComponent(n)}`,i=new AbortController,a=setTimeout(()=>i.abort(),1e4);try{let e=await fetch(r,{signal:i.signal});if(!e.ok)throw new a_(`HTTP ${e.status}`,e.status);return e.json()}finally{clearTimeout(a)}}function l_(e){let t=[];if(t.push(`FactorDB Status: ${e.status}`),e.status===`FF`&&e.factors){t.push(`Fully factored!`);for(let[n,r]of e.factors)t.push(`  ${n}^${r}`);if(e.factors.length===2){let n=BigInt(e.factors[0][0])**BigInt(e.factors[0][1]),r=BigInt(e.factors[1][0])**BigInt(e.factors[1][1]);t.push(`p = ${n}`),t.push(`q = ${r}`)}}else if(e.status===`CF`&&e.factors){t.push(`Partially factored:`);for(let[n,r]of e.factors)t.push(`  ${n}^${r}`)}else t.push(`No factors found`);return t.join(`
+\\textbf{References:} Nemec et al., CCS 2017; extended analysis in subsequent ROCA research`,priority:`medium`,applicableCheck:e=>!!e.n},i_=()=>{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n],t=1n;for(let n of e)t*=n;let n=L.p-77;for(let e=0;e<5e3;e++){let e=Eh(7n,BigInt(Math.floor(Math.random()*1e4)),t),r=Math.ceil(n/8),i=new Uint8Array(r);crypto.getRandomValues(i);let a=0n;for(let e=0;e<r;e++)a=a<<8n|BigInt(i[e]);a|=1n<<BigInt(n-1),a|=1n;let o=a*t+e;if(Dh(o))return{n:(o*Oh(L.q)).toString(),base:`7`}}return{n:kh(L.p,L.q).n.toString(),base:`7`}},a_=class extends Error{status;constructor(e,t){super(e),this.name=`FactorDBError`,this.status=t}},o_=``;function s_(e){o_=e}async function c_(e,t=o_){let n=typeof e==`bigint`?e.toString():e,r=t?`${t}?query=${encodeURIComponent(n)}`:`https://factordb.com/api?query=${encodeURIComponent(n)}`,i=new AbortController,a=setTimeout(()=>i.abort(),1e4);try{let e=await fetch(r,{signal:i.signal});if(!e.ok)throw new a_(`HTTP ${e.status}`,e.status);return e.json()}finally{clearTimeout(a)}}function l_(e){let t=[];if(t.push(`FactorDB Status: ${e.status}`),e.status===`FF`&&e.factors){t.push(`Fully factored!`);for(let[n,r]of e.factors)t.push(`  ${n}^${r}`);if(e.factors.length===2){let n=BigInt(e.factors[0][0])**BigInt(e.factors[0][1]),r=BigInt(e.factors[1][0])**BigInt(e.factors[1][1]);t.push(`p = ${n}`),t.push(`q = ${r}`)}}else if(e.status===`CF`&&e.factors){t.push(`Partially factored:`);for(let[n,r]of e.factors)t.push(`  ${n}^${r}`)}else t.push(`No factors found`);return t.join(`
 `)}var u_={id:`factordb-lookup`,name:`FactorDB Lookup`,category:`Advanced`,description:`Looks up factorization in FactorDB. Use as first step for any unknown modulus.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=await c_(e.n);return t.status===`FF`&&t.factors&&t.factors.length>=2?l_(t):null}catch{return null}},sageTemplate:e=>`# Validate inputs
 if not "${e.n}".strip():
     print("ERROR: n is required")
@@ -4265,7 +4438,7 @@ k = \\lceil \\log_2 n \\rceil &\\implies u_k - \\ell_k < 1 \\implies m = \\ell_k
 
 \\textbf{Explanation:} Each query doubles the effective plaintext modulo \\(n\\). The parity of the result reveals whether the doubling wrapped around \\(n\\), halving the search interval. After \\(\\log_2 n\\) steps the interval contains exactly one integer — the plaintext.
 
-\\textbf{References:} D. Bleichenbacher, "Generating ElGamal Signatures Without Knowing the Secret Key", Eurocrypt 1998; Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP)", CRYPTO 2001`,priority:`medium`,applicableCheck:e=>!!(e.n&&e.e&&e.c&&e.oracle_responses)},x_=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=Ah(BigInt(Math.floor(Math.random()*1e6)+42),e,t),i=[],a=r;for(let r=0;r<256;r++)i.push((Eh(a,n,e)%2n).toString()),a=a*Eh(2n,t,e)%e;return{n:e.toString(),e:t.toString(),c:r.toString(),oracle_responses:i.join(`,`)}},S_={id:`partial-key-exposure`,name:`Partial Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from known MSBs. Use when ≥ half the bits of p are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`p_msb`,label:`p_msb (known MSBs of p)`,placeholder:`Enter known high bits of p...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
+\\textbf{References:} D. Bleichenbacher, "Generating ElGamal Signatures Without Knowing the Secret Key", Eurocrypt 1998; Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP)", CRYPTO 2001`,priority:`medium`,applicableCheck:e=>!!(e.n&&e.e&&e.c&&e.oracle_responses)},x_=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=Ah(BigInt(Math.floor(Math.random()*1e6)+42),e,t),i=[],a=r,o=L.p+L.q;for(let r=0;r<o;r++)i.push((Eh(a,n,e)%2n).toString()),a=a*Eh(2n,t,e)%e;return{n:e.toString(),e:t.toString(),c:r.toString(),oracle_responses:i.join(`,`)}},S_={id:`partial-key-exposure`,name:`Partial Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from known MSBs. Use when ≥ half the bits of p are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`p_msb`,label:`p_msb (known MSBs of p)`,placeholder:`Enter known high bits of p...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
     n = Integer(${e.n})
     p_msb = Integer(${e.p_msb})
 

@@ -1,6 +1,5 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
-import { modPow } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'lsb-oracle',
@@ -22,17 +21,18 @@ print("LSB_ORACLE=FAILED")`;
     n = Integer(${vals.n})
     e = Integer(${vals.e})
     c = Integer(${vals.c})
-    orig_c = Integer(${vals.c})
 
     # Parse oracle responses
     responses_str = """${vals.oracle_responses}""".strip()
     oracle_bits = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
 
     print(f"Number of oracle responses: {len(oracle_bits)}")
-    print(f"Target ciphertext: c = {orig_c}")
+    print(f"Target ciphertext: c = {c}")
+    print()
 
     # Binary search on the message space
-    # LSB(c^d mod n) = 0 means m < n/2, LSB = 1 means m >= n/2
+    # Each oracle response tells us whether m is in the upper or lower half
+    # of the current interval [lower, upper)
     lower = 0
     upper = n
 
@@ -45,9 +45,6 @@ print("LSB_ORACLE=FAILED")`;
             # m is in upper half
             lower = mid
 
-        # Multiply c by 2^e mod n for next iteration
-        c = (c * power_mod(2, e, n)) % n
-
         if i < 5 or i >= len(oracle_bits) - 3:
             print(f"Step {i+1}: bit={bit}, lower={lower}, upper={upper}")
 
@@ -57,9 +54,9 @@ print("LSB_ORACLE=FAILED")`;
     # Verify against original ciphertext
     v = power_mod(m, e, n)
     print(f"Verification: m^e mod n = {v}")
-    print(f"Original c = {orig_c}")
+    print(f"Original c = {c}")
 
-    if v == orig_c:
+    if v == c:
         print("LSB_ORACLE=SUCCESS")
     else:
         print("LSB_ORACLE=FAILED")
@@ -100,15 +97,22 @@ m &= \\ell_k \\qed
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n, e, d } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+  const { n, e } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
   const m = BigInt(Math.floor(Math.random() * 1000000) + 42);
   const c = encrypt(m, n, e);
+  // Oracle responses: binary search bits (is m in upper half of current interval?)
   const responses: string[] = [];
-  let curC = c;
+  let lower = 0n, upper = n;
   const nBits = n.toString(2).length;
   for (let i = 0; i < nBits; i++) {
-    responses.push((modPow(curC, d, n) % 2n).toString());
-    curC = (curC * modPow(2n, e, n)) % n;
+    const mid = (lower + upper) / 2n;
+    if (m >= mid) {
+      responses.push('1');
+      lower = mid;
+    } else {
+      responses.push('0');
+      upper = mid;
+    }
   }
   return { n: n.toString(), e: e.toString(), c: c.toString(), oracle_responses: responses.join(',') };
 };

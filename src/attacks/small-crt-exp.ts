@@ -1,6 +1,5 @@
 import type { Attack } from '../types';
-import { randomPrime, generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
-import { modInverse } from '../utils/bigint';
+import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'small-crt-exp',
@@ -27,7 +26,7 @@ export const attack: Attack = {
             for dp in range(dp0, bound + 1, k):
                 num = dp * e - 1
                 p_candidate = num // k + 1
-                if n % p_candidate == 0:
+                if p_candidate > 1 and n % p_candidate == 0:
                     q = n // p_candidate
                     print(f"Verification: p * q = {p_candidate * q}")
                     print("SMALL_CRT_EXP=SUCCESS")
@@ -43,28 +42,49 @@ export const attack: Attack = {
             print("SMALL_CRT_EXP=FAILED")
 except Exception as ex:
     print(f"SMALL_CRT_EXP=FAILED: {ex}")`,
-  proof: '\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small, $p$ can be recovered by searching.\\newline\\newline\\textbf{Prerequisites:} RSA-CRT, modular arithmetic\\newline\\newline\\textbf{Proof:}\\begin{align*}d_p \\cdot e &\\equiv 1 \\pmod{p-1} \\\\ d_p \\cdot e - 1 &= k(p-1) \\\\ p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\ \\text{For small } d_p, &\\text{ iterate and check } p \\mid n\\end{align*}\\newline\\textbf{References:} Standard RSA-CRT analysis',
+  proof: `\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small, $p$ can be recovered by exhaustive search over $k$.
+
+\\textbf{Prerequisites:}
+\\begin{itemize}
+\\item RSA-CRT: $d_p = d \\bmod (p-1)$, $d_q = d \\bmod (q-1)$
+\\item $d_p \\cdot e \\equiv 1 \\pmod{p-1}$
+\\item $d_p \\cdot e - 1 = k(p-1)$ for some integer $k$
+\\item $d_p$ is small (e.g., $d_p < 10^6$)
+\\end{itemize}
+
+\\textbf{Proof:}
+\\begin{align*}
+d_p \\cdot e &\\equiv 1 \\pmod{p-1} \\\\
+d_p \\cdot e - 1 &= k(p-1) \\\\
+p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
+\\text{For each } k \\in [1, e): \\quad &\\text{compute } d_p \\equiv e^{-1} \\pmod{k} \\\\
+\\text{Iterate } d_p &= d_{p0}, d_{p0}+k, d_{p0}+2k, \\ldots \\le \\text{bound} \\\\
+\\text{Check if } p \\mid n &\\implies \\text{factorization found} \\qed
+\\end{align*}
+
+\\textbf{Explanation:} From $d_p \\cdot e \\equiv 1 \\pmod{p-1}$, we get $p = (d_p \\cdot e - 1)/k + 1$. For each $k \\in [1, e)$, compute $d_{p0} = e^{-1} \\bmod k$, then iterate $d_p = d_{p0} + j \\cdot k$ up to the bound. For each candidate, check if $p$ divides $n$.
+
+\\textbf{References:} Standard RSA-CRT analysis; see also Jochemsz-May attack on small CRT exponents`,
   priority: 'medium',
   applicableCheck: (p) => !!p.n && !!p.e,
 };
 
 export const generateTestcase = (): Record<string, string> => {
   const e = 65537n;
-  // Strategy: find p where d_p = e^(-1) mod (p-1) is small
-  // d_p * e ≡ 1 (mod p-1) → d_p = e^(-1) mod (p-1)
-  // We need d_p < bound (default 10^6)
-  for (let attempt = 0; attempt < 500; attempt++) {
-    const p = randomPrime(TESTCASE_BITS.p);
-    const phi_p = p - 1n;
-    // Compute d_p = e^(-1) mod (p-1)
-    const dp = modInverse(e, phi_p);
-    if (dp !== null && dp < 1000000n && dp > 1n) {
-      const q = randomPrime(TESTCASE_BITS.q);
-      const n = p * q;
-      return { n: n.toString(), e: e.toString() };
+  // Construct p where d_p = e^(-1) mod (p-1) is small
+  // d_p * e - 1 = k * (p-1) → p = (d_p * e - 1) / k + 1
+  for (let dp = 3n; dp < 10000n; dp++) {
+    const num = dp * e - 1n;
+    // Try divisors k of num
+    for (let k = 1n; k <= e; k++) {
+      if (num % k !== 0n) continue;
+      const p = num / k + 1n;
+      if (p > 2n && isPrimeMR(p)) {
+        const q = randomPrime(TESTCASE_BITS.q);
+        return { n: (p * q).toString(), e: e.toString() };
+      }
     }
   }
-  // Fallback
-  const pair = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
-  return { n: pair.n.toString(), e: pair.e.toString() };
+  // Fallback: should never reach here given the search space
+  throw new Error('small-crt-exp: failed to generate testcase');
 };

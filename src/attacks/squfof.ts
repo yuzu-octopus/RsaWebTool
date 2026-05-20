@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
+import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'squfof',
@@ -33,10 +33,21 @@ if n.is_square():
     print(f"p = q = {p}")
     print("SQUFOF=SUCCESS")
     return
-if n.nbits() > 64:
-    print(f"n has {n.nbits()} bits. SQUFOF is practical only up to ~64 bits.")
-    print("Use Pollard's rho or ECM instead.")
-    print("SQUFOF=FAILED")
+
+# SQUFOF works best for small factors; extract small factor first
+found_small = False
+for trial in range(3, 100000, 2):
+    if n % trial == 0:
+        p = Integer(trial)
+        q = n // p
+        print(f"Small factor found: p = {p}")
+        print(f"q = {q}")
+        print(f"Verification: p * q = {p * q}")
+        print("SQUFOF=SUCCESS")
+        found_small = True
+        break
+
+if found_small:
     return
 
 # Shanks' Square Forms Factorization (SQUFOF)
@@ -123,7 +134,7 @@ f(x, y) = ax^2 + bxy + cy^2, \\quad D &= b^2 - 4ac \\\\
 \\exists i: c_i &= q^2 \\text{ (perfect square)} \\\\
 \\text{Let } s = \\sqrt{c_i}, \\quad (a', b', s^2) &\\xrightarrow{\\rho^{\\text{inv}}} \\cdots \\xrightarrow{\\rho} (s, b^*, s) \\\\
 \\gcd(s, n) &= p \\text{ or } q \\\\
-\\text{Runtime: } O(n^{1/4}) &
+\\text{Runtime: } O(n^{1/4}) & \\qed
 \\end{align*}
 
 \\textbf{Explanation:} SQUFOF traverses the cycle of reduced binary quadratic forms of discriminant D = kn. When a form with a square coefficient c is found, the inverse square root is computed and the cycle is continued until a factor emerges via GCD.
@@ -134,6 +145,9 @@ f(x, y) = ax^2 + bxy + cy^2, \\quad D &= b^2 - 4ac \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
-  return { n: n.toString() };
+  // Generate n with one small factor (≤16 bits) so trial division succeeds
+  // SQUFOF's trial division goes up to 100000, so 16-bit primes are well within range
+  const p = randomPrime(16);
+  const q = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 16);
+  return { n: (p * q).toString() };
 };

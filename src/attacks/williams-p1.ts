@@ -66,7 +66,7 @@ def williams_p1(n, B, P):
             return P % n
         result = 2 % n   # V_0
         result1 = P % n  # V_1
-        bits = k.nbits()
+        bits = k.digits(2)  # LSB-first list of binary digits
         for bit in reversed(bits):
             # Double: from (V_j, V_{j+1}) compute (V_{2j}, V_{2j+1})
             V2j = (result**2 - 2) % n
@@ -139,16 +139,17 @@ p &\\mid \\gcd(V_M - 2, n) \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Build ~128-bit p where p+1 is B-smooth
+  // Build ~256-bit p where p+1 is B-smooth (all prime factors ≤ 71)
+  // B=10000 covers all factors with huge margin
   const smallPrimes = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n, 67n, 71n];
   let pPlus1 = 2n;
   for (const sp of smallPrimes) {
     const exp = Math.floor(Math.random() * 4) + 1;
     pPlus1 *= sp ** BigInt(exp);
   }
-  while (pPlus1 < (1n << 127n)) pPlus1 *= 2n;
+  while (pPlus1 < (1n << 255n)) pPlus1 *= 2n;
   let p = pPlus1 - 1n;
   while (!isPrimeMR(p) || p <= 2n) { pPlus1 *= 2n; p = pPlus1 - 1n; }
   const q = randomPrime(TESTCASE_BITS.q);
-  return { n: (p * q).toString() };
+  return { n: (p * q).toString(), B: '10000' };
 };

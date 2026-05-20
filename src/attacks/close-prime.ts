@@ -35,16 +35,16 @@ if n.is_square():
     return
 
 # Close-prime attack (Londahl variant of Fermat)
-# Optimized for primes with structured gaps
+# Optimized incremental update (same as Fermat but with extended bounds)
 try:
     print(f"Close-prime attack on n = {n}")
     print()
 
-    a = isqrt(n) + 1
-    b2 = a**2 - n
+    a, rem = n.sqrtrem()
+    b2 = -rem
+    c = (a << 1) + 1
 
-    # Extended iteration limit for larger prime gaps
-    max_iter = 10**7  # Much larger than standard Fermat
+    max_iter = 10**7
     print(f"Max iterations: {max_iter}")
 
     found = False
@@ -53,7 +53,7 @@ try:
             b = isqrt(b2)
             p = a - b
             q = a + b
-            if p * q == n:
+            if p * q == n and p > 1:
                 print(f"Factor found after {i+1} iterations!")
                 print(f"p = {p}")
                 print(f"q = {q}")
@@ -61,8 +61,8 @@ try:
                 print(f"Verification: p * q = {p * q}")
                 found = True
                 break
-        a += 1
-        b2 = a**2 - n
+        b2 += c
+        c += 2
 
     if found:
         print("CLOSE_PRIME=SUCCESS")
@@ -74,7 +74,7 @@ except Exception as e:
     print(f"Error in Close-Prime attack: {e}")
     print("CLOSE_PRIME=FAILED")
 `,
-  proof: `\\textbf{Theorem:} Fermat factorization extended with larger iteration bounds handles structured prime gaps up to O(n^{1/3}).
+  proof: `\\textbf{Theorem:} Fermat factorization extended with larger iteration bounds handles structured prime gaps up to $2 \\times 10^7$ iterations.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -92,8 +92,9 @@ a_0 &= \\lceil\\sqrt{n}\\rceil \\\\
 a_{i+1} &= a_i + 1, \\quad b_i^2 = a_i^2 - n \\\\
 b_i^2 &= \\square \\implies b = \\sqrt{b_i^2}, \\quad p = a - b, \\quad q = a + b \\\\
 \\text{Iterations: } b &= \\frac{|q - p|}{2} \\\\
-\\text{Standard: } b < n^{1/4}, \\quad \\text{Extended: } b &< n^{1/3} \\\\
-\\text{Runtime: } O(|p - q|) &
+\\text{Standard bound: } b &< n^{1/4} \\\\
+\\text{Extended bound: } b &< 10^7 \\quad \\text{(max iterations)} \\\\
+\\text{Runtime: } O(|p - q|) & \\qed
 \\end{align*}
 
 \\textbf{Explanation:} The close-prime attack is Fermat factorization with an extended iteration limit. It works when |p - q| is small enough that iterating from \\sqrt{n} finds a perfect square within the bound. The Londahl variant increases the bound to handle larger gaps.

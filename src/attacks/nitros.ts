@@ -145,10 +145,19 @@ export const generateTestcase = (): Record<string, string> => {
   const primes_list = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n];
   let M = 1n;
   for (const p of primes_list) { M *= p; }
+  // M ≈ 2^77, p should be ~256 bits → k needs ~179 bits
+  const kBits = TESTCASE_BITS.p - 77;
   for (let attempt = 0; attempt < 5000; attempt++) {
     const i = BigInt(Math.floor(Math.random() * 10000));
     const r = modPow(base, i, M);
-    const k = randomPrime(59);
+    // Generate random k of appropriate bit size
+    const kBytes = Math.ceil(kBits / 8);
+    const bytes = new Uint8Array(kBytes);
+    crypto.getRandomValues(bytes);
+    let k = 0n;
+    for (let j = 0; j < kBytes; j++) { k = (k << 8n) | BigInt(bytes[j]); }
+    k |= (1n << BigInt(kBits - 1));
+    k |= 1n;
     const p = k * M + r;
     if (isPrimeMR(p)) {
       const q = randomPrime(TESTCASE_BITS.q);

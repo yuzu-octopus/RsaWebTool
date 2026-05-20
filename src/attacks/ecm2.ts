@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
+import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'ecm2',
@@ -93,6 +93,8 @@ n > n/p_{i_1} > n/(p_{i_1}p_{i_2}) > \\cdots &> 1 \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
-  return { n: n.toString() };
+  // Generate n with one small factor (≤60 bits) so factor() succeeds quickly
+  const p = randomPrime(60);
+  const q = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 60);
+  return { n: (p * q).toString() };
 };

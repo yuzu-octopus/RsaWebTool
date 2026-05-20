@@ -20,42 +20,41 @@ print()
 if n < 2 or e < 2:
     print("Invalid input: n and e must be >= 2")
     print("BONEH_DURFEE=FAILED")
-    return
+else:
+    # Extended Wiener + lattice-based Boneh-Durfee approach
+    # First try Wiener's attack
+    def wiener_attack(n, e):
+        cf = e.continued_fraction()
+        for conv in cf.convergents():
+            k, d = conv.numerator(), conv.denominator()
+            if k == 0:
+                continue
+            if (e * d - 1) % k == 0:
+                phi = (e * d - 1) // k
+                s = n - phi + 1
+                disc = s**2 - 4 * n
+                if disc >= 0 and disc.is_square():
+                    p = (s + isqrt(disc)) // 2
+                    q = (s - isqrt(disc)) // 2
+                    if p * q == n:
+                        return d, p, q
+        return None
 
-# Extended Wiener + lattice-based Boneh-Durfee approach
-# First try Wiener's attack
-def wiener_attack(n, e):
-    cf = e.continued_fraction()
-    for conv in cf.convergents():
-        k, d = conv.numerator(), conv.denominator()
-        if k == 0:
-            continue
-        if (e * d - 1) % k == 0:
-            phi = (e * d - 1) // k
-            s = n - phi + 1
-            disc = s**2 - 4 * n
-            if disc >= 0 and disc.is_square():
-                p = (s + isqrt(disc)) // 2
-                q = (s - isqrt(disc)) // 2
-                if p * q == n:
-                    return d, p, q
-    return None
-
-try:
-    result = wiener_attack(n, e)
-    if result:
-        d, p, q = result
-        print(f"Wiener's attack succeeded:")
-        print(f"d = {d}, p = {p}, q = {q}")
-        print(f"Verification: p * q = {p * q}")
-        print("BONEH_DURFEE=SUCCESS")
-    else:
-        print("Wiener's attack failed. Full Boneh-Durfee requires custom Herrmann-May lattice construction.")
-        print("Falling back to Wiener's attack which handles d < n^0.25.")
+    try:
+        result = wiener_attack(n, e)
+        if result:
+            d, p, q = result
+            print(f"Wiener's attack succeeded:")
+            print(f"d = {d}, p = {p}, q = {q}")
+            print(f"Verification: p * q = {p * q}")
+            print("BONEH_DURFEE=SUCCESS")
+        else:
+            print("Wiener's attack failed. Full Boneh-Durfee requires custom Herrmann-May lattice construction.")
+            print("Falling back to Wiener's attack which handles d < n^0.25.")
+            print("BONEH_DURFEE=FAILED")
+    except Exception as ex:
+        print(f"Boneh-Durfee attack error: {ex}")
         print("BONEH_DURFEE=FAILED")
-except Exception as ex:
-    print(f"Boneh-Durfee attack error: {ex}")
-    print("BONEH_DURFEE=FAILED")
 `,
   proof: `\\textbf{Theorem:} The private exponent d can be recovered in polynomial time when d < n^{0.292} using lattice reduction.
 

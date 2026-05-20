@@ -13,7 +13,7 @@ export const attack: Attack = {
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
     { name: 'oracle_responses', label: 'Oracle responses (comma-separated 0/1)', placeholder: '1,0,1,1,0,...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `# Validate inputs
+  sageTemplate: (vals: Record<string, string>) => `# Manger's OAEP padding oracle attack
 if not "${vals.n}".strip():
     print("ERROR: n is required")
     print("MANGER=FAILED")
@@ -50,60 +50,82 @@ try:
 
     # RSA-OAEP: EM = 0x00 || maskedSeed || maskedDB
     # Oracle reveals whether first byte of decrypted message is 0x00
-    # This means: m < n / 256 (first byte is zero)
-
-    # The attack uses the multiplicative property:
-    # (c * s^e)^d = m * s mod n
-    # Oracle on (c * s^e) reveals whether m*s mod n < n/256
-
-    k = (n.nbits() + 7) // 8
-    print(f"Block size: {k} bytes")
-    print(f"OAEP constraint: first byte = 0x00 means m < n/256")
+    # This means: m < n / 256
+    threshold = n // 256
+    print(f"OAEP constraint: first byte = 0x00 means m < n/256 = {threshold}")
     print()
 
-    # Initialize: m is in [0, n)
+    # The attack uses: (c * s^e)^d = m * s mod n
+    # Oracle reveals whether m*s mod n < threshold
+    # If yes: m in [rn/s, (rn+threshold)/s) for some r=0..s-1
+    # If no: m NOT in those intervals
+
+    # Start with full interval
     lower = Integer(0)
     upper = Integer(n)
 
     print(f"Initial interval: [0, {n})")
+    print(f"Interval size: {n.nbits()} bits")
     print()
 
-    # For each oracle response, narrow the interval
-    # Oracle reveals whether m*s mod n < n/256 (first byte is 0x00)
-    # For s=2: oracle on (c*2^e) reveals whether 2m mod n < n/256
-
+    # Process each oracle response
+    # Response i corresponds to s = i + 1
     for i, response in enumerate(oracle_bits):
-        s = Integer(2)
+        s = Integer(i + 1)
+        if s == 1:
+            # First response confirms m < threshold
+            if response == 1:
+                upper = min(upper, threshold)
+            continue
 
-        # The oracle tells us whether (m * s) mod n < n / 256
-        # This constrains m to specific sub-intervals
-
-        if response == 1:
-            # m * s mod n < n / 256
-            # For s=2: 2m mod n < n/256
-            # Case 1: 2m < n/256 => m < n/512
-            # Case 2: 2m - n < n/256 => m in [n/2, n/2 + n/512)
-            # Intersect current interval with valid ranges
-            threshold = n // (2 * 256)  # n/512
-            upper = min(upper, threshold)
-        else:
-            # m * s mod n >= n / 256
-            # m is NOT in the small intervals near 0 or n/2
-            # Shift lower bound up
-            threshold = n // (2 * 256)
-            lower = max(lower, threshold)
-
-        # Update c for next iteration
+        # Update ciphertext: c = c * s^e mod n
         c = (c * power_mod(s, e, n)) % n
 
-        if i < 5 or i >= len(oracle_bits) - 3:
-            print(f"Step {i+1}: response={response}, interval=[{lower}, {upper}], size bits={max(0, (upper-lower).nbits())}")
+        if response == 1:
+            # m*s mod n < threshold
+            # m in [rn/s, (rn+threshold)/s) for r=0..s-1
+            # Find the r whose interval intersects [lower, upper)
+            new_lower = None
+            new_upper = None
+            for r in range(int(s)):
+                r_int = Integer(r)
+                ca = floor(r_int * n / s)
+                cb = floor((r_int * n + threshold - 1) / s)
+                inter_a = max(lower, ca)
+                inter_b = min(upper, cb)
+                if inter_a < inter_b:
+                    if new_lower is None:
+                        new_lower = inter_a
+                        new_upper = inter_b
+                    else:
+                        # Merge overlapping intervals
+                        if inter_a <= new_upper:
+                            new_upper = max(new_upper, inter_b)
+                        else:
+                            # Non-overlapping: pick the one containing midpoint
+                            mid = (lower + upper) // 2
+                            if inter_a <= mid < inter_b:
+                                new_lower = inter_a
+                                new_upper = inter_b
 
-    # Final estimate
+            if new_lower is not None:
+                lower = new_lower
+                upper = new_upper
+        else:
+            # m*s mod n >= threshold
+            # m NOT in [rn/s, (rn+threshold)/s) for any r
+            # Simplified: shift lower bound past the first excluded interval
+            first_excluded = floor((threshold - 1) / s) + 1
+            lower = max(lower, first_excluded)
+
+        if i < 5 or i >= len(oracle_bits) - 3:
+            print(f"Step {i+1}: s={s}, response={response}, interval=[{lower}, {upper}], size={(upper-lower).nbits()} bits")
+
+    print()
     m = (lower + upper) // 2
-    print(f"\\nEstimated message: m = {m}")
+    print(f"Estimated message: m = {m}")
     print(f"Final interval: [{lower}, {upper}]")
-    print(f"Uncertainty: {upper - lower} ({(upper-lower).nbits()} bits)")
+    print(f"Uncertainty: {(upper-lower).nbits()} bits")
 
     # Verify
     v = power_mod(m, e, n)
@@ -157,10 +179,10 @@ export const generateTestcase = (): Record<string, string> => {
   const c = encrypt(m, n, e);
   const responses: string[] = [];
   let curC = c;
-  for (let i = 0; i < 264; i++) {
+  for (let s = 1; s <= 512; s++) {
     const dec = modPow(curC, d, n);
     responses.push(dec < threshold ? '1' : '0');
-    curC = (curC * modPow(2n, e, n)) % n;
+    curC = (curC * modPow(BigInt(s + 1), e, n)) % n;
   }
   return { n: n.toString(), e: e.toString(), c: c.toString(), oracle_responses: responses.join(',') };
 };

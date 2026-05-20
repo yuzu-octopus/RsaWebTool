@@ -115,7 +115,7 @@ n &= p \\cdot q, \\quad p \\in \\mathcal{S} \\text{ (special-form set)} \\\\
 |\\mathcal{S}| &\\ll 100 \\quad \\text{(very small)} \\\\
 n \\bmod s &= 0, \\quad s \\in \\mathcal{S} \\\\
 \\text{If } n \\bmod s = 0 &\\implies s \\mid n, \\quad q = n/s \\\\
-\\text{Cost: } O(|\\mathcal{S}| \\cdot \\log^2 n) &
+\\text{Cost: } O(|\\mathcal{S}| \\cdot \\log^2 n) & \\qed
 \\end{align*}
 
 \\textbf{Explanation:} Some CTF challenges use primes with recognizable mathematical structure. Since the total number of known special-form primes is very small, testing divisibility against all of them is fast. This exploits poor randomness in CTF key generation.
@@ -127,8 +127,8 @@ n \\bmod s &= 0, \\quad s \\in \\mathcal{S} \\\\
 
 export const generateTestcase = (): Record<string, string> => {
   // Generate a Mersenne prime: 2^p - 1 for small p
-  // p=17 gives 131071 which is prime
-  const mersenneP = [2, 3, 5, 7, 13, 17, 19];
+  // Skip trivial ones (2,3,5,7) and use 2^17-1=131071 or 2^19-1=524287
+  const mersenneP = [17, 19, 31, 61, 89, 107, 127];
   let mersenne = 0n;
   for (const p of mersenneP) {
     const candidate = (1n << BigInt(p)) - 1n;

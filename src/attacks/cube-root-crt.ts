@@ -117,5 +117,5 @@ export const generateTestcase = (): Record<string, string> => {
   const n = p * q;
   const m = BigInt(Math.floor(Math.random() * 10000) + 42);
   const c = modPow(m, e, n);
-  return { n: n.toString(), e: e.toString(), c: c.toString(), p: p.toString(), q: q.toString() };
+  return { n: n.toString(), c: c.toString(), p: p.toString(), q: q.toString() };
 };
