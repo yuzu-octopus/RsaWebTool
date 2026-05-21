@@ -36,6 +36,7 @@ try:
     n = Integer(${vals.n})
     e = Integer(${vals.e})
     c = Integer(${vals.c})
+    orig_c = Integer(${vals.c})
 
     # Parse oracle responses into a list
     responses_str = """${vals.oracle_responses}""".strip()
@@ -186,7 +187,14 @@ export const generateTestcase = (): Record<string, string> => {
   const B = BigInt(2) ** BigInt(8 * (k - 1));
 
   // m must be < B (OAEP format: first byte 0x00)
-  const m = BigInt(Math.floor(Math.random() * Number(B / 4n)));
+  // Use crypto.getRandomValues to avoid Number() overflow for large B (e.g., 2^504)
+  const mBytes = new Uint8Array(k);
+  crypto.getRandomValues(mBytes);
+  mBytes[0] = 0; // ensure OAEP first byte is 0x00
+  let m = 0n;
+  for (const byte of mBytes) {
+    m = (m << 8n) + BigInt(byte);
+  }
   const c = encrypt(m, n, e);
 
   // Pre-compute oracle responses for the full 3-step attack

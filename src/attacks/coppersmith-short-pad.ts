@@ -47,7 +47,7 @@ export const attack: Attack = {
     print("Resultant degree:", h.degree())
     # Bound: padding difference must be < n^(1/e^2)
     kbits = n.nbits() // (2 * e * e)
-    X = 2^kbits
+    X = 2**kbits
     print("Small root bound (bits):", kbits)
     roots = h.small_roots(X=X, beta=0.5)
     if roots:

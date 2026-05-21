@@ -52,7 +52,6 @@ if n.nbits() > 330:
 try:
     print("Factoring n with qsieve (Quadratic Sieve)...")
     result = qsieve(n)
-
     # Handle multiple qsieve return formats:
     #   Old API (sage.interfaces): [p, q] or ([p, q], time_str)
     #   New API (sage.libs.flint): [(p, 1), (q, 1)]
@@ -60,31 +59,26 @@ try:
         items = result[0]  # Old API with time=True
     else:
         items = result
-
     factors = []
     for item in items:
         if isinstance(item, (list, tuple)):
             factors.append((Integer(item[0]), Integer(item[1])))
         else:
             factors.append((Integer(item), 1))
-
     if not factors:
         print("No factors found")
         print("QUADRATIC_SIEVE=FAILED")
         quit()
-
     # Display factorization
     fac_str = " * ".join(
         f"{p}^{e}" if e > 1 else str(p) for p, e in factors
     )
     print(f"Factorization: {fac_str}")
     print()
-
     # Single factor (qsieve could not factor properly)
     if len(factors) == 1 and factors[0][1] == 1:
         print(f"Only one factor found: {factors[0][0]}")
         print("QUADRATIC_SIEVE=FAILED")
-
     # Two prime factors (semiprime) — typical QS use case
     elif len(factors) == 2 and all(exp == 1 for _, exp in factors):
         p = Integer(factors[0][0])
@@ -95,7 +89,6 @@ try:
         print(f"p is prime: {p.is_prime()}")
         print(f"q is prime: {q.is_prime()}")
         print("QUADRATIC_SIEVE=SUCCESS")
-
     # Multiple factors or powers
     else:
         print(f"Found {len(factors)} factor(s):")
@@ -111,7 +104,6 @@ try:
         print(f"Verification: product = {product}")
         print(f"Matches n: {product == n}")
         print("QUADRATIC_SIEVE=SUCCESS")
-
 except Exception as ex:
     print(f"Factorization failed: {ex}")
     print("n may be too large for the quadratic sieve.")

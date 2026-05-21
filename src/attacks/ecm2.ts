@@ -47,49 +47,53 @@ def ecm_factor_all(m, depth):
             result.append(prime)
     return result
 
-print(f"ECM Full Factorization on n = {n}")
-print()
-if n < 2:
-    print(f"n = {n} is too small to factor")
-    print("ECM2=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2, q = {n // 2}")
-    print("ECM2=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("ECM2=FAILED")
-    quit()
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print(f"p = q = {p}")
-    print("ECM2=SUCCESS")
-    quit()
-factors = ecm_factor_all(n, 0)
-factors.sort()
-print()
-print(f"All {len(factors)} prime factors: {factors}")
-print()
-counts = {}
-for f in factors:
-    counts[f] = counts.get(f, 0) + 1
-print(f"Factorization:")
-product = 1
-for prime, exp in sorted(counts.items()):
-    if exp == 1:
-        print(f"  p = {prime}")
+try:
+    print(f"ECM Full Factorization on n = {n}")
+    print()
+    if n < 2:
+        print(f"n = {n} is too small to factor")
+        print("ECM2=FAILED")
+        quit()
+    if n % 2 == 0:
+        print(f"n is even: {n}")
+        print(f"p = 2, q = {n // 2}")
+        print("ECM2=SUCCESS")
+        quit()
+    if n.is_prime():
+        print(f"n is prime: {n}")
+        print("ECM2=FAILED")
+        quit()
+    if n.is_square():
+        p = isqrt(n)
+        print(f"n is a perfect square: {p}^2 = {n}")
+        print(f"p = q = {p}")
+        print("ECM2=SUCCESS")
+        quit()
+    factors = ecm_factor_all(n, 0)
+    factors.sort()
+    print()
+    print(f"All {len(factors)} prime factors: {factors}")
+    print()
+    counts = {}
+    for f in factors:
+        counts[f] = counts.get(f, 0) + 1
+    print(f"Factorization:")
+    product = 1
+    for prime, exp in sorted(counts.items()):
+        if exp == 1:
+            print(f"  p = {prime}")
+        else:
+            print(f"  {prime}^{exp}")
+        product *= prime ** exp
+    print()
+    print(f"Verification: product = {product}")
+    print(f"Matches n: {product == n}")
+    if product == n:
+        print("ECM2=SUCCESS")
     else:
-        print(f"  {prime}^{exp}")
-    product *= prime ** exp
-print()
-print(f"Verification: product = {product}")
-print(f"Matches n: {product == n}")
-if product == n:
-    print("ECM2=SUCCESS")
-else:
+        print("ECM2=FAILED")
+except Exception as e:
+    print(f"Error: {e}")
     print("ECM2=FAILED")
 `,
   proof: `\\textbf{Theorem:} Repeated ECM with factor removal yields the complete prime factorization of n.

@@ -11,17 +11,7 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'phi', label: 'phi(n) (Euler totient)', placeholder: 'Enter phi(n)...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `# Validate inputs
-if not "${vals.n}".strip():
-    print("ERROR: n is required")
-    print("PHI_LEAK=FAILED")
-    quit()
-if not "${vals.phi}".strip():
-    print("ERROR: phi(n) is required")
-    print("PHI_LEAK=FAILED")
-    quit()
-
-try:
+  sageTemplate: (vals: Record<string, string>) => `try:
     n = Integer(${vals.n})
     phi = Integer(${vals.phi})
     print("Phi(n) leak attack")

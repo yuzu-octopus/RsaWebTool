@@ -26,7 +26,6 @@ if not "${vals.oracle_responses}".strip():
     print("ERROR: oracle_responses is required")
     print("PARITY_ORACLE=FAILED")
     quit()
-
 try:
     n = Integer(${vals.n})
     e_val = "${vals.e}".strip()
@@ -35,20 +34,17 @@ try:
     orig_c = Integer(${vals.c})
     responses_str = "${vals.oracle_responses || ''}".replace(' ', '')
     responses = [int(x) for x in responses_str.split(',') if x]
-
     print("Parity oracle attack on RSA")
     print(f"n = {n}")
     print(f"e = {e}")
     print(f"c = {c}")
     print(f"Oracle responses: {len(responses)} bits")
     print()
-
     n_bits = n.nbits()
     if len(responses) < n_bits:
         print(f"WARNING: Need {n_bits} responses for {n_bits}-bit modulus.")
         print(f"Got {len(responses)}. Attack may be incomplete.")
         print()
-
     # Binary search using parity oracle
     lower = Integer(0)
     upper = Integer(n)

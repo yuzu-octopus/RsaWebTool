@@ -60,7 +60,6 @@ try:
     print(f"Attempting multi-prime factorization of n = {n}")
     print(f"Bit length: {n.nbits()} bits ({n.nbits() / 3.32:.0f} digits)")
     print()
-
     prime_factors = factor_all(n)
 
     print(f"Prime factors ({len(prime_factors)} total):")
@@ -68,7 +67,6 @@ try:
         prime_status = "prime" if p.is_prime() else "composite"
         print(f"  p[{i+1}] = {p} ({p.nbits()} bits, {prime_status})")
     print()
-
     # Verify product
     product = 1
     for p in prime_factors:
@@ -76,10 +74,8 @@ try:
     print(f"Verification: product = {product}")
     print(f"Matches n: {product == n}")
     print()
-
     # Check if any factor is composite (partial factorization)
     all_prime = all(p.is_prime() for p in prime_factors)
-
     if len(prime_factors) > 2 and all_prime:
         print("Multi-prime RSA detected!")
         print(f"n = {' × '.join(str(p) for p in prime_factors)}")

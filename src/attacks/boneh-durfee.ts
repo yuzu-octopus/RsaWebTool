@@ -11,62 +11,57 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `n = Integer(${vals.n})
-e = Integer(${vals.e})
-
-print(f"Boneh-Durfee Attack on n = {n}")
-
-if n < 2 or e < 2:
-    print("Invalid input: n and e must be >= 2")
-    print("BONEH_DURFEE=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2")
-    print(f"q = {n // 2}")
-    print("BONEH_DURFEE=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("BONEH_DURFEE=FAILED")
-    quit()
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print("BONEH_DURFEE=SUCCESS")
-    quit()
-
-# Phase 1: Wiener's attack via continued fraction convergents of e/n
-cf = continued_fraction(QQ(e)/QQ(n))
-found = False
-for conv in cf.convergents():
-    k, d = conv.numerator(), conv.denominator()
-    if k == 0:
-        continue
-    if (e * d - 1) % k == 0:
-        phi = (e * d - 1) // k
-        s = n - phi + 1
-        disc = s ** 2 - 4 * n
-        if disc > 0 and disc.is_square():
-            t = isqrt(disc)
-            if (s + t) % 2 == 0:
-                p = (s - t) // 2
-                q = (s + t) // 2
-                if p * q == n and p > 1:
-                    print(f"Wiener's attack succeeded:")
-                    print(f"d = {d}, p = {p}, q = {q}")
-                    print(f"Verification: p * q = {p * q}")
-                    print("BONEH_DURFEE=SUCCESS")
-                    found = True
-                    break
-
-if found:
-    quit()
-
-# Phase 2: Boneh-Durfee lattice attack (Herrmann-May simplification)
-# f(x,y) = 1 + x*(A + y) with root (2k, -(p+q)/2) where ed = 1 + k*phi(n)
-print("Wiener failed (d >= n^0.25). Attempting Boneh-Durfee lattice attack...")
-try:
+  sageTemplate: (vals: Record<string, string>) => `try:
+    n = Integer(${vals.n})
+    e = Integer(${vals.e})
+    print(f"Boneh-Durfee Attack on n = {n}")
+    if n < 2 or e < 2:
+        print("Invalid input: n and e must be >= 2")
+        print("BONEH_DURFEE=FAILED")
+        quit()
+    if n % 2 == 0:
+        print(f"n is even: {n}")
+        print(f"p = 2")
+        print(f"q = {n // 2}")
+        print("BONEH_DURFEE=SUCCESS")
+        quit()
+    if n.is_prime():
+        print(f"n is prime: {n}")
+        print("BONEH_DURFEE=FAILED")
+        quit()
+    if n.is_square():
+        p = isqrt(n)
+        print(f"n is a perfect square: {p}^2 = {n}")
+        print("BONEH_DURFEE=SUCCESS")
+        quit()
+    # Phase 1: Wiener's attack via continued fraction convergents of e/n
+    cf = continued_fraction(QQ(e)/QQ(n))
+    found = False
+    for conv in cf.convergents():
+        k, d = conv.numerator(), conv.denominator()
+        if k == 0:
+            continue
+        if (e * d - 1) % k == 0:
+            phi = (e * d - 1) // k
+            s = n - phi + 1
+            disc = s ** 2 - 4 * n
+            if disc > 0 and disc.is_square():
+                t = isqrt(disc)
+                if (s + t) % 2 == 0:
+                    p = (s - t) // 2
+                    q = (s + t) // 2
+                    if p * q == n and p > 1:
+                        print(f"Wiener's attack succeeded:")
+                        print(f"d = {d}, p = {p}, q = {q}")
+                        print(f"Verification: p * q = {p * q}")
+                        print("BONEH_DURFEE=SUCCESS")
+                        found = True
+                        break
+    if found:
+        quit()
+    # Phase 2: Boneh-Durfee lattice attack (Herrmann-May simplification)
+    # f(x,y) = 1 + x*(A + y) with root (2k, -(p+q)/2) where ed = 1 + k*phi(n)
+    print("Wiener failed (d >= n^0.25). Attempting Boneh-Durfee lattice attack...")
     A = (n + 1) // 2
     delta = 0.25
     m = 3
@@ -75,36 +70,30 @@ try:
         t = 0
     XX = floor(n ** delta)
     YY = floor(sqrt(n))
-    # Build polynomial f(x,y) = 1 + x*(A + y) with f(2k, y) = ed
     P = PolynomialRing(ZZ, 'x, y')
     x, y = P.gens()
     f = 1 + x * (A + y)
-    # Herrmann-May substitution: u = xy + 1
     PR = PolynomialRing(ZZ, 'u, x, y')
     u, x, y = PR.gens()
     Q = PR.quotient(x * y + 1 - u)
     fZ = Q(f).lift()
     UU = XX * YY + 1
-    # Build lattice from x-shifts
     gg = []
     for kk in range(m + 1):
         for ii in range(m - kk + 1):
             gg.append(x ** ii * e ** (m - kk) * fZ(u, x, y) ** kk)
     gg.sort()
-    # Collect x-shift monomials
     monomials = []
     for poly in gg:
         for mon in poly.monomials():
             if mon not in monomials:
                 monomials.append(mon)
     monomials.sort()
-    # y-shifts (Herrmann-May selective)
     if t > 0:
         for jj in range(1, t + 1):
             for kk in range((m // t) * jj, m + 1):
                 gg.append(Q(y ** jj * fZ(u, x, y) ** kk * e ** (m - kk)).lift())
                 monomials.append(u ** kk * y ** jj)
-    # Build lower-triangular lattice matrix (required for determinant bound)
     nn = len(monomials)
     BB = Matrix(ZZ, nn)
     for ii in range(nn):
@@ -112,9 +101,7 @@ try:
         for jj in range(1, ii + 1):
             if monomials[jj] in gg[ii].monomials():
                 BB[ii, jj] = gg[ii].monomial_coefficient(monomials[jj]) * monomials[jj](UU, XX, YY)
-    # LLL reduction
     BB = BB.LLL()
-    # Recover (x0, y0) by computing resultants on LLL-reduced vector pairs
     PR2 = PolynomialRing(ZZ, 'w, z')
     w, z = PR2.gens()
     found2 = False
@@ -156,12 +143,11 @@ try:
                                     break
             if found2:
                 break
-
     if not found2:
         print("Boneh-Durfee lattice attack failed: d >= n^0.292 or parameters insufficient.")
         print("BONEH_DURFEE=FAILED")
 except Exception as ex:
-    print(f"ERROR: Boneh-Durfee lattice computation failed: {ex}")
+    print(f"ERROR: Boneh-Durfee computation failed: {ex}")
     print("BONEH_DURFEE=FAILED")
 `,
   proof: `\\textbf{Theorem:} The private exponent d can be recovered in polynomial time when d < n^{0.292} using lattice reduction.

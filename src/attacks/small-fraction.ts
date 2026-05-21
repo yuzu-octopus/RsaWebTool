@@ -46,7 +46,6 @@ try:
     trial_window = 5000
     pairs_tried = 0
     divs_tried = 0
-
     for b in range(1, max_den + 1):
         for a in range(1, b + 1):
             if gcd(a, b) != 1:

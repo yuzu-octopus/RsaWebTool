@@ -30,13 +30,11 @@ if not """${vals.oracle_runs}""".strip():
     print("ERROR: oracle_runs is required")
     print("BIASED_LSB=FAILED")
     quit()
-
 try:
     n = Integer(${vals.n})
     e = Integer(${vals.e})
     orig_c = Integer(${vals.c})
     c = (Integer(${vals.c}) * power_mod(Integer(2), e, n)) % n
-
     # Parse oracle runs (multiple response strings, newline-separated)
     runs_str = """${vals.oracle_runs}""".strip()
     runs = []
@@ -46,33 +44,27 @@ try:
             continue
         bits = [int(x.strip()) for x in line.split(',') if x.strip()]
         runs.append(bits)
-
     print(f"Biased LSB Oracle Attack")
     print(f"n = {n}")
     print(f"e = {e}")
     print(f"c = {c}")
     print(f"Number of oracle runs: {len(runs)}")
     print()
-
     # Per-bit majority voting, then binary search
     num_bits = min(len(r) for r in runs)
     n_bits = n.nbits()
     print(f"Using {num_bits} bit positions (n has {n_bits} bits)")
-
     # Majority voting
     voted_bits = []
     for i in range(num_bits):
         votes = sum(runs[j][i] for j in range(len(runs)))
         majority = 1 if votes > len(runs) / 2 else 0
         voted_bits.append(majority)
-
     print(f"Majority-voted bits: {voted_bits[:20]}{'...' if num_bits > 20 else ''}")
     print()
-
     # Binary search with voted bits
     lower = Integer(0)
     upper = Integer(n)
-
     for i, bit in enumerate(voted_bits):
         mid = (lower + upper) // 2
         if bit == 0:
@@ -82,10 +74,8 @@ try:
         c = (c * power_mod(Integer(2), e, n)) % n
         if i < 5 or i >= len(voted_bits) - 3:
             print(f"Step {i+1}: bit={bit}, lower={lower}, upper={upper}")
-
     m = (lower + upper) // 2
     print(f"\\nRecovered message: m = {m}")
-
     # Verify
     v = power_mod(m, e, n)
     print(f"Verification: m^e mod n = {v}")
@@ -96,7 +86,6 @@ try:
     else:
         print("Verification failed - may need more oracle runs or higher bias")
         print("BIASED_LSB=FAILED")
-
 except Exception as ex:
     print(f"ERROR: {ex}")
     print("BIASED_LSB=FAILED")

@@ -21,32 +21,30 @@ export const attack: Attack = {
       return null;
     }
   },
-  sageTemplate: (vals: Record<string, string>) => `# Validate inputs
-if not "${vals.n}".strip():
-    print("ERROR: n is required")
-    print("FACTORDB_LOOKUP=FAILED")
-    quit()
-
-# Simple Floyd cycle Pollard's rho for fallback factorization
-def pollard_rho_factor(n):
-    if n % 2 == 0:
-        return 2
-    if n.is_prime():
+  sageTemplate: (vals: Record<string, string>) => `try:
+    # Validate inputs
+    if not "${vals.n}".strip():
+        print("ERROR: n is required")
+        print("FACTORDB_LOOKUP=FAILED")
+        quit()
+    # Simple Floyd cycle Pollard's rho for fallback factorization
+    def pollard_rho_factor(n):
+        if n % 2 == 0:
+            return 2
+        if n.is_prime():
+            return None
+        for c in range(1, 20):
+            x = 2
+            y = 2
+            d = 1
+            while d == 1:
+                x = (x * x + c) % n
+                y = (y * y + c) % n
+                y = (y * y + c) % n
+                d = gcd(abs(x - y), n)
+            if d != n:
+                return d
         return None
-    for c in range(1, 20):
-        x = 2
-        y = 2
-        d = 1
-        while d == 1:
-            x = (x * x + c) % n
-            y = (y * y + c) % n
-            y = (y * y + c) % n
-            d = gcd(abs(x - y), n)
-        if d != n:
-            return d
-    return None
-
-try:
     n = Integer(${vals.n})
     # Pre-checks
     if n < 2:
@@ -67,7 +65,6 @@ try:
         print(f"p = q = {p}")
         print("FACTORDB_LOOKUP=SUCCESS")
         quit()
-
     print(f"Checking if n = {n} has known factors")
     print()
     # Step 1: Trial division with small primes

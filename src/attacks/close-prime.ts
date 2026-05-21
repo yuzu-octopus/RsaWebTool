@@ -9,86 +9,83 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `n = Integer(${vals.n})
-
-if n < 2:
-    print(f"n = {n} is too small to factor")
-    print("CLOSE_PRIME=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2")
-    print(f"q = {n // 2}")
-    print(f"Verification: 2 * {n // 2} = {n}")
-    print("CLOSE_PRIME=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("No factorization possible")
-    print("CLOSE_PRIME=FAILED")
-    quit()
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print(f"p = q = {p}")
-    print("CLOSE_PRIME=SUCCESS")
-    quit()
-
-print(f"Londahl close-prime factorization on n ({n.nbits()} bits)")
-print()
-
-# Londahl baby-step giant-step phi-approximation attack
-# Source: https://grocid.net/2017/09/16/finding-close-prime-factorizations/
-b = 500000
-
-# Approximate phi(n) = n - (p+q) + 1 ~ n - 2*sqrt(n) + 1 when p ~ q
-phi_approx = n - 2*isqrt(n) + 1
-
-# Baby steps: store 2^j mod n for j = 0..b
-# Parity optimization halves table size (store only parity matching phi_approx)
-print(f"Building baby-step table (b={b})...")
-look_up = {}
-z = 1
-parity = int(phi_approx & 1)
-for j in range(b + 1):
-    if (j & 1) == parity:
-        look_up[z] = j
-    z = (z * 2) % n
-
-# Giant steps: search for phi = phi_approx + j - i*b
-# We compute 2^(-phi_approx) * (2^b)^i and look for collision in baby-step table
-print(f"Searching ({b + 1} giant steps)...")
-mu = inverse_mod(pow(2, phi_approx, n), n)
-step = pow(2, b, n)
-found = False
-for i in range(b + 1):
-    if mu in look_up:
-        j = look_up[mu]
-        phi = phi_approx + j - i * b
-        # Factor n from phi: p+q = n - phi + 1, solve x^2 - (p+q)x + n = 0
-        m = n - phi + 1
-        disc = m*m - 4*n
-        if disc > 0:
-            sqrt_disc = isqrt(disc)
-            if sqrt_disc*sqrt_disc == disc:
-                p_candidate = (m - sqrt_disc) // 2
-                q_candidate = (m + sqrt_disc) // 2
-                if p_candidate * q_candidate == n and p_candidate > 1 and q_candidate > 1:
-                    print(f"Factor found!")
-                    print(f"p = {p_candidate}")
-                    print(f"q = {q_candidate}")
-                    print(f"|p - q| = {abs(q_candidate - p_candidate)}")
-                    print(f"Verification: p * q = {p_candidate * q_candidate}")
-                    print(f"Baby steps: {b+1}, Giant steps: {i+1}")
-                    found = True
-                    break
-    mu = (mu * step) % n
-
-if found:
-    print("CLOSE_PRIME=SUCCESS")
-else:
-    print("Londahl close-prime factorization failed after baby-step giant-step search.")
-    print("The prime gap may be too large. Try Fermat factorization.")
+  sageTemplate: (vals: Record<string, string>) => `try:
+    n = Integer(${vals.n})
+    if n < 2:
+        print(f"n = {n} is too small to factor")
+        print("CLOSE_PRIME=FAILED")
+        quit()
+    if n % 2 == 0:
+        print(f"n is even: {n}")
+        print(f"p = 2")
+        print(f"q = {n // 2}")
+        print(f"Verification: 2 * {n // 2} = {n}")
+        print("CLOSE_PRIME=SUCCESS")
+        quit()
+    if n.is_prime():
+        print(f"n is prime: {n}")
+        print("No factorization possible")
+        print("CLOSE_PRIME=FAILED")
+        quit()
+    if n.is_square():
+        p = isqrt(n)
+        print(f"n is a perfect square: {p}^2 = {n}")
+        print(f"p = q = {p}")
+        print("CLOSE_PRIME=SUCCESS")
+        quit()
+    print(f"Londahl close-prime factorization on n ({n.nbits()} bits)")
+    print()
+    # Londahl baby-step giant-step phi-approximation attack
+    # Source: https://grocid.net/2017/09/16/finding-close-prime-factorizations/
+    b = 500000
+    # Approximate phi(n) = n - (p+q) + 1 ~ n - 2*sqrt(n) + 1 when p ~ q
+    phi_approx = n - 2*isqrt(n) + 1
+    # Baby steps: store 2^j mod n for j = 0..b
+    # Parity optimization halves table size (store only parity matching phi_approx)
+    print(f"Building baby-step table (b={b})...")
+    look_up = {}
+    z = 1
+    parity = int(phi_approx & 1)
+    for j in range(b + 1):
+        if (j & 1) == parity:
+            look_up[z] = j
+        z = (z * 2) % n
+    # Giant steps: search for phi = phi_approx + j - i*b
+    # We compute 2^(-phi_approx) * (2^b)^i and look for collision in baby-step table
+    print(f"Searching ({b + 1} giant steps)...")
+    mu = inverse_mod(pow(2, phi_approx, n), n)
+    step = pow(2, b, n)
+    found = False
+    for i in range(b + 1):
+        if mu in look_up:
+            j = look_up[mu]
+            phi = phi_approx + j - i * b
+            # Factor n from phi: p+q = n - phi + 1, solve x^2 - (p+q)x + n = 0
+            m = n - phi + 1
+            disc = m*m - 4*n
+            if disc > 0:
+                sqrt_disc = isqrt(disc)
+                if sqrt_disc*sqrt_disc == disc:
+                    p_candidate = (m - sqrt_disc) // 2
+                    q_candidate = (m + sqrt_disc) // 2
+                    if p_candidate * q_candidate == n and p_candidate > 1 and q_candidate > 1:
+                        print(f"Factor found!")
+                        print(f"p = {p_candidate}")
+                        print(f"q = {q_candidate}")
+                        print(f"|p - q| = {abs(q_candidate - p_candidate)}")
+                        print(f"Verification: p * q = {p_candidate * q_candidate}")
+                        print(f"Baby steps: {b+1}, Giant steps: {i+1}")
+                        found = True
+                        break
+        mu = (mu * step) % n
+    if found:
+        print("CLOSE_PRIME=SUCCESS")
+    else:
+        print("Londahl close-prime factorization failed after baby-step giant-step search.")
+        print("The prime gap may be too large. Try Fermat factorization.")
+        print("CLOSE_PRIME=FAILED")
+except Exception as e:
+    print(f"Error in close-prime attack: {e}")
     print("CLOSE_PRIME=FAILED")
 `,
   proof: `\\textbf{Theorem:} If $n = p \\cdot q$ with $p \\approx q$, then $n$ can be factored by recovering $\\phi(n)$ via a baby-step giant-step discrete log attack.

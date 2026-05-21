@@ -11,41 +11,35 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'base', label: 'Base (default 65537)', placeholder: '65537', multiline: false },
   ],
-  sageTemplate: (vals: Record<string, string>) => `# Validate inputs
-if not "${vals.n}".strip():
-    print("ERROR: n is required")
-    print("NITROS=FAILED")
-    quit()
-
-try:
-    n = Integer(${vals.n})
+  sageTemplate: (vals: Record<string, string>) => `try:
+    n_input = "${vals.n}".strip()
+    if not n_input:
+        print("ERROR: n is required")
+        print("NITROS=FAILED")
+        quit()
+    n = Integer(n_input)
     base_val = "${vals.base}".strip()
     base = Integer(base_val) if base_val else Integer(65537)
-
     # Even check
     if n % 2 == 0:
         print(f"n is even. p = 2, q = {n // 2}")
         print("NITROS=SUCCESS")
         quit()
-
     # Prime check
     if is_prime(n):
         print("n is prime. Not a valid RSA modulus.")
         print("NITROS=FAILED")
         quit()
-
     print("Nitros / Extended ROCA attack")
     print(f"n = {n}")
     print(f"base = {base}")
     print()
-
     # Try multiple prime bases for M
     prime_sets = [
         [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53],
         [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59],
         [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61],
     ]
-
     found = False
     for primes_subset in prime_sets:
         M = prod(primes_subset)
@@ -53,16 +47,13 @@ try:
         if gcd(base, M) != 1:
             print(f"M = {M}: gcd(base, M) = {gcd(base, M)} != 1, skipping...")
             continue
-
         # Compute remainders
         ord_val = Mod(base, M).multiplicative_order()
         remainders = set()
         for idx in range(ord_val):
             r = power_mod(base, idx, M)
             remainders.add(r)
-
         n_mod = n % M
-
         # Check if n_mod factors into two remainders
         for r1 in remainders:
             r2 = n_mod * inverse_mod(r1, M) % M
@@ -71,15 +62,12 @@ try:
                 print(f"r1 = {r1}, r2 = {r2}")
                 print(f"Verification: r1 * r2 mod M = {(r1 * r2) % M} (n mod M = {n_mod})")
                 found = True
-
                 # Try Coppersmith
                 R.<x> = PolynomialRing(ZZ)
                 f = M*x + r1
                 bound = ceil(sqrt(n) / M)
-
                 f_mod = f.change_ring(Zmod(n))
                 roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=0.05)
-
                 if roots:
                     k = int(roots[0])
                     p = int(M * k + r1)
@@ -107,11 +95,9 @@ try:
                 break
         if found:
             break
-
     if not found:
         print("No ROCA/Nitros pattern detected for tested M values.")
         print("NITROS=FAILED")
-
 except Exception as ex:
     print(f"ERROR: {ex}")
     print("NITROS=FAILED")

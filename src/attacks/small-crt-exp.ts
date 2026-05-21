@@ -14,7 +14,7 @@ export const attack: Attack = {
   sageTemplate: (v) => `try:
     n = Integer(${v.n})
     e = Integer(${v.e})
-    bound = ${v.bound ? `Integer(${v.bound})` : '1000000'}
+    bound = ${v.bound ? `Integer(${v.bound})` : 'Integer(1000000)'}
     if n <= 0 or e <= 0 or bound <= 0:
         print("SMALL_CRT_EXP=FAILED: invalid input values")
     else:

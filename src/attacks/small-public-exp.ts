@@ -47,7 +47,7 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
                     m_hex = '0' + m_hex
                 m_bytes = bytes.fromhex(m_hex)
                 print(f"m as text: {m_bytes.decode('utf-8', errors='replace')}")
-            except:
+            except Exception:
                 print(f"m as hex: {hex(m_root)}")
             print("SMALL_PUBLIC_EXP=SUCCESS")
         else:

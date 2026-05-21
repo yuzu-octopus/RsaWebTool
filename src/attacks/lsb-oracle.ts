@@ -26,7 +26,6 @@ if not "${vals.oracle_responses}".strip():
     print("ERROR: oracle_responses is required")
     print("LSB_ORACLE=FAILED")
     quit()
-
 try:
     n = Integer(${vals.n})
     e_val = "${vals.e}".strip()
@@ -36,25 +35,21 @@ try:
     # Parse oracle responses (LSB of each blinded query)
     responses_str = """${vals.oracle_responses}""".strip()
     oracle_bits = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
-
     print("LSB Oracle Attack on RSA")
     print(f"n = {n}")
     print(f"e = {e}")
     print(f"c = {c}")
     print(f"Oracle responses: {len(oracle_bits)} bits")
     print()
-
     n_bits = n.nbits()
     if len(oracle_bits) < n_bits:
         print(f"WARNING: Need {n_bits} responses for {n_bits}-bit modulus.")
         print(f"Got {len(oracle_bits)}. Attack may be incomplete.")
         print()
-
     # Binary search using LSB oracle with 2^e blinding
     # LSB(2m mod n) = 1 iff 2m >= n (since n is odd) iff m >= current midpoint
     lower = Integer(0)
     upper = Integer(n)
-
     print("Binary search iterations:")
     for i, bit in enumerate(oracle_bits):
         mid = (lower + upper) // 2
@@ -68,11 +63,9 @@ try:
             lower = mid
         if i < 10 or i % 50 == 0:
             print(f"  Step {i+1}: LSB={bit}, range bits = {(upper - lower).nbits()}")
-
     print()
     m = (lower + upper) // 2
     print(f"Recovered message: m = {m}")
-
     # Verify against original ciphertext
     v = power_mod(m, e, n)
     print(f"Verification: m^e mod n = {v}")
@@ -81,7 +74,6 @@ try:
         print("LSB_ORACLE=SUCCESS")
     else:
         print("LSB_ORACLE=FAILED")
-
 except Exception as ex:
     print(f"ERROR: {ex}")
     print("LSB_ORACLE=FAILED")

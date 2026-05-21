@@ -194,71 +194,68 @@ To suppress this warning, you need to explicitly provide the \`palette.${t}Chann
   }
 `,sf=typeof of==`string`?null:Yt`
         animation: ${of} 3s infinite linear;
-      `,cf=e=>{let{classes:t,variant:n,color:r}=e;return Ma({root:[`root`,`color${qo(r)}`,n],dashed:[`dashed`],bar1:[`bar`,`bar1`],bar2:[`bar`,`bar2`,n===`buffer`&&`color${qo(r)}`]},$d,t)},lf=(e,t)=>e.vars?e.vars.palette.LinearProgress[`${t}Bg`]:e.palette.mode===`light`?e.lighten(e.palette[t].main,.62):e.darken(e.palette[t].main,.5),uf=P(`span`,{name:`MuiLinearProgress`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,t[`color${qo(n.color)}`],t[n.variant]]}})(Zo(({theme:e})=>({position:`relative`,overflow:`hidden`,display:`block`,height:4,zIndex:0,"@media print":{colorAdjust:`exact`},variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{backgroundColor:lf(e,t)}})),{props:({ownerState:e})=>e.color===`inherit`&&e.variant!==`buffer`,style:{"&::before":{content:`""`,position:`absolute`,left:0,top:0,right:0,bottom:0,backgroundColor:`currentColor`,opacity:.3}}},{props:{variant:`buffer`},style:{backgroundColor:`transparent`}},{props:{variant:`query`},style:{transform:`rotate(180deg)`}}]}))),df=P(`span`,{name:`MuiLinearProgress`,slot:`Dashed`})(Zo(({theme:e})=>({position:`absolute`,marginTop:0,height:`100%`,width:`100%`,backgroundSize:`10px 10px`,backgroundPosition:`0 -23px`,variants:[{props:{color:`inherit`},style:{opacity:.3,backgroundImage:`radial-gradient(currentColor 0%, currentColor 16%, transparent 42%)`}},...Object.entries(e.palette).filter(Xc()).map(([t])=>{let n=lf(e,t);return{props:{color:t},style:{backgroundImage:`radial-gradient(${n} 0%, ${n} 16%, transparent 42%)`}}})]})),sf||{animation:`${of} 3s infinite linear`}),ff=P(`span`,{name:`MuiLinearProgress`,slot:`Bar1`,overridesResolver:(e,t)=>[t.bar,t.bar1]})(Zo(({theme:e})=>({width:`100%`,position:`absolute`,left:0,bottom:0,top:0,transition:`transform 0.2s linear`,transformOrigin:`left`,variants:[{props:{color:`inherit`},style:{backgroundColor:`currentColor`}},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{backgroundColor:(e.vars||e).palette[t].main}})),{props:{variant:`determinate`},style:{transition:`transform .${ef}s linear`}},{props:{variant:`buffer`},style:{zIndex:1,transition:`transform .${ef}s linear`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:{width:`auto`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:nf||{animation:`${tf} 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite`}}]}))),pf=P(`span`,{name:`MuiLinearProgress`,slot:`Bar2`,overridesResolver:(e,t)=>[t.bar,t.bar2]})(Zo(({theme:e})=>({width:`100%`,position:`absolute`,left:0,bottom:0,top:0,transition:`transform 0.2s linear`,transformOrigin:`left`,variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{"--LinearProgressBar2-barColor":(e.vars||e).palette[t].main}})),{props:({ownerState:e})=>e.variant!==`buffer`&&e.color!==`inherit`,style:{backgroundColor:`var(--LinearProgressBar2-barColor, currentColor)`}},{props:({ownerState:e})=>e.variant!==`buffer`&&e.color===`inherit`,style:{backgroundColor:`currentColor`}},{props:{color:`inherit`},style:{opacity:.3}},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t,variant:`buffer`},style:{backgroundColor:lf(e,t),transition:`transform .${ef}s linear`}})),{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:{width:`auto`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:af||{animation:`${rf} 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite`}}]}))),mf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiLinearProgress`}),{className:r,color:i=`primary`,max:a,min:o,value:s,valueBuffer:c,variant:l=`indeterminate`,...u}=n,d={...n,color:i,variant:l},f=o??0,p=a??100,m=cf(d),h=Zi(),g={},_={bar1:{},bar2:{}};if((l===`determinate`||l===`buffer`)&&s!==void 0){let e=p-f,t=(s-f)/e*100-100;h&&(t=-t),_.bar1.transform=e>0?`translateX(${t}%)`:`translateX(-100%)`,g[`aria-valuenow`]=s,g[`aria-valuemin`]=f,g[`aria-valuemax`]=p}if(l===`buffer`&&c!==void 0){let e=p-f,t=(c-f)/e*100-100;h&&(t=-t),_.bar2.transform=e>0?`translateX(${t}%)`:`translateX(-100%)`}return(0,M.jsxs)(uf,{className:ci(m.root,r),ownerState:d,role:`progressbar`,...g,ref:t,...u,children:[l===`buffer`?(0,M.jsx)(df,{className:m.dashed,ownerState:d}):null,(0,M.jsx)(ff,{className:m.bar1,ownerState:d,style:_.bar1}),l===`determinate`?null:(0,M.jsx)(pf,{className:m.bar2,ownerState:d,style:_.bar2})]})});function hf(e){return di(`MuiLink`,e)}var gf=fi(`MuiLink`,[`root`,`underlineNone`,`underlineHover`,`underlineAlways`,`button`,`focusVisible`]),_f=({theme:e,ownerState:t})=>{let n=t.color;if(`colorSpace`in e&&e.colorSpace){let r=Qn(e,`palette.${n}.main`)||Qn(e,`palette.${n}`)||t.color;return e.alpha(r,.4)}let r=Qn(e,`palette.${n}.main`,!1)||Qn(e,`palette.${n}`,!1)||t.color,i=Qn(e,`palette.${n}.mainChannel`)||Qn(e,`palette.${n}Channel`);return`vars`in e&&i?`rgba(${i} / 0.4)`:Ii(r,.4)},vf={primary:!0,secondary:!0,error:!0,info:!0,success:!0,warning:!0,textPrimary:!0,textSecondary:!0,textDisabled:!0},yf=e=>{let{classes:t,component:n,focusVisible:r,underline:i}=e;return Ma({root:[`root`,`underline${qo(i)}`,n===`button`&&`button`,r&&`focusVisible`]},hf,t)},bf=P(F,{name:`MuiLink`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,t[`underline${qo(n.underline)}`],n.component===`button`&&t.button]}})(Zo(({theme:e})=>({variants:[{props:{underline:`none`},style:{textDecoration:`none`}},{props:{underline:`hover`},style:{textDecoration:`none`,"&:hover":{textDecoration:`underline`}}},{props:{underline:`always`},style:{textDecoration:`underline`,"&:hover":{textDecorationColor:`inherit`}}},{props:({underline:e,ownerState:t})=>e===`always`&&t.color!==`inherit`,style:{textDecorationColor:`var(--Link-underlineColor)`}},{props:({underline:e,ownerState:t})=>e===`always`&&t.color===`inherit`,style:e.colorSpace?{textDecorationColor:e.alpha(`currentColor`,.4)}:null},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{underline:`always`,color:t},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette[t].main,.4)}})),{props:{underline:`always`,color:`textPrimary`},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette.text.primary,.4)}},{props:{underline:`always`,color:`textSecondary`},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette.text.secondary,.4)}},{props:{underline:`always`,color:`textDisabled`},style:{"--Link-underlineColor":(e.vars||e).palette.text.disabled}},{props:{component:`button`},style:{position:`relative`,WebkitTapHighlightColor:`transparent`,backgroundColor:`transparent`,outline:0,border:0,margin:0,borderRadius:0,padding:0,cursor:`pointer`,userSelect:`none`,verticalAlign:`middle`,MozAppearance:`none`,WebkitAppearance:`none`,"&::-moz-focus-inner":{borderStyle:`none`},[`&.${gf.focusVisible}`]:{outline:`auto`}}}]}))),xf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiLink`}),r=Lo(),{className:i,color:a=`primary`,component:o=`a`,onBlur:s,onFocus:c,TypographyClasses:l,underline:u=`always`,variant:d=`inherit`,sx:f,...p}=n,[m,h]=j.useState(!1),g=e=>{Ec(e.target)||h(!1),s&&s(e)},_=e=>{Ec(e.target)&&h(!0),c&&c(e)},v={...n,color:a,component:o,focusVisible:m,underline:u,variant:d};return(0,M.jsx)(bf,{color:a,className:ci(yf(v).root,i),classes:l,component:o,onBlur:g,onFocus:_,ref:t,ownerState:v,variant:d,...p,sx:[...vf[a]===void 0?[{color:a}]:[],...Array.isArray(f)?f:[f]],style:{...p.style,...u===`always`&&a!==`inherit`&&!vf[a]&&{"--Link-underlineColor":_f({theme:r,ownerState:v})}}})}),Sf=j.createContext({});function Cf(e){return di(`MuiList`,e)}fi(`MuiList`,[`root`,`padding`,`dense`,`subheader`]);var wf=e=>{let{classes:t,disablePadding:n,dense:r,subheader:i}=e;return Ma({root:[`root`,!n&&`padding`,r&&`dense`,i&&`subheader`]},Cf,t)},Tf=P(`ul`,{name:`MuiList`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,!n.disablePadding&&t.padding,n.dense&&t.dense,n.subheader&&t.subheader]}})({listStyle:`none`,margin:0,padding:0,position:`relative`,variants:[{props:({ownerState:e})=>!e.disablePadding,style:{paddingTop:8,paddingBottom:8}},{props:({ownerState:e})=>e.subheader,style:{paddingTop:0,isolation:`isolate`}}]}),Ef=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiList`}),{children:r,className:i,component:a=`ul`,dense:o=!1,disablePadding:s=!1,subheader:c,...l}=n,u=j.useMemo(()=>({dense:o}),[o]),d={...n,component:a,dense:o,disablePadding:s},f=wf(d);return(0,M.jsx)(Sf.Provider,{value:u,children:(0,M.jsxs)(Tf,{as:a,className:ci(f.root,i),ref:t,ownerState:d,...l,children:[c,r]})})});function Df(e){return di(`MuiListItem`,e)}fi(`MuiListItem`,[`root`,`dense`,`alignItemsFlexStart`,`divider`,`gutters`,`padding`,`secondaryAction`]);function Of(e){return di(`MuiListItemButton`,e)}var kf=fi(`MuiListItemButton`,[`root`,`focusVisible`,`dense`,`alignItemsFlexStart`,`disabled`,`divider`,`gutters`,`selected`]),Af=(e,t)=>{let{ownerState:n}=e;return[t.root,n.dense&&t.dense,n.alignItems===`flex-start`&&t.alignItemsFlexStart,n.divider&&t.divider,!n.disableGutters&&t.gutters]},jf=e=>{let{alignItems:t,classes:n,dense:r,disabled:i,disableGutters:a,divider:o,selected:s}=e,c=Ma({root:[`root`,r&&`dense`,!a&&`gutters`,o&&`divider`,i&&`disabled`,t===`flex-start`&&`alignItemsFlexStart`,s&&`selected`]},Of,n);return{...n,...c}},Mf=P(Kc,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiListItemButton`,slot:`Root`,overridesResolver:Af})(Zo(({theme:e})=>({display:`flex`,flexGrow:1,justifyContent:`flex-start`,alignItems:`center`,position:`relative`,textDecoration:`none`,minWidth:0,boxSizing:`border-box`,textAlign:`left`,paddingTop:8,paddingBottom:8,transition:e.transitions.create(`background-color`,{duration:e.transitions.duration.shortest}),"&:hover":{textDecoration:`none`,backgroundColor:(e.vars||e).palette.action.hover,"@media (hover: none)":{backgroundColor:`transparent`}},[`&.${kf.selected}`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,(e.vars||e).palette.action.selectedOpacity),[`&.${kf.focusVisible}`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,`${(e.vars||e).palette.action.selectedOpacity} + ${(e.vars||e).palette.action.focusOpacity}`)}},[`&.${kf.selected}:hover`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,`${(e.vars||e).palette.action.selectedOpacity} + ${(e.vars||e).palette.action.hoverOpacity}`),"@media (hover: none)":{backgroundColor:e.alpha((e.vars||e).palette.primary.main,(e.vars||e).palette.action.selectedOpacity)}},[`&.${kf.focusVisible}`]:{backgroundColor:(e.vars||e).palette.action.focus},[`&.${kf.disabled}`]:{opacity:(e.vars||e).palette.action.disabledOpacity},variants:[{props:({ownerState:e})=>e.divider,style:{borderBottom:`1px solid ${(e.vars||e).palette.divider}`,backgroundClip:`padding-box`}},{props:{alignItems:`flex-start`},style:{alignItems:`flex-start`}},{props:({ownerState:e})=>!e.disableGutters,style:{paddingLeft:16,paddingRight:16}},{props:({ownerState:e})=>e.dense,style:{paddingTop:4,paddingBottom:4}}]}))),Nf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemButton`}),{alignItems:r=`center`,autoFocus:i=!1,component:a=`div`,children:o,dense:s=!1,disableGutters:c=!1,divider:l=!1,focusVisibleClassName:u,selected:d=!1,className:f,...p}=n,m=j.useContext(Sf),h=j.useMemo(()=>({dense:s||m.dense||!1,alignItems:r,disableGutters:c}),[r,m.dense,s,c]),g=j.useRef(null);ms(()=>{i&&g.current&&g.current.focus()},[i]);let _={...n,alignItems:r,dense:h.dense,disableGutters:c,divider:l,selected:d},v=jf(_),{root:y,...b}=v,x=xs(g,t);return(0,M.jsx)(Sf.Provider,{value:h,children:(0,M.jsx)(Mf,{ref:x,href:p.href||p.to,component:(p.href||p.to)&&a===`div`?`button`:a,internalNativeButton:!1,focusVisibleClassName:ci(v.focusVisible,u),ownerState:_,className:ci(v.root,f),...p,classes:b,children:o})})});function Pf(e){return di(`MuiListItemSecondaryAction`,e)}fi(`MuiListItemSecondaryAction`,[`root`,`disableGutters`]);var Ff=e=>{let{disableGutters:t,classes:n}=e;return Ma({root:[`root`,t&&`disableGutters`]},Pf,n)},If=P(`div`,{name:`MuiListItemSecondaryAction`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.disableGutters&&t.disableGutters]}})({position:`absolute`,right:16,top:`50%`,transform:`translateY(-50%)`,variants:[{props:({ownerState:e})=>e.disableGutters,style:{right:0}}]}),Lf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemSecondaryAction`}),{className:r,component:i,...a}=n,o=j.useContext(Sf),s={...n,disableGutters:o.disableGutters};return(0,M.jsx)(If,{as:i,className:ci(Ff(s).root,r),ownerState:s,ref:t,...a})});Lf.muiName=`ListItemSecondaryAction`;var Rf=(e,t)=>{let{ownerState:n}=e;return[t.root,n.dense&&t.dense,n.alignItems===`flex-start`&&t.alignItemsFlexStart,n.divider&&t.divider,!n.disableGutters&&t.gutters,!n.disablePadding&&t.padding]},zf=e=>{let{alignItems:t,classes:n,dense:r,disableGutters:i,disablePadding:a,divider:o}=e;return Ma({root:[`root`,r&&`dense`,!i&&`gutters`,!a&&`padding`,o&&`divider`,t===`flex-start`&&`alignItemsFlexStart`],secondaryAction:[`secondaryAction`]},Df,n)},Bf=P(`div`,{name:`MuiListItem`,slot:`Root`,overridesResolver:Rf})(Zo(({theme:e})=>({display:`flex`,justifyContent:`flex-start`,alignItems:`center`,position:`relative`,textDecoration:`none`,width:`100%`,boxSizing:`border-box`,textAlign:`left`,variants:[{props:({ownerState:e})=>!e.disablePadding,style:{paddingTop:8,paddingBottom:8}},{props:({ownerState:e})=>!e.disablePadding&&e.dense,style:{paddingTop:4,paddingBottom:4}},{props:({ownerState:e})=>!e.disablePadding&&!e.disableGutters,style:{paddingLeft:16,paddingRight:16}},{props:({ownerState:e})=>!e.disablePadding&&!!e.secondaryAction,style:{paddingRight:48}},{props:({ownerState:e})=>!!e.secondaryAction,style:{[`& > .${kf.root}`]:{paddingRight:48}}},{props:{alignItems:`flex-start`},style:{alignItems:`flex-start`}},{props:({ownerState:e})=>e.divider,style:{borderBottom:`1px solid ${(e.vars||e).palette.divider}`,backgroundClip:`padding-box`}},{props:({ownerState:e})=>e.button,style:{transition:e.transitions.create(`background-color`,{duration:e.transitions.duration.shortest}),"&:hover":{textDecoration:`none`,backgroundColor:(e.vars||e).palette.action.hover,"@media (hover: none)":{backgroundColor:`transparent`}}}}]}))),Vf=P(Lf,{name:`MuiListItem`,slot:`secondaryAction`})({}),Hf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItem`}),{alignItems:r=`center`,children:i,className:a,component:o=`li`,dense:s=!1,disableGutters:c=!1,disablePadding:l=!1,divider:u=!1,secondaryAction:d,slotProps:f={},slots:p={},...m}=n,h=j.useContext(Sf),g=j.useMemo(()=>({dense:s||h.dense||!1,alignItems:r,disableGutters:c}),[r,h.dense,s,c]),_={...n,alignItems:r,dense:g.dense,disableGutters:c,disablePadding:l,divider:u,secondaryAction:d},v=zf(_),y={slots:p,slotProps:f},[b,x]=hc(`root`,{ref:t,elementType:Bf,externalForwardedProps:{component:o,...y,...m},ownerState:_,className:ci(v.root,a)}),[S,C]=hc(`secondaryAction`,{elementType:Vf,shouldForwardComponentProp:!0,externalForwardedProps:y,ownerState:_,className:v.secondaryAction});return(0,M.jsx)(Sf.Provider,{value:g,children:(0,M.jsxs)(b,{...x,children:[i,d&&(0,M.jsx)(S,{...C,children:d})]})})});function Uf(e){return di(`MuiListItemText`,e)}var Wf=fi(`MuiListItemText`,[`root`,`multiline`,`dense`,`inset`,`primary`,`secondary`]),Gf=e=>{let{classes:t,inset:n,primary:r,secondary:i,dense:a}=e;return Ma({root:[`root`,n&&`inset`,a&&`dense`,r&&i&&`multiline`],primary:[`primary`],secondary:[`secondary`]},Uf,t)},Kf=P(`div`,{name:`MuiListItemText`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`& .${Wf.primary}`]:t.primary},{[`& .${Wf.secondary}`]:t.secondary},t.root,n.inset&&t.inset,n.primary&&n.secondary&&t.multiline,n.dense&&t.dense]}})({flex:`1 1 auto`,minWidth:0,marginTop:4,marginBottom:4,[`.${ul.root}:where(& .${Wf.primary})`]:{display:`block`},[`.${ul.root}:where(& .${Wf.secondary})`]:{display:`block`},variants:[{props:({ownerState:e})=>e.primary&&e.secondary,style:{marginTop:6,marginBottom:6}},{props:({ownerState:e})=>e.inset,style:{paddingLeft:56}}]}),qf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemText`}),{children:r,className:i,disableTypography:a=!1,inset:o=!1,primary:s,secondary:c,slots:l={},slotProps:u={},...d}=n,{dense:f}=j.useContext(Sf),p=s??r,m=c,h={...n,disableTypography:a,inset:o,primary:!!p,secondary:!!m,dense:f},g=Gf(h),_={slots:l,slotProps:u},[v,y]=hc(`root`,{className:ci(g.root,i),elementType:Kf,externalForwardedProps:{..._,...d},ownerState:h,ref:t}),[b,x]=hc(`primary`,{className:g.primary,elementType:F,externalForwardedProps:_,ownerState:h}),[S,C]=hc(`secondary`,{className:g.secondary,elementType:F,externalForwardedProps:_,ownerState:h});return p!=null&&p.type!==F&&!a&&(p=(0,M.jsx)(b,{variant:f?`body2`:`body1`,component:x?.variant?void 0:`span`,...x,children:p})),m!=null&&m.type!==F&&!a&&(m=(0,M.jsx)(S,{variant:`body2`,color:`textSecondary`,...C,children:m})),(0,M.jsxs)(v,{...y,children:[p,m]})}),Jf=j.createContext(void 0);function Yf(){let e=j.useContext(Jf);if(e===void 0)throw Error(`MUI: RovingTabIndexContext is missing. Roving tab index items must be placed within a roving tab index provider.`);return e}var Xf=Object.is;function Zf(e,t){if(e===t)return!0;if(!(e instanceof Object)||!(t instanceof Object))return!1;let n=0,r=0;for(let r in e)if(n+=1,!Xf(e[r],t[r])||!(r in t))return!1;for(let e in t)r+=1;return n===r}var Qf=[`ArrowRight`,`ArrowLeft`,`ArrowUp`,`ArrowDown`,`Home`,`End`];function $f(e){let{activeItemId:t,getDefaultActiveItemId:n,orientation:r,isRtl:i=!1,isItemFocusable:a=pp,wrap:o=!0}=e,[s,c]=j.useState(t),l=j.useRef(t),u=s;t!==l.current&&(l.current=t,t!==void 0&&t!==s&&(u=t,c(t)));let d=j.useRef(null),f=j.useRef(new Map),[p,m]=j.useState(0),h=j.useMemo(()=>up(f.current),[p]),g=tp(u,h,a,n),_=j.useRef(g);_.current=g;let v=j.useCallback(()=>{let e=up(f.current);return sp(e,tp(_.current,e,a,n))},[n,a]),y=j.useCallback(()=>f.current,[]),b=vs(e=>{Zf(f.current.get(e.id)??null,e)||(f.current.set(e.id,e),m(e=>e+1))}),x=vs(e=>{f.current.delete(e)&&m(e=>e+1)}),S=vs(e=>{c(e)}),C=j.useCallback(e=>_.current===e,[]),w=j.useCallback((e,t,n,r)=>{let i=ap(dp(f.current),e,t,n,r??a);return i?(i.element?.focus(),c(i.id),i):null},[a]),T=j.useCallback(e=>({onFocus:e=>{let t=dp(f.current),n=lp(t,e.target);n!==-1&&c(t[n].id)},onKeyDown:e=>{if(e.altKey||e.shiftKey||e.ctrlKey||e.metaKey||!Qf.includes(e.key))return;let t=r===`horizontal`?`ArrowLeft`:`ArrowUp`,n=r===`horizontal`?`ArrowRight`:`ArrowDown`;r===`horizontal`&&i&&(t=`ArrowRight`,n=`ArrowLeft`);let a=dp(f.current),s=ss(ls(d.current)),c=s===d.current,l=ip(a,s,_.current),u=`next`;switch(e.key){case t:u=`previous`,e.preventDefault(),c&&(l=a.length);break;case n:e.preventDefault(),c&&(l=-1);break;case`Home`:e.preventDefault(),l=-1;break;case`End`:e.preventDefault(),u=`previous`,l=a.length;break;default:return}w(l,u,o)},ref:gp(e,e=>{d.current=e})}),[w,i,r,o]),E=j.useCallback(e=>{let t=dp(f.current),n=ss(ls(d.current));return w(n===d.current?-1:ip(t,n,_.current),`next`,!0,e)?.id??null},[w]);return j.useMemo(()=>({activeItemId:g,focusNext:E,getActiveItem:v,getContainerProps:T,getItemMap:y,isItemActive:C,registerItem:b,setActiveItemId:S,unregisterItem:x}),[g,E,v,T,y,C,b,S,x])}function ep(e){let{activeItemId:t,registerItem:n,unregisterItem:r}=Yf(),i=j.useRef(null),a=j.useMemo(()=>({disabled:e.disabled??!1,element:null,focusableWhenDisabled:e.focusableWhenDisabled??!1,id:e.id,selected:e.selected??!1,textValue:e.textValue}),[e.disabled,e.focusableWhenDisabled,e.id,e.selected,e.textValue]),o=j.useRef(a);o.current=a;let s=j.useCallback(t=>{if(i.current=t,t==null){queueMicrotask(()=>{i.current??r(e.id)});return}n({...o.current,element:t})},[e.id,n,r]),c=bs(e.ref,s);return Ti(()=>{i.current&&n({...a,element:i.current})},[a,n]),Ti(()=>{let t=e.id;return()=>{r(t)}},[e.id,r]),{ref:c,tabIndex:t===e.id?0:-1}}function tp(e,t,n,r){return e==null?rp(t,n,r):np(e,t,n)}function np(e,t,n){let r=cp(t,e);return r===-1?op(t,n):n(t[r])?t[r].id:ap(t,r,`next`,!1,n)?.id??null}function rp(e,t,n){let r=n?.(e);if(r!=null){let n=sp(e,r);if(n&&t(n))return n.id}return op(e,t)}function ip(e,t,n){if(t){let n=lp(e,t);if(n!==-1)return n}return cp(e,n)}function ap(e,t,n,r,i){let a=e.length-1;if(a===-1)return null;let o=!1,s=fp(t,a,n,r),c=s;for(;s!==-1;){if(s===c){if(o)return null;o=!0}let t=e[s];if(!t||!i(t))s=fp(s,a,n,r);else return t}return null}function op(e,t){return e.find(e=>t(e))?.id??null}function sp(e,t){return t==null?null:e.find(e=>e.id===t)??null}function cp(e,t){return t==null?-1:e.findIndex(e=>e.id===t)}function lp(e,t){return t?e.findIndex(e=>e.element===t||e.element?.contains(t)):-1}function up(e){let t=Array.from(e.values());if(t.every(e=>e.element==null))return t;let n=t.filter(mp).sort((e,t)=>hp(e.element,t.element)),r=t.filter(e=>!mp(e));return[...n,...r]}function dp(e){return up(e).filter(mp)}function fp(e,t,n,r=!0){return n===`next`?e===t?r?0:-1:e+1:e===0?r?t:-1:e-1}function pp(e){return e.element?e.focusableWhenDisabled?!0:!e.disabled&&!e.element.hasAttribute(`disabled`)&&e.element.getAttribute(`aria-disabled`)!==`true`&&e.element.hasAttribute(`tabindex`):!1}function mp(e){return e.element!=null&&e.element.isConnected}function hp(e,t){if(e===t)return 0;let n=e.compareDocumentPosition(t);return n&Node.DOCUMENT_POSITION_FOLLOWING||n&Node.DOCUMENT_POSITION_CONTAINED_BY?-1:n&Node.DOCUMENT_POSITION_PRECEDING||n&Node.DOCUMENT_POSITION_CONTAINS?1:0}function gp(...e){return t=>{e.forEach(e=>{ps(e??null,t)})}}var _p=Cu;function vp(e,t){if(t==null){e.focus();return}try{e.focus({focusVisible:t===`keyboard`})}catch{e.focus()}}function yp(e){return e?e.type===`mousedown`||e.type===`pointerdown`||e.type===`touchstart`?`pointer`:e.type===`keydown`||e.type===`click`&&e.detail===0?`keyboard`:null:null}function bp(e){return e==null||typeof e==`string`&&!e.trim()}function xp(e,t){return typeof t==`object`&&t?e===t:String(e)===String(t)}var Sp=j.createContext(null);function Cp(){return j.useContext(Sp)}var wp=Sp.Provider,Tp=j.createContext(void 0);function Ep(e){let t=e?.element??e;if(!t)return``;if(e?.textValue!==void 0)return e.textValue;let n=t.innerText;return n===void 0&&(n=t.textContent),n??``}function Dp(e,t){if(t===void 0)return!0;let n=Ep(e);return n=n.trim().toLowerCase(),n.length===0?!1:t.repeating?n[0]===t.keys[0]:n.startsWith(t.keys.join(``))}function Op(e,t){return Dp(e,t)?pp(e):!1}function kp(e,t){vp(e,t)}var Ap=j.forwardRef(function(e,t){let{actions:n,autoFocus:r=!1,autoFocusItem:i=!1,children:a,className:o,disabledItemsFocusable:s=!1,disableListWrap:c=!1,onKeyDown:l,variant:u=`selectedMenu`,...d}=e,f=j.useRef(null),p=j.useRef(!1),[m,h]=j.useState(!1),g=Cp(),_=j.useRef({keys:[],repeating:!0,previousKeyMatched:!0,lastTime:null}),v=$f({activeItemId:void 0,getDefaultActiveItemId:j.useCallback(e=>u===`selectedMenu`?e.find(e=>e.selected&&pp(e))?.id??e.find(e=>pp(e))?.id??null:e.find(e=>pp(e))?.id??null,[u]),orientation:`vertical`,wrap:!c}),{activeItemId:y,focusNext:b,getActiveItem:x,getContainerProps:S,getItemMap:C}=v,w=ys((e=!1)=>{if(!f.current||!e&&p.current)return null;if(i){let e=x();if(e?.element){let t=Array.from(C().values()).some(e=>e.selected);return h(u===`menu`&&t&&!e.selected&&g==null),kp(e.element,g),p.current=!0,e.element}return r?(h(!1),f.current.focus(),f.current):null}return r?(h(!1),f.current.focus(),p.current=!0,f.current):(h(!1),null)});ms(()=>{if(!r&&!i){p.current=!1,h(!1);return}w()},[y,i,r,w]),j.useImperativeHandle(n,()=>({adjustStyleForScrollbar:(e,{direction:t})=>{let n=!f.current.style.width;if(e.clientHeight<f.current.clientHeight&&n){let n=`${_p(fs(e))}px`;f.current.style[t===`rtl`?`paddingLeft`:`paddingRight`]=n,f.current.style.width=`calc(100% + ${n})`}return f.current},focusInitialTarget:()=>{if(!f.current)return null;let e=cs(us(f.current));return e&&Nu(f.current,e)?e:w(!0)}}),[w]);let T=S(),E=xs(f,T.ref,t),D=j.useMemo(()=>({itemsFocusableWhenDisabled:s,suppressInitialFocusVisible:m,variant:u}),[s,m,u]);return(0,M.jsx)(Ef,{role:`menu`,ref:E,className:o,onKeyDown:ys(e=>{if(m&&h(!1),(e.ctrlKey||e.metaKey||e.altKey)&&l){l(e);return}if(T.onKeyDown(e),e.key.length===1){let t=_.current,n=e.key.toLowerCase(),r=performance.now();t.keys.length>0&&(r-t.lastTime>500?(t.keys=[],t.repeating=!0,t.previousKeyMatched=!0):t.repeating&&n!==t.keys[0]&&(t.repeating=!1)),t.lastTime=r,t.keys.push(n);let i=cs(us(f.current)),a=i&&!t.repeating&&Dp(i,t);t.previousKeyMatched&&(a||b(e=>Op(e,t))!=null)?e.preventDefault():t.previousKeyMatched=!1}l&&l(e)}),onFocus:T.onFocus,tabIndex:-1,...d,children:(0,M.jsx)(Tp.Provider,{value:D,children:(0,M.jsx)(Jf.Provider,{value:v,children:a})})})});function jp(e){return di(`MuiPopover`,e)}fi(`MuiPopover`,[`root`,`paper`]);function Mp(e,t){let n=0;return typeof t==`number`?n=t:t===`center`?n=e.height/2:t===`bottom`&&(n=e.height),n}function Np(e,t){let n=0;return typeof t==`number`?n=t:t===`center`?n=e.width/2:t===`right`&&(n=e.width),n}function Pp(e){return[e.horizontal,e.vertical].map(e=>typeof e==`number`?`${e}px`:e).join(` `)}function Fp(e){return typeof e==`function`?e():e}var Ip=e=>{let{classes:t}=e;return Ma({root:[`root`],paper:[`paper`]},jp,t)},Lp=P(Qu,{name:`MuiPopover`,slot:`Root`})({}),Rp=P(Tc,{name:`MuiPopover`,slot:`Paper`})({position:`absolute`,overflowY:`auto`,overflowX:`hidden`,minWidth:16,minHeight:16,maxWidth:`calc(100% - 32px)`,maxHeight:`calc(100% - 32px)`,outline:0}),zp=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiPopover`}),{action:r,anchorEl:i,anchorOrigin:a={vertical:`top`,horizontal:`left`},anchorPosition:o,anchorReference:s=`anchorEl`,children:c,className:l,container:u,disableAutoFocus:d=!1,elevation:f=8,marginThreshold:p=16,open:m,slots:h={},slotProps:g={},transformOrigin:_={vertical:`top`,horizontal:`left`},transitionDuration:v=`auto`,disableScrollLock:y=!1,...b}=n,x=j.useRef(),S={...n,anchorOrigin:a,anchorReference:s,elevation:f,marginThreshold:p,transformOrigin:_,transitionDuration:v},C=Ip(S),w=j.useCallback(()=>{if(s===`anchorPosition`)return o;let e=Fp(i),t=(e&&e.nodeType===1?e:us(x.current).body).getBoundingClientRect();return{top:t.top+Mp(t,a.vertical),left:t.left+Np(t,a.horizontal)}},[i,a.horizontal,a.vertical,o,s]),T=j.useCallback(e=>({vertical:Mp(e,_.vertical),horizontal:Np(e,_.horizontal)}),[_.horizontal,_.vertical]),E=j.useCallback(e=>{let t={width:e.offsetWidth,height:e.offsetHeight},n=T(t);if(s===`none`)return{top:null,left:null,transformOrigin:Pp(n)};let r=w(),a=r.top-n.vertical,o=r.left-n.horizontal,c=a+t.height,l=o+t.width,u=fs(Fp(i)),d=u.innerHeight-p,f=u.innerWidth-p;if(p!=null&&a<p){let e=a-p;a-=e,n.vertical+=e}else if(p!=null&&c>d){let e=c-d;a-=e,n.vertical+=e}if(p!=null&&o<p){let e=o-p;o-=e,n.horizontal+=e}else if(l>f){let e=l-f;o-=e,n.horizontal+=e}return{top:`${Math.round(a)}px`,left:`${Math.round(o)}px`,transformOrigin:Pp(n)}},[i,s,w,T,p]),[D,ee]=j.useState(m),te=j.useCallback(()=>{let e=x.current;if(!e)return;let t=E(e);t.top!=null&&e.style.setProperty(`top`,t.top),t.left!=null&&(e.style.left=t.left),e.style.transformOrigin=t.transformOrigin,ee(!0)},[E]);j.useEffect(()=>(y&&window.addEventListener(`scroll`,te),()=>window.removeEventListener(`scroll`,te)),[i,y,te]);let ne=()=>{te()},re=()=>{ee(!1)};j.useEffect(()=>{m&&te()}),j.useImperativeHandle(r,()=>m?{updatePosition:()=>{te()}}:null,[m,te]),j.useEffect(()=>{if(!m)return;let e=as(()=>{te()}),t=fs(Fp(i));return t.addEventListener(`resize`,e),()=>{e.clear(),t.removeEventListener(`resize`,e)}},[i,m,te]);let ie=v,ae={slots:h,slotProps:g},[oe,O]=hc(`transition`,{elementType:Ud,externalForwardedProps:ae,ownerState:S,getSlotProps:e=>({...e,onEntering:(t,n)=>{e.onEntering?.(t,n),ne()},onExited:t=>{e.onExited?.(t),re()}}),additionalProps:{appear:!0,in:m}});v===`auto`&&!oe.muiSupportAuto&&(ie=void 0);let k=u||(i?us(Fp(i)).body:void 0),[A,{slots:se,slotProps:ce,...le}]=hc(`root`,{ref:t,elementType:Lp,externalForwardedProps:{...ae,...b},shouldForwardComponentProp:!0,additionalProps:{slots:{backdrop:h.backdrop},slotProps:{backdrop:Cs(typeof g.backdrop==`function`?g.backdrop(S):g.backdrop,{invisible:!0})},container:k,open:m},ownerState:S,className:ci(C.root,l)}),[ue,de]=hc(`paper`,{ref:x,className:C.paper,elementType:Rp,externalForwardedProps:ae,shouldForwardComponentProp:!0,additionalProps:{elevation:f,style:D?void 0:{opacity:0}},ownerState:S});return(0,M.jsx)(A,{...le,...!lc(A)&&{slots:se,slotProps:ce,disableAutoFocus:d,disableScrollLock:y},children:(0,M.jsx)(oe,{...O,timeout:ie,children:(0,M.jsx)(ue,{...de,children:c})})})});function Bp(e){return di(`MuiMenu`,e)}fi(`MuiMenu`,[`root`,`paper`,`list`]);var Vp={vertical:`top`,horizontal:`right`},Hp={vertical:`top`,horizontal:`left`},Up=e=>{let{classes:t}=e;return Ma({root:[`root`],paper:[`paper`],list:[`list`]},Bp,t)},Wp=P(zp,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiMenu`,slot:`Root`})({}),Gp=P(Rp,{name:`MuiMenu`,slot:`Paper`})({maxHeight:`calc(100% - 96px)`,WebkitOverflowScrolling:`touch`}),Kp=P(Ap,{name:`MuiMenu`,slot:`List`})({outline:0}),qp=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiMenu`}),{autoFocus:r=!0,children:i,className:a,disableAutoFocusItem:o=!1,onClose:s,open:c,PopoverClasses:l,transitionDuration:u=`auto`,variant:d=`selectedMenu`,slots:f={},slotProps:p={},...m}=n,h=Zi(),g={...n,autoFocus:r,disableAutoFocusItem:o,transitionDuration:u,variant:d},_=Up(g),v=r&&c,y=v&&!o,b=j.useRef(null),x=(e,t)=>{b.current&&(b.current.adjustStyleForScrollbar(e,{direction:h?`rtl`:`ltr`}),v&&b.current.focusInitialTarget?.())},S=e=>{e.key===`Tab`&&(e.preventDefault(),s&&s(e,`tabKeyDown`))},C={slots:f,slotProps:p},w=hl({elementType:f.root,externalSlotProps:p.root,ownerState:g,className:[_.root,a]}),[T,E]=hc(`paper`,{className:_.paper,elementType:Gp,externalForwardedProps:C,shouldForwardComponentProp:!0,ownerState:g}),[D,ee]=hc(`list`,{className:_.list,elementType:Kp,shouldForwardComponentProp:!0,externalForwardedProps:C,getSlotProps:e=>({...e,onKeyDown:t=>{S(t),e.onKeyDown?.(t)}}),ownerState:g}),te=typeof p.transition==`function`?p.transition(g):p.transition;return(0,M.jsx)(Wp,{disableAutoFocus:r,onClose:s,anchorOrigin:{vertical:`bottom`,horizontal:h?`right`:`left`},transformOrigin:h?Vp:Hp,slots:{root:f.root,paper:T,backdrop:f.backdrop,transition:f.transition},slotProps:{root:w,paper:E,backdrop:typeof p.backdrop==`function`?p.backdrop(g):p.backdrop,transition:{...te,onEntering:(...e)=>{x(...e),te?.onEntering?.(...e)}}},open:c,ref:t,transitionDuration:u,ownerState:g,...m,classes:l,children:(0,M.jsx)(D,{actions:b,autoFocus:v,autoFocusItem:y,variant:d,...ee,children:i})})});function Jp(e){return di(`MuiNativeSelect`,e)}var Yp=fi(`MuiNativeSelect`,[`root`,`select`,`multiple`,`filled`,`outlined`,`standard`,`disabled`,`icon`,`iconOpen`,`iconFilled`,`iconOutlined`,`iconStandard`,`nativeInput`,`error`]),Xp=e=>{let{classes:t,variant:n,disabled:r,multiple:i,open:a,error:o}=e;return Ma({select:[`select`,n,r&&`disabled`,i&&`multiple`,o&&`error`],icon:[`icon`,`icon${qo(n)}`,a&&`iconOpen`,r&&`disabled`]},Jp,t)},Zp=P(`select`,{name:`MuiNativeSelect`})(({theme:e})=>({MozAppearance:`none`,WebkitAppearance:`none`,userSelect:`none`,borderRadius:0,cursor:`pointer`,"&:focus":{borderRadius:0},[`&.${Yp.disabled}`]:{cursor:`default`},"&[multiple]":{height:`auto`},"&:not([multiple]) option, &:not([multiple]) optgroup":{backgroundColor:(e.vars||e).palette.background.paper},variants:[{props:({ownerState:e})=>e.variant!==`filled`&&e.variant!==`outlined`,style:{"&&&":{paddingRight:24,minWidth:16}}},{props:{variant:`filled`},style:{"&&&":{paddingRight:32}}},{props:{variant:`outlined`},style:{borderRadius:(e.vars||e).shape.borderRadius,"&:focus":{borderRadius:(e.vars||e).shape.borderRadius},"&&&":{paddingRight:32}}}]})),Qp=P(Zp,{name:`MuiNativeSelect`,slot:`Select`,shouldForwardProp:zo,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.select,t[n.variant],n.error&&t.error,{[`&.${Yp.multiple}`]:t.multiple}]}})({}),$p=P(`svg`,{name:`MuiNativeSelect`})(({theme:e})=>({position:`absolute`,right:0,top:`calc(50% - .5em)`,pointerEvents:`none`,color:(e.vars||e).palette.action.active,[`&.${Yp.disabled}`]:{color:(e.vars||e).palette.action.disabled},variants:[{props:({ownerState:e})=>e.open,style:{transform:`rotate(180deg)`}},{props:{variant:`filled`},style:{right:7}},{props:{variant:`outlined`},style:{right:7}}]})),em=P($p,{name:`MuiNativeSelect`,slot:`Icon`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.icon,n.variant&&t[`icon${qo(n.variant)}`],n.open&&t.iconOpen]}})({}),tm=j.forwardRef(function(e,t){let{className:n,disabled:r,error:i,IconComponent:a,inputRef:o,variant:s=`standard`,...c}=e,l={...e,disabled:r,variant:s,error:i},u=Xp(l);return(0,M.jsxs)(j.Fragment,{children:[(0,M.jsx)(Qp,{ownerState:l,className:ci(u.select,n),disabled:r,ref:o||t,...c}),e.multiple?null:(0,M.jsx)(em,{as:a,ownerState:l,className:u.icon})]})}),nm,rm=P(`fieldset`,{name:`MuiNotchedOutlined`,shouldForwardProp:zo})({textAlign:`left`,position:`absolute`,bottom:0,right:0,top:-5,left:0,margin:0,padding:`0 8px`,pointerEvents:`none`,borderRadius:`inherit`,borderStyle:`solid`,borderWidth:1,overflow:`hidden`,minWidth:`0%`}),im=P(`legend`,{name:`MuiNotchedOutlined`,shouldForwardProp:zo})(Zo(({theme:e})=>({float:`unset`,width:`auto`,overflow:`hidden`,variants:[{props:({ownerState:e})=>!e.withLabel,style:{padding:0,lineHeight:`11px`,transition:e.transitions.create(`width`,{duration:150,easing:e.transitions.easing.easeOut})}},{props:({ownerState:e})=>e.withLabel,style:{display:`block`,padding:0,height:11,fontSize:`0.75em`,visibility:`hidden`,maxWidth:.01,transition:e.transitions.create(`max-width`,{duration:50,easing:e.transitions.easing.easeOut}),whiteSpace:`nowrap`,"& > span":{paddingLeft:5,paddingRight:5,display:`inline-block`,opacity:0,visibility:`visible`}}},{props:({ownerState:e})=>e.withLabel&&e.notched,style:{maxWidth:`100%`,transition:e.transitions.create(`max-width`,{duration:100,easing:e.transitions.easing.easeOut,delay:50})}}]})));function am(e){let{children:t,classes:n,className:r,label:i,notched:a,...o}=e,s=i!=null&&i!==``,c={...e,notched:a,withLabel:s};return(0,M.jsx)(rm,{"aria-hidden":!0,className:r,ownerState:c,...o,children:(0,M.jsx)(im,{ownerState:c,children:s?(0,M.jsx)(`span`,{children:i}):nm||=(0,M.jsx)(`span`,{className:`notranslate`,"aria-hidden":!0,children:`​`})})})}var om=e=>{let{classes:t}=e,n=Ma({root:[`root`],notchedOutline:[`notchedOutline`],input:[`input`]},Ul,t);return{...t,...n}},sm=P(Ll,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiOutlinedInput`,slot:`Root`,overridesResolver:Pl})(Zo(({theme:e})=>{let t=e.palette.mode===`light`?`rgba(0, 0, 0, 0.23)`:`rgba(255, 255, 255, 0.23)`;return{position:`relative`,borderRadius:(e.vars||e).shape.borderRadius,[`&:hover .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.text.primary},"@media (hover: none)":{[`&:hover .${Wl.notchedOutline}`]:{borderColor:e.vars?e.alpha(e.vars.palette.common.onBackground,.23):t}},[`&.${Wl.focused} .${Wl.notchedOutline}`]:{borderWidth:2},variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{[`&.${Wl.focused} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette[t].main}}})),{props:{},style:{[`&.${Wl.error} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.error.main},[`&.${Wl.disabled} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.action.disabled}}},{props:({ownerState:e})=>e.startAdornment,style:{paddingLeft:14}},{props:({ownerState:e})=>e.endAdornment,style:{paddingRight:14}},{props:({ownerState:e})=>e.multiline,style:{padding:`16.5px 14px`}},{props:({ownerState:e,size:t})=>e.multiline&&t===`small`,style:{padding:`8.5px 14px`}}]}})),cm=P(am,{name:`MuiOutlinedInput`,slot:`NotchedOutline`})(Zo(({theme:e})=>{let t=e.palette.mode===`light`?`rgba(0, 0, 0, 0.23)`:`rgba(255, 255, 255, 0.23)`;return{borderColor:e.vars?e.alpha(e.vars.palette.common.onBackground,.23):t}})),lm=P(Rl,{name:`MuiOutlinedInput`,slot:`Input`,overridesResolver:Fl})(Zo(({theme:e})=>({padding:`16.5px 14px`,"&:-webkit-autofill":{...!e.vars&&{WebkitBoxShadow:e.palette.mode===`light`?null:`0 0 0 100px #266798 inset`,WebkitTextFillColor:e.palette.mode===`light`?null:`#fff`,caretColor:e.palette.mode===`light`?null:`#fff`},borderRadius:`inherit`,...e.vars&&e.applyStyles(`dark`,{WebkitBoxShadow:`0 0 0 100px #266798 inset`,WebkitTextFillColor:`#fff`,caretColor:`#fff`})},variants:[{props:{size:`small`},style:{padding:`8.5px 14px`}},{props:({ownerState:e})=>e.multiline,style:{padding:0}},{props:({ownerState:e})=>e.startAdornment,style:{paddingLeft:0}},{props:({ownerState:e})=>e.endAdornment,style:{paddingRight:0}}]}))),um=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiOutlinedInput`}),{fullWidth:r=!1,inputComponent:i=`input`,label:a,multiline:o=!1,notched:s,slots:c={},slotProps:l={},type:u=`text`,...d}=n,f=om(n),[p,m]=Tl({props:n,states:[`color`,`disabled`,`error`,`focused`,`hiddenLabel`,`size`,`required`]}),h={...n,color:p.color||`primary`,disabled:p.disabled,error:p.error,focused:p.focused,formControl:m,fullWidth:r,hiddenLabel:p.hiddenLabel,multiline:o,size:p.size,type:u},g=c.root??sm,_=c.input??lm,[v,y]=hc(`notchedOutline`,{elementType:cm,className:f.notchedOutline,shouldForwardComponentProp:!0,ownerState:h,externalForwardedProps:{slots:c,slotProps:l},additionalProps:{label:a!=null&&a!==``&&p.required?(0,M.jsxs)(j.Fragment,{children:[a,` `,`*`]}):a}});return(0,M.jsx)(Bl,{slots:{root:g,input:_},slotProps:l,renderSuffix:e=>(0,M.jsx)(v,{...y,notched:s===void 0?!!(e.startAdornment||e.filled||e.focused):s}),fullWidth:r,inputComponent:i,multiline:o,ref:t,type:u,...d,classes:{...f,notchedOutline:null}})});um.muiName=`Input`;function dm(e){return di(`MuiSelect`,e)}var fm=fi(`MuiSelect`,[`root`,`select`,`multiple`,`filled`,`outlined`,`standard`,`disabled`,`focused`,`icon`,`iconOpen`,`nativeInput`,`error`]),pm,mm=2,hm=400,gm=200;function _m(e,t){if(!t)return!1;if(e.composedPath().includes(t)||e.target?.nodeType&&t.contains(e.target))return!0;let n=t.getBoundingClientRect();return n.width===0&&n.height===0?!1:e.clientX>=n.left-mm&&e.clientX<=n.right+mm&&e.clientY>=n.top-mm&&e.clientY<=n.bottom+mm}var vm=P(Zp,{name:`MuiSelect`,slot:`Select`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`&.${fm.select}`]:t.select},{[`&.${fm.select}`]:t[n.variant]},{[`&.${fm.error}`]:t.error},{[`&.${fm.multiple}`]:t.multiple}]}})({[`&.${fm.select}`]:{height:`auto`,minHeight:`1.4375em`,textOverflow:`ellipsis`,whiteSpace:`nowrap`,overflow:`hidden`}}),ym=P($p,{name:`MuiSelect`,slot:`Icon`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.icon,n.open&&t.iconOpen]}})({}),bm=P(`input`,{shouldForwardProp:e=>Ro(e)&&e!==`classes`,name:`MuiSelect`,slot:`NativeInput`})({bottom:0,left:0,position:`absolute`,opacity:0,pointerEvents:`none`,width:`100%`,boxSizing:`border-box`}),xm=e=>{let{classes:t,variant:n,disabled:r,multiple:i,open:a,error:o}=e;return Ma({select:[`select`,n,r&&`disabled`,i&&`multiple`,o&&`error`],icon:[`icon`,a&&`iconOpen`,r&&`disabled`],nativeInput:[`nativeInput`]},dm,t)},Sm=j.forwardRef(function(e,t){let{"aria-describedby":n,"aria-label":r,autoFocus:i,autoWidth:a,children:o,className:s,defaultOpen:c,defaultValue:l,disabled:u,displayEmpty:d,error:f=!1,IconComponent:p,inputRef:m,labelId:h,MenuProps:g={},multiple:_,name:v,onBlur:y,onChange:b,onClose:x,onFocus:S,onKeyDown:C,onMouseDown:w,onOpen:T,open:D,readOnly:ee,renderValue:te,required:ne,SelectDisplayProps:re={},tabIndex:ie,type:ae,value:oe,variant:O=`standard`,...k}=e,[A,se]=_s({controlled:oe,default:l,name:`Select`}),[ce,le]=_s({controlled:D,default:c,name:`Select`}),ue=j.useRef(null),de=j.useRef(null),fe=j.useRef(null),pe=j.useRef(!1),me=j.useRef(!1),he=j.useRef(null),ge=j.useRef(!1),_e=j.useRef({allowSelectedMouseUp:!1,allowUnselectedMouseUp:!1}),ve=Qs(),ye=Qs(),[be,xe]=j.useState(null),{current:Se}=j.useRef(D!=null),[Ce,we]=j.useState(),[Te,Ee]=j.useState(null),De=xs(t,m),Oe=j.useCallback(e=>{de.current=e,e&&xe(e)},[]),ke=be?.parentNode;j.useImperativeHandle(De,()=>({focus:()=>{de.current.focus()},node:ue.current,value:A}),[A]);let Ae=be!==null&&ce;ms(()=>{pe.current=Ae},[Ae]);let je=j.useCallback(()=>{ve.clear(),ye.clear()},[ve,ye]),Me=j.useCallback(()=>{je(),ge.current=!1,_e.current={allowSelectedMouseUp:!1,allowUnselectedMouseUp:!1}},[je]),Ne=j.useCallback(()=>{he.current&&=(he.current(),null)},[]);j.useEffect(()=>{Ae||(Me(),Ne())},[Ae,Me,Ne]),j.useEffect(()=>()=>{Me(),Ne()},[Me,Ne]),j.useEffect(()=>{if(!Ae||!ke||a||typeof ResizeObserver>`u`)return;let e=new ResizeObserver(()=>{we(ke.clientWidth)});return e.observe(ke),()=>{e.disconnect()}},[Ae,ke,a]),j.useEffect(()=>{c&&ce&&be&&!Se&&(we(a?null:ke.clientWidth),de.current.focus())},[be,a]),j.useEffect(()=>{i&&de.current.focus()},[i]),j.useEffect(()=>{if(!h)return;let e=us(de.current).getElementById(h);if(e){let t=()=>{getSelection().isCollapsed&&de.current.focus()};return e.addEventListener(`click`,t),()=>{e.removeEventListener(`click`,t)}}},[h]);let Pe=ys((e,t)=>{e||(Me(),Ne()),e?(Ee(yp(t)),T&&T(t)):(Ee(null),x&&x(t)),Se||(pe.current=e,we(a?null:ke.clientWidth),le(e))}),Fe=()=>{Me(),me.current?ye.start(gm,()=>{_e.current.allowUnselectedMouseUp=!0,ve.start(gm,()=>{_e.current.allowSelectedMouseUp=!0})}):ve.start(hm,()=>{_e.current.allowSelectedMouseUp=!0,_e.current.allowUnselectedMouseUp=!0})},Ie=e=>{if(w?.(e),e.button!==0)return;e.preventDefault(),de.current.focus();let t=us(e.currentTarget);Fe(),Ne();let n=e=>{he.current=null,de.current&&(_m(e,de.current)||_m(e,fe.current)||!pe.current&&Se||Pe(!1,e))};t.addEventListener(`mouseup`,n,{capture:!0,once:!0}),he.current=()=>{t.removeEventListener(`mouseup`,n,!0)},Pe(!0,e)},Le=e=>{Pe(!1,e)},Re=j.Children.toArray(o),ze=e=>{let t=Re.find(t=>t.props.value===e.target.value);t!==void 0&&(se(t.props.value),b&&b(e,t))},Be=e=>t=>{ge.current=!1;let n;if(t.currentTarget.hasAttribute(`tabindex`)){if(_){n=Array.isArray(A)?A.slice():[];let t=A.indexOf(e.props.value);t===-1?n.push(e.props.value):n.splice(t,1)}else n=e.props.value;if(e.props.onClick&&e.props.onClick(t),A!==n&&(se(n),b)){let r=t.nativeEvent||t,i=new r.constructor(r.type,r);Object.defineProperty(i,`target`,{writable:!0,value:{value:n,name:v}}),b(i,e)}_||Pe(!1,t)}},Ve=(e,t)=>n=>{if(e.props.onMouseUp?.(n),ge.current){ge.current=!1;return}let r=!_e.current.allowSelectedMouseUp&&t,i=!_e.current.allowUnselectedMouseUp&&!t;r||i||n.currentTarget.click()},He=e=>{ee||([` `,`ArrowUp`,`ArrowDown`,`Enter`].includes(e.key)&&(e.preventDefault(),Pe(!0,e)),C?.(e))},Ue=e=>{!Ae&&y&&(Object.defineProperty(e,`target`,{writable:!0,value:{value:A,name:v}}),y(e))};delete k[`aria-invalid`];let We,Ge,Ke=[],qe=!1,Je=!1;(Dl({value:A})||d)&&(te?We=te(A):qe=!0);let Ye=Re.map(e=>{if(!j.isValidElement(e))return null;let t;if(_){if(!Array.isArray(A))throw Error(E(2));t=A.some(t=>xp(t,e.props.value)),t&&qe&&Ke.push(e.props.children)}else t=xp(A,e.props.value),t&&qe&&(Ge=e.props.children);return t&&(Je=!0),j.cloneElement(e,{"aria-selected":t?`true`:`false`,onMouseDown:t=>{ge.current=!0,e.props.onMouseDown?.(t)},onPointerDown:t=>{ge.current=!0,e.props.onPointerDown?.(t)},onClick:Be(e),onMouseUp:Ve(e,t),onKeyUp:t=>{t.key===` `&&t.preventDefault(),e.props.onKeyUp&&e.props.onKeyUp(t)},role:`option`,selected:t,value:void 0,"data-value":e.props.value})});ms(()=>{me.current=Je},[Je]),qe&&(We=_?Ke.length===0?null:Ke.reduce((e,t,n)=>(e.push(t),n<Ke.length-1&&e.push(`, `),e),[]):Ge);let Xe=Ce;!a&&Se&&be&&(Xe=ke.clientWidth);let Ze;Ze=ie===void 0?u?null:0:ie;let Qe=re.id||(v?`mui-component-select-${v}`:void 0),$e={...e,variant:O,value:A,open:Ae,error:f},et=xm($e),tt=typeof g.slotProps?.paper==`function`?g.slotProps.paper($e):g.slotProps?.paper,nt=xs(tt?.ref,fe),rt=typeof g.slotProps?.list==`function`?g.slotProps.list($e):g.slotProps?.list,it=aa(),at=aa();return(0,M.jsxs)(j.Fragment,{children:[(0,M.jsx)(vm,{as:`div`,ref:Oe,tabIndex:Ze,role:`combobox`,"aria-controls":Ae?it:void 0,"aria-disabled":u?`true`:void 0,"aria-expanded":Ae?`true`:`false`,"aria-haspopup":`listbox`,"aria-label":r,"aria-labelledby":h,"aria-describedby":n,"aria-required":ne?`true`:void 0,"aria-invalid":f?`true`:void 0,onKeyDown:He,onMouseDown:u||ee?null:Ie,onBlur:Ue,onFocus:S,...re,ownerState:$e,className:ci(re.className,et.select,s),id:Qe,children:bp(We)?pm||=(0,M.jsx)(`span`,{className:`notranslate`,"aria-hidden":!0,children:`​`}):We}),(0,M.jsx)(bm,{"aria-invalid":f,value:Array.isArray(A)?A.join(`,`):A,name:v,ref:ue,"aria-hidden":!0,onChange:ze,tabIndex:-1,disabled:u,className:et.nativeInput,autoFocus:i,required:ne,...k,id:k.id??at,ownerState:$e}),(0,M.jsx)(ym,{as:p,className:et.icon,ownerState:$e}),(0,M.jsx)(wp,{value:Te,children:(0,M.jsx)(qp,{id:`menu-${v||``}`,anchorEl:ke,open:Ae,onClose:Le,anchorOrigin:{vertical:`bottom`,horizontal:`center`},transformOrigin:{vertical:`top`,horizontal:`center`},...g,slotProps:{...g.slotProps,list:{"aria-labelledby":h,role:`listbox`,"aria-multiselectable":_?`true`:void 0,disableListWrap:!0,id:it,...rt},paper:{...tt,ref:nt,style:{minWidth:Xe,...tt?.style}}},children:Ye})})]})}),Cm=e=>{let{classes:t}=e,n=Ma({root:[`root`]},dm,t);return{...t,...n}},wm={name:`MuiSelect`,slot:`Root`,shouldForwardProp:e=>zo(e)&&e!==`variant`},Tm=P(Yd,wm)(``),Em=P(um,wm)(``),Dm=P(Cd,wm)(``),Om=j.forwardRef(function(e,t){let n=Qo({name:`MuiSelect`,props:e}),{autoWidth:r=!1,children:i,classes:a={},className:o,defaultOpen:s=!1,displayEmpty:c=!1,IconComponent:l=ql,id:u,input:d,inputProps:f,label:p,labelId:m,MenuProps:h,multiple:g=!1,native:_=!1,onClose:v,onOpen:y,open:b,renderValue:x,SelectDisplayProps:S,variant:C=`outlined`,...w}=n,T=_?tm:Sm,[E]=Tl({props:n,states:[`variant`,`error`]}),D=E.variant||C,ee={...n,variant:D,classes:a},te=Cm(ee),{root:ne,...re}=te,ie=d||{standard:(0,M.jsx)(Tm,{ownerState:ee}),outlined:(0,M.jsx)(Em,{label:p,ownerState:ee}),filled:(0,M.jsx)(Dm,{ownerState:ee})}[D],ae=xs(t,gl(ie));return(0,M.jsx)(j.Fragment,{children:j.cloneElement(ie,{inputComponent:T,inputProps:{children:i,error:E.error,IconComponent:l,variant:D,type:void 0,multiple:g,..._?{id:u}:{autoWidth:r,defaultOpen:s,displayEmpty:c,labelId:m,MenuProps:h,onClose:v,onOpen:y,open:b,renderValue:x,SelectDisplayProps:{id:u,...S}},...f,classes:f?bn(re,f.classes):re,...d?d.props.inputProps:{}},...(g&&_||c)&&D===`outlined`?{notched:!0}:{},ref:ae,className:ci(ie.props.className,o,te.root),...!d&&{variant:D},...w})})});Om.muiName=`Select`;function km(e){return di(`MuiTab`,e)}var Am=fi(`MuiTab`,[`root`,`labelIcon`,`textColorInherit`,`textColorPrimary`,`textColorSecondary`,`selected`,`disabled`,`fullWidth`,`wrapped`,`icon`]),jm=e=>{let{classes:t,textColor:n,fullWidth:r,wrapped:i,icon:a,label:o,selected:s,disabled:c}=e;return Ma({root:[`root`,a&&o&&`labelIcon`,`textColor${qo(n)}`,r&&`fullWidth`,i&&`wrapped`,s&&`selected`,c&&`disabled`],icon:[`icon`]},km,t)},Mm=P(Kc,{name:`MuiTab`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.label&&n.icon&&t.labelIcon,t[`textColor${qo(n.textColor)}`],n.fullWidth&&t.fullWidth,n.wrapped&&t.wrapped,{[`& .${Am.icon}`]:t.icon}]}})(Zo(({theme:e})=>({...e.typography.button,maxWidth:360,minWidth:90,position:`relative`,minHeight:48,flexShrink:0,padding:`12px 16px`,overflow:`hidden`,whiteSpace:`normal`,textAlign:`center`,lineHeight:1.25,variants:[{props:({ownerState:e})=>e.label&&(e.iconPosition===`top`||e.iconPosition===`bottom`),style:{flexDirection:`column`}},{props:({ownerState:e})=>e.label&&e.iconPosition!==`top`&&e.iconPosition!==`bottom`,style:{flexDirection:`row`}},{props:({ownerState:e})=>e.icon&&e.label,style:{minHeight:72,paddingTop:9,paddingBottom:9}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`top`,style:{[`& > .${Am.icon}`]:{marginBottom:6}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`bottom`,style:{[`& > .${Am.icon}`]:{marginTop:6}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`start`,style:{[`& > .${Am.icon}`]:{marginRight:e.spacing(1)}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`end`,style:{[`& > .${Am.icon}`]:{marginLeft:e.spacing(1)}}},{props:{textColor:`inherit`},style:{color:`inherit`,opacity:.6,[`&.${Am.selected}`]:{opacity:1},[`&.${Am.disabled}`]:{opacity:(e.vars||e).palette.action.disabledOpacity}}},{props:{textColor:`primary`},style:{color:(e.vars||e).palette.text.secondary,[`&.${Am.selected}`]:{color:(e.vars||e).palette.primary.main},[`&.${Am.disabled}`]:{color:(e.vars||e).palette.text.disabled}}},{props:{textColor:`secondary`},style:{color:(e.vars||e).palette.text.secondary,[`&.${Am.selected}`]:{color:(e.vars||e).palette.secondary.main},[`&.${Am.disabled}`]:{color:(e.vars||e).palette.text.disabled}}},{props:({ownerState:e})=>e.fullWidth,style:{flexShrink:1,flexGrow:1,flexBasis:0,maxWidth:`none`}},{props:({ownerState:e})=>e.wrapped,style:{fontSize:e.typography.pxToRem(12)}}]}))),Nm=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTab`}),{className:r,disabled:i=!1,disableFocusRipple:a=!1,fullWidth:o,icon:s,iconPosition:c=`top`,indicator:l,label:u,onChange:d,onClick:f,onFocus:p,selected:m,selectionFollowsFocus:h,textColor:g=`inherit`,value:_,wrapped:v=!1,...y}=n,b=Yf(),x=ep({id:_,ref:t,disabled:i,selected:m}),S=b.getItemMap().size===0&&m?0:x.tabIndex,C={...n,disabled:i,disableFocusRipple:a,selected:m,icon:!!s,iconPosition:c,label:!!u,fullWidth:o,textColor:g,wrapped:v},w=jm(C),T=s&&u&&j.isValidElement(s)?j.cloneElement(s,{className:ci(w.icon,s.props.className)}):s;return(0,M.jsxs)(Mm,{internalNativeButton:!0,focusRipple:!a,className:ci(w.root,r),ref:x.ref,role:`tab`,"aria-selected":m,disabled:i,onClick:e=>{!m&&d&&d(e,_),f&&f(e)},onFocus:e=>{h&&!m&&d&&d(e,_),p&&p(e)},tabIndex:S,ownerState:C,...y,children:[c===`top`||c===`start`?(0,M.jsxs)(j.Fragment,{children:[T,u]}):(0,M.jsxs)(j.Fragment,{children:[u,T]}),l]})}),Pm=rs((0,M.jsx)(`path`,{d:`M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z`}),`KeyboardArrowLeft`),Fm=rs((0,M.jsx)(`path`,{d:`M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z`}),`KeyboardArrowRight`);function Im(e){return(1+Math.sin(Math.PI*e-Math.PI/2))/2}function Lm(e,t,n,r={},i=()=>{}){let{ease:a=Im,duration:o=300}=r,s=null,c=t[e],l=!1,u=()=>{l=!0},d=r=>{if(l){i(Error(`Animation cancelled`));return}s===null&&(s=r);let u=Math.min(1,(r-s)/o);if(t[e]=a(u)*(n-c)+c,u>=1){requestAnimationFrame(()=>{i(null)});return}requestAnimationFrame(d)};return c===n?(i(Error(`Element already at target position`)),u):(requestAnimationFrame(d),u)}var Rm={width:99,height:99,position:`absolute`,top:-9999,overflow:`scroll`,pointerEvents:`none`};function zm(e){let{onChange:t,...n}=e,r=j.useRef(),i=j.useRef(null),a=()=>{r.current=i.current.offsetHeight-i.current.clientHeight};return ms(()=>{let e=as(()=>{let e=r.current;a(),e!==r.current&&t(r.current)}),n=fs(i.current);return n.addEventListener(`resize`,e),()=>{e.clear(),n.removeEventListener(`resize`,e)}},[t]),j.useEffect(()=>{a(),t(r.current)},[t]),(0,M.jsx)(`div`,{style:Rm,...n,ref:i})}function Bm(e){return di(`MuiTabScrollButton`,e)}var Vm=fi(`MuiTabScrollButton`,[`root`,`vertical`,`horizontal`,`disabled`]),Hm=e=>{let{classes:t,orientation:n,disabled:r}=e;return Ma({root:[`root`,n,r&&`disabled`]},Bm,t)},Um=P(Kc,{name:`MuiTabScrollButton`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.orientation&&t[n.orientation]]}})({width:40,flexShrink:0,opacity:.8,[`&.${Vm.disabled}`]:{opacity:0},variants:[{props:{orientation:`vertical`},style:{width:`100%`,height:40,"& svg":{transform:`var(--TabScrollButton-svgRotate)`}}}]}),Wm=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTabScrollButton`}),{className:r,slots:i={},slotProps:a={},direction:o,orientation:s,disabled:c,...l}=n,{nativeButton:u,...d}=l,f=Zi(),p={isRtl:f,...n},m=Hm(p),h=i.StartScrollButtonIcon??Pm,g=i.EndScrollButtonIcon??Fm,_=hl({elementType:h,externalSlotProps:a.startScrollButtonIcon,additionalProps:{fontSize:`small`},ownerState:p}),v=hl({elementType:g,externalSlotProps:a.endScrollButtonIcon,additionalProps:{fontSize:`small`},ownerState:p});return(0,M.jsx)(Um,{component:`div`,className:ci(m.root,r),ref:t,role:null,ownerState:p,tabIndex:null,...d,style:{...d.style,...s===`vertical`&&{"--TabScrollButton-svgRotate":`rotate(${f?-90:90}deg)`}},children:o===`left`?(0,M.jsx)(h,{..._}):(0,M.jsx)(g,{...v})})});function Gm(e){return di(`MuiTabs`,e)}var Km=fi(`MuiTabs`,[`root`,`vertical`,`list`,`centered`,`scroller`,`fixed`,`scrollableX`,`scrollableY`,`hideScrollbar`,`scrollButtons`,`scrollButtonsHideMobile`,`indicator`]),qm=e=>{let{vertical:t,fixed:n,hideScrollbar:r,scrollableX:i,scrollableY:a,centered:o,scrollButtonsHideMobile:s,classes:c}=e;return Ma({root:[`root`,t&&`vertical`],scroller:[`scroller`,n&&`fixed`,r&&`hideScrollbar`,i&&`scrollableX`,a&&`scrollableY`],list:[`list`,t&&`vertical`,o&&`centered`],indicator:[`indicator`],scrollButtons:[`scrollButtons`,s&&`scrollButtonsHideMobile`],scrollableX:[i&&`scrollableX`],hideScrollbar:[r&&`hideScrollbar`]},Gm,c)},Jm=P(`div`,{name:`MuiTabs`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`& .${Km.scrollButtons}`]:t.scrollButtons},{[`& .${Km.scrollButtons}`]:n.scrollButtonsHideMobile&&t.scrollButtonsHideMobile},t.root,n.vertical&&t.vertical]}})(Zo(({theme:e})=>({overflow:`hidden`,minHeight:48,WebkitOverflowScrolling:`touch`,display:`flex`,variants:[{props:({ownerState:e})=>e.vertical,style:{flexDirection:`column`}},{props:({ownerState:e})=>e.scrollButtonsHideMobile,style:{[`& .${Km.scrollButtons}`]:{[e.breakpoints.down(`sm`)]:{display:`none`}}}}]}))),Ym=P(`div`,{name:`MuiTabs`,slot:`Scroller`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.scroller,n.fixed&&t.fixed,n.hideScrollbar&&t.hideScrollbar,n.scrollableX&&t.scrollableX,n.scrollableY&&t.scrollableY]}})({position:`relative`,display:`inline-block`,flex:`1 1 auto`,whiteSpace:`nowrap`,variants:[{props:({ownerState:e})=>e.fixed,style:{overflowX:`hidden`,width:`100%`}},{props:({ownerState:e})=>e.hideScrollbar,style:{scrollbarWidth:`none`,"&::-webkit-scrollbar":{display:`none`}}},{props:({ownerState:e})=>e.scrollableX,style:{overflowX:`auto`,overflowY:`hidden`}},{props:({ownerState:e})=>e.scrollableY,style:{overflowY:`auto`,overflowX:`hidden`}}]}),Xm=P(`div`,{name:`MuiTabs`,slot:`List`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.list,n.centered&&t.centered]}})({display:`flex`,variants:[{props:({ownerState:e})=>e.vertical,style:{flexDirection:`column`}},{props:({ownerState:e})=>e.centered,style:{justifyContent:`center`}}]}),Zm=P(`span`,{name:`MuiTabs`,slot:`Indicator`})(Zo(({theme:e})=>({position:`absolute`,height:2,bottom:0,width:`100%`,transition:e.transitions.create(),variants:[{props:{indicatorColor:`primary`},style:{backgroundColor:(e.vars||e).palette.primary.main}},{props:{indicatorColor:`secondary`},style:{backgroundColor:(e.vars||e).palette.secondary.main}},{props:({ownerState:e})=>e.vertical,style:{height:`100%`,width:2,right:0}}]}))),Qm=P(zm)({overflowX:`auto`,overflowY:`hidden`,scrollbarWidth:`none`,"&::-webkit-scrollbar":{display:`none`}}),$m={},eh=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTabs`}),r=Lo(),i=Zi(),{"aria-label":a,"aria-labelledby":o,action:s,centered:c=!1,children:l,className:u,component:d=`div`,allowScrollButtonsMobile:f=!1,indicatorColor:p=`primary`,onChange:m,orientation:h=`horizontal`,scrollButtons:g=`auto`,selectionFollowsFocus:_,slots:v={},slotProps:y={},textColor:b=`primary`,value:x,variant:S=`standard`,visibleScrollbar:C=!1,...w}=n,T=S===`scrollable`,E=h===`vertical`,D=E?`scrollTop`:`scrollLeft`,ee=E?`top`:`left`,te=E?`bottom`:`right`,ne=E?`clientHeight`:`clientWidth`,re=E?`height`:`width`,ie={...n,component:d,allowScrollButtonsMobile:f,indicatorColor:p,orientation:h,vertical:E,scrollButtons:g,textColor:b,variant:S,visibleScrollbar:C,fixed:!T,hideScrollbar:T&&!C,scrollableX:T&&!E,scrollableY:T&&E,centered:c&&!T,scrollButtonsHideMobile:!f},ae=qm(ie),oe=hl({elementType:v.startScrollButtonIcon,externalSlotProps:y.startScrollButtonIcon,ownerState:ie}),O=hl({elementType:v.endScrollButtonIcon,externalSlotProps:y.endScrollButtonIcon,ownerState:ie}),[k,A]=j.useState(!1),[se,ce]=j.useState($m),[le,ue]=j.useState(!1),[de,fe]=j.useState(!1),[pe,me]=j.useState(!1),he=x===!1?null:x,[ge,_e]=j.useState(!1),[ve,ye]=j.useState({overflow:`hidden`,scrollbarWidth:0}),be=new Map,xe=j.useRef(null),Se=j.useRef(null),Ce={slots:v,slotProps:y},we=()=>{let e=xe.current,t;if(e){let n=e.getBoundingClientRect();t={clientWidth:e.clientWidth,scrollLeft:e.scrollLeft,scrollTop:e.scrollTop,scrollWidth:e.scrollWidth,top:n.top,bottom:n.bottom,left:n.left,right:n.right}}let n;if(e&&x!==!1){let e=Se.current.children;if(e.length>0){let t=e[be.get(x)];n=t?t.getBoundingClientRect():null}}return{tabsMeta:t,tabMeta:n}},Te=ys(()=>{let{tabsMeta:e,tabMeta:t}=we(),n=0,r;E?(r=`top`,t&&e&&(n=t.top-e.top+e.scrollTop)):(r=i?`right`:`left`,t&&e&&(n=(i?-1:1)*(t[r]-e[r]+e.scrollLeft)));let a={[r]:n,[re]:t?t[re]:0};if(typeof se[r]!=`number`||typeof se[re]!=`number`)ce(a);else{let e=Math.abs(se[r]-a[r]),t=Math.abs(se[re]-a[re]);(e>=1||t>=1)&&ce(a)}}),Ee=(e,{animation:t=!0}={})=>{t?Lm(D,xe.current,e,{duration:r.transitions.duration.standard}):xe.current[D]=e},De=e=>{let t=xe.current[D];E?t+=e:t+=e*(i?-1:1),Ee(t)},Oe=()=>{let e=xe.current[ne],t=0,n=Array.from(Se.current.children);for(let r=0;r<n.length;r+=1){let i=n[r];if(t+i[ne]>e){r===0&&(t=e);break}t+=i[ne]}return t},ke=()=>{De(-1*Oe())},Ae=()=>{De(Oe())},[je,{onChange:Me,...Ne}]=hc(`scrollbar`,{className:ci(ae.scrollableX,ae.hideScrollbar),elementType:Qm,shouldForwardComponentProp:!0,externalForwardedProps:Ce,ownerState:ie}),Pe=j.useCallback(e=>{Me?.(e),ye({overflow:null,scrollbarWidth:e})},[Me]),[Fe,Ie]=hc(`scrollButtons`,{className:ae.scrollButtons,elementType:Wm,externalForwardedProps:Ce,ownerState:ie,additionalProps:{orientation:h,slots:{StartScrollButtonIcon:v.startScrollButtonIcon,EndScrollButtonIcon:v.endScrollButtonIcon},slotProps:{startScrollButtonIcon:oe,endScrollButtonIcon:O}}}),Le=()=>{let e={};e.scrollbarSizeListener=T?(0,M.jsx)(je,{...Ne,onChange:Pe}):null;let t=T&&(g===`auto`&&(le||de)||g===!0);return e.scrollButtonStart=t?(0,M.jsx)(Fe,{direction:i?`right`:`left`,onClick:ke,disabled:!le,...Ie}):null,e.scrollButtonEnd=t?(0,M.jsx)(Fe,{direction:i?`left`:`right`,onClick:Ae,disabled:!de,...Ie}):null,e},Re=ys(e=>{let{tabsMeta:t,tabMeta:n}=we();!n||!t||(n[ee]<t[ee]?Ee(t[D]+(n[ee]-t[ee]),{animation:e}):n[te]>t[te]&&Ee(t[D]+(n[te]-t[te]),{animation:e}))}),ze=ys(()=>{T&&g!==!1&&me(!pe)});j.useEffect(()=>{let e=as(()=>{xe.current&&Te()}),t,n=n=>{n.forEach(e=>{e.removedNodes.forEach(e=>{t?.unobserve(e)}),e.addedNodes.forEach(e=>{t?.observe(e)})}),e(),ze()},r=fs(xe.current);r.addEventListener(`resize`,e);let i;return typeof ResizeObserver<`u`&&(t=new ResizeObserver(e),Array.from(Se.current.children).forEach(e=>{t.observe(e)})),typeof MutationObserver<`u`&&(i=new MutationObserver(n),i.observe(Se.current,{childList:!0})),()=>{e.clear(),r.removeEventListener(`resize`,e),i?.disconnect(),t?.disconnect()}},[Te,ze]),j.useEffect(()=>{let e=Array.from(Se.current.children),t=e.length;if(typeof IntersectionObserver<`u`&&t>0&&T&&g!==!1){let n=e[0],r=e[t-1],i={root:xe.current,threshold:.99},a=new IntersectionObserver(e=>{ue(!e[0].isIntersecting)},i);a.observe(n);let o=new IntersectionObserver(e=>{fe(!e[0].isIntersecting)},i);return o.observe(r),()=>{a.disconnect(),o.disconnect()}}},[T,g,pe,l?.length]),j.useEffect(()=>{A(!0)},[]),j.useEffect(()=>{Te()}),j.useEffect(()=>{Re($m!==se)},[Re,se]),j.useImperativeHandle(s,()=>({updateIndicator:Te,updateScrollButtons:ze}),[Te,ze]);let[Be,Ve]=hc(`indicator`,{className:ae.indicator,elementType:Zm,externalForwardedProps:Ce,ownerState:ie,additionalProps:{style:se}}),He=(0,M.jsx)(Be,{...Ve}),Ue=$f({activeItemId:ge?void 0:he,orientation:h,isRtl:i}),We=Ue.getContainerProps(),Ge=j.Children.toArray(l).filter(j.isValidElement).map((e,t)=>{let n=e.props.value===void 0?t:e.props.value;return be.set(n,t),{child:e,index:t,childValue:n}}).map(({child:e,childValue:t})=>{let n=t===x;return j.cloneElement(e,{fullWidth:S===`fullWidth`,indicator:n&&!k&&He,selected:n,selectionFollowsFocus:_,onChange:m,textColor:b,value:t})}),Ke=Le(),[qe,Je]=hc(`root`,{ref:t,className:ci(ae.root,u),elementType:Jm,externalForwardedProps:{...Ce,...w,component:d},ownerState:ie}),[Ye,Xe]=hc(`scroller`,{ref:xe,className:ae.scroller,elementType:Ym,externalForwardedProps:Ce,ownerState:ie,additionalProps:{style:{overflow:ve.overflow,[E?`margin${i?`Left`:`Right`}`:`marginBottom`]:C?void 0:-ve.scrollbarWidth}}}),Ze=xs(We.ref,Se),Qe=e=>{let t=Se.current;cs(us(t))?.getAttribute(`role`)===`tab`&&We.onKeyDown(e)},[$e,et]=hc(`list`,{ref:Ze,className:ae.list,elementType:Xm,externalForwardedProps:Ce,ownerState:ie,getSlotProps:e=>({...e,onBlur:t=>{Nu(t.currentTarget,t.relatedTarget)||_e(!1),e.onBlur?.(t)},onKeyDown:t=>{Qe(t),e.onKeyDown?.(t)},onFocus:t=>{_e(!0),We.onFocus(t),e.onFocus?.(t)}})});return(0,M.jsxs)(qe,{...Je,children:[Ke.scrollButtonStart,Ke.scrollbarSizeListener,(0,M.jsxs)(Ye,{...Xe,children:[(0,M.jsx)($e,{"aria-label":a,"aria-labelledby":o,"aria-orientation":h===`vertical`?`vertical`:null,role:`tablist`,...et,children:(0,M.jsx)(Jf.Provider,{value:Ue,children:Ge})}),k&&He]}),Ke.scrollButtonEnd]})});function th(e){return di(`MuiTextField`,e)}fi(`MuiTextField`,[`root`]);var nh={standard:Yd,filled:Cd,outlined:um},rh=e=>{let{classes:t}=e;return Ma({root:[`root`]},th,t)},ih=P(Dd,{name:`MuiTextField`,slot:`Root`})({}),ah=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTextField`}),{autoComplete:r,autoFocus:i=!1,children:a,className:o,color:s=`primary`,defaultValue:c,disabled:l=!1,error:u=!1,fullWidth:d=!1,helperText:f,id:p,inputRef:m,label:h,maxRows:g,minRows:_,multiline:v=!1,name:y,onBlur:b,onChange:x,onFocus:S,placeholder:C,required:w=!1,rows:T,select:E=!1,slots:D={},slotProps:ee={},type:te,value:ne,variant:re=`outlined`,...ie}=n,ae={...n,autoFocus:i,color:s,disabled:l,error:u,fullWidth:d,multiline:v,required:w,select:E,variant:re},oe=rh(ae),O=aa(p),k=f&&O?`${O}-helper-text`:void 0,A=h&&O?`${O}-label`:void 0,se=nh[re],ce={slots:D,slotProps:ee},[le,ue]=hc(`select`,{elementType:Om,externalForwardedProps:ce,ownerState:ae}),de=E&&ue.native,fe={},pe=ce.slotProps.inputLabel;re===`outlined`&&(pe&&pe.shrink!==void 0&&(fe.notched=pe.shrink),fe.label=h),E&&(de||(fe.id=void 0),fe[`aria-describedby`]=void 0);let[me,he]=hc(`root`,{elementType:ih,shouldForwardComponentProp:!0,externalForwardedProps:{...ce,...ie},ownerState:ae,className:ci(oe.root,o),ref:t,additionalProps:{disabled:l,error:u,fullWidth:d,required:w,color:s,variant:re}}),[ge,_e]=hc(`input`,{elementType:se,externalForwardedProps:ce,additionalProps:fe,ownerState:ae}),[ve,ye]=hc(`inputLabel`,{elementType:Qd,externalForwardedProps:ce,ownerState:ae}),[be,xe]=hc(`htmlInput`,{elementType:`input`,externalForwardedProps:ce,ownerState:ae}),[Se,Ce]=hc(`formHelperText`,{elementType:Nd,externalForwardedProps:ce,ownerState:ae}),we=(0,M.jsx)(ge,{"aria-describedby":k,autoComplete:r,autoFocus:i,defaultValue:c,fullWidth:d,multiline:v,name:y,rows:T,maxRows:g,minRows:_,type:te,value:ne,id:O,inputRef:m,onBlur:b,onChange:x,onFocus:S,placeholder:C,inputProps:xe,slots:{input:D.htmlInput?be:void 0},..._e});return(0,M.jsxs)(me,{...he,children:[h!=null&&h!==``&&(0,M.jsx)(ve,{htmlFor:E&&!de?void 0:O,id:A,...E&&!de&&{component:`div`},...ye,children:h}),E?(0,M.jsx)(le,{"aria-describedby":k,id:O,labelId:A,value:ne,input:we,...ue,children:a}):we,f&&(0,M.jsx)(Se,{id:k,...Ce,children:f})]})}),oh=_(),I={background:`#282a36`,currentLine:`#44475a`,foreground:`#f8f8f2`,comment:`#6272a4`,cyan:`#8be9fd`,green:`#50fa7b`,orange:`#ffb86c`,pink:`#ff79c0`,purple:`#bd93f9`,red:`#ff5555`,yellow:`#f1fa8c`},sh=Fo({palette:{mode:`dark`,background:{default:I.background,paper:I.currentLine},primary:{main:I.purple},secondary:{main:I.pink},text:{primary:I.foreground,secondary:I.comment}},typography:{fontFamily:`'JetBrains Mono', monospace`,h1:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},h2:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},h3:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},body1:{fontFamily:`'JetBrains Mono', monospace`},body2:{fontFamily:`'JetBrains Mono', monospace`}},components:{MuiCssBaseline:{styleOverrides:{"*, *::before, *::after":{padding:0},html:{scrollBehavior:`smooth`},code:{fontFamily:`'JetBrains Mono', monospace`},body:{backgroundColor:I.background,color:I.foreground},"::-webkit-scrollbar":{width:`12px`},"::-webkit-scrollbar-track":{background:I.background},"::-webkit-scrollbar-thumb":{background:I.currentLine,borderRadius:`4px`,border:`2px solid transparent`,backgroundClip:`padding-box`},"::-webkit-scrollbar-thumb:hover":{background:I.comment,border:`2px solid transparent`,backgroundClip:`padding-box`}}}}}),ch=rs((0,M.jsx)(`path`,{d:`M7.5 5.6 10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29a.996.996 0 0 0-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41zm-1.03 5.49-2.12-2.12 2.44-2.44 2.12 2.12z`}),`AutoFixHigh`),lh=rs((0,M.jsx)(`path`,{d:`M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-5.97 4.06L14.09 6l1.41 1.41L16.91 6l1.06 1.06-1.41 1.41 1.41 1.41-1.06 1.06-1.41-1.4-1.41 1.41-1.06-1.06 1.41-1.41zm-6.78.66h5v1.5h-5zM11.5 16h-2v2H8v-2H6v-1.5h2v-2h1.5v2h2zm6.5 1.25h-5v-1.5h5zm0-2.5h-5v-1.5h5z`}),`Calculate`),uh=rs((0,M.jsx)(`path`,{d:`M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12z`}),`Cancel`),dh=rs((0,M.jsx)(`path`,{d:`M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2M7.5 18c-.83 0-1.5-.67-1.5-1.5S6.67 15 7.5 15s1.5.67 1.5 1.5S8.33 18 7.5 18m0-9C6.67 9 6 8.33 6 7.5S6.67 6 7.5 6 9 6.67 9 7.5 8.33 9 7.5 9m4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5m4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5m0-9c-.83 0-1.5-.67-1.5-1.5S15.67 6 16.5 6s1.5.67 1.5 1.5S17.33 9 16.5 9`}),`Casino`),fh=rs((0,M.jsx)(`path`,{d:`M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z`}),`CheckCircle`),ph=rs((0,M.jsx)(`path`,{d:`M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z`}),`ContentCopy`),mh=rs((0,M.jsx)(`path`,{d:`M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-2h2zm0-4h-2V7h2z`}),`ErrorOutlined`),hh=rs((0,M.jsx)(`path`,{d:`m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z`}),`ExpandLess`),gh=rs((0,M.jsx)(`path`,{d:`M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z`}),`ExpandMore`),_h=rs((0,M.jsx)(`path`,{d:`M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2zm10 14.5V20H8v-3.5l4-4zm-4-5-4-4V4h8v3.5z`}),`HourglassEmpty`),vh=rs([(0,M.jsx)(`path`,{d:`M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1m0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5z`},`0`),(0,M.jsx)(`path`,{d:`M17.5 10.5c.88 0 1.73.09 2.5.26V9.24c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99M13 12.49v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26V11.9c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.3-4.5.83m4.5 1.84c-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26v-1.52c-.79-.16-1.64-.24-2.5-.24`},`1`)],`MenuBook`),yh=rs((0,M.jsx)(`path`,{d:`M19.8 18.4 14 10.67V6.5l1.35-1.69c.26-.33.03-.81-.39-.81H9.04c-.42 0-.65.48-.39.81L10 6.5v4.17L4.2 18.4c-.49.66-.02 1.6.8 1.6h14c.82 0 1.29-.94.8-1.6`}),`Science`),bh=rs((0,M.jsx)(`path`,{d:`m6 18 8.5-6L6 6zM16 6v12h2V6z`}),`SkipNext`),xh=rs((0,M.jsx)(`path`,{d:`M6 6h12v12H6z`}),`Stop`);function Sh(e,t){for(e=e<0n?-e:e,t=t<0n?-t:t;t!==0n;)[e,t]=[t,e%t];return e}function Ch(e){if(e<0n)throw RangeError(`isqrt: negative input`);if(e<2n)return e;let t=e.toString(2).length,n=1n<<BigInt(Math.floor(t/2));for(;;){let t=n+e/n>>1n;if(t>=n)break;n=t}for(;(n+1n)*(n+1n)<=e;)n++;for(;n*n>e;)n--;return n}function wh(e,t){if(e===0n)return{gcd:t,x:0n,y:1n};let{gcd:n,x:r,y:i}=wh(t%e,e);return{gcd:n,x:i-t/e*r,y:r}}function Th(e,t){let{gcd:n,x:r}=wh(e<0n?e+t:e,t);return n===1n?(r%t+t)%t:null}function Eh(e,t,n){if(n===1n)return 0n;let r=1n;for(e=(e%n+n)%n;t>0n;)t&1n&&(r=r*e%n),t>>=1n,e=e*e%n;return r}function Dh(e){if(e<2n)return!1;if(e<4n)return!0;if(e%2n==0n||e%3n==0n)return!1;for(let t of[5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n]){if(e===t)return!0;if(e%t===0n)return!1}let t=e-1n,n=0;for(;t%2n==0n;)t/=2n,n++;for(let r of[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n]){if(r>=e)break;let i=Eh(r,t,e);if(i===1n||i===e-1n)continue;let a=!0;for(let t=1;t<n;t++)if(i=i*i%e,i===e-1n){a=!1;break}if(a)return!1}return!0}function Oh(e){for(;;){let t=Math.ceil(e/8),n=new Uint8Array(t);crypto.getRandomValues(n);let r=0n;for(let e=0;e<t;e++)r=r<<8n|BigInt(n[e]);if(r|=1n<<BigInt(e-1),r|=1n,r&=(1n<<BigInt(e))-1n,Dh(r))return r}}function kh(e,t,n=65537n){let r,i;do r=Oh(e),i=Oh(t);while(r===i);r>i&&([r,i]=[i,r]);let a=r*i,o=(r-1n)*(i-1n),s=n;for(;Sh(s,o)!==1n;)s+=2n;let c=Th(s,o);if(c===null)throw Error(`modInverse failed`);return{p:r,q:i,n:a,e:s,d:c,phi:o}}function Ah(e,t,n){return Eh(e,n,t)}var L={p:256,q:256},jh={id:`fermat`,name:`Fermat Factorization`,category:`Factorization`,description:`Factors n when p and q are close. Use when |p - q| < 2·n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
-
-print(f"Fermat Factorization on n = {n}")
-print()
-
-# Pre-checks
-if n < 2:
-    print(f"n = {n} is too small to factor")
-    print("FERMAT=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2")
-    print(f"q = {n // 2}")
-    print(f"Verification: 2 * {n // 2} = {n}")
-    print("FERMAT=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("No factorization possible")
-    print("FERMAT=FAILED")
-    quit()
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print(f"p = q = {p}")
-    print(f"Verification: p * q = {p * p}")
-    print("FERMAT=SUCCESS")
-    quit()
-
-# Optimized Fermat (RsaCtfTool algorithm)
-# Uses incremental update: b2 += c, c += 2 instead of recomputing a^2 - n
-a, rem = n.sqrtrem()
-b2 = -rem
-c = 2 * a + 1
-max_iter = 10**6
-iterations = 0
-
-while not b2.is_square():
-    iterations += 1
-    if iterations > max_iter:
-        print(f"Fermat factorization failed: no factor found within {max_iter} iterations")
-        print("p and q may not be close enough for this method")
+      `,cf=e=>{let{classes:t,variant:n,color:r}=e;return Ma({root:[`root`,`color${qo(r)}`,n],dashed:[`dashed`],bar1:[`bar`,`bar1`],bar2:[`bar`,`bar2`,n===`buffer`&&`color${qo(r)}`]},$d,t)},lf=(e,t)=>e.vars?e.vars.palette.LinearProgress[`${t}Bg`]:e.palette.mode===`light`?e.lighten(e.palette[t].main,.62):e.darken(e.palette[t].main,.5),uf=P(`span`,{name:`MuiLinearProgress`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,t[`color${qo(n.color)}`],t[n.variant]]}})(Zo(({theme:e})=>({position:`relative`,overflow:`hidden`,display:`block`,height:4,zIndex:0,"@media print":{colorAdjust:`exact`},variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{backgroundColor:lf(e,t)}})),{props:({ownerState:e})=>e.color===`inherit`&&e.variant!==`buffer`,style:{"&::before":{content:`""`,position:`absolute`,left:0,top:0,right:0,bottom:0,backgroundColor:`currentColor`,opacity:.3}}},{props:{variant:`buffer`},style:{backgroundColor:`transparent`}},{props:{variant:`query`},style:{transform:`rotate(180deg)`}}]}))),df=P(`span`,{name:`MuiLinearProgress`,slot:`Dashed`})(Zo(({theme:e})=>({position:`absolute`,marginTop:0,height:`100%`,width:`100%`,backgroundSize:`10px 10px`,backgroundPosition:`0 -23px`,variants:[{props:{color:`inherit`},style:{opacity:.3,backgroundImage:`radial-gradient(currentColor 0%, currentColor 16%, transparent 42%)`}},...Object.entries(e.palette).filter(Xc()).map(([t])=>{let n=lf(e,t);return{props:{color:t},style:{backgroundImage:`radial-gradient(${n} 0%, ${n} 16%, transparent 42%)`}}})]})),sf||{animation:`${of} 3s infinite linear`}),ff=P(`span`,{name:`MuiLinearProgress`,slot:`Bar1`,overridesResolver:(e,t)=>[t.bar,t.bar1]})(Zo(({theme:e})=>({width:`100%`,position:`absolute`,left:0,bottom:0,top:0,transition:`transform 0.2s linear`,transformOrigin:`left`,variants:[{props:{color:`inherit`},style:{backgroundColor:`currentColor`}},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{backgroundColor:(e.vars||e).palette[t].main}})),{props:{variant:`determinate`},style:{transition:`transform .${ef}s linear`}},{props:{variant:`buffer`},style:{zIndex:1,transition:`transform .${ef}s linear`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:{width:`auto`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:nf||{animation:`${tf} 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite`}}]}))),pf=P(`span`,{name:`MuiLinearProgress`,slot:`Bar2`,overridesResolver:(e,t)=>[t.bar,t.bar2]})(Zo(({theme:e})=>({width:`100%`,position:`absolute`,left:0,bottom:0,top:0,transition:`transform 0.2s linear`,transformOrigin:`left`,variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{"--LinearProgressBar2-barColor":(e.vars||e).palette[t].main}})),{props:({ownerState:e})=>e.variant!==`buffer`&&e.color!==`inherit`,style:{backgroundColor:`var(--LinearProgressBar2-barColor, currentColor)`}},{props:({ownerState:e})=>e.variant!==`buffer`&&e.color===`inherit`,style:{backgroundColor:`currentColor`}},{props:{color:`inherit`},style:{opacity:.3}},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t,variant:`buffer`},style:{backgroundColor:lf(e,t),transition:`transform .${ef}s linear`}})),{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:{width:`auto`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:af||{animation:`${rf} 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite`}}]}))),mf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiLinearProgress`}),{className:r,color:i=`primary`,max:a,min:o,value:s,valueBuffer:c,variant:l=`indeterminate`,...u}=n,d={...n,color:i,variant:l},f=o??0,p=a??100,m=cf(d),h=Zi(),g={},_={bar1:{},bar2:{}};if((l===`determinate`||l===`buffer`)&&s!==void 0){let e=p-f,t=(s-f)/e*100-100;h&&(t=-t),_.bar1.transform=e>0?`translateX(${t}%)`:`translateX(-100%)`,g[`aria-valuenow`]=s,g[`aria-valuemin`]=f,g[`aria-valuemax`]=p}if(l===`buffer`&&c!==void 0){let e=p-f,t=(c-f)/e*100-100;h&&(t=-t),_.bar2.transform=e>0?`translateX(${t}%)`:`translateX(-100%)`}return(0,M.jsxs)(uf,{className:ci(m.root,r),ownerState:d,role:`progressbar`,...g,ref:t,...u,children:[l===`buffer`?(0,M.jsx)(df,{className:m.dashed,ownerState:d}):null,(0,M.jsx)(ff,{className:m.bar1,ownerState:d,style:_.bar1}),l===`determinate`?null:(0,M.jsx)(pf,{className:m.bar2,ownerState:d,style:_.bar2})]})});function hf(e){return di(`MuiLink`,e)}var gf=fi(`MuiLink`,[`root`,`underlineNone`,`underlineHover`,`underlineAlways`,`button`,`focusVisible`]),_f=({theme:e,ownerState:t})=>{let n=t.color;if(`colorSpace`in e&&e.colorSpace){let r=Qn(e,`palette.${n}.main`)||Qn(e,`palette.${n}`)||t.color;return e.alpha(r,.4)}let r=Qn(e,`palette.${n}.main`,!1)||Qn(e,`palette.${n}`,!1)||t.color,i=Qn(e,`palette.${n}.mainChannel`)||Qn(e,`palette.${n}Channel`);return`vars`in e&&i?`rgba(${i} / 0.4)`:Ii(r,.4)},vf={primary:!0,secondary:!0,error:!0,info:!0,success:!0,warning:!0,textPrimary:!0,textSecondary:!0,textDisabled:!0},yf=e=>{let{classes:t,component:n,focusVisible:r,underline:i}=e;return Ma({root:[`root`,`underline${qo(i)}`,n===`button`&&`button`,r&&`focusVisible`]},hf,t)},bf=P(F,{name:`MuiLink`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,t[`underline${qo(n.underline)}`],n.component===`button`&&t.button]}})(Zo(({theme:e})=>({variants:[{props:{underline:`none`},style:{textDecoration:`none`}},{props:{underline:`hover`},style:{textDecoration:`none`,"&:hover":{textDecoration:`underline`}}},{props:{underline:`always`},style:{textDecoration:`underline`,"&:hover":{textDecorationColor:`inherit`}}},{props:({underline:e,ownerState:t})=>e===`always`&&t.color!==`inherit`,style:{textDecorationColor:`var(--Link-underlineColor)`}},{props:({underline:e,ownerState:t})=>e===`always`&&t.color===`inherit`,style:e.colorSpace?{textDecorationColor:e.alpha(`currentColor`,.4)}:null},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{underline:`always`,color:t},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette[t].main,.4)}})),{props:{underline:`always`,color:`textPrimary`},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette.text.primary,.4)}},{props:{underline:`always`,color:`textSecondary`},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette.text.secondary,.4)}},{props:{underline:`always`,color:`textDisabled`},style:{"--Link-underlineColor":(e.vars||e).palette.text.disabled}},{props:{component:`button`},style:{position:`relative`,WebkitTapHighlightColor:`transparent`,backgroundColor:`transparent`,outline:0,border:0,margin:0,borderRadius:0,padding:0,cursor:`pointer`,userSelect:`none`,verticalAlign:`middle`,MozAppearance:`none`,WebkitAppearance:`none`,"&::-moz-focus-inner":{borderStyle:`none`},[`&.${gf.focusVisible}`]:{outline:`auto`}}}]}))),xf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiLink`}),r=Lo(),{className:i,color:a=`primary`,component:o=`a`,onBlur:s,onFocus:c,TypographyClasses:l,underline:u=`always`,variant:d=`inherit`,sx:f,...p}=n,[m,h]=j.useState(!1),g=e=>{Ec(e.target)||h(!1),s&&s(e)},_=e=>{Ec(e.target)&&h(!0),c&&c(e)},v={...n,color:a,component:o,focusVisible:m,underline:u,variant:d};return(0,M.jsx)(bf,{color:a,className:ci(yf(v).root,i),classes:l,component:o,onBlur:g,onFocus:_,ref:t,ownerState:v,variant:d,...p,sx:[...vf[a]===void 0?[{color:a}]:[],...Array.isArray(f)?f:[f]],style:{...p.style,...u===`always`&&a!==`inherit`&&!vf[a]&&{"--Link-underlineColor":_f({theme:r,ownerState:v})}}})}),Sf=j.createContext({});function Cf(e){return di(`MuiList`,e)}fi(`MuiList`,[`root`,`padding`,`dense`,`subheader`]);var wf=e=>{let{classes:t,disablePadding:n,dense:r,subheader:i}=e;return Ma({root:[`root`,!n&&`padding`,r&&`dense`,i&&`subheader`]},Cf,t)},Tf=P(`ul`,{name:`MuiList`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,!n.disablePadding&&t.padding,n.dense&&t.dense,n.subheader&&t.subheader]}})({listStyle:`none`,margin:0,padding:0,position:`relative`,variants:[{props:({ownerState:e})=>!e.disablePadding,style:{paddingTop:8,paddingBottom:8}},{props:({ownerState:e})=>e.subheader,style:{paddingTop:0,isolation:`isolate`}}]}),Ef=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiList`}),{children:r,className:i,component:a=`ul`,dense:o=!1,disablePadding:s=!1,subheader:c,...l}=n,u=j.useMemo(()=>({dense:o}),[o]),d={...n,component:a,dense:o,disablePadding:s},f=wf(d);return(0,M.jsx)(Sf.Provider,{value:u,children:(0,M.jsxs)(Tf,{as:a,className:ci(f.root,i),ref:t,ownerState:d,...l,children:[c,r]})})});function Df(e){return di(`MuiListItem`,e)}fi(`MuiListItem`,[`root`,`dense`,`alignItemsFlexStart`,`divider`,`gutters`,`padding`,`secondaryAction`]);function Of(e){return di(`MuiListItemButton`,e)}var kf=fi(`MuiListItemButton`,[`root`,`focusVisible`,`dense`,`alignItemsFlexStart`,`disabled`,`divider`,`gutters`,`selected`]),Af=(e,t)=>{let{ownerState:n}=e;return[t.root,n.dense&&t.dense,n.alignItems===`flex-start`&&t.alignItemsFlexStart,n.divider&&t.divider,!n.disableGutters&&t.gutters]},jf=e=>{let{alignItems:t,classes:n,dense:r,disabled:i,disableGutters:a,divider:o,selected:s}=e,c=Ma({root:[`root`,r&&`dense`,!a&&`gutters`,o&&`divider`,i&&`disabled`,t===`flex-start`&&`alignItemsFlexStart`,s&&`selected`]},Of,n);return{...n,...c}},Mf=P(Kc,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiListItemButton`,slot:`Root`,overridesResolver:Af})(Zo(({theme:e})=>({display:`flex`,flexGrow:1,justifyContent:`flex-start`,alignItems:`center`,position:`relative`,textDecoration:`none`,minWidth:0,boxSizing:`border-box`,textAlign:`left`,paddingTop:8,paddingBottom:8,transition:e.transitions.create(`background-color`,{duration:e.transitions.duration.shortest}),"&:hover":{textDecoration:`none`,backgroundColor:(e.vars||e).palette.action.hover,"@media (hover: none)":{backgroundColor:`transparent`}},[`&.${kf.selected}`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,(e.vars||e).palette.action.selectedOpacity),[`&.${kf.focusVisible}`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,`${(e.vars||e).palette.action.selectedOpacity} + ${(e.vars||e).palette.action.focusOpacity}`)}},[`&.${kf.selected}:hover`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,`${(e.vars||e).palette.action.selectedOpacity} + ${(e.vars||e).palette.action.hoverOpacity}`),"@media (hover: none)":{backgroundColor:e.alpha((e.vars||e).palette.primary.main,(e.vars||e).palette.action.selectedOpacity)}},[`&.${kf.focusVisible}`]:{backgroundColor:(e.vars||e).palette.action.focus},[`&.${kf.disabled}`]:{opacity:(e.vars||e).palette.action.disabledOpacity},variants:[{props:({ownerState:e})=>e.divider,style:{borderBottom:`1px solid ${(e.vars||e).palette.divider}`,backgroundClip:`padding-box`}},{props:{alignItems:`flex-start`},style:{alignItems:`flex-start`}},{props:({ownerState:e})=>!e.disableGutters,style:{paddingLeft:16,paddingRight:16}},{props:({ownerState:e})=>e.dense,style:{paddingTop:4,paddingBottom:4}}]}))),Nf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemButton`}),{alignItems:r=`center`,autoFocus:i=!1,component:a=`div`,children:o,dense:s=!1,disableGutters:c=!1,divider:l=!1,focusVisibleClassName:u,selected:d=!1,className:f,...p}=n,m=j.useContext(Sf),h=j.useMemo(()=>({dense:s||m.dense||!1,alignItems:r,disableGutters:c}),[r,m.dense,s,c]),g=j.useRef(null);ms(()=>{i&&g.current&&g.current.focus()},[i]);let _={...n,alignItems:r,dense:h.dense,disableGutters:c,divider:l,selected:d},v=jf(_),{root:y,...b}=v,x=xs(g,t);return(0,M.jsx)(Sf.Provider,{value:h,children:(0,M.jsx)(Mf,{ref:x,href:p.href||p.to,component:(p.href||p.to)&&a===`div`?`button`:a,internalNativeButton:!1,focusVisibleClassName:ci(v.focusVisible,u),ownerState:_,className:ci(v.root,f),...p,classes:b,children:o})})});function Pf(e){return di(`MuiListItemSecondaryAction`,e)}fi(`MuiListItemSecondaryAction`,[`root`,`disableGutters`]);var Ff=e=>{let{disableGutters:t,classes:n}=e;return Ma({root:[`root`,t&&`disableGutters`]},Pf,n)},If=P(`div`,{name:`MuiListItemSecondaryAction`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.disableGutters&&t.disableGutters]}})({position:`absolute`,right:16,top:`50%`,transform:`translateY(-50%)`,variants:[{props:({ownerState:e})=>e.disableGutters,style:{right:0}}]}),Lf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemSecondaryAction`}),{className:r,component:i,...a}=n,o=j.useContext(Sf),s={...n,disableGutters:o.disableGutters};return(0,M.jsx)(If,{as:i,className:ci(Ff(s).root,r),ownerState:s,ref:t,...a})});Lf.muiName=`ListItemSecondaryAction`;var Rf=(e,t)=>{let{ownerState:n}=e;return[t.root,n.dense&&t.dense,n.alignItems===`flex-start`&&t.alignItemsFlexStart,n.divider&&t.divider,!n.disableGutters&&t.gutters,!n.disablePadding&&t.padding]},zf=e=>{let{alignItems:t,classes:n,dense:r,disableGutters:i,disablePadding:a,divider:o}=e;return Ma({root:[`root`,r&&`dense`,!i&&`gutters`,!a&&`padding`,o&&`divider`,t===`flex-start`&&`alignItemsFlexStart`],secondaryAction:[`secondaryAction`]},Df,n)},Bf=P(`div`,{name:`MuiListItem`,slot:`Root`,overridesResolver:Rf})(Zo(({theme:e})=>({display:`flex`,justifyContent:`flex-start`,alignItems:`center`,position:`relative`,textDecoration:`none`,width:`100%`,boxSizing:`border-box`,textAlign:`left`,variants:[{props:({ownerState:e})=>!e.disablePadding,style:{paddingTop:8,paddingBottom:8}},{props:({ownerState:e})=>!e.disablePadding&&e.dense,style:{paddingTop:4,paddingBottom:4}},{props:({ownerState:e})=>!e.disablePadding&&!e.disableGutters,style:{paddingLeft:16,paddingRight:16}},{props:({ownerState:e})=>!e.disablePadding&&!!e.secondaryAction,style:{paddingRight:48}},{props:({ownerState:e})=>!!e.secondaryAction,style:{[`& > .${kf.root}`]:{paddingRight:48}}},{props:{alignItems:`flex-start`},style:{alignItems:`flex-start`}},{props:({ownerState:e})=>e.divider,style:{borderBottom:`1px solid ${(e.vars||e).palette.divider}`,backgroundClip:`padding-box`}},{props:({ownerState:e})=>e.button,style:{transition:e.transitions.create(`background-color`,{duration:e.transitions.duration.shortest}),"&:hover":{textDecoration:`none`,backgroundColor:(e.vars||e).palette.action.hover,"@media (hover: none)":{backgroundColor:`transparent`}}}}]}))),Vf=P(Lf,{name:`MuiListItem`,slot:`secondaryAction`})({}),Hf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItem`}),{alignItems:r=`center`,children:i,className:a,component:o=`li`,dense:s=!1,disableGutters:c=!1,disablePadding:l=!1,divider:u=!1,secondaryAction:d,slotProps:f={},slots:p={},...m}=n,h=j.useContext(Sf),g=j.useMemo(()=>({dense:s||h.dense||!1,alignItems:r,disableGutters:c}),[r,h.dense,s,c]),_={...n,alignItems:r,dense:g.dense,disableGutters:c,disablePadding:l,divider:u,secondaryAction:d},v=zf(_),y={slots:p,slotProps:f},[b,x]=hc(`root`,{ref:t,elementType:Bf,externalForwardedProps:{component:o,...y,...m},ownerState:_,className:ci(v.root,a)}),[S,C]=hc(`secondaryAction`,{elementType:Vf,shouldForwardComponentProp:!0,externalForwardedProps:y,ownerState:_,className:v.secondaryAction});return(0,M.jsx)(Sf.Provider,{value:g,children:(0,M.jsxs)(b,{...x,children:[i,d&&(0,M.jsx)(S,{...C,children:d})]})})});function Uf(e){return di(`MuiListItemText`,e)}var Wf=fi(`MuiListItemText`,[`root`,`multiline`,`dense`,`inset`,`primary`,`secondary`]),Gf=e=>{let{classes:t,inset:n,primary:r,secondary:i,dense:a}=e;return Ma({root:[`root`,n&&`inset`,a&&`dense`,r&&i&&`multiline`],primary:[`primary`],secondary:[`secondary`]},Uf,t)},Kf=P(`div`,{name:`MuiListItemText`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`& .${Wf.primary}`]:t.primary},{[`& .${Wf.secondary}`]:t.secondary},t.root,n.inset&&t.inset,n.primary&&n.secondary&&t.multiline,n.dense&&t.dense]}})({flex:`1 1 auto`,minWidth:0,marginTop:4,marginBottom:4,[`.${ul.root}:where(& .${Wf.primary})`]:{display:`block`},[`.${ul.root}:where(& .${Wf.secondary})`]:{display:`block`},variants:[{props:({ownerState:e})=>e.primary&&e.secondary,style:{marginTop:6,marginBottom:6}},{props:({ownerState:e})=>e.inset,style:{paddingLeft:56}}]}),qf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemText`}),{children:r,className:i,disableTypography:a=!1,inset:o=!1,primary:s,secondary:c,slots:l={},slotProps:u={},...d}=n,{dense:f}=j.useContext(Sf),p=s??r,m=c,h={...n,disableTypography:a,inset:o,primary:!!p,secondary:!!m,dense:f},g=Gf(h),_={slots:l,slotProps:u},[v,y]=hc(`root`,{className:ci(g.root,i),elementType:Kf,externalForwardedProps:{..._,...d},ownerState:h,ref:t}),[b,x]=hc(`primary`,{className:g.primary,elementType:F,externalForwardedProps:_,ownerState:h}),[S,C]=hc(`secondary`,{className:g.secondary,elementType:F,externalForwardedProps:_,ownerState:h});return p!=null&&p.type!==F&&!a&&(p=(0,M.jsx)(b,{variant:f?`body2`:`body1`,component:x?.variant?void 0:`span`,...x,children:p})),m!=null&&m.type!==F&&!a&&(m=(0,M.jsx)(S,{variant:`body2`,color:`textSecondary`,...C,children:m})),(0,M.jsxs)(v,{...y,children:[p,m]})}),Jf=j.createContext(void 0);function Yf(){let e=j.useContext(Jf);if(e===void 0)throw Error(`MUI: RovingTabIndexContext is missing. Roving tab index items must be placed within a roving tab index provider.`);return e}var Xf=Object.is;function Zf(e,t){if(e===t)return!0;if(!(e instanceof Object)||!(t instanceof Object))return!1;let n=0,r=0;for(let r in e)if(n+=1,!Xf(e[r],t[r])||!(r in t))return!1;for(let e in t)r+=1;return n===r}var Qf=[`ArrowRight`,`ArrowLeft`,`ArrowUp`,`ArrowDown`,`Home`,`End`];function $f(e){let{activeItemId:t,getDefaultActiveItemId:n,orientation:r,isRtl:i=!1,isItemFocusable:a=pp,wrap:o=!0}=e,[s,c]=j.useState(t),l=j.useRef(t),u=s;t!==l.current&&(l.current=t,t!==void 0&&t!==s&&(u=t,c(t)));let d=j.useRef(null),f=j.useRef(new Map),[p,m]=j.useState(0),h=j.useMemo(()=>up(f.current),[p]),g=tp(u,h,a,n),_=j.useRef(g);_.current=g;let v=j.useCallback(()=>{let e=up(f.current);return sp(e,tp(_.current,e,a,n))},[n,a]),y=j.useCallback(()=>f.current,[]),b=vs(e=>{Zf(f.current.get(e.id)??null,e)||(f.current.set(e.id,e),m(e=>e+1))}),x=vs(e=>{f.current.delete(e)&&m(e=>e+1)}),S=vs(e=>{c(e)}),C=j.useCallback(e=>_.current===e,[]),w=j.useCallback((e,t,n,r)=>{let i=ap(dp(f.current),e,t,n,r??a);return i?(i.element?.focus(),c(i.id),i):null},[a]),T=j.useCallback(e=>({onFocus:e=>{let t=dp(f.current),n=lp(t,e.target);n!==-1&&c(t[n].id)},onKeyDown:e=>{if(e.altKey||e.shiftKey||e.ctrlKey||e.metaKey||!Qf.includes(e.key))return;let t=r===`horizontal`?`ArrowLeft`:`ArrowUp`,n=r===`horizontal`?`ArrowRight`:`ArrowDown`;r===`horizontal`&&i&&(t=`ArrowRight`,n=`ArrowLeft`);let a=dp(f.current),s=ss(ls(d.current)),c=s===d.current,l=ip(a,s,_.current),u=`next`;switch(e.key){case t:u=`previous`,e.preventDefault(),c&&(l=a.length);break;case n:e.preventDefault(),c&&(l=-1);break;case`Home`:e.preventDefault(),l=-1;break;case`End`:e.preventDefault(),u=`previous`,l=a.length;break;default:return}w(l,u,o)},ref:gp(e,e=>{d.current=e})}),[w,i,r,o]),E=j.useCallback(e=>{let t=dp(f.current),n=ss(ls(d.current));return w(n===d.current?-1:ip(t,n,_.current),`next`,!0,e)?.id??null},[w]);return j.useMemo(()=>({activeItemId:g,focusNext:E,getActiveItem:v,getContainerProps:T,getItemMap:y,isItemActive:C,registerItem:b,setActiveItemId:S,unregisterItem:x}),[g,E,v,T,y,C,b,S,x])}function ep(e){let{activeItemId:t,registerItem:n,unregisterItem:r}=Yf(),i=j.useRef(null),a=j.useMemo(()=>({disabled:e.disabled??!1,element:null,focusableWhenDisabled:e.focusableWhenDisabled??!1,id:e.id,selected:e.selected??!1,textValue:e.textValue}),[e.disabled,e.focusableWhenDisabled,e.id,e.selected,e.textValue]),o=j.useRef(a);o.current=a;let s=j.useCallback(t=>{if(i.current=t,t==null){queueMicrotask(()=>{i.current??r(e.id)});return}n({...o.current,element:t})},[e.id,n,r]),c=bs(e.ref,s);return Ti(()=>{i.current&&n({...a,element:i.current})},[a,n]),Ti(()=>{let t=e.id;return()=>{r(t)}},[e.id,r]),{ref:c,tabIndex:t===e.id?0:-1}}function tp(e,t,n,r){return e==null?rp(t,n,r):np(e,t,n)}function np(e,t,n){let r=cp(t,e);return r===-1?op(t,n):n(t[r])?t[r].id:ap(t,r,`next`,!1,n)?.id??null}function rp(e,t,n){let r=n?.(e);if(r!=null){let n=sp(e,r);if(n&&t(n))return n.id}return op(e,t)}function ip(e,t,n){if(t){let n=lp(e,t);if(n!==-1)return n}return cp(e,n)}function ap(e,t,n,r,i){let a=e.length-1;if(a===-1)return null;let o=!1,s=fp(t,a,n,r),c=s;for(;s!==-1;){if(s===c){if(o)return null;o=!0}let t=e[s];if(!t||!i(t))s=fp(s,a,n,r);else return t}return null}function op(e,t){return e.find(e=>t(e))?.id??null}function sp(e,t){return t==null?null:e.find(e=>e.id===t)??null}function cp(e,t){return t==null?-1:e.findIndex(e=>e.id===t)}function lp(e,t){return t?e.findIndex(e=>e.element===t||e.element?.contains(t)):-1}function up(e){let t=Array.from(e.values());if(t.every(e=>e.element==null))return t;let n=t.filter(mp).sort((e,t)=>hp(e.element,t.element)),r=t.filter(e=>!mp(e));return[...n,...r]}function dp(e){return up(e).filter(mp)}function fp(e,t,n,r=!0){return n===`next`?e===t?r?0:-1:e+1:e===0?r?t:-1:e-1}function pp(e){return e.element?e.focusableWhenDisabled?!0:!e.disabled&&!e.element.hasAttribute(`disabled`)&&e.element.getAttribute(`aria-disabled`)!==`true`&&e.element.hasAttribute(`tabindex`):!1}function mp(e){return e.element!=null&&e.element.isConnected}function hp(e,t){if(e===t)return 0;let n=e.compareDocumentPosition(t);return n&Node.DOCUMENT_POSITION_FOLLOWING||n&Node.DOCUMENT_POSITION_CONTAINED_BY?-1:n&Node.DOCUMENT_POSITION_PRECEDING||n&Node.DOCUMENT_POSITION_CONTAINS?1:0}function gp(...e){return t=>{e.forEach(e=>{ps(e??null,t)})}}var _p=Cu;function vp(e,t){if(t==null){e.focus();return}try{e.focus({focusVisible:t===`keyboard`})}catch{e.focus()}}function yp(e){return e?e.type===`mousedown`||e.type===`pointerdown`||e.type===`touchstart`?`pointer`:e.type===`keydown`||e.type===`click`&&e.detail===0?`keyboard`:null:null}function bp(e){return e==null||typeof e==`string`&&!e.trim()}function xp(e,t){return typeof t==`object`&&t?e===t:String(e)===String(t)}var Sp=j.createContext(null);function Cp(){return j.useContext(Sp)}var wp=Sp.Provider,Tp=j.createContext(void 0);function Ep(e){let t=e?.element??e;if(!t)return``;if(e?.textValue!==void 0)return e.textValue;let n=t.innerText;return n===void 0&&(n=t.textContent),n??``}function Dp(e,t){if(t===void 0)return!0;let n=Ep(e);return n=n.trim().toLowerCase(),n.length===0?!1:t.repeating?n[0]===t.keys[0]:n.startsWith(t.keys.join(``))}function Op(e,t){return Dp(e,t)?pp(e):!1}function kp(e,t){vp(e,t)}var Ap=j.forwardRef(function(e,t){let{actions:n,autoFocus:r=!1,autoFocusItem:i=!1,children:a,className:o,disabledItemsFocusable:s=!1,disableListWrap:c=!1,onKeyDown:l,variant:u=`selectedMenu`,...d}=e,f=j.useRef(null),p=j.useRef(!1),[m,h]=j.useState(!1),g=Cp(),_=j.useRef({keys:[],repeating:!0,previousKeyMatched:!0,lastTime:null}),v=$f({activeItemId:void 0,getDefaultActiveItemId:j.useCallback(e=>u===`selectedMenu`?e.find(e=>e.selected&&pp(e))?.id??e.find(e=>pp(e))?.id??null:e.find(e=>pp(e))?.id??null,[u]),orientation:`vertical`,wrap:!c}),{activeItemId:y,focusNext:b,getActiveItem:x,getContainerProps:S,getItemMap:C}=v,w=ys((e=!1)=>{if(!f.current||!e&&p.current)return null;if(i){let e=x();if(e?.element){let t=Array.from(C().values()).some(e=>e.selected);return h(u===`menu`&&t&&!e.selected&&g==null),kp(e.element,g),p.current=!0,e.element}return r?(h(!1),f.current.focus(),f.current):null}return r?(h(!1),f.current.focus(),p.current=!0,f.current):(h(!1),null)});ms(()=>{if(!r&&!i){p.current=!1,h(!1);return}w()},[y,i,r,w]),j.useImperativeHandle(n,()=>({adjustStyleForScrollbar:(e,{direction:t})=>{let n=!f.current.style.width;if(e.clientHeight<f.current.clientHeight&&n){let n=`${_p(fs(e))}px`;f.current.style[t===`rtl`?`paddingLeft`:`paddingRight`]=n,f.current.style.width=`calc(100% + ${n})`}return f.current},focusInitialTarget:()=>{if(!f.current)return null;let e=cs(us(f.current));return e&&Nu(f.current,e)?e:w(!0)}}),[w]);let T=S(),E=xs(f,T.ref,t),D=j.useMemo(()=>({itemsFocusableWhenDisabled:s,suppressInitialFocusVisible:m,variant:u}),[s,m,u]);return(0,M.jsx)(Ef,{role:`menu`,ref:E,className:o,onKeyDown:ys(e=>{if(m&&h(!1),(e.ctrlKey||e.metaKey||e.altKey)&&l){l(e);return}if(T.onKeyDown(e),e.key.length===1){let t=_.current,n=e.key.toLowerCase(),r=performance.now();t.keys.length>0&&(r-t.lastTime>500?(t.keys=[],t.repeating=!0,t.previousKeyMatched=!0):t.repeating&&n!==t.keys[0]&&(t.repeating=!1)),t.lastTime=r,t.keys.push(n);let i=cs(us(f.current)),a=i&&!t.repeating&&Dp(i,t);t.previousKeyMatched&&(a||b(e=>Op(e,t))!=null)?e.preventDefault():t.previousKeyMatched=!1}l&&l(e)}),onFocus:T.onFocus,tabIndex:-1,...d,children:(0,M.jsx)(Tp.Provider,{value:D,children:(0,M.jsx)(Jf.Provider,{value:v,children:a})})})});function jp(e){return di(`MuiPopover`,e)}fi(`MuiPopover`,[`root`,`paper`]);function Mp(e,t){let n=0;return typeof t==`number`?n=t:t===`center`?n=e.height/2:t===`bottom`&&(n=e.height),n}function Np(e,t){let n=0;return typeof t==`number`?n=t:t===`center`?n=e.width/2:t===`right`&&(n=e.width),n}function Pp(e){return[e.horizontal,e.vertical].map(e=>typeof e==`number`?`${e}px`:e).join(` `)}function Fp(e){return typeof e==`function`?e():e}var Ip=e=>{let{classes:t}=e;return Ma({root:[`root`],paper:[`paper`]},jp,t)},Lp=P(Qu,{name:`MuiPopover`,slot:`Root`})({}),Rp=P(Tc,{name:`MuiPopover`,slot:`Paper`})({position:`absolute`,overflowY:`auto`,overflowX:`hidden`,minWidth:16,minHeight:16,maxWidth:`calc(100% - 32px)`,maxHeight:`calc(100% - 32px)`,outline:0}),zp=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiPopover`}),{action:r,anchorEl:i,anchorOrigin:a={vertical:`top`,horizontal:`left`},anchorPosition:o,anchorReference:s=`anchorEl`,children:c,className:l,container:u,disableAutoFocus:d=!1,elevation:f=8,marginThreshold:p=16,open:m,slots:h={},slotProps:g={},transformOrigin:_={vertical:`top`,horizontal:`left`},transitionDuration:v=`auto`,disableScrollLock:y=!1,...b}=n,x=j.useRef(),S={...n,anchorOrigin:a,anchorReference:s,elevation:f,marginThreshold:p,transformOrigin:_,transitionDuration:v},C=Ip(S),w=j.useCallback(()=>{if(s===`anchorPosition`)return o;let e=Fp(i),t=(e&&e.nodeType===1?e:us(x.current).body).getBoundingClientRect();return{top:t.top+Mp(t,a.vertical),left:t.left+Np(t,a.horizontal)}},[i,a.horizontal,a.vertical,o,s]),T=j.useCallback(e=>({vertical:Mp(e,_.vertical),horizontal:Np(e,_.horizontal)}),[_.horizontal,_.vertical]),E=j.useCallback(e=>{let t={width:e.offsetWidth,height:e.offsetHeight},n=T(t);if(s===`none`)return{top:null,left:null,transformOrigin:Pp(n)};let r=w(),a=r.top-n.vertical,o=r.left-n.horizontal,c=a+t.height,l=o+t.width,u=fs(Fp(i)),d=u.innerHeight-p,f=u.innerWidth-p;if(p!=null&&a<p){let e=a-p;a-=e,n.vertical+=e}else if(p!=null&&c>d){let e=c-d;a-=e,n.vertical+=e}if(p!=null&&o<p){let e=o-p;o-=e,n.horizontal+=e}else if(l>f){let e=l-f;o-=e,n.horizontal+=e}return{top:`${Math.round(a)}px`,left:`${Math.round(o)}px`,transformOrigin:Pp(n)}},[i,s,w,T,p]),[D,ee]=j.useState(m),te=j.useCallback(()=>{let e=x.current;if(!e)return;let t=E(e);t.top!=null&&e.style.setProperty(`top`,t.top),t.left!=null&&(e.style.left=t.left),e.style.transformOrigin=t.transformOrigin,ee(!0)},[E]);j.useEffect(()=>(y&&window.addEventListener(`scroll`,te),()=>window.removeEventListener(`scroll`,te)),[i,y,te]);let ne=()=>{te()},re=()=>{ee(!1)};j.useEffect(()=>{m&&te()}),j.useImperativeHandle(r,()=>m?{updatePosition:()=>{te()}}:null,[m,te]),j.useEffect(()=>{if(!m)return;let e=as(()=>{te()}),t=fs(Fp(i));return t.addEventListener(`resize`,e),()=>{e.clear(),t.removeEventListener(`resize`,e)}},[i,m,te]);let ie=v,ae={slots:h,slotProps:g},[oe,O]=hc(`transition`,{elementType:Ud,externalForwardedProps:ae,ownerState:S,getSlotProps:e=>({...e,onEntering:(t,n)=>{e.onEntering?.(t,n),ne()},onExited:t=>{e.onExited?.(t),re()}}),additionalProps:{appear:!0,in:m}});v===`auto`&&!oe.muiSupportAuto&&(ie=void 0);let k=u||(i?us(Fp(i)).body:void 0),[A,{slots:se,slotProps:ce,...le}]=hc(`root`,{ref:t,elementType:Lp,externalForwardedProps:{...ae,...b},shouldForwardComponentProp:!0,additionalProps:{slots:{backdrop:h.backdrop},slotProps:{backdrop:Cs(typeof g.backdrop==`function`?g.backdrop(S):g.backdrop,{invisible:!0})},container:k,open:m},ownerState:S,className:ci(C.root,l)}),[ue,de]=hc(`paper`,{ref:x,className:C.paper,elementType:Rp,externalForwardedProps:ae,shouldForwardComponentProp:!0,additionalProps:{elevation:f,style:D?void 0:{opacity:0}},ownerState:S});return(0,M.jsx)(A,{...le,...!lc(A)&&{slots:se,slotProps:ce,disableAutoFocus:d,disableScrollLock:y},children:(0,M.jsx)(oe,{...O,timeout:ie,children:(0,M.jsx)(ue,{...de,children:c})})})});function Bp(e){return di(`MuiMenu`,e)}fi(`MuiMenu`,[`root`,`paper`,`list`]);var Vp={vertical:`top`,horizontal:`right`},Hp={vertical:`top`,horizontal:`left`},Up=e=>{let{classes:t}=e;return Ma({root:[`root`],paper:[`paper`],list:[`list`]},Bp,t)},Wp=P(zp,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiMenu`,slot:`Root`})({}),Gp=P(Rp,{name:`MuiMenu`,slot:`Paper`})({maxHeight:`calc(100% - 96px)`,WebkitOverflowScrolling:`touch`}),Kp=P(Ap,{name:`MuiMenu`,slot:`List`})({outline:0}),qp=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiMenu`}),{autoFocus:r=!0,children:i,className:a,disableAutoFocusItem:o=!1,onClose:s,open:c,PopoverClasses:l,transitionDuration:u=`auto`,variant:d=`selectedMenu`,slots:f={},slotProps:p={},...m}=n,h=Zi(),g={...n,autoFocus:r,disableAutoFocusItem:o,transitionDuration:u,variant:d},_=Up(g),v=r&&c,y=v&&!o,b=j.useRef(null),x=(e,t)=>{b.current&&(b.current.adjustStyleForScrollbar(e,{direction:h?`rtl`:`ltr`}),v&&b.current.focusInitialTarget?.())},S=e=>{e.key===`Tab`&&(e.preventDefault(),s&&s(e,`tabKeyDown`))},C={slots:f,slotProps:p},w=hl({elementType:f.root,externalSlotProps:p.root,ownerState:g,className:[_.root,a]}),[T,E]=hc(`paper`,{className:_.paper,elementType:Gp,externalForwardedProps:C,shouldForwardComponentProp:!0,ownerState:g}),[D,ee]=hc(`list`,{className:_.list,elementType:Kp,shouldForwardComponentProp:!0,externalForwardedProps:C,getSlotProps:e=>({...e,onKeyDown:t=>{S(t),e.onKeyDown?.(t)}}),ownerState:g}),te=typeof p.transition==`function`?p.transition(g):p.transition;return(0,M.jsx)(Wp,{disableAutoFocus:r,onClose:s,anchorOrigin:{vertical:`bottom`,horizontal:h?`right`:`left`},transformOrigin:h?Vp:Hp,slots:{root:f.root,paper:T,backdrop:f.backdrop,transition:f.transition},slotProps:{root:w,paper:E,backdrop:typeof p.backdrop==`function`?p.backdrop(g):p.backdrop,transition:{...te,onEntering:(...e)=>{x(...e),te?.onEntering?.(...e)}}},open:c,ref:t,transitionDuration:u,ownerState:g,...m,classes:l,children:(0,M.jsx)(D,{actions:b,autoFocus:v,autoFocusItem:y,variant:d,...ee,children:i})})});function Jp(e){return di(`MuiNativeSelect`,e)}var Yp=fi(`MuiNativeSelect`,[`root`,`select`,`multiple`,`filled`,`outlined`,`standard`,`disabled`,`icon`,`iconOpen`,`iconFilled`,`iconOutlined`,`iconStandard`,`nativeInput`,`error`]),Xp=e=>{let{classes:t,variant:n,disabled:r,multiple:i,open:a,error:o}=e;return Ma({select:[`select`,n,r&&`disabled`,i&&`multiple`,o&&`error`],icon:[`icon`,`icon${qo(n)}`,a&&`iconOpen`,r&&`disabled`]},Jp,t)},Zp=P(`select`,{name:`MuiNativeSelect`})(({theme:e})=>({MozAppearance:`none`,WebkitAppearance:`none`,userSelect:`none`,borderRadius:0,cursor:`pointer`,"&:focus":{borderRadius:0},[`&.${Yp.disabled}`]:{cursor:`default`},"&[multiple]":{height:`auto`},"&:not([multiple]) option, &:not([multiple]) optgroup":{backgroundColor:(e.vars||e).palette.background.paper},variants:[{props:({ownerState:e})=>e.variant!==`filled`&&e.variant!==`outlined`,style:{"&&&":{paddingRight:24,minWidth:16}}},{props:{variant:`filled`},style:{"&&&":{paddingRight:32}}},{props:{variant:`outlined`},style:{borderRadius:(e.vars||e).shape.borderRadius,"&:focus":{borderRadius:(e.vars||e).shape.borderRadius},"&&&":{paddingRight:32}}}]})),Qp=P(Zp,{name:`MuiNativeSelect`,slot:`Select`,shouldForwardProp:zo,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.select,t[n.variant],n.error&&t.error,{[`&.${Yp.multiple}`]:t.multiple}]}})({}),$p=P(`svg`,{name:`MuiNativeSelect`})(({theme:e})=>({position:`absolute`,right:0,top:`calc(50% - .5em)`,pointerEvents:`none`,color:(e.vars||e).palette.action.active,[`&.${Yp.disabled}`]:{color:(e.vars||e).palette.action.disabled},variants:[{props:({ownerState:e})=>e.open,style:{transform:`rotate(180deg)`}},{props:{variant:`filled`},style:{right:7}},{props:{variant:`outlined`},style:{right:7}}]})),em=P($p,{name:`MuiNativeSelect`,slot:`Icon`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.icon,n.variant&&t[`icon${qo(n.variant)}`],n.open&&t.iconOpen]}})({}),tm=j.forwardRef(function(e,t){let{className:n,disabled:r,error:i,IconComponent:a,inputRef:o,variant:s=`standard`,...c}=e,l={...e,disabled:r,variant:s,error:i},u=Xp(l);return(0,M.jsxs)(j.Fragment,{children:[(0,M.jsx)(Qp,{ownerState:l,className:ci(u.select,n),disabled:r,ref:o||t,...c}),e.multiple?null:(0,M.jsx)(em,{as:a,ownerState:l,className:u.icon})]})}),nm,rm=P(`fieldset`,{name:`MuiNotchedOutlined`,shouldForwardProp:zo})({textAlign:`left`,position:`absolute`,bottom:0,right:0,top:-5,left:0,margin:0,padding:`0 8px`,pointerEvents:`none`,borderRadius:`inherit`,borderStyle:`solid`,borderWidth:1,overflow:`hidden`,minWidth:`0%`}),im=P(`legend`,{name:`MuiNotchedOutlined`,shouldForwardProp:zo})(Zo(({theme:e})=>({float:`unset`,width:`auto`,overflow:`hidden`,variants:[{props:({ownerState:e})=>!e.withLabel,style:{padding:0,lineHeight:`11px`,transition:e.transitions.create(`width`,{duration:150,easing:e.transitions.easing.easeOut})}},{props:({ownerState:e})=>e.withLabel,style:{display:`block`,padding:0,height:11,fontSize:`0.75em`,visibility:`hidden`,maxWidth:.01,transition:e.transitions.create(`max-width`,{duration:50,easing:e.transitions.easing.easeOut}),whiteSpace:`nowrap`,"& > span":{paddingLeft:5,paddingRight:5,display:`inline-block`,opacity:0,visibility:`visible`}}},{props:({ownerState:e})=>e.withLabel&&e.notched,style:{maxWidth:`100%`,transition:e.transitions.create(`max-width`,{duration:100,easing:e.transitions.easing.easeOut,delay:50})}}]})));function am(e){let{children:t,classes:n,className:r,label:i,notched:a,...o}=e,s=i!=null&&i!==``,c={...e,notched:a,withLabel:s};return(0,M.jsx)(rm,{"aria-hidden":!0,className:r,ownerState:c,...o,children:(0,M.jsx)(im,{ownerState:c,children:s?(0,M.jsx)(`span`,{children:i}):nm||=(0,M.jsx)(`span`,{className:`notranslate`,"aria-hidden":!0,children:`​`})})})}var om=e=>{let{classes:t}=e,n=Ma({root:[`root`],notchedOutline:[`notchedOutline`],input:[`input`]},Ul,t);return{...t,...n}},sm=P(Ll,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiOutlinedInput`,slot:`Root`,overridesResolver:Pl})(Zo(({theme:e})=>{let t=e.palette.mode===`light`?`rgba(0, 0, 0, 0.23)`:`rgba(255, 255, 255, 0.23)`;return{position:`relative`,borderRadius:(e.vars||e).shape.borderRadius,[`&:hover .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.text.primary},"@media (hover: none)":{[`&:hover .${Wl.notchedOutline}`]:{borderColor:e.vars?e.alpha(e.vars.palette.common.onBackground,.23):t}},[`&.${Wl.focused} .${Wl.notchedOutline}`]:{borderWidth:2},variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{[`&.${Wl.focused} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette[t].main}}})),{props:{},style:{[`&.${Wl.error} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.error.main},[`&.${Wl.disabled} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.action.disabled}}},{props:({ownerState:e})=>e.startAdornment,style:{paddingLeft:14}},{props:({ownerState:e})=>e.endAdornment,style:{paddingRight:14}},{props:({ownerState:e})=>e.multiline,style:{padding:`16.5px 14px`}},{props:({ownerState:e,size:t})=>e.multiline&&t===`small`,style:{padding:`8.5px 14px`}}]}})),cm=P(am,{name:`MuiOutlinedInput`,slot:`NotchedOutline`})(Zo(({theme:e})=>{let t=e.palette.mode===`light`?`rgba(0, 0, 0, 0.23)`:`rgba(255, 255, 255, 0.23)`;return{borderColor:e.vars?e.alpha(e.vars.palette.common.onBackground,.23):t}})),lm=P(Rl,{name:`MuiOutlinedInput`,slot:`Input`,overridesResolver:Fl})(Zo(({theme:e})=>({padding:`16.5px 14px`,"&:-webkit-autofill":{...!e.vars&&{WebkitBoxShadow:e.palette.mode===`light`?null:`0 0 0 100px #266798 inset`,WebkitTextFillColor:e.palette.mode===`light`?null:`#fff`,caretColor:e.palette.mode===`light`?null:`#fff`},borderRadius:`inherit`,...e.vars&&e.applyStyles(`dark`,{WebkitBoxShadow:`0 0 0 100px #266798 inset`,WebkitTextFillColor:`#fff`,caretColor:`#fff`})},variants:[{props:{size:`small`},style:{padding:`8.5px 14px`}},{props:({ownerState:e})=>e.multiline,style:{padding:0}},{props:({ownerState:e})=>e.startAdornment,style:{paddingLeft:0}},{props:({ownerState:e})=>e.endAdornment,style:{paddingRight:0}}]}))),um=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiOutlinedInput`}),{fullWidth:r=!1,inputComponent:i=`input`,label:a,multiline:o=!1,notched:s,slots:c={},slotProps:l={},type:u=`text`,...d}=n,f=om(n),[p,m]=Tl({props:n,states:[`color`,`disabled`,`error`,`focused`,`hiddenLabel`,`size`,`required`]}),h={...n,color:p.color||`primary`,disabled:p.disabled,error:p.error,focused:p.focused,formControl:m,fullWidth:r,hiddenLabel:p.hiddenLabel,multiline:o,size:p.size,type:u},g=c.root??sm,_=c.input??lm,[v,y]=hc(`notchedOutline`,{elementType:cm,className:f.notchedOutline,shouldForwardComponentProp:!0,ownerState:h,externalForwardedProps:{slots:c,slotProps:l},additionalProps:{label:a!=null&&a!==``&&p.required?(0,M.jsxs)(j.Fragment,{children:[a,` `,`*`]}):a}});return(0,M.jsx)(Bl,{slots:{root:g,input:_},slotProps:l,renderSuffix:e=>(0,M.jsx)(v,{...y,notched:s===void 0?!!(e.startAdornment||e.filled||e.focused):s}),fullWidth:r,inputComponent:i,multiline:o,ref:t,type:u,...d,classes:{...f,notchedOutline:null}})});um.muiName=`Input`;function dm(e){return di(`MuiSelect`,e)}var fm=fi(`MuiSelect`,[`root`,`select`,`multiple`,`filled`,`outlined`,`standard`,`disabled`,`focused`,`icon`,`iconOpen`,`nativeInput`,`error`]),pm,mm=2,hm=400,gm=200;function _m(e,t){if(!t)return!1;if(e.composedPath().includes(t)||e.target?.nodeType&&t.contains(e.target))return!0;let n=t.getBoundingClientRect();return n.width===0&&n.height===0?!1:e.clientX>=n.left-mm&&e.clientX<=n.right+mm&&e.clientY>=n.top-mm&&e.clientY<=n.bottom+mm}var vm=P(Zp,{name:`MuiSelect`,slot:`Select`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`&.${fm.select}`]:t.select},{[`&.${fm.select}`]:t[n.variant]},{[`&.${fm.error}`]:t.error},{[`&.${fm.multiple}`]:t.multiple}]}})({[`&.${fm.select}`]:{height:`auto`,minHeight:`1.4375em`,textOverflow:`ellipsis`,whiteSpace:`nowrap`,overflow:`hidden`}}),ym=P($p,{name:`MuiSelect`,slot:`Icon`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.icon,n.open&&t.iconOpen]}})({}),bm=P(`input`,{shouldForwardProp:e=>Ro(e)&&e!==`classes`,name:`MuiSelect`,slot:`NativeInput`})({bottom:0,left:0,position:`absolute`,opacity:0,pointerEvents:`none`,width:`100%`,boxSizing:`border-box`}),xm=e=>{let{classes:t,variant:n,disabled:r,multiple:i,open:a,error:o}=e;return Ma({select:[`select`,n,r&&`disabled`,i&&`multiple`,o&&`error`],icon:[`icon`,a&&`iconOpen`,r&&`disabled`],nativeInput:[`nativeInput`]},dm,t)},Sm=j.forwardRef(function(e,t){let{"aria-describedby":n,"aria-label":r,autoFocus:i,autoWidth:a,children:o,className:s,defaultOpen:c,defaultValue:l,disabled:u,displayEmpty:d,error:f=!1,IconComponent:p,inputRef:m,labelId:h,MenuProps:g={},multiple:_,name:v,onBlur:y,onChange:b,onClose:x,onFocus:S,onKeyDown:C,onMouseDown:w,onOpen:T,open:D,readOnly:ee,renderValue:te,required:ne,SelectDisplayProps:re={},tabIndex:ie,type:ae,value:oe,variant:O=`standard`,...k}=e,[A,se]=_s({controlled:oe,default:l,name:`Select`}),[ce,le]=_s({controlled:D,default:c,name:`Select`}),ue=j.useRef(null),de=j.useRef(null),fe=j.useRef(null),pe=j.useRef(!1),me=j.useRef(!1),he=j.useRef(null),ge=j.useRef(!1),_e=j.useRef({allowSelectedMouseUp:!1,allowUnselectedMouseUp:!1}),ve=Qs(),ye=Qs(),[be,xe]=j.useState(null),{current:Se}=j.useRef(D!=null),[Ce,we]=j.useState(),[Te,Ee]=j.useState(null),De=xs(t,m),Oe=j.useCallback(e=>{de.current=e,e&&xe(e)},[]),ke=be?.parentNode;j.useImperativeHandle(De,()=>({focus:()=>{de.current.focus()},node:ue.current,value:A}),[A]);let Ae=be!==null&&ce;ms(()=>{pe.current=Ae},[Ae]);let je=j.useCallback(()=>{ve.clear(),ye.clear()},[ve,ye]),Me=j.useCallback(()=>{je(),ge.current=!1,_e.current={allowSelectedMouseUp:!1,allowUnselectedMouseUp:!1}},[je]),Ne=j.useCallback(()=>{he.current&&=(he.current(),null)},[]);j.useEffect(()=>{Ae||(Me(),Ne())},[Ae,Me,Ne]),j.useEffect(()=>()=>{Me(),Ne()},[Me,Ne]),j.useEffect(()=>{if(!Ae||!ke||a||typeof ResizeObserver>`u`)return;let e=new ResizeObserver(()=>{we(ke.clientWidth)});return e.observe(ke),()=>{e.disconnect()}},[Ae,ke,a]),j.useEffect(()=>{c&&ce&&be&&!Se&&(we(a?null:ke.clientWidth),de.current.focus())},[be,a]),j.useEffect(()=>{i&&de.current.focus()},[i]),j.useEffect(()=>{if(!h)return;let e=us(de.current).getElementById(h);if(e){let t=()=>{getSelection().isCollapsed&&de.current.focus()};return e.addEventListener(`click`,t),()=>{e.removeEventListener(`click`,t)}}},[h]);let Pe=ys((e,t)=>{e||(Me(),Ne()),e?(Ee(yp(t)),T&&T(t)):(Ee(null),x&&x(t)),Se||(pe.current=e,we(a?null:ke.clientWidth),le(e))}),Fe=()=>{Me(),me.current?ye.start(gm,()=>{_e.current.allowUnselectedMouseUp=!0,ve.start(gm,()=>{_e.current.allowSelectedMouseUp=!0})}):ve.start(hm,()=>{_e.current.allowSelectedMouseUp=!0,_e.current.allowUnselectedMouseUp=!0})},Ie=e=>{if(w?.(e),e.button!==0)return;e.preventDefault(),de.current.focus();let t=us(e.currentTarget);Fe(),Ne();let n=e=>{he.current=null,de.current&&(_m(e,de.current)||_m(e,fe.current)||!pe.current&&Se||Pe(!1,e))};t.addEventListener(`mouseup`,n,{capture:!0,once:!0}),he.current=()=>{t.removeEventListener(`mouseup`,n,!0)},Pe(!0,e)},Le=e=>{Pe(!1,e)},Re=j.Children.toArray(o),ze=e=>{let t=Re.find(t=>t.props.value===e.target.value);t!==void 0&&(se(t.props.value),b&&b(e,t))},Be=e=>t=>{ge.current=!1;let n;if(t.currentTarget.hasAttribute(`tabindex`)){if(_){n=Array.isArray(A)?A.slice():[];let t=A.indexOf(e.props.value);t===-1?n.push(e.props.value):n.splice(t,1)}else n=e.props.value;if(e.props.onClick&&e.props.onClick(t),A!==n&&(se(n),b)){let r=t.nativeEvent||t,i=new r.constructor(r.type,r);Object.defineProperty(i,`target`,{writable:!0,value:{value:n,name:v}}),b(i,e)}_||Pe(!1,t)}},Ve=(e,t)=>n=>{if(e.props.onMouseUp?.(n),ge.current){ge.current=!1;return}let r=!_e.current.allowSelectedMouseUp&&t,i=!_e.current.allowUnselectedMouseUp&&!t;r||i||n.currentTarget.click()},He=e=>{ee||([` `,`ArrowUp`,`ArrowDown`,`Enter`].includes(e.key)&&(e.preventDefault(),Pe(!0,e)),C?.(e))},Ue=e=>{!Ae&&y&&(Object.defineProperty(e,`target`,{writable:!0,value:{value:A,name:v}}),y(e))};delete k[`aria-invalid`];let We,Ge,Ke=[],qe=!1,Je=!1;(Dl({value:A})||d)&&(te?We=te(A):qe=!0);let Ye=Re.map(e=>{if(!j.isValidElement(e))return null;let t;if(_){if(!Array.isArray(A))throw Error(E(2));t=A.some(t=>xp(t,e.props.value)),t&&qe&&Ke.push(e.props.children)}else t=xp(A,e.props.value),t&&qe&&(Ge=e.props.children);return t&&(Je=!0),j.cloneElement(e,{"aria-selected":t?`true`:`false`,onMouseDown:t=>{ge.current=!0,e.props.onMouseDown?.(t)},onPointerDown:t=>{ge.current=!0,e.props.onPointerDown?.(t)},onClick:Be(e),onMouseUp:Ve(e,t),onKeyUp:t=>{t.key===` `&&t.preventDefault(),e.props.onKeyUp&&e.props.onKeyUp(t)},role:`option`,selected:t,value:void 0,"data-value":e.props.value})});ms(()=>{me.current=Je},[Je]),qe&&(We=_?Ke.length===0?null:Ke.reduce((e,t,n)=>(e.push(t),n<Ke.length-1&&e.push(`, `),e),[]):Ge);let Xe=Ce;!a&&Se&&be&&(Xe=ke.clientWidth);let Ze;Ze=ie===void 0?u?null:0:ie;let Qe=re.id||(v?`mui-component-select-${v}`:void 0),$e={...e,variant:O,value:A,open:Ae,error:f},et=xm($e),tt=typeof g.slotProps?.paper==`function`?g.slotProps.paper($e):g.slotProps?.paper,nt=xs(tt?.ref,fe),rt=typeof g.slotProps?.list==`function`?g.slotProps.list($e):g.slotProps?.list,it=aa(),at=aa();return(0,M.jsxs)(j.Fragment,{children:[(0,M.jsx)(vm,{as:`div`,ref:Oe,tabIndex:Ze,role:`combobox`,"aria-controls":Ae?it:void 0,"aria-disabled":u?`true`:void 0,"aria-expanded":Ae?`true`:`false`,"aria-haspopup":`listbox`,"aria-label":r,"aria-labelledby":h,"aria-describedby":n,"aria-required":ne?`true`:void 0,"aria-invalid":f?`true`:void 0,onKeyDown:He,onMouseDown:u||ee?null:Ie,onBlur:Ue,onFocus:S,...re,ownerState:$e,className:ci(re.className,et.select,s),id:Qe,children:bp(We)?pm||=(0,M.jsx)(`span`,{className:`notranslate`,"aria-hidden":!0,children:`​`}):We}),(0,M.jsx)(bm,{"aria-invalid":f,value:Array.isArray(A)?A.join(`,`):A,name:v,ref:ue,"aria-hidden":!0,onChange:ze,tabIndex:-1,disabled:u,className:et.nativeInput,autoFocus:i,required:ne,...k,id:k.id??at,ownerState:$e}),(0,M.jsx)(ym,{as:p,className:et.icon,ownerState:$e}),(0,M.jsx)(wp,{value:Te,children:(0,M.jsx)(qp,{id:`menu-${v||``}`,anchorEl:ke,open:Ae,onClose:Le,anchorOrigin:{vertical:`bottom`,horizontal:`center`},transformOrigin:{vertical:`top`,horizontal:`center`},...g,slotProps:{...g.slotProps,list:{"aria-labelledby":h,role:`listbox`,"aria-multiselectable":_?`true`:void 0,disableListWrap:!0,id:it,...rt},paper:{...tt,ref:nt,style:{minWidth:Xe,...tt?.style}}},children:Ye})})]})}),Cm=e=>{let{classes:t}=e,n=Ma({root:[`root`]},dm,t);return{...t,...n}},wm={name:`MuiSelect`,slot:`Root`,shouldForwardProp:e=>zo(e)&&e!==`variant`},Tm=P(Yd,wm)(``),Em=P(um,wm)(``),Dm=P(Cd,wm)(``),Om=j.forwardRef(function(e,t){let n=Qo({name:`MuiSelect`,props:e}),{autoWidth:r=!1,children:i,classes:a={},className:o,defaultOpen:s=!1,displayEmpty:c=!1,IconComponent:l=ql,id:u,input:d,inputProps:f,label:p,labelId:m,MenuProps:h,multiple:g=!1,native:_=!1,onClose:v,onOpen:y,open:b,renderValue:x,SelectDisplayProps:S,variant:C=`outlined`,...w}=n,T=_?tm:Sm,[E]=Tl({props:n,states:[`variant`,`error`]}),D=E.variant||C,ee={...n,variant:D,classes:a},te=Cm(ee),{root:ne,...re}=te,ie=d||{standard:(0,M.jsx)(Tm,{ownerState:ee}),outlined:(0,M.jsx)(Em,{label:p,ownerState:ee}),filled:(0,M.jsx)(Dm,{ownerState:ee})}[D],ae=xs(t,gl(ie));return(0,M.jsx)(j.Fragment,{children:j.cloneElement(ie,{inputComponent:T,inputProps:{children:i,error:E.error,IconComponent:l,variant:D,type:void 0,multiple:g,..._?{id:u}:{autoWidth:r,defaultOpen:s,displayEmpty:c,labelId:m,MenuProps:h,onClose:v,onOpen:y,open:b,renderValue:x,SelectDisplayProps:{id:u,...S}},...f,classes:f?bn(re,f.classes):re,...d?d.props.inputProps:{}},...(g&&_||c)&&D===`outlined`?{notched:!0}:{},ref:ae,className:ci(ie.props.className,o,te.root),...!d&&{variant:D},...w})})});Om.muiName=`Select`;function km(e){return di(`MuiTab`,e)}var Am=fi(`MuiTab`,[`root`,`labelIcon`,`textColorInherit`,`textColorPrimary`,`textColorSecondary`,`selected`,`disabled`,`fullWidth`,`wrapped`,`icon`]),jm=e=>{let{classes:t,textColor:n,fullWidth:r,wrapped:i,icon:a,label:o,selected:s,disabled:c}=e;return Ma({root:[`root`,a&&o&&`labelIcon`,`textColor${qo(n)}`,r&&`fullWidth`,i&&`wrapped`,s&&`selected`,c&&`disabled`],icon:[`icon`]},km,t)},Mm=P(Kc,{name:`MuiTab`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.label&&n.icon&&t.labelIcon,t[`textColor${qo(n.textColor)}`],n.fullWidth&&t.fullWidth,n.wrapped&&t.wrapped,{[`& .${Am.icon}`]:t.icon}]}})(Zo(({theme:e})=>({...e.typography.button,maxWidth:360,minWidth:90,position:`relative`,minHeight:48,flexShrink:0,padding:`12px 16px`,overflow:`hidden`,whiteSpace:`normal`,textAlign:`center`,lineHeight:1.25,variants:[{props:({ownerState:e})=>e.label&&(e.iconPosition===`top`||e.iconPosition===`bottom`),style:{flexDirection:`column`}},{props:({ownerState:e})=>e.label&&e.iconPosition!==`top`&&e.iconPosition!==`bottom`,style:{flexDirection:`row`}},{props:({ownerState:e})=>e.icon&&e.label,style:{minHeight:72,paddingTop:9,paddingBottom:9}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`top`,style:{[`& > .${Am.icon}`]:{marginBottom:6}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`bottom`,style:{[`& > .${Am.icon}`]:{marginTop:6}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`start`,style:{[`& > .${Am.icon}`]:{marginRight:e.spacing(1)}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`end`,style:{[`& > .${Am.icon}`]:{marginLeft:e.spacing(1)}}},{props:{textColor:`inherit`},style:{color:`inherit`,opacity:.6,[`&.${Am.selected}`]:{opacity:1},[`&.${Am.disabled}`]:{opacity:(e.vars||e).palette.action.disabledOpacity}}},{props:{textColor:`primary`},style:{color:(e.vars||e).palette.text.secondary,[`&.${Am.selected}`]:{color:(e.vars||e).palette.primary.main},[`&.${Am.disabled}`]:{color:(e.vars||e).palette.text.disabled}}},{props:{textColor:`secondary`},style:{color:(e.vars||e).palette.text.secondary,[`&.${Am.selected}`]:{color:(e.vars||e).palette.secondary.main},[`&.${Am.disabled}`]:{color:(e.vars||e).palette.text.disabled}}},{props:({ownerState:e})=>e.fullWidth,style:{flexShrink:1,flexGrow:1,flexBasis:0,maxWidth:`none`}},{props:({ownerState:e})=>e.wrapped,style:{fontSize:e.typography.pxToRem(12)}}]}))),Nm=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTab`}),{className:r,disabled:i=!1,disableFocusRipple:a=!1,fullWidth:o,icon:s,iconPosition:c=`top`,indicator:l,label:u,onChange:d,onClick:f,onFocus:p,selected:m,selectionFollowsFocus:h,textColor:g=`inherit`,value:_,wrapped:v=!1,...y}=n,b=Yf(),x=ep({id:_,ref:t,disabled:i,selected:m}),S=b.getItemMap().size===0&&m?0:x.tabIndex,C={...n,disabled:i,disableFocusRipple:a,selected:m,icon:!!s,iconPosition:c,label:!!u,fullWidth:o,textColor:g,wrapped:v},w=jm(C),T=s&&u&&j.isValidElement(s)?j.cloneElement(s,{className:ci(w.icon,s.props.className)}):s;return(0,M.jsxs)(Mm,{internalNativeButton:!0,focusRipple:!a,className:ci(w.root,r),ref:x.ref,role:`tab`,"aria-selected":m,disabled:i,onClick:e=>{!m&&d&&d(e,_),f&&f(e)},onFocus:e=>{h&&!m&&d&&d(e,_),p&&p(e)},tabIndex:S,ownerState:C,...y,children:[c===`top`||c===`start`?(0,M.jsxs)(j.Fragment,{children:[T,u]}):(0,M.jsxs)(j.Fragment,{children:[u,T]}),l]})}),Pm=rs((0,M.jsx)(`path`,{d:`M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z`}),`KeyboardArrowLeft`),Fm=rs((0,M.jsx)(`path`,{d:`M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z`}),`KeyboardArrowRight`);function Im(e){return(1+Math.sin(Math.PI*e-Math.PI/2))/2}function Lm(e,t,n,r={},i=()=>{}){let{ease:a=Im,duration:o=300}=r,s=null,c=t[e],l=!1,u=()=>{l=!0},d=r=>{if(l){i(Error(`Animation cancelled`));return}s===null&&(s=r);let u=Math.min(1,(r-s)/o);if(t[e]=a(u)*(n-c)+c,u>=1){requestAnimationFrame(()=>{i(null)});return}requestAnimationFrame(d)};return c===n?(i(Error(`Element already at target position`)),u):(requestAnimationFrame(d),u)}var Rm={width:99,height:99,position:`absolute`,top:-9999,overflow:`scroll`,pointerEvents:`none`};function zm(e){let{onChange:t,...n}=e,r=j.useRef(),i=j.useRef(null),a=()=>{r.current=i.current.offsetHeight-i.current.clientHeight};return ms(()=>{let e=as(()=>{let e=r.current;a(),e!==r.current&&t(r.current)}),n=fs(i.current);return n.addEventListener(`resize`,e),()=>{e.clear(),n.removeEventListener(`resize`,e)}},[t]),j.useEffect(()=>{a(),t(r.current)},[t]),(0,M.jsx)(`div`,{style:Rm,...n,ref:i})}function Bm(e){return di(`MuiTabScrollButton`,e)}var Vm=fi(`MuiTabScrollButton`,[`root`,`vertical`,`horizontal`,`disabled`]),Hm=e=>{let{classes:t,orientation:n,disabled:r}=e;return Ma({root:[`root`,n,r&&`disabled`]},Bm,t)},Um=P(Kc,{name:`MuiTabScrollButton`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.orientation&&t[n.orientation]]}})({width:40,flexShrink:0,opacity:.8,[`&.${Vm.disabled}`]:{opacity:0},variants:[{props:{orientation:`vertical`},style:{width:`100%`,height:40,"& svg":{transform:`var(--TabScrollButton-svgRotate)`}}}]}),Wm=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTabScrollButton`}),{className:r,slots:i={},slotProps:a={},direction:o,orientation:s,disabled:c,...l}=n,{nativeButton:u,...d}=l,f=Zi(),p={isRtl:f,...n},m=Hm(p),h=i.StartScrollButtonIcon??Pm,g=i.EndScrollButtonIcon??Fm,_=hl({elementType:h,externalSlotProps:a.startScrollButtonIcon,additionalProps:{fontSize:`small`},ownerState:p}),v=hl({elementType:g,externalSlotProps:a.endScrollButtonIcon,additionalProps:{fontSize:`small`},ownerState:p});return(0,M.jsx)(Um,{component:`div`,className:ci(m.root,r),ref:t,role:null,ownerState:p,tabIndex:null,...d,style:{...d.style,...s===`vertical`&&{"--TabScrollButton-svgRotate":`rotate(${f?-90:90}deg)`}},children:o===`left`?(0,M.jsx)(h,{..._}):(0,M.jsx)(g,{...v})})});function Gm(e){return di(`MuiTabs`,e)}var Km=fi(`MuiTabs`,[`root`,`vertical`,`list`,`centered`,`scroller`,`fixed`,`scrollableX`,`scrollableY`,`hideScrollbar`,`scrollButtons`,`scrollButtonsHideMobile`,`indicator`]),qm=e=>{let{vertical:t,fixed:n,hideScrollbar:r,scrollableX:i,scrollableY:a,centered:o,scrollButtonsHideMobile:s,classes:c}=e;return Ma({root:[`root`,t&&`vertical`],scroller:[`scroller`,n&&`fixed`,r&&`hideScrollbar`,i&&`scrollableX`,a&&`scrollableY`],list:[`list`,t&&`vertical`,o&&`centered`],indicator:[`indicator`],scrollButtons:[`scrollButtons`,s&&`scrollButtonsHideMobile`],scrollableX:[i&&`scrollableX`],hideScrollbar:[r&&`hideScrollbar`]},Gm,c)},Jm=P(`div`,{name:`MuiTabs`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`& .${Km.scrollButtons}`]:t.scrollButtons},{[`& .${Km.scrollButtons}`]:n.scrollButtonsHideMobile&&t.scrollButtonsHideMobile},t.root,n.vertical&&t.vertical]}})(Zo(({theme:e})=>({overflow:`hidden`,minHeight:48,WebkitOverflowScrolling:`touch`,display:`flex`,variants:[{props:({ownerState:e})=>e.vertical,style:{flexDirection:`column`}},{props:({ownerState:e})=>e.scrollButtonsHideMobile,style:{[`& .${Km.scrollButtons}`]:{[e.breakpoints.down(`sm`)]:{display:`none`}}}}]}))),Ym=P(`div`,{name:`MuiTabs`,slot:`Scroller`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.scroller,n.fixed&&t.fixed,n.hideScrollbar&&t.hideScrollbar,n.scrollableX&&t.scrollableX,n.scrollableY&&t.scrollableY]}})({position:`relative`,display:`inline-block`,flex:`1 1 auto`,whiteSpace:`nowrap`,variants:[{props:({ownerState:e})=>e.fixed,style:{overflowX:`hidden`,width:`100%`}},{props:({ownerState:e})=>e.hideScrollbar,style:{scrollbarWidth:`none`,"&::-webkit-scrollbar":{display:`none`}}},{props:({ownerState:e})=>e.scrollableX,style:{overflowX:`auto`,overflowY:`hidden`}},{props:({ownerState:e})=>e.scrollableY,style:{overflowY:`auto`,overflowX:`hidden`}}]}),Xm=P(`div`,{name:`MuiTabs`,slot:`List`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.list,n.centered&&t.centered]}})({display:`flex`,variants:[{props:({ownerState:e})=>e.vertical,style:{flexDirection:`column`}},{props:({ownerState:e})=>e.centered,style:{justifyContent:`center`}}]}),Zm=P(`span`,{name:`MuiTabs`,slot:`Indicator`})(Zo(({theme:e})=>({position:`absolute`,height:2,bottom:0,width:`100%`,transition:e.transitions.create(),variants:[{props:{indicatorColor:`primary`},style:{backgroundColor:(e.vars||e).palette.primary.main}},{props:{indicatorColor:`secondary`},style:{backgroundColor:(e.vars||e).palette.secondary.main}},{props:({ownerState:e})=>e.vertical,style:{height:`100%`,width:2,right:0}}]}))),Qm=P(zm)({overflowX:`auto`,overflowY:`hidden`,scrollbarWidth:`none`,"&::-webkit-scrollbar":{display:`none`}}),$m={},eh=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTabs`}),r=Lo(),i=Zi(),{"aria-label":a,"aria-labelledby":o,action:s,centered:c=!1,children:l,className:u,component:d=`div`,allowScrollButtonsMobile:f=!1,indicatorColor:p=`primary`,onChange:m,orientation:h=`horizontal`,scrollButtons:g=`auto`,selectionFollowsFocus:_,slots:v={},slotProps:y={},textColor:b=`primary`,value:x,variant:S=`standard`,visibleScrollbar:C=!1,...w}=n,T=S===`scrollable`,E=h===`vertical`,D=E?`scrollTop`:`scrollLeft`,ee=E?`top`:`left`,te=E?`bottom`:`right`,ne=E?`clientHeight`:`clientWidth`,re=E?`height`:`width`,ie={...n,component:d,allowScrollButtonsMobile:f,indicatorColor:p,orientation:h,vertical:E,scrollButtons:g,textColor:b,variant:S,visibleScrollbar:C,fixed:!T,hideScrollbar:T&&!C,scrollableX:T&&!E,scrollableY:T&&E,centered:c&&!T,scrollButtonsHideMobile:!f},ae=qm(ie),oe=hl({elementType:v.startScrollButtonIcon,externalSlotProps:y.startScrollButtonIcon,ownerState:ie}),O=hl({elementType:v.endScrollButtonIcon,externalSlotProps:y.endScrollButtonIcon,ownerState:ie}),[k,A]=j.useState(!1),[se,ce]=j.useState($m),[le,ue]=j.useState(!1),[de,fe]=j.useState(!1),[pe,me]=j.useState(!1),he=x===!1?null:x,[ge,_e]=j.useState(!1),[ve,ye]=j.useState({overflow:`hidden`,scrollbarWidth:0}),be=new Map,xe=j.useRef(null),Se=j.useRef(null),Ce={slots:v,slotProps:y},we=()=>{let e=xe.current,t;if(e){let n=e.getBoundingClientRect();t={clientWidth:e.clientWidth,scrollLeft:e.scrollLeft,scrollTop:e.scrollTop,scrollWidth:e.scrollWidth,top:n.top,bottom:n.bottom,left:n.left,right:n.right}}let n;if(e&&x!==!1){let e=Se.current.children;if(e.length>0){let t=e[be.get(x)];n=t?t.getBoundingClientRect():null}}return{tabsMeta:t,tabMeta:n}},Te=ys(()=>{let{tabsMeta:e,tabMeta:t}=we(),n=0,r;E?(r=`top`,t&&e&&(n=t.top-e.top+e.scrollTop)):(r=i?`right`:`left`,t&&e&&(n=(i?-1:1)*(t[r]-e[r]+e.scrollLeft)));let a={[r]:n,[re]:t?t[re]:0};if(typeof se[r]!=`number`||typeof se[re]!=`number`)ce(a);else{let e=Math.abs(se[r]-a[r]),t=Math.abs(se[re]-a[re]);(e>=1||t>=1)&&ce(a)}}),Ee=(e,{animation:t=!0}={})=>{t?Lm(D,xe.current,e,{duration:r.transitions.duration.standard}):xe.current[D]=e},De=e=>{let t=xe.current[D];E?t+=e:t+=e*(i?-1:1),Ee(t)},Oe=()=>{let e=xe.current[ne],t=0,n=Array.from(Se.current.children);for(let r=0;r<n.length;r+=1){let i=n[r];if(t+i[ne]>e){r===0&&(t=e);break}t+=i[ne]}return t},ke=()=>{De(-1*Oe())},Ae=()=>{De(Oe())},[je,{onChange:Me,...Ne}]=hc(`scrollbar`,{className:ci(ae.scrollableX,ae.hideScrollbar),elementType:Qm,shouldForwardComponentProp:!0,externalForwardedProps:Ce,ownerState:ie}),Pe=j.useCallback(e=>{Me?.(e),ye({overflow:null,scrollbarWidth:e})},[Me]),[Fe,Ie]=hc(`scrollButtons`,{className:ae.scrollButtons,elementType:Wm,externalForwardedProps:Ce,ownerState:ie,additionalProps:{orientation:h,slots:{StartScrollButtonIcon:v.startScrollButtonIcon,EndScrollButtonIcon:v.endScrollButtonIcon},slotProps:{startScrollButtonIcon:oe,endScrollButtonIcon:O}}}),Le=()=>{let e={};e.scrollbarSizeListener=T?(0,M.jsx)(je,{...Ne,onChange:Pe}):null;let t=T&&(g===`auto`&&(le||de)||g===!0);return e.scrollButtonStart=t?(0,M.jsx)(Fe,{direction:i?`right`:`left`,onClick:ke,disabled:!le,...Ie}):null,e.scrollButtonEnd=t?(0,M.jsx)(Fe,{direction:i?`left`:`right`,onClick:Ae,disabled:!de,...Ie}):null,e},Re=ys(e=>{let{tabsMeta:t,tabMeta:n}=we();!n||!t||(n[ee]<t[ee]?Ee(t[D]+(n[ee]-t[ee]),{animation:e}):n[te]>t[te]&&Ee(t[D]+(n[te]-t[te]),{animation:e}))}),ze=ys(()=>{T&&g!==!1&&me(!pe)});j.useEffect(()=>{let e=as(()=>{xe.current&&Te()}),t,n=n=>{n.forEach(e=>{e.removedNodes.forEach(e=>{t?.unobserve(e)}),e.addedNodes.forEach(e=>{t?.observe(e)})}),e(),ze()},r=fs(xe.current);r.addEventListener(`resize`,e);let i;return typeof ResizeObserver<`u`&&(t=new ResizeObserver(e),Array.from(Se.current.children).forEach(e=>{t.observe(e)})),typeof MutationObserver<`u`&&(i=new MutationObserver(n),i.observe(Se.current,{childList:!0})),()=>{e.clear(),r.removeEventListener(`resize`,e),i?.disconnect(),t?.disconnect()}},[Te,ze]),j.useEffect(()=>{let e=Array.from(Se.current.children),t=e.length;if(typeof IntersectionObserver<`u`&&t>0&&T&&g!==!1){let n=e[0],r=e[t-1],i={root:xe.current,threshold:.99},a=new IntersectionObserver(e=>{ue(!e[0].isIntersecting)},i);a.observe(n);let o=new IntersectionObserver(e=>{fe(!e[0].isIntersecting)},i);return o.observe(r),()=>{a.disconnect(),o.disconnect()}}},[T,g,pe,l?.length]),j.useEffect(()=>{A(!0)},[]),j.useEffect(()=>{Te()}),j.useEffect(()=>{Re($m!==se)},[Re,se]),j.useImperativeHandle(s,()=>({updateIndicator:Te,updateScrollButtons:ze}),[Te,ze]);let[Be,Ve]=hc(`indicator`,{className:ae.indicator,elementType:Zm,externalForwardedProps:Ce,ownerState:ie,additionalProps:{style:se}}),He=(0,M.jsx)(Be,{...Ve}),Ue=$f({activeItemId:ge?void 0:he,orientation:h,isRtl:i}),We=Ue.getContainerProps(),Ge=j.Children.toArray(l).filter(j.isValidElement).map((e,t)=>{let n=e.props.value===void 0?t:e.props.value;return be.set(n,t),{child:e,index:t,childValue:n}}).map(({child:e,childValue:t})=>{let n=t===x;return j.cloneElement(e,{fullWidth:S===`fullWidth`,indicator:n&&!k&&He,selected:n,selectionFollowsFocus:_,onChange:m,textColor:b,value:t})}),Ke=Le(),[qe,Je]=hc(`root`,{ref:t,className:ci(ae.root,u),elementType:Jm,externalForwardedProps:{...Ce,...w,component:d},ownerState:ie}),[Ye,Xe]=hc(`scroller`,{ref:xe,className:ae.scroller,elementType:Ym,externalForwardedProps:Ce,ownerState:ie,additionalProps:{style:{overflow:ve.overflow,[E?`margin${i?`Left`:`Right`}`:`marginBottom`]:C?void 0:-ve.scrollbarWidth}}}),Ze=xs(We.ref,Se),Qe=e=>{let t=Se.current;cs(us(t))?.getAttribute(`role`)===`tab`&&We.onKeyDown(e)},[$e,et]=hc(`list`,{ref:Ze,className:ae.list,elementType:Xm,externalForwardedProps:Ce,ownerState:ie,getSlotProps:e=>({...e,onBlur:t=>{Nu(t.currentTarget,t.relatedTarget)||_e(!1),e.onBlur?.(t)},onKeyDown:t=>{Qe(t),e.onKeyDown?.(t)},onFocus:t=>{_e(!0),We.onFocus(t),e.onFocus?.(t)}})});return(0,M.jsxs)(qe,{...Je,children:[Ke.scrollButtonStart,Ke.scrollbarSizeListener,(0,M.jsxs)(Ye,{...Xe,children:[(0,M.jsx)($e,{"aria-label":a,"aria-labelledby":o,"aria-orientation":h===`vertical`?`vertical`:null,role:`tablist`,...et,children:(0,M.jsx)(Jf.Provider,{value:Ue,children:Ge})}),k&&He]}),Ke.scrollButtonEnd]})});function th(e){return di(`MuiTextField`,e)}fi(`MuiTextField`,[`root`]);var nh={standard:Yd,filled:Cd,outlined:um},rh=e=>{let{classes:t}=e;return Ma({root:[`root`]},th,t)},ih=P(Dd,{name:`MuiTextField`,slot:`Root`})({}),ah=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTextField`}),{autoComplete:r,autoFocus:i=!1,children:a,className:o,color:s=`primary`,defaultValue:c,disabled:l=!1,error:u=!1,fullWidth:d=!1,helperText:f,id:p,inputRef:m,label:h,maxRows:g,minRows:_,multiline:v=!1,name:y,onBlur:b,onChange:x,onFocus:S,placeholder:C,required:w=!1,rows:T,select:E=!1,slots:D={},slotProps:ee={},type:te,value:ne,variant:re=`outlined`,...ie}=n,ae={...n,autoFocus:i,color:s,disabled:l,error:u,fullWidth:d,multiline:v,required:w,select:E,variant:re},oe=rh(ae),O=aa(p),k=f&&O?`${O}-helper-text`:void 0,A=h&&O?`${O}-label`:void 0,se=nh[re],ce={slots:D,slotProps:ee},[le,ue]=hc(`select`,{elementType:Om,externalForwardedProps:ce,ownerState:ae}),de=E&&ue.native,fe={},pe=ce.slotProps.inputLabel;re===`outlined`&&(pe&&pe.shrink!==void 0&&(fe.notched=pe.shrink),fe.label=h),E&&(de||(fe.id=void 0),fe[`aria-describedby`]=void 0);let[me,he]=hc(`root`,{elementType:ih,shouldForwardComponentProp:!0,externalForwardedProps:{...ce,...ie},ownerState:ae,className:ci(oe.root,o),ref:t,additionalProps:{disabled:l,error:u,fullWidth:d,required:w,color:s,variant:re}}),[ge,_e]=hc(`input`,{elementType:se,externalForwardedProps:ce,additionalProps:fe,ownerState:ae}),[ve,ye]=hc(`inputLabel`,{elementType:Qd,externalForwardedProps:ce,ownerState:ae}),[be,xe]=hc(`htmlInput`,{elementType:`input`,externalForwardedProps:ce,ownerState:ae}),[Se,Ce]=hc(`formHelperText`,{elementType:Nd,externalForwardedProps:ce,ownerState:ae}),we=(0,M.jsx)(ge,{"aria-describedby":k,autoComplete:r,autoFocus:i,defaultValue:c,fullWidth:d,multiline:v,name:y,rows:T,maxRows:g,minRows:_,type:te,value:ne,id:O,inputRef:m,onBlur:b,onChange:x,onFocus:S,placeholder:C,inputProps:xe,slots:{input:D.htmlInput?be:void 0},..._e});return(0,M.jsxs)(me,{...he,children:[h!=null&&h!==``&&(0,M.jsx)(ve,{htmlFor:E&&!de?void 0:O,id:A,...E&&!de&&{component:`div`},...ye,children:h}),E?(0,M.jsx)(le,{"aria-describedby":k,id:O,labelId:A,value:ne,input:we,...ue,children:a}):we,f&&(0,M.jsx)(Se,{id:k,...Ce,children:f})]})}),oh=_(),I={background:`#282a36`,currentLine:`#44475a`,foreground:`#f8f8f2`,comment:`#6272a4`,cyan:`#8be9fd`,green:`#50fa7b`,orange:`#ffb86c`,pink:`#ff79c0`,purple:`#bd93f9`,red:`#ff5555`,yellow:`#f1fa8c`},sh=Fo({palette:{mode:`dark`,background:{default:I.background,paper:I.currentLine},primary:{main:I.purple},secondary:{main:I.pink},text:{primary:I.foreground,secondary:I.comment}},typography:{fontFamily:`'JetBrains Mono', monospace`,h1:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},h2:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},h3:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},body1:{fontFamily:`'JetBrains Mono', monospace`},body2:{fontFamily:`'JetBrains Mono', monospace`}},components:{MuiCssBaseline:{styleOverrides:{"*, *::before, *::after":{padding:0},html:{scrollBehavior:`smooth`},code:{fontFamily:`'JetBrains Mono', monospace`},body:{backgroundColor:I.background,color:I.foreground},"::-webkit-scrollbar":{width:`12px`},"::-webkit-scrollbar-track":{background:I.background},"::-webkit-scrollbar-thumb":{background:I.currentLine,borderRadius:`4px`,border:`2px solid transparent`,backgroundClip:`padding-box`},"::-webkit-scrollbar-thumb:hover":{background:I.comment,border:`2px solid transparent`,backgroundClip:`padding-box`}}}}}),ch=rs((0,M.jsx)(`path`,{d:`M7.5 5.6 10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29a.996.996 0 0 0-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41zm-1.03 5.49-2.12-2.12 2.44-2.44 2.12 2.12z`}),`AutoFixHigh`),lh=rs((0,M.jsx)(`path`,{d:`M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-5.97 4.06L14.09 6l1.41 1.41L16.91 6l1.06 1.06-1.41 1.41 1.41 1.41-1.06 1.06-1.41-1.4-1.41 1.41-1.06-1.06 1.41-1.41zm-6.78.66h5v1.5h-5zM11.5 16h-2v2H8v-2H6v-1.5h2v-2h1.5v2h2zm6.5 1.25h-5v-1.5h5zm0-2.5h-5v-1.5h5z`}),`Calculate`),uh=rs((0,M.jsx)(`path`,{d:`M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12z`}),`Cancel`),dh=rs((0,M.jsx)(`path`,{d:`M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2M7.5 18c-.83 0-1.5-.67-1.5-1.5S6.67 15 7.5 15s1.5.67 1.5 1.5S8.33 18 7.5 18m0-9C6.67 9 6 8.33 6 7.5S6.67 6 7.5 6 9 6.67 9 7.5 8.33 9 7.5 9m4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5m4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5m0-9c-.83 0-1.5-.67-1.5-1.5S15.67 6 16.5 6s1.5.67 1.5 1.5S17.33 9 16.5 9`}),`Casino`),fh=rs((0,M.jsx)(`path`,{d:`M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z`}),`CheckCircle`),ph=rs((0,M.jsx)(`path`,{d:`M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z`}),`ContentCopy`),mh=rs((0,M.jsx)(`path`,{d:`M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-2h2zm0-4h-2V7h2z`}),`ErrorOutlined`),hh=rs((0,M.jsx)(`path`,{d:`m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z`}),`ExpandLess`),gh=rs((0,M.jsx)(`path`,{d:`M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z`}),`ExpandMore`),_h=rs((0,M.jsx)(`path`,{d:`M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2zm10 14.5V20H8v-3.5l4-4zm-4-5-4-4V4h8v3.5z`}),`HourglassEmpty`),vh=rs([(0,M.jsx)(`path`,{d:`M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1m0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5z`},`0`),(0,M.jsx)(`path`,{d:`M17.5 10.5c.88 0 1.73.09 2.5.26V9.24c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99M13 12.49v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26V11.9c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.3-4.5.83m4.5 1.84c-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26v-1.52c-.79-.16-1.64-.24-2.5-.24`},`1`)],`MenuBook`),yh=rs((0,M.jsx)(`path`,{d:`M19.8 18.4 14 10.67V6.5l1.35-1.69c.26-.33.03-.81-.39-.81H9.04c-.42 0-.65.48-.39.81L10 6.5v4.17L4.2 18.4c-.49.66-.02 1.6.8 1.6h14c.82 0 1.29-.94.8-1.6`}),`Science`),bh=rs((0,M.jsx)(`path`,{d:`m6 18 8.5-6L6 6zM16 6v12h2V6z`}),`SkipNext`),xh=rs((0,M.jsx)(`path`,{d:`M6 6h12v12H6z`}),`Stop`);function Sh(e,t){for(e=e<0n?-e:e,t=t<0n?-t:t;t!==0n;)[e,t]=[t,e%t];return e}function Ch(e){if(e<0n)throw RangeError(`isqrt: negative input`);if(e<2n)return e;let t=e.toString(2).length,n=1n<<BigInt(Math.floor(t/2));for(;;){let t=n+e/n>>1n;if(t>=n)break;n=t}for(;(n+1n)*(n+1n)<=e;)n++;for(;n*n>e;)n--;return n}function wh(e,t){if(e===0n)return{gcd:t,x:0n,y:1n};let{gcd:n,x:r,y:i}=wh(t%e,e);return{gcd:n,x:i-t/e*r,y:r}}function Th(e,t){let{gcd:n,x:r}=wh(e<0n?e+t:e,t);return n===1n?(r%t+t)%t:null}function Eh(e,t,n){if(n===1n)return 0n;let r=1n;for(e=(e%n+n)%n;t>0n;)t&1n&&(r=r*e%n),t>>=1n,e=e*e%n;return r}function Dh(e){if(e<2n)return!1;if(e<4n)return!0;if(e%2n==0n||e%3n==0n)return!1;for(let t of[5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n]){if(e===t)return!0;if(e%t===0n)return!1}let t=e-1n,n=0;for(;t%2n==0n;)t/=2n,n++;for(let r of[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n]){if(r>=e)break;let i=Eh(r,t,e);if(i===1n||i===e-1n)continue;let a=!0;for(let t=1;t<n;t++)if(i=i*i%e,i===e-1n){a=!1;break}if(a)return!1}return!0}function Oh(e){for(;;){let t=Math.ceil(e/8),n=new Uint8Array(t);crypto.getRandomValues(n);let r=0n;for(let e=0;e<t;e++)r=r<<8n|BigInt(n[e]);if(r|=1n<<BigInt(e-1),r|=1n,r&=(1n<<BigInt(e))-1n,Dh(r))return r}}function kh(e,t,n=65537n){let r,i;do r=Oh(e),i=Oh(t);while(r===i);r>i&&([r,i]=[i,r]);let a=r*i,o=(r-1n)*(i-1n),s=n;for(;Sh(s,o)!==1n;)s+=2n;let c=Th(s,o);if(c===null)throw Error(`modInverse failed`);return{p:r,q:i,n:a,e:s,d:c,phi:o}}function Ah(e,t,n){return Eh(e,n,t)}var L={p:256,q:256},jh={id:`fermat`,name:`Fermat Factorization`,category:`Factorization`,description:`Factors n when p and q are close. Use when |p - q| < 2·n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
+    n = Integer(${e.n})
+    print(f"Fermat Factorization on n = {n}")
+    print()
+    if n < 2:
+        print(f"n = {n} is too small to factor")
         print("FERMAT=FAILED")
         quit()
-    b2 += c
-    c += 2
-
-a = (c - 1) // 2
-b = isqrt(b2)
-p = a - b
-q = a + b
-
-if p <= 1 or q >= n:
-    print(f"Found trivial factorization: {p} x {q} = {n}")
-    print("No non-trivial factors found via Fermat")
+    if n % 2 == 0:
+        print(f"n is even: {n}")
+        print(f"p = 2")
+        print(f"q = {n // 2}")
+        print(f"Verification: 2 * {n // 2} = {n}")
+        print("FERMAT=SUCCESS")
+        quit()
+    if n.is_prime():
+        print(f"n is prime: {n}")
+        print("No factorization possible")
+        print("FERMAT=FAILED")
+        quit()
+    if n.is_square():
+        p = isqrt(n)
+        print(f"n is a perfect square: {p}^2 = {n}")
+        print(f"p = q = {p}")
+        print(f"Verification: p * q = {p * p}")
+        print("FERMAT=SUCCESS")
+        quit()
+    # Optimized Fermat (RsaCtfTool algorithm)
+    # Uses incremental update: b2 += c, c += 2 instead of recomputing a^2 - n
+    a, rem = n.sqrtrem()
+    b2 = -rem
+    c = 2 * a + 1
+    max_iter = 10**6
+    iterations = 0
+    while not b2.is_square():
+        iterations += 1
+        if iterations > max_iter:
+            print(f"Fermat factorization failed: no factor found within {max_iter} iterations")
+            print("p and q may not be close enough for this method")
+            print("FERMAT=FAILED")
+            quit()
+        b2 += c
+        c += 2
+    a = (c - 1) // 2
+    b = isqrt(b2)
+    p = a - b
+    q = a + b
+    if p <= 1 or q >= n:
+        print(f"Found trivial factorization: {p} x {q} = {n}")
+        print("No non-trivial factors found via Fermat")
+        print("FERMAT=FAILED")
+    else:
+        print(f"p = {p}")
+        print(f"q = {q}")
+        print(f"Verification: p * q = {p * q}")
+        print(f"p is prime: {p.is_prime()}")
+        print(f"q is prime: {q.is_prime()}")
+        print(f"Iterations: {iterations}")
+        print("FERMAT=SUCCESS")
+except Exception as e:
+    print(f"ERROR: {e}")
     print("FERMAT=FAILED")
-else:
-    print(f"p = {p}")
-    print(f"q = {q}")
-    print(f"Verification: p * q = {p * q}")
-    print(f"p is prime: {p.is_prime()}")
-    print(f"q is prime: {q.is_prime()}")
-    print(f"Iterations: {iterations}")
-    print("FERMAT=SUCCESS")
 `,proof:`\\textbf{Theorem:} If n = p \\cdot q with |p - q| < 2n^{1/4}, then n can be factored by finding a such that a^2 - n = b^2.
 
 \\textbf{Prerequisites:}
@@ -367,62 +364,57 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\implies p, q \\qed
 
 \\textbf{Explanation:} Compute the continued fraction convergents of e/n. For each convergent k/d, check if (ed - 1) is divisible by k, then solve the quadratic x^2 - (n - \\varphi + 1)x + n = 0. If the roots are integers multiplying to n, you've found d.
 
-\\textbf{References:} M. Wiener, "Cryptanalysis of Short RSA Secret Exponents", IEEE Trans. Info. Theory, 1990`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e},Ph=()=>{let e=Oh(L.p),t=Oh(L.q),n=e*t,r=(e-1n)*(t-1n),i=BigInt(100+Math.floor(Math.random()*1e4));for(;Th(i,r)===null;)i+=1n;let a=Th(i,r);return{n:n.toString(),e:a.toString()}},Fh={id:`boneh-durfee`,name:`Boneh-Durfee Attack`,category:`Factorization`,description:`Recovers d via lattice reduction. Use when d < n^0.292.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
-e = Integer(${e.e})
-
-print(f"Boneh-Durfee Attack on n = {n}")
-
-if n < 2 or e < 2:
-    print("Invalid input: n and e must be >= 2")
-    print("BONEH_DURFEE=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2")
-    print(f"q = {n // 2}")
-    print("BONEH_DURFEE=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("BONEH_DURFEE=FAILED")
-    quit()
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print("BONEH_DURFEE=SUCCESS")
-    quit()
-
-# Phase 1: Wiener's attack via continued fraction convergents of e/n
-cf = continued_fraction(QQ(e)/QQ(n))
-found = False
-for conv in cf.convergents():
-    k, d = conv.numerator(), conv.denominator()
-    if k == 0:
-        continue
-    if (e * d - 1) % k == 0:
-        phi = (e * d - 1) // k
-        s = n - phi + 1
-        disc = s ** 2 - 4 * n
-        if disc > 0 and disc.is_square():
-            t = isqrt(disc)
-            if (s + t) % 2 == 0:
-                p = (s - t) // 2
-                q = (s + t) // 2
-                if p * q == n and p > 1:
-                    print(f"Wiener's attack succeeded:")
-                    print(f"d = {d}, p = {p}, q = {q}")
-                    print(f"Verification: p * q = {p * q}")
-                    print("BONEH_DURFEE=SUCCESS")
-                    found = True
-                    break
-
-if found:
-    quit()
-
-# Phase 2: Boneh-Durfee lattice attack (Herrmann-May simplification)
-# f(x,y) = 1 + x*(A + y) with root (2k, -(p+q)/2) where ed = 1 + k*phi(n)
-print("Wiener failed (d >= n^0.25). Attempting Boneh-Durfee lattice attack...")
-try:
+\\textbf{References:} M. Wiener, "Cryptanalysis of Short RSA Secret Exponents", IEEE Trans. Info. Theory, 1990`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e},Ph=()=>{let e=Oh(L.p),t=Oh(L.q),n=e*t,r=(e-1n)*(t-1n),i=BigInt(100+Math.floor(Math.random()*1e4));for(;Th(i,r)===null;)i+=1n;let a=Th(i,r);return{n:n.toString(),e:a.toString()}},Fh={id:`boneh-durfee`,name:`Boneh-Durfee Attack`,category:`Factorization`,description:`Recovers d via lattice reduction. Use when d < n^0.292.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
+    n = Integer(${e.n})
+    e = Integer(${e.e})
+    print(f"Boneh-Durfee Attack on n = {n}")
+    if n < 2 or e < 2:
+        print("Invalid input: n and e must be >= 2")
+        print("BONEH_DURFEE=FAILED")
+        quit()
+    if n % 2 == 0:
+        print(f"n is even: {n}")
+        print(f"p = 2")
+        print(f"q = {n // 2}")
+        print("BONEH_DURFEE=SUCCESS")
+        quit()
+    if n.is_prime():
+        print(f"n is prime: {n}")
+        print("BONEH_DURFEE=FAILED")
+        quit()
+    if n.is_square():
+        p = isqrt(n)
+        print(f"n is a perfect square: {p}^2 = {n}")
+        print("BONEH_DURFEE=SUCCESS")
+        quit()
+    # Phase 1: Wiener's attack via continued fraction convergents of e/n
+    cf = continued_fraction(QQ(e)/QQ(n))
+    found = False
+    for conv in cf.convergents():
+        k, d = conv.numerator(), conv.denominator()
+        if k == 0:
+            continue
+        if (e * d - 1) % k == 0:
+            phi = (e * d - 1) // k
+            s = n - phi + 1
+            disc = s ** 2 - 4 * n
+            if disc > 0 and disc.is_square():
+                t = isqrt(disc)
+                if (s + t) % 2 == 0:
+                    p = (s - t) // 2
+                    q = (s + t) // 2
+                    if p * q == n and p > 1:
+                        print(f"Wiener's attack succeeded:")
+                        print(f"d = {d}, p = {p}, q = {q}")
+                        print(f"Verification: p * q = {p * q}")
+                        print("BONEH_DURFEE=SUCCESS")
+                        found = True
+                        break
+    if found:
+        quit()
+    # Phase 2: Boneh-Durfee lattice attack (Herrmann-May simplification)
+    # f(x,y) = 1 + x*(A + y) with root (2k, -(p+q)/2) where ed = 1 + k*phi(n)
+    print("Wiener failed (d >= n^0.25). Attempting Boneh-Durfee lattice attack...")
     A = (n + 1) // 2
     delta = 0.25
     m = 3
@@ -431,36 +423,30 @@ try:
         t = 0
     XX = floor(n ** delta)
     YY = floor(sqrt(n))
-    # Build polynomial f(x,y) = 1 + x*(A + y) with f(2k, y) = ed
     P = PolynomialRing(ZZ, 'x, y')
     x, y = P.gens()
     f = 1 + x * (A + y)
-    # Herrmann-May substitution: u = xy + 1
     PR = PolynomialRing(ZZ, 'u, x, y')
     u, x, y = PR.gens()
     Q = PR.quotient(x * y + 1 - u)
     fZ = Q(f).lift()
     UU = XX * YY + 1
-    # Build lattice from x-shifts
     gg = []
     for kk in range(m + 1):
         for ii in range(m - kk + 1):
             gg.append(x ** ii * e ** (m - kk) * fZ(u, x, y) ** kk)
     gg.sort()
-    # Collect x-shift monomials
     monomials = []
     for poly in gg:
         for mon in poly.monomials():
             if mon not in monomials:
                 monomials.append(mon)
     monomials.sort()
-    # y-shifts (Herrmann-May selective)
     if t > 0:
         for jj in range(1, t + 1):
             for kk in range((m // t) * jj, m + 1):
                 gg.append(Q(y ** jj * fZ(u, x, y) ** kk * e ** (m - kk)).lift())
                 monomials.append(u ** kk * y ** jj)
-    # Build lower-triangular lattice matrix (required for determinant bound)
     nn = len(monomials)
     BB = Matrix(ZZ, nn)
     for ii in range(nn):
@@ -468,9 +454,7 @@ try:
         for jj in range(1, ii + 1):
             if monomials[jj] in gg[ii].monomials():
                 BB[ii, jj] = gg[ii].monomial_coefficient(monomials[jj]) * monomials[jj](UU, XX, YY)
-    # LLL reduction
     BB = BB.LLL()
-    # Recover (x0, y0) by computing resultants on LLL-reduced vector pairs
     PR2 = PolynomialRing(ZZ, 'w, z')
     w, z = PR2.gens()
     found2 = False
@@ -512,12 +496,11 @@ try:
                                     break
             if found2:
                 break
-
     if not found2:
         print("Boneh-Durfee lattice attack failed: d >= n^0.292 or parameters insufficient.")
         print("BONEH_DURFEE=FAILED")
 except Exception as ex:
-    print(f"ERROR: Boneh-Durfee lattice computation failed: {ex}")
+    print(f"ERROR: Boneh-Durfee computation failed: {ex}")
     print("BONEH_DURFEE=FAILED")
 `,proof:`\\textbf{Theorem:} The private exponent d can be recovered in polynomial time when d < n^{0.292} using lattice reduction.
 
@@ -546,61 +529,61 @@ f(x, y) &= 1 + x(A + y) \\equiv 0 \\pmod{e} \\quad \\text{with root } (2k, y) \\
 
 \\textbf{Explanation:} Build a bivariate polynomial f(x, y) = 1 + x(A + y) \\pmod{e} with small root (2k, -(p+q)/2). Use the Herrmann-May substitution u = xy + 1 to simplify lattice construction. Build shifts from powers of f and the modulus e, apply LLL to find short vectors, then extract y via resultant. Recover \\varphi(n) and factor n. The bound d < n^{0.292} comes from lattice dimension analysis.
 
-\\textbf{References:} D. Boneh & G. Durfee, "Cryptanalysis of RSA with Private Key d Less than n^0.292", IEEE Trans. Info. Theory, 1999; M. Herrmann & A. May, "Maximizing Small Root Bounds by Linearization and Applications to Small Secret Exponent RSA", PKC 2008`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e},Ih=()=>{let e=Oh(L.p),t=Oh(L.q),n=e*t,r=(e-1n)*(t-1n),i=BigInt(100+Math.floor(Math.random()*1e4));for(;Th(i,r)===null;)i+=1n;let a=Th(i,r);return{n:n.toString(),e:a.toString()}},Lh={id:`ecm`,name:`ECM Factorization`,category:`Factorization`,description:`Factors n using elliptic curves. Use for general factorization when other methods fail.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
-
-print(f"ECM Factorization on n = {n}")
-print()
-
-if n < 2:
-    print(f"n = {n} is too small to factor")
-    print("ECM=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2, q = {n // 2}")
-    print("ECM=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("ECM=FAILED")
-    quit()
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print(f"p = q = {p}")
-    print("ECM=SUCCESS")
-    quit()
-
-from sage.libs.libecm import ecmfactor
-B1_vals = [2000, 10000, 50000, 250000, 1000000]
-curves_per_B1 = 15
-found_p = None
-for B1_cur in B1_vals:
-    for attempt in range(curves_per_B1):
-        try:
-            result = ecmfactor(n, B1_cur)
-            if result[0]:
-                factor = result[1]
-                if factor != 1 and factor != n and n % factor == 0:
-                    found_p = factor
-                    break
-        except Exception:
-            continue
+\\textbf{References:} D. Boneh & G. Durfee, "Cryptanalysis of RSA with Private Key d Less than n^0.292", IEEE Trans. Info. Theory, 1999; M. Herrmann & A. May, "Maximizing Small Root Bounds by Linearization and Applications to Small Secret Exponent RSA", PKC 2008`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e},Ih=()=>{let e=Oh(L.p),t=Oh(L.q),n=e*t,r=(e-1n)*(t-1n),i=BigInt(100+Math.floor(Math.random()*1e4));for(;Th(i,r)===null;)i+=1n;let a=Th(i,r);return{n:n.toString(),e:a.toString()}},Lh={id:`ecm`,name:`ECM Factorization`,category:`Factorization`,description:`Factors n using elliptic curves. Use for general factorization when other methods fail.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
+    n = Integer(${e.n})
+    print(f"ECM Factorization on n = {n}")
+    print()
+    if n < 2:
+        print(f"n = {n} is too small to factor")
+        print("ECM=FAILED")
+        quit()
+    if n % 2 == 0:
+        print(f"n is even: {n}")
+        print(f"p = 2, q = {n // 2}")
+        print("ECM=SUCCESS")
+        quit()
+    if n.is_prime():
+        print(f"n is prime: {n}")
+        print("ECM=FAILED")
+        quit()
+    if n.is_square():
+        p = isqrt(n)
+        print(f"n is a perfect square: {p}^2 = {n}")
+        print(f"p = q = {p}")
+        print("ECM=SUCCESS")
+        quit()
+    from sage.libs.libecm import ecmfactor
+    B1_vals = [2000, 10000, 50000, 250000, 1000000]
+    curves_per_B1 = 15
+    found_p = None
+    for B1_cur in B1_vals:
+        for attempt in range(curves_per_B1):
+            try:
+                result = ecmfactor(n, B1_cur)
+                if result[0]:
+                    factor = result[1]
+                    if factor != 1 and factor != n and n % factor == 0:
+                        found_p = factor
+                        break
+            except Exception:
+                continue
+        if found_p is not None:
+            break
     if found_p is not None:
-        break
-
-if found_p is not None:
-    q = n // found_p
-    if found_p > q:
-        found_p, q = q, found_p
-    print(f"p = {found_p}")
-    print(f"q = {q}")
-    print(f"Verification: p * q = {found_p * q}")
-    print(f"p is prime: {found_p.is_prime()}")
-    print("ECM=SUCCESS")
-else:
-    print("ECM failed to find any factor after multiple attempts")
-    print("Try increasing B1 bounds or using a different method")
+        q = n // found_p
+        if found_p > q:
+            found_p, q = q, found_p
+        print(f"p = {found_p}")
+        print(f"q = {q}")
+        print(f"Verification: p * q = {found_p * q}")
+        print(f"p is prime: {found_p.is_prime()}")
+        print("ECM=SUCCESS")
+    else:
+        print("ECM failed to find any factor after multiple attempts")
+        print("Try increasing B1 bounds or using a different method")
+        print("ECM=FAILED")
+except Exception as e:
+    print(f"ERROR: {e}")
     print("ECM=FAILED")
 `,proof:`\\textbf{Theorem:} ECM finds a prime factor p of n in expected time O(\\exp(\\sqrt{2 \\ln p \\ln \\ln p})).
 
@@ -667,49 +650,53 @@ def ecm_factor_all(m, depth):
             result.append(prime)
     return result
 
-print(f"ECM Full Factorization on n = {n}")
-print()
-if n < 2:
-    print(f"n = {n} is too small to factor")
-    print("ECM2=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2, q = {n // 2}")
-    print("ECM2=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("ECM2=FAILED")
-    quit()
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print(f"p = q = {p}")
-    print("ECM2=SUCCESS")
-    quit()
-factors = ecm_factor_all(n, 0)
-factors.sort()
-print()
-print(f"All {len(factors)} prime factors: {factors}")
-print()
-counts = {}
-for f in factors:
-    counts[f] = counts.get(f, 0) + 1
-print(f"Factorization:")
-product = 1
-for prime, exp in sorted(counts.items()):
-    if exp == 1:
-        print(f"  p = {prime}")
+try:
+    print(f"ECM Full Factorization on n = {n}")
+    print()
+    if n < 2:
+        print(f"n = {n} is too small to factor")
+        print("ECM2=FAILED")
+        quit()
+    if n % 2 == 0:
+        print(f"n is even: {n}")
+        print(f"p = 2, q = {n // 2}")
+        print("ECM2=SUCCESS")
+        quit()
+    if n.is_prime():
+        print(f"n is prime: {n}")
+        print("ECM2=FAILED")
+        quit()
+    if n.is_square():
+        p = isqrt(n)
+        print(f"n is a perfect square: {p}^2 = {n}")
+        print(f"p = q = {p}")
+        print("ECM2=SUCCESS")
+        quit()
+    factors = ecm_factor_all(n, 0)
+    factors.sort()
+    print()
+    print(f"All {len(factors)} prime factors: {factors}")
+    print()
+    counts = {}
+    for f in factors:
+        counts[f] = counts.get(f, 0) + 1
+    print(f"Factorization:")
+    product = 1
+    for prime, exp in sorted(counts.items()):
+        if exp == 1:
+            print(f"  p = {prime}")
+        else:
+            print(f"  {prime}^{exp}")
+        product *= prime ** exp
+    print()
+    print(f"Verification: product = {product}")
+    print(f"Matches n: {product == n}")
+    if product == n:
+        print("ECM2=SUCCESS")
     else:
-        print(f"  {prime}^{exp}")
-    product *= prime ** exp
-print()
-print(f"Verification: product = {product}")
-print(f"Matches n: {product == n}")
-if product == n:
-    print("ECM2=SUCCESS")
-else:
+        print("ECM2=FAILED")
+except Exception as e:
+    print(f"Error: {e}")
     print("ECM2=FAILED")
 `,proof:`\\textbf{Theorem:} Repeated ECM with factor removal yields the complete prime factorization of n.
 
@@ -1165,7 +1152,6 @@ if n.nbits() > 330:
 try:
     print("Factoring n with qsieve (Quadratic Sieve)...")
     result = qsieve(n)
-
     # Handle multiple qsieve return formats:
     #   Old API (sage.interfaces): [p, q] or ([p, q], time_str)
     #   New API (sage.libs.flint): [(p, 1), (q, 1)]
@@ -1173,31 +1159,26 @@ try:
         items = result[0]  # Old API with time=True
     else:
         items = result
-
     factors = []
     for item in items:
         if isinstance(item, (list, tuple)):
             factors.append((Integer(item[0]), Integer(item[1])))
         else:
             factors.append((Integer(item), 1))
-
     if not factors:
         print("No factors found")
         print("QUADRATIC_SIEVE=FAILED")
         quit()
-
     # Display factorization
     fac_str = " * ".join(
         f"{p}^{e}" if e > 1 else str(p) for p, e in factors
     )
     print(f"Factorization: {fac_str}")
     print()
-
     # Single factor (qsieve could not factor properly)
     if len(factors) == 1 and factors[0][1] == 1:
         print(f"Only one factor found: {factors[0][0]}")
         print("QUADRATIC_SIEVE=FAILED")
-
     # Two prime factors (semiprime) — typical QS use case
     elif len(factors) == 2 and all(exp == 1 for _, exp in factors):
         p = Integer(factors[0][0])
@@ -1208,7 +1189,6 @@ try:
         print(f"p is prime: {p.is_prime()}")
         print(f"q is prime: {q.is_prime()}")
         print("QUADRATIC_SIEVE=SUCCESS")
-
     # Multiple factors or powers
     else:
         print(f"Found {len(factors)} factor(s):")
@@ -1224,7 +1204,6 @@ try:
         print(f"Verification: product = {product}")
         print(f"Matches n: {product == n}")
         print("QUADRATIC_SIEVE=SUCCESS")
-
 except Exception as ex:
     print(f"Factorization failed: {ex}")
     print("n may be too large for the quadratic sieve.")
@@ -1259,96 +1238,93 @@ X \\not\\equiv \\pm y \\pmod{n} &\\implies \\gcd(X - y, n) \\text{ is a factor} 
 
 \\textbf{Explanation:} Sieve values of Q(x) = (x + \\sqrt{n})^2 - n for smoothness over a factor base. Each smooth value gives an exponent vector mod 2. Find a linear dependency over \\mathbb{F}_2 to get a congruence of squares X^2 \\equiv y^2 \\pmod{n}. Then gcd(X - y, n) yields a factor with probability \\geq 1/2.
 
-\\textbf{References:} C. Pomerance, "The Quadratic Sieve Factoring Algorithm", Eurocrypt 1984`,priority:`high`,applicableCheck:e=>!!e.n},Jh=()=>({n:(Oh(68)*Oh(68)).toString()}),Yh={id:`squfof`,name:`SQUFOF`,category:`Factorization`,description:`Factors n via continued fractions of sqrt(n). Use for n < 10^14.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
-
-if n < 2:
-    print(f"n = {n} is too small to factor")
-    print("SQUFOF=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2")
-    print(f"q = {n // 2}")
-    print(f"Verification: 2 * {n // 2} = {n}")
-    print("SQUFOF=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("No factorization possible")
-    print("SQUFOF=FAILED")
-    quit()
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print(f"p = q = {p}")
-    print("SQUFOF=SUCCESS")
-    quit()
-
-# SQUFOF works best for small factors; extract small factor first
-found_small = False
-for trial in range(3, 100000, 2):
-    if n % trial == 0:
-        p = Integer(trial)
-        q = n // p
-        print(f"Small factor found: p = {p}")
-        print(f"q = {q}")
-        print(f"Verification: p * q = {p * q}")
+\\textbf{References:} C. Pomerance, "The Quadratic Sieve Factoring Algorithm", Eurocrypt 1984`,priority:`high`,applicableCheck:e=>!!e.n},Jh=()=>({n:(Oh(68)*Oh(68)).toString()}),Yh={id:`squfof`,name:`SQUFOF`,category:`Factorization`,description:`Factors n via continued fractions of sqrt(n). Use for n < 10^14.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
+    n = Integer(${e.n})
+    print(f"SQUFOF on n = {n}")
+    print()
+    if n < 2:
+        print(f"n = {n} is too small to factor")
+        print("SQUFOF=FAILED")
+        quit()
+    if n % 2 == 0:
+        print(f"n is even: {n}")
+        print(f"p = 2")
+        print(f"q = {n // 2}")
+        print(f"Verification: 2 * {n // 2} = {n}")
         print("SQUFOF=SUCCESS")
-        found_small = True
-        break
-
-if found_small:
-    quit()
-
-# Shanks' Square Forms Factorization (SQUFOF)
-def squfof(n):
-    # Find non-residue
-    D = 0
-    for k in [1, 3, 5, 7, -1, -3, -5, -7]:
-        if kronecker(k, n) == -1:
-            D = k * n
+        quit()
+    if n.is_prime():
+        print(f"n is prime: {n}")
+        print("No factorization possible")
+        print("SQUFOF=FAILED")
+        quit()
+    if n.is_square():
+        p = isqrt(n)
+        print(f"n is a perfect square: {p}^2 = {n}")
+        print(f"p = q = {p}")
+        print("SQUFOF=SUCCESS")
+        quit()
+    # SQUFOF works best for small factors; extract small factor first
+    found_small = False
+    for trial in range(3, 100000, 2):
+        if n % trial == 0:
+            p = Integer(trial)
+            q = n // p
+            print(f"Small factor found: p = {p}")
+            print(f"q = {q}")
+            print(f"Verification: p * q = {p * q}")
+            print("SQUFOF=SUCCESS")
+            found_small = True
             break
-    if D == 0:
-        D = n
-    sqrtD = isqrt(D)
-    Po = sqrtD
-    P = Po
-    Q = D - Po**2
-    Qprev = 1
-    # Step 1: forward cycle — find a square form
-    limit = 2 * isqrt(isqrt(n)) + 2
-    for i in range(limit):
-        b = (sqrtD + P) // Q
-        Pnew = b * Q - P
-        Qnew = D - Pnew**2
-        Qnew //= Q
-        if i % 2 == 0 and Qnew.is_square() and Qnew > 0:
-            r = isqrt(Qnew)
-            if (sqrtD - Pnew) % r == 0:
-                # Step 2: inverse square root → start reverse cycle
-                b = (sqrtD - Pnew) // r
-                P = b * r + Pnew
-                Qprev = r
-                Q = (D - P**2) // Qprev
-                # Step 3: reverse cycle — find symmetry
-                for _ in range(limit):
-                    b = (sqrtD + P) // Q
-                    P_old = P
-                    P = b * Q - P
-                    Q_old = Q
-                    Q = (D - P**2) // Q_old
-                    if P == P_old:
-                        g = gcd(Q_old, n)
-                        if 1 < g < n:
-                            return g, n // g
-                        break
+    if found_small:
+        quit()
+    # Shanks' Square Forms Factorization (SQUFOF)
+    def squfof(n):
+        # Find non-residue
+        D = 0
+        for k in [1, 3, 5, 7, -1, -3, -5, -7]:
+            if kronecker(k, n) == -1:
+                D = k * n
                 break
-        Qprev = Q
-        Q = Qnew
-        P = Pnew
-    return None
-
-try:
+        if D == 0:
+            D = n
+        sqrtD = isqrt(D)
+        Po = sqrtD
+        P = Po
+        Q = D - Po**2
+        Qprev = 1
+        # Step 1: forward cycle — find a square form
+        limit = 2 * isqrt(isqrt(n)) + 2
+        for i in range(limit):
+            b = (sqrtD + P) // Q
+            Pnew = b * Q - P
+            Qnew = D - Pnew**2
+            Qnew //= Q
+            if i % 2 == 0 and Qnew.is_square() and Qnew > 0:
+                r = isqrt(Qnew)
+                if (sqrtD - Pnew) % r == 0:
+                    # Step 2: inverse square root → start reverse cycle
+                    b = (sqrtD - Pnew) // r
+                    P = b * r + Pnew
+                    Qprev = r
+                    Q = (D - P**2) // Qprev
+                    # Step 3: reverse cycle — find symmetry
+                    for _ in range(limit):
+                        b = (sqrtD + P) // Q
+                        P_old = P
+                        P = b * Q - P
+                        Q_old = Q
+                        Q = (D - P**2) // Q_old
+                        if P == P_old:
+                            g = gcd(Q_old, n)
+                            if 1 < g < n:
+                                return g, n // g
+                            break
+                    break
+            Qprev = Q
+            Q = Qnew
+            P = Pnew
+        return None
     result = squfof(n)
     if result:
         p, q = result
@@ -1360,7 +1336,7 @@ try:
         print("SQUFOF did not find a factor. Try a different method.")
         print("SQUFOF=FAILED")
 except Exception as e:
-    print(f"Error in SQUFOF: {e}")
+    print(f"ERROR: {e}")
     print("SQUFOF=FAILED")
 `,proof:`\\textbf{Theorem:} SQUFOF factors a composite integer n by finding a square form in the cycle of reduced binary quadratic forms of discriminant D = kn.
 
@@ -1386,42 +1362,35 @@ f(x, y) = ax^2 + bxy + cy^2, \\quad D &= b^2 - 4ac \\\\
 
 \\textbf{Explanation:} SQUFOF traverses the cycle of reduced binary quadratic forms of discriminant D = kn. When a form with a square coefficient c is found, the inverse square root is computed and the cycle is continued until a factor emerges via GCD.
 
-\\textbf{References:} D. Shanks, "SQUFOF: A Quadratic Form Factorization Algorithm", 1975; Gower & Wagstaff, "Square Form Factorization", Mathematics of Computation, 2008`,priority:`medium`,applicableCheck:e=>!!e.n},Xh=()=>({n:(Oh(16)*Oh(L.p+L.q-16)).toString()}),Zh={id:`binary-poly-factor`,name:`Binary Polynomial Factoring`,category:`Factorization`,description:`Factors n via binary polynomial factorization. Use when n's binary form yields factorable polynomial.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
-
-if n < 2:
-    print(f"n = {n} is too small to factor")
-    print("BINARY_POLY=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2")
-    print(f"q = {n // 2}")
-    print(f"Verification: 2 * {n // 2} = {n}")
-    print("BINARY_POLY=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("No factorization possible")
-    print("BINARY_POLY=FAILED")
-    quit()
-
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print(f"p = q = {p}")
-    print("BINARY_POLY=SUCCESS")
-    quit()
-
-# Check if n is a power of 2
-if n > 0 and (n & (n - 1)) == 0:
-    print(f"n is a power of 2: n = 2^{n.nbits() - 1}")
-    print("No non-trivial factorization possible")
-    print("BINARY_POLY=FAILED")
-    quit()
-
-# Binary polynomial factorization
-try:
-    # Convert n to polynomial: n = sum(b_i * 2^i) -> f(x) = sum(b_i * x^i)
+\\textbf{References:} D. Shanks, "SQUFOF: A Quadratic Form Factorization Algorithm", 1975; Gower & Wagstaff, "Square Form Factorization", Mathematics of Computation, 2008`,priority:`medium`,applicableCheck:e=>!!e.n},Xh=()=>({n:(Oh(16)*Oh(L.p+L.q-16)).toString()}),Zh={id:`binary-poly-factor`,name:`Binary Polynomial Factoring`,category:`Factorization`,description:`Factors n via binary polynomial factorization. Use when n's binary form yields factorable polynomial.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
+    n = Integer(${e.n})
+    if n < 2:
+        print(f"n = {n} is too small to factor")
+        print("BINARY_POLY=FAILED")
+        quit()
+    if n % 2 == 0:
+        print(f"n is even: {n}")
+        print(f"p = 2")
+        print(f"q = {n // 2}")
+        print(f"Verification: 2 * {n // 2} = {n}")
+        print("BINARY_POLY=SUCCESS")
+        quit()
+    if n.is_prime():
+        print(f"n is prime: {n}")
+        print("No factorization possible")
+        print("BINARY_POLY=FAILED")
+        quit()
+    if n.is_square():
+        p = isqrt(n)
+        print(f"n is a perfect square: {p}^2 = {n}")
+        print(f"p = q = {p}")
+        print("BINARY_POLY=SUCCESS")
+        quit()
+    if n > 0 and (n & (n - 1)) == 0:
+        print(f"n is a power of 2: n = 2^{n.nbits() - 1}")
+        print("No non-trivial factorization possible")
+        print("BINARY_POLY=FAILED")
+        quit()
     coeffs = n.digits(2)
     R.<x> = PolynomialRing(ZZ)
     f = sum(c * x^i for i, c in enumerate(coeffs))
@@ -1430,24 +1399,20 @@ try:
     print(f"f(2) = {f(2)}")
     print(f"f(2) == n: {f(2) == n}")
     print()
-    # Check if polynomial is irreducible — if so, no factorization is possible
     if f.is_irreducible():
         print(f"Polynomial f(x) = {f} is irreducible over ZZ[x]")
         print("No nontrivial polynomial factorization exists.")
         print("BINARY_POLY=FAILED")
         quit()
-    # Factor the polynomial
     factors = f.factor()
     print(f"Factorization of f(x): {factors}")
     print()
-    # Evaluate each factor at x=2
     print("Evaluating factors at x=2:")
     for factor, mult in factors:
         val = factor(2)
         print(f"  {factor}(2) = {val}")
         if mult > 1:
             print(f"    multiplicity: {mult}")
-    # Check if product of evaluations equals n
     product = 1
     for factor, mult in factors:
         product *= factor(2)**mult
@@ -1455,9 +1420,6 @@ try:
     print(f"Original n: {n}")
     print(f"Match: {product == n}")
     if product == n:
-        # Find factors that give proper divisors of n
-        # (avoid false positive when f(x) is irreducible — len(factors)==1
-        #  and the only factor is f(x) itself with f(2)=n)
         proper_vals = [factor(2) for factor, _ in factors if 1 < factor(2) < n]
         if proper_vals:
             print("\\nPotential factors found:")
@@ -1534,7 +1496,6 @@ try:
     trial_window = 5000
     pairs_tried = 0
     divs_tried = 0
-
     for b in range(1, max_den + 1):
         for a in range(1, b + 1):
             if gcd(a, b) != 1:
@@ -1628,31 +1589,23 @@ q_0 &= \\left\\lfloor\\sqrt{nb/a}\\right\\rfloor = \\left\\lfloor\\sqrt{q^2 + \\
 
 \\textbf{Explanation:} When p/q is close to a small rational a/b, we approximate q as \\sqrt{nb/a}. The error |q - q_0| equals the primality adjustment \\delta (e.g., < 500 bits in practice). Trial division for q_0 \\pm \\Delta finds the exact factor using only fast integer operations — orders of magnitude faster than calling Coppersmith's LLL for each candidate pair.
 
-\\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,priority:`medium`,applicableCheck:e=>!!e.n},eg=()=>{let e=BigInt(3),t=BigInt(5),n=Oh(L.q),r=n*e/t,i=r;for(let e=0n;e<500n;e+=1n){let t=r+e;if(t>1n&&Dh(t)){i=t;break}let n=r-e;if(n>1n&&Dh(n)){i=n;break}}return{n:(i*n).toString()}},tg={id:`batch-gcd`,name:`Batch GCD`,category:`Factorization`,description:`Finds shared factors across multiple moduli. Use when given a list of RSA moduli.`,inputs:[{name:`n_values`,label:`Moduli (one per line or comma-separated)`,placeholder:`n1\\nn2\\nn3...`,multiline:!0,rows:5}],sageTemplate:e=>`# Batch GCD: find shared prime factors across multiple moduli
-n_list_str = """${e.n_values}"""
-
-# Parse input
-import re
-n_list = [Integer(x.strip()) for x in re.split(r'[\\s,]+', n_list_str.strip()) if x.strip()]
-
-if len(n_list) < 2:
-    print("Error: Need at least 2 moduli for Batch GCD attack.")
-    print("BATCH_GCD=FAILED")
-else:
-    try:
+\\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,priority:`medium`,applicableCheck:e=>!!e.n},eg=()=>{let e=BigInt(3),t=BigInt(5),n=Oh(L.q),r=n*e/t,i=r;for(let e=0n;e<500n;e+=1n){let t=r+e;if(t>1n&&Dh(t)){i=t;break}let n=r-e;if(n>1n&&Dh(n)){i=n;break}}return{n:(i*n).toString()}},tg={id:`batch-gcd`,name:`Batch GCD`,category:`Factorization`,description:`Finds shared factors across multiple moduli. Use when given a list of RSA moduli.`,inputs:[{name:`n_values`,label:`Moduli (one per line or comma-separated)`,placeholder:`n1\\nn2\\nn3...`,multiline:!0,rows:5}],sageTemplate:e=>`try:
+    n_list_str = """${e.n_values}"""
+    import re
+    n_list = [Integer(x.strip()) for x in re.split(r'[\\s,]+', n_list_str.strip()) if x.strip()]
+    if len(n_list) < 2:
+        print("Error: Need at least 2 moduli for Batch GCD attack.")
+        print("BATCH_GCD=FAILED")
+    else:
         print(f"Processing {len(n_list)} moduli...")
         print()
-        # Compute product of all moduli
         product = prod(n_list)
-        # Batch GCD: for each n, compute product of all other moduli via division
         found_any = False
         for i, n in enumerate(n_list):
             if n <= 1:
                 print(f"n[{i}] = {n}: invalid")
                 continue
-            # Compute product of all other moduli
             others_product = product // n
-            # GCD of n with product of all others
             g = gcd(n, others_product)
             if g > 1 and g < n:
                 found_any = True
@@ -1675,9 +1628,9 @@ else:
             print("BATCH_GCD=SUCCESS")
         else:
             print("BATCH_GCD=FAILED")
-    except Exception as e:
-        print(f"Error in Batch GCD: {e}")
-        print("BATCH_GCD=FAILED")
+except Exception as e:
+    print(f"Error in Batch GCD: {e}")
+    print("BATCH_GCD=FAILED")
 `,frontendCheck:async e=>{try{let t=(e.n_values||``).trim();if(!t)return null;let n=t.split(/[\n,]+/).map(e=>e.trim()).filter(e=>e.length>0).map(e=>BigInt(e));if(n.length<2)return null;let r=1n;for(let e of n)r*=e;let i=[`Batch GCD Attack (browser-side, BigInt)`,`Processing ${n.length} moduli...`,``],a=!1;for(let e=0;e<n.length;e++){let t=n[e];if(t<=1n)continue;let o=Sh(t,r/t);if(o>1n&&o<t){a=!0;let n=o,r=t/o;i.push(`n[${e}] = ${t}`),i.push(`  Shared factor found: p = ${n}`),i.push(`  q = ${r}`),i.push(`  Verification: p * q = ${n*r}`),i.push(``)}else o===t&&(i.push(`n[${e}] = ${t}`),i.push(`  WARNING: n divides product of others (duplicate or fully shared)`),i.push(``))}return a?(i.push(`Batch GCD complete.`),i.join(`
 `)):null}catch{return null}},proof:`\\textbf{Theorem:} Given moduli \\{n_1, \\ldots, n_k\\}, if any two share a prime, \\gcd(n_i, \\prod_{j \\neq i} n_j) reveals it.
 
@@ -1753,7 +1706,6 @@ try:
     print(f"Attempting multi-prime factorization of n = {n}")
     print(f"Bit length: {n.nbits()} bits ({n.nbits() / 3.32:.0f} digits)")
     print()
-
     prime_factors = factor_all(n)
 
     print(f"Prime factors ({len(prime_factors)} total):")
@@ -1761,7 +1713,6 @@ try:
         prime_status = "prime" if p.is_prime() else "composite"
         print(f"  p[{i+1}] = {p} ({p.nbits()} bits, {prime_status})")
     print()
-
     # Verify product
     product = 1
     for p in prime_factors:
@@ -1769,10 +1720,8 @@ try:
     print(f"Verification: product = {product}")
     print(f"Matches n: {product == n}")
     print()
-
     # Check if any factor is composite (partial factorization)
     all_prime = all(p.is_prime() for p in prime_factors)
-
     if len(prime_factors) > 2 and all_prime:
         print("Multi-prime RSA detected!")
         print(f"n = {' × '.join(str(p) for p in prime_factors)}")
@@ -1941,86 +1890,83 @@ n \\bmod s &= 0, \\quad s \\in \\mathcal{S} \\\\
 
 \\textbf{Explanation:} Some CTF challenges use primes with recognizable mathematical structure. Since the total number of known special-form primes is very small, testing divisibility against all of them is fast. This exploits poor randomness in CTF key generation.
 
-\\textbf{References:} Caldwell, "The Prime Pages" (primes.utm.edu); Ribenboim, "The New Book of Prime Number Records", 1996`,priority:`low`,applicableCheck:e=>!!e.n},og=()=>{let e=[17,19,31,61,89,107,127].map(e=>({p:e,val:(1n<<BigInt(e))-1n})).filter(({val:e})=>Dh(e));return{n:((e.length>0?e[Math.floor(Math.random()*e.length)].val:(1n<<17n)-1n)*Oh(L.q)).toString()}},sg={id:`close-prime`,name:`Close-Prime (Londahl)`,category:`Factorization`,description:`Factor n when p and q are close using Londahl baby-step giant-step phi-approximation. Works for |p - q| up to ~sqrt(n).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
-
-if n < 2:
-    print(f"n = {n} is too small to factor")
-    print("CLOSE_PRIME=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2")
-    print(f"q = {n // 2}")
-    print(f"Verification: 2 * {n // 2} = {n}")
-    print("CLOSE_PRIME=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("No factorization possible")
-    print("CLOSE_PRIME=FAILED")
-    quit()
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print(f"p = q = {p}")
-    print("CLOSE_PRIME=SUCCESS")
-    quit()
-
-print(f"Londahl close-prime factorization on n ({n.nbits()} bits)")
-print()
-
-# Londahl baby-step giant-step phi-approximation attack
-# Source: https://grocid.net/2017/09/16/finding-close-prime-factorizations/
-b = 500000
-
-# Approximate phi(n) = n - (p+q) + 1 ~ n - 2*sqrt(n) + 1 when p ~ q
-phi_approx = n - 2*isqrt(n) + 1
-
-# Baby steps: store 2^j mod n for j = 0..b
-# Parity optimization halves table size (store only parity matching phi_approx)
-print(f"Building baby-step table (b={b})...")
-look_up = {}
-z = 1
-parity = int(phi_approx & 1)
-for j in range(b + 1):
-    if (j & 1) == parity:
-        look_up[z] = j
-    z = (z * 2) % n
-
-# Giant steps: search for phi = phi_approx + j - i*b
-# We compute 2^(-phi_approx) * (2^b)^i and look for collision in baby-step table
-print(f"Searching ({b + 1} giant steps)...")
-mu = inverse_mod(pow(2, phi_approx, n), n)
-step = pow(2, b, n)
-found = False
-for i in range(b + 1):
-    if mu in look_up:
-        j = look_up[mu]
-        phi = phi_approx + j - i * b
-        # Factor n from phi: p+q = n - phi + 1, solve x^2 - (p+q)x + n = 0
-        m = n - phi + 1
-        disc = m*m - 4*n
-        if disc > 0:
-            sqrt_disc = isqrt(disc)
-            if sqrt_disc*sqrt_disc == disc:
-                p_candidate = (m - sqrt_disc) // 2
-                q_candidate = (m + sqrt_disc) // 2
-                if p_candidate * q_candidate == n and p_candidate > 1 and q_candidate > 1:
-                    print(f"Factor found!")
-                    print(f"p = {p_candidate}")
-                    print(f"q = {q_candidate}")
-                    print(f"|p - q| = {abs(q_candidate - p_candidate)}")
-                    print(f"Verification: p * q = {p_candidate * q_candidate}")
-                    print(f"Baby steps: {b+1}, Giant steps: {i+1}")
-                    found = True
-                    break
-    mu = (mu * step) % n
-
-if found:
-    print("CLOSE_PRIME=SUCCESS")
-else:
-    print("Londahl close-prime factorization failed after baby-step giant-step search.")
-    print("The prime gap may be too large. Try Fermat factorization.")
+\\textbf{References:} Caldwell, "The Prime Pages" (primes.utm.edu); Ribenboim, "The New Book of Prime Number Records", 1996`,priority:`low`,applicableCheck:e=>!!e.n},og=()=>{let e=[17,19,31,61,89,107,127].map(e=>({p:e,val:(1n<<BigInt(e))-1n})).filter(({val:e})=>Dh(e));return{n:((e.length>0?e[Math.floor(Math.random()*e.length)].val:(1n<<17n)-1n)*Oh(L.q)).toString()}},sg={id:`close-prime`,name:`Close-Prime (Londahl)`,category:`Factorization`,description:`Factor n when p and q are close using Londahl baby-step giant-step phi-approximation. Works for |p - q| up to ~sqrt(n).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
+    n = Integer(${e.n})
+    if n < 2:
+        print(f"n = {n} is too small to factor")
+        print("CLOSE_PRIME=FAILED")
+        quit()
+    if n % 2 == 0:
+        print(f"n is even: {n}")
+        print(f"p = 2")
+        print(f"q = {n // 2}")
+        print(f"Verification: 2 * {n // 2} = {n}")
+        print("CLOSE_PRIME=SUCCESS")
+        quit()
+    if n.is_prime():
+        print(f"n is prime: {n}")
+        print("No factorization possible")
+        print("CLOSE_PRIME=FAILED")
+        quit()
+    if n.is_square():
+        p = isqrt(n)
+        print(f"n is a perfect square: {p}^2 = {n}")
+        print(f"p = q = {p}")
+        print("CLOSE_PRIME=SUCCESS")
+        quit()
+    print(f"Londahl close-prime factorization on n ({n.nbits()} bits)")
+    print()
+    # Londahl baby-step giant-step phi-approximation attack
+    # Source: https://grocid.net/2017/09/16/finding-close-prime-factorizations/
+    b = 500000
+    # Approximate phi(n) = n - (p+q) + 1 ~ n - 2*sqrt(n) + 1 when p ~ q
+    phi_approx = n - 2*isqrt(n) + 1
+    # Baby steps: store 2^j mod n for j = 0..b
+    # Parity optimization halves table size (store only parity matching phi_approx)
+    print(f"Building baby-step table (b={b})...")
+    look_up = {}
+    z = 1
+    parity = int(phi_approx & 1)
+    for j in range(b + 1):
+        if (j & 1) == parity:
+            look_up[z] = j
+        z = (z * 2) % n
+    # Giant steps: search for phi = phi_approx + j - i*b
+    # We compute 2^(-phi_approx) * (2^b)^i and look for collision in baby-step table
+    print(f"Searching ({b + 1} giant steps)...")
+    mu = inverse_mod(pow(2, phi_approx, n), n)
+    step = pow(2, b, n)
+    found = False
+    for i in range(b + 1):
+        if mu in look_up:
+            j = look_up[mu]
+            phi = phi_approx + j - i * b
+            # Factor n from phi: p+q = n - phi + 1, solve x^2 - (p+q)x + n = 0
+            m = n - phi + 1
+            disc = m*m - 4*n
+            if disc > 0:
+                sqrt_disc = isqrt(disc)
+                if sqrt_disc*sqrt_disc == disc:
+                    p_candidate = (m - sqrt_disc) // 2
+                    q_candidate = (m + sqrt_disc) // 2
+                    if p_candidate * q_candidate == n and p_candidate > 1 and q_candidate > 1:
+                        print(f"Factor found!")
+                        print(f"p = {p_candidate}")
+                        print(f"q = {q_candidate}")
+                        print(f"|p - q| = {abs(q_candidate - p_candidate)}")
+                        print(f"Verification: p * q = {p_candidate * q_candidate}")
+                        print(f"Baby steps: {b+1}, Giant steps: {i+1}")
+                        found = True
+                        break
+        mu = (mu * step) % n
+    if found:
+        print("CLOSE_PRIME=SUCCESS")
+    else:
+        print("Londahl close-prime factorization failed after baby-step giant-step search.")
+        print("The prime gap may be too large. Try Fermat factorization.")
+        print("CLOSE_PRIME=FAILED")
+except Exception as e:
+    print(f"Error in close-prime attack: {e}")
     print("CLOSE_PRIME=FAILED")
 `,proof:`\\textbf{Theorem:} If $n = p \\cdot q$ with $p \\approx q$, then $n$ can be factored by recovering $\\phi(n)$ via a baby-step giant-step discrete log attack.
 
@@ -2047,54 +1993,42 @@ p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
 
 \\textbf{Explanation:} Londahl's attack uses a baby-step giant-step approach to find $\\phi(n)$ directly, unlike Fermat factorization which iteratively searches for $a^2 - n = b^2$. It exploits the approximation $\\phi(n) \\approx n - 2\\sqrt{n} + 1$ when $p \\approx q$, then solves $2^{\\delta} \\equiv 2^{-\\phi_{\\text{approx}}} \\pmod{n}$ via BSGS. With $b = 500{,}000$, it covers up to $2.5 \\times 10^{11}$ candidate $\\delta$ values, handling prime gaps far larger than pure Fermat.
 
-\\textbf{References:} Carl L\\"ondahl, "Finding close-prime factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,priority:`medium`,applicableCheck:e=>!!e.n},cg=()=>{let e=Oh(L.p),t=Math.floor(Math.random()*5e3)*2+2,n=e+BigInt(t);for(;!Dh(n);)n+=2n;return{n:(e*n).toString()}},lg={id:`novelty-primes`,name:`Novelty Primes`,category:`Factorization`,description:`Detects primes near powers of 2 or math constants. Use when p ≈ 2^k or similar.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
-
-if n < 2:
-    print(f"n = {n} is too small to factor")
-    print("NOVELTY_PRIMES=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2")
-    print(f"q = {n // 2}")
-    print(f"Verification: 2 * {n // 2} = {n}")
-    print("NOVELTY_PRIMES=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("No factorization possible")
-    print("NOVELTY_PRIMES=FAILED")
-    quit()
-
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print(f"p = q = {p}")
-    print("NOVELTY_PRIMES=SUCCESS")
-    quit()
-
-# Novelty primes: check against known CTF challenge primes
-try:
+\\textbf{References:} Carl L\\"ondahl, "Finding close-prime factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,priority:`medium`,applicableCheck:e=>!!e.n},cg=()=>{let e=Oh(L.p),t=Math.floor(Math.random()*5e3)*2+2,n=e+BigInt(t);for(;!Dh(n);)n+=2n;return{n:(e*n).toString()}},lg={id:`novelty-primes`,name:`Novelty Primes`,category:`Factorization`,description:`Detects primes near powers of 2 or math constants. Use when p ≈ 2^k or similar.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
+    n = Integer(${e.n})
+    if n < 2:
+        print(f"n = {n} is too small to factor")
+        print("NOVELTY_PRIMES=FAILED")
+        quit()
+    if n % 2 == 0:
+        print(f"n is even: {n}")
+        print(f"p = 2")
+        print(f"q = {n // 2}")
+        print(f"Verification: 2 * {n // 2} = {n}")
+        print("NOVELTY_PRIMES=SUCCESS")
+        quit()
+    if n.is_prime():
+        print(f"n is prime: {n}")
+        print("No factorization possible")
+        print("NOVELTY_PRIMES=FAILED")
+        quit()
+    if n.is_square():
+        p = isqrt(n)
+        print(f"n is a perfect square: {p}^2 = {n}")
+        print(f"p = q = {p}")
+        print("NOVELTY_PRIMES=SUCCESS")
+        quit()
     print(f"Checking n = {n} against known CTF primes...")
     print()
-
-    # Known primes from popular CTF challenges
-    # These are primes that have been reused across multiple CTF problems
     known_ctf_primes = [
         # Common weak primes used in CTFs
         # (In practice, these would be populated from a database of CTF challenges)
         # Example: primes from CSAW, DEF CON, Plaid CTF, etc.
         # The list below is illustrative
     ]
-
     found = False
-
-    # Also check primes that are "almost" common values
-    # e.g., primes close to powers of 2
     print("Checking primes near powers of 2...")
     for bits in [64, 128, 256]:
         target = 2**bits
-        # Search in a small window
         for delta in range(-1000, 1000):
             candidate = target + delta
             if candidate > 1 and candidate.is_prime():
@@ -2103,17 +2037,13 @@ try:
                     print(f"  Cofactor: {n // candidate}")
                     print(f"  Verification: {candidate} * {n // candidate} = {n}")
                     found = True
-
-    # Check primes near common constants
     print("\\nChecking primes near common constants...")
-    # Use Sage's high-precision real field
     RF = RealField(200)
     constants = [
         ("pi", Integer(str(RF(pi()).n(digits=60).str()).replace('.', '')[:55])),
         ("e", Integer(str(RF(exp(1)).n(digits=60).str()).replace('.', '')[:55])),
         ("sqrt(2)", Integer(str(RF(2).sqrt().n(digits=60).str()).replace('.', '')[:55])),
     ]
-
     for name, const in constants:
         for delta in range(-100, 100):
             candidate = const + delta
@@ -2122,8 +2052,6 @@ try:
                     print(f"  Found prime near {name}: {candidate}")
                     print(f"  Cofactor: {n // candidate}")
                     found = True
-
-    # Check against known primes
     if known_ctf_primes:
         print("\\nChecking against known CTF primes...")
         for kp in known_ctf_primes:
@@ -2132,13 +2060,11 @@ try:
                 print(f"  Found known CTF prime: {kp}")
                 print(f"  Cofactor: {n // kp}")
                 found = True
-
     if found:
         print("NOVELTY_PRIMES=SUCCESS")
     else:
         print("\\nNo novelty primes found.")
         print("NOVELTY_PRIMES=FAILED")
-
     print("\\nNovelty prime check complete.")
 except Exception as e:
     print(f"Error in Novelty Primes check: {e}")
@@ -2283,7 +2209,7 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\implies p, q \\qed
 
 \\textbf{Explanation:} For each candidate $k \\in [1, e]$, compute $d_{\\text{approx}} = \\lfloor(kn + 1)/e\\rfloor$. If the low $m$ bits match the leaked $d_{\\text{low}}$, recover $\\varphi(n) = (ed - 1)/k$ and solve the quadratic $x^2 - (n - \\varphi + 1)x + n = 0$ to find $p$ and $q$.
 
-\\textbf{References:} D. Boneh, R. DeMillo, R. Lipton, "On the Importance of Checking Cryptographic Protocols for Faults", EUROCRYPT 1997`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.dLow},mg=()=>{let e=Oh(L.p),t=Oh(L.q),n=e*t,r=(e-1n)*(t-1n),i=BigInt(100+Math.floor(Math.random()*1e4));for(;Th(i,r)===null;)i+=1n;let a=Th(i,r),o=i&(1n<<20n)-1n;return{n:n.toString(),e:a.toString(),dLow:o.toString()}},hg={id:`partial-pq-bits`,name:`Partial p/q Bits`,category:`Partial Key / Lattice`,description:`Recovers p from known MSBs or LSBs. Use when partial bits of p are leaked.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`knownBits`,label:`knownBits (known bits of p)`,placeholder:`Enter known bits as integer...`,multiline:!0,rows:3},{name:`bitPosition`,label:`bitPosition`,placeholder:`msb or lsb`,multiline:!1}],sageTemplate:e=>`try:
+\\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.dLow},mg=()=>{let e=Oh(L.p),t=Oh(L.q),n=e*t,r=(e-1n)*(t-1n),i=BigInt(100+Math.floor(Math.random()*1e4));for(;Th(i,r)===null;)i+=1n;let a=Th(i,r),o=i&(1n<<20n)-1n;return{n:n.toString(),e:a.toString(),dLow:o.toString()}},hg={id:`partial-pq-bits`,name:`Partial p/q Bits`,category:`Partial Key / Lattice`,description:`Recovers p from known MSBs or LSBs. Use when partial bits of p are leaked.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`knownBits`,label:`knownBits (known bits of p)`,placeholder:`Enter known bits as integer...`,multiline:!0,rows:3},{name:`bitPosition`,label:`bitPosition`,placeholder:`msb or lsb`,multiline:!1}],sageTemplate:e=>`try:
     n = Integer(${e.n})
     knownBits = Integer(${e.knownBits})
     bitPosition = "${e.bitPosition}"
@@ -2368,7 +2294,7 @@ p &= f(x_0), \\quad q = n / p \\qed
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996; N. Howgrave-Graham, "Approximate Integer Common Divisors", 1997`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},gg=()=>{let{p:e,n:t}=kh(L.p,L.q),n=e.toString(2).length,r=Math.ceil(n*.6),i=e>>BigInt(n-r);return{n:t.toString(),knownBits:i.toString(),bitPosition:`msb`}},_g={id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via brute-force search over k and d_p. Use when the CRT exponent d_p = d mod (p-1) is small (< bound). Each (k, d_p) pair gives a candidate p = (d_p * e - 1) / k + 1.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 1000000`,multiline:!1}],sageTemplate:e=>`try:
     n = Integer(${e.n})
     e = Integer(${e.e})
-    bound = ${e.bound?`Integer(${e.bound})`:`1000000`}
+    bound = ${e.bound?`Integer(${e.bound})`:`Integer(1000000)`}
     if n <= 0 or e <= 0 or bound <= 0:
         print("SMALL_CRT_EXP=FAILED: invalid input values")
     else:
@@ -2731,13 +2657,13 @@ print("HASTAD=FAILED")`:`try:
                 print("HASTAD=FAILED")
 except Exception as exc:
     print(f"ERROR: {exc}")
-    print("HASTAD=FAILED")`,proof:`\\textbf{Theorem:} Let c_i \\equiv m^e \\pmod{n_i} for i = 1, \\ldots, k with \\gcd(n_i, n_j) = 1. If m^e < \\prod n_i and k \\geq e, recover m via CRT + e-th root.
+    print("HASTAD=FAILED")`,proof:`\\textbf{Theorem:} Let $c_i \\equiv m^e \\pmod{n_i}$ for $i = 1, \\ldots, k$ with $\\gcd(n_i, n_j) = 1$. If $m^e < \\prod n_i$ and $k \\geq e$, recover $m$ via CRT + $e$-th root.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item k pairs of (n_i, c_i) with pairwise coprime moduli
-\\item Same exponent e for all, same message m
-\\item k \\geq e, m^e < \\prod_{i=1}^{k} n_i
+\\item $k$ pairs of $(n_i, c_i)$ with pairwise coprime moduli
+\\item Same exponent $e$ for all, same message $m$
+\\item $k \\geq e$, $m^e < \\prod_{i=1}^{k} n_i$
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -2750,7 +2676,7 @@ m^e < N \\implies C &= m^e \\quad \\text{(over } \\mathbb{Z}\\text{)} \\\\
 m &= \\sqrt[e]{C} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Combine ciphertexts via CRT to get C ≡ mᵉ (mod N). When mᵉ < N, the congruence becomes an exact equality over integers. Take the integer e-th root to recover m.
+\\textbf{Explanation:} Combine ciphertexts via CRT to get $C \\equiv m^e \\pmod{N}$. When $m^e < N$, the congruence becomes an exact equality over integers. Take the integer $e$-th root to recover $m$.
 
 \\textbf{References:} J. Hastad, "Solving Linear Equations Modulo Divisors: On Factoring Given Any Bits", Eurocrypt 1988; Boneh, "Twenty Years of Attacks on RSA", 1999`,priority:`high`,applicableCheck:e=>!!e.pairs&&!!e.e},Og=()=>{let e=BigInt(Math.floor(Math.random()*1e6)+42),t=[];for(let n=0;n<3;n++){let{n}=kh(L.p,L.q);t.push(`${n},${Ah(e,n,3n)}`)}return{pairs:t.join(`
 `),e:`3`}},kg={id:`franklin-reiter`,name:`Franklin-Reiter Related Message Attack`,category:`Message / Protocol`,description:`Recovers m from related ciphertexts. Use when c1 = m^e and c2 = (a·m + b)^e mod n.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3},{name:`a`,label:`a (linear coefficient)`,placeholder:`1`,multiline:!1,defaultValue:`1`},{name:`b`,label:`b (constant offset)`,placeholder:`Enter offset b...`,multiline:!0,rows:2}],sageTemplate:e=>{if(!e.n||!e.e||!e.c1||!e.c2||!e.b)return`print("ERROR: Missing required inputs (n, e, c1, c2, b)")
@@ -2849,7 +2775,7 @@ print("COPPERSMITH_SHORT_PAD=FAILED")`:`try:
     print("Resultant degree:", h.degree())
     # Bound: padding difference must be < n^(1/e^2)
     kbits = n.nbits() // (2 * e * e)
-    X = 2^kbits
+    X = 2**kbits
     print("Small root bound (bits):", kbits)
     roots = h.small_roots(X=X, beta=0.5)
     if roots:
@@ -3024,7 +2950,6 @@ if not "${e.oracle_responses}".strip():
     print("ERROR: oracle_responses is required")
     print("LSB_ORACLE=FAILED")
     quit()
-
 try:
     n = Integer(${e.n})
     e_val = "${e.e}".strip()
@@ -3034,25 +2959,21 @@ try:
     # Parse oracle responses (LSB of each blinded query)
     responses_str = """${e.oracle_responses}""".strip()
     oracle_bits = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
-
     print("LSB Oracle Attack on RSA")
     print(f"n = {n}")
     print(f"e = {e}")
     print(f"c = {c}")
     print(f"Oracle responses: {len(oracle_bits)} bits")
     print()
-
     n_bits = n.nbits()
     if len(oracle_bits) < n_bits:
         print(f"WARNING: Need {n_bits} responses for {n_bits}-bit modulus.")
         print(f"Got {len(oracle_bits)}. Attack may be incomplete.")
         print()
-
     # Binary search using LSB oracle with 2^e blinding
     # LSB(2m mod n) = 1 iff 2m >= n (since n is odd) iff m >= current midpoint
     lower = Integer(0)
     upper = Integer(n)
-
     print("Binary search iterations:")
     for i, bit in enumerate(oracle_bits):
         mid = (lower + upper) // 2
@@ -3066,11 +2987,9 @@ try:
             lower = mid
         if i < 10 or i % 50 == 0:
             print(f"  Step {i+1}: LSB={bit}, range bits = {(upper - lower).nbits()}")
-
     print()
     m = (lower + upper) // 2
     print(f"Recovered message: m = {m}")
-
     # Verify against original ciphertext
     v = power_mod(m, e, n)
     print(f"Verification: m^e mod n = {v}")
@@ -3079,7 +2998,6 @@ try:
         print("LSB_ORACLE=SUCCESS")
     else:
         print("LSB_ORACLE=FAILED")
-
 except Exception as ex:
     print(f"ERROR: {ex}")
     print("LSB_ORACLE=FAILED")
@@ -3509,76 +3427,71 @@ print("BLEICHENBACHER_SIG=FAILED")`:`try:
         print(f"Got e={e}.")
         print("BLEICHENBACHER_SIG=FAILED")
         quit()
-    print(f"Bleichenbacher Signature Forgery (e={e})")
-    print(f"n = {n}")
-    print(f"Target hash: {hash_hex}")
-    print()
-    # Construct EM: 0x00 || 0x01 || 0xFF...FF || 0x00 || hash
     n_bytes = (n.nbits() + 7) // 8
-    hash_int = Integer("0x" + hash_hex)
     hash_bytes = len(hash_hex) // 2
     if hash_bytes == 0:
         print("ERROR: hash_hex is too short (need at least 2 hex chars)")
         print("BLEICHENBACHER_SIG=FAILED")
         quit()
-    # Padding: at least 8 bytes of 0xFF
-    pad_len = max(8, n_bytes - 3 - hash_bytes)
-    em_len = 3 + pad_len + hash_bytes
-    # EM = 0x0001 || 0xFF*pad_len || 0x00 || hash
-    em = (Integer(1) << (8 * (em_len - 2))) + ((Integer(1) << (8 * pad_len)) - 1) * (Integer(1) << (8 * (1 + hash_bytes))) + hash_int
-    print(f"EM has {em.nbits()} bits, n has {n.nbits()} bits")
-    if em >= n:
-        print("ERROR: EM >= n. Hash too large for this modulus.")
+    hash_int = Integer("0x" + hash_hex)
+    # PKCS#1 v1.5: 0x00 || 0x01 || 0xFF*min_padding || 0x00 || hash || garbage
+    # Garbage bytes absorb the error from ceil(cuberoot(target))
+    min_padding = 8
+    fixed_overhead = 3 + min_padding + 1
+    garbage_len = n_bytes - fixed_overhead - hash_bytes
+    if garbage_len < 0:
+        print("ERROR: Hash too large for this modulus (need more garbage bytes)")
         print("BLEICHENBACHER_SIG=FAILED")
         quit()
-    # Bleichenbacher: find S near n^(1/3) such that S^3 mod n ends with hash
-    n_cbrt = n.nth_root(3, truncate_mode=True)[0]
-    print(f"n^(1/3) = {n_cbrt}")
-    found = False
-    search_range = 100000
-    for delta in range(-search_range, search_range + 1):
-        S = n_cbrt + delta
-        check = power_mod(S, 3, n)
-        check_hex = hex(check)[2:].zfill(len(hash_hex))
-        if check_hex.endswith(hash_hex):
-            print(f"Found with delta={delta}")
-            print(f"Forged signature: S = {S}")
-            print(f"S^3 mod n = {check}")
-            print(f"S^3 mod n (hex) = ...{check_hex[-len(hash_hex):]}")
-            print(f"Hash found at end of forged signature!")
-            found = True
-            break
-    if found:
+    # Construct target with garbage = 0
+    # Structure (LSB end): garbage | hash | 0x00 | 0xFF*min_padding | 0x01 | 0x00
+    target = (Integer(1) << (8 * (garbage_len + hash_bytes + 1 + min_padding))) + ((Integer(1) << (8 * min_padding)) - 1) * (Integer(1) << (8 * (garbage_len + hash_bytes + 1))) + hash_int * (Integer(1) << (8 * garbage_len))
+    # Forge S = ceil(cuberoot(target)) over the integers (no mod n needed)
+    sig = target.nth_root(3)
+    if sig ** 3 < target:
+        sig += 1
+    cube = sig ** 3
+    print(f"Bleichenbacher Signature Forgery (e={e})")
+    print(f"n bytes = {n_bytes}")
+    print(f"Target hash: {hash_hex}")
+    print(f"Forged signature S = {sig}")
+    print(f"S^3 = {cube}")
+    # Verify PKCS#1 leading bytes 0x0001 are preserved
+    top_two = cube >> (8 * (n_bytes - 2))
+    if top_two == Integer(0x0001):
+        print("PKCS#1 structure preserved — forged signature valid against lax verifier")
         print("BLEICHENBACHER_SIG=SUCCESS")
     else:
-        print(f"No valid forgery found in range +/- {search_range}.")
-        print("Try a shorter hash or increase search range.")
+        print("Signature forgery failed — garbage area too small for this hash and modulus")
         print("BLEICHENBACHER_SIG=FAILED")
 except Exception as ex:
     print(f"ERROR: {ex}")
     print("BLEICHENBACHER_SIG=FAILED")
-`,proof:`\\textbf{Theorem:} PKCS#1 v1.5 verification with e = 3 is forgeable: construct S such that S³ mod n has valid format without the private key.
+`,proof:`\\textbf{Theorem:} PKCS#1 v1.5 signature verification with e = 3 is forgeable: construct S such that S³ starts with valid PKCS#1 padding and the target hash, without access to the private key.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n (modulus), e = 3
+\\item RSA public key (n, e = 3)
 \\item Target hash H (hex)
-\\item Verifier does not strictly check all padding bytes
+\\item Verifier does not check that the hash is right-justified (trailing garbage ignored)
 \\end{itemize}
 
-\\textbf{Proof:}
+\\textbf{Construction:}
 \\begin{align*}
-EM &= \\text{0x00} || \\text{0x01} || \\text{FF} \\cdots \\text{FF} || \\text{0x00} || \\text{DER} || H \\\\
-S &= \\lfloor n^{1/3} \\rfloor + \\delta \\\\
-S^3 &\\equiv EM \\pmod{n} \\\\
-EM < n &\\implies S^3 = EM \\quad \\text{(exact, no mod reduction)} \\\\
-\\text{Adjust } \\delta &\\text{ so } S^3 \\text{ ends with } H \\\\
-\\text{Verifier checks hash suffix only} &\\implies \\text{forgery accepted} \\qed
+\\text{target} &= \\text{0x00} \\,||\\, \\text{0x01} \\,||\\, \\text{FF}^{8} \\,||\\, \\text{0x00} \\,||\\, H \\,||\\, \\text{0x00}^{\\text{garbage}} \\\\
+S &= \\lceil \\sqrt[3]{\\text{target}} \\rceil \\quad \\text{(integer cube root)} \\\\
+S^3 &= \\text{target} + \\varepsilon \\quad (0 \\leq \\varepsilon < 3S^2)
 \\end{align*}
 
-\\textbf{Explanation:} Construct S ≈ ∛n and adjust lower bits so S³ ends with the target hash. If the verifier only checks that the hash appears at the correct position (not full padding), the forged signature passes. Requires e = 3 and lax verification.
+\\textbf{Analysis:}
+\\begin{itemize}
+\\item The error \\(\\varepsilon\\) from rounding the cube root is bounded by \\(3S^2 \\approx 3 \\cdot 2^{2|n|/3}\\)
+\\item Garbage bytes at the LSB end absorb \\(\\varepsilon\\), leaving the prefix \\(\\text{0x0001FF}^8\\text{00}H\\) intact
+\\item The forged signature S verifies as valid against a verifier that ignores trailing data after the hash
+\\item Requires e = 3 (small exponent) and at least \\(\\lceil \\log_2(3S^2)/8 \\rceil\\) garbage bytes
+\\end{itemize}
 
-\\textbf{References:} D. Bleichenbacher, "Forging PKCS#1 v1.5 Signatures", Crypto 2006 rump session; Halderman et al., "Low-Exponent RSA Signatures", 2006`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.hash_hex},Jg=()=>{let{n:e}=kh(L.p,L.q);return{n:e.toString(),e:`3`,hash_hex:`ab`}},Yg={id:`bleichenbacher`,name:`Bleichenbacher PKCS#1 v1.5`,category:`Oracle`,description:`Decrypts via PKCS#1 v1.5 padding oracle. Use when server reveals padding validity.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`# Bleichenbacher PKCS#1 v1.5 padding oracle attack
+\\textbf{References:} D. Bleichenbacher, "Forging PKCS#1 v1.5 Signatures", Crypto 2006 rump session; A. Langley, "PKCS#1 signature validation", imperialviolet.org (2014)`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.hash_hex},Jg=()=>{let{n:e}=kh(L.p,L.q);return{n:e.toString(),e:`3`,hash_hex:`ab`}},Yg={id:`bleichenbacher`,name:`Bleichenbacher PKCS#1 v1.5`,category:`Oracle`,description:`Decrypts via PKCS#1 v1.5 padding oracle. Use when server reveals padding validity.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`# Bleichenbacher PKCS#1 v1.5 padding oracle attack
 if not "${e.n}".strip():
     print("ERROR: n is required")
     print("BLEICHENBACHER=FAILED")
@@ -3741,6 +3654,7 @@ try:
     n = Integer(${e.n})
     e = Integer(${e.e})
     c = Integer(${e.c})
+    orig_c = Integer(${e.c})
 
     # Parse oracle responses into a list
     responses_str = """${e.oracle_responses}""".strip()
@@ -3878,7 +3792,7 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r + 1)}{256s} \\
 
 \\textbf{Explanation:} Each oracle query on c·s^e reveals whether m·s mod n falls in [0, n/256). This constrains m to a union of narrow intervals. By choosing s strategically (doubling each step), the interval halves each round, converging to m in logarithmic queries.
 
-\\textbf{References:} J. Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP) as Standardized in PKCS #1 v2.0", CRYPTO 2001`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Qg=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=Math.ceil(Number(e.toString(2).length)/8),i=BigInt(2)**BigInt(8*(r-1)),a=Ah(BigInt(Math.floor(Math.random()*Number(i/4n))),e,t),o=[],s=t=>Eh(t,n,e)>=i,c=2n;for(;!s(a*Eh(c,t,e)%e);)o.push(`0`),c*=2n;o.push(`1`);let l=c/2n,u=(e+i)/i*l;for(;s(a*Eh(u,t,e)%e);)o.push(`1`),u+=l;o.push(`0`);let d=(e+u-1n)/u,f=(e+i)/u,p=2n*i,m=0;for(;d<f&&m<2e3;){let n=p/(f-d)*d/e,r=(n*e+d-1n)/d;r===0n&&(r=1n);let c=s(a*Eh(r,t,e)%e);o.push(c?`1`:`0`);let l=n*e+i;c?d=(l+r-1n)/r:f=l/r,m++}return{n:e.toString(),e:t.toString(),c:a.toString(),oracle_responses:o.join(`,`)}},$g={id:`biased-lsb`,name:`Biased LSB Oracle`,category:`Oracle`,description:`Recovers m via noisy LSB oracle. Use when LSB oracle is correct with probability > 50%.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_runs`,label:`Oracle runs (multiple response strings, newline-separated)`,placeholder:`0,1,0,1,1\\n1,0,1,1,0\\n0,1,1,1,0...`,multiline:!0,rows:6}],sageTemplate:e=>`# Validate inputs
+\\textbf{References:} J. Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP) as Standardized in PKCS #1 v2.0", CRYPTO 2001`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Qg=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=Math.ceil(Number(e.toString(2).length)/8),i=BigInt(2)**BigInt(8*(r-1)),a=new Uint8Array(r);crypto.getRandomValues(a),a[0]=0;let o=0n;for(let e of a)o=(o<<8n)+BigInt(e);let s=Ah(o,e,t),c=[],l=t=>Eh(t,n,e)>=i,u=2n;for(;!l(s*Eh(u,t,e)%e);)c.push(`0`),u*=2n;c.push(`1`);let d=u/2n,f=(e+i)/i*d;for(;l(s*Eh(f,t,e)%e);)c.push(`1`),f+=d;c.push(`0`);let p=(e+f-1n)/f,m=(e+i)/f,h=2n*i,g=0;for(;p<m&&g<2e3;){let n=h/(m-p)*p/e,r=(n*e+p-1n)/p;r===0n&&(r=1n);let a=l(s*Eh(r,t,e)%e);c.push(a?`1`:`0`);let o=n*e+i;a?p=(o+r-1n)/r:m=o/r,g++}return{n:e.toString(),e:t.toString(),c:s.toString(),oracle_responses:c.join(`,`)}},$g={id:`biased-lsb`,name:`Biased LSB Oracle`,category:`Oracle`,description:`Recovers m via noisy LSB oracle. Use when LSB oracle is correct with probability > 50%.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_runs`,label:`Oracle runs (multiple response strings, newline-separated)`,placeholder:`0,1,0,1,1\\n1,0,1,1,0\\n0,1,1,1,0...`,multiline:!0,rows:6}],sageTemplate:e=>`# Validate inputs
 if not "${e.n}".strip():
     print("ERROR: n is required")
     print("BIASED_LSB=FAILED")
@@ -3895,13 +3809,11 @@ if not """${e.oracle_runs}""".strip():
     print("ERROR: oracle_runs is required")
     print("BIASED_LSB=FAILED")
     quit()
-
 try:
     n = Integer(${e.n})
     e = Integer(${e.e})
     orig_c = Integer(${e.c})
     c = (Integer(${e.c}) * power_mod(Integer(2), e, n)) % n
-
     # Parse oracle runs (multiple response strings, newline-separated)
     runs_str = """${e.oracle_runs}""".strip()
     runs = []
@@ -3911,33 +3823,27 @@ try:
             continue
         bits = [int(x.strip()) for x in line.split(',') if x.strip()]
         runs.append(bits)
-
     print(f"Biased LSB Oracle Attack")
     print(f"n = {n}")
     print(f"e = {e}")
     print(f"c = {c}")
     print(f"Number of oracle runs: {len(runs)}")
     print()
-
     # Per-bit majority voting, then binary search
     num_bits = min(len(r) for r in runs)
     n_bits = n.nbits()
     print(f"Using {num_bits} bit positions (n has {n_bits} bits)")
-
     # Majority voting
     voted_bits = []
     for i in range(num_bits):
         votes = sum(runs[j][i] for j in range(len(runs)))
         majority = 1 if votes > len(runs) / 2 else 0
         voted_bits.append(majority)
-
     print(f"Majority-voted bits: {voted_bits[:20]}{'...' if num_bits > 20 else ''}")
     print()
-
     # Binary search with voted bits
     lower = Integer(0)
     upper = Integer(n)
-
     for i, bit in enumerate(voted_bits):
         mid = (lower + upper) // 2
         if bit == 0:
@@ -3947,10 +3853,8 @@ try:
         c = (c * power_mod(Integer(2), e, n)) % n
         if i < 5 or i >= len(voted_bits) - 3:
             print(f"Step {i+1}: bit={bit}, lower={lower}, upper={upper}")
-
     m = (lower + upper) // 2
     print(f"\\nRecovered message: m = {m}")
-
     # Verify
     v = power_mod(m, e, n)
     print(f"Verification: m^e mod n = {v}")
@@ -3961,7 +3865,6 @@ try:
     else:
         print("Verification failed - may need more oracle runs or higher bias")
         print("BIASED_LSB=FAILED")
-
 except Exception as ex:
     print(f"ERROR: {ex}")
     print("BIASED_LSB=FAILED")
@@ -3992,52 +3895,42 @@ b_i = 1 \\implies [a_{i+1}, b_{i+1}] &= [(a_i + b_i)/2, b_i) \\\\
 
 \\textbf{References:} Goldwasser, Micali, "Probabilistic Encryption", 1982; Håstad et al., "Bit Security of RSA", 1989`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_runs},e_=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=e.toString(2).length,i=Ah(BigInt(`0x`+Array.from(crypto.getRandomValues(new Uint8Array(Math.ceil(r/8)))).map(e=>e.toString(16).padStart(2,`0`)).join(``))%(e/2n),e,t),a=[];for(let o=0;o<21;o++){let o=[],s=i*Eh(2n,t,e)%e;for(let i=0;i<r;i++){let r=(Eh(s,n,e)%2n).toString(),i=Math.random()<.75?r:r===`0`?`1`:`0`;o.push(i),s=s*Eh(2n,t,e)%e}a.push(o.join(`,`))}return{n:e.toString(),e:t.toString(),c:i.toString(),oracle_runs:a.join(`
 `)}},t_={id:`roca`,name:`ROCA Vulnerability`,category:`Advanced`,description:`Factors ROCA-vulnerable primes. Use when p = k·M + (65537^i mod M).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`# Validate inputs
-if not "${e.n}".strip():
-    print("ERROR: n is required")
-    print("ROCA=FAILED")
-    quit()
-
 try:
+    if not "${e.n}".strip():
+        print("ERROR: n is required")
+        print("ROCA=FAILED")
+        quit()
     n = Integer(${e.n})
-
     # Even check
     if n % 2 == 0:
         print(f"n is even. p = 2, q = {n // 2}")
         print("ROCA=SUCCESS")
         quit()
-
     # Prime check
     if is_prime(n):
         print("n is prime. Not a valid RSA modulus.")
         print("ROCA=FAILED")
         quit()
-
     # ROCA: Return of Coppersmith's Attack
     # Primes of form p = k*M + (65537^i mod M)
     # M = product of first several primes
-
     print("ROCA vulnerability check")
     print(f"n = {n}")
     print()
-
     # Try small M values (M_3, M_5, M_7, ...)
     primes_list = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53]
-
     found = False
     r1 = 0
-    matched_M = 0
     for num_primes in range(1, len(primes_list) + 1):
         M = prod(primes_list[:num_primes])
         if M > 2**80:
             break
-
         # Compute possible remainders: 65537^i mod M
         ord_val = Mod(65537, M).multiplicative_order()
         remainders = set()
         for idx in range(ord_val):
             r = power_mod(65537, idx, M)
             remainders.add(r)
-
         # Check if n mod M is product of two remainders
         n_mod = n % M
         for r in remainders:
@@ -4048,33 +3941,27 @@ try:
                 print(f"Found compatible remainders: r1 = {r}")
                 found = True
                 r1 = r
-                matched_M = M
                 break
         if found:
             break
-
     if found:
         print()
         print("VULNERABLE: n appears to use ROCA-generated primes.")
         print("Use Coppersmith's method to recover p.")
         print()
-
         # Coppersmith's method for small M
         # p = k*M + r, where r is known remainder
         # We search for k using Coppersmith
         r = r1
         R.<x> = PolynomialRing(ZZ)
         f = M*x + r
-
         # Try to find small root
         # p <= sqrt(n), so k <= sqrt(n)/M
         bound = ceil(sqrt(n) / M)
         print(f"Searching for k with bound ~{bound}")
-
         # Use Sage's small_roots
         f_mod = f.change_ring(Zmod(n))
         roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=0.05)
-
         if roots:
             k = int(roots[0])
             p = int(M * k + r)
@@ -4096,7 +3983,6 @@ try:
         print("n does NOT appear to be ROCA-vulnerable for small M values.")
         print("The primes were likely not generated by Infineon's library.")
         print("ROCA=FAILED")
-
 except Exception as ex:
     print(f"ERROR: {ex}")
     print("ROCA=FAILED")
@@ -4122,41 +4008,35 @@ f(x) &= M \\cdot x + r_1 \\equiv 0 \\pmod{p} \\\\
 
 \\textbf{Explanation:} The attack fingerprints \\(n \\bmod M\\) against products of known remainders. A match identifies the correct \\(M\\) and remainder \\(r_1\\), then Coppersmith's method recovers \\(k\\) from the linear polynomial \\(f(x) = Mx + r_1\\) modulo \\(p\\).
 
-\\textbf{References:} M. Nemec et al., "The Return of Coppersmith's Attack: Practical Factorization of Widely Used RSA Moduli", CCS 2017; https://crocs.fi.muni.cz/roca`,priority:`high`,applicableCheck:e=>!!e.n},n_=()=>{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n],t=1n;for(let n of e)t*=n;let n=L.p-77;for(let e=0;e<5e3;e++){let e=Eh(65537n,BigInt(Math.floor(Math.random()*1e4)),t),r=Math.ceil(n/8),i=new Uint8Array(r);crypto.getRandomValues(i);let a=0n;for(let e=0;e<r;e++)a=a<<8n|BigInt(i[e]);a|=1n<<BigInt(n-1),a|=1n;let o=a*t+e;if(Dh(o))return{n:(o*Oh(L.q)).toString()}}return{n:kh(L.p,L.q).n.toString()}},r_={id:`nitros`,name:`Nitros / ROCA Variant`,category:`Advanced`,description:`Factors generalized ROCA primes with arbitrary base. Use when p = k·M + (a^i mod M).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`base`,label:`Base (default 65537)`,placeholder:`65537`,multiline:!1}],sageTemplate:e=>`# Validate inputs
-if not "${e.n}".strip():
-    print("ERROR: n is required")
-    print("NITROS=FAILED")
-    quit()
-
-try:
-    n = Integer(${e.n})
+\\textbf{References:} M. Nemec et al., "The Return of Coppersmith's Attack: Practical Factorization of Widely Used RSA Moduli", CCS 2017; https://crocs.fi.muni.cz/roca`,priority:`high`,applicableCheck:e=>!!e.n},n_=()=>{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n],t=1n;for(let n of e)t*=n;let n=L.p-77;for(let e=0;e<5e3;e++){let e=Eh(65537n,BigInt(Math.floor(Math.random()*1e4)),t),r=Math.ceil(n/8),i=new Uint8Array(r);crypto.getRandomValues(i);let a=0n;for(let e=0;e<r;e++)a=a<<8n|BigInt(i[e]);a|=1n<<BigInt(n-1),a|=1n;let o=a*t+e;if(Dh(o))return{n:(o*Oh(L.q)).toString()}}return{n:kh(L.p,L.q).n.toString()}},r_={id:`nitros`,name:`Nitros / ROCA Variant`,category:`Advanced`,description:`Factors generalized ROCA primes with arbitrary base. Use when p = k·M + (a^i mod M).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`base`,label:`Base (default 65537)`,placeholder:`65537`,multiline:!1}],sageTemplate:e=>`try:
+    n_input = "${e.n}".strip()
+    if not n_input:
+        print("ERROR: n is required")
+        print("NITROS=FAILED")
+        quit()
+    n = Integer(n_input)
     base_val = "${e.base}".strip()
     base = Integer(base_val) if base_val else Integer(65537)
-
     # Even check
     if n % 2 == 0:
         print(f"n is even. p = 2, q = {n // 2}")
         print("NITROS=SUCCESS")
         quit()
-
     # Prime check
     if is_prime(n):
         print("n is prime. Not a valid RSA modulus.")
         print("NITROS=FAILED")
         quit()
-
     print("Nitros / Extended ROCA attack")
     print(f"n = {n}")
     print(f"base = {base}")
     print()
-
     # Try multiple prime bases for M
     prime_sets = [
         [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53],
         [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59],
         [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61],
     ]
-
     found = False
     for primes_subset in prime_sets:
         M = prod(primes_subset)
@@ -4164,16 +4044,13 @@ try:
         if gcd(base, M) != 1:
             print(f"M = {M}: gcd(base, M) = {gcd(base, M)} != 1, skipping...")
             continue
-
         # Compute remainders
         ord_val = Mod(base, M).multiplicative_order()
         remainders = set()
         for idx in range(ord_val):
             r = power_mod(base, idx, M)
             remainders.add(r)
-
         n_mod = n % M
-
         # Check if n_mod factors into two remainders
         for r1 in remainders:
             r2 = n_mod * inverse_mod(r1, M) % M
@@ -4182,15 +4059,12 @@ try:
                 print(f"r1 = {r1}, r2 = {r2}")
                 print(f"Verification: r1 * r2 mod M = {(r1 * r2) % M} (n mod M = {n_mod})")
                 found = True
-
                 # Try Coppersmith
                 R.<x> = PolynomialRing(ZZ)
                 f = M*x + r1
                 bound = ceil(sqrt(n) / M)
-
                 f_mod = f.change_ring(Zmod(n))
                 roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=0.05)
-
                 if roots:
                     k = int(roots[0])
                     p = int(M * k + r1)
@@ -4218,11 +4092,9 @@ try:
                 break
         if found:
             break
-
     if not found:
         print("No ROCA/Nitros pattern detected for tested M values.")
         print("NITROS=FAILED")
-
 except Exception as ex:
     print(f"ERROR: {ex}")
     print("NITROS=FAILED")
@@ -4250,32 +4122,30 @@ f(x) &= M \\cdot x + r_1 \\equiv 0 \\pmod{p} \\\\
 \\textbf{Explanation:} The algorithm tests multiple prime subsets for \\(M\\) and configurable base \\(a\\). Once a matching remainder pair \\((r_1, r_2)\\) is found, Coppersmith's method recovers \\(k\\). Both \\(r_1\\) and \\(r_2\\) are tried as candidate remainders.
 
 \\textbf{References:} Nemec et al., CCS 2017; extended analysis in subsequent ROCA research`,priority:`medium`,applicableCheck:e=>!!e.n},i_=()=>{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n],t=1n;for(let n of e)t*=n;for(let e=0;e<5e3;e++){let e=Eh(65537n,BigInt(Math.floor(Math.random()*1e4)),t),n=new Uint8Array(6);crypto.getRandomValues(n);let r=0n;for(let e=0;e<6;e++)r=r<<8n|BigInt(n[e]);r|=1n<<BigInt(42),r|=1n,r&=(1n<<BigInt(43))-1n;let i=r*t+e;if(Dh(i))return{n:(i*Oh(120)).toString(),base:`65537`}}return{n:kh(120,120).n.toString(),base:`65537`}},a_=class extends Error{status;constructor(e,t){super(e),this.name=`FactorDBError`,this.status=t}},o_=``;function s_(e){o_=e}async function c_(e,t=o_){let n=typeof e==`bigint`?e.toString():e,r=t?`${t}?query=${encodeURIComponent(n)}`:`https://factordb.com/api?query=${encodeURIComponent(n)}`,i=new AbortController,a=setTimeout(()=>i.abort(),1e4);try{let e=await fetch(r,{signal:i.signal});if(!e.ok)throw new a_(`HTTP ${e.status}`,e.status);return e.json()}finally{clearTimeout(a)}}function l_(e){let t=[];if(t.push(`FactorDB Status: ${e.status}`),e.status===`FF`&&e.factors){t.push(`Fully factored!`);for(let[n,r]of e.factors)t.push(`  ${n}^${r}`);if(e.factors.length===2){let n=BigInt(e.factors[0][0])**BigInt(e.factors[0][1]),r=BigInt(e.factors[1][0])**BigInt(e.factors[1][1]);t.push(`p = ${n}`),t.push(`q = ${r}`)}}else if(e.status===`CF`&&e.factors){t.push(`Partially factored:`);for(let[n,r]of e.factors)t.push(`  ${n}^${r}`)}else t.push(`No factors found`);return t.join(`
-`)}var u_={id:`factordb-lookup`,name:`FactorDB Lookup`,category:`Advanced`,description:`Looks up factorization in FactorDB. Use as first step for any unknown modulus.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=await c_(e.n);return t.status===`FF`&&t.factors&&t.factors.length>=2?l_(t):null}catch{return null}},sageTemplate:e=>`# Validate inputs
-if not "${e.n}".strip():
-    print("ERROR: n is required")
-    print("FACTORDB_LOOKUP=FAILED")
-    quit()
-
-# Simple Floyd cycle Pollard's rho for fallback factorization
-def pollard_rho_factor(n):
-    if n % 2 == 0:
-        return 2
-    if n.is_prime():
+`)}var u_={id:`factordb-lookup`,name:`FactorDB Lookup`,category:`Advanced`,description:`Looks up factorization in FactorDB. Use as first step for any unknown modulus.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=await c_(e.n);return t.status===`FF`&&t.factors&&t.factors.length>=2?l_(t):null}catch{return null}},sageTemplate:e=>`try:
+    # Validate inputs
+    if not "${e.n}".strip():
+        print("ERROR: n is required")
+        print("FACTORDB_LOOKUP=FAILED")
+        quit()
+    # Simple Floyd cycle Pollard's rho for fallback factorization
+    def pollard_rho_factor(n):
+        if n % 2 == 0:
+            return 2
+        if n.is_prime():
+            return None
+        for c in range(1, 20):
+            x = 2
+            y = 2
+            d = 1
+            while d == 1:
+                x = (x * x + c) % n
+                y = (y * y + c) % n
+                y = (y * y + c) % n
+                d = gcd(abs(x - y), n)
+            if d != n:
+                return d
         return None
-    for c in range(1, 20):
-        x = 2
-        y = 2
-        d = 1
-        while d == 1:
-            x = (x * x + c) % n
-            y = (y * y + c) % n
-            y = (y * y + c) % n
-            d = gcd(abs(x - y), n)
-        if d != n:
-            return d
-    return None
-
-try:
     n = Integer(${e.n})
     # Pre-checks
     if n < 2:
@@ -4296,7 +4166,6 @@ try:
         print(f"p = q = {p}")
         print("FACTORDB_LOOKUP=SUCCESS")
         quit()
-
     print(f"Checking if n = {n} has known factors")
     print()
     # Step 1: Trial division with small primes
@@ -4504,7 +4373,7 @@ print("SMALL_PUBLIC_EXP=FAILED")`:`try:
                     m_hex = '0' + m_hex
                 m_bytes = bytes.fromhex(m_hex)
                 print(f"m as text: {m_bytes.decode('utf-8', errors='replace')}")
-            except:
+            except Exception:
                 print(f"m as hex: {hex(m_root)}")
             print("SMALL_PUBLIC_EXP=SUCCESS")
         else:
@@ -4555,7 +4424,6 @@ if not moduli_str:
     print("ERROR: moduli_list is required")
     print("MULTI_PRIME_GCD=FAILED")
     quit()
-
 try:
     # Parse moduli
     moduli = [Integer(x.strip()) for x in moduli_str.split('\\n') if x.strip()]
@@ -4625,17 +4493,7 @@ n_j &= g_{ij} \\cdot \\frac{n_j}{g_{ij}} \\\\
 \\textbf{References:} N. Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012`,priority:`high`,applicableCheck:e=>{let t=(e.moduli_list||``).trim();return t?t.split(`
 `).filter(e=>e.trim()).length>=2:!1},frontendCheck:async e=>{try{let t=(e.moduli_list||``).trim();if(!t)return null;let n=t.split(`
 `).map(e=>e.trim()).filter(e=>e.length>0).map(e=>BigInt(e));if(n.length<2)return null;let r=[`Multi-Prime GCD Attack (browser-side, BigInt)`,`Running pairwise GCD on ${n.length} moduli...`,``],i=!1;for(let e=0;e<n.length;e++){let t=n[e];for(let a=e+1;a<n.length;a++){let o=n[a],s=Sh(t,o);s>1n&&s<t&&(i=!0,r.push(`SHARED FACTOR FOUND between moduli ${e+1} and ${a+1}!`),r.push(`gcd(n${e+1}, n${a+1}) = ${s}`),r.push(`n${e+1} = ${t}`),r.push(`  p = ${s}`),r.push(`  q = ${t/s}`),r.push(`n${a+1} = ${o}`),r.push(`  p' = ${s}`),r.push(`  q' = ${o/s}`),r.push(``))}}return i?(r.push(`MULTI_PRIME_GCD=SUCCESS`),r.join(`
-`)):null}catch{return null}}},__=()=>{let e=Oh(L.p),t=Oh(L.q),n=Oh(L.q),r=Oh(L.q);return{moduli_list:`${e*t}\n${e*n}\n${e*r}`}},v_={id:`phi-leak`,name:`Phi(n) Leak`,category:`Advanced`,description:`Factors n when φ(n) is leaked. Use when Euler's totient φ(n) is known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`phi`,label:`phi(n) (Euler totient)`,placeholder:`Enter phi(n)...`,multiline:!0,rows:3}],sageTemplate:e=>`# Validate inputs
-if not "${e.n}".strip():
-    print("ERROR: n is required")
-    print("PHI_LEAK=FAILED")
-    quit()
-if not "${e.phi}".strip():
-    print("ERROR: phi(n) is required")
-    print("PHI_LEAK=FAILED")
-    quit()
-
-try:
+`)):null}catch{return null}}},__=()=>{let e=Oh(L.p),t=Oh(L.q),n=Oh(L.q),r=Oh(L.q);return{moduli_list:`${e*t}\n${e*n}\n${e*r}`}},v_={id:`phi-leak`,name:`Phi(n) Leak`,category:`Advanced`,description:`Factors n when φ(n) is leaked. Use when Euler's totient φ(n) is known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`phi`,label:`phi(n) (Euler totient)`,placeholder:`Enter phi(n)...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
     n = Integer(${e.n})
     phi = Integer(${e.phi})
     print("Phi(n) leak attack")
@@ -4711,7 +4569,6 @@ if not "${e.oracle_responses}".strip():
     print("ERROR: oracle_responses is required")
     print("PARITY_ORACLE=FAILED")
     quit()
-
 try:
     n = Integer(${e.n})
     e_val = "${e.e}".strip()
@@ -4720,20 +4577,17 @@ try:
     orig_c = Integer(${e.c})
     responses_str = "${e.oracle_responses||``}".replace(' ', '')
     responses = [int(x) for x in responses_str.split(',') if x]
-
     print("Parity oracle attack on RSA")
     print(f"n = {n}")
     print(f"e = {e}")
     print(f"c = {c}")
     print(f"Oracle responses: {len(responses)} bits")
     print()
-
     n_bits = n.nbits()
     if len(responses) < n_bits:
         print(f"WARNING: Need {n_bits} responses for {n_bits}-bit modulus.")
         print(f"Got {len(responses)}. Attack may be incomplete.")
         print()
-
     # Binary search using parity oracle
     lower = Integer(0)
     upper = Integer(n)

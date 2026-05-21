@@ -67,7 +67,7 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\implies p, q \\qed
 
 \\textbf{Explanation:} For each candidate $k \\in [1, e]$, compute $d_{\\text{approx}} = \\lfloor(kn + 1)/e\\rfloor$. If the low $m$ bits match the leaked $d_{\\text{low}}$, recover $\\varphi(n) = (ed - 1)/k$ and solve the quadratic $x^2 - (n - \\varphi + 1)x + n = 0$ to find $p$ and $q$.
 
-\\textbf{References:} D. Boneh, R. DeMillo, R. Lipton, "On the Importance of Checking Cryptographic Protocols for Faults", EUROCRYPT 1997`,
+\\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,
   priority: 'high',
   applicableCheck: (p) => !!p.n && !!p.e && !!p.dLow,
 };

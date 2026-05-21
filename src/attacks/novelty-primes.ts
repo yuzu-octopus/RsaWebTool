@@ -9,54 +9,42 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `n = Integer(${vals.n})
-
-if n < 2:
-    print(f"n = {n} is too small to factor")
-    print("NOVELTY_PRIMES=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2")
-    print(f"q = {n // 2}")
-    print(f"Verification: 2 * {n // 2} = {n}")
-    print("NOVELTY_PRIMES=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("No factorization possible")
-    print("NOVELTY_PRIMES=FAILED")
-    quit()
-
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print(f"p = q = {p}")
-    print("NOVELTY_PRIMES=SUCCESS")
-    quit()
-
-# Novelty primes: check against known CTF challenge primes
-try:
+  sageTemplate: (vals: Record<string, string>) => `try:
+    n = Integer(${vals.n})
+    if n < 2:
+        print(f"n = {n} is too small to factor")
+        print("NOVELTY_PRIMES=FAILED")
+        quit()
+    if n % 2 == 0:
+        print(f"n is even: {n}")
+        print(f"p = 2")
+        print(f"q = {n // 2}")
+        print(f"Verification: 2 * {n // 2} = {n}")
+        print("NOVELTY_PRIMES=SUCCESS")
+        quit()
+    if n.is_prime():
+        print(f"n is prime: {n}")
+        print("No factorization possible")
+        print("NOVELTY_PRIMES=FAILED")
+        quit()
+    if n.is_square():
+        p = isqrt(n)
+        print(f"n is a perfect square: {p}^2 = {n}")
+        print(f"p = q = {p}")
+        print("NOVELTY_PRIMES=SUCCESS")
+        quit()
     print(f"Checking n = {n} against known CTF primes...")
     print()
-
-    # Known primes from popular CTF challenges
-    # These are primes that have been reused across multiple CTF problems
     known_ctf_primes = [
         # Common weak primes used in CTFs
         # (In practice, these would be populated from a database of CTF challenges)
         # Example: primes from CSAW, DEF CON, Plaid CTF, etc.
         # The list below is illustrative
     ]
-
     found = False
-
-    # Also check primes that are "almost" common values
-    # e.g., primes close to powers of 2
     print("Checking primes near powers of 2...")
     for bits in [64, 128, 256]:
         target = 2**bits
-        # Search in a small window
         for delta in range(-1000, 1000):
             candidate = target + delta
             if candidate > 1 and candidate.is_prime():
@@ -65,17 +53,13 @@ try:
                     print(f"  Cofactor: {n // candidate}")
                     print(f"  Verification: {candidate} * {n // candidate} = {n}")
                     found = True
-
-    # Check primes near common constants
     print("\\nChecking primes near common constants...")
-    # Use Sage's high-precision real field
     RF = RealField(200)
     constants = [
         ("pi", Integer(str(RF(pi()).n(digits=60).str()).replace('.', '')[:55])),
         ("e", Integer(str(RF(exp(1)).n(digits=60).str()).replace('.', '')[:55])),
         ("sqrt(2)", Integer(str(RF(2).sqrt().n(digits=60).str()).replace('.', '')[:55])),
     ]
-
     for name, const in constants:
         for delta in range(-100, 100):
             candidate = const + delta
@@ -84,8 +68,6 @@ try:
                     print(f"  Found prime near {name}: {candidate}")
                     print(f"  Cofactor: {n // candidate}")
                     found = True
-
-    # Check against known primes
     if known_ctf_primes:
         print("\\nChecking against known CTF primes...")
         for kp in known_ctf_primes:
@@ -94,13 +76,11 @@ try:
                 print(f"  Found known CTF prime: {kp}")
                 print(f"  Cofactor: {n // kp}")
                 found = True
-
     if found:
         print("NOVELTY_PRIMES=SUCCESS")
     else:
         print("\\nNo novelty primes found.")
         print("NOVELTY_PRIMES=FAILED")
-
     print("\\nNovelty prime check complete.")
 except Exception as e:
     print(f"Error in Novelty Primes check: {e}")

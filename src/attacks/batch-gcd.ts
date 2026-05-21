@@ -10,31 +10,23 @@ export const attack: Attack = {
   inputs: [
     { name: 'n_values', label: 'Moduli (one per line or comma-separated)', placeholder: 'n1\\nn2\\nn3...', multiline: true, rows: 5 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `# Batch GCD: find shared prime factors across multiple moduli
-n_list_str = """${vals.n_values}"""
-
-# Parse input
-import re
-n_list = [Integer(x.strip()) for x in re.split(r'[\\s,]+', n_list_str.strip()) if x.strip()]
-
-if len(n_list) < 2:
-    print("Error: Need at least 2 moduli for Batch GCD attack.")
-    print("BATCH_GCD=FAILED")
-else:
-    try:
+  sageTemplate: (vals: Record<string, string>) => `try:
+    n_list_str = """${vals.n_values}"""
+    import re
+    n_list = [Integer(x.strip()) for x in re.split(r'[\\s,]+', n_list_str.strip()) if x.strip()]
+    if len(n_list) < 2:
+        print("Error: Need at least 2 moduli for Batch GCD attack.")
+        print("BATCH_GCD=FAILED")
+    else:
         print(f"Processing {len(n_list)} moduli...")
         print()
-        # Compute product of all moduli
         product = prod(n_list)
-        # Batch GCD: for each n, compute product of all other moduli via division
         found_any = False
         for i, n in enumerate(n_list):
             if n <= 1:
                 print(f"n[{i}] = {n}: invalid")
                 continue
-            # Compute product of all other moduli
             others_product = product // n
-            # GCD of n with product of all others
             g = gcd(n, others_product)
             if g > 1 and g < n:
                 found_any = True
@@ -57,9 +49,9 @@ else:
             print("BATCH_GCD=SUCCESS")
         else:
             print("BATCH_GCD=FAILED")
-    except Exception as e:
-        print(f"Error in Batch GCD: {e}")
-        print("BATCH_GCD=FAILED")
+except Exception as e:
+    print(f"Error in Batch GCD: {e}")
+    print("BATCH_GCD=FAILED")
 `,
   frontendCheck: async (vals: Record<string, string>) => {
     try {

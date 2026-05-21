@@ -16,7 +16,6 @@ if not moduli_str:
     print("ERROR: moduli_list is required")
     print("MULTI_PRIME_GCD=FAILED")
     quit()
-
 try:
     # Parse moduli
     moduli = [Integer(x.strip()) for x in moduli_str.split('\\n') if x.strip()]
