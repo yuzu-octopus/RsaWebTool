@@ -15,7 +15,7 @@ n_list_str = """${vals.n_values}"""
 
 # Parse input
 import re
-n_list = [Integer(x.strip()) for x in re.split(r'[\\n,]+', n_list_str.strip()) if x.strip()]
+n_list = [Integer(x.strip()) for x in re.split(r'[\\s,]+', n_list_str.strip()) if x.strip()]
 
 if len(n_list) < 2:
     print("Error: Need at least 2 moduli for Batch GCD attack.")
@@ -24,23 +24,18 @@ else:
     try:
         print(f"Processing {len(n_list)} moduli...")
         print()
-
         # Compute product of all moduli
         product = prod(n_list)
-
-        # Batch GCD using product tree
+        # Batch GCD: for each n, compute product of all other moduli via division
         found_any = False
         for i, n in enumerate(n_list):
             if n <= 1:
                 print(f"n[{i}] = {n}: invalid")
                 continue
-
             # Compute product of all other moduli
             others_product = product // n
-
             # GCD of n with product of all others
             g = gcd(n, others_product)
-
             if g > 1 and g < n:
                 found_any = True
                 p = g
@@ -54,11 +49,9 @@ else:
                 print(f"n[{i}] = {n}")
                 print(f"  WARNING: n divides product of others (duplicate or fully shared)")
                 print()
-
         if not found_any:
             print("No shared factors found among the provided moduli.")
             print()
-
         print("Batch GCD complete.")
         if found_any:
             print("BATCH_GCD=SUCCESS")
@@ -79,7 +72,7 @@ else:
         .map(s => BigInt(s));
 
       if (moduli.length < 2) {
-        return 'Need at least 2 moduli for Batch GCD attack.';
+        return null;
       }
 
       let product = 1n;
@@ -119,8 +112,7 @@ else:
       }
 
       if (!foundAny) {
-        lines.push('No shared factors found among the provided moduli.');
-        lines.push('');
+        return null;
       }
 
       lines.push('Batch GCD complete.');

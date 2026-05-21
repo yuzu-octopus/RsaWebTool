@@ -11,28 +11,21 @@ export const attack: Attack = {
     { name: 'e', label: 'e (public exponent)', placeholder: '3', multiline: false },
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `# Validate inputs
-if not "${vals.n}".strip():
-    print("ERROR: n is required")
-    print("SMALL_PUBLIC_EXP=FAILED")
-    quit()
-if not "${vals.c}".strip():
-    print("ERROR: c is required")
-    print("SMALL_PUBLIC_EXP=FAILED")
-    quit()
-
-try:
+  sageTemplate: (vals: Record<string, string>) => {
+    if (!vals.n || !vals.c) {
+      return `print("ERROR: Missing required inputs (n, c)")
+print("SMALL_PUBLIC_EXP=FAILED")`;
+    }
+    return `try:
     n = Integer(${vals.n})
     e_val = "${vals.e}".strip()
     e = Integer(e_val) if e_val else Integer(3)
     c = Integer(${vals.c})
-
     print(f"Small public exponent analysis")
     print(f"n = {n}")
     print(f"e = {e}")
     print(f"c = {c}")
     print()
-
     # Check if e is small
     if e >= 100:
         print(f"e = {e} is not considered 'small' for this attack.")
@@ -42,11 +35,10 @@ try:
     else:
         print(f"e = {e} is small. Checking for vulnerabilities...")
         print()
-
         # Attack 1: e-th root (m^e < n)
         print("Attack 1: e-th root attack (m^e < n)")
-        m_root = c.nth_root(e, truncate_mode='floor')
-        if m_root**e == c:
+        m_root, exact = c.nth_root(e, truncate_mode=True)
+        if exact:
             print(f"SUCCESS! c is a perfect {e}-th power.")
             print(f"m = {m_root}")
             try:
@@ -62,7 +54,6 @@ try:
             print(f"c is not a perfect {e}-th power over integers.")
             print("m^e >= n, so modular reduction occurred.")
             print()
-
             # Attack 2: Hastad broadcast (need multiple (n, c) pairs)
             print("Attack 2: Hastad broadcast note")
             print("If the SAME message m was encrypted with e = 3")
@@ -70,18 +61,17 @@ try:
             print("  m = CRT(c1, c2, c3)^(1/3) over integers")
             print("Provide additional (n, c) pairs to attempt this attack.")
             print()
-
             # Attack 3: Franklin-Reiter related message
             print("Attack 3: Franklin-Reiter related message note")
             print("If two ciphertexts c1 = m^e and c2 = (m + delta)^e")
             print("are known with the same (n, e), then m can be recovered.")
             print("Provide a second ciphertext to attempt this attack.")
             print("SMALL_PUBLIC_EXP=FAILED")
-
 except Exception as ex:
     print(f"ERROR: {ex}")
     print("SMALL_PUBLIC_EXP=FAILED")
-`,
+`;
+  },
   proof: `\\textbf{Theorem:} RSA with small public exponent \\(e \\in \\{3, 5, 17\\}\\) is vulnerable to e-th root, Hastad broadcast, and Franklin-Reiter attacks.
 
 \\textbf{Prerequisites:}

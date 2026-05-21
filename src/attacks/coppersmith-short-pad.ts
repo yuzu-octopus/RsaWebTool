@@ -15,70 +15,67 @@ export const attack: Attack = {
   ],
   sageTemplate: (vals: Record<string, string>) => {
     if (!vals.n || !vals.e || !vals.c1 || !vals.c2) {
-      return `print("ERROR: Missing required inputs (n, e, c1, c2)")
-print("COPPERSMITH_SHORT_PAD=FAILED")`;
+      return 'print("ERROR: Missing required inputs (n, e, c1, c2)")\nprint("COPPERSMITH_SHORT_PAD=FAILED")';
     }
     return `try:
     n = Integer(${vals.n})
     e = Integer(${vals.e})
     c1 = Integer(${vals.c1})
     c2 = Integer(${vals.c2})
-
-    print(f"Coppersmith Short Pad Attack")
-    print(f"n = {n}, e = {e}")
-    print()
-
-    # The attack: c1 = m^e mod n, c2 = (m + delta)^e mod n
-    # We want to find delta, then use Franklin-Reiter
-
-    # Method: Compute resultant of x^e - c1 and (x+y)^e - c2 as polynomials in x over Zmod(n)[y]
-    # The resultant eliminates x and gives a polynomial in delta
-
-    # Build proper polynomial ring hierarchy
-    Q.<y> = PolynomialRing(Zmod(n))
-    R2.<x2> = PolynomialRing(Q)
-    f1_x = x2**e - c1
-    f2_x = (x2 + y)**e - c2
-
+    # Custom GCD for polynomials over Zmod(n) with composite n
+    def composite_gcd(a, b):
+        while b:
+            a, b = b, a % b
+        return a.monic()
+    print("Coppersmith Short Pad Attack")
+    print("n =", n, "e =", e)
+    # Step 1: Compute resultant to find delta = m2 - m1
+    # SageMath's resultant() fails over Zmod(n) with composite n
+    # Workaround: use change_ring to a fresh multivariate ring
+    PRxy.<x, y> = PolynomialRing(Zmod(n))
+    PRx.<xn> = PolynomialRing(Zmod(n))
+    PRZZ.<xz, yz> = PolynomialRing(Zmod(n))
+    g1 = x**e - c1
+    g2 = (x + y)**e - c2
+    q1 = g1.change_ring(PRZZ)
+    q2 = g2.change_ring(PRZZ)
     print("Computing resultant...")
-    res = f1_x.resultant(f2_x, x2)
-    print(f"Resultant degree: {res.degree()}")
-
-    # Find small roots of the resultant polynomial
-    bound = ZZ(n**(1/(e**2)))
-    print(f"Small root bound: {bound}")
-
-    roots = res.small_roots(X=bound, beta=0.5)
+    h = q2.resultant(q1)
+    h = h.univariate_polynomial()
+    h = h.change_ring(PRx).subs(y=xn)
+    h = h.monic()
+    print("Resultant degree:", h.degree())
+    # Bound: padding difference must be < n^(1/e^2)
+    kbits = n.nbits() // (2 * e * e)
+    X = 2^kbits
+    print("Small root bound (bits):", kbits)
+    roots = h.small_roots(X=X, beta=0.5)
     if roots:
         delta = roots[0]
-        print(f"Found padding difference: delta = {delta}")
-
-        # Franklin-Reiter with a=1, b=delta
-        P.<x> = PolynomialRing(Zmod(n))
-        f1 = x**e - c1
-        g = gcd(f1, (x + delta)**e - c2)
+        print("Found padding difference: delta =", delta)
+        # Step 2: Franklin-Reiter related message attack
+        g1_fr = xn**e - c1
+        g2_fr = (xn + delta)**e - c2
+        g = composite_gcd(g1_fr, g2_fr)
         if g.degree() == 1:
             m = -g[0] / g[1]
-            print(f"Recovered message: m = {m}")
-
-            # Verify
+            print("Recovered message: m =", m)
             v1 = power_mod(Integer(m), e, n)
             v2 = power_mod(Integer(m) + delta, e, n)
-            print(f"Verification: m^e mod n = {v1} (c1 = {c1})")
-            print(f"Verification: (m+delta)^e mod n = {v2} (c2 = {c2})")
-
+            print("Verification: m^e mod n =", v1, "(c1 =", c1, ")")
+            print("Verification: (m+delta)^e mod n =", v2, "(c2 =", c2, ")")
             if v1 == c1 and v2 == c2:
                 print("COPPERSMITH_SHORT_PAD=SUCCESS")
             else:
                 print("COPPERSMITH_SHORT_PAD=FAILED")
         else:
-            print(f"GCD has degree {g.degree()}, cannot extract unique solution.")
+            print("GCD has degree", g.degree(), "- cannot extract unique solution.")
             print("COPPERSMITH_SHORT_PAD=FAILED")
     else:
         print("No small roots found. Padding may be too large.")
         print("COPPERSMITH_SHORT_PAD=FAILED")
 except Exception as e:
-    print(f"ERROR: {e}")
+    print("ERROR:", e)
     print("COPPERSMITH_SHORT_PAD=FAILED")
 `;
   },

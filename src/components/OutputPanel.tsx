@@ -14,7 +14,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula as draculaStyle } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import type { SyntaxHighlighterProps } from 'react-syntax-highlighter';
 import { draculaColors } from '../theme/dracula';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../hooks/useAppContext';
 import { hexToBytes, hexToAscii, decToHex, decToAscii, base64ToText } from '../utils/converters';
 
 const utilBtnSx = {
@@ -30,7 +30,9 @@ const MAX_WIDTH = 600;
 
 export function OutputPanel({ width, onWidthChange }: { width: number; onWidthChange: (w: number) => void }) {
   const { outputResult, outputError, history } = useAppContext();
-  const [conversionResult, setConversionResult] = useState<string | null>(null);
+  const [conversionState, setConversionState] = useState<{ result: string; sourceOutput: string } | null>(null);
+  const conversionResult = conversionState?.sourceOutput === outputResult ? conversionState.result : null;
+  const [copyMessage, setCopyMessage] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [notepadOpen, setNotepadOpen] = useState(false);
   const [notepadHeight, setNotepadHeight] = useState(() => {
@@ -110,16 +112,15 @@ export function OutputPanel({ width, onWidthChange }: { width: number; onWidthCh
 
   const handleConvert = (fn: (s: string) => string) => {
     if (outputResult) {
-      setConversionResult(fn(outputResult));
+      setConversionState({ result: fn(outputResult), sourceOutput: outputResult });
     }
   };
 
   const handleCopy = () => {
     if (outputResult) {
       navigator.clipboard.writeText(outputResult);
-      const prevResult = conversionResult;
-      setConversionResult('Copied to clipboard!');
-      setTimeout(() => setConversionResult(prevResult), 2000);
+      setCopyMessage('Copied to clipboard!');
+      setTimeout(() => setCopyMessage(null), 2000);
     }
   };
 
@@ -183,6 +184,11 @@ export function OutputPanel({ width, onWidthChange }: { width: number; onWidthCh
               <Button size="small" variant="outlined" onClick={handleCopy} sx={utilBtnSx} startIcon={<ContentCopy />}>
                 Copy
               </Button>
+              {copyMessage && (
+                <Typography variant="caption" sx={{ color: draculaColors.green, fontSize: '0.7rem', alignSelf: 'center' }}>
+                  {copyMessage}
+                </Typography>
+              )}
               <Button size="small" variant="outlined" onClick={() => handleConvert(hexToBytes)} sx={utilBtnSx}>
                 Hex→Bytes
               </Button>

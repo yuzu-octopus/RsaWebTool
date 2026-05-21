@@ -1,11 +1,12 @@
 import type { Attack } from '../types';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
+import { gcd } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'multi-prime-gcd',
   name: 'Multi-Prime GCD',
   category: 'Advanced',
-  description: 'Finds shared primes across multiple moduli. Use when given 3+ RSA moduli.',
+  description: 'Finds shared primes across multiple moduli via pairwise GCD. Use when given 2+ RSA moduli. Unlike Batch GCD (Factorization category), this attack reports exact moduli pairs that share each factor.',
   inputs: [
     { name: 'moduli_list', label: 'Moduli (one per line)', placeholder: 'Enter multiple moduli, one per line...', multiline: true, rows: 6 },
   ],
@@ -19,18 +20,15 @@ if not moduli_str:
 try:
     # Parse moduli
     moduli = [Integer(x.strip()) for x in moduli_str.split('\\n') if x.strip()]
-
     print(f"Multi-Prime GCD attack on {len(moduli)} moduli")
     print()
-
     if len(moduli) < 2:
         print("Need at least 2 moduli for this attack.")
         print("MULTI_PRIME_GCD=FAILED")
     else:
-        # Batch GCD: compute product of all moduli, then GCD each with product/others
-        print("Computing batch GCD...")
+        # Pairwise GCD: check every modulus pair for shared factors
+        print("Running pairwise GCD across all moduli...")
         print()
-
         found_any = False
         for i in range(len(moduli)):
             ni = moduli[i]
@@ -48,7 +46,6 @@ try:
                     print(f"  p' = {g}")
                     print(f"  q' = {nj // g}")
                     print()
-
         if found_any:
             print("MULTI_PRIME_GCD=SUCCESS")
         else:
@@ -62,12 +59,11 @@ try:
             print("Note: In real-world scans, ~0.2% of RSA certificates share factors")
             print("due to poor entropy during key generation.")
             print("MULTI_PRIME_GCD=FAILED")
-
 except Exception as ex:
     print(f"ERROR: {ex}")
     print("MULTI_PRIME_GCD=FAILED")
 `,
-  proof: `\\textbf{Theorem:} RSA moduli generated with insufficient entropy may share prime factors, enabling factorization via pairwise GCD.
+  proof: `\\textbf{Theorem:} Given RSA moduli \\{n_1, \\ldots, n_k\\} generated with insufficient entropy, pairwise GCD reveals both shared factors and the exact pairs that share them.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -78,14 +74,15 @@ except Exception as ex:
 
 \\textbf{Proof:}
 \\begin{align*}
-g_{ij} &= \\gcd(n_i, n_j) \\\\
+g_{ij} &= \\gcd(n_i, n_j) \\quad (1 \\leq i < j \\leq k) \\\\
 g_{ij} &> 1 \\implies \\exists\\, p : p \\mid n_i \\land p \\mid n_j \\\\
 n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}} \\\\
 n_j &= g_{ij} \\cdot \\frac{n_j}{g_{ij}} \\\\
-\\text{Batch optimization:} &\\quad P = \\prod_{i=1}^{k} n_i, \\quad g_i = \\gcd\\!\\left(n_i, \\frac{P}{n_i^2}\\right)
+\\text{GCD complexity:} &\\quad O(\\log^2 \\max(n_i, n_j)) \\text{ per pair} \\\\
+\\text{Total complexity:} &\\quad O(k^2 \\log^2 n) \\qed
 \\end{align*}
 
-\\textbf{Explanation:} When two moduli share a prime factor, their GCD reveals that factor immediately. The batch variant computes the product of all moduli once, then checks each $n_i$ against $P/n_i^2$, reducing $O(k^2)$ pairwise GCDs to $O(k)$.
+\\textbf{Explanation:} Pairwise GCD checks every modulus pair individually, reporting exactly which pairs share a factor. This is simpler than batch GCD (Bernstein remainder tree) and provides pair-level detail, at the cost of $O(k^2)$ operations vs. $O(k \\log k)$ for the batch variant. Useful when investigating which specific keys are related (e.g., hardware RNG failure analysis).
 
 \\textbf{References:} N. Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012`,
   priority: 'high',
@@ -93,6 +90,58 @@ n_j &= g_{ij} \\cdot \\frac{n_j}{g_{ij}} \\\\
     const vals = (p.moduli_list || '').trim();
     if (!vals) return false;
     return vals.split('\n').filter(x => x.trim()).length >= 2;
+  },
+  frontendCheck: async (vals: Record<string, string>) => {
+    try {
+      const raw = (vals.moduli_list || '').trim();
+      if (!raw) return null;
+
+      const moduli = raw.split('\n')
+        .map(s => s.trim())
+        .filter(s => s.length > 0)
+        .map(s => BigInt(s));
+
+      if (moduli.length < 2) {
+        return null;
+      }
+
+      const lines: string[] = [
+        `Multi-Prime GCD Attack (browser-side, BigInt)`,
+        `Running pairwise GCD on ${moduli.length} moduli...`,
+        ``,
+      ];
+
+      let foundAny = false;
+
+      for (let i = 0; i < moduli.length; i++) {
+        const ni = moduli[i];
+        for (let j = i + 1; j < moduli.length; j++) {
+          const nj = moduli[j];
+          const g = gcd(ni, nj);
+          if (g > 1n && g < ni) {
+            foundAny = true;
+            lines.push(`SHARED FACTOR FOUND between moduli ${i + 1} and ${j + 1}!`);
+            lines.push(`gcd(n${i + 1}, n${j + 1}) = ${g}`);
+            lines.push(`n${i + 1} = ${ni}`);
+            lines.push(`  p = ${g}`);
+            lines.push(`  q = ${ni / g}`);
+            lines.push(`n${j + 1} = ${nj}`);
+            lines.push(`  p' = ${g}`);
+            lines.push(`  q' = ${nj / g}`);
+            lines.push('');
+          }
+        }
+      }
+
+      if (!foundAny) {
+        return null;
+      }
+
+      lines.push('MULTI_PRIME_GCD=SUCCESS');
+      return lines.join('\n');
+    } catch {
+      return null;
+    }
   },
 };
 

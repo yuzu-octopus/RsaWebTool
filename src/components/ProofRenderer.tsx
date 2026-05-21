@@ -238,9 +238,9 @@ export function ProofRenderer({ latex }: { latex: string }) {
               const rendered: React.ReactNode[] = [];
               for (let j = 0; j < paragraphs.length; j++) {
                 const para = paragraphs[j];
-                // Detect heading patterns like "Theorem:", "Prerequisites:", "Proof:", "References:"
-                // Handle both plain "References:" and "\textbf{References:}" variants
-                const headingMatch = para.match(/^(?:\\textbf\{)?(Theorem|Prerequisites|Proof|References)(?:\})?:\s*(.*)/s);
+                // Detect heading patterns like \textbf{Theorem}: or Theorem:
+                // Generic: captures any \textbf{...}: or CapitalWord: pattern
+                const headingMatch = para.match(/^\\textbf\{([^:]+):\}\s*(.*)/s) || para.match(/^([A-Z][a-zA-Z]+):\s*(.*)/s);
                 if (headingMatch && headingMatch[1] === 'References') {
                   skipRest = true;
                   break;

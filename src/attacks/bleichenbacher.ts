@@ -35,27 +35,22 @@ try:
     e = Integer(${vals.e})
     c = Integer(${vals.c})
     orig_c = Integer(${vals.c})
-
     # Parse oracle responses
     responses_str = """${vals.oracle_responses}""".strip()
     oracle_bits = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
-
     print(f"Bleichenbacher PKCS#1 v1.5 Attack")
     print(f"n = {n} ({n.nbits()} bits)")
     print(f"e = {e}")
     print(f"c = {c}")
     print(f"Oracle responses: {len(oracle_bits)}")
     print()
-
     # PKCS#1 v1.5: EM = 0x00 || 0x02 || PS || 0x00 || M
     # Valid padding: 2B <= m < 3B where B = 2^(8*(k-2)), k = byte length
     k = (n.nbits() + 7) // 8
     B = Integer(2)**(8 * (k - 2))
-
     print(f"Block size: {k} bytes, B = 2^(8*{k-2})")
     print(f"Valid padding range: [2B, 3B) = [{2*B}, {3*B})")
     print()
-
     # Collect valid s values from oracle responses
     valid_s = [Integer(i + 1) for i, r in enumerate(oracle_bits) if r == 1]
     print(f"Valid padding responses: {len(valid_s)}")
@@ -63,34 +58,32 @@ try:
         print("Need at least 2 valid responses for interval narrowing")
         print("BLEICHENBACHER=FAILED")
         quit()
-
     s1 = valid_s[0]
     print(f"s1 = {s1}")
-
     # Initial interval from s1
-    a = ceil((2 * B) / s1)
-    b = floor((3 * B - 1) / s1)
-    if s1 > 1:
+    if s1 == 1:
+        a = 2 * B
+        b = 3 * B - 1
+    else:
+        # Find r such that interval overlaps with [2B, 3B)
         for r in range(0, int(s1) + 1):
             r_int = Integer(r)
             ca = ceil((2 * B + r_int * n) / s1)
             cb = floor((3 * B - 1 + r_int * n) / s1)
-            if ca < cb:
-                a = ca
-                b = cb
+            inter_a = max(2 * B, ca)
+            inter_b = min(3 * B - 1, cb)
+            if inter_a <= inter_b:
+                a = inter_a
+                b = inter_b
                 break
-
     print(f"Initial interval: [{a}, {b}], size={(b-a+1).nbits()} bits")
     print()
-
     # Narrow using remaining valid s values
     for idx in range(1, min(len(valid_s), 50)):
         s = valid_s[idx]
-
         # Find r range
         r_min = ceil((a * s - 3 * B + 1) / n)
         r_max = floor((b * s - 2 * B) / n)
-
         new_a = None
         new_b = None
         for r in range(int(r_min), int(r_max) + 1):
@@ -104,7 +97,6 @@ try:
                     new_a = inter_a
                 if new_b is None or inter_b < new_b:
                     new_b = inter_b
-
         if new_a is not None and new_b is not None:
             a = new_a
             b = new_b
@@ -112,7 +104,6 @@ try:
                 print(f"Step {idx}: s={s}, interval=[{a}, {b}], size={(b-a+1).nbits()} bits")
         else:
             print(f"Step {idx}: s={s}, no valid interval intersection")
-
     print()
     if a == b:
         m = a
@@ -122,7 +113,6 @@ try:
         print(f"Estimated message: m = {m}")
         print(f"Final interval: [{a}, {b}]")
         print(f"Uncertainty: {(b-a+1).nbits()} bits")
-
     # Verify
     v = power_mod(m, e, n)
     print(f"Verification: m^e mod n = {v}")
@@ -133,7 +123,6 @@ try:
     else:
         print("Verification failed - may need more oracle responses")
         print("BLEICHENBACHER=FAILED")
-
 except Exception as ex:
     print(f"ERROR: {ex}")
     print("BLEICHENBACHER=FAILED")

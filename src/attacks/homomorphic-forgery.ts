@@ -18,11 +18,11 @@ export const attack: Attack = {
       return `print("ERROR: Missing required inputs (n, e, target_m, oracle_pairs)")
 print("HOMOMORPHIC_FORGERY=FAILED")`;
     }
-    return `try:
+    return `from itertools import combinations
+try:
     n = Integer(${vals.n})
     e = Integer(${vals.e})
     target_m = Integer(${vals.target_m})
-
     # Parse oracle pairs
     pairs_str = """${vals.oracle_pairs}""".strip()
     oracle_pairs = []
@@ -36,27 +36,19 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
         m_i = Integer(parts[0].strip())
         s_i = Integer(parts[1].strip())
         oracle_pairs.append((m_i, s_i))
-
-    print(f"Homomorphic Forgery Attack")
+    print("Homomorphic Forgery Attack")
     print(f"Target message: {target_m}")
     print(f"Oracle pairs: {len(oracle_pairs)}")
-    print()
-
     # Verify oracle pairs
     print("Verifying oracle pairs:")
     for i, (m_i, s_i) in enumerate(oracle_pairs):
         v = power_mod(s_i, e, n)
         valid = "OK" if v == m_i else "FAIL"
         print(f"  Pair {i+1}: s_i^e mod n = {v}, m_i = {m_i} [{valid}]")
-    print()
-
     # Try to factor target_m into oracle messages
     # target_m = m_1 * m_2 * ... * m_k (mod n)
     # Then sig = s_1 * s_2 * ... * s_k (mod n)
-
     # Simple approach: try all subsets
-    from itertools import combinations
-
     found = False
     for r in range(1, len(oracle_pairs) + 1):
         for combo in combinations(range(len(oracle_pairs)), r):
@@ -66,12 +58,10 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
                 m_i, s_i = oracle_pairs[idx]
                 product_m = (product_m * m_i) % n
                 product_s = (product_s * s_i) % n
-
             if product_m == target_m % n:
                 print(f"Found factorization using pairs: {[i+1 for i in combo]}")
                 print(f"Product of messages: {product_m}")
                 print(f"Forged signature: {product_s}")
-
                 # Verify
                 v = power_mod(product_s, e, n)
                 print(f"Verification: sig^e mod n = {v}")
@@ -81,15 +71,14 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
                 break
         if found:
             break
-
     if found:
         print("HOMOMORPHIC_FORGERY=SUCCESS")
     else:
         print("Could not factor target_m from oracle pairs using simple multiplication.")
         print("Try more complex factorizations or additional oracle queries.")
         print("HOMOMORPHIC_FORGERY=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
+except Exception as ex:
+    print(f"ERROR: {ex}")
     print("HOMOMORPHIC_FORGERY=FAILED")
 `;
   },

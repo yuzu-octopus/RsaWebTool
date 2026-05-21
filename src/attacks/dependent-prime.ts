@@ -14,30 +14,48 @@ export const attack: Attack = {
   sageTemplate: (v) => `try:
     n = Integer(${v.n})
     e = Integer(${v.e})
-    if n <= 0 or e <= 0:
-        print("DEPENDENT_PRIME=FAILED: invalid input values")
-    else:
-        ne = n * e
-        found = False
-        for k in range(1, 100000):
-            disc = 1 + 4*k*ne
-            if disc >= 0:
-                sqrt_disc = ZZ(disc).isqrt()
-                if sqrt_disc * sqrt_disc == disc:
-                    num = -1 + sqrt_disc
-                    if num > 0 and num % (2*k) == 0:
-                        p = num // (2*k)
-                        if n % p == 0:
-                            q = n // p
-                            print(f"Verification: p * q = {p * q}")
-                            print(f"DEPENDENT_PRIME=SUCCESS")
-                            print(f"p={p}")
-                            print(f"q={q}")
-                            print(f"k={k}")
-                            found = True
-                            break
-        if not found:
-            print("DEPENDENT_PRIME=FAILED: no valid factorization found")
+    if n < 2:
+        print("DEPENDENT_PRIME=FAILED: n is too small")
+        quit()
+    if e < 2:
+        print("DEPENDENT_PRIME=FAILED: e must be >= 2")
+        quit()
+    if n % 2 == 0:
+        print(f"n is even: {n}")
+        print(f"p = 2")
+        print(f"q = {n // 2}")
+        print(f"Verification: 2 * {n // 2} = {n}")
+        print("DEPENDENT_PRIME=SUCCESS")
+        quit()
+    if n.is_prime():
+        print("DEPENDENT_PRIME=FAILED: n is prime")
+        quit()
+    if n.is_square():
+        p = isqrt(n)
+        print(f"n is a perfect square: {p}^2 = {n}")
+        print(f"p = q = {p}")
+        print("DEPENDENT_PRIME=SUCCESS")
+        quit()
+    ne = n * e
+    found = False
+    for k in range(1, 100001):
+        disc = 1 + 4*k*ne
+        sqrt_disc = ZZ(disc).isqrt()
+        if sqrt_disc * sqrt_disc == disc:
+            num = -1 + sqrt_disc
+            if num > 0 and num % (2*k) == 0:
+                p = num // (2*k)
+                if n % p == 0:
+                    q = n // p
+                    print(f"Verification: p * q = {p * q}")
+                    print("DEPENDENT_PRIME=SUCCESS")
+                    print(f"p={p}")
+                    print(f"q={q}")
+                    print(f"k={k}")
+                    found = True
+                    break
+    if not found:
+        print("DEPENDENT_PRIME=FAILED: no valid factorization found")
 except Exception as ex:
     print(f"DEPENDENT_PRIME=FAILED: {ex}")`,
   proof: `\\textbf{Theorem:} If $q = e^{-1} \\bmod p$, then $n = pq$ creates a solvable quadratic system $kp^2 + p - ne = 0$.
@@ -75,7 +93,7 @@ export const generateTestcase = (): Record<string, string> => {
     if (q !== null && q >= 2n && isPrimeMR(q)) {
       const n = p * q;
       const k = (q * e - 1n) / p;
-      if (k > 0n && k <= 100000n) {
+      if (k > 0n && k < 100001n) {
         return { n: n.toString(), e: e.toString() };
       }
     }

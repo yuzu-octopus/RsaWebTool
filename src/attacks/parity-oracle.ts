@@ -56,17 +56,14 @@ try:
     print("Binary search iterations:")
     for i, parity in enumerate(responses):
         mid = (lower + upper) // 2
-
         # Multiply ciphertext by 2^e mod n
         c = (c * power_mod(Integer(2), e, n)) % n
-
         if parity == 0:
             # 2m mod n is even, so 2m < n, m is in lower half
             upper = mid
         else:
             # 2m mod n is odd (since n is odd), so 2m >= n, m is in upper half
             lower = mid
-
         if i < 10 or i % 50 == 0:
             print(f"  Step {i+1}: parity={parity}, range bits = {(upper - lower).nbits()}")
 
@@ -131,7 +128,9 @@ export const generateTestcase = (): Record<string, string> => {
   const m = BigInt(Math.floor(Math.random() * 1000000) + 42);
   const c = encrypt(m, n, e);
   const responses: string[] = [];
-  let curC = c;
+  // Start from c * 2^e mod n so that responses[0] = LSB(2m mod n)
+  // matching the sage template which multiplies c by 2^e before each check
+  let curC = (c * modPow(2n, e, n)) % n;
   const nBits = TESTCASE_BITS.p + TESTCASE_BITS.q;
   for (let i = 0; i < nBits; i++) {
     responses.push((modPow(curC, d, n) % 2n).toString());

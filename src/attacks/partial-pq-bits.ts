@@ -26,7 +26,7 @@ export const attack: Attack = {
         else:
             R.<x> = PolynomialRing(Zmod(n))
             f = (knownBits << k) + x
-            bound = 2^k
+            bound = 2**k
             print(f"Using bound X = {bound}")
             roots = f.small_roots(X=bound, beta=0.5)
             if roots:
@@ -50,12 +50,13 @@ export const attack: Attack = {
             print("PARTIAL_PQ_BITS=FAILED: knownBits is zero")
         else:
             R.<x> = PolynomialRing(Zmod(n))
-            f = x * (2^m) + knownBits
-            bound = 2^(n.nbits() // 2 - m)
+            f = x * (2**m) + knownBits
+            f = f.monic()
+            bound = 2**(n.nbits() // 2 - m)
             print(f"Using bound X = {bound}")
             roots = f.small_roots(X=bound, beta=0.5)
             if roots:
-                p = Integer(roots[0] * (2^m) + knownBits)
+                p = Integer(roots[0] * (2**m) + knownBits)
                 if n % p == 0:
                     q = n // p
                     print(f"Verification: p * q = {p * q}")

@@ -13,29 +13,47 @@ export const attack: Attack = {
   sageTemplate: (v) => `try:
     n = Integer(${v.n})
     k = Integer(${v.k})
-    if n <= 0 or k <= 0:
-        print("LINEARLY_RELATED=FAILED: invalid input values")
-    else:
-        found = False
-        for delta in range(-10000, 10001):
-            disc = delta*delta + 4*k*n
-            if disc >= 0:
-                sqrt_disc = ZZ(disc).isqrt()
-                if sqrt_disc * sqrt_disc == disc:
-                    num = -delta + sqrt_disc
-                    if num > 0 and num % (2*k) == 0:
-                        p = num // (2*k)
-                        if n % p == 0:
-                            q = n // p
-                            print(f"Verification: p * q = {p * q}")
-                            print(f"LINEARLY_RELATED=SUCCESS")
-                            print(f"p={p}")
-                            print(f"q={q}")
-                            print(f"delta={delta}")
-                            found = True
-                            break
-        if not found:
-            print("LINEARLY_RELATED=FAILED: no valid factorization found")
+    if n < 2:
+        print("LINEARLY_RELATED=FAILED: n is too small")
+        quit()
+    if k <= 0:
+        print("LINEARLY_RELATED=FAILED: k must be positive")
+        quit()
+    if n % 2 == 0:
+        print(f"n is even: {n}")
+        print(f"p = 2")
+        print(f"q = {n // 2}")
+        print(f"Verification: 2 * {n // 2} = {n}")
+        print("LINEARLY_RELATED=SUCCESS")
+        quit()
+    if n.is_prime():
+        print("LINEARLY_RELATED=FAILED: n is prime")
+        quit()
+    if n.is_square():
+        p = isqrt(n)
+        print(f"n is a perfect square: {p}^2 = {n}")
+        print(f"p = q = {p}")
+        print("LINEARLY_RELATED=SUCCESS")
+        quit()
+    found = False
+    for delta in range(-10000, 10001):
+        disc = delta*delta + 4*k*n
+        sqrt_disc = ZZ(disc).isqrt()
+        if sqrt_disc * sqrt_disc == disc:
+            num = -delta + sqrt_disc
+            if num > 0 and num % (2*k) == 0:
+                p = num // (2*k)
+                if n % p == 0:
+                    q = n // p
+                    print(f"Verification: p * q = {p * q}")
+                    print(f"LINEARLY_RELATED=SUCCESS")
+                    print(f"p={p}")
+                    print(f"q={q}")
+                    print(f"delta={delta}")
+                    found = True
+                    break
+    if not found:
+        print("LINEARLY_RELATED=FAILED: no valid factorization found")
 except Exception as ex:
     print(f"LINEARLY_RELATED=FAILED: {ex}")`,
   proof: `\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta|$, solve the quadratic $kp^2 + \\delta p - n = 0$ to factor $n$.
@@ -66,12 +84,15 @@ p &= \\frac{-\\delta \\pm \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
 
 export const generateTestcase = (): Record<string, string> => {
   const p = randomPrime(TESTCASE_BITS.p);
-  const k = 1n;
+  // Vary k to test general linear relationship: q = k·p + δ
+  const r = Math.random();
+  const k = r < 0.4 ? 1n : r < 0.7 ? 2n : 3n;
   // Pick a small non-zero delta, then find q = k*p + delta that is prime
   let targetDelta = BigInt(Math.floor(Math.random() * 100) + 1); // [1, 100]
   if (Math.random() < 0.5) targetDelta = -targetDelta;
   let q = k * p + targetDelta;
-  if (q < 2n) q = p + BigInt(Math.abs(Number(targetDelta))) + 2n;
+  // q is always > 2 for 256-bit primes; keep safety guard
+  if (q < 2n) q = k * p + BigInt(Math.abs(Number(targetDelta))) + 2n;
   // Ensure q is odd and q ≠ p
   if (q % 2n === 0n) q += 1n;
   while (!isPrimeMR(q) || q === p) {

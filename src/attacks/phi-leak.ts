@@ -24,27 +24,22 @@ if not "${vals.phi}".strip():
 try:
     n = Integer(${vals.n})
     phi = Integer(${vals.phi})
-
     print("Phi(n) leak attack")
     print(f"n = {n}")
     print(f"phi(n) = {phi}")
     print()
-
     # For n = p*q: phi(n) = (p-1)(q-1) = pq - p - q + 1 = n - p - q + 1
     # So: p + q = n - phi + 1
     # And: p * q = n
     # We solve: x^2 - (p+q)x + pq = 0
     # i.e.: x^2 - (n - phi + 1)x + n = 0
-
     sum_pq = n - phi + 1
     print(f"p + q = {sum_pq}")
     print(f"p * q = {n}")
     print()
-
     # Solve quadratic: x^2 - sum_pq * x + n = 0
     discriminant = sum_pq**2 - 4*n
     print(f"Discriminant = {discriminant}")
-
     if discriminant < 0:
         print("ERROR: Negative discriminant. phi(n) is inconsistent with n.")
         print("PHI_LEAK=FAILED")
@@ -62,19 +57,10 @@ try:
             print(f"Verification: p * q = {p * q}")
             print(f"Verification: (p-1)*(q-1) = {(p-1)*(q-1)}")
             print("PHI_LEAK=SUCCESS")
-
-            try:
-                e_val = "${vals.e}".strip()
-                if e_val and Integer(e_val) > 0:
-                    d = inverse_mod(Integer(e_val), phi)
-                    print(f"d (private exponent) = {d}")
-            except:
-                pass
         else:
             print(f"Discriminant is not a perfect square: {discriminant}")
             print("phi(n) may be incorrect, or n has more than 2 prime factors.")
             print("PHI_LEAK=FAILED")
-
 except Exception as ex:
     print(f"ERROR: {ex}")
     print("PHI_LEAK=FAILED")

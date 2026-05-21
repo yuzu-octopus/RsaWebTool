@@ -18,32 +18,32 @@ print()
 if n < 2:
     print(f"n = {n} is too small to factor")
     print("FERMAT=FAILED")
-    return
+    quit()
 if n % 2 == 0:
     print(f"n is even: {n}")
     print(f"p = 2")
     print(f"q = {n // 2}")
     print(f"Verification: 2 * {n // 2} = {n}")
     print("FERMAT=SUCCESS")
-    return
+    quit()
 if n.is_prime():
     print(f"n is prime: {n}")
     print("No factorization possible")
     print("FERMAT=FAILED")
-    return
+    quit()
 if n.is_square():
     p = isqrt(n)
     print(f"n is a perfect square: {p}^2 = {n}")
     print(f"p = q = {p}")
     print(f"Verification: p * q = {p * p}")
     print("FERMAT=SUCCESS")
-    return
+    quit()
 
 # Optimized Fermat (RsaCtfTool algorithm)
 # Uses incremental update: b2 += c, c += 2 instead of recomputing a^2 - n
 a, rem = n.sqrtrem()
 b2 = -rem
-c = (a << 1) + 1
+c = 2 * a + 1
 max_iter = 10**6
 iterations = 0
 
@@ -53,11 +53,11 @@ while not b2.is_square():
         print(f"Fermat factorization failed: no factor found within {max_iter} iterations")
         print("p and q may not be close enough for this method")
         print("FERMAT=FAILED")
-        return
+        quit()
     b2 += c
     c += 2
 
-a = (c - 1) >> 1
+a = (c - 1) // 2
 b = isqrt(b2)
 p = a - b
 q = a + b

@@ -24,42 +24,27 @@ print("COMMON_MODULUS=FAILED")`;
     e2 = Integer(${vals.e2})
     c1 = Integer(${vals.c1})
     c2 = Integer(${vals.c2})
-
     # Check gcd(e1, e2) first
     g = gcd(e1, e2)
     print(f"gcd(e1, e2) = {g}")
-
     if g != 1:
         print(f"ERROR: gcd(e1, e2) = {g} != 1. Exponents must be coprime.")
         print("COMMON_MODULUS=FAILED")
     else:
         # Extended GCD to find a, b such that a*e1 + b*e2 = 1
-        g, a, b = xgcd(e1, e2)
+        _, a, b = xgcd(e1, e2)
         print(f"Bezout coefficients: a = {a}, b = {b}")
         print(f"Verification: a*e1 + b*e2 = {a*e1 + b*e2}")
-
-        # Compute m = c1^a * c2^b mod n
-        if a >= 0:
-            part1 = power_mod(c1, a, n)
-        else:
-            c1_inv = power_mod(c1, -1, n)
-            part1 = power_mod(c1_inv, -a, n)
-
-        if b >= 0:
-            part2 = power_mod(c2, b, n)
-        else:
-            c2_inv = power_mod(c2, -1, n)
-            part2 = power_mod(c2_inv, -b, n)
-
+        # Compute m = c1^a * c2^b mod n (power_mod handles negative exponents)
+        part1 = power_mod(c1, a, n)
+        part2 = power_mod(c2, b, n)
         m = (part1 * part2) % n
         print(f"Recovered message: m = {m}")
-
         # Verify
         v1 = power_mod(m, e1, n)
         v2 = power_mod(m, e2, n)
         print(f"Verification: m^e1 mod n = {v1} (should equal c1 = {c1})")
         print(f"Verification: m^e2 mod n = {v2} (should equal c2 = {c2})")
-
         if v1 == c1 and v2 == c2:
             print("COMMON_MODULUS=SUCCESS")
         else:

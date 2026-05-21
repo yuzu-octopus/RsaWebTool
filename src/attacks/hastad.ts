@@ -17,62 +17,56 @@ print("HASTAD=FAILED")`;
     }
     return `try:
     e = Integer(${vals.e})
-
-    # Parse pairs
-    pairs_str = """${vals.pairs}""".strip()
-    pairs = []
-    for line in pairs_str.split('\\n'):
-        line = line.strip()
-        if not line:
-            continue
-        parts = line.split(',')
-        if len(parts) < 2:
-            continue
-        n_i = Integer(parts[0].strip())
-        c_i = Integer(parts[1].strip())
-        pairs.append((n_i, c_i))
-
-    print(f"Number of ciphertexts: {len(pairs)}")
+    print(f"Hastad's Broadcast Attack")
     print(f"Public exponent: e = {e}")
-
-    if len(pairs) < e:
-        print(f"ERROR: Need at least {e} ciphertexts for e = {e}, got {len(pairs)}")
+    if e < 2:
+        print(f"ERROR: e must be >= 2, got e = {e}")
         print("HASTAD=FAILED")
     else:
-        # Chinese Remainder Theorem
-        moduli = [p[0] for p in pairs]
-        remainders = [p[1] for p in pairs]
-
-        print("Applying CRT...")
-        m_e = crt(remainders, moduli)
-        print(f"m^e = {m_e}")
-
-        # Integer e-th root
-        print(f"Computing integer {e}-th root...")
-        m, exact = m_e.nth_root(e, truncate_mode=True)
-
-        if exact:
-            print(f"Recovered message: m = {m}")
-            # Verify
-            all_ok = True
-            for i, (n_i, c_i) in enumerate(pairs):
-                v = power_mod(m, e, n_i)
-                ok = v == c_i
-                if not ok:
-                    all_ok = False
-                print(f"  Verify {i+1}: m^e mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
-            if all_ok:
-                print("HASTAD=SUCCESS")
-            else:
-                print("HASTAD=FAILED")
-        else:
-            print(f"Approximate root: m = {m}")
-            print("Warning: m^e was not a perfect e-th power. Message may be padded.")
+        pairs_str = """${vals.pairs}""".strip()
+        pairs = []
+        for line in pairs_str.split('\\n'):
+            line = line.strip()
+            if not line:
+                continue
+            parts = line.split(',')
+            if len(parts) < 2:
+                continue
+            n_i = Integer(parts[0].strip())
+            c_i = Integer(parts[1].strip())
+            pairs.append((n_i, c_i))
+        print(f"Number of ciphertexts: {len(pairs)}")
+        if len(pairs) < e:
+            print(f"ERROR: Need at least {e} ciphertexts for e = {e}, got {len(pairs)}")
             print("HASTAD=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("HASTAD=FAILED")
-`;
+        else:
+            moduli = [p[0] for p in pairs[:e]]
+            remainders = [p[1] for p in pairs[:e]]
+            m_e = crt(remainders, moduli)
+            N = prod(moduli)
+            print(f"CRT combined m^e = {m_e}")
+            print(f"Modulus product bits: {N.nbits()}")
+            m, exact = m_e.nth_root(e, truncate_mode=True)
+            if exact:
+                print(f"Recovered message: m = {m}")
+                all_ok = True
+                for i, (n_i, c_i) in enumerate(pairs):
+                    v = power_mod(m, e, n_i)
+                    ok = v == c_i
+                    if not ok:
+                        all_ok = False
+                    print(f"  Verify {i+1}: m^{e} mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
+                if all_ok:
+                    print("HASTAD=SUCCESS")
+                else:
+                    print("HASTAD=FAILED")
+            else:
+                print(f"Approximate root: m = {m}")
+                print("Warning: m^e was not a perfect e-th power")
+                print("HASTAD=FAILED")
+except Exception as exc:
+    print(f"ERROR: {exc}")
+    print("HASTAD=FAILED")`;
   },
   proof: `\\textbf{Theorem:} Let c_i \\equiv m^e \\pmod{n_i} for i = 1, \\ldots, k with \\gcd(n_i, n_j) = 1. If m^e < \\prod n_i and k \\geq e, recover m via CRT + e-th root.
 

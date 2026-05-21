@@ -11,71 +11,77 @@ export const attack: Attack = {
     { name: 'e', label: 'e (public exponent / number of ciphertexts)', placeholder: '3', multiline: false },
     { name: 'ciphertexts', label: 'ciphertexts (one per line: c, n)', placeholder: 'c1, n1\nc2, n2\nc3, n3', multiline: true, rows: 6 },
   ],
-  sageTemplate: (v) => `e = Integer(${v.e})
-lines = """${v.ciphertexts}""".strip().split('\\n')
-
-if e < 2:
-    print("e must be >= 2 for broadcast attack")
-    print("HASTAD_BROADCAST=FAILED")
-    return
-
-print(f"Hastad's Broadcast Attack")
-print(f"e = {e}")
-print(f"Number of ciphertexts: {len(lines)}")
-print()
-
-if len(lines) < e:
-    print(f"Need at least {e} ciphertexts for e = {e}.")
-    print(f"Got {len(lines)}.")
-    print("HASTAD_BROADCAST=FAILED")
-    return
-
-pairs = []
-for i, line in enumerate(lines[:e]):
-    parts = line.strip().split(',')
-    if len(parts) != 2:
-        print(f"Line {i+1}: expected 'c, n', got '{line}'")
+  sageTemplate: (vals: Record<string, string>) => {
+    if (!vals.e || !vals.ciphertexts) {
+      return `print("ERROR: Missing required inputs (e, ciphertexts)")
+print("HASTAD_BROADCAST=FAILED")`;
+    }
+    return `try:
+    e = Integer(${vals.e})
+    lines = """${vals.ciphertexts}""".strip().split('\\n')
+    print(f"Hastad's Broadcast Attack")
+    print(f"e = {e}")
+    print(f"Number of ciphertexts: {len(lines)}")
+    print()
+    if e < 2:
+        print("e must be >= 2 for broadcast attack")
         print("HASTAD_BROADCAST=FAILED")
-        return
-    c, n = Integer(parts[0].strip()), Integer(parts[1].strip())
-    pairs.append((c, n))
-    print(f"c{i+1} = {c}")
-    print(f"n{i+1} = {n}")
-print()
-
-# Chinese Remainder Theorem
-# Find M such that M ≡ c_i (mod n_i) for all i
-N = 1
-for _, n in pairs:
-    N *= n
-
-print(f"Product of all moduli: N has {N.nbits()} bits")
-print()
-
-M = 0
-for c_i, n_i in pairs:
-    N_i = N // n_i
-    inv = inverse_mod(N_i, n_i)
-    M += c_i * N_i * inv
-    M = M % N
-
-print(f"m^e (over integers) = {M}")
-print()
-
-# Take e-th root
-root, exact = M.integer_nth_root(e)
-if exact:
-    m = root
-    print(f"m = {m}")
-    for i, (c_i, n_i) in enumerate(pairs):
-        check = power_mod(m, e, n_i)
-        print(f"Verification {i+1}: m^{e} mod n = {check} == c? {check == c_i}")
-    print("HASTAD_BROADCAST=SUCCESS")
-else:
-    print(f"m^e is not a perfect {e}-th root.")
-    print("Messages may differ or ciphertexts are malformed.")
-    print("HASTAD_BROADCAST=FAILED")
-`,
+    elif len(lines) < e:
+        print(f"Need at least {e} ciphertexts for e = {e}, got {len(lines)}")
+        print("HASTAD_BROADCAST=FAILED")
+    else:
+        pairs = []
+        parse_ok = True
+        for i, line in enumerate(lines[:e]):
+            parts = line.strip().split(',')
+            if len(parts) != 2:
+                print(f"Line {i+1}: expected 'c, n', got '{line}'")
+                parse_ok = False
+                break
+            c = Integer(parts[0].strip())
+            n = Integer(parts[1].strip())
+            pairs.append((c, n))
+            print(f"c{i+1} = {c}")
+            print(f"n{i+1} = {n}")
+        print()
+        if not parse_ok:
+            print("HASTAD_BROADCAST=FAILED")
+        else:
+            N = 1
+            for _, n_i in pairs:
+                N *= n_i
+            print(f"Product of moduli: N has {N.nbits()} bits")
+            print()
+            M = 0
+            for c_i, n_i in pairs:
+                N_i = N // n_i
+                inv = inverse_mod(N_i, n_i)
+                M += c_i * N_i * inv
+                M = M % N
+            print(f"CRT combined m^e = {M}")
+            print()
+            try:
+                m = M.nth_root(e)
+                print(f"Recovered message: m = {m}")
+                all_ok = True
+                for i, (c_i, n_i) in enumerate(pairs):
+                    v = power_mod(m, e, n_i)
+                    ok = v == c_i
+                    if not ok:
+                        all_ok = False
+                    print(f"  Verify {i+1}: m^{e} mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
+                if all_ok:
+                    print("HASTAD_BROADCAST=SUCCESS")
+                else:
+                    print("HASTAD_BROADCAST=FAILED")
+            except ValueError:
+                print(f"m^e is not a perfect {e}-th power.")
+                print("Messages may differ or ciphertexts are malformed.")
+                print("HASTAD_BROADCAST=FAILED")
+except Exception as ex:
+    print(f"ERROR: {ex}")
+    print("HASTAD_BROADCAST=FAILED")`;
+  },
   proof: `\\textbf{Theorem:} If $m$ is encrypted with the same $e$ to $e$ different moduli, CRT recovers $m^e$ over $\\mathbb{Z}$, then $m = \\sqrt[e]{m^e}$.
 
 \\textbf{Prerequisites:}
@@ -98,7 +104,7 @@ m &= \\sqrt[e]{M} \\qed
 
 \\textbf{References:} J. Hastad, "Solving Low-Exponent RSA", 1988`,
   priority: 'high',
-  applicableCheck: (p) => !!p.e && !!p.ciphertexts,
+  applicableCheck: (p: Record<string, string>) => !!p.e && !!p.ciphertexts,
 };
 
 export const generateTestcase = (): Record<string, string> => {

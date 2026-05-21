@@ -1,7 +1,6 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { useState, useCallback, type ReactNode } from 'react';
 import type { AppContextType, HistoryEntry } from '../types';
-
-const AppContext = createContext<AppContextType | null>(null);
+import { AppContext } from './ctx';
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [selectedAttack, setSelectedAttack] = useState<AppContextType['selectedAttack']>(null);
@@ -21,8 +20,3 @@ export function AppProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useAppContext() {
-  const ctx = useContext(AppContext);
-  if (!ctx) throw new Error('useAppContext must be used within AppProvider');
-  return ctx;
-}

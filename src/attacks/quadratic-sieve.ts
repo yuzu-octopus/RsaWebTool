@@ -1,11 +1,11 @@
 import type { Attack } from '../types';
-import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
+import { randomPrime } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'quadratic-sieve',
   name: 'Quadratic Sieve',
   category: 'Factorization',
-  description: 'Factors n via quadratic sieve. Use for general factorization of medium-sized n.',
+  description: 'Factors n via the quadratic sieve (qsieve). Best for medium-sized semiprimes (< 100 digits / ~330 bits) with similar-sized factors.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -20,50 +20,72 @@ print()
 if n < 2:
     print(f"n = {n} is too small to factor")
     print("QUADRATIC_SIEVE=FAILED")
-    return
+    quit()
 if n % 2 == 0:
     print(f"n is even: {n}")
     print(f"p = 2")
     print(f"q = {n // 2}")
     print(f"Verification: 2 * {n // 2} = {n}")
     print("QUADRATIC_SIEVE=SUCCESS")
-    return
+    quit()
 if n.is_prime():
     print(f"n is prime: {n}")
     print("No factorization possible")
     print("QUADRATIC_SIEVE=FAILED")
-    return
+    quit()
 if n.is_square():
     p = isqrt(n)
     print(f"n is a perfect square: {p}^2 = {n}")
     print(f"p = q = {p}")
     print(f"Verification: p * q = {p * p}")
     print("QUADRATIC_SIEVE=SUCCESS")
-    return
+    quit()
 
 # Check size before attempting factorization
-if n.nbits() > 400:
+if n.nbits() > 330:
     print(f"WARNING: n has {n.nbits()} bits ({n.nbits() / 3.32:.0f} digits)")
     print("Quadratic Sieve is effective up to ~100 digits (330 bits)")
     print("For larger numbers, try ECM, Pollard's p-1, or other methods")
     print()
 
-# Use Sage's built-in factorization (auto-selects best algorithm)
+# Use Sage's quadratic sieve (qsieve) specifically
 try:
-    print("Factoring n...")
-    fac = factor(n)
-    factors = list(fac)
+    print("Factoring n with qsieve (Quadratic Sieve)...")
+    result = qsieve(n)
 
-    print(f"Factorization: {fac}")
+    # Handle multiple qsieve return formats:
+    #   Old API (sage.interfaces): [p, q] or ([p, q], time_str)
+    #   New API (sage.libs.flint): [(p, 1), (q, 1)]
+    if isinstance(result, tuple):
+        items = result[0]  # Old API with time=True
+    else:
+        items = result
+
+    factors = []
+    for item in items:
+        if isinstance(item, (list, tuple)):
+            factors.append((Integer(item[0]), Integer(item[1])))
+        else:
+            factors.append((Integer(item), 1))
+
+    if not factors:
+        print("No factors found")
+        print("QUADRATIC_SIEVE=FAILED")
+        quit()
+
+    # Display factorization
+    fac_str = " * ".join(
+        f"{p}^{e}" if e > 1 else str(p) for p, e in factors
+    )
+    print(f"Factorization: {fac_str}")
     print()
 
-    # Single prime factor (n is prime)
+    # Single factor (qsieve could not factor properly)
     if len(factors) == 1 and factors[0][1] == 1:
-        print(f"n is prime: {n.is_prime()}")
-        print("No factorization possible — n is already prime")
+        print(f"Only one factor found: {factors[0][0]}")
         print("QUADRATIC_SIEVE=FAILED")
 
-    # Two prime factors (semiprime)
+    # Two prime factors (semiprime) — typical QS use case
     elif len(factors) == 2 and all(exp == 1 for _, exp in factors):
         p = Integer(factors[0][0])
         q = Integer(factors[1][0])
@@ -76,14 +98,13 @@ try:
 
     # Multiple factors or powers
     else:
-        print(f"Found {len(factors)} prime factor(s):")
+        print(f"Found {len(factors)} factor(s):")
         for prime, exp in factors:
             if exp == 1:
                 print(f"  p = {prime}")
             else:
                 print(f"  {prime}^{exp}")
         print()
-        # Verify product
         product = 1
         for prime, exp in factors:
             product *= Integer(prime) ** exp
@@ -93,7 +114,7 @@ try:
 
 except Exception as ex:
     print(f"Factorization failed: {ex}")
-    print("n may be too large for available methods.")
+    print("n may be too large for the quadratic sieve.")
     print("For numbers > 100 digits, try ECM or specialized attacks.")
     print("QUADRATIC_SIEVE=FAILED")
 `,
@@ -132,7 +153,9 @@ X \\not\\equiv \\pm y \\pmod{n} &\\implies \\gcd(X - y, n) \\text{ is a factor} 
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const p = randomPrime(60);
-  const q = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 60);
+  // QS works best for similar-sized factors. Use two ~68-bit primes
+  // giving n ≈ 136 bits (~41 digits) — fast for QS in SageMathCell.
+  const p = randomPrime(68);
+  const q = randomPrime(68);
   return { n: (p * q).toString() };
 };

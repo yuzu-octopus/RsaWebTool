@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { randomPrime, TESTCASE_BITS, isPrimeMR, generateKeyPair } from '../utils/testcases/core';
+import { randomPrime, isPrimeMR, generateKeyPair } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 
 export const attack: Attack = {
@@ -49,9 +49,13 @@ try:
     found = False
     for primes_subset in prime_sets:
         M = prod(primes_subset)
+        # Skip if base is not coprime to M — multiplicative_order would crash
+        if gcd(base, M) != 1:
+            print(f"M = {M}: gcd(base, M) = {gcd(base, M)} != 1, skipping...")
+            continue
 
         # Compute remainders
-        ord_val = Integer(base).multiplicative_order(Mod(1, M))
+        ord_val = Mod(base, M).multiplicative_order()
         remainders = set()
         for idx in range(ord_val):
             r = power_mod(base, idx, M)
@@ -141,12 +145,15 @@ f(x) &= M \\cdot x + r_1 \\equiv 0 \\pmod{p} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const base = 7n;
+  const base = 65537n; // Must be coprime to ALL primes in M — 7 would fail since 7|M
   const primes_list = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n];
   let M = 1n;
   for (const p of primes_list) { M *= p; }
-  // M ≈ 2^77, p should be ~256 bits → k needs ~179 bits
-  const kBits = TESTCASE_BITS.p - 77;
+  // M ≈ 2^77, Coppersmith bound ~N^0.2 for degree-1 polynomial.
+  // For 512-bit N: bound ≈ 2^102, but k ≈ 2^179 → won't work.
+  // Use p ≈ 120 bits so k ≈ 44 bits < bound ≈ 2^48 for N ≈ 240 bits.
+  const pBits = 120;
+  const kBits = pBits - 77; // ≈ 43
   for (let attempt = 0; attempt < 5000; attempt++) {
     const i = BigInt(Math.floor(Math.random() * 10000));
     const r = modPow(base, i, M);
@@ -158,12 +165,14 @@ export const generateTestcase = (): Record<string, string> => {
     for (let j = 0; j < kBytes; j++) { k = (k << 8n) | BigInt(bytes[j]); }
     k |= (1n << BigInt(kBits - 1));
     k |= 1n;
+    k &= (1n << BigInt(kBits)) - 1n;
     const p = k * M + r;
     if (isPrimeMR(p)) {
-      const q = randomPrime(TESTCASE_BITS.q);
+      const q = randomPrime(120);
       return { n: (p * q).toString(), base: base.toString() };
     }
   }
-  const pair = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+  // Fallback: use regular random RSA keypair with 120-bit primes
+  const pair = generateKeyPair(120, 120);
   return { n: pair.n.toString(), base: base.toString() };
 };

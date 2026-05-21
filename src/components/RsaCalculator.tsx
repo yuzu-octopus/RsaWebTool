@@ -6,11 +6,10 @@ import {
   Button,
   Tabs,
   Tab,
-  CircularProgress,
 } from '@mui/material';
 import { Calculate } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../hooks/useAppContext';
 import { modPow, modInverse } from '../utils/bigint';
 import { detectFormat } from '../utils/converters';
 
@@ -109,7 +108,6 @@ function isPrintableAscii(n: bigint): boolean {
 export function RsaCalculator() {
   const { viewMode } = useAppContext();
   const [tab, setTab] = useState(0);
-  const [computing, setComputing] = useState(false);
 
   // Key Gen state
   const [kgP, setKgP] = useState('');
@@ -161,18 +159,14 @@ export function RsaCalculator() {
       return;
     }
 
-    setComputing(true);
-    setTimeout(() => {
-      const n = p * q;
-      const phi = (p - 1n) * (q - 1n);
-      const d = modInverse(e, phi);
+    const n = p * q;
+    const phi = (p - 1n) * (q - 1n);
+    const d = modInverse(e, phi);
 
-      let result = `n  = ${n}\n`;
-      result += `phi = ${phi}\n`;
-      result += d !== null ? `d  = ${d}` : `d  = undefined (e and phi not coprime)`;
-      setKgOutput(result);
-      setComputing(false);
-    }, 0);
+    let result = `n  = ${n}\n`;
+    result += `phi = ${phi}\n`;
+    result += d !== null ? `d  = ${d}` : `d  = undefined (e and phi not coprime)`;
+    setKgOutput(result);
   };
 
   const handleEncrypt = () => {
@@ -199,17 +193,13 @@ export function RsaCalculator() {
       return;
     }
 
-    setComputing(true);
-    setTimeout(() => {
-      const c = modPow(m, e, n);
-      let result = `c = ${c}\n`;
-      result += `c (hex) = ${toHex(c)}\n`;
-      if (isPrintableAscii(c)) {
-        result += `c (ascii) = ${toAscii(c)}`;
-      }
-      setEncOutput(result);
-      setComputing(false);
-    }, 0);
+    const c = modPow(m, e, n);
+    let result = `c = ${c}\n`;
+    result += `c (hex) = ${toHex(c)}\n`;
+    if (isPrintableAscii(c)) {
+      result += `c (ascii) = ${toAscii(c)}`;
+    }
+    setEncOutput(result);
   };
 
   const handleDecrypt = () => {
@@ -231,48 +221,43 @@ export function RsaCalculator() {
       return;
     }
 
-    setComputing(true);
-    setTimeout(() => {
-      let m: bigint | null = null;
-      const dProvided = decD.trim() !== '';
-      const pProvided = decP.trim() !== '';
-      const qProvided = decQ.trim() !== '';
-      const eProvided = decE.trim() !== '';
+    let m: bigint | null = null;
+    const dProvided = decD.trim() !== '';
+    const pProvided = decP.trim() !== '';
+    const qProvided = decQ.trim() !== '';
+    const eProvided = decE.trim() !== '';
 
-      if (dProvided) {
-        const d = parseBigInt(decD);
-        if (d !== null && d > 0n) {
-          m = modPow(c, d, n);
+    if (dProvided) {
+      const d = parseBigInt(decD);
+      if (d !== null && d > 0n) {
+        m = modPow(c, d, n);
+      }
+    }
+
+    if (m === null && pProvided && qProvided && eProvided) {
+      const p = parseBigInt(decP);
+      const q = parseBigInt(decQ);
+      const e = parseBigInt(decE);
+      if (p !== null && q !== null && e !== null && p > 1n && q > 1n && e > 0n) {
+        const phi = (p - 1n) * (q - 1n);
+        const dComputed = modInverse(e, phi);
+        if (dComputed !== null) {
+          m = modPow(c, dComputed, n);
         }
       }
+    }
 
-      if (m === null && pProvided && qProvided && eProvided) {
-        const p = parseBigInt(decP);
-        const q = parseBigInt(decQ);
-        const e = parseBigInt(decE);
-        if (p !== null && q !== null && e !== null && p > 1n && q > 1n && e > 0n) {
-          const phi = (p - 1n) * (q - 1n);
-          const dComputed = modInverse(e, phi);
-          if (dComputed !== null) {
-            m = modPow(c, dComputed, n);
-          }
-        }
-      }
+    if (m === null) {
+      setDecError('Provide d, or p+q+e');
+      return;
+    }
 
-      if (m === null) {
-        setDecError('Provide d, or p+q+e');
-        setComputing(false);
-        return;
-      }
-
-      let result = `m = ${m}\n`;
-      result += `m (hex) = ${toHex(m)}\n`;
-      if (isPrintableAscii(m)) {
-        result += `m (ascii) = ${toAscii(m)}`;
-      }
-      setDecOutput(result);
-      setComputing(false);
-    }, 0);
+    let result = `m = ${m}\n`;
+    result += `m (hex) = ${toHex(m)}\n`;
+    if (isPrintableAscii(m)) {
+      result += `m (ascii) = ${toAscii(m)}`;
+    }
+    setDecOutput(result);
   };
 
   return (
@@ -310,7 +295,7 @@ export function RsaCalculator() {
                 fullWidth
                 variant="contained"
                 onClick={handleKeyGen}
-                disabled={computing || !kgP.trim() || !kgQ.trim()}
+                disabled={!kgP.trim() || !kgQ.trim()}
                 sx={{
                   backgroundColor: draculaColors.purple,
                   fontFamily: "'JetBrains Mono', monospace",
@@ -318,7 +303,7 @@ export function RsaCalculator() {
                   '&:disabled': { backgroundColor: draculaColors.comment },
                 }}
               >
-                {computing ? <CircularProgress size={24} sx={{ color: draculaColors.foreground }} /> : 'Compute'}
+                Compute
               </Button>
               {kgOutput && <Box sx={outputBoxSx}>{kgOutput}</Box>}
               {kgError && <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem' }}>{kgError}</Typography>}
@@ -335,7 +320,7 @@ export function RsaCalculator() {
                 fullWidth
                 variant="contained"
                 onClick={handleEncrypt}
-                disabled={computing || !encM.trim() || !encN.trim() || !encE.trim()}
+                disabled={!encM.trim() || !encN.trim() || !encE.trim()}
                 sx={{
                   backgroundColor: draculaColors.purple,
                   fontFamily: "'JetBrains Mono', monospace",
@@ -343,7 +328,7 @@ export function RsaCalculator() {
                   '&:disabled': { backgroundColor: draculaColors.comment },
                 }}
               >
-                {computing ? <CircularProgress size={24} sx={{ color: draculaColors.foreground }} /> : 'Encrypt'}
+                Encrypt
               </Button>
               {encOutput && <Box sx={outputBoxSx}>{encOutput}</Box>}
               {encError && <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem' }}>{encError}</Typography>}
@@ -365,7 +350,7 @@ export function RsaCalculator() {
                 fullWidth
                 variant="contained"
                 onClick={handleDecrypt}
-                disabled={computing || !decC.trim() || !decN.trim()}
+                disabled={!decC.trim() || !decN.trim()}
                 sx={{
                   backgroundColor: draculaColors.purple,
                   fontFamily: "'JetBrains Mono', monospace",
@@ -373,7 +358,7 @@ export function RsaCalculator() {
                   '&:disabled': { backgroundColor: draculaColors.comment },
                 }}
               >
-                {computing ? <CircularProgress size={24} sx={{ color: draculaColors.foreground }} /> : 'Decrypt'}
+                Decrypt
               </Button>
               {decOutput && <Box sx={outputBoxSx}>{decOutput}</Box>}
               {decError && <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem' }}>{decError}</Typography>}

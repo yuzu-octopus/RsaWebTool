@@ -14,19 +14,26 @@ export const attack: Attack = {
 if n < 2:
     print(f"n = {n} is too small to factor")
     print("NOVELTY_PRIMES=FAILED")
-    return
+    quit()
 if n % 2 == 0:
     print(f"n is even: {n}")
     print(f"p = 2")
     print(f"q = {n // 2}")
     print(f"Verification: 2 * {n // 2} = {n}")
     print("NOVELTY_PRIMES=SUCCESS")
-    return
+    quit()
 if n.is_prime():
     print(f"n is prime: {n}")
     print("No factorization possible")
     print("NOVELTY_PRIMES=FAILED")
-    return
+    quit()
+
+if n.is_square():
+    p = isqrt(n)
+    print(f"n is a perfect square: {p}^2 = {n}")
+    print(f"p = q = {p}")
+    print("NOVELTY_PRIMES=SUCCESS")
+    quit()
 
 # Novelty primes: check against known CTF challenge primes
 try:
@@ -64,9 +71,9 @@ try:
     # Use Sage's high-precision real field
     RF = RealField(200)
     constants = [
-        ("pi", Integer(str(RF(pi()).str(digits=60)).replace('.', '')[:55])),
-        ("e", Integer(str(RF(exp(1)).str(digits=60)).replace('.', '')[:55])),
-        ("sqrt(2)", Integer(str(RF(2).sqrt().str(digits=60)).replace('.', '')[:55])),
+        ("pi", Integer(str(RF(pi()).n(digits=60).str()).replace('.', '')[:55])),
+        ("e", Integer(str(RF(exp(1)).n(digits=60).str()).replace('.', '')[:55])),
+        ("sqrt(2)", Integer(str(RF(2).sqrt().n(digits=60).str()).replace('.', '')[:55])),
     ]
 
     for name, const in constants:

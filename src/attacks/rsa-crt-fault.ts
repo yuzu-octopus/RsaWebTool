@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
-import { modPow } from '../utils/bigint';
+import { modPow, modInverse } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'rsa-crt-fault',
@@ -25,48 +25,38 @@ print("RSA_CRT_FAULT=FAILED")`;
     m = Integer(${vals.m})
     sig_valid = Integer(${vals.sig_valid})
     sig_faulty = Integer(${vals.sig_faulty})
-
     print(f"RSA-CRT Fault Attack (Bellcore Attack)")
     print(f"n = {n}")
-    print()
-
+    print(f"Valid sig: {sig_valid}")
     # Verify the valid signature
     v_valid = power_mod(sig_valid, e, n)
-    print(f"Valid signature verification: sig_valid^e mod n = {v_valid}")
-    print(f"Expected (m): {m}")
-    print(f"Valid: {v_valid == m}")
-    print()
-
-    # The faulty signature is correct mod one prime but wrong mod the other
-    # gcd(sig_faulty^e - m, n) reveals one factor
-
+    print(f"sig_valid^e mod n = {v_valid}")
+    print(f"Expected m = {m}")
+    print(f"Valid sig check: {v_valid == m}")
+    # Faulty signature: correct mod one prime, wrong mod the other
+    # gcd(sig_faulty^e - m, n) reveals the factor
     sig_faulty_e = power_mod(sig_faulty, e, n)
-    print(f"Faulty signature verification: sig_faulty^e mod n = {sig_faulty_e}")
-    print()
-
+    print(f"sig_faulty^e mod n = {sig_faulty_e}")
     # Compute GCD
     g = gcd(sig_faulty_e - m, n)
     print(f"gcd(sig_faulty^e - m, n) = {g}")
-
     if 1 < g < n:
         p = g
         q = n // g
         print(f"\\nFactorization found!")
         print(f"p = {p}")
         print(f"q = {q}")
-        print(f"Verification: p * q = {p * q}")
+        print(f"p * q = {p * q}")
         print(f"p is prime: {p.is_prime()}")
         print(f"q is prime: {q.is_prime()}")
-
         # Compute private key
         phi = (p - 1) * (q - 1)
-        d = power_mod(e, -1, phi)
-        print(f"\\nPrivate exponent: d = {d}")
-
+        d = inverse_mod(e, phi)
+        print(f"\\nPrivate exponent d = {d}")
         # Verify with valid signature
         sig_recovered = power_mod(m, d, n)
-        print(f"Recovered signature: {sig_recovered}")
-        print(f"Matches valid signature: {sig_recovered == sig_valid}")
+        print(f"Recovered sig: {sig_recovered}")
+        print(f"Matches valid sig: {sig_recovered == sig_valid}")
         print("RSA_CRT_FAULT=SUCCESS")
     else:
         print("GCD did not reveal a factor. The fault may not be a CRT fault.")
@@ -100,14 +90,23 @@ q &= n / p \\qed
 
 \\textbf{References:} Boneh, DeMillo, Lipton, "On the Importance of Checking Cryptographic Protocols for Faults", Eurocrypt 1997; Joye, "Fault Injection Attacks on CRT-RSA", 2012`,
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.sig_valid && !!p.sig_faulty,
+  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.m && !!p.sig_valid && !!p.sig_faulty,
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n, e, d, p } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+  const { p, q, n, e, d } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
   const m = BigInt(Math.floor(Math.random() * 1000000) + 42);
   const sigValid = modPow(m, d, n);
+  // CRT components: sp = m^dp mod p, sq = m^dq mod q
   const dp = d % (p - 1n);
-  const sigFaulty = modPow(m, dp, p);
+  const dq = d % (q - 1n);
+  const sp = modPow(m, dp, p);
+  const sq = modPow(m, dq, q);
+  // Fault: flip LSB of q-component so signature is correct mod p but wrong mod q
+  const sqFaulty = sq ^ 1n;
+  // CRT combine: sig = sp*q*inv_q_mod_p + sq_faulty*p*inv_p_mod_q mod n
+  const invQ = modInverse(q % p, p)!;
+  const invP = modInverse(p % q, q)!;
+  const sigFaulty = (sp * q % n * invQ % n + sqFaulty * p % n * invP % n) % n;
   return { n: n.toString(), e: e.toString(), m: m.toString(), sig_valid: sigValid.toString(), sig_faulty: sigFaulty.toString() };
 };

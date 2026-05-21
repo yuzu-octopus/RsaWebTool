@@ -13,7 +13,8 @@ export const attack: Attack = {
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
     { name: 'oracle_responses', label: 'Oracle responses (comma-separated 0/1)', placeholder: '1,0,1,1,0,...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `# Manger's OAEP padding oracle attack
+  sageTemplate: (vals: Record<string, string>) => `# Manger's OAEP padding oracle attack (3-step algorithm)
+# Reference: J. Manger, CRYPTO 2001
 if not "${vals.n}".strip():
     print("ERROR: n is required")
     print("MANGER=FAILED")
@@ -35,107 +36,113 @@ try:
     n = Integer(${vals.n})
     e = Integer(${vals.e})
     c = Integer(${vals.c})
-    orig_c = Integer(${vals.c})
 
-    # Parse oracle responses
+    # Parse oracle responses into a list
     responses_str = """${vals.oracle_responses}""".strip()
-    oracle_bits = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
+    oracle_list = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
+    oracle_idx = [0]
 
-    print(f"Manger's OAEP Attack")
+    def oracle(query_c):
+        """Simulate oracle using pre-computed responses.
+        Returns True (1) if decrypted value >= B, False (0) if < B."""
+        if oracle_idx[0] >= len(oracle_list):
+            print(f"WARNING: ran out of oracle responses at index {oracle_idx[0]}")
+            return False
+        result = oracle_list[oracle_idx[0]] == 1
+        oracle_idx[0] += 1
+        return result
+
+    def ceil_div(a, b):
+        return (a + b - 1) // b
+
+    def floor_div(a, b):
+        return a // b
+
+    print(f"Manger's OAEP Attack (3-step algorithm)")
     print(f"n = {n} ({n.nbits()} bits)")
     print(f"e = {e}")
     print(f"c = {c}")
-    print(f"Oracle responses: {len(oracle_bits)}")
+
+    # k = byte length of n, B = 2^(8*(k-1))
+    k = ceil_div(n.nbits(), 8)
+    B = Integer(2) ** (8 * (k - 1))
+    print(f"k = {k}, B = 2^(8*{k-1}) = {B}")
+    print(f"2*B = {2*B}, 2*B < n: {2*B < n}")
     print()
 
-    # RSA-OAEP: EM = 0x00 || maskedSeed || maskedDB
-    # Oracle reveals whether first byte of decrypted message is 0x00
-    # This means: m < n / 256
-    threshold = n // 256
-    print(f"OAEP constraint: first byte = 0x00 means m < n/256 = {threshold}")
+    queries_used = [0]
+
+    # Step 1: Find f1 such that f1*m mod n >= B
+    # Start with f1=2, double until oracle returns True (>= B)
+    print("=== Step 1: Finding f1 ===")
+    f1 = Integer(2)
+    while not oracle((power_mod(f1, e, n) * c) % n):
+        queries_used[0] += 1
+        f1 *= 2
+    queries_used[0] += 1
+    print(f"f1 = {f1} (f1*m mod n >= B confirmed)")
     print()
 
-    # The attack uses: (c * s^e)^d = m * s mod n
-    # Oracle reveals whether m*s mod n < threshold
-    # If yes: m in [rn/s, (rn+threshold)/s) for some r=0..s-1
-    # If no: m NOT in those intervals
-
-    # Start with full interval
-    lower = Integer(0)
-    upper = Integer(n)
-
-    print(f"Initial interval: [0, {n})")
-    print(f"Interval size: {n.nbits()} bits")
+    # Step 2: Find f2 such that f2*m mod n < B (wrapped around)
+    # Start: f2 = floor((n+B)/B) * f1/2
+    # Increment by f1/2 until oracle returns False (< B)
+    print("=== Step 2: Finding f2 ===")
+    f1_half = f1 // 2
+    f2 = floor_div(n + B, B) * f1_half
+    while oracle((power_mod(f2, e, n) * c) % n):
+        queries_used[0] += 1
+        f2 += f1_half
+    queries_used[0] += 1
+    print(f"f2 = {f2} (f2*m mod n < B, wrapped to [n, n+B))")
     print()
 
-    # Process each oracle response
-    # Response i corresponds to s = i + 1
-    for i, response in enumerate(oracle_bits):
-        s = Integer(i + 1)
-        if s == 1:
-            # First response confirms m < threshold
-            if response == 1:
-                upper = min(upper, threshold)
-            continue
+    # Step 3: Binary search to narrow [mmin, mmax] to single value
+    print("=== Step 3: Binary search ===")
+    mmin = ceil_div(n, f2)
+    mmax = floor_div(n + B, f2)
+    print(f"Initial: mmin={mmin}, mmax={mmax}")
+    print(f"Range size: {(mmax - mmin).nbits()} bits")
+    print()
 
-        # Update ciphertext: c = c * s^e mod n
-        c = (c * power_mod(s, e, n)) % n
-
-        if response == 1:
-            # m*s mod n < threshold
-            # m in [rn/s, (rn+threshold)/s) for r=0..s-1
-            # Find the r whose interval intersects [lower, upper)
-            new_lower = None
-            new_upper = None
-            for r in range(int(s)):
-                r_int = Integer(r)
-                ca = floor(r_int * n / s)
-                cb = floor((r_int * n + threshold - 1) / s)
-                inter_a = max(lower, ca)
-                inter_b = min(upper, cb)
-                if inter_a < inter_b:
-                    if new_lower is None:
-                        new_lower = inter_a
-                        new_upper = inter_b
-                    else:
-                        # Merge overlapping intervals
-                        if inter_a <= new_upper:
-                            new_upper = max(new_upper, inter_b)
-                        else:
-                            # Non-overlapping: pick the one containing midpoint
-                            mid = (lower + upper) // 2
-                            if inter_a <= mid < inter_b:
-                                new_lower = inter_a
-                                new_upper = inter_b
-
-            if new_lower is not None:
-                lower = new_lower
-                upper = new_upper
+    step_count = 0
+    twoB = Integer(2) * B
+    while mmin < mmax:
+        step_count += 1
+        f_tmp = floor_div(twoB, mmax - mmin)
+        i_val = floor_div(f_tmp * mmin, n)
+        f3 = ceil_div(i_val * n, mmin)
+        if f3 == 0:
+            f3 = Integer(1)
+        # Query oracle with f3
+        oracle_result = oracle((power_mod(f3, e, n) * c) % n)
+        queries_used[0] += 1
+        iNB = i_val * n + B
+        if oracle_result:
+            # f3*m mod n >= B => mmin = ceil((i*n + B) / f3)
+            mmin = ceil_div(iNB, f3)
         else:
-            # m*s mod n >= threshold
-            # m NOT in [rn/s, (rn+threshold)/s) for any r
-            # Simplified: shift lower bound past the first excluded interval
-            first_excluded = floor((threshold - 1) / s) + 1
-            lower = max(lower, first_excluded)
-
-        if i < 5 or i >= len(oracle_bits) - 3:
-            print(f"Step {i+1}: s={s}, response={response}, interval=[{lower}, {upper}], size={(upper-lower).nbits()} bits")
+            # f3*m mod n < B => mmax = floor((i*n + B) / f3)
+            mmax = floor_div(iNB, f3)
+        if step_count <= 5 or (mmax - mmin) <= Integer(2):
+            print(f"Step {step_count}: f3={f3}, oracle={oracle_result}, mmin={mmin}, mmax={mmax}, range={(mmax-mmin).nbits()} bits")
 
     print()
-    m = (lower + upper) // 2
-    print(f"Estimated message: m = {m}")
-    print(f"Final interval: [{lower}, {upper}]")
-    print(f"Uncertainty: {(upper-lower).nbits()} bits")
+    m = mmin
+    print(f"Recovered message: m = {m}")
+    print(f"Total oracle queries: {queries_used[0]}")
+    print(f"Total binary search steps: {step_count}")
 
     # Verify
     v = power_mod(m, e, n)
     print(f"Verification: m^e mod n = {v}")
-    print(f"Original c = {orig_c}")
-    if v == orig_c:
+    print(f"Original c = {c}")
+    if v == c:
         print("VERIFICATION PASSED!")
         print("MANGER=SUCCESS")
     else:
         print("Verification failed - may need more oracle responses")
+        print(f"m^e mod n = {v}")
+        print(f"c = {c}")
         print("MANGER=FAILED")
 
 except Exception as ex:
@@ -174,15 +181,60 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r + 1)}{256s} \\
 
 export const generateTestcase = (): Record<string, string> => {
   const { n, e, d } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
-  const threshold = n / 256n;
-  const m = BigInt(Math.floor(Math.random() * Number(threshold / 2n)));
+  // k = byte length, B = 2^(8*(k-1))
+  const k = Math.ceil(Number(n.toString(2).length) / 8);
+  const B = BigInt(2) ** BigInt(8 * (k - 1));
+
+  // m must be < B (OAEP format: first byte 0x00)
+  const m = BigInt(Math.floor(Math.random() * Number(B / 4n)));
   const c = encrypt(m, n, e);
+
+  // Pre-compute oracle responses for the full 3-step attack
+  // We simulate the attack to know exactly which f values will be queried
   const responses: string[] = [];
-  let curC = c;
-  for (let s = 1; s <= 512; s++) {
-    const dec = modPow(curC, d, n);
-    responses.push(dec < threshold ? '1' : '0');
-    curC = (curC * modPow(BigInt(s + 1), e, n)) % n;
+  const oracle = (queryC: bigint): boolean => {
+    const dec = modPow(queryC, d, n);
+    return dec >= B;
+  };
+
+  // Step 1: find f1
+  let f1 = 2n;
+  while (!oracle((c * modPow(f1, e, n)) % n)) {
+    responses.push('0');
+    f1 *= 2n;
   }
+  responses.push('1');
+
+  // Step 2: find f2
+  const f1Half = f1 / 2n;
+  let f2 = ((n + B) / B) * f1Half;
+  while (oracle((c * modPow(f2, e, n)) % n)) {
+    responses.push('1');
+    f2 += f1Half;
+  }
+  responses.push('0');
+
+  // Step 3: binary search
+  let mmin = (n + f2 - 1n) / f2; // ceil(n/f2)
+  let mmax = (n + B) / f2; // floor((n+B)/f2)
+  const twoB = 2n * B;
+  let steps = 0;
+  const maxSteps = 2000; // safety limit
+  while (mmin < mmax && steps < maxSteps) {
+    const fTmp = twoB / (mmax - mmin);
+    const iVal = (fTmp * mmin) / n;
+    let f3 = (iVal * n + mmin - 1n) / mmin; // ceil(i*n/mmin)
+    if (f3 === 0n) f3 = 1n;
+    const oracleResult = oracle((c * modPow(f3, e, n)) % n);
+    responses.push(oracleResult ? '1' : '0');
+    const iNB = iVal * n + B;
+    if (oracleResult) {
+      mmin = (iNB + f3 - 1n) / f3; // ceil
+    } else {
+      mmax = iNB / f3; // floor
+    }
+    steps++;
+  }
+
   return { n: n.toString(), e: e.toString(), c: c.toString(), oracle_responses: responses.join(',') };
 };

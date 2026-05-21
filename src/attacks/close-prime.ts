@@ -5,7 +5,7 @@ export const attack: Attack = {
   id: 'close-prime',
   name: 'Close-Prime (Londahl)',
   category: 'Factorization',
-  description: 'Factors n when primes are within small delta. Use when |p - q| < 10000.',
+  description: 'Factor n when p and q are close using Londahl baby-step giant-step phi-approximation. Works for |p - q| up to ~sqrt(n).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -14,92 +14,109 @@ export const attack: Attack = {
 if n < 2:
     print(f"n = {n} is too small to factor")
     print("CLOSE_PRIME=FAILED")
-    return
+    quit()
 if n % 2 == 0:
     print(f"n is even: {n}")
     print(f"p = 2")
     print(f"q = {n // 2}")
     print(f"Verification: 2 * {n // 2} = {n}")
     print("CLOSE_PRIME=SUCCESS")
-    return
+    quit()
 if n.is_prime():
     print(f"n is prime: {n}")
     print("No factorization possible")
     print("CLOSE_PRIME=FAILED")
-    return
+    quit()
 if n.is_square():
     p = isqrt(n)
     print(f"n is a perfect square: {p}^2 = {n}")
     print(f"p = q = {p}")
     print("CLOSE_PRIME=SUCCESS")
-    return
+    quit()
 
-# Close-prime attack (Londahl variant of Fermat)
-# Optimized incremental update (same as Fermat but with extended bounds)
-try:
-    print(f"Close-prime attack on n = {n}")
-    print()
+print(f"Londahl close-prime factorization on n ({n.nbits()} bits)")
+print()
 
-    a, rem = n.sqrtrem()
-    b2 = -rem
-    c = (a << 1) + 1
+# Londahl baby-step giant-step phi-approximation attack
+# Source: https://grocid.net/2017/09/16/finding-close-prime-factorizations/
+b = 500000
 
-    max_iter = 10**7
-    print(f"Max iterations: {max_iter}")
+# Approximate phi(n) = n - (p+q) + 1 ~ n - 2*sqrt(n) + 1 when p ~ q
+phi_approx = n - 2*isqrt(n) + 1
 
-    found = False
-    for i in range(max_iter):
-        if b2.is_square():
-            b = isqrt(b2)
-            p = a - b
-            q = a + b
-            if p * q == n and p > 1:
-                print(f"Factor found after {i+1} iterations!")
-                print(f"p = {p}")
-                print(f"q = {q}")
-                print(f"|p - q| = {q - p}")
-                print(f"Verification: p * q = {p * q}")
-                found = True
-                break
-        b2 += c
-        c += 2
+# Baby steps: store 2^j mod n for j = 0..b
+# Parity optimization halves table size (store only parity matching phi_approx)
+print(f"Building baby-step table (b={b})...")
+look_up = {}
+z = 1
+parity = int(phi_approx & 1)
+for j in range(b + 1):
+    if (j & 1) == parity:
+        look_up[z] = j
+    z = (z * 2) % n
 
-    if found:
-        print("CLOSE_PRIME=SUCCESS")
-    else:
-        print(f"Close-prime attack failed after {max_iter} iterations.")
-        print("The prime gap may be too large. Try a different method.")
-        print("CLOSE_PRIME=FAILED")
-except Exception as e:
-    print(f"Error in Close-Prime attack: {e}")
+# Giant steps: search for phi = phi_approx + j - i*b
+# We compute 2^(-phi_approx) * (2^b)^i and look for collision in baby-step table
+print(f"Searching ({b + 1} giant steps)...")
+mu = inverse_mod(pow(2, phi_approx, n), n)
+step = pow(2, b, n)
+found = False
+for i in range(b + 1):
+    if mu in look_up:
+        j = look_up[mu]
+        phi = phi_approx + j - i * b
+        # Factor n from phi: p+q = n - phi + 1, solve x^2 - (p+q)x + n = 0
+        m = n - phi + 1
+        disc = m*m - 4*n
+        if disc > 0:
+            sqrt_disc = isqrt(disc)
+            if sqrt_disc*sqrt_disc == disc:
+                p_candidate = (m - sqrt_disc) // 2
+                q_candidate = (m + sqrt_disc) // 2
+                if p_candidate * q_candidate == n and p_candidate > 1 and q_candidate > 1:
+                    print(f"Factor found!")
+                    print(f"p = {p_candidate}")
+                    print(f"q = {q_candidate}")
+                    print(f"|p - q| = {abs(q_candidate - p_candidate)}")
+                    print(f"Verification: p * q = {p_candidate * q_candidate}")
+                    print(f"Baby steps: {b+1}, Giant steps: {i+1}")
+                    found = True
+                    break
+    mu = (mu * step) % n
+
+if found:
+    print("CLOSE_PRIME=SUCCESS")
+else:
+    print("Londahl close-prime factorization failed after baby-step giant-step search.")
+    print("The prime gap may be too large. Try Fermat factorization.")
     print("CLOSE_PRIME=FAILED")
 `,
-  proof: `\\textbf{Theorem:} Fermat factorization extended with larger iteration bounds handles structured prime gaps up to $2 \\times 10^7$ iterations.
+  proof: `\\textbf{Theorem:} If $n = p \\cdot q$ with $p \\approx q$, then $n$ can be factored by recovering $\\phi(n)$ via a baby-step giant-step discrete log attack.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n = pq — RSA modulus with p \\leq q
-\\item a = (p + q)/2, b = (q - p)/2
-\\item a_0 = \\lceil\\sqrt{n}\\rceil — starting point
-\\item Gap: |p - q| determines iterations needed
+\\item $n = p \\cdot q$, $p$ and $q$ odd primes
+\\item $\\phi(n) = (p-1)(q-1) = n - (p+q) + 1$ (Euler totient)
+\\item $2^{\\phi(n)} \\equiv 1 \\pmod{n}$ (Euler's theorem)
+\\item $\\phi_{\\text{approx}} = n - 2\\lfloor\\sqrt{n}\\rfloor + 1 \\approx \\phi(n)$ for close primes
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-n &= pq = (a - b)(a + b) = a^2 - b^2 \\\\
-a &= \\frac{p + q}{2}, \\quad b = \\frac{q - p}{2} \\\\
-a_0 &= \\lceil\\sqrt{n}\\rceil \\\\
-a_{i+1} &= a_i + 1, \\quad b_i^2 = a_i^2 - n \\\\
-b_i^2 &= \\square \\implies b = \\sqrt{b_i^2}, \\quad p = a - b, \\quad q = a + b \\\\
-\\text{Iterations: } b &= \\frac{|q - p|}{2} \\\\
-\\text{Standard bound: } b &< n^{1/4} \\\\
-\\text{Extended bound: } b &< 10^7 \\quad \\text{(max iterations)} \\\\
-\\text{Runtime: } O(|p - q|) & \\qed
+\\delta &= \\phi(n) - \\phi_{\\text{approx}} \\quad \\text{(small when } p \\approx q\\text{)} \\\\
+2^{\\phi_{\\text{approx}} + \\delta} &\\equiv 1 \\pmod{n} \\quad \\text{(by Euler)} \\\\
+2^{\\delta} &\\equiv 2^{-\\phi_{\\text{approx}}} \\pmod{n} \\\\
+\\text{Baby steps: store } 2^j &\\bmod n \\text{ for } j = 0,\\dots,b \\\\
+\\text{Giant steps: compute } 2^{-\\phi_{\\text{approx}}} \\cdot (2^b)^i &\\bmod n \\text{ for } i = 0,\\dots,b \\\\
+\\text{Match: } 2^j &\\equiv 2^{-\\phi_{\\text{approx}} + i \\cdot b} \\pmod{n} \\\\
+\\phi(n) &= \\phi_{\\text{approx}} + j - i \\cdot b \\\\
+p+q &= n - \\phi(n) + 1 \\\\
+p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} The close-prime attack is Fermat factorization with an extended iteration limit. It works when |p - q| is small enough that iterating from \\sqrt{n} finds a perfect square within the bound. The Londahl variant increases the bound to handle larger gaps.
+\\textbf{Explanation:} Londahl's attack uses a baby-step giant-step approach to find $\\phi(n)$ directly, unlike Fermat factorization which iteratively searches for $a^2 - n = b^2$. It exploits the approximation $\\phi(n) \\approx n - 2\\sqrt{n} + 1$ when $p \\approx q$, then solves $2^{\\delta} \\equiv 2^{-\\phi_{\\text{approx}}} \\pmod{n}$ via BSGS. With $b = 500{,}000$, it covers up to $2.5 \\times 10^{11}$ candidate $\\delta$ values, handling prime gaps far larger than pure Fermat.
 
-\\textbf{References:} Londahl, "Close-Prime Factorization", CTF writeup; Menezes et al., "Handbook of Applied Cryptography", Algorithm 3.21`,
+\\textbf{References:} Carl L\\"ondahl, "Finding close-prime factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

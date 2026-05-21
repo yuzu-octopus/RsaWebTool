@@ -15,28 +15,44 @@ export const attack: Attack = {
     nearp = Integer(${v.nearp})
     if n <= 0 or nearp <= 0:
         print("SIMPLE_LATTICE=FAILED: invalid input values")
-    else:
-        R.<x> = PolynomialRing(Zmod(n))
-        f = nearp + x
-        # Bound: we expect |x| < n^(1/4) for Coppersmith to work
-        bound = 2^(n.nbits() // 4)
-        print(f"Using bound X = {bound}")
-        roots = f.small_roots(X=bound, beta=0.5)
-        if roots:
-            p = Integer(nearp + roots[0])
-            if n % p == 0:
-                q = n // p
-                print(f"Verification: p * q = {p * q}")
-                if p * q == n:
-                    print(f"SIMPLE_LATTICE=SUCCESS")
-                    print(f"p={p}")
-                    print(f"q={q}")
-                else:
-                    print("SIMPLE_LATTICE=FAILED: verification mismatch")
+        quit()
+    if nearp >= n:
+        print("nearp must be less than n (modulus)")
+        print("SIMPLE_LATTICE=FAILED: nearp >= n")
+        quit()
+    if n % nearp == 0:
+        p = nearp
+        q = n // p
+        print("SIMPLE_LATTICE=SUCCESS: nearp exactly divides n")
+        print(f"p={p}")
+        print(f"q={q}")
+        quit()
+    if n % 2 == 0:
+        print("n is even — cannot apply lattice attack")
+        print("SIMPLE_LATTICE=FAILED: even modulus")
+        quit()
+    R.<x> = PolynomialRing(Zmod(n))
+    f = nearp + x
+    # Bound: |x| < n^(1/4) for Coppersmith with beta=0.5, deg=1
+    bound = n.nth_root(4)
+    print(f"Using bound X = {bound}")
+    roots = f.small_roots(X=bound, beta=0.5, epsilon=0.05)
+    if roots:
+        p = Integer(nearp + roots[0])
+        if n % p == 0:
+            q = n // p
+            print(f"Verification: p * q = {p * q}")
+            if p * q == n:
+                print("SIMPLE_LATTICE=SUCCESS")
+                print(f"p={p}")
+                print(f"q={q}")
             else:
-                print("SIMPLE_LATTICE=FAILED: recovered p does not divide n")
+                print("SIMPLE_LATTICE=FAILED: verification mismatch")
         else:
-            print("SIMPLE_LATTICE=FAILED: no roots found")
+            print("SIMPLE_LATTICE=FAILED: recovered p does not divide n")
+    else:
+        print("No roots found with X = %d. Try a smaller epsilon (e.g., 0.01) for a larger lattice if the offset is near the bound." % bound)
+        print("SIMPLE_LATTICE=FAILED: no roots found")
 except Exception as ex:
     print(f"SIMPLE_LATTICE=FAILED: {ex}")`,
   proof: `\\textbf{Theorem:} If $p = p_0 + x$ where $|x| < n^{1/4}$, Coppersmith's method recovers $p$ from the approximation $p_0$.

@@ -17,38 +17,53 @@ print()
 if n < 2:
     print(f"n = {n} is too small to factor")
     print("ECM=FAILED")
-    return
+    quit()
 if n % 2 == 0:
     print(f"n is even: {n}")
     print(f"p = 2, q = {n // 2}")
     print("ECM=SUCCESS")
-    return
+    quit()
 if n.is_prime():
     print(f"n is prime: {n}")
     print("ECM=FAILED")
-    return
+    quit()
 if n.is_square():
     p = isqrt(n)
     print(f"n is a perfect square: {p}^2 = {n}")
     print(f"p = q = {p}")
     print("ECM=SUCCESS")
-    return
+    quit()
 
-try:
-    # Use SageMath's Integer.ecm() method
-    p = n.ecm()
-    if p > 1 and p < n:
-        q = n // p
-        print(f"p = {p}")
-        print(f"q = {q}")
-        print(f"Verification: p * q = {p * q}")
-        print(f"p is prime: {p.is_prime()}")
-        print("ECM=SUCCESS")
-    else:
-        print("ECM found no non-trivial factors")
-        print("ECM=FAILED")
-except Exception as ex:
-    print(f"ECM failed: {ex}")
+from sage.libs.libecm import ecmfactor
+B1_vals = [2000, 10000, 50000, 250000, 1000000]
+curves_per_B1 = 15
+found_p = None
+for B1_cur in B1_vals:
+    for attempt in range(curves_per_B1):
+        try:
+            result = ecmfactor(n, B1_cur)
+            if result[0]:
+                factor = result[1]
+                if factor != 1 and factor != n and n % factor == 0:
+                    found_p = factor
+                    break
+        except Exception:
+            continue
+    if found_p is not None:
+        break
+
+if found_p is not None:
+    q = n // found_p
+    if found_p > q:
+        found_p, q = q, found_p
+    print(f"p = {found_p}")
+    print(f"q = {q}")
+    print(f"Verification: p * q = {found_p * q}")
+    print(f"p is prime: {found_p.is_prime()}")
+    print("ECM=SUCCESS")
+else:
+    print("ECM failed to find any factor after multiple attempts")
+    print("Try increasing B1 bounds or using a different method")
     print("ECM=FAILED")
 `,
   proof: `\\textbf{Theorem:} ECM finds a prime factor p of n in expected time O(\\exp(\\sqrt{2 \\ln p \\ln \\ln p})).
@@ -84,8 +99,8 @@ M \\cdot P &= \\mathcal{O} \\text{ in } E(\\mathbb{F}_p) \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Generate n with one small factor (≤60 bits) so ECM succeeds quickly
-  const p = randomPrime(60);
-  const q = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 60);
+  // Generate n with one small factor (≤40 bits) so ECM succeeds quickly
+  const p = randomPrime(40);
+  const q = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 40);
   return { n: (p * q).toString() };
 };

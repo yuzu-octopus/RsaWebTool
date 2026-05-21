@@ -17,7 +17,6 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
     }
     return `try:
     e = Integer(${vals.e})
-
     # Parse triples
     triples_str = """${vals.triples}""".strip()
     triples = []
@@ -33,57 +32,34 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
         a_i = Integer(parts[2].strip())
         b_i = Integer(parts[3].strip())
         triples.append((n_i, c_i, a_i, b_i))
-
     print(f"Number of ciphertexts: {len(triples)}")
     print(f"Public exponent: e = {e}")
-
     if len(triples) < e:
         print(f"ERROR: Need at least {e} ciphertexts for e = {e}, got {len(triples)}")
         print("HASTAD_LINEAR_PAD=FAILED")
     else:
-        # General Hastad with linear padding:
-        # c_i = (a_i * m + b_i)^e mod n_i
-        #
-        # Strategy: For each i, we have (a_i * m + b_i)^e = c_i mod n_i
-        # Use CRT to combine, then solve for m
-
-        # Step 1: Compute combined modulus N = prod(n_i)
+        # General Hastad with linear padding: c_i = (a_i * m + b_i)^e mod n_i
+        # Combined modulus N = prod(n_i)
         N = prod([t[0] for t in triples])
         print(f"Combined modulus N has {N.nbits()} bits")
-
-        # Step 2: For each triple, define polynomial f_i(x) = (a_i*x + b_i)^e - c_i mod n_i
-        # We want x = m such that f_i(m) = 0 mod n_i for all i
-
-        # Step 3: Use CRT to combine the polynomial system
-        # Build polynomial over Zmod(N): F(x) such that F(x) = 0 mod n_i for all i
-        # This is done by: F(x) = sum_i [ CRT_coeff_i * f_i(x) ] mod N
-        # where CRT_coeff_i = (N/n_i) * inverse(N/n_i, n_i)
-
+        # Build CRT-combined polynomial F(x) = sum_i coeff_i * f_i(x) mod N
         R.<x> = PolynomialRing(Zmod(N))
-
-        # Build the combined polynomial
         F = 0
         for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
-            # CRT coefficient for this modulus
             Ni = N // n_i
             coeff = Ni * inverse_mod(Ni, n_i)
-            # f_i(x) = (a_i*x + b_i)^e - c_i
             fi = (a_i*x + b_i)**e - c_i
             F += coeff * fi
-
         F = F % N
         print(f"Combined polynomial degree: {F.degree()}")
-
-        # Step 4: Find small roots of F(x) = 0 mod N
-        # m is small compared to N (since N = prod(n_i) and m < min(n_i))
-        bound = ZZ(min(t[0] for t in triples))
-        print(f"Small root bound: {bound}")
-
-        roots = F.small_roots(X=bound, beta=1.0, epsilon=0.05)
+        # Make polynomial monic for Coppersmith's small_roots
+        F = F.monic()
+        print(f"Polynomial made monic, leading coefficient = 1")
+        # Coppersmith: find small root m < N^(1/e)
+        roots = F.small_roots(beta=1.0, epsilon=0.05)
         if roots:
             m = roots[0]
             print(f"Recovered message: m = {m}")
-
             # Verify against all triples
             all_ok = True
             for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
@@ -97,10 +73,9 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
             else:
                 print("HASTAD_LINEAR_PAD=FAILED")
         else:
-            print("No small roots found. Try increasing epsilon or check inputs.")
-            print("Fallback: try standard Hastad if all a_i=1, b_i=0.")
-
-            # Fallback for standard case
+            print("No small roots found. The message may be too large for the Coppersmith bound.")
+            print("Try: smaller epsilon (e.g., 0.01) for larger lattice, or ensure m is sufficiently small.")
+            # Fallback: standard Hastad if all a_i=1, b_i=0
             all_simple = all(t[2] == 1 and t[3] == 0 for t in triples)
             if all_simple:
                 print("All a_i=1, b_i=0. Using standard Hastad CRT approach...")
@@ -124,8 +99,8 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                     print("HASTAD_LINEAR_PAD=FAILED")
             else:
                 print("HASTAD_LINEAR_PAD=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
+except Exception as ex:
+    print(f"ERROR: {ex}")
     print("HASTAD_LINEAR_PAD=FAILED")
 `;
   },
@@ -145,7 +120,8 @@ N &= \\prod_{i=1}^{k} n_i \\\\
 N_i &= N / n_i, \\quad t_i = N_i \\cdot N_i^{-1} \\bmod n_i \\\\
 F(x) &= \\sum_{i=1}^{k} t_i \\cdot f_i(x) \\pmod{N} \\\\
 F(m) &\\equiv 0 \\pmod{N} \\\\
-m &= small\\_roots(F, X = \\min(n_i)) \\qed
+\\tilde{F}(x) &= F(x) / \\text{lc}(F) \\text{ (make monic)} \\\\
+m &= small\\_roots(\\tilde{F}, X = \\lceil \\tfrac{1}{2} N^{1/e - \\varepsilon} \\rceil) \\qed
 \\end{align*}
 
 \\textbf{Explanation:} Build a polynomial per ciphertext, combine via CRT coefficients into F(x) over Zmod(N). The message m is a small root of F. Use Coppersmith's small_roots to extract it.

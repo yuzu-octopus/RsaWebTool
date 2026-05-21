@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
+import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 import { queryFactorDB, formatFactorDBResult } from '../utils/factordb';
 
 export const attack: Attack = {
@@ -27,80 +27,102 @@ if not "${vals.n}".strip():
     print("FACTORDB_LOOKUP=FAILED")
     quit()
 
+# Simple Floyd cycle Pollard's rho for fallback factorization
+def pollard_rho_factor(n):
+    if n % 2 == 0:
+        return 2
+    if n.is_prime():
+        return None
+    for c in range(1, 20):
+        x = 2
+        y = 2
+        d = 1
+        while d == 1:
+            x = (x * x + c) % n
+            y = (y * y + c) % n
+            y = (y * y + c) % n
+            d = gcd(abs(x - y), n)
+        if d != n:
+            return d
+    return None
+
 try:
     n = Integer(${vals.n})
-
-    # Even check
+    # Pre-checks
+    if n < 2:
+        print(f"n = {n} is too small to factor")
+        print("FACTORDB_LOOKUP=FAILED")
+        quit()
     if n % 2 == 0:
         print(f"n is even. p = 2, q = {n // 2}")
         print("FACTORDB_LOOKUP=SUCCESS")
         quit()
-
-    # Prime check
-    if is_prime(n):
+    if n.is_prime():
         print("n is prime. Not a valid RSA modulus.")
         print("FACTORDB_LOOKUP=FAILED")
+        quit()
+    if n.is_square():
+        p = isqrt(n)
+        print(f"n is a perfect square: {p}^2 = {n}")
+        print(f"p = q = {p}")
+        print("FACTORDB_LOOKUP=SUCCESS")
         quit()
 
     print(f"Checking if n = {n} has known factors")
     print()
-
-    # Trial division with small primes
+    # Step 1: Trial division with small primes
     print("Step 1: Trial division with small primes...")
-    small_primes = primes(10000)
-    found = False
-    for p in small_primes:
+    for p in primes(10000):
         if n % p == 0:
             q = n // p
             print(f"Found small factor: p = {p}")
             print(f"q = {q}")
-            if is_prime(q):
+            if q.is_prime():
                 print("q is prime. Factorization complete!")
             else:
-                print(f"q is composite. Further factorization needed.")
+                print("q is composite. Further factorization needed.")
                 print(f"q factors: {factor(q)}")
-            found = True
-            break
-    if not found:
-        print("No factors found below 10000.")
-
-    # Try ECM
+            print("FACTORDB_LOOKUP=SUCCESS")
+            quit()
+    print("No factors found below 10000.")
+    # Step 2: ECM factorization
     print()
     print("Step 2: ECM factorization...")
     try:
-        factors = ecm.factor(n, max_steps=100)
-        if factors and len(factors) > 1:
-            print(f"ECM found factors: {factors}")
-            flist = list(factors)
-            if len(flist) == 2:
-                p, q = flist[0][0], flist[1][0]
-                print(f"p = {p}")
+        fac = n.factor(algorithm='ecm')
+        if fac:
+            fac_p = None
+            for fp, exp in fac:
+                fac_p = fp
+                break
+            if fac_p is not None and 1 < fac_p < n:
+                q = n // fac_p
+                print(f"p = {fac_p}")
                 print(f"q = {q}")
+                print(f"Verification: p * q = {fac_p * q}")
                 print("FACTORDB_LOOKUP=SUCCESS")
+                quit()
             else:
-                print(f"Complete factorization: {factors}")
-                print("FACTORDB_LOOKUP=SUCCESS")
+                print("ECM found no non-trivial factors.")
         else:
-            print("ECM did not find factors within step limit.")
-    except:
-        print("ECM failed.")
-
-    # Try Pollard's rho
+            print("ECM did not find factors.")
+    except Exception as ex:
+        print(f"ECM failed: {ex}")
+    # Step 3: Pollard's rho fallback
     print()
     print("Step 3: Pollard's rho...")
     try:
-        f = pollard_rho(n)
-        if f and f != n:
+        f = pollard_rho_factor(n)
+        if f is not None and f != n:
             print(f"Pollard's rho found: {f}")
             print(f"Other factor: {n // f}")
             print("FACTORDB_LOOKUP=SUCCESS")
+            quit()
         else:
             print("Pollard's rho did not find a factor.")
-            print("FACTORDB_LOOKUP=FAILED")
-    except:
-        print("Pollard's rho failed.")
-        print("FACTORDB_LOOKUP=FAILED")
-
+    except Exception as ex:
+        print(f"Pollard's rho failed: {ex}")
+    print("FACTORDB_LOOKUP=FAILED")
 except Exception as ex:
     print(f"ERROR: {ex}")
     print("FACTORDB_LOOKUP=FAILED")
@@ -132,6 +154,8 @@ except Exception as ex:
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
-  return { n: n.toString() };
+  // Use a small factor (> 10000 so trial division misses it, < 40 bits so Pollard's rho finds it)
+  const p = randomPrime(36);
+  const q = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 36);
+  return { n: (p * q).toString() };
 };

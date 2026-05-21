@@ -13,7 +13,7 @@ import {
 import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, Calculate, CheckCircle, ErrorOutlined } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { CATEGORIES, attacksByCategory, attacks } from '../attacks';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../hooks/useAppContext';
 import { FACTORDB_PROXY_URL } from '../config';
 
 export const drawerWidth = 220;
@@ -29,17 +29,30 @@ export function Sidebar() {
   const [status, setStatus] = useState<ServiceStatus>({ factordb: 'checking', sagecell: 'checking' });
 
   useEffect(() => {
+    const abortController = new AbortController();
     let timer: ReturnType<typeof setInterval> | undefined;
     let timeout: ReturnType<typeof setTimeout> | undefined;
+    let factorDbTimeout: ReturnType<typeof setTimeout> | undefined;
 
     // Check FactorDB proxy
     if (FACTORDB_PROXY_URL) {
-      fetch(`${FACTORDB_PROXY_URL}?query=15`, { signal: AbortSignal.timeout(5000) })
+      fetch(`${FACTORDB_PROXY_URL}?query=15`, { signal: abortController.signal })
         .then(r => r.json())
         .then(() => setStatus(prev => ({ ...prev, factordb: 'ok' })))
-        .catch(() => setStatus(prev => ({ ...prev, factordb: 'error' })));
+        .catch(() => {
+          if (!abortController.signal.aborted) {
+            setStatus(prev => ({ ...prev, factordb: 'error' }));
+          }
+        });
+      // Timeout fallback
+      factorDbTimeout = setTimeout(() => {
+        if (!abortController.signal.aborted) {
+          abortController.abort();
+          setStatus(prev => ({ ...prev, factordb: 'error' }));
+        }
+      }, 5000);
     } else {
-      setStatus(prev => ({ ...prev, factordb: 'error' }));
+      queueMicrotask(() => setStatus(prev => ({ ...prev, factordb: 'error' })));
     }
 
     // Check SageMathCell
@@ -64,7 +77,9 @@ export function Sidebar() {
     checkSageCell();
 
     return () => {
+      abortController.abort();
       if (timer) clearInterval(timer);
+      if (factorDbTimeout) clearTimeout(factorDbTimeout);
       if (timeout) clearTimeout(timeout);
     };
   }, []);

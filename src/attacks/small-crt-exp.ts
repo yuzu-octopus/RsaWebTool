@@ -5,7 +5,7 @@ export const attack: Attack = {
   id: 'small-crt-exp',
   name: 'Small CRT Exponent',
   category: 'Partial Key / Lattice',
-  description: 'Factors n when d_p = d mod (p-1) is small. Use when d_p < 10^6.',
+  description: 'Factors n via brute-force search over k and d_p. Use when the CRT exponent d_p = d mod (p-1) is small (< bound). Each (k, d_p) pair gives a candidate p = (d_p * e - 1) / k + 1.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -18,11 +18,17 @@ export const attack: Attack = {
     if n <= 0 or e <= 0 or bound <= 0:
         print("SMALL_CRT_EXP=FAILED: invalid input values")
     else:
+        # RSA-CRT: d_p * e ≡ 1 (mod p-1), so d_p * e - 1 = k(p-1)
+        # Rearranged: p = (d_p * e - 1) / k + 1
+        # We brute-force k ∈ [1, e) and step through d_p candidates
         found = False
         for k in range(1, e):
+            # k and e must be coprime for inverse_mod(e, k) to exist
             if gcd(e, k) != 1:
                 continue
+            # d_p0 = e^(-1) mod k is the smallest d_p satisfying the congruence mod k
             dp0 = inverse_mod(e, k)
+            # Step d_p by k: all d_p ≡ d_p0 (mod k) satisfy d_p * e ≡ 1 (mod k)
             for dp in range(dp0, bound + 1, k):
                 num = dp * e - 1
                 p_candidate = num // k + 1
@@ -71,11 +77,13 @@ p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
 
 export const generateTestcase = (): Record<string, string> => {
   const e = 65537n;
-  // Construct p where d_p = e^(-1) mod (p-1) is small
+  // Backward construction: pick a small d_p, then derive p from the CRT equation
   // d_p * e - 1 = k * (p-1) → p = (d_p * e - 1) / k + 1
+  // For each candidate d_p (starting at 3), iterate over divisors k of (d_p * e - 1)
+  // that yield a prime p. The resulting p is typically small (≈ 16-30 bits).
+  // This ensures the attack's brute-force search finds d_p within the bound.
   for (let dp = 3n; dp < 10000n; dp++) {
     const num = dp * e - 1n;
-    // Try divisors k of num
     for (let k = 1n; k <= e; k++) {
       if (num % k !== 0n) continue;
       const p = num / k + 1n;
@@ -85,6 +93,5 @@ export const generateTestcase = (): Record<string, string> => {
       }
     }
   }
-  // Fallback: should never reach here given the search space
   throw new Error('small-crt-exp: failed to generate testcase');
 };

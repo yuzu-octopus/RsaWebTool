@@ -52,7 +52,7 @@ try:
             break
 
         # Compute possible remainders: 65537^i mod M
-        ord_val = Integer(65537).multiplicative_order(Mod(1, M))
+        ord_val = Mod(65537, M).multiplicative_order()
         remainders = set()
         for idx in range(ord_val):
             r = power_mod(65537, idx, M)

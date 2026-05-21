@@ -10,7 +10,7 @@ export function isPrimeMR(n: bigint): boolean {
     if (n % p === 0n) return false;
   }
   let d = n - 1n;
-  let s = 0n;
+  let s = 0;
   while (d % 2n === 0n) { d /= 2n; s++; }
   const bases = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n];
   for (const a of bases) {
@@ -18,7 +18,7 @@ export function isPrimeMR(n: bigint): boolean {
     let x = modPow(a, d, n);
     if (x === 1n || x === n - 1n) continue;
     let composite = true;
-    for (let r = 1n; r < s; r++) {
+    for (let r = 1; r < s; r++) {
       x = (x * x) % n;
       if (x === n - 1n) { composite = false; break; }
     }

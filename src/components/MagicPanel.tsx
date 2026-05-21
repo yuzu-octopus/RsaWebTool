@@ -14,36 +14,30 @@ import {
 } from '@mui/material';
 import { AutoFixHigh, Science, CheckCircle, Cancel, HourglassEmpty, SkipNext, Stop, ExpandMore, ExpandLess, Casino } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../hooks/useAppContext';
 import { useSageMathParallel } from '../hooks/useSageMath';
 import { attacks } from '../attacks';
 import { detectFormat, parsePEM } from '../utils/converters';
-import { generateKeyPair, encrypt } from '../utils/testcases/core';
+import { generateKeyPair, encrypt, TESTCASE_BITS } from '../utils/testcases/core';
 
 function isActualSuccess(output: string): boolean {
-  const text = output.toLowerCase();
-  const failureIndicators = [
-    'failed', 'error', 'impossible', 'no factor found', 'no non-trivial',
-    'too small', 'is prime', 'no factorization possible', 'trivial factorization',
-    'could not', 'unable to', 'not found', 'no solution',
-  ];
-  for (const indicator of failureIndicators) {
-    if (text.includes(indicator)) return false;
+  const trimmed = output.trim();
+  // Check for explicit SUCCESS/FAILED markers (preferred)
+  const failedIdx = trimmed.lastIndexOf('=FAILED');
+  const successIdx = trimmed.lastIndexOf('=SUCCESS');
+  if (failedIdx > -1 || successIdx > -1) {
+    return successIdx > failedIdx;
   }
-  const successIndicators = [
-    '=success', 'p =', 'q =', 'factors:', 'factorization:', 'recovered',
-    'message:', 'plaintext:', 'decrypted', 'forged', 'signature:',
-    'verification:', 'matches', 'found',
-  ];
-  for (const indicator of successIndicators) {
-    if (text.includes(indicator)) return true;
-  }
+  // Heuristic fallback for older templates without markers
+  const text = trimmed.toLowerCase();
+  if (/failed|error|impossible|no factor found|could not|unable to/.test(text)) return false;
+  if (/=success|p =|q =|factors:|recovered|found|decrypted/.test(text)) return true;
   return false;
 }
 
 function detectParams(input: string): Record<string, string> {
   const params: Record<string, string> = {};
-  const kvRegex = /(n|e|c|d|p|q|dp|dq|qinv|dLow|nearp|bound|k|B|a|b|e1|e2|c1|c2|hash_hex|target_m|sig_valid|sig_faulty|k_phi|base|bitOffset|bitLength|num_primes|knownBits|bitPosition|oracle_responses|oracle_runs|phi|moduli_list|n_values|pairs|triples|oracle_pairs|known_prefix)\s*=\s*([0-9a-fA-F,\n]+)/g;
+  const kvRegex = /(n|e|c|d|p|q|dp|dq|qinv|dLow|nearp|bound|B2|B|a|b|e1|e2|c1|c2|ciphertexts|hash_hex|target_m|sig_valid|sig_faulty|k_phi|base|bitOffset|bitLength|num_primes|knownBits|bitPosition|oracle_responses|oracle_runs|phi|moduli_list|n_values|pairs|triples|oracle_pairs|known_prefix|p_msb|leak|unknown_bits)\s*=\s*([0-9a-fA-F,\n]+)/g;
   let match;
   while ((match = kvRegex.exec(input)) !== null) {
     params[match[1]] = match[2].trim();
@@ -183,8 +177,6 @@ export function MagicPanel() {
         return false;
       }, controller);
 
-      setJobs(prev => prev.map(j => j.status === 'running' ? { ...j, status: 'aborted' as const } : j));
-
       const updatedJobs = initialJobs.map((job, i) => {
         const pre = preCheckResults[i];
         if (pre) {
@@ -201,9 +193,9 @@ export function MagicPanel() {
             error: r.error,
           };
         }
-        return job;
+        // Job wasn't reached (early stop)
+        return { ...job, status: 'aborted' as const };
       });
-
       setJobs(updatedJobs);
 
       const firstSuccess = updatedJobs.find(j => j.status === 'success');
@@ -225,8 +217,11 @@ export function MagicPanel() {
   };
 
   const handleGenerateTestcase = () => {
-    const { p, q, n, e, d } = generateKeyPair(16, 16);
-    const m = BigInt(Math.floor(Math.random() * 1000000) + 42);
+    const { p, q, n, e, d } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+    // Use crypto.getRandomValues for unbiased random message
+    const rand = new Uint32Array(1);
+    crypto.getRandomValues(rand);
+    const m = BigInt(rand[0] % 1000000) + 42n;
     const c = encrypt(m, n, e);
     const dp = d % (p - 1n);
     const dq = d % (q - 1n);

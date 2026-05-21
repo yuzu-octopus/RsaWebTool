@@ -14,26 +14,28 @@ export const attack: Attack = {
 if n < 2:
     print(f"n = {n} is too small to factor")
     print("GIMMICKY_PRIMES=FAILED")
-    return
+    quit()
 if n % 2 == 0:
     print(f"n is even: {n}")
     print(f"p = 2")
     print(f"q = {n // 2}")
     print(f"Verification: 2 * {n // 2} = {n}")
     print("GIMMICKY_PRIMES=SUCCESS")
-    return
+    quit()
 if n.is_prime():
     print(f"n is prime: {n}")
     print("No factorization possible")
     print("GIMMICKY_PRIMES=FAILED")
-    return
+    quit()
+if n.is_square():
+    p = isqrt(n)
+    print(f"n is a perfect square: {p}^2 = {n}")
+    print(f"p = q = {p}")
+    print("GIMMICKY_PRIMES=SUCCESS")
+    quit()
 
 try:
-    print(f"Checking for gimmicky/special-form prime factors of n = {n}")
-    print()
-
     found = False
-
     # 1. Mersenne primes: 2^p - 1
     print("Checking Mersenne primes (2^p - 1)...")
     for p in [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127, 521, 607, 1279, 2203, 2281, 3217, 4253, 4423]:
@@ -41,10 +43,11 @@ try:
         if n % mersenne == 0:
             print(f"  Found Mersenne prime factor: 2^{p} - 1 = {mersenne}")
             print(f"  Cofactor: {n // mersenne}")
+            print(f"  Verification: {mersenne} * {n // mersenne} = {n}")
             found = True
-
     # 2. Primorial primes: p# +/- 1
-    print("\\nChecking primorial primes (p# ± 1)...")
+    print()
+    print("Checking primorial primes (p# \\u00b1 1)...")
     primes_list = list(prime_range(2, 200))
     primorial = 1
     for p in primes_list:
@@ -54,38 +57,41 @@ try:
             if candidate > 1 and n % candidate == 0:
                 print(f"  Found primorial prime factor: {candidate} = {p}# {'+' if sign == 1 else '-'} 1")
                 print(f"  Cofactor: {n // candidate}")
+                print(f"  Verification: {candidate} * {n // candidate} = {n}")
                 found = True
-
     # 3. Fermat primes: 2^(2^k) + 1
-    print("\\nChecking Fermat primes (2^(2^k) + 1)...")
+    print()
+    print("Checking Fermat primes (2^(2^k) + 1)...")
     for k in range(0, 5):
         fermat = 2**(2**k) + 1
         if n % fermat == 0:
             print(f"  Found Fermat prime factor: 2^(2^{k}) + 1 = {fermat}")
             print(f"  Cofactor: {n // fermat}")
+            print(f"  Verification: {fermat} * {n // fermat} = {n}")
             found = True
-
     # 4. Fibonacci primes
-    print("\\nChecking Fibonacci primes...")
+    print()
+    print("Checking Fibonacci primes...")
     fib_primes = [2, 3, 5, 13, 89, 233, 1597, 28657, 514229, 433494437, 2971215073]
     for fib in fib_primes:
         if n % fib == 0:
             print(f"  Found Fibonacci prime factor: {fib}")
             print(f"  Cofactor: {n // fib}")
+            print(f"  Verification: {fib} * {n // fib} = {n}")
             found = True
-
     # 5. Repunit primes: (10^p - 1) / 9
-    print("\\nChecking repunit primes...")
+    print()
+    print("Checking repunit primes...")
     for p in [2, 19, 23, 317, 1031]:
         try:
             repunit = (10**p - 1) // 9
             if n % repunit == 0:
                 print(f"  Found repunit prime factor: R({p}) = {repunit}")
                 print(f"  Cofactor: {n // repunit}")
+                print(f"  Verification: {repunit} * {n // repunit} = {n}")
                 found = True
-        except:
+        except Exception:
             pass
-
     if found:
         print("GIMMICKY_PRIMES=SUCCESS")
     else:
@@ -93,7 +99,7 @@ try:
         print("The factors are likely standard randomly-generated primes.")
         print("GIMMICKY_PRIMES=FAILED")
 except Exception as e:
-    print(f"Error in Gimmicky Primes check: {e}")
+    print(f"Error in gimmicky primes check: {e}")
     print("GIMMICKY_PRIMES=FAILED")
 `,
   proof: `\\textbf{Theorem:} Special-form primes (Mersenne, primorial, Fermat, Fibonacci, repunit) appear in small known lists and can be tested by direct divisibility.
@@ -126,17 +132,16 @@ n \\bmod s &= 0, \\quad s \\in \\mathcal{S} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Generate a Mersenne prime: 2^p - 1 for small p
-  // Skip trivial ones (2,3,5,7) and use 2^17-1=131071 or 2^19-1=524287
+  // Generate using a random Mersenne prime: 2^p - 1
+  // Skip trivial ones (2,3,5,7); use medium ones for variety
   const mersenneP = [17, 19, 31, 61, 89, 107, 127];
-  let mersenne = 0n;
-  for (const p of mersenneP) {
-    const candidate = (1n << BigInt(p)) - 1n;
-    if (isPrimeMR(candidate)) {
-      mersenne = candidate;
-      break;
-    }
-  }
+  const candidates = mersenneP
+    .map(p => ({ p, val: (1n << BigInt(p)) - 1n }))
+    .filter(({ val }) => isPrimeMR(val));
+  // Fallback: 2^17 - 1 = 131071 is a known Mersenne prime guaranteed to pass
+  const mersenne = candidates.length > 0
+    ? candidates[Math.floor(Math.random() * candidates.length)].val
+    : (1n << 17n) - 1n;
   const q = randomPrime(TESTCASE_BITS.q);
   return { n: (mersenne * q).toString() };
 };

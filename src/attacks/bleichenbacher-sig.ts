@@ -11,75 +11,71 @@ export const attack: Attack = {
     { name: 'e', label: 'e (public exponent)', placeholder: '3', multiline: false, defaultValue: '3' },
     { name: 'hash_hex', label: 'Hash (hex)', placeholder: 'Enter hash in hex (e.g., SHA256)...', multiline: false },
   ],
-  sageTemplate: (v) => {
-    const eVal = v.e || '3';
-    return `n = Integer(${v.n})
-e = Integer(${eVal})
-hash_hex = "${v.hash_hex || 'dead'}".strip()
-if not hash_hex:
-    print("ERROR: hash_hex is empty")
-    print("BLEICHENBACHER_SIG=FAILED")
-    return
-
-if n < 2:
-    print("Invalid input")
-    print("BLEICHENBACHER_SIG=FAILED")
-    return
-
-print(f"Bleichenbacher Signature Forgery (e={e})")
-print(f"n = {n}")
-print(f"Target hash: {hash_hex}")
-print()
-
-if e != 3:
-    print("This attack requires e=3.")
-    print(f"Got e={e}.")
-    print("BLEICHENBACHER_SIG=FAILED")
-    return
-
-# Construct EM: 0x00 || 0x01 || 0xFF...FF || 0x00 || hash
-n_bytes = (n.nbits() + 7) // 8
-hash_int = Integer("0x" + hash_hex)
-hash_bytes = (hash_int.nbits() + 7) // 8
-
-# Padding: at least 8 bytes of 0xFF
-pad_len = max(8, n_bytes - 3 - hash_bytes)
-em_len = 2 + pad_len + hash_bytes
-
-# EM = 0x0001 || 0xFF*pad_len || 0x00 || hash
-em = (Integer(1) << (8 * (em_len - 2))) + ((Integer(1) << (8 * pad_len)) - 1) * (Integer(1) << (8 * hash_bytes)) + hash_int
-
-print(f"EM has {em.nbits()} bits, n has {n.nbits()} bits")
-
-if em >= n:
-    print("ERROR: EM >= n. Hash too large for this modulus.")
-    print("BLEICHENBACHER_SIG=FAILED")
-    return
-
-# Bleichenbacher: find S near n^(1/3) such that S^3 mod n ends with hash
-n_cbrt = n.nth_root(3, truncate_mode=True)[0]
-print(f"n^(1/3) = {n_cbrt}")
-
-found = False
-search_range = 100000
-for delta in range(-search_range, search_range + 1):
-    S = n_cbrt + delta
-    check = power_mod(S, 3, n)
-    check_hex = hex(check)[2:].zfill(len(hash_hex))
-    if check_hex.endswith(hash_hex):
-        print(f"Found with delta={delta}")
-        print(f"Forged signature: S = {S}")
-        print(f"S^3 mod n = {check}")
-        print(f"S^3 mod n (hex) = ...{check_hex[-len(hash_hex):]}")
-        print(f"Hash found at end of forged signature!")
-        found = True
-        break
-
-if found:
-    print("BLEICHENBACHER_SIG=SUCCESS")
-else:
-    print(f"No valid forgery found in range +/- {search_range}.")
-    print("Try a shorter hash or increase search range.")
+  sageTemplate: (vals: Record<string, string>) => {
+    if (!vals.n || !vals.hash_hex) {
+      return `print("ERROR: Missing required inputs (n, hash_hex)")
+print("BLEICHENBACHER_SIG=FAILED")`;
+    }
+    return `try:
+    n = Integer(${vals.n})
+    e = Integer(${vals.e || '3'})
+    hash_hex = "${vals.hash_hex}".strip()
+    if not hash_hex:
+        print("ERROR: hash_hex is empty")
+        print("BLEICHENBACHER_SIG=FAILED")
+        quit()
+    if e != 3:
+        print("This attack requires e=3.")
+        print(f"Got e={e}.")
+        print("BLEICHENBACHER_SIG=FAILED")
+        quit()
+    print(f"Bleichenbacher Signature Forgery (e={e})")
+    print(f"n = {n}")
+    print(f"Target hash: {hash_hex}")
+    print()
+    # Construct EM: 0x00 || 0x01 || 0xFF...FF || 0x00 || hash
+    n_bytes = (n.nbits() + 7) // 8
+    hash_int = Integer("0x" + hash_hex)
+    hash_bytes = len(hash_hex) // 2
+    if hash_bytes == 0:
+        print("ERROR: hash_hex is too short (need at least 2 hex chars)")
+        print("BLEICHENBACHER_SIG=FAILED")
+        quit()
+    # Padding: at least 8 bytes of 0xFF
+    pad_len = max(8, n_bytes - 3 - hash_bytes)
+    em_len = 3 + pad_len + hash_bytes
+    # EM = 0x0001 || 0xFF*pad_len || 0x00 || hash
+    em = (Integer(1) << (8 * (em_len - 2))) + ((Integer(1) << (8 * pad_len)) - 1) * (Integer(1) << (8 * (1 + hash_bytes))) + hash_int
+    print(f"EM has {em.nbits()} bits, n has {n.nbits()} bits")
+    if em >= n:
+        print("ERROR: EM >= n. Hash too large for this modulus.")
+        print("BLEICHENBACHER_SIG=FAILED")
+        quit()
+    # Bleichenbacher: find S near n^(1/3) such that S^3 mod n ends with hash
+    n_cbrt = n.nth_root(3, truncate_mode=True)[0]
+    print(f"n^(1/3) = {n_cbrt}")
+    found = False
+    search_range = 100000
+    for delta in range(-search_range, search_range + 1):
+        S = n_cbrt + delta
+        check = power_mod(S, 3, n)
+        check_hex = hex(check)[2:].zfill(len(hash_hex))
+        if check_hex.endswith(hash_hex):
+            print(f"Found with delta={delta}")
+            print(f"Forged signature: S = {S}")
+            print(f"S^3 mod n = {check}")
+            print(f"S^3 mod n (hex) = ...{check_hex[-len(hash_hex):]}")
+            print(f"Hash found at end of forged signature!")
+            found = True
+            break
+    if found:
+        print("BLEICHENBACHER_SIG=SUCCESS")
+    else:
+        print(f"No valid forgery found in range +/- {search_range}.")
+        print("Try a shorter hash or increase search range.")
+        print("BLEICHENBACHER_SIG=FAILED")
+except Exception as ex:
+    print(f"ERROR: {ex}")
     print("BLEICHENBACHER_SIG=FAILED")
 `;
   },
@@ -111,5 +107,5 @@ EM < n &\\implies S^3 = EM \\quad \\text{(exact, no mod reduction)} \\\\
 
 export const generateTestcase = (): Record<string, string> => {
   const { n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
-  return { n: n.toString(), hash_hex: 'ab' };
+  return { n: n.toString(), e: '3', hash_hex: 'ab' };
 };

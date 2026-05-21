@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
-import { modPow } from '../utils/bigint';
+import { modPow, gcd } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'implicit-key-exposure',
@@ -16,26 +16,21 @@ export const attack: Attack = {
     n = Integer(${v.n})
     a = Integer(${v.a})
     leak = Integer(${v.leak})
-
     if n < 2 or a < 2 or leak < 0:
         print("Invalid input")
         print("IMPLICIT_KEY_EXPOSURE=FAILED")
-        return
-
+        quit()
     print(f"Implicit Key Exposure Attack")
     print(f"n = {n}")
     print(f"a = {a}")
     print(f"leak = a^p mod n = {leak}")
     print()
-
-    # By Fermat's little theorem: a^p ≡ a (mod p)
-    # leak ≡ a^p (mod n) → leak ≡ a^p (mod p) → leak ≡ a (mod p)
-    # Therefore: p | (leak - a) → p = gcd(leak - a, n)
-
+    # By Fermat's little theorem: a^p = a (mod p)
+    # leak = a^p (mod n) => leak = a^p (mod p) => leak = a (mod p)
+    # Therefore: p | (leak - a) => p = gcd(leak - a, n)
     g = gcd(leak - a, n)
     print(f"gcd(leak - a, n) = {g}")
     print()
-
     if g > 1 and g < n:
         p = g
         q = n // p
@@ -76,6 +71,33 @@ p &= \\gcd(\\text{leak} - a, n) \\qed
 \\textbf{References:} Common CTF pattern; based on Fermat's Little Theorem`,
   priority: 'high',
   applicableCheck: (p) => !!p.n && !!p.a && !!p.leak,
+  frontendCheck: async (vals) => {
+    try {
+      const n = BigInt(vals.n);
+      const a = BigInt(vals.a);
+      const leak = BigInt(vals.leak);
+      const g = gcd(leak - a, n);
+      if (g > 1n && g < n) {
+        const p = g;
+        const q = n / p;
+        return [
+          `Implicit Key Exposure Attack (browser-side, BigInt)`,
+          `n = ${n}`,
+          `a = ${a}`,
+          `leak = ${leak}`,
+          ``,
+          `Factors recovered:`,
+          `p = ${p}`,
+          `q = ${q}`,
+          `Verification: p * q = ${p * q}`,
+          `Verification: a^p mod n = ${modPow(a, p, n)} == leak? ${modPow(a, p, n) === leak}`,
+        ].join('\n');
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  },
 };
 
 export const generateTestcase = (): Record<string, string> => {

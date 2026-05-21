@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { MenuBook } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../hooks/useAppContext';
 import { attacks } from '../attacks';
 
 const inputSx = {

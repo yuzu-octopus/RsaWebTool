@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
+import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
 import { gcd } from '../utils/bigint';
 
 export const attack: Attack = {
@@ -19,15 +19,12 @@ print("COMMON_FACTOR=FAILED")`;
     return `try:
     n = Integer(${vals.n})
     c = Integer(${vals.c})
-
     print(f"Common Factor Attack")
     print(f"n = {n}")
     print(f"c = {c}")
     print()
-
     g = gcd(c, n)
     print(f"gcd(c, n) = {g}")
-
     if g == 1:
         print("gcd(c, n) = 1. No common factor. Message is not a multiple of p or q.")
         print("This attack does not apply.")
@@ -45,19 +42,13 @@ print("COMMON_FACTOR=FAILED")`;
         print(f"Verification: p * q = {p * q}")
         print(f"p is prime: {p.is_prime()}")
         print(f"q is prime: {q.is_prime()}")
-
-        # The message m was a multiple of p (or q)
-        # m = k * p for some k
-        # c = m^e mod n = (k*p)^e mod n
-        # Since p | m, we have m = 0 mod p
-        print(f"\\nThe message m is a multiple of p = {p}")
-        print(f"m = k * {p} for some integer k")
-
-        # If we know e, we can try to recover k
-        # c = (k*p)^e mod (p*q)
-        # c/p^e = k^e mod q (if p^e | c)
-        # This requires knowing e
-        print("COMMON_FACTOR=SUCCESS")
+        if p.is_prime() and q.is_prime():
+            print(f"\\nThe message m is a multiple of p = {p}")
+            print(f"m = k * {p} for some integer k")
+            print("COMMON_FACTOR=SUCCESS")
+        else:
+            print("gcd(c, n) did not yield valid prime factors.")
+            print("COMMON_FACTOR=FAILED")
 except Exception as e:
     print(f"ERROR: {e}")
     print("COMMON_FACTOR=FAILED")
@@ -70,10 +61,10 @@ except Exception as e:
       const g = gcd(c, n);
 
       if (g === 1n) {
-        return "gcd(c, n) = 1. No common factor. Message is not a multiple of p or q.\nThis attack does not apply.";
+        return null;
       }
       if (g === n) {
-        return "gcd(c, n) = n. c is a multiple of n (c = 0 mod n).\nThe message m was 0 or a multiple of n.";
+        return null;
       }
 
       const p = g;
@@ -113,12 +104,15 @@ q &= n / \\gcd(c, n) \\qed
 \\textbf{Explanation:} If the message shares a factor with n, the ciphertext does too. GCD(c, n) extracts that prime factor directly, factoring n. This is a degenerate case — proper RSA padding prevents it.
 
 \\textbf{References:} Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2; Boneh, "Twenty Years of Attacks on RSA", 1999`,
-  priority: 'low',
+  priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.c,
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { p, n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
-  const c = p * BigInt(Math.floor(Math.random() * 1000) + 2);
+  const { p, n, e } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+  // The message m is a multiple of p, so c = m^e mod n will also share factor p.
+  // gcd(c, n) reveals p.
+  const m = p * BigInt(Math.floor(Math.random() * 1000) + 2);
+  const c = encrypt(m, n, e);
   return { n: n.toString(), c: c.toString() };
 };

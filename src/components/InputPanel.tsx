@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { Stop, Casino } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../hooks/useAppContext';
 import { useSageMath } from '../hooks/useSageMath';
 import { ProofRenderer } from './ProofRenderer';
 import { testcaseGenerators } from '../attacks';
@@ -33,6 +33,22 @@ const inputSx = {
     fontFamily: "'JetBrains Mono', monospace",
   },
 };
+
+function isActualSuccess(output: string): boolean {
+  const text = output.trim();
+  // Check for explicit FAILED marker first
+  const failedIdx = text.lastIndexOf('=FAILED');
+  const successIdx = text.lastIndexOf('=SUCCESS');
+  if (failedIdx > -1 || successIdx > -1) {
+    return successIdx > failedIdx;
+  }
+  // Heuristic fallback for older attack templates without markers
+  const failureWords = ['failed', 'error', 'impossible', 'no factor found', 'could not', 'unable to'];
+  const lower = text.toLowerCase();
+  if (failureWords.some(w => lower.includes(w))) return false;
+  const successWords = ['p =', 'q =', 'factors:', 'recovered', 'found', 'decrypted'];
+  return successWords.some(w => lower.includes(w));
+}
 
 export function InputPanel() {
   const { selectedAttack, viewMode, setOutputResult, setOutputError, addToHistory } = useAppContext();
@@ -88,7 +104,7 @@ export function InputPanel() {
         const preResult = await selectedAttack.frontendCheck(inputValues);
         if (preResult !== null) {
           setOutputResult(preResult);
-          addToHistory(selectedAttack.id, selectedAttack.name, preResult, true);
+          addToHistory(selectedAttack.id, selectedAttack.name, preResult, isActualSuccess(preResult));
           setLoading(false);
           return;
         }
@@ -98,7 +114,7 @@ export function InputPanel() {
       const result = await execute(code, 35000, controller.signal);
       if (result.success) {
         setOutputResult(result.stdout);
-        addToHistory(selectedAttack.id, selectedAttack.name, result.stdout, true);
+        addToHistory(selectedAttack.id, selectedAttack.name, result.stdout, isActualSuccess(result.stdout));
       } else {
         setOutputError(result.error || 'Unknown error');
         addToHistory(selectedAttack.id, selectedAttack.name, result.error || 'Unknown error', false);

@@ -26,7 +26,7 @@ if not "${vals.c}".strip():
     print("ERROR: c is required")
     print("BIASED_LSB=FAILED")
     quit()
-if not "${vals.oracle_runs}".strip():
+if not """${vals.oracle_runs}""".strip():
     print("ERROR: oracle_runs is required")
     print("BIASED_LSB=FAILED")
     quit()
@@ -34,8 +34,8 @@ if not "${vals.oracle_runs}".strip():
 try:
     n = Integer(${vals.n})
     e = Integer(${vals.e})
-    c = Integer(${vals.c})
     orig_c = Integer(${vals.c})
+    c = (Integer(${vals.c}) * power_mod(Integer(2), e, n)) % n
 
     # Parse oracle runs (multiple response strings, newline-separated)
     runs_str = """${vals.oracle_runs}""".strip()
@@ -79,9 +79,7 @@ try:
             upper = mid
         else:
             lower = mid
-
         c = (c * power_mod(Integer(2), e, n)) % n
-
         if i < 5 or i >= len(voted_bits) - 3:
             print(f"Step {i+1}: bit={bit}, lower={lower}, upper={upper}")
 
@@ -143,7 +141,7 @@ export const generateTestcase = (): Record<string, string> => {
   const numRuns = 21;
   for (let run = 0; run < numRuns; run++) {
     const bits: string[] = [];
-    let curC = c;
+    let curC = (c * modPow(2n, e, n)) % n;
     for (let i = 0; i < nBits; i++) {
       const dec = modPow(curC, d, n);
       const trueBit = (dec % 2n).toString();

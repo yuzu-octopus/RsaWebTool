@@ -14,46 +14,55 @@ export const attack: Attack = {
 if n < 2:
     print(f"n = {n} is too small to factor")
     print("BINARY_POLY=FAILED")
-    return
+    quit()
 if n % 2 == 0:
     print(f"n is even: {n}")
     print(f"p = 2")
     print(f"q = {n // 2}")
     print(f"Verification: 2 * {n // 2} = {n}")
     print("BINARY_POLY=SUCCESS")
-    return
+    quit()
 if n.is_prime():
     print(f"n is prime: {n}")
     print("No factorization possible")
     print("BINARY_POLY=FAILED")
-    return
+    quit()
+
+if n.is_square():
+    p = isqrt(n)
+    print(f"n is a perfect square: {p}^2 = {n}")
+    print(f"p = q = {p}")
+    print("BINARY_POLY=SUCCESS")
+    quit()
 
 # Check if n is a power of 2
 if n > 0 and (n & (n - 1)) == 0:
     print(f"n is a power of 2: n = 2^{n.nbits() - 1}")
     print("No non-trivial factorization possible")
     print("BINARY_POLY=FAILED")
-    return
+    quit()
 
 # Binary polynomial factorization
 try:
     # Convert n to polynomial: n = sum(b_i * 2^i) -> f(x) = sum(b_i * x^i)
     coeffs = n.digits(2)
-
     R.<x> = PolynomialRing(ZZ)
     f = sum(c * x^i for i, c in enumerate(coeffs))
-
     print(f"Polynomial: f(x) = {f}")
     print(f"Degree: {f.degree()}")
     print(f"f(2) = {f(2)}")
     print(f"f(2) == n: {f(2) == n}")
     print()
-
+    # Check if polynomial is irreducible — if so, no factorization is possible
+    if f.is_irreducible():
+        print(f"Polynomial f(x) = {f} is irreducible over ZZ[x]")
+        print("No nontrivial polynomial factorization exists.")
+        print("BINARY_POLY=FAILED")
+        quit()
     # Factor the polynomial
     factors = f.factor()
     print(f"Factorization of f(x): {factors}")
     print()
-
     # Evaluate each factor at x=2
     print("Evaluating factors at x=2:")
     for factor, mult in factors:
@@ -61,23 +70,28 @@ try:
         print(f"  {factor}(2) = {val}")
         if mult > 1:
             print(f"    multiplicity: {mult}")
-
     # Check if product of evaluations equals n
     product = 1
     for factor, mult in factors:
         product *= factor(2)**mult
-
     print(f"\\nProduct of evaluations: {product}")
     print(f"Original n: {n}")
     print(f"Match: {product == n}")
-
     if product == n:
-        print("\\nPotential factors found:")
-        for factor, mult in factors:
-            val = factor(2)
-            if val > 1:
-                print(f"  {val} (is prime: {val.is_prime()})")
-        print("BINARY_POLY=SUCCESS")
+        # Find factors that give proper divisors of n
+        # (avoid false positive when f(x) is irreducible — len(factors)==1
+        #  and the only factor is f(x) itself with f(2)=n)
+        proper_vals = [factor(2) for factor, _ in factors if 1 < factor(2) < n]
+        if proper_vals:
+            print("\\nPotential factors found:")
+            for factor, mult in factors:
+                val = factor(2)
+                if val > 1:
+                    print(f"  {val} (is prime: {val.is_prime()})")
+            print("BINARY_POLY=SUCCESS")
+        else:
+            print("No proper factors: polynomial factorization is trivial (irreducible f(x)).")
+            print("BINARY_POLY=FAILED")
     else:
         print("Polynomial factorization does not yield integer factors.")
         print("BINARY_POLY=FAILED")

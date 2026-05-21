@@ -8,10 +8,29 @@ bun run build        # tsc -b && vite build → docs/
 bun run lint         # eslint
 bun run lint:fix     # eslint --fix
 bun run typecheck    # tsc -b --noEmit
-bun run preview      # vite preview (prod build locally)
+bun run preview      # vite preview (prod build)
 ```
 
 **Verification order:** `typecheck → lint → build`
+
+**Review & fix all attacks:** use `/fix` with this prompt verbatim:
+
+> Spawn 52 fix-worker subagents in parallel — one per attack file in `src/attacks/`. Each worker independently:
+>
+> 1. **Read** the attack file and its integration in `src/attacks/index.ts`
+> 2. **Research** the mathematical technique via websearch to verify correctness
+> 3. **Compare** against sibling attacks (same category) for style consistency
+> 4. **Fix** all issues: blank lines in SageMath templates, missing `Integer()` wrappers, `quit()` vs `return`, try/except guards, `orig_c` save pattern, proof quality
+> 5. **Test** in `/tmp/`:
+>    - SageMath templates → extract to temp file, run via `docker run --rm -v /tmp/test.sage:/tmp/test.sage sagemath/sagemath sage /tmp/test.sage`, verify output contains SUCCESS/FAILED marker
+>    - TypeScript → `cd <project> && bun run typecheck`
+>    - Compare against known-good patterns from sibling attacks
+> 6. **Iterate** until both SageMath + TypeScript checks pass
+> 7. **Report**: `{file, changes_made: [...], issues_found: [...], sage_test: "pass"|"fail", ts_test: "pass"|"fail"}`
+>
+> All 52 workers launch in a single response. Strict concurrency — no sequential batching, no partial deploys.
+
+All workers MUST be spawned in a single response — every independent file fix launches simultaneously. No sequential batching. Strict concurrency: if 52 files need fixes, 52 workers launch at once.
 
 ## Deploy
 
@@ -19,158 +38,116 @@ bun run preview      # vite preview (prod build locally)
 
 ```bash
 bun run build
-git add -f docs/           # CRITICAL — docs/ is gitignored, blank screen without -f
+git add -f docs/           # CRITICAL — blank screen without -f
 git add -A
 git status                 # verify before committing
-git commit --no-verify -m "type: description"  # --no-verify: pre-commit blocks .env files
+git commit --no-verify -m "type: description"
 git push origin main
 ```
 
+CI workflow at `.github/workflows/deploy.yml` runs `lint → build` and deploys to GitHub Pages.
+
 ## Pre-commit Hook (global: `~/.config/git/hooks/`)
 
-- **Blocks** any `.env` file in staged changes → use `--no-verify`
-- **Blocks** high-confidence secrets (AWS keys, GitHub tokens, private keys, AI API keys, DB URLs)
-- **Warns** on JWT tokens
-- Never `--no-verify` for secrets — only for .env files you know are safe
+- Blocks `.env` files → use `--no-verify`
+- Blocks high-confidence secrets (API keys, tokens, private keys, DB URLs)
+- Never `--no-verify` for secrets — only for .env files
 
 ## Architecture
 
-**Browser-only** RSA CTF tool on GitHub Pages. No backend. All computation is client-side.
+**Browser-only RSA CTF tool on GitHub Pages.** No backend. No test suite — verification is `typecheck → lint → build`.
 
 ### Key Directories
 | Path | Purpose |
 |------|---------|
-| `src/attacks/` | 52 individual attack files + `index.ts` barrel |
+| `src/attacks/` | 52 attack files + `index.ts` barrel |
 | `src/utils/testcases/core.ts` | `randomPrime()`, `generateKeyPair()`, `encrypt()`, `TESTCASE_BITS` |
-| `src/utils/bigint.ts` | `gcd()`, `isqrt()`, `modPow()`, `modInverse()`, `extendedGcd()` |
+| `src/utils/bigint.ts` | `gcd()`, `modPow()`, `modInverse()`, `isqrt()`, `extendedGcd()` |
 | `src/utils/factordb.ts` | FactorDB client (CORS-proxied) |
 | `src/hooks/useSageMath.ts` | Embedded SageMathCell executor (concurrency=3) |
+| `src/config.ts` | `FACTORDB_PROXY_URL` — overridable via `VITE_FACTORDB_PROXY_URL` env var |
 | `workers/` | Cloudflare Worker CORS proxy for FactorDB |
+| `.env.example` | Documents `VITE_FACTORDB_PROXY_URL` env var |
+| `scripts/` | Empty — no helper scripts |
+
+### Entry Points
+- `index.html` — loads SageMathCell script + mounts React at `#root`
+- `src/main.tsx` — React root
+- `src/App.tsx` — top-level layout (InputPanel, OutputPanel, Sidebar, MagicPanel, ProofIndex, RsaCalculator)
+- `src/attacks/index.ts` — barrel: `attacks[]`, `CATEGORIES`, `attacksByCategory`, `testcaseGenerators`
 
 ### Attack System
 - Each file in `src/attacks/` exports `{ attack: Attack, generateTestcase: () => Record<string, string> }`
 - `src/attacks/index.ts` aggregates: `attacks[]`, `CATEGORIES`, `attacksByCategory`, `testcaseGenerators`
-- Adding a new attack = 1 file + 1 import in `index.ts`. Zero UI changes needed.
-- `TESTCASE_BITS = { p: 256, q: 256 }` → n ≈ 512-bit
+- Adding a new attack = 1 file + 1 import in `index.ts`. Zero UI changes.
+- `TESTCASE_BITS = { p: 256, q: 256 }` → n ≈ 512-bit (small factors for factorization attacks to avoid SageCell timeout)
 
-### Attack Type (`src/types/index.ts`)
+### Attack Interface (`src/types/index.ts`)
 ```ts
 type Attack = {
-  id, name, category, description, inputs: InputField[],
+  id, name, description, category, inputs: InputField[],
   sageTemplate: (vals) => string, proof: string,
-  frontendCheck?, applicableCheck, priority,
+  frontendCheck?, applicableCheck, priority: 'high' | 'medium' | 'low',
   generateTestcase?: () => Record<string, string>
 }
 ```
 
-### frontendCheck Pattern
-Optional async `(vals) => Promise<string | null>`. Runs **before** SageCell in InputPanel and MagicPanel.
-- Returns string → use result, skip SageCell
-- Returns null → fall through to SageCell
-- 4 attacks use it: `factordb-lookup`, `phi-leak`, `batch-gcd`, `common-factor`
-- Graceful degradation: if proxy is down, FactorDB frontendCheck returns null
-
-### Categories (52 attacks)
-| Category | Count |
-|----------|-------|
-| Factorization | 17 |
-| Partial Key / Lattice | 7 |
-| Message / Protocol | 12 |
-| Oracle | 3 |
-| Advanced | 8 |
-
-### Components
-| Component | Purpose |
-|-----------|---------|
-| `InputPanel.tsx` | Attack input form + Generate Testcase + Run/Stop + proof tab |
-| `OutputPanel.tsx` | Results display + converters + copy + history + Notepad |
-| `MagicPanel.tsx` | Auto-detect format, applicableCheck filter, priority-ordered parallel execution with early stop |
-| `Sidebar.tsx` | Collapsible category tree + Magic/Proofs/Calculator buttons + service status |
-| `RsaCalculator.tsx` | Pure BigInt calculator: Key Gen / Encrypt / Decrypt tabs |
-| `ProofIndex.tsx` | Searchable index of all attacks |
-| `ProofRenderer.tsx` | KaTeX renderer, hides References section |
-
 ### External Services
 - **FactorDB**: CORS proxy at `https://factordb-proxy.octopusyuzu.workers.dev` (Cloudflare Worker in `workers/`)
-- **SageMathCell**: embedded `makeSagecell` JS only — `/service` REST API is dead (Cloudflare 520)
+- **SageMathCell**: embedded `makeSagecell` JS only (`/service` REST API is dead — Cloudflare 520)
 - SageMathCell has **no internet** (firewall since 2021) — attack templates must be pure math
-- SageCell container: off-screen (`position: absolute; left: -9999px`)
 
-## Critical Gotchas
+## SageMath Gotchas (Hard-Earned)
 
-### SageMath
-- `^` is **XOR** for Python `int` — always use `**` for exponentiation
+- **No blank lines inside function/loop bodies** — SageMath interactive mode treats blank lines as cell separators, causing `break/return outside loop/function` errors. This is the single most common bug.
+- `^` is XOR for Python `int` — always use `**` for exponentiation
 - `.bits()` returns bit positions list — use `.nbits()` for bit count
+- Always wrap numeric inputs in `Integer()`
+- No `return` at module level — use `quit()` instead (`return` is fine inside functions)
+- No nested `def` inside `for` loops at module level — move function definitions outside or inline
+- Multi-line string values use `"""..."""` triple quotes, not single-line
+- `file.integer_nth_root()` doesn't exist — use `file.nth_root()` with try/except
+- `file.continued_fraction()` doesn't exist on Integer — use `continued_fraction(QQ(e)/QQ(n))` global function
 - `small_roots(X=..., beta=...)` — `beta=0.5` for sqrt(n) factor search
 - `prime_range(start, end)` is faster than `range()` + `is_prime()`
 - Oracle attacks: save `orig_c = Integer(${vals.c})` before loop mutation
-- Always wrap numeric inputs in `Integer()`
+- 60-second timeout — factorization testcases must use small factors
 
-### Testcase Generation (512-bit)
-- Random 512-bit semiprimes **will timeout** in SageCell for factorization attacks
-- Factorization testcases use small factors: Pollard's rho (40-bit), ECM (60-bit), QS (60-bit), SQUFOF (16-bit)
-- Coppersmith bound: N^(beta^2/deg). For 512-bit N, beta=0.5 → N^0.25 ≈ 2^128
-- ROCA/Nitros: need proper M construction with 5000+ retry attempts
-- Parity oracle: needs 512 responses for 512-bit n (one per bit)
+## TypeScript
 
-### TypeScript
-- `erasableSyntaxOnly: true` — **no parameter properties** in constructors
-- `verbatimModuleSyntax: true` — use `import type` for type-only imports
-- `noUnusedLocals` + `noUnusedParameters` — strict
-- `strict: true` — no `any` types
+```json
+{ "erasableSyntaxOnly": true, "verbatimModuleSyntax": true, "strict": true,
+  "noUnusedLocals": true, "noUnusedParameters": true }
+```
+- No parameter properties in constructors
+- Use `import type` for type-only imports
+- No `any` types
+- Target ES2023, React 19, MUI v9
 
-### UI Conventions
-- Dracula theme throughout — see `src/theme/dracula.ts`
-- Font: `'JetBrains Mono'`
+## UI Conventions
+
+- Dracula palette (`src/theme/dracula.ts`): background=#282a36, currentLine=#44475a, foreground=#f8f8f2, purple=#bd93f9, etc.
+- Font: `'JetBrains Mono'` (400, 500)
 - **NO emojis** — Material Icons only (`@mui/icons-material`)
 - NO box-shadows — borders + bg colors only
-- Scrollbar: 12px width with `border: 2px solid transparent` + `backgroundClip: padding-box` trick
-
-### MagicPanel
-- `applicableCheck` wrapped in try/catch — single bad check won't crash filter
-- Priority-ordered execution (high→medium→low), early stop on first success
-- Concurrency=3 via `useSageMathParallel`
-- `executeAll` accepts `onResult` callback — returns `true` to abort remaining via AbortController
-
-### ProofRenderer
-- Handles `$...$` and `\(...\)` inline math delimiters
-- Hides References section (both `References:` and `\textbf{References:}` variants)
-- Format: Theorem → Prerequisites (itemize) → Proof (align*) → Explanation → References
-- `\qed` in align blocks → rendered as `∎` tombstone symbol
-
-### OutputPanel
-- Resizable 200-600px via left-edge drag handle (4px grab area, 1px visible line)
-- Width persisted in `localStorage` as `outputPanelWidth`
-
-### Notepad
-- Collapsible textarea in OutputPanel above History section
-- Drag-resizable via 4px grab bar (80-200px range)
-- localStorage persistence with 1h expiry (`notepad` key: `{text, timestamp}`)
-- Height persisted separately (`notepadHeight` key)
-
-### RSA Calculator
-- `calculator` viewMode, pure BigInt (no SageCell)
-- 3 tabs: Key Gen (p,q,e → n,φ,d), Encrypt (m,n,e → c), Decrypt (c,n,d or c,n,p,q,e → m)
-- Decrypt tries `d` first, falls back to computing from `p,q,e` if not provided
-
-### Service Status
-- Sidebar shows FactorDB proxy and SageMathCell availability on mount
-- FactorDB: 5s timeout fetch to `?query=15`
-- SageMathCell: polls for `window.sagecell` with 8s timeout
+- Scrollbar: 12px, `border: 2px solid transparent`, `backgroundClip: padding-box`
 
 ## Workers (FactorDB Proxy)
 
 ```bash
 cd workers
-bun install          # or npm install
-npx wrangler deploy  # deploy to Cloudflare Workers
-npx wrangler dev     # local dev on :8787
+npm install           # NOT bun — wrangler requires Node
+npx wrangler deploy   # deploy to Cloudflare Workers
+npx wrangler dev      # local dev on :8787
 ```
 
 Gitignored: `workers/node_modules/`, `workers/.wrangler/`, `workers/bun.lock`
 
-## File Safety
+After deploy, copy the worker URL into `src/config.ts → FACTORDB_PROXY_URL`.
 
-- Use `trash` for file deletion — never `rm`
-- Create `.bak` backups before overwriting non-git files
+## Safety & File Conventions
+
+- Use `trash` for file deletion (installed at `/usr/bin/trash`) — never `rm`
+- Create `.bak` backup before overwriting non-git files
 - `docs/` is a build artifact — never edit manually
+- `--no-verify` for .env files only (pre-commit blocks secrets)
