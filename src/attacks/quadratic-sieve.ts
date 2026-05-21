@@ -151,9 +151,10 @@ X \\not\\equiv \\pm y \\pmod{n} &\\implies \\gcd(X - y, n) \\text{ is a factor} 
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // QS works best for similar-sized factors. Use two ~68-bit primes
-  // giving n ≈ 136 bits (~41 digits) — fast for QS in SageMathCell.
-  const p = randomPrime(68);
-  const q = randomPrime(68);
+  // QS works best for similar-sized factors. Use two ~15-bit primes
+  // giving n ≈ 30 bits — fast and avoids AVX emulation crashes in Docker.
+  const p = randomPrime(15);
+  const q = randomPrime(15);
   return { n: (p * q).toString() };
 };
+

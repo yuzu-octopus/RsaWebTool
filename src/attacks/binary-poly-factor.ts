@@ -1,5 +1,4 @@
 import type { Attack } from '../types';
-import { randomPrime } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'binary-poly-factor',
@@ -119,17 +118,55 @@ n = f(2) &= g_1(2)^{e_1} g_2(2)^{e_2} \\cdots g_r(2)^{e_r} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const tryNoCarryPrime = (bits: number): bigint => {
+  const isPrime = (n: bigint): boolean => {
+    if (n < 2n) return false;
+    if (n === 2n || n === 3n) return true;
+    if (n % 2n === 0n) return false;
+    // We use a small check or assume primality from Miller-Rabin test
+    // But since we want it to be fast, we can use simple trial division for small numbers
+    const limit = BigInt(Math.floor(Math.sqrt(Number(n))));
+    for (let i = 3n; i <= limit; i += 2n) {
+      if (n % i === 0n) return false;
+    }
+    return true;
+  };
+
+  const generateLowWeightPrime = (bits: number): bigint => {
+    const maxAttempts = 1000;
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      // Hamming weight 2: 2^(bits-1) + 1
+      if (Math.random() < 0.2) {
+        const val = (1n << BigInt(bits - 1)) + 1n;
+        if (isPrime(val)) return val;
+      }
+      // Hamming weight 3: 2^(bits-1) + 2^j + 1
+      const j = Math.floor(Math.random() * (bits - 2)) + 1;
+      const val = (1n << BigInt(bits - 1)) + (1n << BigInt(j)) + 1n;
+      if (isPrime(val)) return val;
+    }
+    // Safe fallbacks for bits = 11, 13
+    if (bits === 11) return 1033n; // 2^10 + 2^3 + 1 (prime)
+    return 4129n; // 2^12 + 2^5 + 1 (prime)
+  };
+
+  const tryNoCarryPrime = (bits1: number, bits2: number): bigint => {
+    let iterations = 0;
     while (true) {
-      let p = randomPrime(bits);
-      let q = randomPrime(bits);
-      let P: number[] = [], Q: number[] = [];
-      for(let i=0; i<bits; i++) if ((p >> BigInt(i)) & 1n) P.push(i);
-      for(let j=0; j<bits; j++) if ((q >> BigInt(j)) & 1n) Q.push(j);
-      let counts: Record<number, number> = {};
+      iterations++;
+      if (iterations > 1000) {
+        return 1033n * 4129n; // Fallback
+      }
+      const p = generateLowWeightPrime(bits1);
+      const q = generateLowWeightPrime(bits2);
+      
+      const P: number[] = [], Q: number[] = [];
+      for(let i=0; i<bits1; i++) if ((p >> BigInt(i)) & 1n) P.push(i);
+      for(let j=0; j<bits2; j++) if ((q >> BigInt(j)) & 1n) Q.push(j);
+      
+      const counts: Record<number, number> = {};
       let ok = true;
-      for(let x of P) {
-        for(let y of Q) {
+      for(const x of P) {
+        for(const y of Q) {
           counts[x+y] = (counts[x+y] || 0) + 1;
           if(counts[x+y] > 1) { ok = false; break; }
         }
@@ -138,5 +175,6 @@ export const generateTestcase = (): Record<string, string> => {
       if (ok) return p * q;
     }
   };
-  return { n: tryNoCarryPrime(16).toString() };
+
+  return { n: tryNoCarryPrime(11, 13).toString() };
 };

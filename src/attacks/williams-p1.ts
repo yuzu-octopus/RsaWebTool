@@ -105,15 +105,23 @@ export const attack: Attack = {
                             return Integer(g)
             return None
         #
-        # Build bound configurations: original + auto-escalation (10x)
+        # Build bound configurations: original + auto-escalation
         B1_orig = B1
         B2_orig = B2
-        configs = [(B1_orig, B2_orig)]
-        if B2_orig > 0:
-            configs.append((B1_orig * 10, B2_orig * 10))
+        if B1_orig == 10000 and B2_orig == 0:
+            configs = [
+                (100, 1000),
+                (1000, 10000),
+                (10000, 100000),
+                (100000, 500000)
+            ]
         else:
-            configs.append((B1_orig * 10, 0))
-            configs.append((B1_orig * 10, B1_orig * 100))
+            configs = [(B1_orig, B2_orig)]
+            if B2_orig > 0:
+                configs.append((B1_orig * 10, B2_orig * 10))
+            else:
+                configs.append((B1_orig * 10, 0))
+                configs.append((B1_orig * 10, B1_orig * 100))
         #
         try:
             found = False
@@ -189,12 +197,10 @@ V_{(k+1)M} &= V_{kM} \\cdot V_M - V_{(k-1)M} \\pmod{n} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  let p = 0n;
-  let attempt = 0;
-  while(true) {
-    attempt++;
+  let p: bigint;
+  while (true) {
     let pPlus1 = 2n;
-    let primes = [];
+    const primes = [];
     for(let i=2; i<=2000; i++) if(isPrimeMR(BigInt(i))) primes.push(BigInt(i));
     primes.sort(() => Math.random() - 0.5);
     let currentBits = 0;

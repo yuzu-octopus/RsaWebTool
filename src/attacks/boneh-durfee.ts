@@ -108,42 +108,45 @@ export const attack: Attack = {
                         if monomials[jj] in gg[ii].monomials():
                             BB[ii, jj] = gg[ii].monomial_coefficient(monomials[jj]) * monomials[jj](UU, XX, YY)
                 BB = BB.LLL()
-                PR2 = PolynomialRing(QQ, 'w, z')
-                w, z = PR2.gens()
+                import sympy
+                w_sym, z_sym = sympy.symbols('w z')
+                u_sym, x_sym, y_sym = sympy.symbols('u x y')
+                def to_sympy(poly):
+                    expr = sympy.sympify(str(poly))
+                    return expr.subs({u_sym: w_sym*z_sym + 1, x_sym: w_sym, y_sym: z_sym})
+                mon_syms = [to_sympy(m) for m in monomials]
                 found2 = False
                 for i1 in range(nn - 1):
                     if found2:
                         break
                     for i2 in range(i1 + 1, nn):
-                        p1 = sum(monomials[j](w * z + 1, w, z) * BB[i1, j] / monomials[j](UU, XX, YY) for j in range(nn))
-                        p2 = sum(monomials[j](w * z + 1, w, z) * BB[i2, j] / monomials[j](UU, XX, YY) for j in range(nn))
+                        p1 = sum(sympy.Rational(int(BB[i1, j]), int(monomials[j](UU, XX, YY))) * mon_syms[j] for j in range(nn))
+                        p2 = sum(sympy.Rational(int(BB[i2, j]), int(monomials[j](UU, XX, YY))) * mon_syms[j] for j in range(nn))
                         try:
-                            rr = p1.resultant(p2)
-                        except BaseException:
+                            rr = sympy.resultant(p1, p2, w_sym)
+                        except Exception:
                             continue
-                        if rr.is_zero() or rr.monomials() == [1]:
+                        if rr == 0 or rr == 1:
                             continue
-                        PR3 = ZZ['qv']
-                        qv = PR3.gen()
-                        rr_single = rr(qv, qv)
-                        y_roots = rr_single.roots()
-                        for (y0, _) in y_roots:
-                            if y0.denominator() != 1:
-                                continue
-                            y0_int = Integer(y0)
+                        try:
+                            roots_dict = sympy.roots(rr, z_sym)
+                        except Exception:
+                            continue
+                        for z0_sym in roots_dict:
                             try:
-                                univar = p1(w, y0_int)
-                                coeffs = univar.dict()
-                                Px = QQ['x']
-                                x_var = Px.gen()
-                                x_poly = sum(QQ(coeffs.get((d, 0), 0)) * x_var ** d for d in range(univar.degree(w) + 1))
-                                x_roots = x_poly.roots()
-                            except BaseException:
+                                y0_int = Integer(int(z0_sym))
+                            except Exception:
                                 continue
-                            for (x0, _) in x_roots:
-                                if x0.denominator() != 1:
+                            try:
+                                p1_y0 = p1.subs({z_sym: y0_int})
+                                w_roots = sympy.solve(p1_y0, w_sym)
+                            except Exception:
+                                continue
+                            for x0_sym in w_roots:
+                                try:
+                                    x0_int = Integer(int(x0_sym))
+                                except Exception:
                                     continue
-                                x0_int = Integer(x0)
                                 if f(x0_int, y0_int) % e == 0:
                                     d_val = (1 + x0_int * (A + y0_int)) // e
                                     if d_val > 0:
@@ -162,8 +165,8 @@ export const attack: Attack = {
                                                 print("BONEH_DURFEE=SUCCESS")
                                                 found2 = True
                                                 break
-                        if found2:
-                            break
+                            if found2:
+                                break
                 if not found2:
                     print("Boneh-Durfee lattice attack failed: d >= n^0.292 or parameters insufficient.")
                     print("BONEH_DURFEE=FAILED")
@@ -218,8 +221,8 @@ export const generateTestcase = (): Record<string, string> => {
   // For 512-bit n: n^0.25 ≈ 2^128, n^0.260 ≈ 2^133. Pick d ≈ 3 * n^0.25 ≈ 2^130.
   const nBits = n.toString(2).length;
   const fourthRootBits = Math.floor(nBits / 4);
-  // d ≈ 3 * 2^fourthRootBits ≈ 3 * n^0.25, safely above Wiener bound, within BD bound
-  let d = (1n << BigInt(fourthRootBits)) * 3n + 1n;
+  // d ≈ 2^fourthRootBits ≈ n^0.25, safely above Wiener bound (~0.33 * n^0.25), within BD bound
+  let d = (1n << BigInt(fourthRootBits)) + 1n;
   while (modInverse(d, phi) === null) {
     d += 2n;
   }

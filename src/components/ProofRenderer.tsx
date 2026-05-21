@@ -90,9 +90,125 @@ function parseTextBlock(text: string): ProofSegment[] {
 }
 
 /**
+ * Heuristically wraps math-like expressions in text with $...$ delimiters.
+ */
+function autoWrapMathInParagraph(text: string): string {
+  // Split by existing math blocks to avoid double wrapping
+  const parts = text.split(/(\$[^\$]+\$|\\\(.*?[^\\]\\\))/);
+  
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2 === 1) continue; // Already math
+    
+    const current = parts[i];
+    const tokens = current.split(/(\s+|[.,;:!]+)/).filter(t => t !== '');
+    let inMath = false;
+    let mathSegment: string[] = [];
+    const newWords: string[] = [];
+    
+    const mathFunctionNames = ['log', 'gcd', 'mod', 'div', 'lcm', 'max', 'min', 'sin', 'cos', 'tan', 'det', 'res', 'ln', 'exp', 'deg'];
+    
+    const isMathToken = (token: string, canStart: boolean): boolean => {
+      const t = token.trim();
+      if (!t) return false;
+      
+      if (t.includes('\\') || t.includes('_') || t.includes('^') || /[=<>+\-*\/|~]/.test(t)) {
+        return true;
+      }
+      
+      if (/^[a-zA-Z]$/.test(t)) {
+        return true;
+      }
+      
+      if (/^[0-9]+(\.[0-9]+)?$/.test(t)) {
+        return true;
+      }
+      
+      // Case-sensitive check for math functions
+      if (mathFunctionNames.includes(t)) {
+        return true;
+      }
+      
+      if (/^[()\[\]\{\}]+$/.test(t)) {
+        return true;
+      }
+      
+      if (/^[.,;:!]+$/.test(t)) {
+        return !canStart;
+      }
+      
+      if (/^[a-zA-Z]{2,}$/.test(t)) {
+        return false;
+      }
+      
+      if (/^[a-zA-Z0-9()\[\]\{\},.:;!+=<>\-*\/|\\_]+$/.test(t)) {
+        return /[^a-zA-Z]/.test(t);
+      }
+      
+      return false;
+    };
+    
+    const hasStrongMathIndicator = (segment: string[]): boolean => {
+      const combined = segment.join('');
+      return combined.includes('\\') || combined.includes('_') || combined.includes('^') || /[=<>+\-*\/|]/.test(combined);
+    };
+    
+    const flushMath = () => {
+      if (mathSegment.length > 0) {
+        const segmentToWrap = [...mathSegment];
+        let trailingPunc = '';
+        
+        while (segmentToWrap.length > 0) {
+          const lastToken = segmentToWrap[segmentToWrap.length - 1];
+          if (/^[.,;:!]+$/.test(lastToken.trim())) {
+            trailingPunc = lastToken + trailingPunc;
+            segmentToWrap.pop();
+          } else {
+            break;
+          }
+        }
+        
+        if (segmentToWrap.length > 0 && hasStrongMathIndicator(segmentToWrap)) {
+          newWords.push('$' + segmentToWrap.join('') + '$' + trailingPunc);
+        } else {
+          newWords.push(mathSegment.join(''));
+        }
+        mathSegment = [];
+      }
+      inMath = false;
+    };
+    
+    for (const w of tokens) {
+      if (/^\s+$/.test(w)) {
+        if (inMath) {
+          mathSegment.push(w);
+        } else {
+          newWords.push(w);
+        }
+        continue;
+      }
+      
+      if (isMathToken(w, !inMath)) {
+        inMath = true;
+        mathSegment.push(w);
+      } else {
+        flushMath();
+        newWords.push(w);
+      }
+    }
+    flushMath();
+    
+    parts[i] = newWords.join('');
+  }
+  
+  return parts.join('');
+}
+
+/**
  * Renders text that may contain inline math ($...$).
  */
 function InlineMath({ text }: { text: string }) {
+  const processedText = useMemo(() => autoWrapMathInParagraph(text), [text]);
+
   const parts = useMemo(() => {
     const result: React.ReactNode[] = [];
     const inlineRegex = /\$([^$]+)\$|\\\(([^)]+)\\\)/g;
@@ -100,10 +216,10 @@ function InlineMath({ text }: { text: string }) {
     let match;
     let key = 0;
 
-    while ((match = inlineRegex.exec(text)) !== null) {
+    while ((match = inlineRegex.exec(processedText)) !== null) {
       if (match.index > lastIdx) {
         result.push(
-          <span key={key} dangerouslySetInnerHTML={{ __html: renderInlineText(text.slice(lastIdx, match.index)) }} />
+          <span key={key} dangerouslySetInnerHTML={{ __html: renderInlineText(processedText.slice(lastIdx, match.index)) }} />
         );
         key++;
       }
@@ -119,14 +235,14 @@ function InlineMath({ text }: { text: string }) {
       lastIdx = match.index + match[0].length;
     }
 
-    if (lastIdx < text.length) {
+    if (lastIdx < processedText.length) {
       result.push(
-        <span key={key} dangerouslySetInnerHTML={{ __html: renderInlineText(text.slice(lastIdx)) }} />
+        <span key={key} dangerouslySetInnerHTML={{ __html: renderInlineText(processedText.slice(lastIdx)) }} />
       );
     }
 
     return result;
-  }, [text]);
+  }, [processedText]);
 
   return <>{parts}</>;
 }

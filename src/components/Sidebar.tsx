@@ -38,9 +38,13 @@ export function Sidebar() {
     if (FACTORDB_PROXY_URL) {
       fetch(`${FACTORDB_PROXY_URL}?query=15`, { signal: abortController.signal })
         .then(r => r.json())
-        .then(() => setStatus(prev => ({ ...prev, factordb: 'ok' })))
+        .then(() => {
+          if (factorDbTimeout) clearTimeout(factorDbTimeout);
+          setStatus(prev => ({ ...prev, factordb: 'ok' }));
+        })
         .catch(() => {
           if (!abortController.signal.aborted) {
+            if (factorDbTimeout) clearTimeout(factorDbTimeout);
             setStatus(prev => ({ ...prev, factordb: 'error' }));
           }
         });
