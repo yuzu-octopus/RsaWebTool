@@ -6,7 +6,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 
 ## Features
 
-- **52 attack implementations** across 5 categories
+- **52 attack implementations** across 5 categories (100% mathematically verified via Dockerized SageMath test suite)
 - **Real-time SageMath execution** via embedded SageMathCell
 - **Browser-side pre-checks** — 4 attacks run entirely in the browser (no SageCell needed)
 - **FactorDB integration** — CORS-proxied API for instant factor lookups

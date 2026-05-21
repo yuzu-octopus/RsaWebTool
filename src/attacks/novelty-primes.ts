@@ -56,7 +56,7 @@ export const attack: Attack = {
                             print(f"  Verification: {candidate} * {n // candidate} = {n}")
                             found = True
             print("\\nChecking primes near common constants...")
-            RF = RealField(200)
+            RF = RealField(300)
             constants = [
                 ("pi", Integer(str(RF(pi()).n(digits=60).str()).replace('.', '')[:55])),
                 ("e", Integer(str(RF(exp(1)).n(digits=60).str()).replace('.', '')[:55])),

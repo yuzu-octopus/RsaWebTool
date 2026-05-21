@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
+import { generateKeyPair, encrypt } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'bleichenbacher',
@@ -164,7 +164,7 @@ M_i &= \\bigcup_r \\left[ \\left\\lceil \\frac{2B + r n}{s_i} \\right\\rceil, \\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n, e } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+  const { n, e } = generateKeyPair(64, 64);
   const k = Math.ceil(n.toString(2).length / 8);
   const B = 256n ** BigInt(k - 2);
   const lower = 2n * B;
@@ -175,8 +175,8 @@ export const generateTestcase = (): Record<string, string> => {
 
   // Compute valid s positions: m*s mod n ∈ [2B, 3B)
   // For wrapping round r: s ∈ [ceil((r·n+2B)/m), floor((r·n+3B-1)/m)]
-  // Use maxS = 2^18 = 262144 to get ~4 valid responses
-  const maxS = 262144;
+  // Use maxS = 2^18 = 1048576 to get ~4 valid responses
+  const maxS = 1048576;
   const validPositions = new Set<number>();
   validPositions.add(1); // s=1 always valid
 

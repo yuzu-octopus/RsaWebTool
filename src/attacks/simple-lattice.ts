@@ -36,7 +36,7 @@ export const attack: Attack = {
             R.<x> = PolynomialRing(Zmod(n))
             f = nearp + x
             # Bound: |x| < n^(1/4) for Coppersmith with beta=0.5, deg=1
-            bound = n.nth_root(4)
+            bound = n.nth_root(4, truncate_mode=True)[0]
             print(f"Using bound X = {bound}")
             roots = f.small_roots(X=bound, beta=0.5, epsilon=0.05)
             if roots:

@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
+import { randomPrime } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'binary-poly-factor',
@@ -119,27 +119,24 @@ n = f(2) &= g_1(2)^{e_1} g_2(2)^{e_2} \\cdots g_r(2)^{e_r} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Construct primes with sparse binary patterns (more likely to yield factorable polynomials)
-  // Build p = 2^a + 2^b + 1 with random a, b positions
-  const trySparsePrime = (bits: number): bigint => {
-    for (let attempt = 0; attempt < 200; attempt++) {
-      let val = (1n << BigInt(bits - 1)) | 1n; // top and bottom bits set
-      const numOnes = 3 + Math.floor(Math.random() * 4); // 3-6 bits set
-      const positions = new Set<number>();
-      positions.add(bits - 1);
-      positions.add(0);
-      while (positions.size < numOnes) {
-        positions.add(1 + Math.floor(Math.random() * (bits - 2)));
+  const tryNoCarryPrime = (bits: number): bigint => {
+    while (true) {
+      let p = randomPrime(bits);
+      let q = randomPrime(bits);
+      let P: number[] = [], Q: number[] = [];
+      for(let i=0; i<bits; i++) if ((p >> BigInt(i)) & 1n) P.push(i);
+      for(let j=0; j<bits; j++) if ((q >> BigInt(j)) & 1n) Q.push(j);
+      let counts: Record<number, number> = {};
+      let ok = true;
+      for(let x of P) {
+        for(let y of Q) {
+          counts[x+y] = (counts[x+y] || 0) + 1;
+          if(counts[x+y] > 1) { ok = false; break; }
+        }
+        if(!ok) break;
       }
-      for (const pos of positions) {
-        val |= (1n << BigInt(pos));
-      }
-      if (isPrimeMR(val)) return val;
+      if (ok) return p * q;
     }
-    return randomPrime(bits);
   };
-
-  const p = trySparsePrime(TESTCASE_BITS.p);
-  const q = trySparsePrime(TESTCASE_BITS.q);
-  return { n: (p * q).toString() };
+  return { n: tryNoCarryPrime(16).toString() };
 };

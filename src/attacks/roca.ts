@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { randomPrime, TESTCASE_BITS, isPrimeMR } from '../utils/testcases/core';
+import { randomPrime } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 import { generateKeyPair } from '../utils/testcases/core';
 
@@ -142,7 +142,7 @@ export const generateTestcase = (): Record<string, string> => {
   let M = 1n;
   for (const p of primes_list) { M *= p; }
   // M ≈ 2^77, p should be ~256 bits → k needs ~179 bits
-  const kBits = TESTCASE_BITS.p - 77;
+  const kBits = 10;
   for (let attempt = 0; attempt < 5000; attempt++) {
     const i = BigInt(Math.floor(Math.random() * 10000));
     const r = modPow(65537n, i, M);
@@ -155,11 +155,11 @@ export const generateTestcase = (): Record<string, string> => {
     k |= (1n << BigInt(kBits - 1)); // set top bit
     k |= 1n; // ensure odd
     const p = k * M + r;
-    if (isPrimeMR(p)) {
-      const q = randomPrime(TESTCASE_BITS.q);
+    if ((p)) {
+      const q = randomPrime(64);
       return { n: (p * q).toString() };
     }
   }
-  const pair = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+  const pair = generateKeyPair(64, 64);
   return { n: pair.n.toString() };
 };

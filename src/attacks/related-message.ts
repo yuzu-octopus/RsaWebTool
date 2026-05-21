@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { TESTCASE_BITS, randomPrime } from '../utils/testcases/core';
+import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 
 export const attack: Attack = {
@@ -112,9 +112,7 @@ m &= -\\frac{\\text{constant term}}{\\text{leading coefficient}} \\pmod{n} \\qed
 
 export const generateTestcase = (): Record<string, string> => {
   const e = 3n;
-  const p = randomPrime(TESTCASE_BITS.p);
-  const q = randomPrime(TESTCASE_BITS.q);
-  const n = p * q;
+  const { n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q, e);
   const m = BigInt(Math.floor(Math.random() * 10000) + 42);
   const a = 2n;
   const b = 3n;

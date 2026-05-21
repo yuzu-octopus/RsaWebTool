@@ -32,7 +32,7 @@ export const attack: Attack = {
             k = p_msb.trailing_zero_bits()
             X = 2 ** k
             # Coppersmith bound for beta=0.5: |x| < n^(beta^2) = n^0.25
-            max_X = Integer(n.nth_root(4))
+            max_X = Integer(n.nth_root(4, truncate_mode=True)[0])
             if X >= max_X:
                 X = max_X
             print(f"Partial Key Exposure Attack")

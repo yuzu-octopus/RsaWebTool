@@ -144,48 +144,36 @@ p &\\mid (H^{q_0} - 1) \\implies 1 < \\gcd\\left(\\prod_{q \\in (B_1, B_2]} (H^q
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // 70% chance: create a stage 1 testcase (p-1 entirely B1-smooth, small factors)
-  // 30% chance: create a stage 2 testcase (p-1 has one large factor > B1, ≤ B2)
-  if (Math.random() < 0.7) {
-    // Stage 1 case: all prime factors of p-1 are ≤ 71, well within B1=10000
-    const smallPrimes = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n, 67n, 71n];
+  let p = 0n;
+  let attempt = 0;
+  while(true) {
+    attempt++;
     let pMinus1 = 2n;
-    for (const sp of smallPrimes) {
-      const exp = Math.floor(Math.random() * 4) + 1;
-      pMinus1 *= sp ** BigInt(exp);
+    let primes = [];
+    for(let i=2; i<=2000; i++) if(isPrimeMR(BigInt(i))) primes.push(BigInt(i));
+    primes.sort(() => Math.random() - 0.5);
+    let currentBits = 0;
+    let idx = 0;
+    while (currentBits < 250 && idx < primes.length) {
+      pMinus1 *= primes[idx];
+      currentBits += primes[idx].toString(2).length;
+      idx++;
     }
-    while (pMinus1 < (1n << 255n)) pMinus1 *= 2n;
-    let p = pMinus1 + 1n;
-    while (!isPrimeMR(p)) { pMinus1 *= 2n; p = pMinus1 + 1n; }
-    const q = randomPrime(TESTCASE_BITS.q);
-    return { n: (p * q).toString(), B: '10000', B2: '0' };
-  } else {
-    // Stage 2 case: p-1 = smooth_part * large_prime, large_prime in (10000, 50000]
-    // smooth_part has all prime factors ≤ 71
-    const smallPrimes = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n, 67n, 71n];
-    let smoothPart = 2n;
-    for (const sp of smallPrimes) {
-      const exp = Math.floor(Math.random() * 3) + 1;
-      smoothPart *= sp ** BigInt(exp);
+    
+    // Check if Stage 1 or 2
+    if (Math.random() < 0.7) {
+      p = pMinus1 + 1n;
+    } else {
+      let largePrime = BigInt(Math.floor(Math.random() * 900000) + 10000);
+      while (!isPrimeMR(largePrime)) {
+        largePrime++;
+      }
+      p = pMinus1 * largePrime + 1n;
     }
-    while (smoothPart < (1n << 240n)) smoothPart *= 2n;
-    // Pick a random prime between 10007 and 50000 for the large factor
-    // All candidates must be ≤ B2 (50000) so Stage 2 can find them
-    const largeCandidates = [
-      10007n, 10009n, 10037n, 10039n, 10061n, 10067n, 10069n, 10079n, 10091n, 10093n,
-      20011n, 20021n, 20023n, 20029n, 20047n, 20051n, 20063n, 20071n, 20089n, 20101n,
-      30011n, 30013n, 30029n, 30047n, 30059n, 30071n, 30089n, 30091n, 30097n, 30103n,
-      40009n, 40013n, 40031n, 40037n, 40039n, 40063n, 40087n, 40093n, 40099n, 40111n,
-      43003n, 43013n, 43019n, 43037n, 43049n, 43051n, 43063n, 43067n, 43093n, 43103n,
-      46021n, 46027n, 46049n, 46051n, 46061n, 46073n, 46091n, 46093n, 46099n, 46103n,
-    ];
-    const largePrime = largeCandidates[Math.floor(Math.random() * largeCandidates.length)];
-    let pMinus1 = smoothPart * largePrime;
-    // Ensure pMinus1 is even (p is odd)
-    if (pMinus1 % 2n === 1n) pMinus1 *= 2n;
-    let p = pMinus1 + 1n;
-    while (!isPrimeMR(p)) { pMinus1 += largePrime; p = pMinus1 + 1n; }
-    const q = randomPrime(TESTCASE_BITS.q);
-    return { n: (p * q).toString(), B: '10000', B2: '50000' };
+    if (isPrimeMR(p)) break;
   }
+
+  const q = randomPrime(TESTCASE_BITS.q);
+  const n = p * q;
+  return { n: n.toString() };
 };

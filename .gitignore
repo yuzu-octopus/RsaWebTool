@@ -19,3 +19,4 @@ workers/.wrangler/
 workers/bun.lock
 test-*.ts
 HANDOFF.md
+scratch/

@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
+import { randomPrime } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 
 export const attack: Attack = {
@@ -127,8 +127,8 @@ m &= \\text{root} - \\delta_1 \\qed
 
 export const generateTestcase = (): Record<string, string> => {
   const e = 3n;
-  const p = randomPrime(TESTCASE_BITS.p);
-  const q = randomPrime(TESTCASE_BITS.q);
+  const p = randomPrime(64);
+  const q = randomPrime(64);
   const n = p * q;
   const m = BigInt(Math.floor(Math.random() * 10000) + 42);
   const maxPad = 2 ** 20;

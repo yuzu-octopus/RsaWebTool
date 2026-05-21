@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
+import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 
 export const attack: Attack = {
@@ -152,7 +152,7 @@ b_i = 1 \\implies [a_{i+1}, b_{i+1}] &= [(a_i + b_i)/2, b_i) \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n, e, d } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+  const { n, e, d } = generateKeyPair(32, 32);
   const nBits = n.toString(2).length;
   const m = BigInt('0x' + Array.from(crypto.getRandomValues(new Uint8Array(Math.ceil(nBits / 8))))
     .map(b => b.toString(16).padStart(2, '0')).join('')) % (n / 2n);

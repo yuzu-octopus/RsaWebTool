@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
+import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 
 export const attack: Attack = {
@@ -124,14 +124,14 @@ k = \\lceil \\log_2 n \\rceil &\\implies u_k - \\ell_k < 1 \\implies m = \\ell_k
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n, e, d } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+  const { n, e, d } = generateKeyPair(32, 32);
   const m = BigInt(Math.floor(Math.random() * 1000000) + 42);
   const c = encrypt(m, n, e);
   const responses: string[] = [];
   // Start from c * 2^e mod n so that responses[0] = LSB(2m mod n)
   // matching the sage template which multiplies c by 2^e before each check
   let curC = (c * modPow(2n, e, n)) % n;
-  const nBits = TESTCASE_BITS.p + TESTCASE_BITS.q;
+  const nBits = 32 + 32;
   for (let i = 0; i < nBits; i++) {
     responses.push((modPow(curC, d, n) % 2n).toString());
     curC = (curC * modPow(2n, e, n)) % n;

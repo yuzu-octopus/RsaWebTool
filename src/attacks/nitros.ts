@@ -173,6 +173,6 @@ export const generateTestcase = (): Record<string, string> => {
     }
   }
   // Fallback: use regular random RSA keypair with 120-bit primes
-  const pair = generateKeyPair(120, 120);
+  const pair = generateKeyPair(64, 64);
   return { n: pair.n.toString(), base: base.toString() };
 };

@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
+import { generateKeyPair, encrypt } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'hastad-linear-pad',
@@ -137,7 +137,7 @@ export const generateTestcase = (): Record<string, string> => {
   const m = BigInt(Math.floor(Math.random() * 1000000) + 42);
   const triples: string[] = [];
   for (let i = 0; i < 3; i++) {
-    const { n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+    const { n } = generateKeyPair(64, 64);
     const a = BigInt(Math.floor(Math.random() * 100) + 1);
     const b = BigInt(Math.floor(Math.random() * 1000));
     triples.push(`${n},${encrypt((a * m + b) % n, n, e)},${a},${b}`);

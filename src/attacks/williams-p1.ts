@@ -124,7 +124,7 @@ export const attack: Attack = {
                         print(f", B2 = {B2_cur}")
                     else:
                         print()
-                for P in range(3, 30):
+                for P in range(3, 10):
                     g = williams_p1_stage(n, B1_cur, B2_cur, P)
                     if g is not None:
                         p = Integer(g)
@@ -189,44 +189,36 @@ V_{(k+1)M} &= V_{kM} \\cdot V_M - V_{(k-1)M} \\pmod{n} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // 70% chance: stage 1 case (p+1 entirely B1-smooth, all factors ≤ 71)
-  // 30% chance: stage 2 case (p+1 has one large factor ∈ (10007, 50000], B2=50000)
-  if (Math.random() < 0.7) {
-    // Stage 1 case: all prime factors of p+1 are ≤ 71, well within B1=10000
-    const smallPrimes = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n, 67n, 71n];
+  let p = 0n;
+  let attempt = 0;
+  while(true) {
+    attempt++;
     let pPlus1 = 2n;
-    for (const sp of smallPrimes) {
-      const exp = Math.floor(Math.random() * 4) + 1;
-      pPlus1 *= sp ** BigInt(exp);
+    let primes = [];
+    for(let i=2; i<=2000; i++) if(isPrimeMR(BigInt(i))) primes.push(BigInt(i));
+    primes.sort(() => Math.random() - 0.5);
+    let currentBits = 0;
+    let idx = 0;
+    while (currentBits < 250 && idx < primes.length) {
+      pPlus1 *= primes[idx];
+      currentBits += primes[idx].toString(2).length;
+      idx++;
     }
-    while (pPlus1 < (1n << 255n)) pPlus1 *= 2n;
-    let p = pPlus1 - 1n;
-    while (!isPrimeMR(p) || p <= 2n) { pPlus1 *= 2n; p = pPlus1 - 1n; }
-    const q = randomPrime(TESTCASE_BITS.q);
-    return { n: (p * q).toString(), B: '10000', B2: '0' };
-  } else {
-    // Stage 2 case: p+1 = smooth_part * large_prime, large_prime ∈ (10007, 50000]
-    const smallPrimes = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n, 67n, 71n];
-    let smoothPart = 2n;
-    for (const sp of smallPrimes) {
-      const exp = Math.floor(Math.random() * 3) + 1;
-      smoothPart *= sp ** BigInt(exp);
+    
+    // Check if Stage 1 or 2
+    if (Math.random() < 0.7) {
+      p = pPlus1 - 1n;
+    } else {
+      let largePrime = BigInt(Math.floor(Math.random() * 900000) + 10000);
+      while (!isPrimeMR(largePrime)) {
+        largePrime++;
+      }
+      p = pPlus1 * largePrime - 1n;
     }
-    while (smoothPart < (1n << 240n)) smoothPart *= 2n;
-    // Pick a random prime between 10007 and 50000 for the large factor
-    const largeCandidates = [
-      10007n, 10009n, 10037n, 10039n, 10061n, 10067n, 10069n, 10079n, 10091n, 10093n,
-      20011n, 20021n, 20023n, 20029n, 20047n, 20051n, 20063n, 20071n, 20089n, 20101n,
-      30011n, 30013n, 30029n, 30047n, 30059n, 30071n, 30089n, 30091n, 30097n, 30103n,
-      40009n, 40013n, 40031n, 40037n, 40039n, 40063n, 40087n, 40093n, 40099n, 40111n,
-      50021n, 50023n, 50033n, 50047n, 50051n, 50053n, 50069n, 50077n, 50087n, 50093n,
-    ];
-    const largePrime = largeCandidates[Math.floor(Math.random() * largeCandidates.length)];
-    let pPlus1 = smoothPart * largePrime;
-    if (pPlus1 % 2n === 1n) pPlus1 *= 2n;
-    let p = pPlus1 - 1n;
-    while (!isPrimeMR(p) || p <= 2n) { pPlus1 += largePrime; p = pPlus1 - 1n; }
-    const q = randomPrime(TESTCASE_BITS.q);
-    return { n: (p * q).toString(), B: '10000', B2: '50000' };
+    if (isPrimeMR(p)) break;
   }
+
+  const q = randomPrime(TESTCASE_BITS.q);
+  const n = p * q;
+  return { n: n.toString() };
 };
