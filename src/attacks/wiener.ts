@@ -11,69 +11,74 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `try:
-    n = Integer(${vals.n})
-    e = Integer(${vals.e})
-    print(f"Wiener's Attack on n = {n}")
-    print()
-    # Pre-checks
-    if n < 2 or e < 2:
-        print("Invalid input: n and e must be >= 2")
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
+    try:
+        def _wiener_attack():
+            try:
+                n = Integer(${vals.n})
+                e = Integer(${vals.e})
+                print(f"Wiener's Attack on n = {n}")
+                if n < 2 or e < 2:
+                    print("Invalid input: n and e must be >= 2")
+                    print("WIENER=FAILED")
+                    return
+                if n % 2 == 0:
+                    print(f"n is even: {n}")
+                    print(f"p = 2")
+                    print(f"q = {n // 2}")
+                    print(f"Verification: 2 * {n // 2} = {n}")
+                    print("WIENER=SUCCESS")
+                    return
+                if n.is_prime():
+                    print(f"n is prime: {n}")
+                    print("No factorization possible")
+                    print("WIENER=FAILED")
+                    return
+                if n.is_square():
+                    p = n.isqrt()
+                    print(f"n is a perfect square: {p}^2 = {n}")
+                    print(f"p = q = {p}")
+                    print(f"Verification: p * q = {p * p}")
+                    print("WIENER=SUCCESS")
+                    return
+                cf = continued_fraction(QQ(e) / QQ(n))
+                found = False
+                for conv in cf.convergents():
+                    k, d = conv.numerator(), conv.denominator()
+                    if k == 0 or d % 2 == 0:
+                        continue
+                    if (e * d - 1) % k == 0:
+                        phi = (e * d - 1) // k
+                        if phi % 2 == 0:
+                            s = n - phi + 1
+                            disc = s * s - 4 * n
+                            if disc > 0 and disc.is_square():
+                                t = disc.isqrt()
+                                if (s + t) % 2 == 0:
+                                    p = (s - t) // 2
+                                    q = (s + t) // 2
+                                    if p * q == n and p > 1:
+                                        print(f"Private exponent d = {d}")
+                                        print(f"p = {p}")
+                                        print(f"q = {q}")
+                                        print(f"Verification: p * q = {p * q}")
+                                        print(f"d < n^0.25: {d ** 4 < n}")
+                                        print("WIENER=SUCCESS")
+                                        found = True
+                                        break
+                if not found:
+                    print("Wiener's attack failed: d may be too large (d >= n^0.25)")
+                    print("Try Boneh-Durfee attack for larger d values")
+                    print("WIENER=FAILED")
+            except BaseException as ex:
+                print(f"ERROR: {ex}")
+                print("WIENER=FAILED")
+        _wiener_attack()
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("WIENER=FAILED")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2")
-        print(f"q = {n // 2}")
-        print(f"Verification: 2 * {n // 2} = {n}")
-        print("WIENER=SUCCESS")
-        quit()
-    if n.is_prime():
-        print(f"n is prime: {n}")
-        print("No factorization possible")
-        print("WIENER=FAILED")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print(f"Verification: p * q = {p * p}")
-        print("WIENER=SUCCESS")
-        quit()
-    # Continued fraction convergents of e/n using SageMath built-in
-    cf = continued_fraction(QQ(e) / QQ(n))
-    found = False
-    for conv in cf.convergents():
-        k, d = conv.numerator(), conv.denominator()
-        if k == 0:
-            continue
-        if (e * d - 1) % k == 0:
-            phi = (e * d - 1) // k
-            if phi % 2 == 0:
-                s = n - phi + 1
-                disc = s * s - 4 * n
-                if disc > 0 and disc.is_square():
-                    t = isqrt(disc)
-                    if (s + t) % 2 == 0:
-                        p = (s - t) // 2
-                        q = (s + t) // 2
-                        if p * q == n and p > 1:
-                            print(f"Private exponent d = {d}")
-                            print(f"p = {p}")
-                            print(f"q = {q}")
-                            print(f"Verification: p * q = {p * q}")
-                            print(f"d < n^0.25: {d ** 4 < n}")
-                            print("WIENER=SUCCESS")
-                            found = True
-                            break
-    if not found:
-        print("Wiener's attack failed: d may be too large (d >= n^0.25)")
-        print("Try Boneh-Durfee attack for larger d values")
-        print("WIENER=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("WIENER=FAILED")
-`,
+_attack()`,
   proof: `\\textbf{Theorem:} If d < n^{1/4}/3 and q < p < 2q, then d can be recovered from the continued fraction expansion of e/n.
 
 \\textbf{Prerequisites:}

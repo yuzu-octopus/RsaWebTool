@@ -12,40 +12,46 @@ export const attack: Attack = {
     { name: 'a', label: 'a (base)', placeholder: 'Enter base a...', multiline: false },
     { name: 'leak', label: 'leak (a^p mod n)', placeholder: 'Enter leaked value...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (v) => `try:
-    n = Integer(${v.n})
-    a = Integer(${v.a})
-    leak = Integer(${v.leak})
-    if n < 2 or a < 2 or leak < 0:
-        print("Invalid input")
+  sageTemplate: (v) => `def _attack():
+    try:
+        try:
+            n = Integer(${v.n})
+            a = Integer(${v.a})
+            leak = Integer(${v.leak})
+            if n < 2 or a < 2 or leak < 0:
+                print("Invalid input")
+                print("IMPLICIT_KEY_EXPOSURE=FAILED")
+                return
+            print(f"Implicit Key Exposure Attack")
+            print(f"n = {n}")
+            print(f"a = {a}")
+            print(f"leak = a^p mod n = {leak}")
+            print()
+            # By Fermat's little theorem: a^p = a (mod p)
+            # leak = a^p (mod n) => leak = a^p (mod p) => leak = a (mod p)
+            # Therefore: p | (leak - a) => p = gcd(leak - a, n)
+            g = gcd(leak - a, n)
+            print(f"gcd(leak - a, n) = {g}")
+            print()
+            if g > 1 and g < n:
+                p = g
+                q = n // p
+                print(f"p = {p}")
+                print(f"q = {q}")
+                print(f"Verification: p * q = {p * q}")
+                print(f"Verification: a^p mod n = {power_mod(a, p, n)} == leak? {power_mod(a, p, n) == leak}")
+                print("IMPLICIT_KEY_EXPOSURE=SUCCESS")
+            else:
+                print("gcd(leak - a, n) = 1 or n. Fermat trick failed.")
+                print("Possible causes: p divides a, or leak is not a^p mod n.")
+                print("IMPLICIT_KEY_EXPOSURE=FAILED")
+        except Exception as ex:
+            print(f"IMPLICIT_KEY_EXPOSURE=FAILED: {ex}")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("IMPLICIT_KEY_EXPOSURE=FAILED")
-        quit()
-    print(f"Implicit Key Exposure Attack")
-    print(f"n = {n}")
-    print(f"a = {a}")
-    print(f"leak = a^p mod n = {leak}")
-    print()
-    # By Fermat's little theorem: a^p = a (mod p)
-    # leak = a^p (mod n) => leak = a^p (mod p) => leak = a (mod p)
-    # Therefore: p | (leak - a) => p = gcd(leak - a, n)
-    g = gcd(leak - a, n)
-    print(f"gcd(leak - a, n) = {g}")
-    print()
-    if g > 1 and g < n:
-        p = g
-        q = n // p
-        print(f"p = {p}")
-        print(f"q = {q}")
-        print(f"Verification: p * q = {p * q}")
-        print(f"Verification: a^p mod n = {power_mod(a, p, n)} == leak? {power_mod(a, p, n) == leak}")
-        print("IMPLICIT_KEY_EXPOSURE=SUCCESS")
-    else:
-        print("gcd(leak - a, n) = 1 or n. Fermat trick failed.")
-        print("Possible causes: p divides a, or leak is not a^p mod n.")
-        print("IMPLICIT_KEY_EXPOSURE=FAILED")
-except Exception as ex:
-    print(f"IMPLICIT_KEY_EXPOSURE=FAILED: {ex}")
-`,
+_attack()`,
   proof: `\\textbf{Theorem:} If $a^p \\bmod n$ is leaked, $p$ is recovered via $\\gcd(a - \\text{leak}, n)$.
 
 \\textbf{Prerequisites:}

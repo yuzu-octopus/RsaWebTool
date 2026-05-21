@@ -13,88 +13,119 @@ export const attack: Attack = {
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
     { name: 'oracle_runs', label: 'Oracle runs (multiple response strings, newline-separated)', placeholder: '0,1,0,1,1\\n1,0,1,1,0\\n0,1,1,1,0...', multiline: true, rows: 6 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `# Validate inputs
-if not "${vals.n}".strip():
-    print("ERROR: n is required")
-    print("BIASED_LSB=FAILED")
-    quit()
-if not "${vals.e}".strip():
-    print("ERROR: e is required")
-    print("BIASED_LSB=FAILED")
-    quit()
-if not "${vals.c}".strip():
-    print("ERROR: c is required")
-    print("BIASED_LSB=FAILED")
-    quit()
-if not """${vals.oracle_runs}""".strip():
-    print("ERROR: oracle_runs is required")
-    print("BIASED_LSB=FAILED")
-    quit()
-try:
-    n = Integer(${vals.n})
-    e = Integer(${vals.e})
-    orig_c = Integer(${vals.c})
-    c = (Integer(${vals.c}) * power_mod(Integer(2), e, n)) % n
-    # Parse oracle runs (multiple response strings, newline-separated)
-    runs_str = """${vals.oracle_runs}""".strip()
-    runs = []
-    for line in runs_str.split('\\n'):
-        line = line.strip()
-        if not line:
-            continue
-        bits = [int(x.strip()) for x in line.split(',') if x.strip()]
-        runs.append(bits)
-    print(f"Biased LSB Oracle Attack")
-    print(f"n = {n}")
-    print(f"e = {e}")
-    print(f"c = {c}")
-    print(f"Number of oracle runs: {len(runs)}")
-    print()
-    # Per-bit majority voting, then binary search
-    num_bits = min(len(r) for r in runs)
-    n_bits = n.nbits()
-    print(f"Using {num_bits} bit positions (n has {n_bits} bits)")
-    # Majority voting
-    voted_bits = []
-    for i in range(num_bits):
-        votes = sum(runs[j][i] for j in range(len(runs)))
-        majority = 1 if votes > len(runs) / 2 else 0
-        voted_bits.append(majority)
-    print(f"Majority-voted bits: {voted_bits[:20]}{'...' if num_bits > 20 else ''}")
-    print()
-    # Binary search with voted bits
-    lower = Integer(0)
-    upper = Integer(n)
-    for i, bit in enumerate(voted_bits):
-        mid = (lower + upper) // 2
-        if bit == 0:
-            upper = mid
-        else:
-            lower = mid
-        c = (c * power_mod(Integer(2), e, n)) % n
-        if i < 5 or i >= len(voted_bits) - 3:
-            print(f"Step {i+1}: bit={bit}, lower={lower}, upper={upper}")
-    m = (lower + upper) // 2
-    print(f"\\nRecovered message: m = {m}")
-    # Verify
-    v = power_mod(m, e, n)
-    print(f"Verification: m^e mod n = {v}")
-    print(f"Original c = {orig_c}")
-    if v == orig_c:
-        print("VERIFICATION PASSED!")
-        print("BIASED_LSB=SUCCESS")
-    else:
-        print("Verification failed - may need more oracle runs or higher bias")
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
+    try:
+        # Validate inputs
+        if not "${vals.n}".strip():
+            print("ERROR: n is required")
+            print("BIASED_LSB=FAILED")
+            return
+        if not "${vals.e}".strip():
+            print("ERROR: e is required")
+            print("BIASED_LSB=FAILED")
+            return
+        if not "${vals.c}".strip():
+            print("ERROR: c is required")
+            print("BIASED_LSB=FAILED")
+            return
+        if not """${vals.oracle_runs}""".strip():
+            print("ERROR: oracle_runs is required")
+            print("BIASED_LSB=FAILED")
+            return
+        try:
+            n = Integer(${vals.n})
+            e_val = "${vals.e}".strip()
+            e = Integer(e_val) if e_val else Integer(65537)
+            orig_c = Integer(${vals.c})
+            c = (Integer(${vals.c}) * power_mod(Integer(2), e, n)) % n
+            # Parse oracle runs (multiple response strings, newline-separated)
+            runs_str = """${vals.oracle_runs}""".strip()
+            runs = []
+            for line in runs_str.split('\\n'):
+                line = line.strip()
+                if not line:
+                    continue
+                bits = [int(x.strip()) for x in line.split(',') if x.strip()]
+                runs.append(bits)
+            if not runs:
+                print("ERROR: No valid oracle runs parsed")
+                print("BIASED_LSB=FAILED")
+                return
+            print(f"Biased LSB Oracle Attack")
+            print(f"n = {n}")
+            print(f"e = {e}")
+            print(f"c = {c}")
+            print(f"Number of oracle runs: {len(runs)}")
+            print()
+            # Per-bit majority voting, then binary search
+            num_bits = min(len(r) for r in runs)
+            n_bits = n.nbits()
+            print(f"Using {num_bits} bit positions (n has {n_bits} bits)")
+            # Majority voting
+            voted_bits = []
+            for i in range(num_bits):
+                votes = sum(runs[j][i] for j in range(len(runs)))
+                majority = 1 if votes > len(runs) / 2 else 0
+                voted_bits.append(majority)
+            print(f"Majority-voted bits: {voted_bits[:20]}{'...' if num_bits > 20 else ''}")
+            print()
+            # Binary search with voted bits using exact rational division
+            # NOTE: Must use /2 (Rational) not //2 (floor division) to avoid
+            # accumulated truncation errors that exclude m from the interval.
+            lower = Integer(0)
+            upper = Integer(n)
+            for i, bit in enumerate(voted_bits):
+                mid = (lower + upper) / 2  # Rational — exact midpoint
+                if bit == 0:
+                    upper = mid
+                else:
+                    lower = mid
+                c = (c * power_mod(Integer(2), e, n)) % n
+                if i < 5 or i >= len(voted_bits) - 3:
+                    print(f"Step {i+1}: bit={bit}, lower={lower}, upper={upper}")
+            # Scan candidates near the rational interval [lower, upper)
+            # After log2(n) steps, interval should contain exactly one integer
+            from math import ceil, floor
+            candidate_start = Integer(ceil(lower))
+            candidate_end = Integer(floor(upper)) + 1
+            found_m = None
+            for m_candidate in range(candidate_start, candidate_end + 1):
+                m_test = Integer(m_candidate)
+                if power_mod(m_test, e, n) == orig_c:
+                    found_m = m_test
+                    break
+            if found_m is None:
+                # Fallback: wider scan around midpoint estimate (noisy oracle may have wrong bits)
+                mid_est = Integer(floor((lower + upper) / 2))
+                for m_candidate in range(max(0, mid_est - 20), mid_est + 21):
+                    m_test = Integer(m_candidate)
+                    if power_mod(m_test, e, n) == orig_c:
+                        found_m = m_test
+                        break
+            if found_m is not None:
+                print(f"\\nRecovered message: m = {found_m}")
+                v = power_mod(found_m, e, n)
+                print(f"Verification: m^e mod n = {v}")
+                print(f"Original c = {orig_c}")
+                print("VERIFICATION PASSED!")
+                print("BIASED_LSB=SUCCESS")
+            else:
+                print(f"\\nCandidate scan failed to find m in range [{candidate_start}, {candidate_end}]")
+                print("Verification failed - may need more oracle runs or higher bias")
+                print("BIASED_LSB=FAILED")
+        except Exception as ex:
+            print(f"ERROR: {ex}")
+            print("BIASED_LSB=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("BIASED_LSB=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("BIASED_LSB=FAILED")
-`,
+_attack()`,
   proof: `\\textbf{Theorem:} An LSB oracle with bias p > 1/2 recovers m with high probability via majority voting + binary search.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item Noisy oracle \\mathcal{O}_j(c) = \\text{LSB}(c^d \\bmod n) with \\Pr[\\text{correct}] = p > 1/2
+\\item Noisy oracle \\mathcal{O}\\_j(c) = \\text{LSB}(c^d \\bmod n) with \\Pr[\\text{correct}] = p > 1/2
 \\item k independent oracle runs available per query
 \\item RSA homomorphism: \\text{LSB}((c \\cdot 2^e)^d) = \\text{LSB}(2m \\bmod n)
 \\item Binary search: \\text{LSB}(2^i m \\bmod n) halves the interval each step

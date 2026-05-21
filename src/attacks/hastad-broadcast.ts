@@ -4,9 +4,9 @@ import { modPow } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'hastad-broadcast',
-  name: "Hastad's Broadcast Attack",
+  name: "Hastad's Broadcast Attack (CRT Recovery)",
   category: 'Message / Protocol',
-  description: 'Recovers m from e broadcasts with small e. Use when same m sent to e recipients with exponent e.',
+  description: 'Recovers m from e ciphertexts with small e using CRT. Use when same m sent to e recipients with exponent e.',
   inputs: [
     { name: 'e', label: 'e (public exponent / number of ciphertexts)', placeholder: '3', multiline: false },
     { name: 'ciphertexts', label: 'ciphertexts (one per line: c, n)', placeholder: 'c1, n1\nc2, n2\nc3, n3', multiline: true, rows: 6 },
@@ -16,71 +16,60 @@ export const attack: Attack = {
       return `print("ERROR: Missing required inputs (e, ciphertexts)")
 print("HASTAD_BROADCAST=FAILED")`;
     }
-    return `try:
-    e = Integer(${vals.e})
-    lines = """${vals.ciphertexts}""".strip().split('\\n')
-    print(f"Hastad's Broadcast Attack")
-    print(f"e = {e}")
-    print(f"Number of ciphertexts: {len(lines)}")
-    print()
-    if e < 2:
-        print("e must be >= 2 for broadcast attack")
-        print("HASTAD_BROADCAST=FAILED")
-    elif len(lines) < e:
-        print(f"Need at least {e} ciphertexts for e = {e}, got {len(lines)}")
-        print("HASTAD_BROADCAST=FAILED")
-    else:
-        pairs = []
-        parse_ok = True
-        for i, line in enumerate(lines[:e]):
-            parts = line.strip().split(',')
-            if len(parts) != 2:
-                print(f"Line {i+1}: expected 'c, n', got '{line}'")
-                parse_ok = False
-                break
-            c = Integer(parts[0].strip())
-            n = Integer(parts[1].strip())
-            pairs.append((c, n))
-            print(f"c{i+1} = {c}")
-            print(f"n{i+1} = {n}")
-        print()
-        if not parse_ok:
+    return `def _attack():
+    try:
+        e = Integer(${vals.e})
+        print(f"Hastad's Broadcast Attack")
+        print(f"Public exponent: e = {e}")
+        if e < 2:
+            print(f"ERROR: e must be >= 2, got e = {e}")
             print("HASTAD_BROADCAST=FAILED")
         else:
-            N = 1
-            for _, n_i in pairs:
-                N *= n_i
-            print(f"Product of moduli: N has {N.nbits()} bits")
-            print()
-            M = 0
-            for c_i, n_i in pairs:
-                N_i = N // n_i
-                inv = inverse_mod(N_i, n_i)
-                M += c_i * N_i * inv
-                M = M % N
-            print(f"CRT combined m^e = {M}")
-            print()
-            try:
-                m = M.nth_root(e)
-                print(f"Recovered message: m = {m}")
-                all_ok = True
-                for i, (c_i, n_i) in enumerate(pairs):
-                    v = power_mod(m, e, n_i)
-                    ok = v == c_i
-                    if not ok:
-                        all_ok = False
-                    print(f"  Verify {i+1}: m^{e} mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
-                if all_ok:
-                    print("HASTAD_BROADCAST=SUCCESS")
-                else:
-                    print("HASTAD_BROADCAST=FAILED")
-            except ValueError:
-                print(f"m^e is not a perfect {e}-th power.")
-                print("Messages may differ or ciphertexts are malformed.")
+            lines_str = """${vals.ciphertexts}""".strip()
+            pairs = []
+            for line in lines_str.split('\\n'):
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split(',')
+                if len(parts) < 2:
+                    continue
+                c = Integer(parts[0].strip())
+                n = Integer(parts[1].strip())
+                pairs.append((c, n))
+            print(f"Number of ciphertexts: {len(pairs)}")
+            if len(pairs) < e:
+                print(f"ERROR: Need at least {e} ciphertexts for e = {e}, got {len(pairs)}")
                 print("HASTAD_BROADCAST=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("HASTAD_BROADCAST=FAILED")`;
+            else:
+                moduli = [p[1] for p in pairs[:e]]
+                remainders = [p[0] for p in pairs[:e]]
+                N = prod(moduli)
+                M = crt(remainders, moduli)
+                print(f"CRT combined m^e = {M}")
+                print(f"Modulus product bits: {N.nbits()}")
+                m, exact = M.nth_root(e, truncate_mode=True)
+                if exact:
+                    print(f"Recovered message: m = {m}")
+                    all_ok = True
+                    for i, (c_i, n_i) in enumerate(pairs):
+                        v = power_mod(m, e, n_i)
+                        ok = v == c_i
+                        if not ok:
+                            all_ok = False
+                        print(f"  Verify {i+1}: m^{e} mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
+                    if all_ok:
+                        print("HASTAD_BROADCAST=SUCCESS")
+                    else:
+                        print("HASTAD_BROADCAST=FAILED")
+                else:
+                    print(f"Approximate root: m = {m}")
+                    print("Warning: m^e was not a perfect e-th power")
+                    print("HASTAD_BROADCAST=FAILED")
+    except Exception as ex:
+        print(f"ERROR: {ex}")
+        print("HASTAD_BROADCAST=FAILED")
+_attack()`;
   },
   proof: `\\textbf{Theorem:} If $m$ is encrypted with the same $e$ to $e$ different moduli, CRT recovers $m^e$ over $\\mathbb{Z}$, then $m = \\sqrt[e]{m^e}$.
 

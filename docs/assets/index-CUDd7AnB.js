@@ -194,75 +194,81 @@ To suppress this warning, you need to explicitly provide the \`palette.${t}Chann
   }
 `,sf=typeof of==`string`?null:Yt`
         animation: ${of} 3s infinite linear;
-      `,cf=e=>{let{classes:t,variant:n,color:r}=e;return Ma({root:[`root`,`color${qo(r)}`,n],dashed:[`dashed`],bar1:[`bar`,`bar1`],bar2:[`bar`,`bar2`,n===`buffer`&&`color${qo(r)}`]},$d,t)},lf=(e,t)=>e.vars?e.vars.palette.LinearProgress[`${t}Bg`]:e.palette.mode===`light`?e.lighten(e.palette[t].main,.62):e.darken(e.palette[t].main,.5),uf=P(`span`,{name:`MuiLinearProgress`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,t[`color${qo(n.color)}`],t[n.variant]]}})(Zo(({theme:e})=>({position:`relative`,overflow:`hidden`,display:`block`,height:4,zIndex:0,"@media print":{colorAdjust:`exact`},variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{backgroundColor:lf(e,t)}})),{props:({ownerState:e})=>e.color===`inherit`&&e.variant!==`buffer`,style:{"&::before":{content:`""`,position:`absolute`,left:0,top:0,right:0,bottom:0,backgroundColor:`currentColor`,opacity:.3}}},{props:{variant:`buffer`},style:{backgroundColor:`transparent`}},{props:{variant:`query`},style:{transform:`rotate(180deg)`}}]}))),df=P(`span`,{name:`MuiLinearProgress`,slot:`Dashed`})(Zo(({theme:e})=>({position:`absolute`,marginTop:0,height:`100%`,width:`100%`,backgroundSize:`10px 10px`,backgroundPosition:`0 -23px`,variants:[{props:{color:`inherit`},style:{opacity:.3,backgroundImage:`radial-gradient(currentColor 0%, currentColor 16%, transparent 42%)`}},...Object.entries(e.palette).filter(Xc()).map(([t])=>{let n=lf(e,t);return{props:{color:t},style:{backgroundImage:`radial-gradient(${n} 0%, ${n} 16%, transparent 42%)`}}})]})),sf||{animation:`${of} 3s infinite linear`}),ff=P(`span`,{name:`MuiLinearProgress`,slot:`Bar1`,overridesResolver:(e,t)=>[t.bar,t.bar1]})(Zo(({theme:e})=>({width:`100%`,position:`absolute`,left:0,bottom:0,top:0,transition:`transform 0.2s linear`,transformOrigin:`left`,variants:[{props:{color:`inherit`},style:{backgroundColor:`currentColor`}},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{backgroundColor:(e.vars||e).palette[t].main}})),{props:{variant:`determinate`},style:{transition:`transform .${ef}s linear`}},{props:{variant:`buffer`},style:{zIndex:1,transition:`transform .${ef}s linear`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:{width:`auto`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:nf||{animation:`${tf} 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite`}}]}))),pf=P(`span`,{name:`MuiLinearProgress`,slot:`Bar2`,overridesResolver:(e,t)=>[t.bar,t.bar2]})(Zo(({theme:e})=>({width:`100%`,position:`absolute`,left:0,bottom:0,top:0,transition:`transform 0.2s linear`,transformOrigin:`left`,variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{"--LinearProgressBar2-barColor":(e.vars||e).palette[t].main}})),{props:({ownerState:e})=>e.variant!==`buffer`&&e.color!==`inherit`,style:{backgroundColor:`var(--LinearProgressBar2-barColor, currentColor)`}},{props:({ownerState:e})=>e.variant!==`buffer`&&e.color===`inherit`,style:{backgroundColor:`currentColor`}},{props:{color:`inherit`},style:{opacity:.3}},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t,variant:`buffer`},style:{backgroundColor:lf(e,t),transition:`transform .${ef}s linear`}})),{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:{width:`auto`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:af||{animation:`${rf} 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite`}}]}))),mf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiLinearProgress`}),{className:r,color:i=`primary`,max:a,min:o,value:s,valueBuffer:c,variant:l=`indeterminate`,...u}=n,d={...n,color:i,variant:l},f=o??0,p=a??100,m=cf(d),h=Zi(),g={},_={bar1:{},bar2:{}};if((l===`determinate`||l===`buffer`)&&s!==void 0){let e=p-f,t=(s-f)/e*100-100;h&&(t=-t),_.bar1.transform=e>0?`translateX(${t}%)`:`translateX(-100%)`,g[`aria-valuenow`]=s,g[`aria-valuemin`]=f,g[`aria-valuemax`]=p}if(l===`buffer`&&c!==void 0){let e=p-f,t=(c-f)/e*100-100;h&&(t=-t),_.bar2.transform=e>0?`translateX(${t}%)`:`translateX(-100%)`}return(0,M.jsxs)(uf,{className:ci(m.root,r),ownerState:d,role:`progressbar`,...g,ref:t,...u,children:[l===`buffer`?(0,M.jsx)(df,{className:m.dashed,ownerState:d}):null,(0,M.jsx)(ff,{className:m.bar1,ownerState:d,style:_.bar1}),l===`determinate`?null:(0,M.jsx)(pf,{className:m.bar2,ownerState:d,style:_.bar2})]})});function hf(e){return di(`MuiLink`,e)}var gf=fi(`MuiLink`,[`root`,`underlineNone`,`underlineHover`,`underlineAlways`,`button`,`focusVisible`]),_f=({theme:e,ownerState:t})=>{let n=t.color;if(`colorSpace`in e&&e.colorSpace){let r=Qn(e,`palette.${n}.main`)||Qn(e,`palette.${n}`)||t.color;return e.alpha(r,.4)}let r=Qn(e,`palette.${n}.main`,!1)||Qn(e,`palette.${n}`,!1)||t.color,i=Qn(e,`palette.${n}.mainChannel`)||Qn(e,`palette.${n}Channel`);return`vars`in e&&i?`rgba(${i} / 0.4)`:Ii(r,.4)},vf={primary:!0,secondary:!0,error:!0,info:!0,success:!0,warning:!0,textPrimary:!0,textSecondary:!0,textDisabled:!0},yf=e=>{let{classes:t,component:n,focusVisible:r,underline:i}=e;return Ma({root:[`root`,`underline${qo(i)}`,n===`button`&&`button`,r&&`focusVisible`]},hf,t)},bf=P(F,{name:`MuiLink`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,t[`underline${qo(n.underline)}`],n.component===`button`&&t.button]}})(Zo(({theme:e})=>({variants:[{props:{underline:`none`},style:{textDecoration:`none`}},{props:{underline:`hover`},style:{textDecoration:`none`,"&:hover":{textDecoration:`underline`}}},{props:{underline:`always`},style:{textDecoration:`underline`,"&:hover":{textDecorationColor:`inherit`}}},{props:({underline:e,ownerState:t})=>e===`always`&&t.color!==`inherit`,style:{textDecorationColor:`var(--Link-underlineColor)`}},{props:({underline:e,ownerState:t})=>e===`always`&&t.color===`inherit`,style:e.colorSpace?{textDecorationColor:e.alpha(`currentColor`,.4)}:null},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{underline:`always`,color:t},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette[t].main,.4)}})),{props:{underline:`always`,color:`textPrimary`},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette.text.primary,.4)}},{props:{underline:`always`,color:`textSecondary`},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette.text.secondary,.4)}},{props:{underline:`always`,color:`textDisabled`},style:{"--Link-underlineColor":(e.vars||e).palette.text.disabled}},{props:{component:`button`},style:{position:`relative`,WebkitTapHighlightColor:`transparent`,backgroundColor:`transparent`,outline:0,border:0,margin:0,borderRadius:0,padding:0,cursor:`pointer`,userSelect:`none`,verticalAlign:`middle`,MozAppearance:`none`,WebkitAppearance:`none`,"&::-moz-focus-inner":{borderStyle:`none`},[`&.${gf.focusVisible}`]:{outline:`auto`}}}]}))),xf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiLink`}),r=Lo(),{className:i,color:a=`primary`,component:o=`a`,onBlur:s,onFocus:c,TypographyClasses:l,underline:u=`always`,variant:d=`inherit`,sx:f,...p}=n,[m,h]=j.useState(!1),g=e=>{Ec(e.target)||h(!1),s&&s(e)},_=e=>{Ec(e.target)&&h(!0),c&&c(e)},v={...n,color:a,component:o,focusVisible:m,underline:u,variant:d};return(0,M.jsx)(bf,{color:a,className:ci(yf(v).root,i),classes:l,component:o,onBlur:g,onFocus:_,ref:t,ownerState:v,variant:d,...p,sx:[...vf[a]===void 0?[{color:a}]:[],...Array.isArray(f)?f:[f]],style:{...p.style,...u===`always`&&a!==`inherit`&&!vf[a]&&{"--Link-underlineColor":_f({theme:r,ownerState:v})}}})}),Sf=j.createContext({});function Cf(e){return di(`MuiList`,e)}fi(`MuiList`,[`root`,`padding`,`dense`,`subheader`]);var wf=e=>{let{classes:t,disablePadding:n,dense:r,subheader:i}=e;return Ma({root:[`root`,!n&&`padding`,r&&`dense`,i&&`subheader`]},Cf,t)},Tf=P(`ul`,{name:`MuiList`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,!n.disablePadding&&t.padding,n.dense&&t.dense,n.subheader&&t.subheader]}})({listStyle:`none`,margin:0,padding:0,position:`relative`,variants:[{props:({ownerState:e})=>!e.disablePadding,style:{paddingTop:8,paddingBottom:8}},{props:({ownerState:e})=>e.subheader,style:{paddingTop:0,isolation:`isolate`}}]}),Ef=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiList`}),{children:r,className:i,component:a=`ul`,dense:o=!1,disablePadding:s=!1,subheader:c,...l}=n,u=j.useMemo(()=>({dense:o}),[o]),d={...n,component:a,dense:o,disablePadding:s},f=wf(d);return(0,M.jsx)(Sf.Provider,{value:u,children:(0,M.jsxs)(Tf,{as:a,className:ci(f.root,i),ref:t,ownerState:d,...l,children:[c,r]})})});function Df(e){return di(`MuiListItem`,e)}fi(`MuiListItem`,[`root`,`dense`,`alignItemsFlexStart`,`divider`,`gutters`,`padding`,`secondaryAction`]);function Of(e){return di(`MuiListItemButton`,e)}var kf=fi(`MuiListItemButton`,[`root`,`focusVisible`,`dense`,`alignItemsFlexStart`,`disabled`,`divider`,`gutters`,`selected`]),Af=(e,t)=>{let{ownerState:n}=e;return[t.root,n.dense&&t.dense,n.alignItems===`flex-start`&&t.alignItemsFlexStart,n.divider&&t.divider,!n.disableGutters&&t.gutters]},jf=e=>{let{alignItems:t,classes:n,dense:r,disabled:i,disableGutters:a,divider:o,selected:s}=e,c=Ma({root:[`root`,r&&`dense`,!a&&`gutters`,o&&`divider`,i&&`disabled`,t===`flex-start`&&`alignItemsFlexStart`,s&&`selected`]},Of,n);return{...n,...c}},Mf=P(Kc,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiListItemButton`,slot:`Root`,overridesResolver:Af})(Zo(({theme:e})=>({display:`flex`,flexGrow:1,justifyContent:`flex-start`,alignItems:`center`,position:`relative`,textDecoration:`none`,minWidth:0,boxSizing:`border-box`,textAlign:`left`,paddingTop:8,paddingBottom:8,transition:e.transitions.create(`background-color`,{duration:e.transitions.duration.shortest}),"&:hover":{textDecoration:`none`,backgroundColor:(e.vars||e).palette.action.hover,"@media (hover: none)":{backgroundColor:`transparent`}},[`&.${kf.selected}`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,(e.vars||e).palette.action.selectedOpacity),[`&.${kf.focusVisible}`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,`${(e.vars||e).palette.action.selectedOpacity} + ${(e.vars||e).palette.action.focusOpacity}`)}},[`&.${kf.selected}:hover`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,`${(e.vars||e).palette.action.selectedOpacity} + ${(e.vars||e).palette.action.hoverOpacity}`),"@media (hover: none)":{backgroundColor:e.alpha((e.vars||e).palette.primary.main,(e.vars||e).palette.action.selectedOpacity)}},[`&.${kf.focusVisible}`]:{backgroundColor:(e.vars||e).palette.action.focus},[`&.${kf.disabled}`]:{opacity:(e.vars||e).palette.action.disabledOpacity},variants:[{props:({ownerState:e})=>e.divider,style:{borderBottom:`1px solid ${(e.vars||e).palette.divider}`,backgroundClip:`padding-box`}},{props:{alignItems:`flex-start`},style:{alignItems:`flex-start`}},{props:({ownerState:e})=>!e.disableGutters,style:{paddingLeft:16,paddingRight:16}},{props:({ownerState:e})=>e.dense,style:{paddingTop:4,paddingBottom:4}}]}))),Nf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemButton`}),{alignItems:r=`center`,autoFocus:i=!1,component:a=`div`,children:o,dense:s=!1,disableGutters:c=!1,divider:l=!1,focusVisibleClassName:u,selected:d=!1,className:f,...p}=n,m=j.useContext(Sf),h=j.useMemo(()=>({dense:s||m.dense||!1,alignItems:r,disableGutters:c}),[r,m.dense,s,c]),g=j.useRef(null);ms(()=>{i&&g.current&&g.current.focus()},[i]);let _={...n,alignItems:r,dense:h.dense,disableGutters:c,divider:l,selected:d},v=jf(_),{root:y,...b}=v,x=xs(g,t);return(0,M.jsx)(Sf.Provider,{value:h,children:(0,M.jsx)(Mf,{ref:x,href:p.href||p.to,component:(p.href||p.to)&&a===`div`?`button`:a,internalNativeButton:!1,focusVisibleClassName:ci(v.focusVisible,u),ownerState:_,className:ci(v.root,f),...p,classes:b,children:o})})});function Pf(e){return di(`MuiListItemSecondaryAction`,e)}fi(`MuiListItemSecondaryAction`,[`root`,`disableGutters`]);var Ff=e=>{let{disableGutters:t,classes:n}=e;return Ma({root:[`root`,t&&`disableGutters`]},Pf,n)},If=P(`div`,{name:`MuiListItemSecondaryAction`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.disableGutters&&t.disableGutters]}})({position:`absolute`,right:16,top:`50%`,transform:`translateY(-50%)`,variants:[{props:({ownerState:e})=>e.disableGutters,style:{right:0}}]}),Lf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemSecondaryAction`}),{className:r,component:i,...a}=n,o=j.useContext(Sf),s={...n,disableGutters:o.disableGutters};return(0,M.jsx)(If,{as:i,className:ci(Ff(s).root,r),ownerState:s,ref:t,...a})});Lf.muiName=`ListItemSecondaryAction`;var Rf=(e,t)=>{let{ownerState:n}=e;return[t.root,n.dense&&t.dense,n.alignItems===`flex-start`&&t.alignItemsFlexStart,n.divider&&t.divider,!n.disableGutters&&t.gutters,!n.disablePadding&&t.padding]},zf=e=>{let{alignItems:t,classes:n,dense:r,disableGutters:i,disablePadding:a,divider:o}=e;return Ma({root:[`root`,r&&`dense`,!i&&`gutters`,!a&&`padding`,o&&`divider`,t===`flex-start`&&`alignItemsFlexStart`],secondaryAction:[`secondaryAction`]},Df,n)},Bf=P(`div`,{name:`MuiListItem`,slot:`Root`,overridesResolver:Rf})(Zo(({theme:e})=>({display:`flex`,justifyContent:`flex-start`,alignItems:`center`,position:`relative`,textDecoration:`none`,width:`100%`,boxSizing:`border-box`,textAlign:`left`,variants:[{props:({ownerState:e})=>!e.disablePadding,style:{paddingTop:8,paddingBottom:8}},{props:({ownerState:e})=>!e.disablePadding&&e.dense,style:{paddingTop:4,paddingBottom:4}},{props:({ownerState:e})=>!e.disablePadding&&!e.disableGutters,style:{paddingLeft:16,paddingRight:16}},{props:({ownerState:e})=>!e.disablePadding&&!!e.secondaryAction,style:{paddingRight:48}},{props:({ownerState:e})=>!!e.secondaryAction,style:{[`& > .${kf.root}`]:{paddingRight:48}}},{props:{alignItems:`flex-start`},style:{alignItems:`flex-start`}},{props:({ownerState:e})=>e.divider,style:{borderBottom:`1px solid ${(e.vars||e).palette.divider}`,backgroundClip:`padding-box`}},{props:({ownerState:e})=>e.button,style:{transition:e.transitions.create(`background-color`,{duration:e.transitions.duration.shortest}),"&:hover":{textDecoration:`none`,backgroundColor:(e.vars||e).palette.action.hover,"@media (hover: none)":{backgroundColor:`transparent`}}}}]}))),Vf=P(Lf,{name:`MuiListItem`,slot:`secondaryAction`})({}),Hf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItem`}),{alignItems:r=`center`,children:i,className:a,component:o=`li`,dense:s=!1,disableGutters:c=!1,disablePadding:l=!1,divider:u=!1,secondaryAction:d,slotProps:f={},slots:p={},...m}=n,h=j.useContext(Sf),g=j.useMemo(()=>({dense:s||h.dense||!1,alignItems:r,disableGutters:c}),[r,h.dense,s,c]),_={...n,alignItems:r,dense:g.dense,disableGutters:c,disablePadding:l,divider:u,secondaryAction:d},v=zf(_),y={slots:p,slotProps:f},[b,x]=hc(`root`,{ref:t,elementType:Bf,externalForwardedProps:{component:o,...y,...m},ownerState:_,className:ci(v.root,a)}),[S,C]=hc(`secondaryAction`,{elementType:Vf,shouldForwardComponentProp:!0,externalForwardedProps:y,ownerState:_,className:v.secondaryAction});return(0,M.jsx)(Sf.Provider,{value:g,children:(0,M.jsxs)(b,{...x,children:[i,d&&(0,M.jsx)(S,{...C,children:d})]})})});function Uf(e){return di(`MuiListItemText`,e)}var Wf=fi(`MuiListItemText`,[`root`,`multiline`,`dense`,`inset`,`primary`,`secondary`]),Gf=e=>{let{classes:t,inset:n,primary:r,secondary:i,dense:a}=e;return Ma({root:[`root`,n&&`inset`,a&&`dense`,r&&i&&`multiline`],primary:[`primary`],secondary:[`secondary`]},Uf,t)},Kf=P(`div`,{name:`MuiListItemText`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`& .${Wf.primary}`]:t.primary},{[`& .${Wf.secondary}`]:t.secondary},t.root,n.inset&&t.inset,n.primary&&n.secondary&&t.multiline,n.dense&&t.dense]}})({flex:`1 1 auto`,minWidth:0,marginTop:4,marginBottom:4,[`.${ul.root}:where(& .${Wf.primary})`]:{display:`block`},[`.${ul.root}:where(& .${Wf.secondary})`]:{display:`block`},variants:[{props:({ownerState:e})=>e.primary&&e.secondary,style:{marginTop:6,marginBottom:6}},{props:({ownerState:e})=>e.inset,style:{paddingLeft:56}}]}),qf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemText`}),{children:r,className:i,disableTypography:a=!1,inset:o=!1,primary:s,secondary:c,slots:l={},slotProps:u={},...d}=n,{dense:f}=j.useContext(Sf),p=s??r,m=c,h={...n,disableTypography:a,inset:o,primary:!!p,secondary:!!m,dense:f},g=Gf(h),_={slots:l,slotProps:u},[v,y]=hc(`root`,{className:ci(g.root,i),elementType:Kf,externalForwardedProps:{..._,...d},ownerState:h,ref:t}),[b,x]=hc(`primary`,{className:g.primary,elementType:F,externalForwardedProps:_,ownerState:h}),[S,C]=hc(`secondary`,{className:g.secondary,elementType:F,externalForwardedProps:_,ownerState:h});return p!=null&&p.type!==F&&!a&&(p=(0,M.jsx)(b,{variant:f?`body2`:`body1`,component:x?.variant?void 0:`span`,...x,children:p})),m!=null&&m.type!==F&&!a&&(m=(0,M.jsx)(S,{variant:`body2`,color:`textSecondary`,...C,children:m})),(0,M.jsxs)(v,{...y,children:[p,m]})}),Jf=j.createContext(void 0);function Yf(){let e=j.useContext(Jf);if(e===void 0)throw Error(`MUI: RovingTabIndexContext is missing. Roving tab index items must be placed within a roving tab index provider.`);return e}var Xf=Object.is;function Zf(e,t){if(e===t)return!0;if(!(e instanceof Object)||!(t instanceof Object))return!1;let n=0,r=0;for(let r in e)if(n+=1,!Xf(e[r],t[r])||!(r in t))return!1;for(let e in t)r+=1;return n===r}var Qf=[`ArrowRight`,`ArrowLeft`,`ArrowUp`,`ArrowDown`,`Home`,`End`];function $f(e){let{activeItemId:t,getDefaultActiveItemId:n,orientation:r,isRtl:i=!1,isItemFocusable:a=pp,wrap:o=!0}=e,[s,c]=j.useState(t),l=j.useRef(t),u=s;t!==l.current&&(l.current=t,t!==void 0&&t!==s&&(u=t,c(t)));let d=j.useRef(null),f=j.useRef(new Map),[p,m]=j.useState(0),h=j.useMemo(()=>up(f.current),[p]),g=tp(u,h,a,n),_=j.useRef(g);_.current=g;let v=j.useCallback(()=>{let e=up(f.current);return sp(e,tp(_.current,e,a,n))},[n,a]),y=j.useCallback(()=>f.current,[]),b=vs(e=>{Zf(f.current.get(e.id)??null,e)||(f.current.set(e.id,e),m(e=>e+1))}),x=vs(e=>{f.current.delete(e)&&m(e=>e+1)}),S=vs(e=>{c(e)}),C=j.useCallback(e=>_.current===e,[]),w=j.useCallback((e,t,n,r)=>{let i=ap(dp(f.current),e,t,n,r??a);return i?(i.element?.focus(),c(i.id),i):null},[a]),T=j.useCallback(e=>({onFocus:e=>{let t=dp(f.current),n=lp(t,e.target);n!==-1&&c(t[n].id)},onKeyDown:e=>{if(e.altKey||e.shiftKey||e.ctrlKey||e.metaKey||!Qf.includes(e.key))return;let t=r===`horizontal`?`ArrowLeft`:`ArrowUp`,n=r===`horizontal`?`ArrowRight`:`ArrowDown`;r===`horizontal`&&i&&(t=`ArrowRight`,n=`ArrowLeft`);let a=dp(f.current),s=ss(ls(d.current)),c=s===d.current,l=ip(a,s,_.current),u=`next`;switch(e.key){case t:u=`previous`,e.preventDefault(),c&&(l=a.length);break;case n:e.preventDefault(),c&&(l=-1);break;case`Home`:e.preventDefault(),l=-1;break;case`End`:e.preventDefault(),u=`previous`,l=a.length;break;default:return}w(l,u,o)},ref:gp(e,e=>{d.current=e})}),[w,i,r,o]),E=j.useCallback(e=>{let t=dp(f.current),n=ss(ls(d.current));return w(n===d.current?-1:ip(t,n,_.current),`next`,!0,e)?.id??null},[w]);return j.useMemo(()=>({activeItemId:g,focusNext:E,getActiveItem:v,getContainerProps:T,getItemMap:y,isItemActive:C,registerItem:b,setActiveItemId:S,unregisterItem:x}),[g,E,v,T,y,C,b,S,x])}function ep(e){let{activeItemId:t,registerItem:n,unregisterItem:r}=Yf(),i=j.useRef(null),a=j.useMemo(()=>({disabled:e.disabled??!1,element:null,focusableWhenDisabled:e.focusableWhenDisabled??!1,id:e.id,selected:e.selected??!1,textValue:e.textValue}),[e.disabled,e.focusableWhenDisabled,e.id,e.selected,e.textValue]),o=j.useRef(a);o.current=a;let s=j.useCallback(t=>{if(i.current=t,t==null){queueMicrotask(()=>{i.current??r(e.id)});return}n({...o.current,element:t})},[e.id,n,r]),c=bs(e.ref,s);return Ti(()=>{i.current&&n({...a,element:i.current})},[a,n]),Ti(()=>{let t=e.id;return()=>{r(t)}},[e.id,r]),{ref:c,tabIndex:t===e.id?0:-1}}function tp(e,t,n,r){return e==null?rp(t,n,r):np(e,t,n)}function np(e,t,n){let r=cp(t,e);return r===-1?op(t,n):n(t[r])?t[r].id:ap(t,r,`next`,!1,n)?.id??null}function rp(e,t,n){let r=n?.(e);if(r!=null){let n=sp(e,r);if(n&&t(n))return n.id}return op(e,t)}function ip(e,t,n){if(t){let n=lp(e,t);if(n!==-1)return n}return cp(e,n)}function ap(e,t,n,r,i){let a=e.length-1;if(a===-1)return null;let o=!1,s=fp(t,a,n,r),c=s;for(;s!==-1;){if(s===c){if(o)return null;o=!0}let t=e[s];if(!t||!i(t))s=fp(s,a,n,r);else return t}return null}function op(e,t){return e.find(e=>t(e))?.id??null}function sp(e,t){return t==null?null:e.find(e=>e.id===t)??null}function cp(e,t){return t==null?-1:e.findIndex(e=>e.id===t)}function lp(e,t){return t?e.findIndex(e=>e.element===t||e.element?.contains(t)):-1}function up(e){let t=Array.from(e.values());if(t.every(e=>e.element==null))return t;let n=t.filter(mp).sort((e,t)=>hp(e.element,t.element)),r=t.filter(e=>!mp(e));return[...n,...r]}function dp(e){return up(e).filter(mp)}function fp(e,t,n,r=!0){return n===`next`?e===t?r?0:-1:e+1:e===0?r?t:-1:e-1}function pp(e){return e.element?e.focusableWhenDisabled?!0:!e.disabled&&!e.element.hasAttribute(`disabled`)&&e.element.getAttribute(`aria-disabled`)!==`true`&&e.element.hasAttribute(`tabindex`):!1}function mp(e){return e.element!=null&&e.element.isConnected}function hp(e,t){if(e===t)return 0;let n=e.compareDocumentPosition(t);return n&Node.DOCUMENT_POSITION_FOLLOWING||n&Node.DOCUMENT_POSITION_CONTAINED_BY?-1:n&Node.DOCUMENT_POSITION_PRECEDING||n&Node.DOCUMENT_POSITION_CONTAINS?1:0}function gp(...e){return t=>{e.forEach(e=>{ps(e??null,t)})}}var _p=Cu;function vp(e,t){if(t==null){e.focus();return}try{e.focus({focusVisible:t===`keyboard`})}catch{e.focus()}}function yp(e){return e?e.type===`mousedown`||e.type===`pointerdown`||e.type===`touchstart`?`pointer`:e.type===`keydown`||e.type===`click`&&e.detail===0?`keyboard`:null:null}function bp(e){return e==null||typeof e==`string`&&!e.trim()}function xp(e,t){return typeof t==`object`&&t?e===t:String(e)===String(t)}var Sp=j.createContext(null);function Cp(){return j.useContext(Sp)}var wp=Sp.Provider,Tp=j.createContext(void 0);function Ep(e){let t=e?.element??e;if(!t)return``;if(e?.textValue!==void 0)return e.textValue;let n=t.innerText;return n===void 0&&(n=t.textContent),n??``}function Dp(e,t){if(t===void 0)return!0;let n=Ep(e);return n=n.trim().toLowerCase(),n.length===0?!1:t.repeating?n[0]===t.keys[0]:n.startsWith(t.keys.join(``))}function Op(e,t){return Dp(e,t)?pp(e):!1}function kp(e,t){vp(e,t)}var Ap=j.forwardRef(function(e,t){let{actions:n,autoFocus:r=!1,autoFocusItem:i=!1,children:a,className:o,disabledItemsFocusable:s=!1,disableListWrap:c=!1,onKeyDown:l,variant:u=`selectedMenu`,...d}=e,f=j.useRef(null),p=j.useRef(!1),[m,h]=j.useState(!1),g=Cp(),_=j.useRef({keys:[],repeating:!0,previousKeyMatched:!0,lastTime:null}),v=$f({activeItemId:void 0,getDefaultActiveItemId:j.useCallback(e=>u===`selectedMenu`?e.find(e=>e.selected&&pp(e))?.id??e.find(e=>pp(e))?.id??null:e.find(e=>pp(e))?.id??null,[u]),orientation:`vertical`,wrap:!c}),{activeItemId:y,focusNext:b,getActiveItem:x,getContainerProps:S,getItemMap:C}=v,w=ys((e=!1)=>{if(!f.current||!e&&p.current)return null;if(i){let e=x();if(e?.element){let t=Array.from(C().values()).some(e=>e.selected);return h(u===`menu`&&t&&!e.selected&&g==null),kp(e.element,g),p.current=!0,e.element}return r?(h(!1),f.current.focus(),f.current):null}return r?(h(!1),f.current.focus(),p.current=!0,f.current):(h(!1),null)});ms(()=>{if(!r&&!i){p.current=!1,h(!1);return}w()},[y,i,r,w]),j.useImperativeHandle(n,()=>({adjustStyleForScrollbar:(e,{direction:t})=>{let n=!f.current.style.width;if(e.clientHeight<f.current.clientHeight&&n){let n=`${_p(fs(e))}px`;f.current.style[t===`rtl`?`paddingLeft`:`paddingRight`]=n,f.current.style.width=`calc(100% + ${n})`}return f.current},focusInitialTarget:()=>{if(!f.current)return null;let e=cs(us(f.current));return e&&Nu(f.current,e)?e:w(!0)}}),[w]);let T=S(),E=xs(f,T.ref,t),D=j.useMemo(()=>({itemsFocusableWhenDisabled:s,suppressInitialFocusVisible:m,variant:u}),[s,m,u]);return(0,M.jsx)(Ef,{role:`menu`,ref:E,className:o,onKeyDown:ys(e=>{if(m&&h(!1),(e.ctrlKey||e.metaKey||e.altKey)&&l){l(e);return}if(T.onKeyDown(e),e.key.length===1){let t=_.current,n=e.key.toLowerCase(),r=performance.now();t.keys.length>0&&(r-t.lastTime>500?(t.keys=[],t.repeating=!0,t.previousKeyMatched=!0):t.repeating&&n!==t.keys[0]&&(t.repeating=!1)),t.lastTime=r,t.keys.push(n);let i=cs(us(f.current)),a=i&&!t.repeating&&Dp(i,t);t.previousKeyMatched&&(a||b(e=>Op(e,t))!=null)?e.preventDefault():t.previousKeyMatched=!1}l&&l(e)}),onFocus:T.onFocus,tabIndex:-1,...d,children:(0,M.jsx)(Tp.Provider,{value:D,children:(0,M.jsx)(Jf.Provider,{value:v,children:a})})})});function jp(e){return di(`MuiPopover`,e)}fi(`MuiPopover`,[`root`,`paper`]);function Mp(e,t){let n=0;return typeof t==`number`?n=t:t===`center`?n=e.height/2:t===`bottom`&&(n=e.height),n}function Np(e,t){let n=0;return typeof t==`number`?n=t:t===`center`?n=e.width/2:t===`right`&&(n=e.width),n}function Pp(e){return[e.horizontal,e.vertical].map(e=>typeof e==`number`?`${e}px`:e).join(` `)}function Fp(e){return typeof e==`function`?e():e}var Ip=e=>{let{classes:t}=e;return Ma({root:[`root`],paper:[`paper`]},jp,t)},Lp=P(Qu,{name:`MuiPopover`,slot:`Root`})({}),Rp=P(Tc,{name:`MuiPopover`,slot:`Paper`})({position:`absolute`,overflowY:`auto`,overflowX:`hidden`,minWidth:16,minHeight:16,maxWidth:`calc(100% - 32px)`,maxHeight:`calc(100% - 32px)`,outline:0}),zp=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiPopover`}),{action:r,anchorEl:i,anchorOrigin:a={vertical:`top`,horizontal:`left`},anchorPosition:o,anchorReference:s=`anchorEl`,children:c,className:l,container:u,disableAutoFocus:d=!1,elevation:f=8,marginThreshold:p=16,open:m,slots:h={},slotProps:g={},transformOrigin:_={vertical:`top`,horizontal:`left`},transitionDuration:v=`auto`,disableScrollLock:y=!1,...b}=n,x=j.useRef(),S={...n,anchorOrigin:a,anchorReference:s,elevation:f,marginThreshold:p,transformOrigin:_,transitionDuration:v},C=Ip(S),w=j.useCallback(()=>{if(s===`anchorPosition`)return o;let e=Fp(i),t=(e&&e.nodeType===1?e:us(x.current).body).getBoundingClientRect();return{top:t.top+Mp(t,a.vertical),left:t.left+Np(t,a.horizontal)}},[i,a.horizontal,a.vertical,o,s]),T=j.useCallback(e=>({vertical:Mp(e,_.vertical),horizontal:Np(e,_.horizontal)}),[_.horizontal,_.vertical]),E=j.useCallback(e=>{let t={width:e.offsetWidth,height:e.offsetHeight},n=T(t);if(s===`none`)return{top:null,left:null,transformOrigin:Pp(n)};let r=w(),a=r.top-n.vertical,o=r.left-n.horizontal,c=a+t.height,l=o+t.width,u=fs(Fp(i)),d=u.innerHeight-p,f=u.innerWidth-p;if(p!=null&&a<p){let e=a-p;a-=e,n.vertical+=e}else if(p!=null&&c>d){let e=c-d;a-=e,n.vertical+=e}if(p!=null&&o<p){let e=o-p;o-=e,n.horizontal+=e}else if(l>f){let e=l-f;o-=e,n.horizontal+=e}return{top:`${Math.round(a)}px`,left:`${Math.round(o)}px`,transformOrigin:Pp(n)}},[i,s,w,T,p]),[D,ee]=j.useState(m),te=j.useCallback(()=>{let e=x.current;if(!e)return;let t=E(e);t.top!=null&&e.style.setProperty(`top`,t.top),t.left!=null&&(e.style.left=t.left),e.style.transformOrigin=t.transformOrigin,ee(!0)},[E]);j.useEffect(()=>(y&&window.addEventListener(`scroll`,te),()=>window.removeEventListener(`scroll`,te)),[i,y,te]);let ne=()=>{te()},re=()=>{ee(!1)};j.useEffect(()=>{m&&te()}),j.useImperativeHandle(r,()=>m?{updatePosition:()=>{te()}}:null,[m,te]),j.useEffect(()=>{if(!m)return;let e=as(()=>{te()}),t=fs(Fp(i));return t.addEventListener(`resize`,e),()=>{e.clear(),t.removeEventListener(`resize`,e)}},[i,m,te]);let ie=v,ae={slots:h,slotProps:g},[oe,O]=hc(`transition`,{elementType:Ud,externalForwardedProps:ae,ownerState:S,getSlotProps:e=>({...e,onEntering:(t,n)=>{e.onEntering?.(t,n),ne()},onExited:t=>{e.onExited?.(t),re()}}),additionalProps:{appear:!0,in:m}});v===`auto`&&!oe.muiSupportAuto&&(ie=void 0);let k=u||(i?us(Fp(i)).body:void 0),[A,{slots:se,slotProps:ce,...le}]=hc(`root`,{ref:t,elementType:Lp,externalForwardedProps:{...ae,...b},shouldForwardComponentProp:!0,additionalProps:{slots:{backdrop:h.backdrop},slotProps:{backdrop:Cs(typeof g.backdrop==`function`?g.backdrop(S):g.backdrop,{invisible:!0})},container:k,open:m},ownerState:S,className:ci(C.root,l)}),[ue,de]=hc(`paper`,{ref:x,className:C.paper,elementType:Rp,externalForwardedProps:ae,shouldForwardComponentProp:!0,additionalProps:{elevation:f,style:D?void 0:{opacity:0}},ownerState:S});return(0,M.jsx)(A,{...le,...!lc(A)&&{slots:se,slotProps:ce,disableAutoFocus:d,disableScrollLock:y},children:(0,M.jsx)(oe,{...O,timeout:ie,children:(0,M.jsx)(ue,{...de,children:c})})})});function Bp(e){return di(`MuiMenu`,e)}fi(`MuiMenu`,[`root`,`paper`,`list`]);var Vp={vertical:`top`,horizontal:`right`},Hp={vertical:`top`,horizontal:`left`},Up=e=>{let{classes:t}=e;return Ma({root:[`root`],paper:[`paper`],list:[`list`]},Bp,t)},Wp=P(zp,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiMenu`,slot:`Root`})({}),Gp=P(Rp,{name:`MuiMenu`,slot:`Paper`})({maxHeight:`calc(100% - 96px)`,WebkitOverflowScrolling:`touch`}),Kp=P(Ap,{name:`MuiMenu`,slot:`List`})({outline:0}),qp=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiMenu`}),{autoFocus:r=!0,children:i,className:a,disableAutoFocusItem:o=!1,onClose:s,open:c,PopoverClasses:l,transitionDuration:u=`auto`,variant:d=`selectedMenu`,slots:f={},slotProps:p={},...m}=n,h=Zi(),g={...n,autoFocus:r,disableAutoFocusItem:o,transitionDuration:u,variant:d},_=Up(g),v=r&&c,y=v&&!o,b=j.useRef(null),x=(e,t)=>{b.current&&(b.current.adjustStyleForScrollbar(e,{direction:h?`rtl`:`ltr`}),v&&b.current.focusInitialTarget?.())},S=e=>{e.key===`Tab`&&(e.preventDefault(),s&&s(e,`tabKeyDown`))},C={slots:f,slotProps:p},w=hl({elementType:f.root,externalSlotProps:p.root,ownerState:g,className:[_.root,a]}),[T,E]=hc(`paper`,{className:_.paper,elementType:Gp,externalForwardedProps:C,shouldForwardComponentProp:!0,ownerState:g}),[D,ee]=hc(`list`,{className:_.list,elementType:Kp,shouldForwardComponentProp:!0,externalForwardedProps:C,getSlotProps:e=>({...e,onKeyDown:t=>{S(t),e.onKeyDown?.(t)}}),ownerState:g}),te=typeof p.transition==`function`?p.transition(g):p.transition;return(0,M.jsx)(Wp,{disableAutoFocus:r,onClose:s,anchorOrigin:{vertical:`bottom`,horizontal:h?`right`:`left`},transformOrigin:h?Vp:Hp,slots:{root:f.root,paper:T,backdrop:f.backdrop,transition:f.transition},slotProps:{root:w,paper:E,backdrop:typeof p.backdrop==`function`?p.backdrop(g):p.backdrop,transition:{...te,onEntering:(...e)=>{x(...e),te?.onEntering?.(...e)}}},open:c,ref:t,transitionDuration:u,ownerState:g,...m,classes:l,children:(0,M.jsx)(D,{actions:b,autoFocus:v,autoFocusItem:y,variant:d,...ee,children:i})})});function Jp(e){return di(`MuiNativeSelect`,e)}var Yp=fi(`MuiNativeSelect`,[`root`,`select`,`multiple`,`filled`,`outlined`,`standard`,`disabled`,`icon`,`iconOpen`,`iconFilled`,`iconOutlined`,`iconStandard`,`nativeInput`,`error`]),Xp=e=>{let{classes:t,variant:n,disabled:r,multiple:i,open:a,error:o}=e;return Ma({select:[`select`,n,r&&`disabled`,i&&`multiple`,o&&`error`],icon:[`icon`,`icon${qo(n)}`,a&&`iconOpen`,r&&`disabled`]},Jp,t)},Zp=P(`select`,{name:`MuiNativeSelect`})(({theme:e})=>({MozAppearance:`none`,WebkitAppearance:`none`,userSelect:`none`,borderRadius:0,cursor:`pointer`,"&:focus":{borderRadius:0},[`&.${Yp.disabled}`]:{cursor:`default`},"&[multiple]":{height:`auto`},"&:not([multiple]) option, &:not([multiple]) optgroup":{backgroundColor:(e.vars||e).palette.background.paper},variants:[{props:({ownerState:e})=>e.variant!==`filled`&&e.variant!==`outlined`,style:{"&&&":{paddingRight:24,minWidth:16}}},{props:{variant:`filled`},style:{"&&&":{paddingRight:32}}},{props:{variant:`outlined`},style:{borderRadius:(e.vars||e).shape.borderRadius,"&:focus":{borderRadius:(e.vars||e).shape.borderRadius},"&&&":{paddingRight:32}}}]})),Qp=P(Zp,{name:`MuiNativeSelect`,slot:`Select`,shouldForwardProp:zo,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.select,t[n.variant],n.error&&t.error,{[`&.${Yp.multiple}`]:t.multiple}]}})({}),$p=P(`svg`,{name:`MuiNativeSelect`})(({theme:e})=>({position:`absolute`,right:0,top:`calc(50% - .5em)`,pointerEvents:`none`,color:(e.vars||e).palette.action.active,[`&.${Yp.disabled}`]:{color:(e.vars||e).palette.action.disabled},variants:[{props:({ownerState:e})=>e.open,style:{transform:`rotate(180deg)`}},{props:{variant:`filled`},style:{right:7}},{props:{variant:`outlined`},style:{right:7}}]})),em=P($p,{name:`MuiNativeSelect`,slot:`Icon`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.icon,n.variant&&t[`icon${qo(n.variant)}`],n.open&&t.iconOpen]}})({}),tm=j.forwardRef(function(e,t){let{className:n,disabled:r,error:i,IconComponent:a,inputRef:o,variant:s=`standard`,...c}=e,l={...e,disabled:r,variant:s,error:i},u=Xp(l);return(0,M.jsxs)(j.Fragment,{children:[(0,M.jsx)(Qp,{ownerState:l,className:ci(u.select,n),disabled:r,ref:o||t,...c}),e.multiple?null:(0,M.jsx)(em,{as:a,ownerState:l,className:u.icon})]})}),nm,rm=P(`fieldset`,{name:`MuiNotchedOutlined`,shouldForwardProp:zo})({textAlign:`left`,position:`absolute`,bottom:0,right:0,top:-5,left:0,margin:0,padding:`0 8px`,pointerEvents:`none`,borderRadius:`inherit`,borderStyle:`solid`,borderWidth:1,overflow:`hidden`,minWidth:`0%`}),im=P(`legend`,{name:`MuiNotchedOutlined`,shouldForwardProp:zo})(Zo(({theme:e})=>({float:`unset`,width:`auto`,overflow:`hidden`,variants:[{props:({ownerState:e})=>!e.withLabel,style:{padding:0,lineHeight:`11px`,transition:e.transitions.create(`width`,{duration:150,easing:e.transitions.easing.easeOut})}},{props:({ownerState:e})=>e.withLabel,style:{display:`block`,padding:0,height:11,fontSize:`0.75em`,visibility:`hidden`,maxWidth:.01,transition:e.transitions.create(`max-width`,{duration:50,easing:e.transitions.easing.easeOut}),whiteSpace:`nowrap`,"& > span":{paddingLeft:5,paddingRight:5,display:`inline-block`,opacity:0,visibility:`visible`}}},{props:({ownerState:e})=>e.withLabel&&e.notched,style:{maxWidth:`100%`,transition:e.transitions.create(`max-width`,{duration:100,easing:e.transitions.easing.easeOut,delay:50})}}]})));function am(e){let{children:t,classes:n,className:r,label:i,notched:a,...o}=e,s=i!=null&&i!==``,c={...e,notched:a,withLabel:s};return(0,M.jsx)(rm,{"aria-hidden":!0,className:r,ownerState:c,...o,children:(0,M.jsx)(im,{ownerState:c,children:s?(0,M.jsx)(`span`,{children:i}):nm||=(0,M.jsx)(`span`,{className:`notranslate`,"aria-hidden":!0,children:`​`})})})}var om=e=>{let{classes:t}=e,n=Ma({root:[`root`],notchedOutline:[`notchedOutline`],input:[`input`]},Ul,t);return{...t,...n}},sm=P(Ll,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiOutlinedInput`,slot:`Root`,overridesResolver:Pl})(Zo(({theme:e})=>{let t=e.palette.mode===`light`?`rgba(0, 0, 0, 0.23)`:`rgba(255, 255, 255, 0.23)`;return{position:`relative`,borderRadius:(e.vars||e).shape.borderRadius,[`&:hover .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.text.primary},"@media (hover: none)":{[`&:hover .${Wl.notchedOutline}`]:{borderColor:e.vars?e.alpha(e.vars.palette.common.onBackground,.23):t}},[`&.${Wl.focused} .${Wl.notchedOutline}`]:{borderWidth:2},variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{[`&.${Wl.focused} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette[t].main}}})),{props:{},style:{[`&.${Wl.error} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.error.main},[`&.${Wl.disabled} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.action.disabled}}},{props:({ownerState:e})=>e.startAdornment,style:{paddingLeft:14}},{props:({ownerState:e})=>e.endAdornment,style:{paddingRight:14}},{props:({ownerState:e})=>e.multiline,style:{padding:`16.5px 14px`}},{props:({ownerState:e,size:t})=>e.multiline&&t===`small`,style:{padding:`8.5px 14px`}}]}})),cm=P(am,{name:`MuiOutlinedInput`,slot:`NotchedOutline`})(Zo(({theme:e})=>{let t=e.palette.mode===`light`?`rgba(0, 0, 0, 0.23)`:`rgba(255, 255, 255, 0.23)`;return{borderColor:e.vars?e.alpha(e.vars.palette.common.onBackground,.23):t}})),lm=P(Rl,{name:`MuiOutlinedInput`,slot:`Input`,overridesResolver:Fl})(Zo(({theme:e})=>({padding:`16.5px 14px`,"&:-webkit-autofill":{...!e.vars&&{WebkitBoxShadow:e.palette.mode===`light`?null:`0 0 0 100px #266798 inset`,WebkitTextFillColor:e.palette.mode===`light`?null:`#fff`,caretColor:e.palette.mode===`light`?null:`#fff`},borderRadius:`inherit`,...e.vars&&e.applyStyles(`dark`,{WebkitBoxShadow:`0 0 0 100px #266798 inset`,WebkitTextFillColor:`#fff`,caretColor:`#fff`})},variants:[{props:{size:`small`},style:{padding:`8.5px 14px`}},{props:({ownerState:e})=>e.multiline,style:{padding:0}},{props:({ownerState:e})=>e.startAdornment,style:{paddingLeft:0}},{props:({ownerState:e})=>e.endAdornment,style:{paddingRight:0}}]}))),um=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiOutlinedInput`}),{fullWidth:r=!1,inputComponent:i=`input`,label:a,multiline:o=!1,notched:s,slots:c={},slotProps:l={},type:u=`text`,...d}=n,f=om(n),[p,m]=Tl({props:n,states:[`color`,`disabled`,`error`,`focused`,`hiddenLabel`,`size`,`required`]}),h={...n,color:p.color||`primary`,disabled:p.disabled,error:p.error,focused:p.focused,formControl:m,fullWidth:r,hiddenLabel:p.hiddenLabel,multiline:o,size:p.size,type:u},g=c.root??sm,_=c.input??lm,[v,y]=hc(`notchedOutline`,{elementType:cm,className:f.notchedOutline,shouldForwardComponentProp:!0,ownerState:h,externalForwardedProps:{slots:c,slotProps:l},additionalProps:{label:a!=null&&a!==``&&p.required?(0,M.jsxs)(j.Fragment,{children:[a,` `,`*`]}):a}});return(0,M.jsx)(Bl,{slots:{root:g,input:_},slotProps:l,renderSuffix:e=>(0,M.jsx)(v,{...y,notched:s===void 0?!!(e.startAdornment||e.filled||e.focused):s}),fullWidth:r,inputComponent:i,multiline:o,ref:t,type:u,...d,classes:{...f,notchedOutline:null}})});um.muiName=`Input`;function dm(e){return di(`MuiSelect`,e)}var fm=fi(`MuiSelect`,[`root`,`select`,`multiple`,`filled`,`outlined`,`standard`,`disabled`,`focused`,`icon`,`iconOpen`,`nativeInput`,`error`]),pm,mm=2,hm=400,gm=200;function _m(e,t){if(!t)return!1;if(e.composedPath().includes(t)||e.target?.nodeType&&t.contains(e.target))return!0;let n=t.getBoundingClientRect();return n.width===0&&n.height===0?!1:e.clientX>=n.left-mm&&e.clientX<=n.right+mm&&e.clientY>=n.top-mm&&e.clientY<=n.bottom+mm}var vm=P(Zp,{name:`MuiSelect`,slot:`Select`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`&.${fm.select}`]:t.select},{[`&.${fm.select}`]:t[n.variant]},{[`&.${fm.error}`]:t.error},{[`&.${fm.multiple}`]:t.multiple}]}})({[`&.${fm.select}`]:{height:`auto`,minHeight:`1.4375em`,textOverflow:`ellipsis`,whiteSpace:`nowrap`,overflow:`hidden`}}),ym=P($p,{name:`MuiSelect`,slot:`Icon`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.icon,n.open&&t.iconOpen]}})({}),bm=P(`input`,{shouldForwardProp:e=>Ro(e)&&e!==`classes`,name:`MuiSelect`,slot:`NativeInput`})({bottom:0,left:0,position:`absolute`,opacity:0,pointerEvents:`none`,width:`100%`,boxSizing:`border-box`}),xm=e=>{let{classes:t,variant:n,disabled:r,multiple:i,open:a,error:o}=e;return Ma({select:[`select`,n,r&&`disabled`,i&&`multiple`,o&&`error`],icon:[`icon`,a&&`iconOpen`,r&&`disabled`],nativeInput:[`nativeInput`]},dm,t)},Sm=j.forwardRef(function(e,t){let{"aria-describedby":n,"aria-label":r,autoFocus:i,autoWidth:a,children:o,className:s,defaultOpen:c,defaultValue:l,disabled:u,displayEmpty:d,error:f=!1,IconComponent:p,inputRef:m,labelId:h,MenuProps:g={},multiple:_,name:v,onBlur:y,onChange:b,onClose:x,onFocus:S,onKeyDown:C,onMouseDown:w,onOpen:T,open:D,readOnly:ee,renderValue:te,required:ne,SelectDisplayProps:re={},tabIndex:ie,type:ae,value:oe,variant:O=`standard`,...k}=e,[A,se]=_s({controlled:oe,default:l,name:`Select`}),[ce,le]=_s({controlled:D,default:c,name:`Select`}),ue=j.useRef(null),de=j.useRef(null),fe=j.useRef(null),pe=j.useRef(!1),me=j.useRef(!1),he=j.useRef(null),ge=j.useRef(!1),_e=j.useRef({allowSelectedMouseUp:!1,allowUnselectedMouseUp:!1}),ve=Qs(),ye=Qs(),[be,xe]=j.useState(null),{current:Se}=j.useRef(D!=null),[Ce,we]=j.useState(),[Te,Ee]=j.useState(null),De=xs(t,m),Oe=j.useCallback(e=>{de.current=e,e&&xe(e)},[]),ke=be?.parentNode;j.useImperativeHandle(De,()=>({focus:()=>{de.current.focus()},node:ue.current,value:A}),[A]);let Ae=be!==null&&ce;ms(()=>{pe.current=Ae},[Ae]);let je=j.useCallback(()=>{ve.clear(),ye.clear()},[ve,ye]),Me=j.useCallback(()=>{je(),ge.current=!1,_e.current={allowSelectedMouseUp:!1,allowUnselectedMouseUp:!1}},[je]),Ne=j.useCallback(()=>{he.current&&=(he.current(),null)},[]);j.useEffect(()=>{Ae||(Me(),Ne())},[Ae,Me,Ne]),j.useEffect(()=>()=>{Me(),Ne()},[Me,Ne]),j.useEffect(()=>{if(!Ae||!ke||a||typeof ResizeObserver>`u`)return;let e=new ResizeObserver(()=>{we(ke.clientWidth)});return e.observe(ke),()=>{e.disconnect()}},[Ae,ke,a]),j.useEffect(()=>{c&&ce&&be&&!Se&&(we(a?null:ke.clientWidth),de.current.focus())},[be,a]),j.useEffect(()=>{i&&de.current.focus()},[i]),j.useEffect(()=>{if(!h)return;let e=us(de.current).getElementById(h);if(e){let t=()=>{getSelection().isCollapsed&&de.current.focus()};return e.addEventListener(`click`,t),()=>{e.removeEventListener(`click`,t)}}},[h]);let Pe=ys((e,t)=>{e||(Me(),Ne()),e?(Ee(yp(t)),T&&T(t)):(Ee(null),x&&x(t)),Se||(pe.current=e,we(a?null:ke.clientWidth),le(e))}),Fe=()=>{Me(),me.current?ye.start(gm,()=>{_e.current.allowUnselectedMouseUp=!0,ve.start(gm,()=>{_e.current.allowSelectedMouseUp=!0})}):ve.start(hm,()=>{_e.current.allowSelectedMouseUp=!0,_e.current.allowUnselectedMouseUp=!0})},Ie=e=>{if(w?.(e),e.button!==0)return;e.preventDefault(),de.current.focus();let t=us(e.currentTarget);Fe(),Ne();let n=e=>{he.current=null,de.current&&(_m(e,de.current)||_m(e,fe.current)||!pe.current&&Se||Pe(!1,e))};t.addEventListener(`mouseup`,n,{capture:!0,once:!0}),he.current=()=>{t.removeEventListener(`mouseup`,n,!0)},Pe(!0,e)},Le=e=>{Pe(!1,e)},Re=j.Children.toArray(o),ze=e=>{let t=Re.find(t=>t.props.value===e.target.value);t!==void 0&&(se(t.props.value),b&&b(e,t))},Be=e=>t=>{ge.current=!1;let n;if(t.currentTarget.hasAttribute(`tabindex`)){if(_){n=Array.isArray(A)?A.slice():[];let t=A.indexOf(e.props.value);t===-1?n.push(e.props.value):n.splice(t,1)}else n=e.props.value;if(e.props.onClick&&e.props.onClick(t),A!==n&&(se(n),b)){let r=t.nativeEvent||t,i=new r.constructor(r.type,r);Object.defineProperty(i,`target`,{writable:!0,value:{value:n,name:v}}),b(i,e)}_||Pe(!1,t)}},Ve=(e,t)=>n=>{if(e.props.onMouseUp?.(n),ge.current){ge.current=!1;return}let r=!_e.current.allowSelectedMouseUp&&t,i=!_e.current.allowUnselectedMouseUp&&!t;r||i||n.currentTarget.click()},He=e=>{ee||([` `,`ArrowUp`,`ArrowDown`,`Enter`].includes(e.key)&&(e.preventDefault(),Pe(!0,e)),C?.(e))},Ue=e=>{!Ae&&y&&(Object.defineProperty(e,`target`,{writable:!0,value:{value:A,name:v}}),y(e))};delete k[`aria-invalid`];let We,Ge,Ke=[],qe=!1,Je=!1;(Dl({value:A})||d)&&(te?We=te(A):qe=!0);let Ye=Re.map(e=>{if(!j.isValidElement(e))return null;let t;if(_){if(!Array.isArray(A))throw Error(E(2));t=A.some(t=>xp(t,e.props.value)),t&&qe&&Ke.push(e.props.children)}else t=xp(A,e.props.value),t&&qe&&(Ge=e.props.children);return t&&(Je=!0),j.cloneElement(e,{"aria-selected":t?`true`:`false`,onMouseDown:t=>{ge.current=!0,e.props.onMouseDown?.(t)},onPointerDown:t=>{ge.current=!0,e.props.onPointerDown?.(t)},onClick:Be(e),onMouseUp:Ve(e,t),onKeyUp:t=>{t.key===` `&&t.preventDefault(),e.props.onKeyUp&&e.props.onKeyUp(t)},role:`option`,selected:t,value:void 0,"data-value":e.props.value})});ms(()=>{me.current=Je},[Je]),qe&&(We=_?Ke.length===0?null:Ke.reduce((e,t,n)=>(e.push(t),n<Ke.length-1&&e.push(`, `),e),[]):Ge);let Xe=Ce;!a&&Se&&be&&(Xe=ke.clientWidth);let Ze;Ze=ie===void 0?u?null:0:ie;let Qe=re.id||(v?`mui-component-select-${v}`:void 0),$e={...e,variant:O,value:A,open:Ae,error:f},et=xm($e),tt=typeof g.slotProps?.paper==`function`?g.slotProps.paper($e):g.slotProps?.paper,nt=xs(tt?.ref,fe),rt=typeof g.slotProps?.list==`function`?g.slotProps.list($e):g.slotProps?.list,it=aa(),at=aa();return(0,M.jsxs)(j.Fragment,{children:[(0,M.jsx)(vm,{as:`div`,ref:Oe,tabIndex:Ze,role:`combobox`,"aria-controls":Ae?it:void 0,"aria-disabled":u?`true`:void 0,"aria-expanded":Ae?`true`:`false`,"aria-haspopup":`listbox`,"aria-label":r,"aria-labelledby":h,"aria-describedby":n,"aria-required":ne?`true`:void 0,"aria-invalid":f?`true`:void 0,onKeyDown:He,onMouseDown:u||ee?null:Ie,onBlur:Ue,onFocus:S,...re,ownerState:$e,className:ci(re.className,et.select,s),id:Qe,children:bp(We)?pm||=(0,M.jsx)(`span`,{className:`notranslate`,"aria-hidden":!0,children:`​`}):We}),(0,M.jsx)(bm,{"aria-invalid":f,value:Array.isArray(A)?A.join(`,`):A,name:v,ref:ue,"aria-hidden":!0,onChange:ze,tabIndex:-1,disabled:u,className:et.nativeInput,autoFocus:i,required:ne,...k,id:k.id??at,ownerState:$e}),(0,M.jsx)(ym,{as:p,className:et.icon,ownerState:$e}),(0,M.jsx)(wp,{value:Te,children:(0,M.jsx)(qp,{id:`menu-${v||``}`,anchorEl:ke,open:Ae,onClose:Le,anchorOrigin:{vertical:`bottom`,horizontal:`center`},transformOrigin:{vertical:`top`,horizontal:`center`},...g,slotProps:{...g.slotProps,list:{"aria-labelledby":h,role:`listbox`,"aria-multiselectable":_?`true`:void 0,disableListWrap:!0,id:it,...rt},paper:{...tt,ref:nt,style:{minWidth:Xe,...tt?.style}}},children:Ye})})]})}),Cm=e=>{let{classes:t}=e,n=Ma({root:[`root`]},dm,t);return{...t,...n}},wm={name:`MuiSelect`,slot:`Root`,shouldForwardProp:e=>zo(e)&&e!==`variant`},Tm=P(Yd,wm)(``),Em=P(um,wm)(``),Dm=P(Cd,wm)(``),Om=j.forwardRef(function(e,t){let n=Qo({name:`MuiSelect`,props:e}),{autoWidth:r=!1,children:i,classes:a={},className:o,defaultOpen:s=!1,displayEmpty:c=!1,IconComponent:l=ql,id:u,input:d,inputProps:f,label:p,labelId:m,MenuProps:h,multiple:g=!1,native:_=!1,onClose:v,onOpen:y,open:b,renderValue:x,SelectDisplayProps:S,variant:C=`outlined`,...w}=n,T=_?tm:Sm,[E]=Tl({props:n,states:[`variant`,`error`]}),D=E.variant||C,ee={...n,variant:D,classes:a},te=Cm(ee),{root:ne,...re}=te,ie=d||{standard:(0,M.jsx)(Tm,{ownerState:ee}),outlined:(0,M.jsx)(Em,{label:p,ownerState:ee}),filled:(0,M.jsx)(Dm,{ownerState:ee})}[D],ae=xs(t,gl(ie));return(0,M.jsx)(j.Fragment,{children:j.cloneElement(ie,{inputComponent:T,inputProps:{children:i,error:E.error,IconComponent:l,variant:D,type:void 0,multiple:g,..._?{id:u}:{autoWidth:r,defaultOpen:s,displayEmpty:c,labelId:m,MenuProps:h,onClose:v,onOpen:y,open:b,renderValue:x,SelectDisplayProps:{id:u,...S}},...f,classes:f?bn(re,f.classes):re,...d?d.props.inputProps:{}},...(g&&_||c)&&D===`outlined`?{notched:!0}:{},ref:ae,className:ci(ie.props.className,o,te.root),...!d&&{variant:D},...w})})});Om.muiName=`Select`;function km(e){return di(`MuiTab`,e)}var Am=fi(`MuiTab`,[`root`,`labelIcon`,`textColorInherit`,`textColorPrimary`,`textColorSecondary`,`selected`,`disabled`,`fullWidth`,`wrapped`,`icon`]),jm=e=>{let{classes:t,textColor:n,fullWidth:r,wrapped:i,icon:a,label:o,selected:s,disabled:c}=e;return Ma({root:[`root`,a&&o&&`labelIcon`,`textColor${qo(n)}`,r&&`fullWidth`,i&&`wrapped`,s&&`selected`,c&&`disabled`],icon:[`icon`]},km,t)},Mm=P(Kc,{name:`MuiTab`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.label&&n.icon&&t.labelIcon,t[`textColor${qo(n.textColor)}`],n.fullWidth&&t.fullWidth,n.wrapped&&t.wrapped,{[`& .${Am.icon}`]:t.icon}]}})(Zo(({theme:e})=>({...e.typography.button,maxWidth:360,minWidth:90,position:`relative`,minHeight:48,flexShrink:0,padding:`12px 16px`,overflow:`hidden`,whiteSpace:`normal`,textAlign:`center`,lineHeight:1.25,variants:[{props:({ownerState:e})=>e.label&&(e.iconPosition===`top`||e.iconPosition===`bottom`),style:{flexDirection:`column`}},{props:({ownerState:e})=>e.label&&e.iconPosition!==`top`&&e.iconPosition!==`bottom`,style:{flexDirection:`row`}},{props:({ownerState:e})=>e.icon&&e.label,style:{minHeight:72,paddingTop:9,paddingBottom:9}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`top`,style:{[`& > .${Am.icon}`]:{marginBottom:6}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`bottom`,style:{[`& > .${Am.icon}`]:{marginTop:6}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`start`,style:{[`& > .${Am.icon}`]:{marginRight:e.spacing(1)}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`end`,style:{[`& > .${Am.icon}`]:{marginLeft:e.spacing(1)}}},{props:{textColor:`inherit`},style:{color:`inherit`,opacity:.6,[`&.${Am.selected}`]:{opacity:1},[`&.${Am.disabled}`]:{opacity:(e.vars||e).palette.action.disabledOpacity}}},{props:{textColor:`primary`},style:{color:(e.vars||e).palette.text.secondary,[`&.${Am.selected}`]:{color:(e.vars||e).palette.primary.main},[`&.${Am.disabled}`]:{color:(e.vars||e).palette.text.disabled}}},{props:{textColor:`secondary`},style:{color:(e.vars||e).palette.text.secondary,[`&.${Am.selected}`]:{color:(e.vars||e).palette.secondary.main},[`&.${Am.disabled}`]:{color:(e.vars||e).palette.text.disabled}}},{props:({ownerState:e})=>e.fullWidth,style:{flexShrink:1,flexGrow:1,flexBasis:0,maxWidth:`none`}},{props:({ownerState:e})=>e.wrapped,style:{fontSize:e.typography.pxToRem(12)}}]}))),Nm=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTab`}),{className:r,disabled:i=!1,disableFocusRipple:a=!1,fullWidth:o,icon:s,iconPosition:c=`top`,indicator:l,label:u,onChange:d,onClick:f,onFocus:p,selected:m,selectionFollowsFocus:h,textColor:g=`inherit`,value:_,wrapped:v=!1,...y}=n,b=Yf(),x=ep({id:_,ref:t,disabled:i,selected:m}),S=b.getItemMap().size===0&&m?0:x.tabIndex,C={...n,disabled:i,disableFocusRipple:a,selected:m,icon:!!s,iconPosition:c,label:!!u,fullWidth:o,textColor:g,wrapped:v},w=jm(C),T=s&&u&&j.isValidElement(s)?j.cloneElement(s,{className:ci(w.icon,s.props.className)}):s;return(0,M.jsxs)(Mm,{internalNativeButton:!0,focusRipple:!a,className:ci(w.root,r),ref:x.ref,role:`tab`,"aria-selected":m,disabled:i,onClick:e=>{!m&&d&&d(e,_),f&&f(e)},onFocus:e=>{h&&!m&&d&&d(e,_),p&&p(e)},tabIndex:S,ownerState:C,...y,children:[c===`top`||c===`start`?(0,M.jsxs)(j.Fragment,{children:[T,u]}):(0,M.jsxs)(j.Fragment,{children:[u,T]}),l]})}),Pm=rs((0,M.jsx)(`path`,{d:`M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z`}),`KeyboardArrowLeft`),Fm=rs((0,M.jsx)(`path`,{d:`M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z`}),`KeyboardArrowRight`);function Im(e){return(1+Math.sin(Math.PI*e-Math.PI/2))/2}function Lm(e,t,n,r={},i=()=>{}){let{ease:a=Im,duration:o=300}=r,s=null,c=t[e],l=!1,u=()=>{l=!0},d=r=>{if(l){i(Error(`Animation cancelled`));return}s===null&&(s=r);let u=Math.min(1,(r-s)/o);if(t[e]=a(u)*(n-c)+c,u>=1){requestAnimationFrame(()=>{i(null)});return}requestAnimationFrame(d)};return c===n?(i(Error(`Element already at target position`)),u):(requestAnimationFrame(d),u)}var Rm={width:99,height:99,position:`absolute`,top:-9999,overflow:`scroll`,pointerEvents:`none`};function zm(e){let{onChange:t,...n}=e,r=j.useRef(),i=j.useRef(null),a=()=>{r.current=i.current.offsetHeight-i.current.clientHeight};return ms(()=>{let e=as(()=>{let e=r.current;a(),e!==r.current&&t(r.current)}),n=fs(i.current);return n.addEventListener(`resize`,e),()=>{e.clear(),n.removeEventListener(`resize`,e)}},[t]),j.useEffect(()=>{a(),t(r.current)},[t]),(0,M.jsx)(`div`,{style:Rm,...n,ref:i})}function Bm(e){return di(`MuiTabScrollButton`,e)}var Vm=fi(`MuiTabScrollButton`,[`root`,`vertical`,`horizontal`,`disabled`]),Hm=e=>{let{classes:t,orientation:n,disabled:r}=e;return Ma({root:[`root`,n,r&&`disabled`]},Bm,t)},Um=P(Kc,{name:`MuiTabScrollButton`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.orientation&&t[n.orientation]]}})({width:40,flexShrink:0,opacity:.8,[`&.${Vm.disabled}`]:{opacity:0},variants:[{props:{orientation:`vertical`},style:{width:`100%`,height:40,"& svg":{transform:`var(--TabScrollButton-svgRotate)`}}}]}),Wm=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTabScrollButton`}),{className:r,slots:i={},slotProps:a={},direction:o,orientation:s,disabled:c,...l}=n,{nativeButton:u,...d}=l,f=Zi(),p={isRtl:f,...n},m=Hm(p),h=i.StartScrollButtonIcon??Pm,g=i.EndScrollButtonIcon??Fm,_=hl({elementType:h,externalSlotProps:a.startScrollButtonIcon,additionalProps:{fontSize:`small`},ownerState:p}),v=hl({elementType:g,externalSlotProps:a.endScrollButtonIcon,additionalProps:{fontSize:`small`},ownerState:p});return(0,M.jsx)(Um,{component:`div`,className:ci(m.root,r),ref:t,role:null,ownerState:p,tabIndex:null,...d,style:{...d.style,...s===`vertical`&&{"--TabScrollButton-svgRotate":`rotate(${f?-90:90}deg)`}},children:o===`left`?(0,M.jsx)(h,{..._}):(0,M.jsx)(g,{...v})})});function Gm(e){return di(`MuiTabs`,e)}var Km=fi(`MuiTabs`,[`root`,`vertical`,`list`,`centered`,`scroller`,`fixed`,`scrollableX`,`scrollableY`,`hideScrollbar`,`scrollButtons`,`scrollButtonsHideMobile`,`indicator`]),qm=e=>{let{vertical:t,fixed:n,hideScrollbar:r,scrollableX:i,scrollableY:a,centered:o,scrollButtonsHideMobile:s,classes:c}=e;return Ma({root:[`root`,t&&`vertical`],scroller:[`scroller`,n&&`fixed`,r&&`hideScrollbar`,i&&`scrollableX`,a&&`scrollableY`],list:[`list`,t&&`vertical`,o&&`centered`],indicator:[`indicator`],scrollButtons:[`scrollButtons`,s&&`scrollButtonsHideMobile`],scrollableX:[i&&`scrollableX`],hideScrollbar:[r&&`hideScrollbar`]},Gm,c)},Jm=P(`div`,{name:`MuiTabs`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`& .${Km.scrollButtons}`]:t.scrollButtons},{[`& .${Km.scrollButtons}`]:n.scrollButtonsHideMobile&&t.scrollButtonsHideMobile},t.root,n.vertical&&t.vertical]}})(Zo(({theme:e})=>({overflow:`hidden`,minHeight:48,WebkitOverflowScrolling:`touch`,display:`flex`,variants:[{props:({ownerState:e})=>e.vertical,style:{flexDirection:`column`}},{props:({ownerState:e})=>e.scrollButtonsHideMobile,style:{[`& .${Km.scrollButtons}`]:{[e.breakpoints.down(`sm`)]:{display:`none`}}}}]}))),Ym=P(`div`,{name:`MuiTabs`,slot:`Scroller`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.scroller,n.fixed&&t.fixed,n.hideScrollbar&&t.hideScrollbar,n.scrollableX&&t.scrollableX,n.scrollableY&&t.scrollableY]}})({position:`relative`,display:`inline-block`,flex:`1 1 auto`,whiteSpace:`nowrap`,variants:[{props:({ownerState:e})=>e.fixed,style:{overflowX:`hidden`,width:`100%`}},{props:({ownerState:e})=>e.hideScrollbar,style:{scrollbarWidth:`none`,"&::-webkit-scrollbar":{display:`none`}}},{props:({ownerState:e})=>e.scrollableX,style:{overflowX:`auto`,overflowY:`hidden`}},{props:({ownerState:e})=>e.scrollableY,style:{overflowY:`auto`,overflowX:`hidden`}}]}),Xm=P(`div`,{name:`MuiTabs`,slot:`List`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.list,n.centered&&t.centered]}})({display:`flex`,variants:[{props:({ownerState:e})=>e.vertical,style:{flexDirection:`column`}},{props:({ownerState:e})=>e.centered,style:{justifyContent:`center`}}]}),Zm=P(`span`,{name:`MuiTabs`,slot:`Indicator`})(Zo(({theme:e})=>({position:`absolute`,height:2,bottom:0,width:`100%`,transition:e.transitions.create(),variants:[{props:{indicatorColor:`primary`},style:{backgroundColor:(e.vars||e).palette.primary.main}},{props:{indicatorColor:`secondary`},style:{backgroundColor:(e.vars||e).palette.secondary.main}},{props:({ownerState:e})=>e.vertical,style:{height:`100%`,width:2,right:0}}]}))),Qm=P(zm)({overflowX:`auto`,overflowY:`hidden`,scrollbarWidth:`none`,"&::-webkit-scrollbar":{display:`none`}}),$m={},eh=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTabs`}),r=Lo(),i=Zi(),{"aria-label":a,"aria-labelledby":o,action:s,centered:c=!1,children:l,className:u,component:d=`div`,allowScrollButtonsMobile:f=!1,indicatorColor:p=`primary`,onChange:m,orientation:h=`horizontal`,scrollButtons:g=`auto`,selectionFollowsFocus:_,slots:v={},slotProps:y={},textColor:b=`primary`,value:x,variant:S=`standard`,visibleScrollbar:C=!1,...w}=n,T=S===`scrollable`,E=h===`vertical`,D=E?`scrollTop`:`scrollLeft`,ee=E?`top`:`left`,te=E?`bottom`:`right`,ne=E?`clientHeight`:`clientWidth`,re=E?`height`:`width`,ie={...n,component:d,allowScrollButtonsMobile:f,indicatorColor:p,orientation:h,vertical:E,scrollButtons:g,textColor:b,variant:S,visibleScrollbar:C,fixed:!T,hideScrollbar:T&&!C,scrollableX:T&&!E,scrollableY:T&&E,centered:c&&!T,scrollButtonsHideMobile:!f},ae=qm(ie),oe=hl({elementType:v.startScrollButtonIcon,externalSlotProps:y.startScrollButtonIcon,ownerState:ie}),O=hl({elementType:v.endScrollButtonIcon,externalSlotProps:y.endScrollButtonIcon,ownerState:ie}),[k,A]=j.useState(!1),[se,ce]=j.useState($m),[le,ue]=j.useState(!1),[de,fe]=j.useState(!1),[pe,me]=j.useState(!1),he=x===!1?null:x,[ge,_e]=j.useState(!1),[ve,ye]=j.useState({overflow:`hidden`,scrollbarWidth:0}),be=new Map,xe=j.useRef(null),Se=j.useRef(null),Ce={slots:v,slotProps:y},we=()=>{let e=xe.current,t;if(e){let n=e.getBoundingClientRect();t={clientWidth:e.clientWidth,scrollLeft:e.scrollLeft,scrollTop:e.scrollTop,scrollWidth:e.scrollWidth,top:n.top,bottom:n.bottom,left:n.left,right:n.right}}let n;if(e&&x!==!1){let e=Se.current.children;if(e.length>0){let t=e[be.get(x)];n=t?t.getBoundingClientRect():null}}return{tabsMeta:t,tabMeta:n}},Te=ys(()=>{let{tabsMeta:e,tabMeta:t}=we(),n=0,r;E?(r=`top`,t&&e&&(n=t.top-e.top+e.scrollTop)):(r=i?`right`:`left`,t&&e&&(n=(i?-1:1)*(t[r]-e[r]+e.scrollLeft)));let a={[r]:n,[re]:t?t[re]:0};if(typeof se[r]!=`number`||typeof se[re]!=`number`)ce(a);else{let e=Math.abs(se[r]-a[r]),t=Math.abs(se[re]-a[re]);(e>=1||t>=1)&&ce(a)}}),Ee=(e,{animation:t=!0}={})=>{t?Lm(D,xe.current,e,{duration:r.transitions.duration.standard}):xe.current[D]=e},De=e=>{let t=xe.current[D];E?t+=e:t+=e*(i?-1:1),Ee(t)},Oe=()=>{let e=xe.current[ne],t=0,n=Array.from(Se.current.children);for(let r=0;r<n.length;r+=1){let i=n[r];if(t+i[ne]>e){r===0&&(t=e);break}t+=i[ne]}return t},ke=()=>{De(-1*Oe())},Ae=()=>{De(Oe())},[je,{onChange:Me,...Ne}]=hc(`scrollbar`,{className:ci(ae.scrollableX,ae.hideScrollbar),elementType:Qm,shouldForwardComponentProp:!0,externalForwardedProps:Ce,ownerState:ie}),Pe=j.useCallback(e=>{Me?.(e),ye({overflow:null,scrollbarWidth:e})},[Me]),[Fe,Ie]=hc(`scrollButtons`,{className:ae.scrollButtons,elementType:Wm,externalForwardedProps:Ce,ownerState:ie,additionalProps:{orientation:h,slots:{StartScrollButtonIcon:v.startScrollButtonIcon,EndScrollButtonIcon:v.endScrollButtonIcon},slotProps:{startScrollButtonIcon:oe,endScrollButtonIcon:O}}}),Le=()=>{let e={};e.scrollbarSizeListener=T?(0,M.jsx)(je,{...Ne,onChange:Pe}):null;let t=T&&(g===`auto`&&(le||de)||g===!0);return e.scrollButtonStart=t?(0,M.jsx)(Fe,{direction:i?`right`:`left`,onClick:ke,disabled:!le,...Ie}):null,e.scrollButtonEnd=t?(0,M.jsx)(Fe,{direction:i?`left`:`right`,onClick:Ae,disabled:!de,...Ie}):null,e},Re=ys(e=>{let{tabsMeta:t,tabMeta:n}=we();!n||!t||(n[ee]<t[ee]?Ee(t[D]+(n[ee]-t[ee]),{animation:e}):n[te]>t[te]&&Ee(t[D]+(n[te]-t[te]),{animation:e}))}),ze=ys(()=>{T&&g!==!1&&me(!pe)});j.useEffect(()=>{let e=as(()=>{xe.current&&Te()}),t,n=n=>{n.forEach(e=>{e.removedNodes.forEach(e=>{t?.unobserve(e)}),e.addedNodes.forEach(e=>{t?.observe(e)})}),e(),ze()},r=fs(xe.current);r.addEventListener(`resize`,e);let i;return typeof ResizeObserver<`u`&&(t=new ResizeObserver(e),Array.from(Se.current.children).forEach(e=>{t.observe(e)})),typeof MutationObserver<`u`&&(i=new MutationObserver(n),i.observe(Se.current,{childList:!0})),()=>{e.clear(),r.removeEventListener(`resize`,e),i?.disconnect(),t?.disconnect()}},[Te,ze]),j.useEffect(()=>{let e=Array.from(Se.current.children),t=e.length;if(typeof IntersectionObserver<`u`&&t>0&&T&&g!==!1){let n=e[0],r=e[t-1],i={root:xe.current,threshold:.99},a=new IntersectionObserver(e=>{ue(!e[0].isIntersecting)},i);a.observe(n);let o=new IntersectionObserver(e=>{fe(!e[0].isIntersecting)},i);return o.observe(r),()=>{a.disconnect(),o.disconnect()}}},[T,g,pe,l?.length]),j.useEffect(()=>{A(!0)},[]),j.useEffect(()=>{Te()}),j.useEffect(()=>{Re($m!==se)},[Re,se]),j.useImperativeHandle(s,()=>({updateIndicator:Te,updateScrollButtons:ze}),[Te,ze]);let[Be,Ve]=hc(`indicator`,{className:ae.indicator,elementType:Zm,externalForwardedProps:Ce,ownerState:ie,additionalProps:{style:se}}),He=(0,M.jsx)(Be,{...Ve}),Ue=$f({activeItemId:ge?void 0:he,orientation:h,isRtl:i}),We=Ue.getContainerProps(),Ge=j.Children.toArray(l).filter(j.isValidElement).map((e,t)=>{let n=e.props.value===void 0?t:e.props.value;return be.set(n,t),{child:e,index:t,childValue:n}}).map(({child:e,childValue:t})=>{let n=t===x;return j.cloneElement(e,{fullWidth:S===`fullWidth`,indicator:n&&!k&&He,selected:n,selectionFollowsFocus:_,onChange:m,textColor:b,value:t})}),Ke=Le(),[qe,Je]=hc(`root`,{ref:t,className:ci(ae.root,u),elementType:Jm,externalForwardedProps:{...Ce,...w,component:d},ownerState:ie}),[Ye,Xe]=hc(`scroller`,{ref:xe,className:ae.scroller,elementType:Ym,externalForwardedProps:Ce,ownerState:ie,additionalProps:{style:{overflow:ve.overflow,[E?`margin${i?`Left`:`Right`}`:`marginBottom`]:C?void 0:-ve.scrollbarWidth}}}),Ze=xs(We.ref,Se),Qe=e=>{let t=Se.current;cs(us(t))?.getAttribute(`role`)===`tab`&&We.onKeyDown(e)},[$e,et]=hc(`list`,{ref:Ze,className:ae.list,elementType:Xm,externalForwardedProps:Ce,ownerState:ie,getSlotProps:e=>({...e,onBlur:t=>{Nu(t.currentTarget,t.relatedTarget)||_e(!1),e.onBlur?.(t)},onKeyDown:t=>{Qe(t),e.onKeyDown?.(t)},onFocus:t=>{_e(!0),We.onFocus(t),e.onFocus?.(t)}})});return(0,M.jsxs)(qe,{...Je,children:[Ke.scrollButtonStart,Ke.scrollbarSizeListener,(0,M.jsxs)(Ye,{...Xe,children:[(0,M.jsx)($e,{"aria-label":a,"aria-labelledby":o,"aria-orientation":h===`vertical`?`vertical`:null,role:`tablist`,...et,children:(0,M.jsx)(Jf.Provider,{value:Ue,children:Ge})}),k&&He]}),Ke.scrollButtonEnd]})});function th(e){return di(`MuiTextField`,e)}fi(`MuiTextField`,[`root`]);var nh={standard:Yd,filled:Cd,outlined:um},rh=e=>{let{classes:t}=e;return Ma({root:[`root`]},th,t)},ih=P(Dd,{name:`MuiTextField`,slot:`Root`})({}),ah=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTextField`}),{autoComplete:r,autoFocus:i=!1,children:a,className:o,color:s=`primary`,defaultValue:c,disabled:l=!1,error:u=!1,fullWidth:d=!1,helperText:f,id:p,inputRef:m,label:h,maxRows:g,minRows:_,multiline:v=!1,name:y,onBlur:b,onChange:x,onFocus:S,placeholder:C,required:w=!1,rows:T,select:E=!1,slots:D={},slotProps:ee={},type:te,value:ne,variant:re=`outlined`,...ie}=n,ae={...n,autoFocus:i,color:s,disabled:l,error:u,fullWidth:d,multiline:v,required:w,select:E,variant:re},oe=rh(ae),O=aa(p),k=f&&O?`${O}-helper-text`:void 0,A=h&&O?`${O}-label`:void 0,se=nh[re],ce={slots:D,slotProps:ee},[le,ue]=hc(`select`,{elementType:Om,externalForwardedProps:ce,ownerState:ae}),de=E&&ue.native,fe={},pe=ce.slotProps.inputLabel;re===`outlined`&&(pe&&pe.shrink!==void 0&&(fe.notched=pe.shrink),fe.label=h),E&&(de||(fe.id=void 0),fe[`aria-describedby`]=void 0);let[me,he]=hc(`root`,{elementType:ih,shouldForwardComponentProp:!0,externalForwardedProps:{...ce,...ie},ownerState:ae,className:ci(oe.root,o),ref:t,additionalProps:{disabled:l,error:u,fullWidth:d,required:w,color:s,variant:re}}),[ge,_e]=hc(`input`,{elementType:se,externalForwardedProps:ce,additionalProps:fe,ownerState:ae}),[ve,ye]=hc(`inputLabel`,{elementType:Qd,externalForwardedProps:ce,ownerState:ae}),[be,xe]=hc(`htmlInput`,{elementType:`input`,externalForwardedProps:ce,ownerState:ae}),[Se,Ce]=hc(`formHelperText`,{elementType:Nd,externalForwardedProps:ce,ownerState:ae}),we=(0,M.jsx)(ge,{"aria-describedby":k,autoComplete:r,autoFocus:i,defaultValue:c,fullWidth:d,multiline:v,name:y,rows:T,maxRows:g,minRows:_,type:te,value:ne,id:O,inputRef:m,onBlur:b,onChange:x,onFocus:S,placeholder:C,inputProps:xe,slots:{input:D.htmlInput?be:void 0},..._e});return(0,M.jsxs)(me,{...he,children:[h!=null&&h!==``&&(0,M.jsx)(ve,{htmlFor:E&&!de?void 0:O,id:A,...E&&!de&&{component:`div`},...ye,children:h}),E?(0,M.jsx)(le,{"aria-describedby":k,id:O,labelId:A,value:ne,input:we,...ue,children:a}):we,f&&(0,M.jsx)(Se,{id:k,...Ce,children:f})]})}),oh=_(),I={background:`#282a36`,currentLine:`#44475a`,foreground:`#f8f8f2`,comment:`#6272a4`,cyan:`#8be9fd`,green:`#50fa7b`,orange:`#ffb86c`,pink:`#ff79c0`,purple:`#bd93f9`,red:`#ff5555`,yellow:`#f1fa8c`},sh=Fo({palette:{mode:`dark`,background:{default:I.background,paper:I.currentLine},primary:{main:I.purple},secondary:{main:I.pink},text:{primary:I.foreground,secondary:I.comment}},typography:{fontFamily:`'JetBrains Mono', monospace`,h1:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},h2:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},h3:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},body1:{fontFamily:`'JetBrains Mono', monospace`},body2:{fontFamily:`'JetBrains Mono', monospace`}},components:{MuiCssBaseline:{styleOverrides:{"*, *::before, *::after":{padding:0},html:{scrollBehavior:`smooth`},code:{fontFamily:`'JetBrains Mono', monospace`},body:{backgroundColor:I.background,color:I.foreground},"::-webkit-scrollbar":{width:`12px`},"::-webkit-scrollbar-track":{background:I.background},"::-webkit-scrollbar-thumb":{background:I.currentLine,borderRadius:`4px`,border:`2px solid transparent`,backgroundClip:`padding-box`},"::-webkit-scrollbar-thumb:hover":{background:I.comment,border:`2px solid transparent`,backgroundClip:`padding-box`}}}}}),ch=rs((0,M.jsx)(`path`,{d:`M7.5 5.6 10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29a.996.996 0 0 0-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41zm-1.03 5.49-2.12-2.12 2.44-2.44 2.12 2.12z`}),`AutoFixHigh`),lh=rs((0,M.jsx)(`path`,{d:`M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-5.97 4.06L14.09 6l1.41 1.41L16.91 6l1.06 1.06-1.41 1.41 1.41 1.41-1.06 1.06-1.41-1.4-1.41 1.41-1.06-1.06 1.41-1.41zm-6.78.66h5v1.5h-5zM11.5 16h-2v2H8v-2H6v-1.5h2v-2h1.5v2h2zm6.5 1.25h-5v-1.5h5zm0-2.5h-5v-1.5h5z`}),`Calculate`),uh=rs((0,M.jsx)(`path`,{d:`M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12z`}),`Cancel`),dh=rs((0,M.jsx)(`path`,{d:`M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2M7.5 18c-.83 0-1.5-.67-1.5-1.5S6.67 15 7.5 15s1.5.67 1.5 1.5S8.33 18 7.5 18m0-9C6.67 9 6 8.33 6 7.5S6.67 6 7.5 6 9 6.67 9 7.5 8.33 9 7.5 9m4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5m4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5m0-9c-.83 0-1.5-.67-1.5-1.5S15.67 6 16.5 6s1.5.67 1.5 1.5S17.33 9 16.5 9`}),`Casino`),fh=rs((0,M.jsx)(`path`,{d:`M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z`}),`CheckCircle`),ph=rs((0,M.jsx)(`path`,{d:`M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z`}),`ContentCopy`),mh=rs((0,M.jsx)(`path`,{d:`M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-2h2zm0-4h-2V7h2z`}),`ErrorOutlined`),hh=rs((0,M.jsx)(`path`,{d:`m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z`}),`ExpandLess`),gh=rs((0,M.jsx)(`path`,{d:`M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z`}),`ExpandMore`),_h=rs((0,M.jsx)(`path`,{d:`M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2zm10 14.5V20H8v-3.5l4-4zm-4-5-4-4V4h8v3.5z`}),`HourglassEmpty`),vh=rs([(0,M.jsx)(`path`,{d:`M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1m0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5z`},`0`),(0,M.jsx)(`path`,{d:`M17.5 10.5c.88 0 1.73.09 2.5.26V9.24c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99M13 12.49v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26V11.9c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.3-4.5.83m4.5 1.84c-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26v-1.52c-.79-.16-1.64-.24-2.5-.24`},`1`)],`MenuBook`),yh=rs((0,M.jsx)(`path`,{d:`M19.8 18.4 14 10.67V6.5l1.35-1.69c.26-.33.03-.81-.39-.81H9.04c-.42 0-.65.48-.39.81L10 6.5v4.17L4.2 18.4c-.49.66-.02 1.6.8 1.6h14c.82 0 1.29-.94.8-1.6`}),`Science`),bh=rs((0,M.jsx)(`path`,{d:`m6 18 8.5-6L6 6zM16 6v12h2V6z`}),`SkipNext`),xh=rs((0,M.jsx)(`path`,{d:`M6 6h12v12H6z`}),`Stop`);function Sh(e,t){for(e=e<0n?-e:e,t=t<0n?-t:t;t!==0n;)[e,t]=[t,e%t];return e}function Ch(e){if(e<0n)throw RangeError(`isqrt: negative input`);if(e<2n)return e;let t=e.toString(2).length,n=1n<<BigInt(Math.floor(t/2));for(;;){let t=n+e/n>>1n;if(t>=n)break;n=t}for(;(n+1n)*(n+1n)<=e;)n++;for(;n*n>e;)n--;return n}function wh(e,t){if(e===0n)return{gcd:t,x:0n,y:1n};let{gcd:n,x:r,y:i}=wh(t%e,e);return{gcd:n,x:i-t/e*r,y:r}}function Th(e,t){let{gcd:n,x:r}=wh(e<0n?e+t:e,t);return n===1n?(r%t+t)%t:null}function Eh(e,t,n){if(n===1n)return 0n;let r=1n;for(e=(e%n+n)%n;t>0n;)t&1n&&(r=r*e%n),t>>=1n,e=e*e%n;return r}function Dh(e){if(e<2n)return!1;if(e<4n)return!0;if(e%2n==0n||e%3n==0n)return!1;for(let t of[5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n]){if(e===t)return!0;if(e%t===0n)return!1}let t=e-1n,n=0;for(;t%2n==0n;)t/=2n,n++;for(let r of[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n]){if(r>=e)break;let i=Eh(r,t,e);if(i===1n||i===e-1n)continue;let a=!0;for(let t=1;t<n;t++)if(i=i*i%e,i===e-1n){a=!1;break}if(a)return!1}return!0}function Oh(e){for(;;){let t=Math.ceil(e/8),n=new Uint8Array(t);crypto.getRandomValues(n);let r=0n;for(let e=0;e<t;e++)r=r<<8n|BigInt(n[e]);if(r|=1n<<BigInt(e-1),r|=1n,r&=(1n<<BigInt(e))-1n,Dh(r))return r}}function kh(e,t,n=65537n){let r,i;do r=Oh(e),i=Oh(t);while(r===i);r>i&&([r,i]=[i,r]);let a=r*i,o=(r-1n)*(i-1n),s=n;for(;Sh(s,o)!==1n;)s+=2n;let c=Th(s,o);if(c===null)throw Error(`modInverse failed`);return{p:r,q:i,n:a,e:s,d:c,phi:o}}function Ah(e,t,n){return Eh(e,n,t)}var L={p:256,q:256},jh={id:`fermat`,name:`Fermat Factorization`,category:`Factorization`,description:`Factors n when p and q are close. Use when |p - q| < 2·n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    print(f"Fermat Factorization on n = {n}")
-    print()
-    if n < 2:
-        print(f"n = {n} is too small to factor")
-        print("FERMAT=FAILED")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2")
-        print(f"q = {n // 2}")
-        print(f"Verification: 2 * {n // 2} = {n}")
-        print("FERMAT=SUCCESS")
-        quit()
-    if n.is_prime():
-        print(f"n is prime: {n}")
-        print("No factorization possible")
-        print("FERMAT=FAILED")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print(f"Verification: p * q = {p * p}")
-        print("FERMAT=SUCCESS")
-        quit()
-    # Optimized Fermat (RsaCtfTool algorithm)
-    # Uses incremental update: b2 += c, c += 2 instead of recomputing a^2 - n
-    a, rem = n.sqrtrem()
-    b2 = -rem
-    c = 2 * a + 1
-    max_iter = 10**6
-    iterations = 0
-    while not b2.is_square():
-        iterations += 1
-        if iterations > max_iter:
-            print(f"Fermat factorization failed: no factor found within {max_iter} iterations")
-            print("p and q may not be close enough for this method")
+      `,cf=e=>{let{classes:t,variant:n,color:r}=e;return Ma({root:[`root`,`color${qo(r)}`,n],dashed:[`dashed`],bar1:[`bar`,`bar1`],bar2:[`bar`,`bar2`,n===`buffer`&&`color${qo(r)}`]},$d,t)},lf=(e,t)=>e.vars?e.vars.palette.LinearProgress[`${t}Bg`]:e.palette.mode===`light`?e.lighten(e.palette[t].main,.62):e.darken(e.palette[t].main,.5),uf=P(`span`,{name:`MuiLinearProgress`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,t[`color${qo(n.color)}`],t[n.variant]]}})(Zo(({theme:e})=>({position:`relative`,overflow:`hidden`,display:`block`,height:4,zIndex:0,"@media print":{colorAdjust:`exact`},variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{backgroundColor:lf(e,t)}})),{props:({ownerState:e})=>e.color===`inherit`&&e.variant!==`buffer`,style:{"&::before":{content:`""`,position:`absolute`,left:0,top:0,right:0,bottom:0,backgroundColor:`currentColor`,opacity:.3}}},{props:{variant:`buffer`},style:{backgroundColor:`transparent`}},{props:{variant:`query`},style:{transform:`rotate(180deg)`}}]}))),df=P(`span`,{name:`MuiLinearProgress`,slot:`Dashed`})(Zo(({theme:e})=>({position:`absolute`,marginTop:0,height:`100%`,width:`100%`,backgroundSize:`10px 10px`,backgroundPosition:`0 -23px`,variants:[{props:{color:`inherit`},style:{opacity:.3,backgroundImage:`radial-gradient(currentColor 0%, currentColor 16%, transparent 42%)`}},...Object.entries(e.palette).filter(Xc()).map(([t])=>{let n=lf(e,t);return{props:{color:t},style:{backgroundImage:`radial-gradient(${n} 0%, ${n} 16%, transparent 42%)`}}})]})),sf||{animation:`${of} 3s infinite linear`}),ff=P(`span`,{name:`MuiLinearProgress`,slot:`Bar1`,overridesResolver:(e,t)=>[t.bar,t.bar1]})(Zo(({theme:e})=>({width:`100%`,position:`absolute`,left:0,bottom:0,top:0,transition:`transform 0.2s linear`,transformOrigin:`left`,variants:[{props:{color:`inherit`},style:{backgroundColor:`currentColor`}},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{backgroundColor:(e.vars||e).palette[t].main}})),{props:{variant:`determinate`},style:{transition:`transform .${ef}s linear`}},{props:{variant:`buffer`},style:{zIndex:1,transition:`transform .${ef}s linear`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:{width:`auto`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:nf||{animation:`${tf} 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite`}}]}))),pf=P(`span`,{name:`MuiLinearProgress`,slot:`Bar2`,overridesResolver:(e,t)=>[t.bar,t.bar2]})(Zo(({theme:e})=>({width:`100%`,position:`absolute`,left:0,bottom:0,top:0,transition:`transform 0.2s linear`,transformOrigin:`left`,variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{"--LinearProgressBar2-barColor":(e.vars||e).palette[t].main}})),{props:({ownerState:e})=>e.variant!==`buffer`&&e.color!==`inherit`,style:{backgroundColor:`var(--LinearProgressBar2-barColor, currentColor)`}},{props:({ownerState:e})=>e.variant!==`buffer`&&e.color===`inherit`,style:{backgroundColor:`currentColor`}},{props:{color:`inherit`},style:{opacity:.3}},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t,variant:`buffer`},style:{backgroundColor:lf(e,t),transition:`transform .${ef}s linear`}})),{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:{width:`auto`}},{props:({ownerState:e})=>e.variant===`indeterminate`||e.variant===`query`,style:af||{animation:`${rf} 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite`}}]}))),mf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiLinearProgress`}),{className:r,color:i=`primary`,max:a,min:o,value:s,valueBuffer:c,variant:l=`indeterminate`,...u}=n,d={...n,color:i,variant:l},f=o??0,p=a??100,m=cf(d),h=Zi(),g={},_={bar1:{},bar2:{}};if((l===`determinate`||l===`buffer`)&&s!==void 0){let e=p-f,t=(s-f)/e*100-100;h&&(t=-t),_.bar1.transform=e>0?`translateX(${t}%)`:`translateX(-100%)`,g[`aria-valuenow`]=s,g[`aria-valuemin`]=f,g[`aria-valuemax`]=p}if(l===`buffer`&&c!==void 0){let e=p-f,t=(c-f)/e*100-100;h&&(t=-t),_.bar2.transform=e>0?`translateX(${t}%)`:`translateX(-100%)`}return(0,M.jsxs)(uf,{className:ci(m.root,r),ownerState:d,role:`progressbar`,...g,ref:t,...u,children:[l===`buffer`?(0,M.jsx)(df,{className:m.dashed,ownerState:d}):null,(0,M.jsx)(ff,{className:m.bar1,ownerState:d,style:_.bar1}),l===`determinate`?null:(0,M.jsx)(pf,{className:m.bar2,ownerState:d,style:_.bar2})]})});function hf(e){return di(`MuiLink`,e)}var gf=fi(`MuiLink`,[`root`,`underlineNone`,`underlineHover`,`underlineAlways`,`button`,`focusVisible`]),_f=({theme:e,ownerState:t})=>{let n=t.color;if(`colorSpace`in e&&e.colorSpace){let r=Qn(e,`palette.${n}.main`)||Qn(e,`palette.${n}`)||t.color;return e.alpha(r,.4)}let r=Qn(e,`palette.${n}.main`,!1)||Qn(e,`palette.${n}`,!1)||t.color,i=Qn(e,`palette.${n}.mainChannel`)||Qn(e,`palette.${n}Channel`);return`vars`in e&&i?`rgba(${i} / 0.4)`:Ii(r,.4)},vf={primary:!0,secondary:!0,error:!0,info:!0,success:!0,warning:!0,textPrimary:!0,textSecondary:!0,textDisabled:!0},yf=e=>{let{classes:t,component:n,focusVisible:r,underline:i}=e;return Ma({root:[`root`,`underline${qo(i)}`,n===`button`&&`button`,r&&`focusVisible`]},hf,t)},bf=P(F,{name:`MuiLink`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,t[`underline${qo(n.underline)}`],n.component===`button`&&t.button]}})(Zo(({theme:e})=>({variants:[{props:{underline:`none`},style:{textDecoration:`none`}},{props:{underline:`hover`},style:{textDecoration:`none`,"&:hover":{textDecoration:`underline`}}},{props:{underline:`always`},style:{textDecoration:`underline`,"&:hover":{textDecorationColor:`inherit`}}},{props:({underline:e,ownerState:t})=>e===`always`&&t.color!==`inherit`,style:{textDecorationColor:`var(--Link-underlineColor)`}},{props:({underline:e,ownerState:t})=>e===`always`&&t.color===`inherit`,style:e.colorSpace?{textDecorationColor:e.alpha(`currentColor`,.4)}:null},...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{underline:`always`,color:t},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette[t].main,.4)}})),{props:{underline:`always`,color:`textPrimary`},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette.text.primary,.4)}},{props:{underline:`always`,color:`textSecondary`},style:{"--Link-underlineColor":e.alpha((e.vars||e).palette.text.secondary,.4)}},{props:{underline:`always`,color:`textDisabled`},style:{"--Link-underlineColor":(e.vars||e).palette.text.disabled}},{props:{component:`button`},style:{position:`relative`,WebkitTapHighlightColor:`transparent`,backgroundColor:`transparent`,outline:0,border:0,margin:0,borderRadius:0,padding:0,cursor:`pointer`,userSelect:`none`,verticalAlign:`middle`,MozAppearance:`none`,WebkitAppearance:`none`,"&::-moz-focus-inner":{borderStyle:`none`},[`&.${gf.focusVisible}`]:{outline:`auto`}}}]}))),xf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiLink`}),r=Lo(),{className:i,color:a=`primary`,component:o=`a`,onBlur:s,onFocus:c,TypographyClasses:l,underline:u=`always`,variant:d=`inherit`,sx:f,...p}=n,[m,h]=j.useState(!1),g=e=>{Ec(e.target)||h(!1),s&&s(e)},_=e=>{Ec(e.target)&&h(!0),c&&c(e)},v={...n,color:a,component:o,focusVisible:m,underline:u,variant:d};return(0,M.jsx)(bf,{color:a,className:ci(yf(v).root,i),classes:l,component:o,onBlur:g,onFocus:_,ref:t,ownerState:v,variant:d,...p,sx:[...vf[a]===void 0?[{color:a}]:[],...Array.isArray(f)?f:[f]],style:{...p.style,...u===`always`&&a!==`inherit`&&!vf[a]&&{"--Link-underlineColor":_f({theme:r,ownerState:v})}}})}),Sf=j.createContext({});function Cf(e){return di(`MuiList`,e)}fi(`MuiList`,[`root`,`padding`,`dense`,`subheader`]);var wf=e=>{let{classes:t,disablePadding:n,dense:r,subheader:i}=e;return Ma({root:[`root`,!n&&`padding`,r&&`dense`,i&&`subheader`]},Cf,t)},Tf=P(`ul`,{name:`MuiList`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,!n.disablePadding&&t.padding,n.dense&&t.dense,n.subheader&&t.subheader]}})({listStyle:`none`,margin:0,padding:0,position:`relative`,variants:[{props:({ownerState:e})=>!e.disablePadding,style:{paddingTop:8,paddingBottom:8}},{props:({ownerState:e})=>e.subheader,style:{paddingTop:0,isolation:`isolate`}}]}),Ef=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiList`}),{children:r,className:i,component:a=`ul`,dense:o=!1,disablePadding:s=!1,subheader:c,...l}=n,u=j.useMemo(()=>({dense:o}),[o]),d={...n,component:a,dense:o,disablePadding:s},f=wf(d);return(0,M.jsx)(Sf.Provider,{value:u,children:(0,M.jsxs)(Tf,{as:a,className:ci(f.root,i),ref:t,ownerState:d,...l,children:[c,r]})})});function Df(e){return di(`MuiListItem`,e)}fi(`MuiListItem`,[`root`,`dense`,`alignItemsFlexStart`,`divider`,`gutters`,`padding`,`secondaryAction`]);function Of(e){return di(`MuiListItemButton`,e)}var kf=fi(`MuiListItemButton`,[`root`,`focusVisible`,`dense`,`alignItemsFlexStart`,`disabled`,`divider`,`gutters`,`selected`]),Af=(e,t)=>{let{ownerState:n}=e;return[t.root,n.dense&&t.dense,n.alignItems===`flex-start`&&t.alignItemsFlexStart,n.divider&&t.divider,!n.disableGutters&&t.gutters]},jf=e=>{let{alignItems:t,classes:n,dense:r,disabled:i,disableGutters:a,divider:o,selected:s}=e,c=Ma({root:[`root`,r&&`dense`,!a&&`gutters`,o&&`divider`,i&&`disabled`,t===`flex-start`&&`alignItemsFlexStart`,s&&`selected`]},Of,n);return{...n,...c}},Mf=P(Kc,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiListItemButton`,slot:`Root`,overridesResolver:Af})(Zo(({theme:e})=>({display:`flex`,flexGrow:1,justifyContent:`flex-start`,alignItems:`center`,position:`relative`,textDecoration:`none`,minWidth:0,boxSizing:`border-box`,textAlign:`left`,paddingTop:8,paddingBottom:8,transition:e.transitions.create(`background-color`,{duration:e.transitions.duration.shortest}),"&:hover":{textDecoration:`none`,backgroundColor:(e.vars||e).palette.action.hover,"@media (hover: none)":{backgroundColor:`transparent`}},[`&.${kf.selected}`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,(e.vars||e).palette.action.selectedOpacity),[`&.${kf.focusVisible}`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,`${(e.vars||e).palette.action.selectedOpacity} + ${(e.vars||e).palette.action.focusOpacity}`)}},[`&.${kf.selected}:hover`]:{backgroundColor:e.alpha((e.vars||e).palette.primary.main,`${(e.vars||e).palette.action.selectedOpacity} + ${(e.vars||e).palette.action.hoverOpacity}`),"@media (hover: none)":{backgroundColor:e.alpha((e.vars||e).palette.primary.main,(e.vars||e).palette.action.selectedOpacity)}},[`&.${kf.focusVisible}`]:{backgroundColor:(e.vars||e).palette.action.focus},[`&.${kf.disabled}`]:{opacity:(e.vars||e).palette.action.disabledOpacity},variants:[{props:({ownerState:e})=>e.divider,style:{borderBottom:`1px solid ${(e.vars||e).palette.divider}`,backgroundClip:`padding-box`}},{props:{alignItems:`flex-start`},style:{alignItems:`flex-start`}},{props:({ownerState:e})=>!e.disableGutters,style:{paddingLeft:16,paddingRight:16}},{props:({ownerState:e})=>e.dense,style:{paddingTop:4,paddingBottom:4}}]}))),Nf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemButton`}),{alignItems:r=`center`,autoFocus:i=!1,component:a=`div`,children:o,dense:s=!1,disableGutters:c=!1,divider:l=!1,focusVisibleClassName:u,selected:d=!1,className:f,...p}=n,m=j.useContext(Sf),h=j.useMemo(()=>({dense:s||m.dense||!1,alignItems:r,disableGutters:c}),[r,m.dense,s,c]),g=j.useRef(null);ms(()=>{i&&g.current&&g.current.focus()},[i]);let _={...n,alignItems:r,dense:h.dense,disableGutters:c,divider:l,selected:d},v=jf(_),{root:y,...b}=v,x=xs(g,t);return(0,M.jsx)(Sf.Provider,{value:h,children:(0,M.jsx)(Mf,{ref:x,href:p.href||p.to,component:(p.href||p.to)&&a===`div`?`button`:a,internalNativeButton:!1,focusVisibleClassName:ci(v.focusVisible,u),ownerState:_,className:ci(v.root,f),...p,classes:b,children:o})})});function Pf(e){return di(`MuiListItemSecondaryAction`,e)}fi(`MuiListItemSecondaryAction`,[`root`,`disableGutters`]);var Ff=e=>{let{disableGutters:t,classes:n}=e;return Ma({root:[`root`,t&&`disableGutters`]},Pf,n)},If=P(`div`,{name:`MuiListItemSecondaryAction`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.disableGutters&&t.disableGutters]}})({position:`absolute`,right:16,top:`50%`,transform:`translateY(-50%)`,variants:[{props:({ownerState:e})=>e.disableGutters,style:{right:0}}]}),Lf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemSecondaryAction`}),{className:r,component:i,...a}=n,o=j.useContext(Sf),s={...n,disableGutters:o.disableGutters};return(0,M.jsx)(If,{as:i,className:ci(Ff(s).root,r),ownerState:s,ref:t,...a})});Lf.muiName=`ListItemSecondaryAction`;var Rf=(e,t)=>{let{ownerState:n}=e;return[t.root,n.dense&&t.dense,n.alignItems===`flex-start`&&t.alignItemsFlexStart,n.divider&&t.divider,!n.disableGutters&&t.gutters,!n.disablePadding&&t.padding]},zf=e=>{let{alignItems:t,classes:n,dense:r,disableGutters:i,disablePadding:a,divider:o}=e;return Ma({root:[`root`,r&&`dense`,!i&&`gutters`,!a&&`padding`,o&&`divider`,t===`flex-start`&&`alignItemsFlexStart`],secondaryAction:[`secondaryAction`]},Df,n)},Bf=P(`div`,{name:`MuiListItem`,slot:`Root`,overridesResolver:Rf})(Zo(({theme:e})=>({display:`flex`,justifyContent:`flex-start`,alignItems:`center`,position:`relative`,textDecoration:`none`,width:`100%`,boxSizing:`border-box`,textAlign:`left`,variants:[{props:({ownerState:e})=>!e.disablePadding,style:{paddingTop:8,paddingBottom:8}},{props:({ownerState:e})=>!e.disablePadding&&e.dense,style:{paddingTop:4,paddingBottom:4}},{props:({ownerState:e})=>!e.disablePadding&&!e.disableGutters,style:{paddingLeft:16,paddingRight:16}},{props:({ownerState:e})=>!e.disablePadding&&!!e.secondaryAction,style:{paddingRight:48}},{props:({ownerState:e})=>!!e.secondaryAction,style:{[`& > .${kf.root}`]:{paddingRight:48}}},{props:{alignItems:`flex-start`},style:{alignItems:`flex-start`}},{props:({ownerState:e})=>e.divider,style:{borderBottom:`1px solid ${(e.vars||e).palette.divider}`,backgroundClip:`padding-box`}},{props:({ownerState:e})=>e.button,style:{transition:e.transitions.create(`background-color`,{duration:e.transitions.duration.shortest}),"&:hover":{textDecoration:`none`,backgroundColor:(e.vars||e).palette.action.hover,"@media (hover: none)":{backgroundColor:`transparent`}}}}]}))),Vf=P(Lf,{name:`MuiListItem`,slot:`secondaryAction`})({}),Hf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItem`}),{alignItems:r=`center`,children:i,className:a,component:o=`li`,dense:s=!1,disableGutters:c=!1,disablePadding:l=!1,divider:u=!1,secondaryAction:d,slotProps:f={},slots:p={},...m}=n,h=j.useContext(Sf),g=j.useMemo(()=>({dense:s||h.dense||!1,alignItems:r,disableGutters:c}),[r,h.dense,s,c]),_={...n,alignItems:r,dense:g.dense,disableGutters:c,disablePadding:l,divider:u,secondaryAction:d},v=zf(_),y={slots:p,slotProps:f},[b,x]=hc(`root`,{ref:t,elementType:Bf,externalForwardedProps:{component:o,...y,...m},ownerState:_,className:ci(v.root,a)}),[S,C]=hc(`secondaryAction`,{elementType:Vf,shouldForwardComponentProp:!0,externalForwardedProps:y,ownerState:_,className:v.secondaryAction});return(0,M.jsx)(Sf.Provider,{value:g,children:(0,M.jsxs)(b,{...x,children:[i,d&&(0,M.jsx)(S,{...C,children:d})]})})});function Uf(e){return di(`MuiListItemText`,e)}var Wf=fi(`MuiListItemText`,[`root`,`multiline`,`dense`,`inset`,`primary`,`secondary`]),Gf=e=>{let{classes:t,inset:n,primary:r,secondary:i,dense:a}=e;return Ma({root:[`root`,n&&`inset`,a&&`dense`,r&&i&&`multiline`],primary:[`primary`],secondary:[`secondary`]},Uf,t)},Kf=P(`div`,{name:`MuiListItemText`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`& .${Wf.primary}`]:t.primary},{[`& .${Wf.secondary}`]:t.secondary},t.root,n.inset&&t.inset,n.primary&&n.secondary&&t.multiline,n.dense&&t.dense]}})({flex:`1 1 auto`,minWidth:0,marginTop:4,marginBottom:4,[`.${ul.root}:where(& .${Wf.primary})`]:{display:`block`},[`.${ul.root}:where(& .${Wf.secondary})`]:{display:`block`},variants:[{props:({ownerState:e})=>e.primary&&e.secondary,style:{marginTop:6,marginBottom:6}},{props:({ownerState:e})=>e.inset,style:{paddingLeft:56}}]}),qf=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiListItemText`}),{children:r,className:i,disableTypography:a=!1,inset:o=!1,primary:s,secondary:c,slots:l={},slotProps:u={},...d}=n,{dense:f}=j.useContext(Sf),p=s??r,m=c,h={...n,disableTypography:a,inset:o,primary:!!p,secondary:!!m,dense:f},g=Gf(h),_={slots:l,slotProps:u},[v,y]=hc(`root`,{className:ci(g.root,i),elementType:Kf,externalForwardedProps:{..._,...d},ownerState:h,ref:t}),[b,x]=hc(`primary`,{className:g.primary,elementType:F,externalForwardedProps:_,ownerState:h}),[S,C]=hc(`secondary`,{className:g.secondary,elementType:F,externalForwardedProps:_,ownerState:h});return p!=null&&p.type!==F&&!a&&(p=(0,M.jsx)(b,{variant:f?`body2`:`body1`,component:x?.variant?void 0:`span`,...x,children:p})),m!=null&&m.type!==F&&!a&&(m=(0,M.jsx)(S,{variant:`body2`,color:`textSecondary`,...C,children:m})),(0,M.jsxs)(v,{...y,children:[p,m]})}),Jf=j.createContext(void 0);function Yf(){let e=j.useContext(Jf);if(e===void 0)throw Error(`MUI: RovingTabIndexContext is missing. Roving tab index items must be placed within a roving tab index provider.`);return e}var Xf=Object.is;function Zf(e,t){if(e===t)return!0;if(!(e instanceof Object)||!(t instanceof Object))return!1;let n=0,r=0;for(let r in e)if(n+=1,!Xf(e[r],t[r])||!(r in t))return!1;for(let e in t)r+=1;return n===r}var Qf=[`ArrowRight`,`ArrowLeft`,`ArrowUp`,`ArrowDown`,`Home`,`End`];function $f(e){let{activeItemId:t,getDefaultActiveItemId:n,orientation:r,isRtl:i=!1,isItemFocusable:a=pp,wrap:o=!0}=e,[s,c]=j.useState(t),l=j.useRef(t),u=s;t!==l.current&&(l.current=t,t!==void 0&&t!==s&&(u=t,c(t)));let d=j.useRef(null),f=j.useRef(new Map),[p,m]=j.useState(0),h=j.useMemo(()=>up(f.current),[p]),g=tp(u,h,a,n),_=j.useRef(g);_.current=g;let v=j.useCallback(()=>{let e=up(f.current);return sp(e,tp(_.current,e,a,n))},[n,a]),y=j.useCallback(()=>f.current,[]),b=vs(e=>{Zf(f.current.get(e.id)??null,e)||(f.current.set(e.id,e),m(e=>e+1))}),x=vs(e=>{f.current.delete(e)&&m(e=>e+1)}),S=vs(e=>{c(e)}),C=j.useCallback(e=>_.current===e,[]),w=j.useCallback((e,t,n,r)=>{let i=ap(dp(f.current),e,t,n,r??a);return i?(i.element?.focus(),c(i.id),i):null},[a]),T=j.useCallback(e=>({onFocus:e=>{let t=dp(f.current),n=lp(t,e.target);n!==-1&&c(t[n].id)},onKeyDown:e=>{if(e.altKey||e.shiftKey||e.ctrlKey||e.metaKey||!Qf.includes(e.key))return;let t=r===`horizontal`?`ArrowLeft`:`ArrowUp`,n=r===`horizontal`?`ArrowRight`:`ArrowDown`;r===`horizontal`&&i&&(t=`ArrowRight`,n=`ArrowLeft`);let a=dp(f.current),s=ss(ls(d.current)),c=s===d.current,l=ip(a,s,_.current),u=`next`;switch(e.key){case t:u=`previous`,e.preventDefault(),c&&(l=a.length);break;case n:e.preventDefault(),c&&(l=-1);break;case`Home`:e.preventDefault(),l=-1;break;case`End`:e.preventDefault(),u=`previous`,l=a.length;break;default:return}w(l,u,o)},ref:gp(e,e=>{d.current=e})}),[w,i,r,o]),E=j.useCallback(e=>{let t=dp(f.current),n=ss(ls(d.current));return w(n===d.current?-1:ip(t,n,_.current),`next`,!0,e)?.id??null},[w]);return j.useMemo(()=>({activeItemId:g,focusNext:E,getActiveItem:v,getContainerProps:T,getItemMap:y,isItemActive:C,registerItem:b,setActiveItemId:S,unregisterItem:x}),[g,E,v,T,y,C,b,S,x])}function ep(e){let{activeItemId:t,registerItem:n,unregisterItem:r}=Yf(),i=j.useRef(null),a=j.useMemo(()=>({disabled:e.disabled??!1,element:null,focusableWhenDisabled:e.focusableWhenDisabled??!1,id:e.id,selected:e.selected??!1,textValue:e.textValue}),[e.disabled,e.focusableWhenDisabled,e.id,e.selected,e.textValue]),o=j.useRef(a);o.current=a;let s=j.useCallback(t=>{if(i.current=t,t==null){queueMicrotask(()=>{i.current??r(e.id)});return}n({...o.current,element:t})},[e.id,n,r]),c=bs(e.ref,s);return Ti(()=>{i.current&&n({...a,element:i.current})},[a,n]),Ti(()=>{let t=e.id;return()=>{r(t)}},[e.id,r]),{ref:c,tabIndex:t===e.id?0:-1}}function tp(e,t,n,r){return e==null?rp(t,n,r):np(e,t,n)}function np(e,t,n){let r=cp(t,e);return r===-1?op(t,n):n(t[r])?t[r].id:ap(t,r,`next`,!1,n)?.id??null}function rp(e,t,n){let r=n?.(e);if(r!=null){let n=sp(e,r);if(n&&t(n))return n.id}return op(e,t)}function ip(e,t,n){if(t){let n=lp(e,t);if(n!==-1)return n}return cp(e,n)}function ap(e,t,n,r,i){let a=e.length-1;if(a===-1)return null;let o=!1,s=fp(t,a,n,r),c=s;for(;s!==-1;){if(s===c){if(o)return null;o=!0}let t=e[s];if(!t||!i(t))s=fp(s,a,n,r);else return t}return null}function op(e,t){return e.find(e=>t(e))?.id??null}function sp(e,t){return t==null?null:e.find(e=>e.id===t)??null}function cp(e,t){return t==null?-1:e.findIndex(e=>e.id===t)}function lp(e,t){return t?e.findIndex(e=>e.element===t||e.element?.contains(t)):-1}function up(e){let t=Array.from(e.values());if(t.every(e=>e.element==null))return t;let n=t.filter(mp).sort((e,t)=>hp(e.element,t.element)),r=t.filter(e=>!mp(e));return[...n,...r]}function dp(e){return up(e).filter(mp)}function fp(e,t,n,r=!0){return n===`next`?e===t?r?0:-1:e+1:e===0?r?t:-1:e-1}function pp(e){return e.element?e.focusableWhenDisabled?!0:!e.disabled&&!e.element.hasAttribute(`disabled`)&&e.element.getAttribute(`aria-disabled`)!==`true`&&e.element.hasAttribute(`tabindex`):!1}function mp(e){return e.element!=null&&e.element.isConnected}function hp(e,t){if(e===t)return 0;let n=e.compareDocumentPosition(t);return n&Node.DOCUMENT_POSITION_FOLLOWING||n&Node.DOCUMENT_POSITION_CONTAINED_BY?-1:n&Node.DOCUMENT_POSITION_PRECEDING||n&Node.DOCUMENT_POSITION_CONTAINS?1:0}function gp(...e){return t=>{e.forEach(e=>{ps(e??null,t)})}}var _p=Cu;function vp(e,t){if(t==null){e.focus();return}try{e.focus({focusVisible:t===`keyboard`})}catch{e.focus()}}function yp(e){return e?e.type===`mousedown`||e.type===`pointerdown`||e.type===`touchstart`?`pointer`:e.type===`keydown`||e.type===`click`&&e.detail===0?`keyboard`:null:null}function bp(e){return e==null||typeof e==`string`&&!e.trim()}function xp(e,t){return typeof t==`object`&&t?e===t:String(e)===String(t)}var Sp=j.createContext(null);function Cp(){return j.useContext(Sp)}var wp=Sp.Provider,Tp=j.createContext(void 0);function Ep(e){let t=e?.element??e;if(!t)return``;if(e?.textValue!==void 0)return e.textValue;let n=t.innerText;return n===void 0&&(n=t.textContent),n??``}function Dp(e,t){if(t===void 0)return!0;let n=Ep(e);return n=n.trim().toLowerCase(),n.length===0?!1:t.repeating?n[0]===t.keys[0]:n.startsWith(t.keys.join(``))}function Op(e,t){return Dp(e,t)?pp(e):!1}function kp(e,t){vp(e,t)}var Ap=j.forwardRef(function(e,t){let{actions:n,autoFocus:r=!1,autoFocusItem:i=!1,children:a,className:o,disabledItemsFocusable:s=!1,disableListWrap:c=!1,onKeyDown:l,variant:u=`selectedMenu`,...d}=e,f=j.useRef(null),p=j.useRef(!1),[m,h]=j.useState(!1),g=Cp(),_=j.useRef({keys:[],repeating:!0,previousKeyMatched:!0,lastTime:null}),v=$f({activeItemId:void 0,getDefaultActiveItemId:j.useCallback(e=>u===`selectedMenu`?e.find(e=>e.selected&&pp(e))?.id??e.find(e=>pp(e))?.id??null:e.find(e=>pp(e))?.id??null,[u]),orientation:`vertical`,wrap:!c}),{activeItemId:y,focusNext:b,getActiveItem:x,getContainerProps:S,getItemMap:C}=v,w=ys((e=!1)=>{if(!f.current||!e&&p.current)return null;if(i){let e=x();if(e?.element){let t=Array.from(C().values()).some(e=>e.selected);return h(u===`menu`&&t&&!e.selected&&g==null),kp(e.element,g),p.current=!0,e.element}return r?(h(!1),f.current.focus(),f.current):null}return r?(h(!1),f.current.focus(),p.current=!0,f.current):(h(!1),null)});ms(()=>{if(!r&&!i){p.current=!1,h(!1);return}w()},[y,i,r,w]),j.useImperativeHandle(n,()=>({adjustStyleForScrollbar:(e,{direction:t})=>{let n=!f.current.style.width;if(e.clientHeight<f.current.clientHeight&&n){let n=`${_p(fs(e))}px`;f.current.style[t===`rtl`?`paddingLeft`:`paddingRight`]=n,f.current.style.width=`calc(100% + ${n})`}return f.current},focusInitialTarget:()=>{if(!f.current)return null;let e=cs(us(f.current));return e&&Nu(f.current,e)?e:w(!0)}}),[w]);let T=S(),E=xs(f,T.ref,t),D=j.useMemo(()=>({itemsFocusableWhenDisabled:s,suppressInitialFocusVisible:m,variant:u}),[s,m,u]);return(0,M.jsx)(Ef,{role:`menu`,ref:E,className:o,onKeyDown:ys(e=>{if(m&&h(!1),(e.ctrlKey||e.metaKey||e.altKey)&&l){l(e);return}if(T.onKeyDown(e),e.key.length===1){let t=_.current,n=e.key.toLowerCase(),r=performance.now();t.keys.length>0&&(r-t.lastTime>500?(t.keys=[],t.repeating=!0,t.previousKeyMatched=!0):t.repeating&&n!==t.keys[0]&&(t.repeating=!1)),t.lastTime=r,t.keys.push(n);let i=cs(us(f.current)),a=i&&!t.repeating&&Dp(i,t);t.previousKeyMatched&&(a||b(e=>Op(e,t))!=null)?e.preventDefault():t.previousKeyMatched=!1}l&&l(e)}),onFocus:T.onFocus,tabIndex:-1,...d,children:(0,M.jsx)(Tp.Provider,{value:D,children:(0,M.jsx)(Jf.Provider,{value:v,children:a})})})});function jp(e){return di(`MuiPopover`,e)}fi(`MuiPopover`,[`root`,`paper`]);function Mp(e,t){let n=0;return typeof t==`number`?n=t:t===`center`?n=e.height/2:t===`bottom`&&(n=e.height),n}function Np(e,t){let n=0;return typeof t==`number`?n=t:t===`center`?n=e.width/2:t===`right`&&(n=e.width),n}function Pp(e){return[e.horizontal,e.vertical].map(e=>typeof e==`number`?`${e}px`:e).join(` `)}function Fp(e){return typeof e==`function`?e():e}var Ip=e=>{let{classes:t}=e;return Ma({root:[`root`],paper:[`paper`]},jp,t)},Lp=P(Qu,{name:`MuiPopover`,slot:`Root`})({}),Rp=P(Tc,{name:`MuiPopover`,slot:`Paper`})({position:`absolute`,overflowY:`auto`,overflowX:`hidden`,minWidth:16,minHeight:16,maxWidth:`calc(100% - 32px)`,maxHeight:`calc(100% - 32px)`,outline:0}),zp=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiPopover`}),{action:r,anchorEl:i,anchorOrigin:a={vertical:`top`,horizontal:`left`},anchorPosition:o,anchorReference:s=`anchorEl`,children:c,className:l,container:u,disableAutoFocus:d=!1,elevation:f=8,marginThreshold:p=16,open:m,slots:h={},slotProps:g={},transformOrigin:_={vertical:`top`,horizontal:`left`},transitionDuration:v=`auto`,disableScrollLock:y=!1,...b}=n,x=j.useRef(),S={...n,anchorOrigin:a,anchorReference:s,elevation:f,marginThreshold:p,transformOrigin:_,transitionDuration:v},C=Ip(S),w=j.useCallback(()=>{if(s===`anchorPosition`)return o;let e=Fp(i),t=(e&&e.nodeType===1?e:us(x.current).body).getBoundingClientRect();return{top:t.top+Mp(t,a.vertical),left:t.left+Np(t,a.horizontal)}},[i,a.horizontal,a.vertical,o,s]),T=j.useCallback(e=>({vertical:Mp(e,_.vertical),horizontal:Np(e,_.horizontal)}),[_.horizontal,_.vertical]),E=j.useCallback(e=>{let t={width:e.offsetWidth,height:e.offsetHeight},n=T(t);if(s===`none`)return{top:null,left:null,transformOrigin:Pp(n)};let r=w(),a=r.top-n.vertical,o=r.left-n.horizontal,c=a+t.height,l=o+t.width,u=fs(Fp(i)),d=u.innerHeight-p,f=u.innerWidth-p;if(p!=null&&a<p){let e=a-p;a-=e,n.vertical+=e}else if(p!=null&&c>d){let e=c-d;a-=e,n.vertical+=e}if(p!=null&&o<p){let e=o-p;o-=e,n.horizontal+=e}else if(l>f){let e=l-f;o-=e,n.horizontal+=e}return{top:`${Math.round(a)}px`,left:`${Math.round(o)}px`,transformOrigin:Pp(n)}},[i,s,w,T,p]),[D,ee]=j.useState(m),te=j.useCallback(()=>{let e=x.current;if(!e)return;let t=E(e);t.top!=null&&e.style.setProperty(`top`,t.top),t.left!=null&&(e.style.left=t.left),e.style.transformOrigin=t.transformOrigin,ee(!0)},[E]);j.useEffect(()=>(y&&window.addEventListener(`scroll`,te),()=>window.removeEventListener(`scroll`,te)),[i,y,te]);let ne=()=>{te()},re=()=>{ee(!1)};j.useEffect(()=>{m&&te()}),j.useImperativeHandle(r,()=>m?{updatePosition:()=>{te()}}:null,[m,te]),j.useEffect(()=>{if(!m)return;let e=as(()=>{te()}),t=fs(Fp(i));return t.addEventListener(`resize`,e),()=>{e.clear(),t.removeEventListener(`resize`,e)}},[i,m,te]);let ie=v,ae={slots:h,slotProps:g},[oe,O]=hc(`transition`,{elementType:Ud,externalForwardedProps:ae,ownerState:S,getSlotProps:e=>({...e,onEntering:(t,n)=>{e.onEntering?.(t,n),ne()},onExited:t=>{e.onExited?.(t),re()}}),additionalProps:{appear:!0,in:m}});v===`auto`&&!oe.muiSupportAuto&&(ie=void 0);let k=u||(i?us(Fp(i)).body:void 0),[A,{slots:se,slotProps:ce,...le}]=hc(`root`,{ref:t,elementType:Lp,externalForwardedProps:{...ae,...b},shouldForwardComponentProp:!0,additionalProps:{slots:{backdrop:h.backdrop},slotProps:{backdrop:Cs(typeof g.backdrop==`function`?g.backdrop(S):g.backdrop,{invisible:!0})},container:k,open:m},ownerState:S,className:ci(C.root,l)}),[ue,de]=hc(`paper`,{ref:x,className:C.paper,elementType:Rp,externalForwardedProps:ae,shouldForwardComponentProp:!0,additionalProps:{elevation:f,style:D?void 0:{opacity:0}},ownerState:S});return(0,M.jsx)(A,{...le,...!lc(A)&&{slots:se,slotProps:ce,disableAutoFocus:d,disableScrollLock:y},children:(0,M.jsx)(oe,{...O,timeout:ie,children:(0,M.jsx)(ue,{...de,children:c})})})});function Bp(e){return di(`MuiMenu`,e)}fi(`MuiMenu`,[`root`,`paper`,`list`]);var Vp={vertical:`top`,horizontal:`right`},Hp={vertical:`top`,horizontal:`left`},Up=e=>{let{classes:t}=e;return Ma({root:[`root`],paper:[`paper`],list:[`list`]},Bp,t)},Wp=P(zp,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiMenu`,slot:`Root`})({}),Gp=P(Rp,{name:`MuiMenu`,slot:`Paper`})({maxHeight:`calc(100% - 96px)`,WebkitOverflowScrolling:`touch`}),Kp=P(Ap,{name:`MuiMenu`,slot:`List`})({outline:0}),qp=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiMenu`}),{autoFocus:r=!0,children:i,className:a,disableAutoFocusItem:o=!1,onClose:s,open:c,PopoverClasses:l,transitionDuration:u=`auto`,variant:d=`selectedMenu`,slots:f={},slotProps:p={},...m}=n,h=Zi(),g={...n,autoFocus:r,disableAutoFocusItem:o,transitionDuration:u,variant:d},_=Up(g),v=r&&c,y=v&&!o,b=j.useRef(null),x=(e,t)=>{b.current&&(b.current.adjustStyleForScrollbar(e,{direction:h?`rtl`:`ltr`}),v&&b.current.focusInitialTarget?.())},S=e=>{e.key===`Tab`&&(e.preventDefault(),s&&s(e,`tabKeyDown`))},C={slots:f,slotProps:p},w=hl({elementType:f.root,externalSlotProps:p.root,ownerState:g,className:[_.root,a]}),[T,E]=hc(`paper`,{className:_.paper,elementType:Gp,externalForwardedProps:C,shouldForwardComponentProp:!0,ownerState:g}),[D,ee]=hc(`list`,{className:_.list,elementType:Kp,shouldForwardComponentProp:!0,externalForwardedProps:C,getSlotProps:e=>({...e,onKeyDown:t=>{S(t),e.onKeyDown?.(t)}}),ownerState:g}),te=typeof p.transition==`function`?p.transition(g):p.transition;return(0,M.jsx)(Wp,{disableAutoFocus:r,onClose:s,anchorOrigin:{vertical:`bottom`,horizontal:h?`right`:`left`},transformOrigin:h?Vp:Hp,slots:{root:f.root,paper:T,backdrop:f.backdrop,transition:f.transition},slotProps:{root:w,paper:E,backdrop:typeof p.backdrop==`function`?p.backdrop(g):p.backdrop,transition:{...te,onEntering:(...e)=>{x(...e),te?.onEntering?.(...e)}}},open:c,ref:t,transitionDuration:u,ownerState:g,...m,classes:l,children:(0,M.jsx)(D,{actions:b,autoFocus:v,autoFocusItem:y,variant:d,...ee,children:i})})});function Jp(e){return di(`MuiNativeSelect`,e)}var Yp=fi(`MuiNativeSelect`,[`root`,`select`,`multiple`,`filled`,`outlined`,`standard`,`disabled`,`icon`,`iconOpen`,`iconFilled`,`iconOutlined`,`iconStandard`,`nativeInput`,`error`]),Xp=e=>{let{classes:t,variant:n,disabled:r,multiple:i,open:a,error:o}=e;return Ma({select:[`select`,n,r&&`disabled`,i&&`multiple`,o&&`error`],icon:[`icon`,`icon${qo(n)}`,a&&`iconOpen`,r&&`disabled`]},Jp,t)},Zp=P(`select`,{name:`MuiNativeSelect`})(({theme:e})=>({MozAppearance:`none`,WebkitAppearance:`none`,userSelect:`none`,borderRadius:0,cursor:`pointer`,"&:focus":{borderRadius:0},[`&.${Yp.disabled}`]:{cursor:`default`},"&[multiple]":{height:`auto`},"&:not([multiple]) option, &:not([multiple]) optgroup":{backgroundColor:(e.vars||e).palette.background.paper},variants:[{props:({ownerState:e})=>e.variant!==`filled`&&e.variant!==`outlined`,style:{"&&&":{paddingRight:24,minWidth:16}}},{props:{variant:`filled`},style:{"&&&":{paddingRight:32}}},{props:{variant:`outlined`},style:{borderRadius:(e.vars||e).shape.borderRadius,"&:focus":{borderRadius:(e.vars||e).shape.borderRadius},"&&&":{paddingRight:32}}}]})),Qp=P(Zp,{name:`MuiNativeSelect`,slot:`Select`,shouldForwardProp:zo,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.select,t[n.variant],n.error&&t.error,{[`&.${Yp.multiple}`]:t.multiple}]}})({}),$p=P(`svg`,{name:`MuiNativeSelect`})(({theme:e})=>({position:`absolute`,right:0,top:`calc(50% - .5em)`,pointerEvents:`none`,color:(e.vars||e).palette.action.active,[`&.${Yp.disabled}`]:{color:(e.vars||e).palette.action.disabled},variants:[{props:({ownerState:e})=>e.open,style:{transform:`rotate(180deg)`}},{props:{variant:`filled`},style:{right:7}},{props:{variant:`outlined`},style:{right:7}}]})),em=P($p,{name:`MuiNativeSelect`,slot:`Icon`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.icon,n.variant&&t[`icon${qo(n.variant)}`],n.open&&t.iconOpen]}})({}),tm=j.forwardRef(function(e,t){let{className:n,disabled:r,error:i,IconComponent:a,inputRef:o,variant:s=`standard`,...c}=e,l={...e,disabled:r,variant:s,error:i},u=Xp(l);return(0,M.jsxs)(j.Fragment,{children:[(0,M.jsx)(Qp,{ownerState:l,className:ci(u.select,n),disabled:r,ref:o||t,...c}),e.multiple?null:(0,M.jsx)(em,{as:a,ownerState:l,className:u.icon})]})}),nm,rm=P(`fieldset`,{name:`MuiNotchedOutlined`,shouldForwardProp:zo})({textAlign:`left`,position:`absolute`,bottom:0,right:0,top:-5,left:0,margin:0,padding:`0 8px`,pointerEvents:`none`,borderRadius:`inherit`,borderStyle:`solid`,borderWidth:1,overflow:`hidden`,minWidth:`0%`}),im=P(`legend`,{name:`MuiNotchedOutlined`,shouldForwardProp:zo})(Zo(({theme:e})=>({float:`unset`,width:`auto`,overflow:`hidden`,variants:[{props:({ownerState:e})=>!e.withLabel,style:{padding:0,lineHeight:`11px`,transition:e.transitions.create(`width`,{duration:150,easing:e.transitions.easing.easeOut})}},{props:({ownerState:e})=>e.withLabel,style:{display:`block`,padding:0,height:11,fontSize:`0.75em`,visibility:`hidden`,maxWidth:.01,transition:e.transitions.create(`max-width`,{duration:50,easing:e.transitions.easing.easeOut}),whiteSpace:`nowrap`,"& > span":{paddingLeft:5,paddingRight:5,display:`inline-block`,opacity:0,visibility:`visible`}}},{props:({ownerState:e})=>e.withLabel&&e.notched,style:{maxWidth:`100%`,transition:e.transitions.create(`max-width`,{duration:100,easing:e.transitions.easing.easeOut,delay:50})}}]})));function am(e){let{children:t,classes:n,className:r,label:i,notched:a,...o}=e,s=i!=null&&i!==``,c={...e,notched:a,withLabel:s};return(0,M.jsx)(rm,{"aria-hidden":!0,className:r,ownerState:c,...o,children:(0,M.jsx)(im,{ownerState:c,children:s?(0,M.jsx)(`span`,{children:i}):nm||=(0,M.jsx)(`span`,{className:`notranslate`,"aria-hidden":!0,children:`​`})})})}var om=e=>{let{classes:t}=e,n=Ma({root:[`root`],notchedOutline:[`notchedOutline`],input:[`input`]},Ul,t);return{...t,...n}},sm=P(Ll,{shouldForwardProp:e=>zo(e)||e===`classes`,name:`MuiOutlinedInput`,slot:`Root`,overridesResolver:Pl})(Zo(({theme:e})=>{let t=e.palette.mode===`light`?`rgba(0, 0, 0, 0.23)`:`rgba(255, 255, 255, 0.23)`;return{position:`relative`,borderRadius:(e.vars||e).shape.borderRadius,[`&:hover .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.text.primary},"@media (hover: none)":{[`&:hover .${Wl.notchedOutline}`]:{borderColor:e.vars?e.alpha(e.vars.palette.common.onBackground,.23):t}},[`&.${Wl.focused} .${Wl.notchedOutline}`]:{borderWidth:2},variants:[...Object.entries(e.palette).filter(Xc()).map(([t])=>({props:{color:t},style:{[`&.${Wl.focused} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette[t].main}}})),{props:{},style:{[`&.${Wl.error} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.error.main},[`&.${Wl.disabled} .${Wl.notchedOutline}`]:{borderColor:(e.vars||e).palette.action.disabled}}},{props:({ownerState:e})=>e.startAdornment,style:{paddingLeft:14}},{props:({ownerState:e})=>e.endAdornment,style:{paddingRight:14}},{props:({ownerState:e})=>e.multiline,style:{padding:`16.5px 14px`}},{props:({ownerState:e,size:t})=>e.multiline&&t===`small`,style:{padding:`8.5px 14px`}}]}})),cm=P(am,{name:`MuiOutlinedInput`,slot:`NotchedOutline`})(Zo(({theme:e})=>{let t=e.palette.mode===`light`?`rgba(0, 0, 0, 0.23)`:`rgba(255, 255, 255, 0.23)`;return{borderColor:e.vars?e.alpha(e.vars.palette.common.onBackground,.23):t}})),lm=P(Rl,{name:`MuiOutlinedInput`,slot:`Input`,overridesResolver:Fl})(Zo(({theme:e})=>({padding:`16.5px 14px`,"&:-webkit-autofill":{...!e.vars&&{WebkitBoxShadow:e.palette.mode===`light`?null:`0 0 0 100px #266798 inset`,WebkitTextFillColor:e.palette.mode===`light`?null:`#fff`,caretColor:e.palette.mode===`light`?null:`#fff`},borderRadius:`inherit`,...e.vars&&e.applyStyles(`dark`,{WebkitBoxShadow:`0 0 0 100px #266798 inset`,WebkitTextFillColor:`#fff`,caretColor:`#fff`})},variants:[{props:{size:`small`},style:{padding:`8.5px 14px`}},{props:({ownerState:e})=>e.multiline,style:{padding:0}},{props:({ownerState:e})=>e.startAdornment,style:{paddingLeft:0}},{props:({ownerState:e})=>e.endAdornment,style:{paddingRight:0}}]}))),um=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiOutlinedInput`}),{fullWidth:r=!1,inputComponent:i=`input`,label:a,multiline:o=!1,notched:s,slots:c={},slotProps:l={},type:u=`text`,...d}=n,f=om(n),[p,m]=Tl({props:n,states:[`color`,`disabled`,`error`,`focused`,`hiddenLabel`,`size`,`required`]}),h={...n,color:p.color||`primary`,disabled:p.disabled,error:p.error,focused:p.focused,formControl:m,fullWidth:r,hiddenLabel:p.hiddenLabel,multiline:o,size:p.size,type:u},g=c.root??sm,_=c.input??lm,[v,y]=hc(`notchedOutline`,{elementType:cm,className:f.notchedOutline,shouldForwardComponentProp:!0,ownerState:h,externalForwardedProps:{slots:c,slotProps:l},additionalProps:{label:a!=null&&a!==``&&p.required?(0,M.jsxs)(j.Fragment,{children:[a,` `,`*`]}):a}});return(0,M.jsx)(Bl,{slots:{root:g,input:_},slotProps:l,renderSuffix:e=>(0,M.jsx)(v,{...y,notched:s===void 0?!!(e.startAdornment||e.filled||e.focused):s}),fullWidth:r,inputComponent:i,multiline:o,ref:t,type:u,...d,classes:{...f,notchedOutline:null}})});um.muiName=`Input`;function dm(e){return di(`MuiSelect`,e)}var fm=fi(`MuiSelect`,[`root`,`select`,`multiple`,`filled`,`outlined`,`standard`,`disabled`,`focused`,`icon`,`iconOpen`,`nativeInput`,`error`]),pm,mm=2,hm=400,gm=200;function _m(e,t){if(!t)return!1;if(e.composedPath().includes(t)||e.target?.nodeType&&t.contains(e.target))return!0;let n=t.getBoundingClientRect();return n.width===0&&n.height===0?!1:e.clientX>=n.left-mm&&e.clientX<=n.right+mm&&e.clientY>=n.top-mm&&e.clientY<=n.bottom+mm}var vm=P(Zp,{name:`MuiSelect`,slot:`Select`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`&.${fm.select}`]:t.select},{[`&.${fm.select}`]:t[n.variant]},{[`&.${fm.error}`]:t.error},{[`&.${fm.multiple}`]:t.multiple}]}})({[`&.${fm.select}`]:{height:`auto`,minHeight:`1.4375em`,textOverflow:`ellipsis`,whiteSpace:`nowrap`,overflow:`hidden`}}),ym=P($p,{name:`MuiSelect`,slot:`Icon`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.icon,n.open&&t.iconOpen]}})({}),bm=P(`input`,{shouldForwardProp:e=>Ro(e)&&e!==`classes`,name:`MuiSelect`,slot:`NativeInput`})({bottom:0,left:0,position:`absolute`,opacity:0,pointerEvents:`none`,width:`100%`,boxSizing:`border-box`}),xm=e=>{let{classes:t,variant:n,disabled:r,multiple:i,open:a,error:o}=e;return Ma({select:[`select`,n,r&&`disabled`,i&&`multiple`,o&&`error`],icon:[`icon`,a&&`iconOpen`,r&&`disabled`],nativeInput:[`nativeInput`]},dm,t)},Sm=j.forwardRef(function(e,t){let{"aria-describedby":n,"aria-label":r,autoFocus:i,autoWidth:a,children:o,className:s,defaultOpen:c,defaultValue:l,disabled:u,displayEmpty:d,error:f=!1,IconComponent:p,inputRef:m,labelId:h,MenuProps:g={},multiple:_,name:v,onBlur:y,onChange:b,onClose:x,onFocus:S,onKeyDown:C,onMouseDown:w,onOpen:T,open:D,readOnly:ee,renderValue:te,required:ne,SelectDisplayProps:re={},tabIndex:ie,type:ae,value:oe,variant:O=`standard`,...k}=e,[A,se]=_s({controlled:oe,default:l,name:`Select`}),[ce,le]=_s({controlled:D,default:c,name:`Select`}),ue=j.useRef(null),de=j.useRef(null),fe=j.useRef(null),pe=j.useRef(!1),me=j.useRef(!1),he=j.useRef(null),ge=j.useRef(!1),_e=j.useRef({allowSelectedMouseUp:!1,allowUnselectedMouseUp:!1}),ve=Qs(),ye=Qs(),[be,xe]=j.useState(null),{current:Se}=j.useRef(D!=null),[Ce,we]=j.useState(),[Te,Ee]=j.useState(null),De=xs(t,m),Oe=j.useCallback(e=>{de.current=e,e&&xe(e)},[]),ke=be?.parentNode;j.useImperativeHandle(De,()=>({focus:()=>{de.current.focus()},node:ue.current,value:A}),[A]);let Ae=be!==null&&ce;ms(()=>{pe.current=Ae},[Ae]);let je=j.useCallback(()=>{ve.clear(),ye.clear()},[ve,ye]),Me=j.useCallback(()=>{je(),ge.current=!1,_e.current={allowSelectedMouseUp:!1,allowUnselectedMouseUp:!1}},[je]),Ne=j.useCallback(()=>{he.current&&=(he.current(),null)},[]);j.useEffect(()=>{Ae||(Me(),Ne())},[Ae,Me,Ne]),j.useEffect(()=>()=>{Me(),Ne()},[Me,Ne]),j.useEffect(()=>{if(!Ae||!ke||a||typeof ResizeObserver>`u`)return;let e=new ResizeObserver(()=>{we(ke.clientWidth)});return e.observe(ke),()=>{e.disconnect()}},[Ae,ke,a]),j.useEffect(()=>{c&&ce&&be&&!Se&&(we(a?null:ke.clientWidth),de.current.focus())},[be,a]),j.useEffect(()=>{i&&de.current.focus()},[i]),j.useEffect(()=>{if(!h)return;let e=us(de.current).getElementById(h);if(e){let t=()=>{getSelection().isCollapsed&&de.current.focus()};return e.addEventListener(`click`,t),()=>{e.removeEventListener(`click`,t)}}},[h]);let Pe=ys((e,t)=>{e||(Me(),Ne()),e?(Ee(yp(t)),T&&T(t)):(Ee(null),x&&x(t)),Se||(pe.current=e,we(a?null:ke.clientWidth),le(e))}),Fe=()=>{Me(),me.current?ye.start(gm,()=>{_e.current.allowUnselectedMouseUp=!0,ve.start(gm,()=>{_e.current.allowSelectedMouseUp=!0})}):ve.start(hm,()=>{_e.current.allowSelectedMouseUp=!0,_e.current.allowUnselectedMouseUp=!0})},Ie=e=>{if(w?.(e),e.button!==0)return;e.preventDefault(),de.current.focus();let t=us(e.currentTarget);Fe(),Ne();let n=e=>{he.current=null,de.current&&(_m(e,de.current)||_m(e,fe.current)||!pe.current&&Se||Pe(!1,e))};t.addEventListener(`mouseup`,n,{capture:!0,once:!0}),he.current=()=>{t.removeEventListener(`mouseup`,n,!0)},Pe(!0,e)},Le=e=>{Pe(!1,e)},Re=j.Children.toArray(o),ze=e=>{let t=Re.find(t=>t.props.value===e.target.value);t!==void 0&&(se(t.props.value),b&&b(e,t))},Be=e=>t=>{ge.current=!1;let n;if(t.currentTarget.hasAttribute(`tabindex`)){if(_){n=Array.isArray(A)?A.slice():[];let t=A.indexOf(e.props.value);t===-1?n.push(e.props.value):n.splice(t,1)}else n=e.props.value;if(e.props.onClick&&e.props.onClick(t),A!==n&&(se(n),b)){let r=t.nativeEvent||t,i=new r.constructor(r.type,r);Object.defineProperty(i,`target`,{writable:!0,value:{value:n,name:v}}),b(i,e)}_||Pe(!1,t)}},Ve=(e,t)=>n=>{if(e.props.onMouseUp?.(n),ge.current){ge.current=!1;return}let r=!_e.current.allowSelectedMouseUp&&t,i=!_e.current.allowUnselectedMouseUp&&!t;r||i||n.currentTarget.click()},He=e=>{ee||([` `,`ArrowUp`,`ArrowDown`,`Enter`].includes(e.key)&&(e.preventDefault(),Pe(!0,e)),C?.(e))},Ue=e=>{!Ae&&y&&(Object.defineProperty(e,`target`,{writable:!0,value:{value:A,name:v}}),y(e))};delete k[`aria-invalid`];let We,Ge,Ke=[],qe=!1,Je=!1;(Dl({value:A})||d)&&(te?We=te(A):qe=!0);let Ye=Re.map(e=>{if(!j.isValidElement(e))return null;let t;if(_){if(!Array.isArray(A))throw Error(E(2));t=A.some(t=>xp(t,e.props.value)),t&&qe&&Ke.push(e.props.children)}else t=xp(A,e.props.value),t&&qe&&(Ge=e.props.children);return t&&(Je=!0),j.cloneElement(e,{"aria-selected":t?`true`:`false`,onMouseDown:t=>{ge.current=!0,e.props.onMouseDown?.(t)},onPointerDown:t=>{ge.current=!0,e.props.onPointerDown?.(t)},onClick:Be(e),onMouseUp:Ve(e,t),onKeyUp:t=>{t.key===` `&&t.preventDefault(),e.props.onKeyUp&&e.props.onKeyUp(t)},role:`option`,selected:t,value:void 0,"data-value":e.props.value})});ms(()=>{me.current=Je},[Je]),qe&&(We=_?Ke.length===0?null:Ke.reduce((e,t,n)=>(e.push(t),n<Ke.length-1&&e.push(`, `),e),[]):Ge);let Xe=Ce;!a&&Se&&be&&(Xe=ke.clientWidth);let Ze;Ze=ie===void 0?u?null:0:ie;let Qe=re.id||(v?`mui-component-select-${v}`:void 0),$e={...e,variant:O,value:A,open:Ae,error:f},et=xm($e),tt=typeof g.slotProps?.paper==`function`?g.slotProps.paper($e):g.slotProps?.paper,nt=xs(tt?.ref,fe),rt=typeof g.slotProps?.list==`function`?g.slotProps.list($e):g.slotProps?.list,it=aa(),at=aa();return(0,M.jsxs)(j.Fragment,{children:[(0,M.jsx)(vm,{as:`div`,ref:Oe,tabIndex:Ze,role:`combobox`,"aria-controls":Ae?it:void 0,"aria-disabled":u?`true`:void 0,"aria-expanded":Ae?`true`:`false`,"aria-haspopup":`listbox`,"aria-label":r,"aria-labelledby":h,"aria-describedby":n,"aria-required":ne?`true`:void 0,"aria-invalid":f?`true`:void 0,onKeyDown:He,onMouseDown:u||ee?null:Ie,onBlur:Ue,onFocus:S,...re,ownerState:$e,className:ci(re.className,et.select,s),id:Qe,children:bp(We)?pm||=(0,M.jsx)(`span`,{className:`notranslate`,"aria-hidden":!0,children:`​`}):We}),(0,M.jsx)(bm,{"aria-invalid":f,value:Array.isArray(A)?A.join(`,`):A,name:v,ref:ue,"aria-hidden":!0,onChange:ze,tabIndex:-1,disabled:u,className:et.nativeInput,autoFocus:i,required:ne,...k,id:k.id??at,ownerState:$e}),(0,M.jsx)(ym,{as:p,className:et.icon,ownerState:$e}),(0,M.jsx)(wp,{value:Te,children:(0,M.jsx)(qp,{id:`menu-${v||``}`,anchorEl:ke,open:Ae,onClose:Le,anchorOrigin:{vertical:`bottom`,horizontal:`center`},transformOrigin:{vertical:`top`,horizontal:`center`},...g,slotProps:{...g.slotProps,list:{"aria-labelledby":h,role:`listbox`,"aria-multiselectable":_?`true`:void 0,disableListWrap:!0,id:it,...rt},paper:{...tt,ref:nt,style:{minWidth:Xe,...tt?.style}}},children:Ye})})]})}),Cm=e=>{let{classes:t}=e,n=Ma({root:[`root`]},dm,t);return{...t,...n}},wm={name:`MuiSelect`,slot:`Root`,shouldForwardProp:e=>zo(e)&&e!==`variant`},Tm=P(Yd,wm)(``),Em=P(um,wm)(``),Dm=P(Cd,wm)(``),Om=j.forwardRef(function(e,t){let n=Qo({name:`MuiSelect`,props:e}),{autoWidth:r=!1,children:i,classes:a={},className:o,defaultOpen:s=!1,displayEmpty:c=!1,IconComponent:l=ql,id:u,input:d,inputProps:f,label:p,labelId:m,MenuProps:h,multiple:g=!1,native:_=!1,onClose:v,onOpen:y,open:b,renderValue:x,SelectDisplayProps:S,variant:C=`outlined`,...w}=n,T=_?tm:Sm,[E]=Tl({props:n,states:[`variant`,`error`]}),D=E.variant||C,ee={...n,variant:D,classes:a},te=Cm(ee),{root:ne,...re}=te,ie=d||{standard:(0,M.jsx)(Tm,{ownerState:ee}),outlined:(0,M.jsx)(Em,{label:p,ownerState:ee}),filled:(0,M.jsx)(Dm,{ownerState:ee})}[D],ae=xs(t,gl(ie));return(0,M.jsx)(j.Fragment,{children:j.cloneElement(ie,{inputComponent:T,inputProps:{children:i,error:E.error,IconComponent:l,variant:D,type:void 0,multiple:g,..._?{id:u}:{autoWidth:r,defaultOpen:s,displayEmpty:c,labelId:m,MenuProps:h,onClose:v,onOpen:y,open:b,renderValue:x,SelectDisplayProps:{id:u,...S}},...f,classes:f?bn(re,f.classes):re,...d?d.props.inputProps:{}},...(g&&_||c)&&D===`outlined`?{notched:!0}:{},ref:ae,className:ci(ie.props.className,o,te.root),...!d&&{variant:D},...w})})});Om.muiName=`Select`;function km(e){return di(`MuiTab`,e)}var Am=fi(`MuiTab`,[`root`,`labelIcon`,`textColorInherit`,`textColorPrimary`,`textColorSecondary`,`selected`,`disabled`,`fullWidth`,`wrapped`,`icon`]),jm=e=>{let{classes:t,textColor:n,fullWidth:r,wrapped:i,icon:a,label:o,selected:s,disabled:c}=e;return Ma({root:[`root`,a&&o&&`labelIcon`,`textColor${qo(n)}`,r&&`fullWidth`,i&&`wrapped`,s&&`selected`,c&&`disabled`],icon:[`icon`]},km,t)},Mm=P(Kc,{name:`MuiTab`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.label&&n.icon&&t.labelIcon,t[`textColor${qo(n.textColor)}`],n.fullWidth&&t.fullWidth,n.wrapped&&t.wrapped,{[`& .${Am.icon}`]:t.icon}]}})(Zo(({theme:e})=>({...e.typography.button,maxWidth:360,minWidth:90,position:`relative`,minHeight:48,flexShrink:0,padding:`12px 16px`,overflow:`hidden`,whiteSpace:`normal`,textAlign:`center`,lineHeight:1.25,variants:[{props:({ownerState:e})=>e.label&&(e.iconPosition===`top`||e.iconPosition===`bottom`),style:{flexDirection:`column`}},{props:({ownerState:e})=>e.label&&e.iconPosition!==`top`&&e.iconPosition!==`bottom`,style:{flexDirection:`row`}},{props:({ownerState:e})=>e.icon&&e.label,style:{minHeight:72,paddingTop:9,paddingBottom:9}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`top`,style:{[`& > .${Am.icon}`]:{marginBottom:6}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`bottom`,style:{[`& > .${Am.icon}`]:{marginTop:6}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`start`,style:{[`& > .${Am.icon}`]:{marginRight:e.spacing(1)}}},{props:({ownerState:e,iconPosition:t})=>e.icon&&e.label&&t===`end`,style:{[`& > .${Am.icon}`]:{marginLeft:e.spacing(1)}}},{props:{textColor:`inherit`},style:{color:`inherit`,opacity:.6,[`&.${Am.selected}`]:{opacity:1},[`&.${Am.disabled}`]:{opacity:(e.vars||e).palette.action.disabledOpacity}}},{props:{textColor:`primary`},style:{color:(e.vars||e).palette.text.secondary,[`&.${Am.selected}`]:{color:(e.vars||e).palette.primary.main},[`&.${Am.disabled}`]:{color:(e.vars||e).palette.text.disabled}}},{props:{textColor:`secondary`},style:{color:(e.vars||e).palette.text.secondary,[`&.${Am.selected}`]:{color:(e.vars||e).palette.secondary.main},[`&.${Am.disabled}`]:{color:(e.vars||e).palette.text.disabled}}},{props:({ownerState:e})=>e.fullWidth,style:{flexShrink:1,flexGrow:1,flexBasis:0,maxWidth:`none`}},{props:({ownerState:e})=>e.wrapped,style:{fontSize:e.typography.pxToRem(12)}}]}))),Nm=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTab`}),{className:r,disabled:i=!1,disableFocusRipple:a=!1,fullWidth:o,icon:s,iconPosition:c=`top`,indicator:l,label:u,onChange:d,onClick:f,onFocus:p,selected:m,selectionFollowsFocus:h,textColor:g=`inherit`,value:_,wrapped:v=!1,...y}=n,b=Yf(),x=ep({id:_,ref:t,disabled:i,selected:m}),S=b.getItemMap().size===0&&m?0:x.tabIndex,C={...n,disabled:i,disableFocusRipple:a,selected:m,icon:!!s,iconPosition:c,label:!!u,fullWidth:o,textColor:g,wrapped:v},w=jm(C),T=s&&u&&j.isValidElement(s)?j.cloneElement(s,{className:ci(w.icon,s.props.className)}):s;return(0,M.jsxs)(Mm,{internalNativeButton:!0,focusRipple:!a,className:ci(w.root,r),ref:x.ref,role:`tab`,"aria-selected":m,disabled:i,onClick:e=>{!m&&d&&d(e,_),f&&f(e)},onFocus:e=>{h&&!m&&d&&d(e,_),p&&p(e)},tabIndex:S,ownerState:C,...y,children:[c===`top`||c===`start`?(0,M.jsxs)(j.Fragment,{children:[T,u]}):(0,M.jsxs)(j.Fragment,{children:[u,T]}),l]})}),Pm=rs((0,M.jsx)(`path`,{d:`M15.41 16.09l-4.58-4.59 4.58-4.59L14 5.5l-6 6 6 6z`}),`KeyboardArrowLeft`),Fm=rs((0,M.jsx)(`path`,{d:`M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z`}),`KeyboardArrowRight`);function Im(e){return(1+Math.sin(Math.PI*e-Math.PI/2))/2}function Lm(e,t,n,r={},i=()=>{}){let{ease:a=Im,duration:o=300}=r,s=null,c=t[e],l=!1,u=()=>{l=!0},d=r=>{if(l){i(Error(`Animation cancelled`));return}s===null&&(s=r);let u=Math.min(1,(r-s)/o);if(t[e]=a(u)*(n-c)+c,u>=1){requestAnimationFrame(()=>{i(null)});return}requestAnimationFrame(d)};return c===n?(i(Error(`Element already at target position`)),u):(requestAnimationFrame(d),u)}var Rm={width:99,height:99,position:`absolute`,top:-9999,overflow:`scroll`,pointerEvents:`none`};function zm(e){let{onChange:t,...n}=e,r=j.useRef(),i=j.useRef(null),a=()=>{r.current=i.current.offsetHeight-i.current.clientHeight};return ms(()=>{let e=as(()=>{let e=r.current;a(),e!==r.current&&t(r.current)}),n=fs(i.current);return n.addEventListener(`resize`,e),()=>{e.clear(),n.removeEventListener(`resize`,e)}},[t]),j.useEffect(()=>{a(),t(r.current)},[t]),(0,M.jsx)(`div`,{style:Rm,...n,ref:i})}function Bm(e){return di(`MuiTabScrollButton`,e)}var Vm=fi(`MuiTabScrollButton`,[`root`,`vertical`,`horizontal`,`disabled`]),Hm=e=>{let{classes:t,orientation:n,disabled:r}=e;return Ma({root:[`root`,n,r&&`disabled`]},Bm,t)},Um=P(Kc,{name:`MuiTabScrollButton`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.root,n.orientation&&t[n.orientation]]}})({width:40,flexShrink:0,opacity:.8,[`&.${Vm.disabled}`]:{opacity:0},variants:[{props:{orientation:`vertical`},style:{width:`100%`,height:40,"& svg":{transform:`var(--TabScrollButton-svgRotate)`}}}]}),Wm=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTabScrollButton`}),{className:r,slots:i={},slotProps:a={},direction:o,orientation:s,disabled:c,...l}=n,{nativeButton:u,...d}=l,f=Zi(),p={isRtl:f,...n},m=Hm(p),h=i.StartScrollButtonIcon??Pm,g=i.EndScrollButtonIcon??Fm,_=hl({elementType:h,externalSlotProps:a.startScrollButtonIcon,additionalProps:{fontSize:`small`},ownerState:p}),v=hl({elementType:g,externalSlotProps:a.endScrollButtonIcon,additionalProps:{fontSize:`small`},ownerState:p});return(0,M.jsx)(Um,{component:`div`,className:ci(m.root,r),ref:t,role:null,ownerState:p,tabIndex:null,...d,style:{...d.style,...s===`vertical`&&{"--TabScrollButton-svgRotate":`rotate(${f?-90:90}deg)`}},children:o===`left`?(0,M.jsx)(h,{..._}):(0,M.jsx)(g,{...v})})});function Gm(e){return di(`MuiTabs`,e)}var Km=fi(`MuiTabs`,[`root`,`vertical`,`list`,`centered`,`scroller`,`fixed`,`scrollableX`,`scrollableY`,`hideScrollbar`,`scrollButtons`,`scrollButtonsHideMobile`,`indicator`]),qm=e=>{let{vertical:t,fixed:n,hideScrollbar:r,scrollableX:i,scrollableY:a,centered:o,scrollButtonsHideMobile:s,classes:c}=e;return Ma({root:[`root`,t&&`vertical`],scroller:[`scroller`,n&&`fixed`,r&&`hideScrollbar`,i&&`scrollableX`,a&&`scrollableY`],list:[`list`,t&&`vertical`,o&&`centered`],indicator:[`indicator`],scrollButtons:[`scrollButtons`,s&&`scrollButtonsHideMobile`],scrollableX:[i&&`scrollableX`],hideScrollbar:[r&&`hideScrollbar`]},Gm,c)},Jm=P(`div`,{name:`MuiTabs`,slot:`Root`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[{[`& .${Km.scrollButtons}`]:t.scrollButtons},{[`& .${Km.scrollButtons}`]:n.scrollButtonsHideMobile&&t.scrollButtonsHideMobile},t.root,n.vertical&&t.vertical]}})(Zo(({theme:e})=>({overflow:`hidden`,minHeight:48,WebkitOverflowScrolling:`touch`,display:`flex`,variants:[{props:({ownerState:e})=>e.vertical,style:{flexDirection:`column`}},{props:({ownerState:e})=>e.scrollButtonsHideMobile,style:{[`& .${Km.scrollButtons}`]:{[e.breakpoints.down(`sm`)]:{display:`none`}}}}]}))),Ym=P(`div`,{name:`MuiTabs`,slot:`Scroller`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.scroller,n.fixed&&t.fixed,n.hideScrollbar&&t.hideScrollbar,n.scrollableX&&t.scrollableX,n.scrollableY&&t.scrollableY]}})({position:`relative`,display:`inline-block`,flex:`1 1 auto`,whiteSpace:`nowrap`,variants:[{props:({ownerState:e})=>e.fixed,style:{overflowX:`hidden`,width:`100%`}},{props:({ownerState:e})=>e.hideScrollbar,style:{scrollbarWidth:`none`,"&::-webkit-scrollbar":{display:`none`}}},{props:({ownerState:e})=>e.scrollableX,style:{overflowX:`auto`,overflowY:`hidden`}},{props:({ownerState:e})=>e.scrollableY,style:{overflowY:`auto`,overflowX:`hidden`}}]}),Xm=P(`div`,{name:`MuiTabs`,slot:`List`,overridesResolver:(e,t)=>{let{ownerState:n}=e;return[t.list,n.centered&&t.centered]}})({display:`flex`,variants:[{props:({ownerState:e})=>e.vertical,style:{flexDirection:`column`}},{props:({ownerState:e})=>e.centered,style:{justifyContent:`center`}}]}),Zm=P(`span`,{name:`MuiTabs`,slot:`Indicator`})(Zo(({theme:e})=>({position:`absolute`,height:2,bottom:0,width:`100%`,transition:e.transitions.create(),variants:[{props:{indicatorColor:`primary`},style:{backgroundColor:(e.vars||e).palette.primary.main}},{props:{indicatorColor:`secondary`},style:{backgroundColor:(e.vars||e).palette.secondary.main}},{props:({ownerState:e})=>e.vertical,style:{height:`100%`,width:2,right:0}}]}))),Qm=P(zm)({overflowX:`auto`,overflowY:`hidden`,scrollbarWidth:`none`,"&::-webkit-scrollbar":{display:`none`}}),$m={},eh=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTabs`}),r=Lo(),i=Zi(),{"aria-label":a,"aria-labelledby":o,action:s,centered:c=!1,children:l,className:u,component:d=`div`,allowScrollButtonsMobile:f=!1,indicatorColor:p=`primary`,onChange:m,orientation:h=`horizontal`,scrollButtons:g=`auto`,selectionFollowsFocus:_,slots:v={},slotProps:y={},textColor:b=`primary`,value:x,variant:S=`standard`,visibleScrollbar:C=!1,...w}=n,T=S===`scrollable`,E=h===`vertical`,D=E?`scrollTop`:`scrollLeft`,ee=E?`top`:`left`,te=E?`bottom`:`right`,ne=E?`clientHeight`:`clientWidth`,re=E?`height`:`width`,ie={...n,component:d,allowScrollButtonsMobile:f,indicatorColor:p,orientation:h,vertical:E,scrollButtons:g,textColor:b,variant:S,visibleScrollbar:C,fixed:!T,hideScrollbar:T&&!C,scrollableX:T&&!E,scrollableY:T&&E,centered:c&&!T,scrollButtonsHideMobile:!f},ae=qm(ie),oe=hl({elementType:v.startScrollButtonIcon,externalSlotProps:y.startScrollButtonIcon,ownerState:ie}),O=hl({elementType:v.endScrollButtonIcon,externalSlotProps:y.endScrollButtonIcon,ownerState:ie}),[k,A]=j.useState(!1),[se,ce]=j.useState($m),[le,ue]=j.useState(!1),[de,fe]=j.useState(!1),[pe,me]=j.useState(!1),he=x===!1?null:x,[ge,_e]=j.useState(!1),[ve,ye]=j.useState({overflow:`hidden`,scrollbarWidth:0}),be=new Map,xe=j.useRef(null),Se=j.useRef(null),Ce={slots:v,slotProps:y},we=()=>{let e=xe.current,t;if(e){let n=e.getBoundingClientRect();t={clientWidth:e.clientWidth,scrollLeft:e.scrollLeft,scrollTop:e.scrollTop,scrollWidth:e.scrollWidth,top:n.top,bottom:n.bottom,left:n.left,right:n.right}}let n;if(e&&x!==!1){let e=Se.current.children;if(e.length>0){let t=e[be.get(x)];n=t?t.getBoundingClientRect():null}}return{tabsMeta:t,tabMeta:n}},Te=ys(()=>{let{tabsMeta:e,tabMeta:t}=we(),n=0,r;E?(r=`top`,t&&e&&(n=t.top-e.top+e.scrollTop)):(r=i?`right`:`left`,t&&e&&(n=(i?-1:1)*(t[r]-e[r]+e.scrollLeft)));let a={[r]:n,[re]:t?t[re]:0};if(typeof se[r]!=`number`||typeof se[re]!=`number`)ce(a);else{let e=Math.abs(se[r]-a[r]),t=Math.abs(se[re]-a[re]);(e>=1||t>=1)&&ce(a)}}),Ee=(e,{animation:t=!0}={})=>{t?Lm(D,xe.current,e,{duration:r.transitions.duration.standard}):xe.current[D]=e},De=e=>{let t=xe.current[D];E?t+=e:t+=e*(i?-1:1),Ee(t)},Oe=()=>{let e=xe.current[ne],t=0,n=Array.from(Se.current.children);for(let r=0;r<n.length;r+=1){let i=n[r];if(t+i[ne]>e){r===0&&(t=e);break}t+=i[ne]}return t},ke=()=>{De(-1*Oe())},Ae=()=>{De(Oe())},[je,{onChange:Me,...Ne}]=hc(`scrollbar`,{className:ci(ae.scrollableX,ae.hideScrollbar),elementType:Qm,shouldForwardComponentProp:!0,externalForwardedProps:Ce,ownerState:ie}),Pe=j.useCallback(e=>{Me?.(e),ye({overflow:null,scrollbarWidth:e})},[Me]),[Fe,Ie]=hc(`scrollButtons`,{className:ae.scrollButtons,elementType:Wm,externalForwardedProps:Ce,ownerState:ie,additionalProps:{orientation:h,slots:{StartScrollButtonIcon:v.startScrollButtonIcon,EndScrollButtonIcon:v.endScrollButtonIcon},slotProps:{startScrollButtonIcon:oe,endScrollButtonIcon:O}}}),Le=()=>{let e={};e.scrollbarSizeListener=T?(0,M.jsx)(je,{...Ne,onChange:Pe}):null;let t=T&&(g===`auto`&&(le||de)||g===!0);return e.scrollButtonStart=t?(0,M.jsx)(Fe,{direction:i?`right`:`left`,onClick:ke,disabled:!le,...Ie}):null,e.scrollButtonEnd=t?(0,M.jsx)(Fe,{direction:i?`left`:`right`,onClick:Ae,disabled:!de,...Ie}):null,e},Re=ys(e=>{let{tabsMeta:t,tabMeta:n}=we();!n||!t||(n[ee]<t[ee]?Ee(t[D]+(n[ee]-t[ee]),{animation:e}):n[te]>t[te]&&Ee(t[D]+(n[te]-t[te]),{animation:e}))}),ze=ys(()=>{T&&g!==!1&&me(!pe)});j.useEffect(()=>{let e=as(()=>{xe.current&&Te()}),t,n=n=>{n.forEach(e=>{e.removedNodes.forEach(e=>{t?.unobserve(e)}),e.addedNodes.forEach(e=>{t?.observe(e)})}),e(),ze()},r=fs(xe.current);r.addEventListener(`resize`,e);let i;return typeof ResizeObserver<`u`&&(t=new ResizeObserver(e),Array.from(Se.current.children).forEach(e=>{t.observe(e)})),typeof MutationObserver<`u`&&(i=new MutationObserver(n),i.observe(Se.current,{childList:!0})),()=>{e.clear(),r.removeEventListener(`resize`,e),i?.disconnect(),t?.disconnect()}},[Te,ze]),j.useEffect(()=>{let e=Array.from(Se.current.children),t=e.length;if(typeof IntersectionObserver<`u`&&t>0&&T&&g!==!1){let n=e[0],r=e[t-1],i={root:xe.current,threshold:.99},a=new IntersectionObserver(e=>{ue(!e[0].isIntersecting)},i);a.observe(n);let o=new IntersectionObserver(e=>{fe(!e[0].isIntersecting)},i);return o.observe(r),()=>{a.disconnect(),o.disconnect()}}},[T,g,pe,l?.length]),j.useEffect(()=>{A(!0)},[]),j.useEffect(()=>{Te()}),j.useEffect(()=>{Re($m!==se)},[Re,se]),j.useImperativeHandle(s,()=>({updateIndicator:Te,updateScrollButtons:ze}),[Te,ze]);let[Be,Ve]=hc(`indicator`,{className:ae.indicator,elementType:Zm,externalForwardedProps:Ce,ownerState:ie,additionalProps:{style:se}}),He=(0,M.jsx)(Be,{...Ve}),Ue=$f({activeItemId:ge?void 0:he,orientation:h,isRtl:i}),We=Ue.getContainerProps(),Ge=j.Children.toArray(l).filter(j.isValidElement).map((e,t)=>{let n=e.props.value===void 0?t:e.props.value;return be.set(n,t),{child:e,index:t,childValue:n}}).map(({child:e,childValue:t})=>{let n=t===x;return j.cloneElement(e,{fullWidth:S===`fullWidth`,indicator:n&&!k&&He,selected:n,selectionFollowsFocus:_,onChange:m,textColor:b,value:t})}),Ke=Le(),[qe,Je]=hc(`root`,{ref:t,className:ci(ae.root,u),elementType:Jm,externalForwardedProps:{...Ce,...w,component:d},ownerState:ie}),[Ye,Xe]=hc(`scroller`,{ref:xe,className:ae.scroller,elementType:Ym,externalForwardedProps:Ce,ownerState:ie,additionalProps:{style:{overflow:ve.overflow,[E?`margin${i?`Left`:`Right`}`:`marginBottom`]:C?void 0:-ve.scrollbarWidth}}}),Ze=xs(We.ref,Se),Qe=e=>{let t=Se.current;cs(us(t))?.getAttribute(`role`)===`tab`&&We.onKeyDown(e)},[$e,et]=hc(`list`,{ref:Ze,className:ae.list,elementType:Xm,externalForwardedProps:Ce,ownerState:ie,getSlotProps:e=>({...e,onBlur:t=>{Nu(t.currentTarget,t.relatedTarget)||_e(!1),e.onBlur?.(t)},onKeyDown:t=>{Qe(t),e.onKeyDown?.(t)},onFocus:t=>{_e(!0),We.onFocus(t),e.onFocus?.(t)}})});return(0,M.jsxs)(qe,{...Je,children:[Ke.scrollButtonStart,Ke.scrollbarSizeListener,(0,M.jsxs)(Ye,{...Xe,children:[(0,M.jsx)($e,{"aria-label":a,"aria-labelledby":o,"aria-orientation":h===`vertical`?`vertical`:null,role:`tablist`,...et,children:(0,M.jsx)(Jf.Provider,{value:Ue,children:Ge})}),k&&He]}),Ke.scrollButtonEnd]})});function th(e){return di(`MuiTextField`,e)}fi(`MuiTextField`,[`root`]);var nh={standard:Yd,filled:Cd,outlined:um},rh=e=>{let{classes:t}=e;return Ma({root:[`root`]},th,t)},ih=P(Dd,{name:`MuiTextField`,slot:`Root`})({}),ah=j.forwardRef(function(e,t){let n=Qo({props:e,name:`MuiTextField`}),{autoComplete:r,autoFocus:i=!1,children:a,className:o,color:s=`primary`,defaultValue:c,disabled:l=!1,error:u=!1,fullWidth:d=!1,helperText:f,id:p,inputRef:m,label:h,maxRows:g,minRows:_,multiline:v=!1,name:y,onBlur:b,onChange:x,onFocus:S,placeholder:C,required:w=!1,rows:T,select:E=!1,slots:D={},slotProps:ee={},type:te,value:ne,variant:re=`outlined`,...ie}=n,ae={...n,autoFocus:i,color:s,disabled:l,error:u,fullWidth:d,multiline:v,required:w,select:E,variant:re},oe=rh(ae),O=aa(p),k=f&&O?`${O}-helper-text`:void 0,A=h&&O?`${O}-label`:void 0,se=nh[re],ce={slots:D,slotProps:ee},[le,ue]=hc(`select`,{elementType:Om,externalForwardedProps:ce,ownerState:ae}),de=E&&ue.native,fe={},pe=ce.slotProps.inputLabel;re===`outlined`&&(pe&&pe.shrink!==void 0&&(fe.notched=pe.shrink),fe.label=h),E&&(de||(fe.id=void 0),fe[`aria-describedby`]=void 0);let[me,he]=hc(`root`,{elementType:ih,shouldForwardComponentProp:!0,externalForwardedProps:{...ce,...ie},ownerState:ae,className:ci(oe.root,o),ref:t,additionalProps:{disabled:l,error:u,fullWidth:d,required:w,color:s,variant:re}}),[ge,_e]=hc(`input`,{elementType:se,externalForwardedProps:ce,additionalProps:fe,ownerState:ae}),[ve,ye]=hc(`inputLabel`,{elementType:Qd,externalForwardedProps:ce,ownerState:ae}),[be,xe]=hc(`htmlInput`,{elementType:`input`,externalForwardedProps:ce,ownerState:ae}),[Se,Ce]=hc(`formHelperText`,{elementType:Nd,externalForwardedProps:ce,ownerState:ae}),we=(0,M.jsx)(ge,{"aria-describedby":k,autoComplete:r,autoFocus:i,defaultValue:c,fullWidth:d,multiline:v,name:y,rows:T,maxRows:g,minRows:_,type:te,value:ne,id:O,inputRef:m,onBlur:b,onChange:x,onFocus:S,placeholder:C,inputProps:xe,slots:{input:D.htmlInput?be:void 0},..._e});return(0,M.jsxs)(me,{...he,children:[h!=null&&h!==``&&(0,M.jsx)(ve,{htmlFor:E&&!de?void 0:O,id:A,...E&&!de&&{component:`div`},...ye,children:h}),E?(0,M.jsx)(le,{"aria-describedby":k,id:O,labelId:A,value:ne,input:we,...ue,children:a}):we,f&&(0,M.jsx)(Se,{id:k,...Ce,children:f})]})}),oh=_(),I={background:`#282a36`,currentLine:`#44475a`,foreground:`#f8f8f2`,comment:`#6272a4`,cyan:`#8be9fd`,green:`#50fa7b`,orange:`#ffb86c`,pink:`#ff79c0`,purple:`#bd93f9`,red:`#ff5555`,yellow:`#f1fa8c`},sh=Fo({palette:{mode:`dark`,background:{default:I.background,paper:I.currentLine},primary:{main:I.purple},secondary:{main:I.pink},text:{primary:I.foreground,secondary:I.comment}},typography:{fontFamily:`'JetBrains Mono', monospace`,h1:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},h2:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},h3:{fontFamily:`'JetBrains Mono', monospace`,fontWeight:700},body1:{fontFamily:`'JetBrains Mono', monospace`},body2:{fontFamily:`'JetBrains Mono', monospace`}},components:{MuiCssBaseline:{styleOverrides:{"*, *::before, *::after":{padding:0},html:{scrollBehavior:`smooth`},code:{fontFamily:`'JetBrains Mono', monospace`},body:{backgroundColor:I.background,color:I.foreground},"::-webkit-scrollbar":{width:`12px`},"::-webkit-scrollbar-track":{background:I.background},"::-webkit-scrollbar-thumb":{background:I.currentLine,borderRadius:`4px`,border:`2px solid transparent`,backgroundClip:`padding-box`},"::-webkit-scrollbar-thumb:hover":{background:I.comment,border:`2px solid transparent`,backgroundClip:`padding-box`}}}}}),ch=rs((0,M.jsx)(`path`,{d:`M7.5 5.6 10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29a.996.996 0 0 0-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41zm-1.03 5.49-2.12-2.12 2.44-2.44 2.12 2.12z`}),`AutoFixHigh`),lh=rs((0,M.jsx)(`path`,{d:`M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-5.97 4.06L14.09 6l1.41 1.41L16.91 6l1.06 1.06-1.41 1.41 1.41 1.41-1.06 1.06-1.41-1.4-1.41 1.41-1.06-1.06 1.41-1.41zm-6.78.66h5v1.5h-5zM11.5 16h-2v2H8v-2H6v-1.5h2v-2h1.5v2h2zm6.5 1.25h-5v-1.5h5zm0-2.5h-5v-1.5h5z`}),`Calculate`),uh=rs((0,M.jsx)(`path`,{d:`M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12z`}),`Cancel`),dh=rs((0,M.jsx)(`path`,{d:`M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2M7.5 18c-.83 0-1.5-.67-1.5-1.5S6.67 15 7.5 15s1.5.67 1.5 1.5S8.33 18 7.5 18m0-9C6.67 9 6 8.33 6 7.5S6.67 6 7.5 6 9 6.67 9 7.5 8.33 9 7.5 9m4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5m4.5 4.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5m0-9c-.83 0-1.5-.67-1.5-1.5S15.67 6 16.5 6s1.5.67 1.5 1.5S17.33 9 16.5 9`}),`Casino`),fh=rs((0,M.jsx)(`path`,{d:`M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8z`}),`CheckCircle`),ph=rs((0,M.jsx)(`path`,{d:`M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2m0 16H8V7h11z`}),`ContentCopy`),mh=rs((0,M.jsx)(`path`,{d:`M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m1 15h-2v-2h2zm0-4h-2V7h2z`}),`ErrorOutlined`),hh=rs((0,M.jsx)(`path`,{d:`m12 8-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z`}),`ExpandLess`),gh=rs((0,M.jsx)(`path`,{d:`M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z`}),`ExpandMore`),_h=rs((0,M.jsx)(`path`,{d:`M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2zm10 14.5V20H8v-3.5l4-4zm-4-5-4-4V4h8v3.5z`}),`HourglassEmpty`),vh=rs([(0,M.jsx)(`path`,{d:`M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1m0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5z`},`0`),(0,M.jsx)(`path`,{d:`M17.5 10.5c.88 0 1.73.09 2.5.26V9.24c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99M13 12.49v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26V11.9c-.79-.15-1.64-.24-2.5-.24-1.7 0-3.24.3-4.5.83m4.5 1.84c-1.7 0-3.24.29-4.5.83v1.66c1.13-.64 2.7-.99 4.5-.99.88 0 1.73.09 2.5.26v-1.52c-.79-.16-1.64-.24-2.5-.24`},`1`)],`MenuBook`),yh=rs((0,M.jsx)(`path`,{d:`M19.8 18.4 14 10.67V6.5l1.35-1.69c.26-.33.03-.81-.39-.81H9.04c-.42 0-.65.48-.39.81L10 6.5v4.17L4.2 18.4c-.49.66-.02 1.6.8 1.6h14c.82 0 1.29-.94.8-1.6`}),`Science`),bh=rs((0,M.jsx)(`path`,{d:`m6 18 8.5-6L6 6zM16 6v12h2V6z`}),`SkipNext`),xh=rs((0,M.jsx)(`path`,{d:`M6 6h12v12H6z`}),`Stop`);function Sh(e,t){for(e=e<0n?-e:e,t=t<0n?-t:t;t!==0n;)[e,t]=[t,e%t];return e}function Ch(e){if(e<0n)throw RangeError(`isqrt: negative input`);if(e<2n)return e;let t=e.toString(2).length,n=1n<<BigInt(Math.floor(t/2));for(;;){let t=n+e/n>>1n;if(t>=n)break;n=t}for(;(n+1n)*(n+1n)<=e;)n++;for(;n*n>e;)n--;return n}function wh(e,t){if(e===0n)return{gcd:t,x:0n,y:1n};let{gcd:n,x:r,y:i}=wh(t%e,e);return{gcd:n,x:i-t/e*r,y:r}}function Th(e,t){let{gcd:n,x:r}=wh(e<0n?e+t:e,t);return n===1n?(r%t+t)%t:null}function Eh(e,t,n){if(n===1n)return 0n;let r=1n;for(e=(e%n+n)%n;t>0n;)t&1n&&(r=r*e%n),t>>=1n,e=e*e%n;return r}function Dh(e){if(e<2n)return!1;if(e<4n)return!0;if(e%2n==0n||e%3n==0n)return!1;for(let t of[5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n]){if(e===t)return!0;if(e%t===0n)return!1}let t=e-1n,n=0;for(;t%2n==0n;)t/=2n,n++;for(let r of[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n]){if(r>=e)break;let i=Eh(r,t,e);if(i===1n||i===e-1n)continue;let a=!0;for(let t=1;t<n;t++)if(i=i*i%e,i===e-1n){a=!1;break}if(a)return!1}return!0}function Oh(e){for(;;){let t=Math.ceil(e/8),n=new Uint8Array(t);crypto.getRandomValues(n);let r=0n;for(let e=0;e<t;e++)r=r<<8n|BigInt(n[e]);if(r|=1n<<BigInt(e-1),r|=1n,r&=(1n<<BigInt(e))-1n,Dh(r))return r}}function kh(e,t,n=65537n){let r,i;do r=Oh(e),i=Oh(t);while(r===i);r>i&&([r,i]=[i,r]);let a=r*i,o=(r-1n)*(i-1n),s=n;for(;Sh(s,o)!==1n;)s+=2n;let c=Th(s,o);if(c===null)throw Error(`modInverse failed`);return{p:r,q:i,n:a,e:s,d:c,phi:o}}function Ah(e,t,n){return Eh(e,n,t)}var L={p:256,q:256},jh={id:`fermat`,name:`Fermat Factorization`,category:`Factorization`,description:`Factors n when p and q are close. Use when |p - q| < 2·n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            print(f"Fermat Factorization on n = {n}")
+            print()
+            if n < 2:
+                print(f"n = {n} is too small to factor")
+                print("FERMAT=FAILED")
+                return
+            if n % 2 == 0:
+                print(f"n is even: {n}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print(f"Verification: 2 * {n // 2} = {n}")
+                print("FERMAT=SUCCESS")
+                return
+            if n.is_prime():
+                print(f"n is prime: {n}")
+                print("No factorization possible")
+                print("FERMAT=FAILED")
+                return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print("FERMAT=SUCCESS")
+                return
+            # Optimized Fermat (RsaCtfTool algorithm)
+            # Uses incremental update: b2 += c, c += 2 instead of recomputing a^2 - n
+            a, rem = n.sqrtrem()
+            b2 = -rem
+            c = 2 * a + 1
+            max_iter = 10**6
+            iterations = 0
+            while not b2.is_square():
+                iterations += 1
+                if iterations > max_iter:
+                    print(f"Fermat factorization failed: no factor found within {max_iter} iterations")
+                    print("p and q may not be close enough for this method")
+                    print("FERMAT=FAILED")
+                    return
+                b2 += c
+                c += 2
+            a = (c - 1) // 2
+            b = isqrt(b2)
+            p = a - b
+            q = a + b
+            if p <= 1 or q >= n:
+                print(f"Found trivial factorization: {p} x {q} = {n}")
+                print("No non-trivial factors found via Fermat")
+                print("FERMAT=FAILED")
+            else:
+                print(f"p = {p}")
+                print(f"q = {q}")
+                print(f"Verification: p * q = {p * q}")
+                print(f"p is prime: {p.is_prime()}")
+                print(f"q is prime: {q.is_prime()}")
+                print(f"Iterations: {iterations}")
+                print("FERMAT=SUCCESS")
+        except Exception as e:
+            print(f"ERROR: {e}")
             print("FERMAT=FAILED")
-            quit()
-        b2 += c
-        c += 2
-    a = (c - 1) // 2
-    b = isqrt(b2)
-    p = a - b
-    q = a + b
-    if p <= 1 or q >= n:
-        print(f"Found trivial factorization: {p} x {q} = {n}")
-        print("No non-trivial factors found via Fermat")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("FERMAT=FAILED")
-    else:
-        print(f"p = {p}")
-        print(f"q = {q}")
-        print(f"Verification: p * q = {p * q}")
-        print(f"p is prime: {p.is_prime()}")
-        print(f"q is prime: {q.is_prime()}")
-        print(f"Iterations: {iterations}")
-        print("FERMAT=SUCCESS")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("FERMAT=FAILED")
-`,proof:`\\textbf{Theorem:} If n = p \\cdot q with |p - q| < 2n^{1/4}, then n can be factored by finding a such that a^2 - n = b^2.
+_attack()`,proof:`\\textbf{Theorem:} If $n = p \\cdot q$ with $|p - q| < 2n^{1/4}$, then $n$ can be factored by finding $a$ such that $a^2 - n = b^2$.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n = p \\cdot q, p and q odd primes
-\\item |p - q| < 2n^{1/4} (primes must be close)
-\\item Difference of squares: a^2 - b^2 = (a - b)(a + b)
+\\item $n = p \\cdot q$, $p$ and $q$ odd primes
+\\item $|p - q| < 2n^{1/4}$ (primes must be close)
+\\item Difference of squares: $a^2 - b^2 = (a - b)(a + b)$
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -275,71 +281,76 @@ a = \\sqrt{n + b^2} &\\approx \\sqrt{n} \\\\
 p = a - b, \\quad q &= a + b \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Starting from \\lceil\\sqrt{n}\\rceil, increment a until a^2 - n is a perfect square b^2. Then p = a - b and q = a + b. The number of iterations equals (q - p)/2, so it's efficient only when p and q are close.
+\\textbf{Explanation:} Starting from $\\lceil\\sqrt{n}\\rceil$, increment $a$ until $a^2 - n$ is a perfect square $b^2$. Then $p = a - b$ and $q = a + b$. The number of iterations equals $(q - p)/2$, so it's efficient only when $p$ and $q$ are close.
 
-\\textbf{References:} Hardy & Wright, "An Introduction to the Theory of Numbers", Section 10.2`,priority:`high`,applicableCheck:e=>!!e.n},Mh=()=>{let e=Oh(L.p),t=Math.floor(Math.random()*1e3)*2+2,n=e+BigInt(t);for(;!Dh(n);)n+=2n;return{n:(e*n).toString()}},Nh={id:`wiener`,name:`Wiener's Attack`,category:`Factorization`,description:`Recovers d via continued fractions. Use when d < n^0.25.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    e = Integer(${e.e})
-    print(f"Wiener's Attack on n = {n}")
-    print()
-    # Pre-checks
-    if n < 2 or e < 2:
-        print("Invalid input: n and e must be >= 2")
+\\textbf{References:} Hardy & Wright, "An Introduction to the Theory of Numbers", Section 10.2`,priority:`high`,applicableCheck:e=>!!e.n},Mh=()=>{let e=Oh(L.p),t=Math.floor(Math.random()*1e3)*2+2,n=e+BigInt(t);for(;!Dh(n);)n+=2n;return{n:(e*n).toString()}},Nh={id:`wiener`,name:`Wiener's Attack`,category:`Factorization`,description:`Recovers d via continued fractions. Use when d < n^0.25.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        def _wiener_attack():
+            try:
+                n = Integer(${e.n})
+                e = Integer(${e.e})
+                print(f"Wiener's Attack on n = {n}")
+                if n < 2 or e < 2:
+                    print("Invalid input: n and e must be >= 2")
+                    print("WIENER=FAILED")
+                    return
+                if n % 2 == 0:
+                    print(f"n is even: {n}")
+                    print(f"p = 2")
+                    print(f"q = {n // 2}")
+                    print(f"Verification: 2 * {n // 2} = {n}")
+                    print("WIENER=SUCCESS")
+                    return
+                if n.is_prime():
+                    print(f"n is prime: {n}")
+                    print("No factorization possible")
+                    print("WIENER=FAILED")
+                    return
+                if n.is_square():
+                    p = n.isqrt()
+                    print(f"n is a perfect square: {p}^2 = {n}")
+                    print(f"p = q = {p}")
+                    print(f"Verification: p * q = {p * p}")
+                    print("WIENER=SUCCESS")
+                    return
+                cf = continued_fraction(QQ(e) / QQ(n))
+                found = False
+                for conv in cf.convergents():
+                    k, d = conv.numerator(), conv.denominator()
+                    if k == 0 or d % 2 == 0:
+                        continue
+                    if (e * d - 1) % k == 0:
+                        phi = (e * d - 1) // k
+                        if phi % 2 == 0:
+                            s = n - phi + 1
+                            disc = s * s - 4 * n
+                            if disc > 0 and disc.is_square():
+                                t = disc.isqrt()
+                                if (s + t) % 2 == 0:
+                                    p = (s - t) // 2
+                                    q = (s + t) // 2
+                                    if p * q == n and p > 1:
+                                        print(f"Private exponent d = {d}")
+                                        print(f"p = {p}")
+                                        print(f"q = {q}")
+                                        print(f"Verification: p * q = {p * q}")
+                                        print(f"d < n^0.25: {d ** 4 < n}")
+                                        print("WIENER=SUCCESS")
+                                        found = True
+                                        break
+                if not found:
+                    print("Wiener's attack failed: d may be too large (d >= n^0.25)")
+                    print("Try Boneh-Durfee attack for larger d values")
+                    print("WIENER=FAILED")
+            except BaseException as ex:
+                print(f"ERROR: {ex}")
+                print("WIENER=FAILED")
+        _wiener_attack()
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("WIENER=FAILED")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2")
-        print(f"q = {n // 2}")
-        print(f"Verification: 2 * {n // 2} = {n}")
-        print("WIENER=SUCCESS")
-        quit()
-    if n.is_prime():
-        print(f"n is prime: {n}")
-        print("No factorization possible")
-        print("WIENER=FAILED")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print(f"Verification: p * q = {p * p}")
-        print("WIENER=SUCCESS")
-        quit()
-    # Continued fraction convergents of e/n using SageMath built-in
-    cf = continued_fraction(QQ(e) / QQ(n))
-    found = False
-    for conv in cf.convergents():
-        k, d = conv.numerator(), conv.denominator()
-        if k == 0:
-            continue
-        if (e * d - 1) % k == 0:
-            phi = (e * d - 1) // k
-            if phi % 2 == 0:
-                s = n - phi + 1
-                disc = s * s - 4 * n
-                if disc > 0 and disc.is_square():
-                    t = isqrt(disc)
-                    if (s + t) % 2 == 0:
-                        p = (s - t) // 2
-                        q = (s + t) // 2
-                        if p * q == n and p > 1:
-                            print(f"Private exponent d = {d}")
-                            print(f"p = {p}")
-                            print(f"q = {q}")
-                            print(f"Verification: p * q = {p * q}")
-                            print(f"d < n^0.25: {d ** 4 < n}")
-                            print("WIENER=SUCCESS")
-                            found = True
-                            break
-    if not found:
-        print("Wiener's attack failed: d may be too large (d >= n^0.25)")
-        print("Try Boneh-Durfee attack for larger d values")
-        print("WIENER=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("WIENER=FAILED")
-`,proof:`\\textbf{Theorem:} If d < n^{1/4}/3 and q < p < 2q, then d can be recovered from the continued fraction expansion of e/n.
+_attack()`,proof:`\\textbf{Theorem:} If d < n^{1/4}/3 and q < p < 2q, then d can be recovered from the continued fraction expansion of e/n.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -364,145 +375,172 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\implies p, q \\qed
 
 \\textbf{Explanation:} Compute the continued fraction convergents of e/n. For each convergent k/d, check if (ed - 1) is divisible by k, then solve the quadratic x^2 - (n - \\varphi + 1)x + n = 0. If the roots are integers multiplying to n, you've found d.
 
-\\textbf{References:} M. Wiener, "Cryptanalysis of Short RSA Secret Exponents", IEEE Trans. Info. Theory, 1990`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e},Ph=()=>{let e=Oh(L.p),t=Oh(L.q),n=e*t,r=(e-1n)*(t-1n),i=BigInt(100+Math.floor(Math.random()*1e4));for(;Th(i,r)===null;)i+=1n;let a=Th(i,r);return{n:n.toString(),e:a.toString()}},Fh={id:`boneh-durfee`,name:`Boneh-Durfee Attack`,category:`Factorization`,description:`Recovers d via lattice reduction. Use when d < n^0.292.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    e = Integer(${e.e})
-    print(f"Boneh-Durfee Attack on n = {n}")
-    if n < 2 or e < 2:
-        print("Invalid input: n and e must be >= 2")
-        print("BONEH_DURFEE=FAILED")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2")
-        print(f"q = {n // 2}")
-        print("BONEH_DURFEE=SUCCESS")
-        quit()
-    if n.is_prime():
-        print(f"n is prime: {n}")
-        print("BONEH_DURFEE=FAILED")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print("BONEH_DURFEE=SUCCESS")
-        quit()
-    # Phase 1: Wiener's attack via continued fraction convergents of e/n
-    cf = continued_fraction(QQ(e)/QQ(n))
-    found = False
-    for conv in cf.convergents():
-        k, d = conv.numerator(), conv.denominator()
-        if k == 0:
-            continue
-        if (e * d - 1) % k == 0:
-            phi = (e * d - 1) // k
-            s = n - phi + 1
-            disc = s ** 2 - 4 * n
-            if disc > 0 and disc.is_square():
-                t = isqrt(disc)
-                if (s + t) % 2 == 0:
-                    p = (s - t) // 2
-                    q = (s + t) // 2
-                    if p * q == n and p > 1:
-                        print(f"Wiener's attack succeeded:")
-                        print(f"d = {d}, p = {p}, q = {q}")
-                        print(f"Verification: p * q = {p * q}")
-                        print("BONEH_DURFEE=SUCCESS")
-                        found = True
-                        break
-    if found:
-        quit()
-    # Phase 2: Boneh-Durfee lattice attack (Herrmann-May simplification)
-    # f(x,y) = 1 + x*(A + y) with root (2k, -(p+q)/2) where ed = 1 + k*phi(n)
-    print("Wiener failed (d >= n^0.25). Attempting Boneh-Durfee lattice attack...")
-    A = (n + 1) // 2
-    delta = 0.25
-    m = 3
-    t = int((1 - 2 * delta) * m)
-    if t < 0:
-        t = 0
-    XX = floor(n ** delta)
-    YY = floor(sqrt(n))
-    P = PolynomialRing(ZZ, 'x, y')
-    x, y = P.gens()
-    f = 1 + x * (A + y)
-    PR = PolynomialRing(ZZ, 'u, x, y')
-    u, x, y = PR.gens()
-    Q = PR.quotient(x * y + 1 - u)
-    fZ = Q(f).lift()
-    UU = XX * YY + 1
-    gg = []
-    for kk in range(m + 1):
-        for ii in range(m - kk + 1):
-            gg.append(x ** ii * e ** (m - kk) * fZ(u, x, y) ** kk)
-    gg.sort()
-    monomials = []
-    for poly in gg:
-        for mon in poly.monomials():
-            if mon not in monomials:
-                monomials.append(mon)
-    monomials.sort()
-    if t > 0:
-        for jj in range(1, t + 1):
-            for kk in range((m // t) * jj, m + 1):
-                gg.append(Q(y ** jj * fZ(u, x, y) ** kk * e ** (m - kk)).lift())
-                monomials.append(u ** kk * y ** jj)
-    nn = len(monomials)
-    BB = Matrix(ZZ, nn)
-    for ii in range(nn):
-        BB[ii, 0] = gg[ii](0, 0, 0)
-        for jj in range(1, ii + 1):
-            if monomials[jj] in gg[ii].monomials():
-                BB[ii, jj] = gg[ii].monomial_coefficient(monomials[jj]) * monomials[jj](UU, XX, YY)
-    BB = BB.LLL()
-    PR2 = PolynomialRing(ZZ, 'w, z')
-    w, z = PR2.gens()
-    found2 = False
-    for i1 in range(nn - 1):
-        if found2:
-            break
-        for i2 in range(i1 + 1, nn):
-            p1 = sum(monomials[j](w * z + 1, w, z) * BB[i1, j] / monomials[j](UU, XX, YY) for j in range(nn))
-            p2 = sum(monomials[j](w * z + 1, w, z) * BB[i2, j] / monomials[j](UU, XX, YY) for j in range(nn))
-            rr = p1.resultant(p2)
-            if rr.is_zero() or rr.monomials() == [1]:
-                continue
-            PR3 = PolynomialRing(ZZ, 'q')
-            q = PR3.gen()
-            rr = rr(q)
-            y_roots = rr.roots()
-            for (y0, _) in y_roots:
-                x_poly = p1(w, y0)
-                x_roots = x_poly.roots()
-                if x_roots:
-                    x0 = x_roots[0][0]
-                    if f(ZZ(x0), ZZ(y0)) % e == 0:
-                        d_val = (1 + x0 * (A + y0)) // e
-                        if d_val > 0:
-                            p_plus_q = -2 * y0
-                            disc2 = p_plus_q ** 2 - 4 * n
-                            if disc2 > 0 and disc2.is_square():
-                                sqrt_disc2 = isqrt(disc2)
-                                p_val = ZZ((p_plus_q + sqrt_disc2) // 2)
-                                q_val = ZZ((p_plus_q - sqrt_disc2) // 2)
-                                if p_val * q_val == n and p_val > 1:
-                                    print("Boneh-Durfee lattice attack succeeded!")
-                                    print(f"d = {d_val}")
-                                    print(f"p = {p_val}")
-                                    print(f"q = {q_val}")
-                                    print(f"Verification: p * q = {p_val * q_val}")
+\\textbf{References:} M. Wiener, "Cryptanalysis of Short RSA Secret Exponents", IEEE Trans. Info. Theory, 1990`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e},Ph=()=>{let e=Oh(L.p),t=Oh(L.q),n=e*t,r=(e-1n)*(t-1n),i=BigInt(100+Math.floor(Math.random()*1e4));for(;Th(i,r)===null;)i+=1n;let a=Th(i,r);return{n:n.toString(),e:a.toString()}},Fh={id:`boneh-durfee`,name:`Boneh-Durfee Attack`,category:`Factorization`,description:`Recovers d via lattice reduction. Use when d < n^0.292.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        import sys
+        #
+        def _bd_attack():
+            try:
+                n = Integer(${e.n})
+                e = Integer(${e.e})
+                print(f"Boneh-Durfee Attack on n = {n}")
+                if n < 2 or e < 2:
+                    print("Invalid input: n and e must be >= 2")
+                    print("BONEH_DURFEE=FAILED")
+                    return
+                if n % 2 == 0:
+                    print(f"n is even: {n}")
+                    print(f"p = 2")
+                    print(f"q = {n // 2}")
+                    print("BONEH_DURFEE=SUCCESS")
+                    return
+                if n.is_prime():
+                    print(f"n is prime: {n}")
+                    print("BONEH_DURFEE=FAILED")
+                    return
+                if n.is_square():
+                    p = isqrt(n)
+                    print(f"n is a perfect square: {p}^2 = {n}")
+                    print("BONEH_DURFEE=SUCCESS")
+                    return
+                # Phase 1: Wiener's attack via continued fraction convergents of e/n
+                cf = continued_fraction(QQ(e)/QQ(n))
+                found = False
+                for conv in cf.convergents():
+                    k, d = conv.numerator(), conv.denominator()
+                    if k == 0:
+                        continue
+                    if (e * d - 1) % k == 0:
+                        phi = (e * d - 1) // k
+                        s = n - phi + 1
+                        disc = s ** 2 - 4 * n
+                        if disc > 0 and disc.is_square():
+                            t = isqrt(disc)
+                            if (s + t) % 2 == 0:
+                                p = (s - t) // 2
+                                q = (s + t) // 2
+                                if p * q == n and p > 1:
+                                    print(f"Wiener's attack succeeded:")
+                                    print(f"d = {d}, p = {p}, q = {q}")
+                                    print(f"Verification: p * q = {p * q}")
                                     print("BONEH_DURFEE=SUCCESS")
-                                    found2 = True
+                                    found = True
                                     break
-            if found2:
-                break
-    if not found2:
-        print("Boneh-Durfee lattice attack failed: d >= n^0.292 or parameters insufficient.")
+                if found:
+                    return
+                # Phase 2: Boneh-Durfee lattice attack (Herrmann-May simplification)
+                # f(x,y) = 1 + x*(A + y) with root (2k, -(p+q)/2) where ed = 1 + k*phi(n)
+                # Theoretical bound: d < n^delta with delta < 1 - 1/sqrt(2) ≈ 0.292
+                print("Wiener failed (d >= n^0.25). Attempting Boneh-Durfee lattice attack...")
+                A = (n + 1) // 2
+                delta = 0.260
+                m = 3
+                t = int((1 - 2 * delta) * m)
+                if t < 0:
+                    t = 0
+                XX = Integer(floor(RR(n) ** delta))
+                YY = isqrt(n) + 1
+                P = PolynomialRing(ZZ, 'x, y')
+                x, y = P.gens()
+                f = 1 + x * (A + y)
+                PR = PolynomialRing(ZZ, 'u, x, y')
+                u, x, y = PR.gens()
+                Q = PR.quotient(x * y + 1 - u)
+                fZ = Q(f).lift()
+                UU = XX * YY + 1
+                gg = []
+                for kk in range(m + 1):
+                    for ii in range(m - kk + 1):
+                        gg.append(x ** ii * e ** (m - kk) * fZ(u, x, y) ** kk)
+                gg.sort()
+                monomials = []
+                for poly in gg:
+                    for mon in poly.monomials():
+                        if mon not in monomials:
+                            monomials.append(mon)
+                monomials.sort()
+                if t > 0:
+                    for jj in range(1, t + 1):
+                        for kk in range((m // t) * jj, m + 1):
+                            gg.append(Q(y ** jj * fZ(u, x, y) ** kk * e ** (m - kk)).lift())
+                            monomials.append(u ** kk * y ** jj)
+                nn = len(monomials)
+                BB = Matrix(ZZ, nn)
+                for ii in range(nn):
+                    BB[ii, 0] = gg[ii](0, 0, 0)
+                    for jj in range(1, ii + 1):
+                        if monomials[jj] in gg[ii].monomials():
+                            BB[ii, jj] = gg[ii].monomial_coefficient(monomials[jj]) * monomials[jj](UU, XX, YY)
+                BB = BB.LLL()
+                PR2 = PolynomialRing(QQ, 'w, z')
+                w, z = PR2.gens()
+                found2 = False
+                for i1 in range(nn - 1):
+                    if found2:
+                        break
+                    for i2 in range(i1 + 1, nn):
+                        p1 = sum(monomials[j](w * z + 1, w, z) * BB[i1, j] / monomials[j](UU, XX, YY) for j in range(nn))
+                        p2 = sum(monomials[j](w * z + 1, w, z) * BB[i2, j] / monomials[j](UU, XX, YY) for j in range(nn))
+                        try:
+                            rr = p1.resultant(p2)
+                        except BaseException:
+                            continue
+                        if rr.is_zero() or rr.monomials() == [1]:
+                            continue
+                        PR3 = ZZ['qv']
+                        qv = PR3.gen()
+                        rr_single = rr(qv, qv)
+                        y_roots = rr_single.roots()
+                        for (y0, _) in y_roots:
+                            if y0.denominator() != 1:
+                                continue
+                            y0_int = Integer(y0)
+                            try:
+                                univar = p1(w, y0_int)
+                                coeffs = univar.dict()
+                                Px = QQ['x']
+                                x_var = Px.gen()
+                                x_poly = sum(QQ(coeffs.get((d, 0), 0)) * x_var ** d for d in range(univar.degree(w) + 1))
+                                x_roots = x_poly.roots()
+                            except BaseException:
+                                continue
+                            for (x0, _) in x_roots:
+                                if x0.denominator() != 1:
+                                    continue
+                                x0_int = Integer(x0)
+                                if f(x0_int, y0_int) % e == 0:
+                                    d_val = (1 + x0_int * (A + y0_int)) // e
+                                    if d_val > 0:
+                                        p_plus_q = -2 * y0_int
+                                        disc2 = p_plus_q ** 2 - 4 * n
+                                        if disc2 > 0 and disc2.is_square():
+                                            sqrt_disc2 = isqrt(disc2)
+                                            p_val = ZZ((p_plus_q + sqrt_disc2) // 2)
+                                            q_val = ZZ((p_plus_q - sqrt_disc2) // 2)
+                                            if p_val * q_val == n and p_val > 1:
+                                                print("Boneh-Durfee lattice attack succeeded!")
+                                                print(f"d = {d_val}")
+                                                print(f"p = {p_val}")
+                                                print(f"q = {q_val}")
+                                                print(f"Verification: p * q = {p_val * q_val}")
+                                                print("BONEH_DURFEE=SUCCESS")
+                                                found2 = True
+                                                break
+                        if found2:
+                            break
+                if not found2:
+                    print("Boneh-Durfee lattice attack failed: d >= n^0.292 or parameters insufficient.")
+                    print("BONEH_DURFEE=FAILED")
+            except BaseException as ex:
+                print(f"ERROR: Boneh-Durfee computation failed: {ex}")
+                print("BONEH_DURFEE=FAILED")
+        #
+        _bd_attack()
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("BONEH_DURFEE=FAILED")
-except Exception as ex:
-    print(f"ERROR: Boneh-Durfee computation failed: {ex}")
-    print("BONEH_DURFEE=FAILED")
-`,proof:`\\textbf{Theorem:} The private exponent d can be recovered in polynomial time when d < n^{0.292} using lattice reduction.
+_attack()`,proof:`\\textbf{Theorem:} The private exponent d can be recovered in polynomial time when d < n^{0.292} using lattice reduction.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -529,71 +567,77 @@ f(x, y) &= 1 + x(A + y) \\equiv 0 \\pmod{e} \\quad \\text{with root } (2k, y) \\
 
 \\textbf{Explanation:} Build a bivariate polynomial f(x, y) = 1 + x(A + y) \\pmod{e} with small root (2k, -(p+q)/2). Use the Herrmann-May substitution u = xy + 1 to simplify lattice construction. Build shifts from powers of f and the modulus e, apply LLL to find short vectors, then extract y via resultant. Recover \\varphi(n) and factor n. The bound d < n^{0.292} comes from lattice dimension analysis.
 
-\\textbf{References:} D. Boneh & G. Durfee, "Cryptanalysis of RSA with Private Key d Less than n^0.292", IEEE Trans. Info. Theory, 1999; M. Herrmann & A. May, "Maximizing Small Root Bounds by Linearization and Applications to Small Secret Exponent RSA", PKC 2008`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e},Ih=()=>{let e=Oh(L.p),t=Oh(L.q),n=e*t,r=(e-1n)*(t-1n),i=BigInt(100+Math.floor(Math.random()*1e4));for(;Th(i,r)===null;)i+=1n;let a=Th(i,r);return{n:n.toString(),e:a.toString()}},Lh={id:`ecm`,name:`ECM Factorization`,category:`Factorization`,description:`Factors n using elliptic curves. Use for general factorization when other methods fail.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    print(f"ECM Factorization on n = {n}")
-    print()
-    if n < 2:
-        print(f"n = {n} is too small to factor")
+\\textbf{References:} D. Boneh & G. Durfee, "Cryptanalysis of RSA with Private Key d Less than n^0.292", IEEE Trans. Info. Theory, 1999; M. Herrmann & A. May, "Maximizing Small Root Bounds by Linearization and Applications to Small Secret Exponent RSA", PKC 2008`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e},Ih=()=>{let e=Oh(L.p),t=Oh(L.q),n=e*t,r=(e-1n)*(t-1n),i=n.toString(2).length,a=Math.floor(i/4),o=(1n<<BigInt(a))*3n+1n;for(;Th(o,r)===null;)o+=2n;let s=Th(o,r);return{n:n.toString(),e:s.toString()}},Lh={id:`ecm`,name:`ECM Factorization`,category:`Factorization`,description:`Factors n using elliptic curves. Use for general factorization when other methods fail.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            print(f"ECM Factorization on n = {n}")
+            print()
+            if n < 2:
+                print(f"n = {n} is too small to factor")
+                print("ECM=FAILED")
+                return
+            if n % 2 == 0:
+                print(f"n is even: {n}")
+                print(f"p = 2, q = {n // 2}")
+                print("ECM=SUCCESS")
+                return
+            if n.is_prime():
+                print(f"n is prime: {n}")
+                print("ECM=FAILED")
+                return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"p = q = {p}")
+                print("ECM=SUCCESS")
+                return
+            from sage.libs.libecm import ecmfactor
+            B1_vals = [2000, 10000, 50000, 250000, 1000000]
+            curves_per_B1 = 15
+            found_p = None
+            for B1_cur in B1_vals:
+                for attempt in range(curves_per_B1):
+                    try:
+                        result = ecmfactor(n, B1_cur)
+                        if result[0]:
+                            factor = result[1]
+                            if factor != 1 and factor != n and n % factor == 0:
+                                found_p = factor
+                                break
+                    except Exception:
+                        continue
+                if found_p is not None:
+                    break
+            if found_p is not None:
+                q = n // found_p
+                if found_p > q:
+                    found_p, q = q, found_p
+                print(f"p = {found_p}")
+                print(f"q = {q}")
+                print(f"Verification: p * q = {found_p * q}")
+                print(f"p is prime: {found_p.is_prime()}")
+                print("ECM=SUCCESS")
+            else:
+                print("ECM failed to find any factor after multiple attempts")
+                print("Try increasing B1 bounds or using a different method")
+                print("ECM=FAILED")
+        except Exception as e:
+            print(f"ERROR: {e}")
+            print("ECM=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("ECM=FAILED")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2, q = {n // 2}")
-        print("ECM=SUCCESS")
-        quit()
-    if n.is_prime():
-        print(f"n is prime: {n}")
-        print("ECM=FAILED")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print("ECM=SUCCESS")
-        quit()
-    from sage.libs.libecm import ecmfactor
-    B1_vals = [2000, 10000, 50000, 250000, 1000000]
-    curves_per_B1 = 15
-    found_p = None
-    for B1_cur in B1_vals:
-        for attempt in range(curves_per_B1):
-            try:
-                result = ecmfactor(n, B1_cur)
-                if result[0]:
-                    factor = result[1]
-                    if factor != 1 and factor != n and n % factor == 0:
-                        found_p = factor
-                        break
-            except Exception:
-                continue
-        if found_p is not None:
-            break
-    if found_p is not None:
-        q = n // found_p
-        if found_p > q:
-            found_p, q = q, found_p
-        print(f"p = {found_p}")
-        print(f"q = {q}")
-        print(f"Verification: p * q = {found_p * q}")
-        print(f"p is prime: {found_p.is_prime()}")
-        print("ECM=SUCCESS")
-    else:
-        print("ECM failed to find any factor after multiple attempts")
-        print("Try increasing B1 bounds or using a different method")
-        print("ECM=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("ECM=FAILED")
-`,proof:`\\textbf{Theorem:} ECM finds a prime factor p of n in expected time O(\\exp(\\sqrt{2 \\ln p \\ln \\ln p})).
+_attack()`,proof:`\\textbf{Theorem:} ECM finds a prime factor p of n in expected time O(\\exp(\\sqrt{2 \\ln p \\ln \\ln p})).
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
 \\item Elliptic curve E: y^2 = x^3 + ax + b over \\mathbb{Z}/n\\mathbb{Z}
 \\item Group law on E: point addition and scalar multiplication
-\\item Hasse's theorem: |\\#E(\\mathbb{F}_p) - (p + 1)| \\leq 2\\sqrt{p}
+\\item Hasse's theorem: |\\#E(\\mathbb{F}\\_p) - (p + 1)| \\leq 2\\sqrt{p}
 \\item B-smooth: all prime factors \\leq B
-\\item M = \\prod_{q \\leq B_1} q^{\\lfloor \\log_q B_1 \\rfloor}
+\\item M = \\prod\\_{q \\leq B\\_1} q^{\\lfloor \\log\\_q B\\_1 \\rfloor}
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -610,100 +654,103 @@ M \\cdot P &= \\mathcal{O} \\text{ in } E(\\mathbb{F}_p) \\\\
 \\text{Expected time: } O(&\\exp(\\sqrt{2 \\ln p \\ln \\ln p})) \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Pick a random elliptic curve and point. Compute M \\cdot P where M is the product of all prime powers up to B_1. If the curve order modulo p is B_1-smooth, the computation fails modulo p but not modulo other factors, revealing p via gcd. Try different curves until one succeeds.
+\\textbf{Explanation:} Pick a random elliptic curve and point. Compute M \\cdot P where M is the product of all prime powers up to B\\_1. If the curve order modulo p is B\\_1-smooth, the computation fails modulo p but not modulo other factors, revealing p via gcd. Try different curves until one succeeds.
 
-\\textbf{References:} H. W. Lenstra Jr., "Factoring Integers with Elliptic Curves", Annals of Mathematics, 1987`,priority:`high`,applicableCheck:e=>!!e.n},Rh=()=>({n:(Oh(40)*Oh(L.p+L.q-40)).toString()}),zh={id:`ecm2`,name:`ECM Full Factorization`,category:`Factorization`,description:`Full factorization via repeated ECM. Use to find all prime factors of n by recursively applying ECM to composite remainders.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
-
-from sage.libs.libecm import ecmfactor
-
-def ecm_factor_all(m, depth):
-    indent = "  " * depth
-    if m == 1:
-        return []
-    if m.is_prime():
-        print(f"{indent}Prime: {m}")
-        return [m]
-    print(f"{indent}Composite: {m} ({m.nbits()} bits)")
-    B1_vals = [2000, 10000, 50000, 250000]
-    found_p = None
-    for B1_cur in B1_vals:
-        for attempt in range(20):
-            try:
-                result = ecmfactor(m, B1_cur)
-                if result[0]:
-                    p = result[1]
-                    if p != 1 and p != m and m % p == 0:
-                        found_p = p
+\\textbf{References:} H. W. Lenstra Jr., "Factoring Integers with Elliptic Curves", Annals of Mathematics, 1987`,priority:`high`,applicableCheck:e=>!!e.n},Rh=()=>({n:(Oh(40)*Oh(L.p+L.q-40)).toString()}),zh={id:`ecm2`,name:`ECM Full Factorization`,category:`Factorization`,description:`Full factorization via repeated ECM. Use to find all prime factors of n by recursively applying ECM to composite remainders.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            from sage.libs.libecm import ecmfactor
+            def ecm_factor_all(m, depth):
+                indent = "  " * depth
+                if m == 1:
+                    return []
+                if m.is_prime():
+                    print(f"{indent}Prime: {m}")
+                    return [m]
+                print(f"{indent}Composite: {m} ({m.nbits()} bits)")
+                B1_vals = [2000, 10000, 50000, 250000]
+                found_p = None
+                for B1_cur in B1_vals:
+                    for attempt in range(20):
+                        try:
+                            result = ecmfactor(m, B1_cur)
+                            if result[0]:
+                                p = result[1]
+                                if p != 1 and p != m and m % p == 0:
+                                    found_p = p
+                                    break
+                        except Exception:
+                            continue
+                    if found_p is not None:
                         break
-            except Exception:
-                continue
-        if found_p is not None:
-            break
-    if found_p is not None:
-        print(f"{indent}ECM factor: {found_p}")
-        return ecm_factor_all(found_p, depth + 1) + ecm_factor_all(m // found_p, depth + 1)
-    print(f"{indent}ECM found no factor, using factor()")
-    fac = factor(m)
-    result = []
-    for prime, exp in fac:
-        for _ in range(exp):
-            result.append(prime)
-    return result
-
-try:
-    print(f"ECM Full Factorization on n = {n}")
-    print()
-    if n < 2:
-        print(f"n = {n} is too small to factor")
+                if found_p is not None:
+                    print(f"{indent}ECM factor: {found_p}")
+                    return ecm_factor_all(found_p, depth + 1) + ecm_factor_all(m // found_p, depth + 1)
+                print(f"{indent}ECM found no factor, using factor()")
+                fac = factor(m)
+                result = []
+                for prime, exp in fac:
+                    for _ in range(exp):
+                        result.append(prime)
+                return result
+            print(f"ECM Full Factorization on n = {n}")
+            print()
+            if n < 2:
+                print(f"n = {n} is too small to factor")
+                print("ECM2=FAILED")
+                return
+            if n % 2 == 0:
+                print(f"n is even: {n}")
+                print(f"p = 2, q = {n // 2}")
+                print("ECM2=SUCCESS")
+                return
+            if n.is_prime():
+                print(f"n is prime: {n}")
+                print("ECM2=FAILED")
+                return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"p = q = {p}")
+                print("ECM2=SUCCESS")
+                return
+            factors = ecm_factor_all(n, 0)
+            factors.sort()
+            print()
+            print(f"All {len(factors)} prime factors: {factors}")
+            print()
+            counts = {}
+            for f in factors:
+                counts[f] = counts.get(f, 0) + 1
+            print(f"Factorization:")
+            product = 1
+            for prime, exp in sorted(counts.items()):
+                if exp == 1:
+                    print(f"  p = {prime}")
+                else:
+                    print(f"  {prime}^{exp}")
+                product *= prime ** exp
+            print()
+            print(f"Verification: product = {product}")
+            print(f"Matches n: {product == n}")
+            if product == n:
+                print("ECM2=SUCCESS")
+            else:
+                print("ECM2=FAILED")
+        except Exception as e:
+            print(f"Error: {e}")
+            print("ECM2=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("ECM2=FAILED")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2, q = {n // 2}")
-        print("ECM2=SUCCESS")
-        quit()
-    if n.is_prime():
-        print(f"n is prime: {n}")
-        print("ECM2=FAILED")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print("ECM2=SUCCESS")
-        quit()
-    factors = ecm_factor_all(n, 0)
-    factors.sort()
-    print()
-    print(f"All {len(factors)} prime factors: {factors}")
-    print()
-    counts = {}
-    for f in factors:
-        counts[f] = counts.get(f, 0) + 1
-    print(f"Factorization:")
-    product = 1
-    for prime, exp in sorted(counts.items()):
-        if exp == 1:
-            print(f"  p = {prime}")
-        else:
-            print(f"  {prime}^{exp}")
-        product *= prime ** exp
-    print()
-    print(f"Verification: product = {product}")
-    print(f"Matches n: {product == n}")
-    if product == n:
-        print("ECM2=SUCCESS")
-    else:
-        print("ECM2=FAILED")
-except Exception as e:
-    print(f"Error: {e}")
-    print("ECM2=FAILED")
-`,proof:`\\textbf{Theorem:} Repeated ECM with factor removal yields the complete prime factorization of n.
+_attack()`,proof:`\\textbf{Theorem:} Repeated ECM with factor removal yields the complete prime factorization of n.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
 \\item ECM finds one prime factor p of n at a time
-\\item Fundamental Theorem of Arithmetic: n = p_1^{e_1} \\cdots p_k^{e_k} uniquely
+\\item Fundamental Theorem of Arithmetic: n = p\\_1^{e\\_1} \\cdots p\\_k^{e\\_k} uniquely
 \\item After finding p, reduce to n' = n / p and recurse
 \\item Primality test (Miller-Rabin) for termination
 \\end{itemize}
@@ -723,104 +770,110 @@ n > n/p_{i_1} > n/(p_{i_1}p_{i_2}) > \\cdots &> 1 \\\\
 
 \\textbf{Explanation:} Run ECM to find one factor, divide it out, and repeat on the quotient. The process terminates when the remainder is 1 or prime. Each iteration strictly reduces the number of prime factors, guaranteeing termination. The total cost is dominated by finding the largest prime factor.
 
-\\textbf{References:} Lenstra, "Factoring Integers with Elliptic Curves", 1987`,priority:`medium`,applicableCheck:e=>!!e.n},Bh=()=>{let e=Oh(40),t=Oh(50),n=Oh(L.p+L.q-90);return{n:(e*t*n).toString()}},Vh={id:`pollard-p1`,name:`Pollard's p-1 Method`,category:`Factorization`,description:`Factors n when p-1 is smooth. Stage 1 handles p-1 with all prime factors ≤ B1. Stage 2 (B2) extends to catch p-1 with one larger factor.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B1 (stage 1 bound, optional)`,placeholder:`10000`,multiline:!1},{name:`B2`,label:`B2 (stage 2 bound, optional)`,placeholder:`0 (disabled)`,multiline:!1}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    B1 = Integer(${e.B||`10000`})
-    if B1 < 2:
-        B1 = 10000
-    B2 = Integer(${e.B2||`0`})
-    if B2 <= B1:
-        B2 = 0
-    print(f"Pollard's p-1 on n = {n}")
-    print(f"Initial B1 = {B1}")
-    if B2 > 0:
-        print(f"Initial B2 = {B2}")
-    print()
-    if n < 2:
-        print(f"n = {n} is too small to factor")
-        print("POLLARD_P1=FAILED")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2, q = {n // 2}")
-        print("POLLARD_P1=SUCCESS")
-        quit()
-    if n.is_prime():
-        print(f"n is prime: {n}")
-        print("POLLARD_P1=FAILED")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print("POLLARD_P1=SUCCESS")
-        quit()
-    # Build bound configurations: original + auto-escalation (10x)
-    B1_orig = B1
-    B2_orig = B2
-    configs = [(B1_orig, B2_orig)]
-    if B2_orig > 0:
-        configs.append((B1_orig * 10, B2_orig * 10))
-    else:
-        configs.append((B1_orig * 10, 0))
-        configs.append((B1_orig * 10, B1_orig * 100))
-    for attempt, (B1_cur, B2_cur) in enumerate(configs):
-        if attempt > 0:
-            print(f"Retry #{attempt}: B1 = {B1_cur}", end="")
-            if B2_cur > 0:
-                print(f", B2 = {B2_cur}")
+\\textbf{References:} Lenstra, "Factoring Integers with Elliptic Curves", 1987`,priority:`medium`,applicableCheck:e=>!!e.n},Bh=()=>{let e=Oh(40),t=Oh(50),n=Oh(L.p+L.q-90);return{n:(e*t*n).toString()}},Vh={id:`pollard-p1`,name:`Pollard's p-1 Method`,category:`Factorization`,description:`Factors n when p-1 is smooth. Stage 1 handles p-1 with all prime factors ≤ B1. Stage 2 (B2) extends to catch p-1 with one larger factor.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B1 (stage 1 bound, optional)`,placeholder:`10000`,multiline:!1},{name:`B2`,label:`B2 (stage 2 bound, optional)`,placeholder:`0 (disabled)`,multiline:!1}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            B1 = Integer(${e.B||`10000`})
+            if B1 < 2:
+                B1 = 10000
+            B2 = Integer(${e.B2||`0`})
+            if B2 <= B1:
+                B2 = 0
+            print(f"Pollard's p-1 on n = {n}")
+            print(f"Initial B1 = {B1}")
+            if B2 > 0:
+                print(f"Initial B2 = {B2}")
+            print()
+            if n < 2:
+                print(f"n = {n} is too small to factor")
+                print("POLLARD_P1=FAILED")
+                return
+            if n % 2 == 0:
+                print(f"n is even: {n}")
+                print(f"p = 2, q = {n // 2}")
+                print("POLLARD_P1=SUCCESS")
+                return
+            if n.is_prime():
+                print(f"n is prime: {n}")
+                print("POLLARD_P1=FAILED")
+                return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"p = q = {p}")
+                print("POLLARD_P1=SUCCESS")
+                return
+            # Build bound configurations: original + auto-escalation (10x)
+            B1_orig = B1
+            B2_orig = B2
+            configs = [(B1_orig, B2_orig)]
+            if B2_orig > 0:
+                configs.append((B1_orig * 10, B2_orig * 10))
             else:
-                print()
-        print(f"Stage 1: computing a = 2^lcm(1..{B1_cur}) mod n...")
-        a = 2
-        for p in prime_range(2, B1_cur + 1):
-            q = p
-            while q <= B1_cur:
-                a = power_mod(a, p, n)
-                q *= p
-        g = gcd(a - 1, n)
-        if 1 < g < n:
-            q = n // g
-            print(f"p = {g}")
-            print(f"q = {q}")
-            print(f"Verification: p * q = {g * q}")
-            print(f"p-1 is B1-smooth (B1={B1_cur})")
-            print("POLLARD_P1=SUCCESS")
-            quit()
-        if B2_cur > B1_cur:
-            print(f"Stage 2: checking primes q in (B1={B1_cur}, B2={B2_cur}]...")
-            H = a
-            prime_list = list(prime_range(B1_cur + 1, B2_cur + 1))
-            if len(prime_list) > 0:
-                Q = 1
-                Hq = power_mod(H, prime_list[0], n)
-                Q = (Q * (Hq - 1)) % n
-                for j in range(1, len(prime_list)):
-                    d = prime_list[j] - prime_list[j-1]
-                    Hq = (Hq * power_mod(H, d, n)) % n
-                    Q = (Q * (Hq - 1)) % n
-                g = gcd(Q, n)
+                configs.append((B1_orig * 10, 0))
+                configs.append((B1_orig * 10, B1_orig * 100))
+            for attempt, (B1_cur, B2_cur) in enumerate(configs):
+                if attempt > 0:
+                    print(f"Retry #{attempt}: B1 = {B1_cur}", end="")
+                    if B2_cur > 0:
+                        print(f", B2 = {B2_cur}")
+                    else:
+                        print()
+                print(f"Stage 1: computing a = 2^lcm(1..{B1_cur}) mod n...")
+                a = 2
+                for p in prime_range(2, B1_cur + 1):
+                    q = p
+                    while q <= B1_cur:
+                        a = power_mod(a, p, n)
+                        q *= p
+                g = gcd(a - 1, n)
                 if 1 < g < n:
                     q = n // g
                     print(f"p = {g}")
                     print(f"q = {q}")
                     print(f"Verification: p * q = {g * q}")
-                    print(f"p-1 has one large factor <= B2 (B1={B1_cur}, B2={B2_cur})")
+                    print(f"p-1 is B1-smooth (B1={B1_cur})")
                     print("POLLARD_P1=SUCCESS")
-                    quit()
-    print("Pollard p-1 failed: p-1 may not be smooth enough")
-    print("POLLARD_P1=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("POLLARD_P1=FAILED")
-`,proof:`\\textbf{Theorem:} If p-1 is B_1-smooth, then p can be found in time O(B_1 \\log B_1 \\log^2 n). Stage 2 catches p-1 with one prime factor \\leq B_2 > B_1.
+                    return
+                if B2_cur > B1_cur:
+                    print(f"Stage 2: checking primes q in (B1={B1_cur}, B2={B2_cur}]...")
+                    H = a
+                    prime_list = list(prime_range(B1_cur + 1, B2_cur + 1))
+                    if len(prime_list) > 0:
+                        Q = 1
+                        Hq = power_mod(H, prime_list[0], n)
+                        Q = (Q * (Hq - 1)) % n
+                        for j in range(1, len(prime_list)):
+                            d = prime_list[j] - prime_list[j-1]
+                            Hq = (Hq * power_mod(H, d, n)) % n
+                            Q = (Q * (Hq - 1)) % n
+                        g = gcd(Q, n)
+                        if 1 < g < n:
+                            q = n // g
+                            print(f"p = {g}")
+                            print(f"q = {q}")
+                            print(f"Verification: p * q = {g * q}")
+                            print(f"p-1 has one large factor <= B2 (B1={B1_cur}, B2={B2_cur})")
+                            print("POLLARD_P1=SUCCESS")
+                            return
+            print("Pollard p-1 failed: p-1 may not be smooth enough")
+            print("POLLARD_P1=FAILED")
+        except Exception as e:
+            print(f"ERROR: {e}")
+            print("POLLARD_P1=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("POLLARD_P1=FAILED")
+_attack()`,proof:`\\textbf{Theorem:} If p-1 is B\\_1-smooth, then p can be found in time O(B\\_1 \\log B\\_1 \\log^2 n). Stage 2 catches p-1 with one prime factor \\leq B\\_2 > B\\_1.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
 \\item Fermat's Little Theorem: a^{p-1} \\equiv 1 \\pmod{p} for \\gcd(a, p) = 1
-\\item p-1 is B_1-smooth: all prime factors of p-1 are \\leq B_1
-\\item M = \\operatorname{lcm}(1, 2, \\ldots, B_1) = \\prod_{q \\leq B_1} q^{\\lfloor \\log_q B_1 \\rfloor}
-\\item Stage 2: p-1 = q_0 \\cdot s where s is B_1-smooth and q_0 \\in (B_1, B_2]
+\\item p-1 is B\\_1-smooth: all prime factors of p-1 are \\leq B\\_1
+\\item M = \\operatorname{lcm}(1, 2, \\ldots, B\\_1) = \\prod\\_{q \\leq B\\_1} q^{\\lfloor \\log\\_q B\\_1 \\rfloor}
+\\item Stage 2: p-1 = q\\_0 \\cdot s where s is B\\_1-smooth and q\\_0 \\in (B\\_1, B\\_2]
 \\end{itemize}
 
 \\textbf{Proof (Stage 1):}
@@ -841,90 +894,96 @@ p &\\mid (H^{q_0} - 1) \\implies 1 < \\gcd\\left(\\prod_{q \\in (B_1, B_2]} (H^q
 \\text{Runtime: } O(B_1 \\log B_1 \\log^2 n) &+ O(\\pi(B_2) - \\pi(B_1)) \\; \\text{multiplications} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Stage 1 computes M = lcm(1, \\ldots, B_1) and then a^M \\bmod n. If p-1 divides M, then \\gcd(a^M - 1, n) reveals p. Stage 2 extends the search when p-1 has one prime factor q_0 between B_1 and B_2: after computing H = a^M, check \\gcd(H^q - 1, n) for each prime q in (B_1, B_2]. The prime-difference optimization reuses H^{q_{j-1}} to compute H^{q_j} efficiently.
+\\textbf{Explanation:} Stage 1 computes M = lcm(1, \\ldots, B\\_1) and then a^M \\bmod n. If p-1 divides M, then \\gcd(a^M - 1, n) reveals p. Stage 2 extends the search when p-1 has one prime factor q\\_0 between B\\_1 and B\\_2: after computing H = a^M, check \\gcd(H^q - 1, n) for each prime q in (B\\_1, B\\_2]. The prime-difference optimization reuses H^{q\\_{j-1}} to compute H^{q\\_j} efficiently.
 
-\\textbf{References:} J. M. Pollard, "Theorems on Factorization and Primality Testing", Proc. Cambridge Philos. Soc., 1974`,priority:`medium`,applicableCheck:e=>!!e.n},Hh=()=>{if(Math.random()<.7){let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n,67n,71n],t=2n;for(let n of e){let e=Math.floor(Math.random()*4)+1;t*=n**BigInt(e)}for(;t<1n<<255n;)t*=2n;let n=t+1n;for(;!Dh(n);)t*=2n,n=t+1n;let r=Oh(L.q);return{n:(n*r).toString(),B:`10000`,B2:`0`}}else{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n,67n,71n],t=2n;for(let n of e){let e=Math.floor(Math.random()*3)+1;t*=n**BigInt(e)}for(;t<1n<<240n;)t*=2n;let n=[10007n,10009n,10037n,10039n,10061n,10067n,10069n,10079n,10091n,10093n,20011n,20021n,20023n,20029n,20047n,20051n,20063n,20071n,20089n,20101n,30011n,30013n,30029n,30047n,30059n,30071n,30089n,30091n,30097n,30103n,40009n,40013n,40031n,40037n,40039n,40063n,40087n,40093n,40099n,40111n,43003n,43013n,43019n,43037n,43049n,43051n,43063n,43067n,43093n,43103n,46021n,46027n,46049n,46051n,46061n,46073n,46091n,46093n,46099n,46103n],r=n[Math.floor(Math.random()*n.length)],i=t*r;i%2n==1n&&(i*=2n);let a=i+1n;for(;!Dh(a);)i+=r,a=i+1n;let o=Oh(L.q);return{n:(a*o).toString(),B:`10000`,B2:`50000`}}},Uh={id:`pollard-rho`,name:`Pollard's Rho (Brent variant)`,category:`Factorization`,description:`Factors n via birthday paradox with Brent's cycle detection and batched GCD (primefac-style). Batched GCD reduces gcd overhead from O(sqrt(p)) to O(sqrt(p)/m). Backtracking recovers when accumulated product contains all factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    print(f"Pollard's Rho (Brent variant) on n = {n}")
-    print()
-    if n < 2:
-        print(f"n = {n} is too small to factor")
-        print("POLLARD_RHO=FAILED")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2, q = {n // 2}")
-        print("POLLARD_RHO=SUCCESS")
-        quit()
-    if n.is_prime():
-        print(f"n is prime: {n}")
-        print("POLLARD_RHO=FAILED")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print("POLLARD_RHO=SUCCESS")
-        quit()
-    # Brent's cycle detection with batched GCD (primefac-style, BIT 1980)
-    # Batched GCD reduces overhead: accumulate |x-y| products, one gcd per batch
-    # Backtracking handles g == n case (when accumulated product contains all factors)
-    def brent_rho_batch(n, c):
-        y = 2
-        r = 1
-        q = 1
-        g = 1
-        m = 100
-        while g == 1:
-            x = y
-            for _ in range(r):
-                y = (y * y + c) % n
-            k = 0
-            while k < r and g == 1:
-                ys = y
-                batch = min(m, r - k)
-                for _ in range(batch):
-                    y = (y * y + c) % n
-                    q = (q * abs(x - y)) % n
-                g = gcd(q, n)
+\\textbf{References:} J. M. Pollard, "Theorems on Factorization and Primality Testing", Proc. Cambridge Philos. Soc., 1974`,priority:`medium`,applicableCheck:e=>!!e.n},Hh=()=>{if(Math.random()<.7){let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n,67n,71n],t=2n;for(let n of e){let e=Math.floor(Math.random()*4)+1;t*=n**BigInt(e)}for(;t<1n<<255n;)t*=2n;let n=t+1n;for(;!Dh(n);)t*=2n,n=t+1n;let r=Oh(L.q);return{n:(n*r).toString(),B:`10000`,B2:`0`}}else{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n,67n,71n],t=2n;for(let n of e){let e=Math.floor(Math.random()*3)+1;t*=n**BigInt(e)}for(;t<1n<<240n;)t*=2n;let n=[10007n,10009n,10037n,10039n,10061n,10067n,10069n,10079n,10091n,10093n,20011n,20021n,20023n,20029n,20047n,20051n,20063n,20071n,20089n,20101n,30011n,30013n,30029n,30047n,30059n,30071n,30089n,30091n,30097n,30103n,40009n,40013n,40031n,40037n,40039n,40063n,40087n,40093n,40099n,40111n,43003n,43013n,43019n,43037n,43049n,43051n,43063n,43067n,43093n,43103n,46021n,46027n,46049n,46051n,46061n,46073n,46091n,46093n,46099n,46103n],r=n[Math.floor(Math.random()*n.length)],i=t*r;i%2n==1n&&(i*=2n);let a=i+1n;for(;!Dh(a);)i+=r,a=i+1n;let o=Oh(L.q);return{n:(a*o).toString(),B:`10000`,B2:`50000`}}},Uh={id:`pollard-rho`,name:`Pollard's Rho (Brent variant)`,category:`Factorization`,description:`Factors n via birthday paradox with Brent's cycle detection and batched GCD (primefac-style). Batched GCD reduces gcd overhead from O(sqrt(p)) to O(sqrt(p)/m). Backtracking recovers when accumulated product contains all factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            print(f"Pollard's Rho (Brent variant) on n = {n}")
+            print()
+            if n < 2:
+                print(f"n = {n} is too small to factor")
+                print("POLLARD_RHO=FAILED")
+                return
+            if n % 2 == 0:
+                print(f"n is even: {n}")
+                print(f"p = 2, q = {n // 2}")
+                print("POLLARD_RHO=SUCCESS")
+                return
+            if n.is_prime():
+                print(f"n is prime: {n}")
+                print("POLLARD_RHO=FAILED")
+                return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"p = q = {p}")
+                print("POLLARD_RHO=SUCCESS")
+                return
+            # Brent's cycle detection with batched GCD (primefac-style, BIT 1980)
+            # Batched GCD reduces overhead: accumulate |x-y| products, one gcd per batch
+            # Backtracking handles g == n case (when accumulated product contains all factors)
+            def brent_rho_batch(n, c):
+                y = 2
+                r = 1
                 q = 1
-                k += m
-            r *= 2
-        if g == n:
-            while True:
-                ys = (ys * ys + c) % n
-                g = gcd(abs(x - ys), n)
-                if g > 1:
+                g = 1
+                m = 100
+                while g == 1:
+                    x = y
+                    for _ in range(r):
+                        y = (y * y + c) % n
+                    k = 0
+                    while k < r and g == 1:
+                        ys = y
+                        batch = min(m, r - k)
+                        for _ in range(batch):
+                            y = (y * y + c) % n
+                            q = (q * abs(x - y)) % n
+                        g = gcd(q, n)
+                        q = 1
+                        k += m
+                    r *= 2
+                if g == n:
+                    while True:
+                        ys = (ys * ys + c) % n
+                        g = gcd(abs(x - ys), n)
+                        if g > 1:
+                            break
+                return g if 1 < g < n else None
+            found = False
+            for c_val in range(1, 20):
+                d = brent_rho_batch(n, c_val)
+                if d is not None:
+                    p = d
+                    q = n // p
+                    print(f"p = {p}")
+                    print(f"q = {q}")
+                    print(f"Verification: p * q = {p * q}")
+                    print(f"c value: {c_val}")
+                    print("POLLARD_RHO=SUCCESS")
+                    found = True
                     break
-        return g if 1 < g < n else None
-    found = False
-    for c_val in range(1, 20):
-        d = brent_rho_batch(n, c_val)
-        if d is not None:
-            p = d
-            q = n // p
-            print(f"p = {p}")
-            print(f"q = {q}")
-            print(f"Verification: p * q = {p * q}")
-            print(f"c value: {c_val}")
-            print("POLLARD_RHO=SUCCESS")
-            found = True
-            break
-    if not found:
-        print("Pollard's rho (Brent variant) failed: no factor found")
-        print("Try ECM or other methods")
+            if not found:
+                print("Pollard's rho (Brent variant) failed: no factor found")
+                print("Try ECM or other methods")
+                print("POLLARD_RHO=FAILED")
+        except Exception as e:
+            print(f"ERROR: {e}")
+            print("POLLARD_RHO=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("POLLARD_RHO=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("POLLARD_RHO=FAILED")
-`,proof:`\\textbf{Theorem:} Pollard's rho (Brent variant) with batched GCD finds a nontrivial factor of n in expected O(n^{1/4}) time, reducing GCD overhead from O(n^{1/4} \\log n) to O(n^{1/4}).
+_attack()`,proof:`\\textbf{Theorem:} Pollard's rho (Brent variant) with batched GCD finds a nontrivial factor of n in expected O(n^{1/4}) time, reducing GCD overhead from O(n^{1/4} \\log n) to O(n^{1/4}).
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
 \\item Birthday paradox: collision among \\sqrt{N} random elements with prob \\approx 1/2
 \\item Brent's cycle detection: saves sequence value at powers of 2, one function eval per step
-\\item Pseudorandom sequence: x_{i+1} = x_i^2 + c \\pmod{n}
-\\item Batched GCD: accumulate \\prod |x - y_i| \\bmod n for m iterations, then one gcd
+\\item Pseudorandom sequence: x\\_{i+1} = x\\_i^2 + c \\pmod{n}
+\\item Batched GCD: accumulate \\prod |x - y\\_i| \\bmod n for m iterations, then one gcd
 \\item Backtracking: when gcd = n, find individual factor via per-step gcd
 \\end{itemize}
 
@@ -942,150 +1001,156 @@ p &\\mid \\gcd\\left(\\prod_{k} |x - y_k|, n\\right) \\;\\;\\; \\text{(batch pro
 \\text{Expected total time: } O(n^{1/4}) & \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Generate a pseudorandom sequence x_{i+1} = x_i^2 + c mod n. Brent's cycle detection saves x at powers of 2. Batched GCD accumulates \\prod |x - y| mod n for m = 100 iterations, computing gcd once per batch. If gcd = n (all factors in product), backtrack per-step to isolate the individual factor. Expected O(\\sqrt{p}) iterations.
+\\textbf{Explanation:} Generate a pseudorandom sequence x\\_{i+1} = x\\_i^2 + c mod n. Brent's cycle detection saves x at powers of 2. Batched GCD accumulates \\prod |x - y| mod n for m = 100 iterations, computing gcd once per batch. If gcd = n (all factors in product), backtrack per-step to isolate the individual factor. Expected O(\\sqrt{p}) iterations.
 
-\\textbf{References:} R. P. Brent, "An Improved Monte Carlo Factorization Algorithm", BIT Numerical Mathematics, 20(2):176-184, 1980. J. M. Pollard, "A Monte Carlo Method for Factorization", BIT Numerical Mathematics, 1975. primefac v2.0.12, "pollardrho_brent" implementation, 2023`,priority:`medium`,applicableCheck:e=>!!e.n},Wh=()=>({n:(Oh(40)*Oh(L.p+L.q-40)).toString()}),Gh={id:`williams-p1`,name:`Williams' p+1 Method`,category:`Factorization`,description:`Factors n when p+1 is smooth. Use when p+1 has only small prime factors. Stage 2 catches p+1 with one larger prime factor.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B1 (stage 1 bound, optional)`,placeholder:`10000`,multiline:!1},{name:`B2`,label:`B2 (stage 2 bound, optional)`,placeholder:`0 (disabled)`,multiline:!1}],sageTemplate:e=>`n = Integer(${e.n})
-
-# Handle B1 parameter: default to 10000 if not provided or invalid
-try:
-    B1 = Integer(${e.B||`10000`})
-    if B1 < 2:
-        B1 = 10000
-except:
-    B1 = 10000
-
-# Handle B2 parameter: default to 0 (disabled) if not provided or invalid
-try:
-    B2 = Integer(${e.B2||`0`})
-    if B2 < 0:
-        B2 = 0
-except:
-    B2 = 0
-
-print(f"Williams' p+1 method on n = {n}")
-print(f"Initial B1 = {B1}")
-print(f"Initial B2 = {B2}")
-print()
-
-# Check for trivial cases
-if n < 2:
-    print(f"n = {n} is too small to factor")
-    print("WILLIAMS_P1=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2")
-    print(f"q = {n // 2}")
-    print(f"Verification: 2 * {n // 2} = {n}")
-    print("WILLIAMS_P1=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("No factorization possible")
-    print("WILLIAMS_P1=FAILED")
-    quit()
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print(f"p = q = {p}")
-    print(f"Verification: p * q = {p * p}")
-    print("WILLIAMS_P1=SUCCESS")
-    quit()
-
-# Williams' p+1 using Lucas sequences with two-stage
-# V_k(P, Q) where Q = 1, V_0 = 2, V_1 = P, V_k = P * V_{k-1} - V_{k-2}
-# Stage 1: compute V_M(P, 1) where M = lcm(1..B1) using binary exponentiation
-# Stage 2: iterate V_{k*M} for k=B1..B2 using recurrence V_{(k+1)*M} = V_{k*M} * V_M - V_{(k-1)*M}
-def lucas_V(k, P, n):
-    if k == 0:
-        return 2 % n
-    if k == 1:
-        return P % n
-    result = 2 % n   # V_0
-    result1 = P % n  # V_1
-    bits = k.digits(2)  # LSB-first list of binary digits
-    # Binary ladder: maintain (V_j, V_{j+1}) invariant, process MSB first
-    for bit in reversed(bits):
-        V2j = (result**2 - 2) % n          # V_{2j} = V_j^2 - 2 (Q=1)
-        V2j1 = (result * result1 - P) % n   # V_{2j+1} = V_j * V_{j+1} - P (Q=1)
-        result, result1 = V2j, V2j1
-        if bit == 1:
-            # Advance: (V_{2j}, V_{2j+1}) → (V_{2j+1}, V_{2j+2})
-            # V_{2j+2} = P * V_{2j+1} - V_{2j} via recurrence V_k = P*V_{k-1} - V_{k-2}
-            V2j2 = (P * result1 - result) % n
-            result, result1 = result1, V2j2
-    return result
-
-def williams_p1_stage(n, B1, B2, P):
-    M = 1
-    for i in range(2, B1 + 1):
-        M = lcm(M, i)
-    VM = lucas_V(M, P, n)
-    g = gcd(VM - 2, n)
-    if 1 < g < n:
-        return g
-    if B2 > B1:
-        V_curr = VM
-        V_prev = 2
-        for k in range(2, B2 + 1):
-            V_next = (V_curr * VM - V_prev) % n
-            V_prev, V_curr = V_curr, V_next
-            if k > B1 and is_prime(k):
-                g = gcd(V_curr - 2, n)
-                if 1 < g < n:
-                    return Integer(g)
-    return None
-
-# Build bound configurations: original + auto-escalation (10x)
-B1_orig = B1
-B2_orig = B2
-configs = [(B1_orig, B2_orig)]
-if B2_orig > 0:
-    configs.append((B1_orig * 10, B2_orig * 10))
-else:
-    configs.append((B1_orig * 10, 0))
-    configs.append((B1_orig * 10, B1_orig * 100))
-
-try:
-    found = False
-    for attempt, (B1_cur, B2_cur) in enumerate(configs):
-        if attempt > 0:
-            print(f"Retry #{attempt}: B1 = {B1_cur}", end="")
-            if B2_cur > 0:
-                print(f", B2 = {B2_cur}")
+\\textbf{References:} R. P. Brent, "An Improved Monte Carlo Factorization Algorithm", BIT Numerical Mathematics, 20(2):176-184, 1980. J. M. Pollard, "A Monte Carlo Method for Factorization", BIT Numerical Mathematics, 1975. primefac v2.0.12, "pollardrho\\_brent" implementation, 2023`,priority:`medium`,applicableCheck:e=>!!e.n},Wh=()=>({n:(Oh(40)*Oh(L.p+L.q-40)).toString()}),Gh={id:`williams-p1`,name:`Williams' p+1 Method`,category:`Factorization`,description:`Factors n when p+1 is smooth. Use when p+1 has only small prime factors. Stage 2 catches p+1 with one larger prime factor.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B1 (stage 1 bound, optional)`,placeholder:`10000`,multiline:!1},{name:`B2`,label:`B2 (stage 2 bound, optional)`,placeholder:`0 (disabled)`,multiline:!1}],sageTemplate:e=>`def _attack():
+    try:
+        n = Integer(${e.n})
+        #
+        # Handle B1 parameter: default to 10000 if not provided or invalid
+        try:
+            B1 = Integer(${e.B||`10000`})
+            if B1 < 2:
+                B1 = 10000
+        except:
+            B1 = 10000
+        #
+        # Handle B2 parameter: default to 0 (disabled) if not provided or invalid
+        try:
+            B2 = Integer(${e.B2||`0`})
+            if B2 < 0:
+                B2 = 0
+        except:
+            B2 = 0
+        #
+        print(f"Williams' p+1 method on n = {n}")
+        print(f"Initial B1 = {B1}")
+        print(f"Initial B2 = {B2}")
+        print()
+        #
+        # Check for trivial cases
+        if n < 2:
+            print(f"n = {n} is too small to factor")
+            print("WILLIAMS_P1=FAILED")
+            return
+        if n % 2 == 0:
+            print(f"n is even: {n}")
+            print(f"p = 2")
+            print(f"q = {n // 2}")
+            print(f"Verification: 2 * {n // 2} = {n}")
+            print("WILLIAMS_P1=SUCCESS")
+            return
+        if n.is_prime():
+            print(f"n is prime: {n}")
+            print("No factorization possible")
+            print("WILLIAMS_P1=FAILED")
+            return
+        if n.is_square():
+            p = isqrt(n)
+            print(f"n is a perfect square: {p}^2 = {n}")
+            print(f"p = q = {p}")
+            print(f"Verification: p * q = {p * p}")
+            print("WILLIAMS_P1=SUCCESS")
+            return
+        #
+        # Williams' p+1 using Lucas sequences with two-stage
+        # V_k(P, Q) where Q = 1, V_0 = 2, V_1 = P, V_k = P * V_{k-1} - V_{k-2}
+        # Stage 1: compute V_M(P, 1) where M = lcm(1..B1) using binary exponentiation
+        # Stage 2: iterate V_{k*M} for k=B1..B2 using recurrence V_{(k+1)*M} = V_{k*M} * V_M - V_{(k-1)*M}
+        def lucas_V(k, P, n):
+            if k == 0:
+                return 2 % n
+            if k == 1:
+                return P % n
+            result = 2 % n   # V_0
+            result1 = P % n  # V_1
+            bits = k.digits(2)  # LSB-first list of binary digits
+            # Binary ladder: maintain (V_j, V_{j+1}) invariant, process MSB first
+            for bit in reversed(bits):
+                V2j = (result**2 - 2) % n          # V_{2j} = V_j**2 - 2 (Q=1)
+                V2j1 = (result * result1 - P) % n   # V_{2j+1} = V_j * V_{j+1} - P (Q=1)
+                result, result1 = V2j, V2j1
+                if bit == 1:
+                    # Advance: (V_{2j}, V_{2j+1}) → (V_{2j+1}, V_{2j+2})
+                    # V_{2j+2} = P * V_{2j+1} - V_{2j} via recurrence V_k = P*V_{k-1} - V_{k-2}
+                    V2j2 = (P * result1 - result) % n
+                    result, result1 = result1, V2j2
+            return result
+        #
+        def williams_p1_stage(n, B1, B2, P):
+            M = 1
+            for i in range(2, B1 + 1):
+                M = lcm(M, i)
+            VM = lucas_V(M, P, n)
+            g = gcd(VM - 2, n)
+            if 1 < g < n:
+                return g
+            if B2 > B1:
+                V_curr = VM
+                V_prev = 2
+                for k in range(2, B2 + 1):
+                    V_next = (V_curr * VM - V_prev) % n
+                    V_prev, V_curr = V_curr, V_next
+                    if k > B1 and is_prime(k):
+                        g = gcd(V_curr - 2, n)
+                        if 1 < g < n:
+                            return Integer(g)
+            return None
+        #
+        # Build bound configurations: original + auto-escalation (10x)
+        B1_orig = B1
+        B2_orig = B2
+        configs = [(B1_orig, B2_orig)]
+        if B2_orig > 0:
+            configs.append((B1_orig * 10, B2_orig * 10))
+        else:
+            configs.append((B1_orig * 10, 0))
+            configs.append((B1_orig * 10, B1_orig * 100))
+        #
+        try:
+            found = False
+            for attempt, (B1_cur, B2_cur) in enumerate(configs):
+                if attempt > 0:
+                    print(f"Retry #{attempt}: B1 = {B1_cur}", end="")
+                    if B2_cur > 0:
+                        print(f", B2 = {B2_cur}")
+                    else:
+                        print()
+                for P in range(3, 30):
+                    g = williams_p1_stage(n, B1_cur, B2_cur, P)
+                    if g is not None:
+                        p = Integer(g)
+                        q = n // g
+                        print(f"Factor found with P = {P}!")
+                        print(f"p = {p}")
+                        print(f"q = {q}")
+                        print(f"Verification: p * q = {p * q}")
+                        found = True
+                        break
+                if found:
+                    break
+            if not found:
+                print("Williams' p+1 failed. p+1 may not be B1-smooth for tested P values.")
+                print("Try increasing B1, enabling stage 2 with B2 > B1, or using a different method.")
+                print("WILLIAMS_P1=FAILED")
             else:
-                print()
-        for P in range(3, 30):
-            g = williams_p1_stage(n, B1_cur, B2_cur, P)
-            if g is not None:
-                p = Integer(g)
-                q = n // g
-                print(f"Factor found with P = {P}!")
-                print(f"p = {p}")
-                print(f"q = {q}")
-                print(f"Verification: p * q = {p * q}")
-                found = True
-                break
-        if found:
-            break
-    if not found:
-        print("Williams' p+1 failed. p+1 may not be B1-smooth for tested P values.")
-        print("Try increasing B1, enabling stage 2 with B2 > B1, or using a different method.")
+                print("WILLIAMS_P1=SUCCESS")
+        except Exception as ex:
+            print(f"Williams' p+1 error: {ex}")
+            print("WILLIAMS_P1=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("WILLIAMS_P1=FAILED")
-    else:
-        print("WILLIAMS_P1=SUCCESS")
-except Exception as ex:
-    print(f"Williams' p+1 error: {ex}")
-    print("WILLIAMS_P1=FAILED")
-`,proof:`\\textbf{Theorem:} If p+1 is B1-smooth, then p can be found using Lucas sequences in time O(B \\log B \\log^2 n). Stage 2 extends to p+1 with one prime factor between B1 and B2.
+_attack()`,proof:`\\textbf{Theorem:} If p+1 is B1-smooth, then p can be found using Lucas sequences in time O(B \\log B \\log^2 n). Stage 2 extends to p+1 with one prime factor between B1 and B2.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item Lucas sequences: V_k(P, 1) with V_0 = 2, V_1 = P, V_k = P \\cdot V_{k-1} - V_{k-2}
-\\item V_k(\\alpha + \\alpha^{-1}, 1) = \\alpha^k + \\alpha^{-k} where \\alpha, \\alpha^{-1} are roots of x^2 - Px + 1 = 0
-\\item For (D/p) = -1 with D = P^2 - 4: \\alpha^{p+1} = 1 in \\mathbb{F}_{p^2}^*
+\\item Lucas sequences: V\\_k(P, 1) with V\\_0 = 2, V\\_1 = P, V\\_k = P \\cdot V\\_{k-1} - V\\_{k-2}
+\\item V\\_k(\\alpha + \\alpha^{-1}, 1) = \\alpha^k + \\alpha^{-k} where \\alpha, \\alpha^{-1} are roots of x^2 - Px + 1 = 0
+\\item For (D/p) = -1 with D = P^2 - 4: \\alpha^{p+1} = 1 in \\mathbb{F}\\_{p^2}^*
 \\item M = \\text{lcm}(1, 2, \\ldots, B1)
-\\item Lucas recurrence with Q=1: V_{a+b} = V_a \\cdot V_b - V_{a-b}
+\\item Lucas recurrence with Q=1: V\\_{a+b} = V\\_a \\cdot V\\_b - V\\_{a-b}
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -1107,116 +1172,122 @@ V_{(k+1)M} &= V_{kM} \\cdot V_M - V_{(k-1)M} \\pmod{n} \\\\
 \\text{Try different } P &\\text{ until } (D/p) = -1 \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Choose P and compute V_M(P, 1) mod n using Lucas sequences. If p+1 is B1-smooth and (P^2-4/p) = -1, then V_M \\equiv 2 \\pmod{p}, so gcd(V_M - 2, n) reveals p. Stage 2 checks V_{kM} for k > B1 up to B2 using the recurrence V_{(k+1)M} = V_{kM} \\cdot V_M - V_{(k-1)M}, catching cases where p+1 has one prime factor between B1 and B2. Try different P values to find one with the right Legendre symbol.
+\\textbf{Explanation:} Choose P and compute V\\_M(P, 1) mod n using Lucas sequences. If p+1 is B1-smooth and (P^2-4/p) = -1, then V\\_M \\equiv 2 \\pmod{p}, so gcd(V\\_M - 2, n) reveals p. Stage 2 checks V\\_{kM} for k > B1 up to B2 using the recurrence V\\_{(k+1)M} = V\\_{kM} \\cdot V\\_M - V\\_{(k-1)M}, catching cases where p+1 has one prime factor between B1 and B2. Try different P values to find one with the right Legendre symbol.
 
-\\textbf{References:} H. C. Williams, "A p+1 Method of Factoring", Mathematics of Computation, 1982`,priority:`medium`,applicableCheck:e=>!!e.n},Kh=()=>{if(Math.random()<.7){let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n,67n,71n],t=2n;for(let n of e){let e=Math.floor(Math.random()*4)+1;t*=n**BigInt(e)}for(;t<1n<<255n;)t*=2n;let n=t-1n;for(;!Dh(n)||n<=2n;)t*=2n,n=t-1n;let r=Oh(L.q);return{n:(n*r).toString(),B:`10000`,B2:`0`}}else{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n,67n,71n],t=2n;for(let n of e){let e=Math.floor(Math.random()*3)+1;t*=n**BigInt(e)}for(;t<1n<<240n;)t*=2n;let n=[10007n,10009n,10037n,10039n,10061n,10067n,10069n,10079n,10091n,10093n,20011n,20021n,20023n,20029n,20047n,20051n,20063n,20071n,20089n,20101n,30011n,30013n,30029n,30047n,30059n,30071n,30089n,30091n,30097n,30103n,40009n,40013n,40031n,40037n,40039n,40063n,40087n,40093n,40099n,40111n,50021n,50023n,50033n,50047n,50051n,50053n,50069n,50077n,50087n,50093n],r=n[Math.floor(Math.random()*n.length)],i=t*r;i%2n==1n&&(i*=2n);let a=i-1n;for(;!Dh(a)||a<=2n;)i+=r,a=i-1n;let o=Oh(L.q);return{n:(a*o).toString(),B:`10000`,B2:`50000`}}},qh={id:`quadratic-sieve`,name:`Quadratic Sieve`,category:`Factorization`,description:`Factors n via the quadratic sieve (qsieve). Best for medium-sized semiprimes (< 100 digits / ~330 bits) with similar-sized factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
-
-print(f"Quadratic Sieve on n = {n}")
-print(f"Number of digits: {n.nbits() / 3.32:.0f}")
-print(f"Bit length: {n.nbits()}")
-print()
-
-# Check for trivial cases
-if n < 2:
-    print(f"n = {n} is too small to factor")
-    print("QUADRATIC_SIEVE=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2")
-    print(f"q = {n // 2}")
-    print(f"Verification: 2 * {n // 2} = {n}")
-    print("QUADRATIC_SIEVE=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("No factorization possible")
-    print("QUADRATIC_SIEVE=FAILED")
-    quit()
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print(f"p = q = {p}")
-    print(f"Verification: p * q = {p * p}")
-    print("QUADRATIC_SIEVE=SUCCESS")
-    quit()
-
-# Check size before attempting factorization
-if n.nbits() > 330:
-    print(f"WARNING: n has {n.nbits()} bits ({n.nbits() / 3.32:.0f} digits)")
-    print("Quadratic Sieve is effective up to ~100 digits (330 bits)")
-    print("For larger numbers, try ECM, Pollard's p-1, or other methods")
-    print()
-
-# Use Sage's quadratic sieve (qsieve) specifically
-try:
-    print("Factoring n with qsieve (Quadratic Sieve)...")
-    result = qsieve(n)
-    # Handle multiple qsieve return formats:
-    #   Old API (sage.interfaces): [p, q] or ([p, q], time_str)
-    #   New API (sage.libs.flint): [(p, 1), (q, 1)]
-    if isinstance(result, tuple):
-        items = result[0]  # Old API with time=True
-    else:
-        items = result
-    factors = []
-    for item in items:
-        if isinstance(item, (list, tuple)):
-            factors.append((Integer(item[0]), Integer(item[1])))
-        else:
-            factors.append((Integer(item), 1))
-    if not factors:
-        print("No factors found")
-        print("QUADRATIC_SIEVE=FAILED")
-        quit()
-    # Display factorization
-    fac_str = " * ".join(
-        f"{p}^{e}" if e > 1 else str(p) for p, e in factors
-    )
-    print(f"Factorization: {fac_str}")
-    print()
-    # Single factor (qsieve could not factor properly)
-    if len(factors) == 1 and factors[0][1] == 1:
-        print(f"Only one factor found: {factors[0][0]}")
-        print("QUADRATIC_SIEVE=FAILED")
-    # Two prime factors (semiprime) — typical QS use case
-    elif len(factors) == 2 and all(exp == 1 for _, exp in factors):
-        p = Integer(factors[0][0])
-        q = Integer(factors[1][0])
-        print(f"p = {p}")
-        print(f"q = {q}")
-        print(f"Verification: p * q = {p * q}")
-        print(f"p is prime: {p.is_prime()}")
-        print(f"q is prime: {q.is_prime()}")
-        print("QUADRATIC_SIEVE=SUCCESS")
-    # Multiple factors or powers
-    else:
-        print(f"Found {len(factors)} factor(s):")
-        for prime, exp in factors:
-            if exp == 1:
-                print(f"  p = {prime}")
-            else:
-                print(f"  {prime}^{exp}")
+\\textbf{References:} H. C. Williams, "A p+1 Method of Factoring", Mathematics of Computation, 1982`,priority:`medium`,applicableCheck:e=>!!e.n},Kh=()=>{if(Math.random()<.7){let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n,67n,71n],t=2n;for(let n of e){let e=Math.floor(Math.random()*4)+1;t*=n**BigInt(e)}for(;t<1n<<255n;)t*=2n;let n=t-1n;for(;!Dh(n)||n<=2n;)t*=2n,n=t-1n;let r=Oh(L.q);return{n:(n*r).toString(),B:`10000`,B2:`0`}}else{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n,67n,71n],t=2n;for(let n of e){let e=Math.floor(Math.random()*3)+1;t*=n**BigInt(e)}for(;t<1n<<240n;)t*=2n;let n=[10007n,10009n,10037n,10039n,10061n,10067n,10069n,10079n,10091n,10093n,20011n,20021n,20023n,20029n,20047n,20051n,20063n,20071n,20089n,20101n,30011n,30013n,30029n,30047n,30059n,30071n,30089n,30091n,30097n,30103n,40009n,40013n,40031n,40037n,40039n,40063n,40087n,40093n,40099n,40111n,50021n,50023n,50033n,50047n,50051n,50053n,50069n,50077n,50087n,50093n],r=n[Math.floor(Math.random()*n.length)],i=t*r;i%2n==1n&&(i*=2n);let a=i-1n;for(;!Dh(a)||a<=2n;)i+=r,a=i-1n;let o=Oh(L.q);return{n:(a*o).toString(),B:`10000`,B2:`50000`}}},qh={id:`quadratic-sieve`,name:`Quadratic Sieve`,category:`Factorization`,description:`Factors n via the quadratic sieve (qsieve). Best for medium-sized semiprimes (< 100 digits / ~330 bits) with similar-sized factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        n = Integer(${e.n})
+        #
+        print(f"Quadratic Sieve on n = {n}")
+        print(f"Number of digits: {n.nbits() / 3.32:.0f}")
+        print(f"Bit length: {n.nbits()}")
         print()
-        product = 1
-        for prime, exp in factors:
-            product *= Integer(prime) ** exp
-        print(f"Verification: product = {product}")
-        print(f"Matches n: {product == n}")
-        print("QUADRATIC_SIEVE=SUCCESS")
-except Exception as ex:
-    print(f"Factorization failed: {ex}")
-    print("n may be too large for the quadratic sieve.")
-    print("For numbers > 100 digits, try ECM or specialized attacks.")
-    print("QUADRATIC_SIEVE=FAILED")
-`,proof:`\\textbf{Theorem:} Quadratic Sieve factors n in expected time O(\\exp(\\sqrt{\\ln n \\ln \\ln n})).
+        #
+        # Check for trivial cases
+        if n < 2:
+            print(f"n = {n} is too small to factor")
+            print("QUADRATIC_SIEVE=FAILED")
+            return
+        if n % 2 == 0:
+            print(f"n is even: {n}")
+            print(f"p = 2")
+            print(f"q = {n // 2}")
+            print(f"Verification: 2 * {n // 2} = {n}")
+            print("QUADRATIC_SIEVE=SUCCESS")
+            return
+        if n.is_prime():
+            print(f"n is prime: {n}")
+            print("No factorization possible")
+            print("QUADRATIC_SIEVE=FAILED")
+            return
+        if n.is_square():
+            p = isqrt(n)
+            print(f"n is a perfect square: {p}^2 = {n}")
+            print(f"p = q = {p}")
+            print(f"Verification: p * q = {p * p}")
+            print("QUADRATIC_SIEVE=SUCCESS")
+            return
+        #
+        # Check size before attempting factorization
+        if n.nbits() > 330:
+            print(f"WARNING: n has {n.nbits()} bits ({n.nbits() / 3.32:.0f} digits)")
+            print("Quadratic Sieve is effective up to ~100 digits (330 bits)")
+            print("For larger numbers, try ECM, Pollard's p-1, or other methods")
+            print()
+        #
+        # Use Sage's quadratic sieve (qsieve) specifically
+        try:
+            print("Factoring n with qsieve (Quadratic Sieve)...")
+            result = qsieve(n)
+            # Handle multiple qsieve return formats:
+            #   Old API (sage.interfaces): [p, q] or ([p, q], time_str)
+            #   New API (sage.libs.flint): [(p, 1), (q, 1)]
+            if isinstance(result, tuple):
+                items = result[0]  # Old API with time=True
+            else:
+                items = result
+            factors = []
+            for item in items:
+                if isinstance(item, (list, tuple)):
+                    factors.append((Integer(item[0]), Integer(item[1])))
+                else:
+                    factors.append((Integer(item), 1))
+            if not factors:
+                print("No factors found")
+                print("QUADRATIC_SIEVE=FAILED")
+                return
+            # Display factorization
+            fac_str = " * ".join(
+                f"{p}**{e}" if e > 1 else str(p) for p, e in factors
+            )
+            print(f"Factorization: {fac_str}")
+            print()
+            # Single factor (qsieve could not factor properly)
+            if len(factors) == 1 and factors[0][1] == 1:
+                print(f"Only one factor found: {factors[0][0]}")
+                print("QUADRATIC_SIEVE=FAILED")
+            # Two prime factors (semiprime) — typical QS use case
+            elif len(factors) == 2 and all(exp == 1 for _, exp in factors):
+                p = Integer(factors[0][0])
+                q = Integer(factors[1][0])
+                print(f"p = {p}")
+                print(f"q = {q}")
+                print(f"Verification: p * q = {p * q}")
+                print(f"p is prime: {p.is_prime()}")
+                print(f"q is prime: {q.is_prime()}")
+                print("QUADRATIC_SIEVE=SUCCESS")
+            # Multiple factors or powers
+            else:
+                print(f"Found {len(factors)} factor(s):")
+                for prime, exp in factors:
+                    if exp == 1:
+                        print(f"  p = {prime}")
+                    else:
+                        print(f"  {prime}^{exp}")
+                print()
+                product = 1
+                for prime, exp in factors:
+                    product *= Integer(prime) ** exp
+                print(f"Verification: product = {product}")
+                print(f"Matches n: {product == n}")
+                print("QUADRATIC_SIEVE=SUCCESS")
+        except Exception as ex:
+            print(f"Factorization failed: {ex}")
+            print("n may be too large for the quadratic sieve.")
+            print("For numbers > 100 digits, try ECM or specialized attacks.")
+            print("QUADRATIC_SIEVE=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("QUADRATIC_SIEVE=FAILED")
+_attack()`,proof:`\\textbf{Theorem:} Quadratic Sieve factors n in expected time O(\\exp(\\sqrt{\\ln n \\ln \\ln n})).
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
 \\item Congruent squares: x^2 \\equiv y^2 \\pmod{n}, x \\not\\equiv \\pm y \\implies \\gcd(x - y, n) is a factor
 \\item Factor base \\mathcal{F} = \\{-1\\} \\cup \\{p : p \\leq B, (n/p) = 1\\}
 \\item Q(x) = (x + \\lfloor\\sqrt{n}\\rfloor)^2 - n, sieved for B-smooth values
-\\item Linear algebra over \\mathbb{F}_2 on exponent vectors
+\\item Linear algebra over \\mathbb{F}\\_2 on exponent vectors
 \\item Smoothness bound B = \\exp(\\frac{1}{2}\\sqrt{\\ln n \\ln \\ln n})
 \\end{itemize}
 
@@ -1236,109 +1307,115 @@ X \\not\\equiv \\pm y \\pmod{n} &\\implies \\gcd(X - y, n) \\text{ is a factor} 
 \\text{Success prob: } \\geq 1/2, \\quad \\text{time: } O(&\\exp(\\sqrt{\\ln n \\ln \\ln n})) \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Sieve values of Q(x) = (x + \\sqrt{n})^2 - n for smoothness over a factor base. Each smooth value gives an exponent vector mod 2. Find a linear dependency over \\mathbb{F}_2 to get a congruence of squares X^2 \\equiv y^2 \\pmod{n}. Then gcd(X - y, n) yields a factor with probability \\geq 1/2.
+\\textbf{Explanation:} Sieve values of Q(x) = (x + \\sqrt{n})^2 - n for smoothness over a factor base. Each smooth value gives an exponent vector mod 2. Find a linear dependency over \\mathbb{F}\\_2 to get a congruence of squares X^2 \\equiv y^2 \\pmod{n}. Then gcd(X - y, n) yields a factor with probability \\geq 1/2.
 
-\\textbf{References:} C. Pomerance, "The Quadratic Sieve Factoring Algorithm", Eurocrypt 1984`,priority:`high`,applicableCheck:e=>!!e.n},Jh=()=>({n:(Oh(68)*Oh(68)).toString()}),Yh={id:`squfof`,name:`SQUFOF`,category:`Factorization`,description:`Factors n via continued fractions of sqrt(n). Use for n < 10^14.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    print(f"SQUFOF on n = {n}")
-    print()
-    if n < 2:
-        print(f"n = {n} is too small to factor")
-        print("SQUFOF=FAILED")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2")
-        print(f"q = {n // 2}")
-        print(f"Verification: 2 * {n // 2} = {n}")
-        print("SQUFOF=SUCCESS")
-        quit()
-    if n.is_prime():
-        print(f"n is prime: {n}")
-        print("No factorization possible")
-        print("SQUFOF=FAILED")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print("SQUFOF=SUCCESS")
-        quit()
-    # SQUFOF works best for small factors; extract small factor first
-    found_small = False
-    for trial in range(3, 100000, 2):
-        if n % trial == 0:
-            p = Integer(trial)
-            q = n // p
-            print(f"Small factor found: p = {p}")
-            print(f"q = {q}")
-            print(f"Verification: p * q = {p * q}")
-            print("SQUFOF=SUCCESS")
-            found_small = True
-            break
-    if found_small:
-        quit()
-    # Shanks' Square Forms Factorization (SQUFOF)
-    def squfof(n):
-        # Find non-residue
-        D = 0
-        for k in [1, 3, 5, 7, -1, -3, -5, -7]:
-            if kronecker(k, n) == -1:
-                D = k * n
-                break
-        if D == 0:
-            D = n
-        sqrtD = isqrt(D)
-        Po = sqrtD
-        P = Po
-        Q = D - Po**2
-        Qprev = 1
-        # Step 1: forward cycle — find a square form
-        limit = 2 * isqrt(isqrt(n)) + 2
-        for i in range(limit):
-            b = (sqrtD + P) // Q
-            Pnew = b * Q - P
-            Qnew = D - Pnew**2
-            Qnew //= Q
-            if i % 2 == 0 and Qnew.is_square() and Qnew > 0:
-                r = isqrt(Qnew)
-                if (sqrtD - Pnew) % r == 0:
-                    # Step 2: inverse square root → start reverse cycle
-                    b = (sqrtD - Pnew) // r
-                    P = b * r + Pnew
-                    Qprev = r
-                    Q = (D - P**2) // Qprev
-                    # Step 3: reverse cycle — find symmetry
-                    for _ in range(limit):
-                        b = (sqrtD + P) // Q
-                        P_old = P
-                        P = b * Q - P
-                        Q_old = Q
-                        Q = (D - P**2) // Q_old
-                        if P == P_old:
-                            g = gcd(Q_old, n)
-                            if 1 < g < n:
-                                return g, n // g
-                            break
+\\textbf{References:} C. Pomerance, "The Quadratic Sieve Factoring Algorithm", Eurocrypt 1984`,priority:`high`,applicableCheck:e=>!!e.n},Jh=()=>({n:(Oh(68)*Oh(68)).toString()}),Yh={id:`squfof`,name:`SQUFOF`,category:`Factorization`,description:`Factors n via continued fractions of sqrt(n). Use for n < 10^14.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            print(f"SQUFOF on n = {n}")
+            print()
+            if n < 2:
+                print(f"n = {n} is too small to factor")
+                print("SQUFOF=FAILED")
+                return
+            if n % 2 == 0:
+                print(f"n is even: {n}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print(f"Verification: 2 * {n // 2} = {n}")
+                print("SQUFOF=SUCCESS")
+                return
+            if n.is_prime():
+                print(f"n is prime: {n}")
+                print("No factorization possible")
+                print("SQUFOF=FAILED")
+                return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"p = q = {p}")
+                print("SQUFOF=SUCCESS")
+                return
+            # SQUFOF works best for small factors; extract small factor first
+            found_small = False
+            for trial in range(3, 100000, 2):
+                if n % trial == 0:
+                    p = Integer(trial)
+                    q = n // p
+                    print(f"Small factor found: p = {p}")
+                    print(f"q = {q}")
+                    print(f"Verification: p * q = {p * q}")
+                    print("SQUFOF=SUCCESS")
+                    found_small = True
                     break
-            Qprev = Q
-            Q = Qnew
-            P = Pnew
-        return None
-    result = squfof(n)
-    if result:
-        p, q = result
-        print(f"p = {p}")
-        print(f"q = {q}")
-        print(f"Verification: p * q = {p * q}")
-        print("SQUFOF=SUCCESS")
-    else:
-        print("SQUFOF did not find a factor. Try a different method.")
+            if found_small:
+                return
+            # Shanks' Square Forms Factorization (SQUFOF)
+            def squfof(n):
+                # Find non-residue
+                D = 0
+                for k in [1, 3, 5, 7, -1, -3, -5, -7]:
+                    if kronecker(k, n) == -1:
+                        D = k * n
+                        break
+                if D == 0:
+                    D = n
+                sqrtD = isqrt(D)
+                Po = sqrtD
+                P = Po
+                Q = D - Po**2
+                Qprev = 1
+                # Step 1: forward cycle — find a square form
+                limit = 2 * isqrt(isqrt(n)) + 2
+                for i in range(limit):
+                    b = (sqrtD + P) // Q
+                    Pnew = b * Q - P
+                    Qnew = D - Pnew**2
+                    Qnew //= Q
+                    if i % 2 == 0 and Qnew.is_square() and Qnew > 0:
+                        r = isqrt(Qnew)
+                        if (sqrtD - Pnew) % r == 0:
+                            # Step 2: inverse square root → start reverse cycle
+                            b = (sqrtD - Pnew) // r
+                            P = b * r + Pnew
+                            Qprev = r
+                            Q = (D - P**2) // Qprev
+                            # Step 3: reverse cycle — find symmetry
+                            for _ in range(limit):
+                                b = (sqrtD + P) // Q
+                                P_old = P
+                                P = b * Q - P
+                                Q_old = Q
+                                Q = (D - P**2) // Q_old
+                                if P == P_old:
+                                    g = gcd(Q_old, n)
+                                    if 1 < g < n:
+                                        return g, n // g
+                                    break
+                            break
+                    Qprev = Q
+                    Q = Qnew
+                    P = Pnew
+                return None
+            result = squfof(n)
+            if result:
+                p, q = result
+                print(f"p = {p}")
+                print(f"q = {q}")
+                print(f"Verification: p * q = {p * q}")
+                print("SQUFOF=SUCCESS")
+            else:
+                print("SQUFOF did not find a factor. Try a different method.")
+                print("SQUFOF=FAILED")
+        except Exception as e:
+            print(f"ERROR: {e}")
+            print("SQUFOF=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("SQUFOF=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("SQUFOF=FAILED")
-`,proof:`\\textbf{Theorem:} SQUFOF factors a composite integer n by finding a square form in the cycle of reduced binary quadratic forms of discriminant D = kn.
+_attack()`,proof:`\\textbf{Theorem:} SQUFOF factors a composite integer n by finding a square form in the cycle of reduced binary quadratic forms of discriminant D = kn.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -1362,89 +1439,95 @@ f(x, y) = ax^2 + bxy + cy^2, \\quad D &= b^2 - 4ac \\\\
 
 \\textbf{Explanation:} SQUFOF traverses the cycle of reduced binary quadratic forms of discriminant D = kn. When a form with a square coefficient c is found, the inverse square root is computed and the cycle is continued until a factor emerges via GCD.
 
-\\textbf{References:} D. Shanks, "SQUFOF: A Quadratic Form Factorization Algorithm", 1975; Gower & Wagstaff, "Square Form Factorization", Mathematics of Computation, 2008`,priority:`medium`,applicableCheck:e=>!!e.n},Xh=()=>({n:(Oh(16)*Oh(L.p+L.q-16)).toString()}),Zh={id:`binary-poly-factor`,name:`Binary Polynomial Factoring`,category:`Factorization`,description:`Factors n via binary polynomial factorization. Use when n's binary form yields factorable polynomial.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    if n < 2:
-        print(f"n = {n} is too small to factor")
-        print("BINARY_POLY=FAILED")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2")
-        print(f"q = {n // 2}")
-        print(f"Verification: 2 * {n // 2} = {n}")
-        print("BINARY_POLY=SUCCESS")
-        quit()
-    if n.is_prime():
-        print(f"n is prime: {n}")
-        print("No factorization possible")
-        print("BINARY_POLY=FAILED")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print("BINARY_POLY=SUCCESS")
-        quit()
-    if n > 0 and (n & (n - 1)) == 0:
-        print(f"n is a power of 2: n = 2^{n.nbits() - 1}")
-        print("No non-trivial factorization possible")
-        print("BINARY_POLY=FAILED")
-        quit()
-    coeffs = n.digits(2)
-    R.<x> = PolynomialRing(ZZ)
-    f = sum(c * x^i for i, c in enumerate(coeffs))
-    print(f"Polynomial: f(x) = {f}")
-    print(f"Degree: {f.degree()}")
-    print(f"f(2) = {f(2)}")
-    print(f"f(2) == n: {f(2) == n}")
-    print()
-    if f.is_irreducible():
-        print(f"Polynomial f(x) = {f} is irreducible over ZZ[x]")
-        print("No nontrivial polynomial factorization exists.")
-        print("BINARY_POLY=FAILED")
-        quit()
-    factors = f.factor()
-    print(f"Factorization of f(x): {factors}")
-    print()
-    print("Evaluating factors at x=2:")
-    for factor, mult in factors:
-        val = factor(2)
-        print(f"  {factor}(2) = {val}")
-        if mult > 1:
-            print(f"    multiplicity: {mult}")
-    product = 1
-    for factor, mult in factors:
-        product *= factor(2)**mult
-    print(f"\\nProduct of evaluations: {product}")
-    print(f"Original n: {n}")
-    print(f"Match: {product == n}")
-    if product == n:
-        proper_vals = [factor(2) for factor, _ in factors if 1 < factor(2) < n]
-        if proper_vals:
-            print("\\nPotential factors found:")
+\\textbf{References:} D. Shanks, "SQUFOF: A Quadratic Form Factorization Algorithm", 1975; Gower & Wagstaff, "Square Form Factorization", Mathematics of Computation, 2008`,priority:`medium`,applicableCheck:e=>!!e.n},Xh=()=>({n:(Oh(16)*Oh(L.p+L.q-16)).toString()}),Zh={id:`binary-poly-factor`,name:`Binary Polynomial Factoring`,category:`Factorization`,description:`Factors n via binary polynomial factorization. Use when n's binary form yields factorable polynomial.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            if n < 2:
+                print(f"n = {n} is too small to factor")
+                print("BINARY_POLY_FACTOR=FAILED")
+                return
+            if n % 2 == 0:
+                print(f"n is even: {n}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print(f"Verification: 2 * {n // 2} = {n}")
+                print("BINARY_POLY_FACTOR=SUCCESS")
+                return
+            if n.is_prime():
+                print(f"n is prime: {n}")
+                print("No factorization possible")
+                print("BINARY_POLY_FACTOR=FAILED")
+                return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"p = q = {p}")
+                print("BINARY_POLY_FACTOR=SUCCESS")
+                return
+            if n > 0 and (n & (n - 1)) == 0:
+                print(f"n is a power of 2: n = 2^{n.nbits() - 1}")
+                print("No non-trivial factorization possible")
+                print("BINARY_POLY_FACTOR=FAILED")
+                return
+            coeffs = n.digits(2)
+            R.<x> = PolynomialRing(ZZ)
+            f = sum(c * x**i for i, c in enumerate(coeffs))
+            print(f"Polynomial: f(x) = {f}")
+            print(f"Degree: {f.degree()}")
+            print(f"f(2) = {f(2)}")
+            print(f"f(2) == n: {f(2) == n}")
+            print()
+            if f.is_irreducible():
+                print(f"Polynomial f(x) = {f} is irreducible over ZZ[x]")
+                print("No nontrivial polynomial factorization exists.")
+                print("BINARY_POLY_FACTOR=FAILED")
+                return
+            factors = f.factor()
+            print(f"Factorization of f(x): {factors}")
+            print()
+            print("Evaluating factors at x=2:")
             for factor, mult in factors:
                 val = factor(2)
-                if val > 1:
-                    print(f"  {val} (is prime: {val.is_prime()})")
-            print("BINARY_POLY=SUCCESS")
-        else:
-            print("No proper factors: polynomial factorization is trivial (irreducible f(x)).")
-            print("BINARY_POLY=FAILED")
-    else:
-        print("Polynomial factorization does not yield integer factors.")
-        print("BINARY_POLY=FAILED")
-except Exception as e:
-    print(f"Error in Binary Polynomial Factoring: {e}")
-    print("BINARY_POLY=FAILED")
-`,proof:`\\textbf{Theorem:} If n's binary polynomial f(x) factors over \\mathbb{Z}[x] as f(x) = g(x)h(x), then n = g(2)h(2).
+                print(f"  {factor}(2) = {val}")
+                if mult > 1:
+                    print(f"    multiplicity: {mult}")
+            product = 1
+            for factor, mult in factors:
+                product *= factor(2)**mult
+            print(f"\\nProduct of evaluations: {product}")
+            print(f"Original n: {n}")
+            print(f"Match: {product == n}")
+            if product == n:
+                proper_vals = [factor(2) for factor, _ in factors if 1 < factor(2) < n]
+                if proper_vals:
+                    print("\\nPotential factors found:")
+                    for factor, mult in factors:
+                        val = factor(2)
+                        if val > 1:
+                            print(f"  {val} (is prime: {val.is_prime()})")
+                    print("BINARY_POLY_FACTOR=SUCCESS")
+                else:
+                    print("No proper factors: polynomial factorization is trivial (irreducible f(x)).")
+                    print("BINARY_POLY_FACTOR=FAILED")
+            else:
+                print("Polynomial factorization does not yield integer factors.")
+                print("BINARY_POLY_FACTOR=FAILED")
+        except Exception as e:
+            print(f"Error in Binary Polynomial Factoring: {e}")
+            print("BINARY_POLY_FACTOR=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("BINARY_POLY_FACTOR=FAILED")
+_attack()`,proof:`\\textbf{Theorem:} If n's binary polynomial f(x) factors over \\mathbb{Z}[x] as f(x) = g(x)h(x), then n = g(2)h(2).
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n — integer to factor, with binary digits b_i \\in \\{0, 1\\}
-\\item f(x) = \\sum b_i x^i \\in \\mathbb{Z}[x] — polynomial with f(2) = n
+\\item n — integer to factor, with binary digits b\\_i \\in \\{0, 1\\}
+\\item f(x) = \\sum b\\_i x^i \\in \\mathbb{Z}[x] — polynomial with f(2) = n
 \\item Unique factorization in \\mathbb{Z}[x]
-\\item Evaluation homomorphism \\text{ev}_2: \\mathbb{Z}[x] \\to \\mathbb{Z}
+\\item Evaluation homomorphism \\text{ev}\\_2: \\mathbb{Z}[x] \\to \\mathbb{Z}
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -1459,118 +1542,124 @@ n = f(2) &= g_1(2)^{e_1} g_2(2)^{e_2} \\cdots g_r(2)^{e_r} \\\\
 
 \\textbf{Explanation:} Convert n to a polynomial by treating its binary digits as coefficients. Factor this polynomial over the integers, then evaluate each factor at x=2. If the polynomial factorization aligns with the integer factorization, the evaluations reveal p and q. Works best when p and q have structured binary patterns.
 
-\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen & Gerhard, "Modern Computer Algebra", Chapter 5`,priority:`low`,applicableCheck:e=>!!e.n},Qh=()=>{let e=e=>{for(let t=0;t<200;t++){let t=1n<<BigInt(e-1)|1n,n=3+Math.floor(Math.random()*4),r=new Set;for(r.add(e-1),r.add(0);r.size<n;)r.add(1+Math.floor(Math.random()*(e-2)));for(let e of r)t|=1n<<BigInt(e);if(Dh(t))return t}return Oh(e)};return{n:(e(L.p)*e(L.q)).toString()}},$h={id:`small-fraction`,name:`Small Fraction Attack`,category:`Factorization`,description:`Factors n when p/q ≈ a/b for small a,b. Uses trial division around isqrt(nb/a) for each candidate fraction.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
-
-if n < 2:
-    print(f"n = {n} is too small to factor")
-    print("SMALL_FRACTION=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2")
-    print(f"q = {n // 2}")
-    print(f"Verification: 2 * {n // 2} = {n}")
-    print("SMALL_FRACTION=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("No factorization possible")
-    print("SMALL_FRACTION=FAILED")
-    quit()
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print(f"p = q = {p}")
-    print("SMALL_FRACTION=SUCCESS")
-    quit()
-
-# Small fraction attack: p/q ≈ a/b for small a, b
-# For each coprime (a,b), approximate q ≈ sqrt(n*b/a), then trial-divide near q0
-# Trial division is orders of magnitude faster than Coppersmith small_roots per pair
-try:
-    print(f"Searching for small fraction approximation of p/q...")
-    print(f"n = {n}")
-    print()
-    found = False
-    max_den = 200
-    trial_window = 5000
-    pairs_tried = 0
-    divs_tried = 0
-    for b in range(1, max_den + 1):
-        for a in range(1, b + 1):
-            if gcd(a, b) != 1:
-                continue
-            pairs_tried += 1
-            # q approx sqrt(n*b/a): p/q ≈ a/b => n = p*q ≈ a*q²/b
-            q0 = isqrt(n * b // a)
-            if q0 <= 1:
-                continue
-            # Exact rational match: q0 divides n
-            if n % q0 == 0:
-                q = Integer(q0)
-                p = n // q
-                if p > 1 and p * q == n:
-                    print(f"Found! a/b = {a}/{b}")
-                    print(f"p = {p}")
-                    print(f"q = {q}")
-                    print(f"p/q = {float(p)/float(q):.10f}")
-                    print(f"a/b = {float(a)/float(b):.10f}")
-                    print(f"Verification: p * q = {p * q}")
-                    found = True
+\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen & Gerhard, "Modern Computer Algebra", Chapter 5`,priority:`low`,applicableCheck:e=>!!e.n},Qh=()=>{let e=e=>{for(let t=0;t<200;t++){let t=1n<<BigInt(e-1)|1n,n=3+Math.floor(Math.random()*4),r=new Set;for(r.add(e-1),r.add(0);r.size<n;)r.add(1+Math.floor(Math.random()*(e-2)));for(let e of r)t|=1n<<BigInt(e);if(Dh(t))return t}return Oh(e)};return{n:(e(L.p)*e(L.q)).toString()}},$h={id:`small-fraction`,name:`Small Fraction Attack`,category:`Factorization`,description:`Factors n when p/q ≈ a/b for small a,b. Uses trial division around isqrt(nb/a) for each candidate fraction.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        n = Integer(${e.n})
+        #
+        if n < 2:
+            print(f"n = {n} is too small to factor")
+            print("SMALL_FRACTION=FAILED")
+            return
+        if n % 2 == 0:
+            print(f"n is even: {n}")
+            print(f"p = 2")
+            print(f"q = {n // 2}")
+            print(f"Verification: 2 * {n // 2} = {n}")
+            print("SMALL_FRACTION=SUCCESS")
+            return
+        if n.is_prime():
+            print(f"n is prime: {n}")
+            print("No factorization possible")
+            print("SMALL_FRACTION=FAILED")
+            return
+        if n.is_square():
+            p = isqrt(n)
+            print(f"n is a perfect square: {p}^2 = {n}")
+            print(f"p = q = {p}")
+            print("SMALL_FRACTION=SUCCESS")
+            return
+        #
+        # Small fraction attack: p/q ≈ a/b for small a, b
+        # For each coprime (a,b), approximate q ≈ sqrt(n*b/a), then trial-divide near q0
+        # Trial division is orders of magnitude faster than Coppersmith small_roots per pair
+        try:
+            print(f"Searching for small fraction approximation of p/q...")
+            print(f"n = {n}")
+            print()
+            found = False
+            max_den = 200
+            trial_window = 5000
+            pairs_tried = 0
+            divs_tried = 0
+            for b in range(1, max_den + 1):
+                for a in range(1, b + 1):
+                    if gcd(a, b) != 1:
+                        continue
+                    pairs_tried += 1
+                    # q approx sqrt(n*b/a): p/q ≈ a/b => n = p*q ≈ a*q²/b
+                    q0 = isqrt(n * b // a)
+                    if q0 <= 1:
+                        continue
+                    # Exact rational match: q0 divides n
+                    if n % q0 == 0:
+                        q = Integer(q0)
+                        p = n // q
+                        if p > 1 and p * q == n:
+                            print(f"Found! a/b = {a}/{b}")
+                            print(f"p = {p}")
+                            print(f"q = {q}")
+                            print(f"p/q = {float(p)/float(q):.10f}")
+                            print(f"a/b = {float(a)/float(b):.10f}")
+                            print(f"Verification: p * q = {p * q}")
+                            found = True
+                            break
+                    # Near-exact: try q0 ± delta
+                    for delta in range(1, trial_window + 1):
+                        divs_tried += 1
+                        q_candidate = q0 + delta
+                        if q_candidate > 1 and n % q_candidate == 0:
+                            q = Integer(q_candidate)
+                            p = n // q
+                            if p > 1 and p * q == n:
+                                print(f"Found! a/b = {a}/{b} (delta = +{delta})")
+                                print(f"p = {p}")
+                                print(f"q = {q}")
+                                print(f"p/q = {float(p)/float(q):.10f}")
+                                print(f"a/b = {float(a)/float(b):.10f}")
+                                print(f"Verification: p * q = {p * q}")
+                                found = True
+                                break
+                        q_candidate = q0 - delta
+                        if q_candidate > 1 and n % q_candidate == 0:
+                            q = Integer(q_candidate)
+                            p = n // q
+                            if p > 1 and p * q == n:
+                                print(f"Found! a/b = {a}/{b} (delta = -{delta})")
+                                print(f"p = {p}")
+                                print(f"q = {q}")
+                                print(f"p/q = {float(p)/float(q):.10f}")
+                                print(f"a/b = {float(a)/float(b):.10f}")
+                                print(f"Verification: p * q = {p * q}")
+                                found = True
+                                break
+                    if found:
+                        break
+                if found:
                     break
-            # Near-exact: try q0 ± delta
-            for delta in range(1, trial_window + 1):
-                divs_tried += 1
-                q_candidate = q0 + delta
-                if q_candidate > 1 and n % q_candidate == 0:
-                    q = Integer(q_candidate)
-                    p = n // q
-                    if p > 1 and p * q == n:
-                        print(f"Found! a/b = {a}/{b} (delta = +{delta})")
-                        print(f"p = {p}")
-                        print(f"q = {q}")
-                        print(f"p/q = {float(p)/float(q):.10f}")
-                        print(f"a/b = {float(a)/float(b):.10f}")
-                        print(f"Verification: p * q = {p * q}")
-                        found = True
-                        break
-                q_candidate = q0 - delta
-                if q_candidate > 1 and n % q_candidate == 0:
-                    q = Integer(q_candidate)
-                    p = n // q
-                    if p > 1 and p * q == n:
-                        print(f"Found! a/b = {a}/{b} (delta = -{delta})")
-                        print(f"p = {p}")
-                        print(f"q = {q}")
-                        print(f"p/q = {float(p)/float(q):.10f}")
-                        print(f"a/b = {float(a)/float(b):.10f}")
-                        print(f"Verification: p * q = {p * q}")
-                        found = True
-                        break
+            print()
+            print(f"Pairs tested: {pairs_tried}, trial divisions: {divs_tried}")
             if found:
-                break
-        if found:
-            break
-    print()
-    print(f"Pairs tested: {pairs_tried}, trial divisions: {divs_tried}")
-    if found:
-        print("SMALL_FRACTION=SUCCESS")
-    else:
-        print(f"No small fraction found with denominator up to {max_den}.")
-        print("p/q may not be close to a small rational.")
+                print("SMALL_FRACTION=SUCCESS")
+            else:
+                print(f"No small fraction found with denominator up to {max_den}.")
+                print("p/q may not be close to a small rational.")
+                print("SMALL_FRACTION=FAILED")
+        except Exception as e:
+            print(f"Error in Small Fraction Attack: {e}")
+            print("SMALL_FRACTION=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("SMALL_FRACTION=FAILED")
-except Exception as e:
-    print(f"Error in Small Fraction Attack: {e}")
-    print("SMALL_FRACTION=FAILED")
-`,proof:`\\textbf{Theorem:} If p/q \\approx a/b for small coprime a, b, then q \\approx \\sqrt{nb/a} and trial division near q_0 recovers the factor.
+_attack()`,proof:`\\textbf{Theorem:} If p/q \\approx a/b for small coprime a, b, then q \\approx \\sqrt{nb/a} and trial division near q\\_0 recovers the factor.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
 \\item n = pq — RSA modulus with p \\leq q
 \\item a, b — small coprime integers such that p/q \\approx a/b
-\\item q_0 = \\lfloor\\sqrt{nb/a}\\rfloor — initial approximation of q
+\\item q\\_0 = \\lfloor\\sqrt{nb/a}\\rfloor — initial approximation of q
 \\item \\delta = |p - aq/b| — deviation from exact rational ratio
-\\item |q - q_0| \\approx \\delta — q_0 error equals the prime adjustment
+\\item |q - q\\_0| \\approx \\delta — q\\_0 error equals the prime adjustment
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -1587,58 +1676,64 @@ q_0 &= \\left\\lfloor\\sqrt{nb/a}\\right\\rfloor = \\left\\lfloor\\sqrt{q^2 + \\
 \\text{Complexity: } O(B^2 \\cdot \\Delta) &\\text{ integer divisions} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} When p/q is close to a small rational a/b, we approximate q as \\sqrt{nb/a}. The error |q - q_0| equals the primality adjustment \\delta (e.g., < 500 bits in practice). Trial division for q_0 \\pm \\Delta finds the exact factor using only fast integer operations — orders of magnitude faster than calling Coppersmith's LLL for each candidate pair.
+\\textbf{Explanation:} When p/q is close to a small rational a/b, we approximate q as \\sqrt{nb/a}. The error |q - q\\_0| equals the primality adjustment \\delta (e.g., < 500 bits in practice). Trial division for q\\_0 \\pm \\Delta finds the exact factor using only fast integer operations — orders of magnitude faster than calling Coppersmith's LLL for each candidate pair.
 
-\\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,priority:`medium`,applicableCheck:e=>!!e.n},eg=()=>{let e=BigInt(3),t=BigInt(5),n=Oh(L.q),r=n*e/t,i=r;for(let e=0n;e<500n;e+=1n){let t=r+e;if(t>1n&&Dh(t)){i=t;break}let n=r-e;if(n>1n&&Dh(n)){i=n;break}}return{n:(i*n).toString()}},tg={id:`batch-gcd`,name:`Batch GCD`,category:`Factorization`,description:`Finds shared factors across multiple moduli. Use when given a list of RSA moduli.`,inputs:[{name:`n_values`,label:`Moduli (one per line or comma-separated)`,placeholder:`n1\\nn2\\nn3...`,multiline:!0,rows:5}],sageTemplate:e=>`try:
-    n_list_str = """${e.n_values}"""
-    import re
-    n_list = [Integer(x.strip()) for x in re.split(r'[\\s,]+', n_list_str.strip()) if x.strip()]
-    if len(n_list) < 2:
-        print("Error: Need at least 2 moduli for Batch GCD attack.")
-        print("BATCH_GCD=FAILED")
-    else:
-        print(f"Processing {len(n_list)} moduli...")
-        print()
-        product = prod(n_list)
-        found_any = False
-        for i, n in enumerate(n_list):
-            if n <= 1:
-                print(f"n[{i}] = {n}: invalid")
-                continue
-            others_product = product // n
-            g = gcd(n, others_product)
-            if g > 1 and g < n:
-                found_any = True
-                p = g
-                q = n // g
-                print(f"n[{i}] = {n}")
-                print(f"  Shared factor found: p = {p}")
-                print(f"  q = {q}")
-                print(f"  Verification: p * q = {p * q}")
+\\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,priority:`medium`,applicableCheck:e=>!!e.n},eg=()=>{let e=BigInt(3),t=BigInt(5),n=Oh(L.q),r=n*e/t,i=r;for(let e=0n;e<500n;e+=1n){let t=r+e;if(t>1n&&Dh(t)){i=t;break}let n=r-e;if(n>1n&&Dh(n)){i=n;break}}return{n:(i*n).toString()}},tg={id:`batch-gcd`,name:`Batch GCD`,category:`Factorization`,description:`Finds shared factors across multiple moduli. Use when given a list of RSA moduli.`,inputs:[{name:`n_values`,label:`Moduli (one per line or comma-separated)`,placeholder:`n1\\nn2\\nn3...`,multiline:!0,rows:5}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n_list_str = """${e.n_values}"""
+            import re
+            n_list = [Integer(x.strip()) for x in re.split(r'[\\s,]+', n_list_str.strip()) if x.strip()]
+            if len(n_list) < 2:
+                print("Error: Need at least 2 moduli for Batch GCD attack.")
+                print("BATCH_GCD=FAILED")
+            else:
+                print(f"Processing {len(n_list)} moduli...")
                 print()
-            elif g == n:
-                print(f"n[{i}] = {n}")
-                print(f"  WARNING: n divides product of others (duplicate or fully shared)")
-                print()
-        if not found_any:
-            print("No shared factors found among the provided moduli.")
-            print()
-        print("Batch GCD complete.")
-        if found_any:
-            print("BATCH_GCD=SUCCESS")
-        else:
+                product = prod(n_list)
+                found_any = False
+                for i, n in enumerate(n_list):
+                    if n <= 1:
+                        print(f"n[{i}] = {n}: invalid")
+                        continue
+                    others_product = product // n
+                    g = gcd(n, others_product)
+                    if g > 1 and g < n:
+                        found_any = True
+                        p = g
+                        q = n // g
+                        print(f"n[{i}] = {n}")
+                        print(f"  Shared factor found: p = {p}")
+                        print(f"  q = {q}")
+                        print(f"  Verification: p * q = {p * q}")
+                        print()
+                    elif g == n:
+                        print(f"n[{i}] = {n}")
+                        print(f"  WARNING: n divides product of others (duplicate or fully shared)")
+                        print()
+                if not found_any:
+                    print("No shared factors found among the provided moduli.")
+                    print()
+                print("Batch GCD complete.")
+                if found_any:
+                    print("BATCH_GCD=SUCCESS")
+                else:
+                    print("BATCH_GCD=FAILED")
+        except Exception as e:
+            print(f"Error in Batch GCD: {e}")
             print("BATCH_GCD=FAILED")
-except Exception as e:
-    print(f"Error in Batch GCD: {e}")
-    print("BATCH_GCD=FAILED")
-`,frontendCheck:async e=>{try{let t=(e.n_values||``).trim();if(!t)return null;let n=t.split(/[\n,]+/).map(e=>e.trim()).filter(e=>e.length>0).map(e=>BigInt(e));if(n.length<2)return null;let r=1n;for(let e of n)r*=e;let i=[`Batch GCD Attack (browser-side, BigInt)`,`Processing ${n.length} moduli...`,``],a=!1;for(let e=0;e<n.length;e++){let t=n[e];if(t<=1n)continue;let o=Sh(t,r/t);if(o>1n&&o<t){a=!0;let n=o,r=t/o;i.push(`n[${e}] = ${t}`),i.push(`  Shared factor found: p = ${n}`),i.push(`  q = ${r}`),i.push(`  Verification: p * q = ${n*r}`),i.push(``)}else o===t&&(i.push(`n[${e}] = ${t}`),i.push(`  WARNING: n divides product of others (duplicate or fully shared)`),i.push(``))}return a?(i.push(`Batch GCD complete.`),i.join(`
-`)):null}catch{return null}},proof:`\\textbf{Theorem:} Given moduli \\{n_1, \\ldots, n_k\\}, if any two share a prime, \\gcd(n_i, \\prod_{j \\neq i} n_j) reveals it.
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("BATCH_GCD=FAILED")
+_attack()`,frontendCheck:async e=>{try{let t=(e.n_values||``).trim();if(!t)return null;let n=t.split(/[\n,]+/).map(e=>e.trim()).filter(e=>e.length>0).map(e=>BigInt(e));if(n.length<2)return null;let r=1n;for(let e of n)r*=e;let i=[`Batch GCD Attack (browser-side, BigInt)`,`Processing ${n.length} moduli...`,``],a=!1;for(let e=0;e<n.length;e++){let t=n[e];if(t<=1n)continue;let o=Sh(t,r/t);if(o>1n&&o<t){a=!0;let n=o,r=t/o;i.push(`n[${e}] = ${t}`),i.push(`  Shared factor found: p = ${n}`),i.push(`  q = ${r}`),i.push(`  Verification: p * q = ${n*r}`),i.push(``)}else o===t&&(i.push(`n[${e}] = ${t}`),i.push(`  WARNING: n divides product of others (duplicate or fully shared)`),i.push(``))}return a?(i.push(`Batch GCD complete.`),i.join(`
+`)):null}catch{return null}},proof:`\\textbf{Theorem:} Given moduli \\{n\\_1, \\ldots, n\\_k\\}, if any two share a prime, \\gcd(n\\_i, \\prod\\_{j \\neq i} n\\_j) reveals it.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item \\{n_1, \\ldots, n_k\\} — set of RSA moduli, n_i = p_i q_i
-\\item Shared prime: p_i = p_j for some i \\neq j
-\\item Product tree for efficient computation of \\prod_{j \\neq i} n_j \\bmod n_i
+\\item \\{n\\_1, \\ldots, n\\_k\\} — set of RSA moduli, n\\_i = p\\_i q\\_i
+\\item Shared prime: p\\_i = p\\_j for some i \\neq j
+\\item Product tree for efficient computation of \\prod\\_{j \\neq i} n\\_j \\bmod n\\_i
 \\item Euclidean GCD: O(\\log^2(\\max(a, b)))
 \\end{itemize}
 
@@ -1655,110 +1750,102 @@ g_i > 1 &\\implies g_i \\text{ is a shared prime factor} \\\\
 
 \\textbf{Explanation:} If two RSA moduli share a prime factor, computing the GCD of each modulus against the product of all others exposes the shared factor. A product tree makes this efficient — O(k \\log k) instead of O(k^2) pairwise comparisons.
 
-\\textbf{References:} Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012; Bernstein, "How to Find Small Factors of Products", 2004`,priority:`high`,applicableCheck:e=>{let t=(e.n_values||``).trim();return t?t.split(/[\n,]+/).filter(e=>e.trim()).length>=2:!1}},ng=()=>{let e=Oh(L.p),t=Oh(L.q),n=Oh(L.q),r=Oh(L.q);return{n_values:`${e*t}\n${e*n}\n${e*r}`}},rg={id:`multi-prime`,name:`Multi-Prime RSA`,category:`Factorization`,description:`Factors multi-prime RSA (n = p·q·r...). Use when n has more than 2 prime factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
-
-if n < 2:
-    print(f"n = {n} is too small to factor")
-    print("MULTI_PRIME=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2")
-    print(f"q = {n // 2}")
-    print(f"Verification: 2 * {n // 2} = {n}")
-    print("MULTI_PRIME=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("No factorization possible")
-    print("MULTI_PRIME=FAILED")
-    quit()
-
-# Use ECM in a loop to find all prime factors (handles larger n than factor())
-def factor_all(m):
-    """Complete factorization using trial division + ECM loop"""
-    fac = []
-    rem = Integer(m)
-    for p in prime_range(2, 10000):
-        while rem % p == 0:
-            fac.append(Integer(p))
-            rem //= p
-    if rem == 1:
-        return sorted(fac)
-    if rem.is_prime():
-        fac.append(rem)
-        return sorted(fac)
-    while rem > 1:
-        if rem.is_prime():
-            fac.append(rem)
-            break
-        f = rem.ecm()
-        if f > 1 and f < rem:
-            fac.append(Integer(f))
-            rem //= Integer(f)
-        else:
-            break
-    if rem > 1:
-        fac.append(rem)
-    return sorted(fac)
-
-try:
-    print(f"Attempting multi-prime factorization of n = {n}")
-    print(f"Bit length: {n.nbits()} bits ({n.nbits() / 3.32:.0f} digits)")
-    print()
-    prime_factors = factor_all(n)
-
-    print(f"Prime factors ({len(prime_factors)} total):")
-    for i, p in enumerate(prime_factors):
-        prime_status = "prime" if p.is_prime() else "composite"
-        print(f"  p[{i+1}] = {p} ({p.nbits()} bits, {prime_status})")
-    print()
-    # Verify product
-    product = 1
-    for p in prime_factors:
-        product *= p
-    print(f"Verification: product = {product}")
-    print(f"Matches n: {product == n}")
-    print()
-    # Check if any factor is composite (partial factorization)
-    all_prime = all(p.is_prime() for p in prime_factors)
-    if len(prime_factors) > 2 and all_prime:
-        print("Multi-prime RSA detected!")
-        print(f"n = {' × '.join(str(p) for p in prime_factors)}")
-        print()
-        # Compute phi(n) correctly for multi-prime with possible repeated factors
-        from collections import Counter
-        factor_counts = Counter(prime_factors)
-        phi = 1
-        for p, k in factor_counts.items():
-            phi *= p**(k-1) * (p - 1)
-        print(f"phi(n) = {phi}")
-        print("MULTI_PRIME=SUCCESS")
-    elif len(prime_factors) == 2 and all_prime:
-        print("Standard 2-prime RSA (not multi-prime).")
-        p, q = prime_factors[0], prime_factors[1]
-        print(f"p = {p}")
-        print(f"q = {q}")
-        print(f"phi(n) = {(p-1)*(q-1)}")
-        print("MULTI_PRIME=FAILED (only 2 factors)")
-    elif not all_prime:
-        print("Partial factorization only — some factors remain composite.")
-        print("Suggestion: Try running ECM again with higher B1 bounds.")
+\\textbf{References:} Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012; Bernstein, "How to Find Small Factors of Products", 2004`,priority:`high`,applicableCheck:e=>{let t=(e.n_values||``).trim();return t?t.split(/[\n,]+/).filter(e=>e.trim()).length>=2:!1}},ng=()=>{let e=Oh(L.p),t=Oh(L.q),n=Oh(L.q),r=Oh(L.q);return{n_values:`${e*t}\n${e*n}\n${e*r}`}},rg={id:`multi-prime`,name:`Multi-Prime RSA`,category:`Factorization`,description:`Factors multi-prime RSA (n = p·q·r...). Use when n has more than 2 prime factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            if n < 2:
+                print(f"n = {n} is too small to factor")
+                print("MULTI_PRIME=FAILED")
+                return
+            if n % 2 == 0:
+                print(f"n is even: {n}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print(f"Verification: 2 * {n // 2} = {n}")
+                print("MULTI_PRIME=SUCCESS")
+                return
+            if n.is_prime():
+                print(f"n is prime: {n}")
+                print("No factorization possible")
+                print("MULTI_PRIME=FAILED")
+                return
+            # Use trial division + Sage's factor() for complete factorization
+            def factor_all(m):
+                """Complete factorization using trial division + Sage's factor()"""
+                fac = []
+                rem = Integer(m)
+                for p in prime_range(2, 10000):
+                    while rem % p == 0:
+                        fac.append(Integer(p))
+                        rem //= p
+                if rem == 1:
+                    return sorted(fac)
+                if rem.is_prime():
+                    fac.append(rem)
+                    return sorted(fac)
+                for p, e in factor(rem):
+                    fac.extend([p] * e)
+                return sorted(fac)
+            print(f"Attempting multi-prime factorization of n = {n}")
+            print(f"Bit length: {n.nbits()} bits ({n.nbits() / 3.32:.0f} digits)")
+            print()
+            prime_factors = factor_all(n)
+            print(f"Prime factors ({len(prime_factors)} total):")
+            for i, p in enumerate(prime_factors):
+                prime_status = "prime" if p.is_prime() else "composite"
+                print(f"  p[{i+1}] = {p} ({p.nbits()} bits, {prime_status})")
+            print()
+            # Verify product
+            product = 1
+            for p in prime_factors:
+                product *= p
+            print(f"Verification: product = {product}")
+            print(f"Matches n: {product == n}")
+            print()
+            # Check if any factor is composite (partial factorization)
+            all_prime = all(p.is_prime() for p in prime_factors)
+            if len(prime_factors) > 2 and all_prime:
+                print("Multi-prime RSA detected!")
+                print(f"n = {' × '.join(str(p) for p in prime_factors)}")
+                print()
+                # Compute phi(n) correctly for multi-prime with possible repeated factors
+                from collections import Counter
+                factor_counts = Counter(prime_factors)
+                phi = 1
+                for p, k in factor_counts.items():
+                    phi *= p**(k-1) * (p - 1)
+                print(f"phi(n) = {phi}")
+                print("MULTI_PRIME=SUCCESS")
+            elif len(prime_factors) == 2 and all_prime:
+                print("Standard 2-prime RSA (not multi-prime).")
+                p, q = prime_factors[0], prime_factors[1]
+                print(f"p = {p}")
+                print(f"q = {q}")
+                print(f"phi(n) = {(p-1)*(q-1)}")
+                print("MULTI_PRIME=FAILED (only 2 factors)")
+            elif not all_prime:
+                print("Partial factorization only — some factors remain composite.")
+                print("Suggestion: Try running ECM again with higher B1 bounds.")
+                print("MULTI_PRIME=FAILED")
+            else:
+                print("n could not be factored into multiple primes.")
+                print("MULTI_PRIME=FAILED")
+        except Exception as e:
+            print(f"Error in Multi-Prime RSA factorization: {e}")
+            print("MULTI_PRIME=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("MULTI_PRIME=FAILED")
-    else:
-        print("n could not be factored into multiple primes.")
-        print("MULTI_PRIME=FAILED")
-except Exception as e:
-    print(f"Error in Multi-Prime RSA factorization: {e}")
-    print("MULTI_PRIME=FAILED")
-`,proof:`\\textbf{Theorem:} Multi-prime RSA uses n = \\prod_{i=1}^{r} p_i with r > 2 primes and \\varphi(n) = \\prod (p_i - 1).
+_attack()`,proof:`\\textbf{Theorem:} Multi-prime RSA uses n = \\prod\\_{i=1}^{r} p\\_i with r > 2 primes and \\varphi(n) = \\prod (p\\_i - 1).
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n = p_1 p_2 \\cdots p_r — product of r \\geq 3 distinct primes
-\\item Euler's totient: \\varphi(n) = \\prod_{i=1}^{r} (p_i - 1)
+\\item n = p\\_1 p\\_2 \\cdots p\\_r — product of r \\geq 3 distinct primes
+\\item Euler's totient: \\varphi(n) = \\prod\\_{i=1}^{r} (p\\_i - 1)
 \\item RSA: ed \\equiv 1 \\pmod{\\varphi(n)}
-\\item CRT decryption: m_i = c^d \\bmod p_i, then combine
+\\item CRT decryption: m\\_i = c^d \\bmod p\\_i, then combine
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -1774,201 +1861,251 @@ p_i &\\approx n^{1/r} \\implies \\text{ECM, QS more effective} \\qed
 
 \\textbf{Explanation:} Multi-prime RSA splits n into more than two primes for faster CRT-based decryption. However, each prime is smaller (n^{1/r} bits), making factorization easier. For a 2048-bit modulus with r=3, each prime is only ~683 bits.
 
-\\textbf{References:} Simmons & Norris, "Preliminary Comments on the MIT Public Key Cryptosystem", 1976; Boneh, "Twenty Years of Attacks on RSA", 1999`,priority:`medium`,applicableCheck:e=>!!e.n},ig=()=>{let e=Oh(45),t=Oh(90),n=Oh(90);return{n:(e*t*n).toString()}},ag={id:`gimmicky-primes`,name:`Gimmicky Primes`,category:`Factorization`,description:`Detects special-form primes (Mersenne, Fermat, etc.). Use when p may be a known special prime.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`n = Integer(${e.n})
-
-if n < 2:
-    print(f"n = {n} is too small to factor")
-    print("GIMMICKY_PRIMES=FAILED")
-    quit()
-if n % 2 == 0:
-    print(f"n is even: {n}")
-    print(f"p = 2")
-    print(f"q = {n // 2}")
-    print(f"Verification: 2 * {n // 2} = {n}")
-    print("GIMMICKY_PRIMES=SUCCESS")
-    quit()
-if n.is_prime():
-    print(f"n is prime: {n}")
-    print("No factorization possible")
-    print("GIMMICKY_PRIMES=FAILED")
-    quit()
-if n.is_square():
-    p = isqrt(n)
-    print(f"n is a perfect square: {p}^2 = {n}")
-    print(f"p = q = {p}")
-    print("GIMMICKY_PRIMES=SUCCESS")
-    quit()
-
-try:
-    found = False
-    # 1. Mersenne primes: 2^p - 1
-    print("Checking Mersenne primes (2^p - 1)...")
-    for p in [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127, 521, 607, 1279, 2203, 2281, 3217, 4253, 4423]:
-        mersenne = 2**p - 1
-        if n % mersenne == 0:
-            print(f"  Found Mersenne prime factor: 2^{p} - 1 = {mersenne}")
-            print(f"  Cofactor: {n // mersenne}")
-            print(f"  Verification: {mersenne} * {n // mersenne} = {n}")
-            found = True
-    # 2. Primorial primes: p# +/- 1
-    print()
-    print("Checking primorial primes (p# \\u00b1 1)...")
-    primes_list = list(prime_range(2, 200))
-    primorial = 1
-    for p in primes_list:
-        primorial *= p
-        for sign in [1, -1]:
-            candidate = primorial + sign
-            if candidate > 1 and n % candidate == 0:
-                print(f"  Found primorial prime factor: {candidate} = {p}# {'+' if sign == 1 else '-'} 1")
-                print(f"  Cofactor: {n // candidate}")
-                print(f"  Verification: {candidate} * {n // candidate} = {n}")
-                found = True
-    # 3. Fermat primes: 2^(2^k) + 1
-    print()
-    print("Checking Fermat primes (2^(2^k) + 1)...")
-    for k in range(0, 5):
-        fermat = 2**(2**k) + 1
-        if n % fermat == 0:
-            print(f"  Found Fermat prime factor: 2^(2^{k}) + 1 = {fermat}")
-            print(f"  Cofactor: {n // fermat}")
-            print(f"  Verification: {fermat} * {n // fermat} = {n}")
-            found = True
-    # 4. Fibonacci primes
-    print()
-    print("Checking Fibonacci primes...")
-    fib_primes = [2, 3, 5, 13, 89, 233, 1597, 28657, 514229, 433494437, 2971215073]
-    for fib in fib_primes:
-        if n % fib == 0:
-            print(f"  Found Fibonacci prime factor: {fib}")
-            print(f"  Cofactor: {n // fib}")
-            print(f"  Verification: {fib} * {n // fib} = {n}")
-            found = True
-    # 5. Repunit primes: (10^p - 1) / 9
-    print()
-    print("Checking repunit primes...")
-    for p in [2, 19, 23, 317, 1031]:
+\\textbf{References:} Simmons & Norris, "Preliminary Comments on the MIT Public Key Cryptosystem", 1976; Boneh, "Twenty Years of Attacks on RSA", 1999`,priority:`medium`,applicableCheck:e=>!!e.n},ig=()=>{let e=Oh(45),t=Oh(90),n=Oh(90);return{n:(e*t*n).toString()}},ag={id:`gimmicky-primes`,name:`Gimmicky Primes`,category:`Factorization`,description:`Detects special-form primes (Mersenne, Fermat, etc.). Use when p may be a known special prime.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
         try:
-            repunit = (10**p - 1) // 9
-            if n % repunit == 0:
-                print(f"  Found repunit prime factor: R({p}) = {repunit}")
-                print(f"  Cofactor: {n // repunit}")
-                print(f"  Verification: {repunit} * {n // repunit} = {n}")
-                found = True
-        except Exception:
-            pass
-    if found:
-        print("GIMMICKY_PRIMES=SUCCESS")
-    else:
-        print("No gimmicky prime factors found.")
-        print("The factors are likely standard randomly-generated primes.")
+            n = Integer(${e.n})
+            if n < 2:
+                print(f"n = {n} is too small to factor")
+                print("GIMMICKY_PRIMES=FAILED")
+                return
+            if n % 2 == 0:
+                print(f"n is even: {n}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print(f"Verification: 2 * {n // 2} = {n}")
+                print("GIMMICKY_PRIMES=SUCCESS")
+                return
+            if n.is_prime():
+                print(f"n is prime: {n}")
+                print("No factorization possible")
+                print("GIMMICKY_PRIMES=FAILED")
+                return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"p = q = {p}")
+                print("GIMMICKY_PRIMES=SUCCESS")
+                return
+            found = False
+            # 1. Mersenne primes: 2^p - 1
+            print("Checking Mersenne primes (2^p - 1)...")
+            for p in [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127, 521, 607, 1279, 2203, 2281, 3217, 4253, 4423]:
+                mersenne = 2**p - 1
+                if n % mersenne == 0:
+                    print(f"  Found Mersenne prime factor: 2^{p} - 1 = {mersenne}")
+                    print(f"  Cofactor: {n // mersenne}")
+                    print(f"  Verification: {mersenne} * {n // mersenne} = {n}")
+                    found = True
+            # 2. Primorial primes: p# +/- 1
+            print()
+            print("Checking primorial primes (p# \u00b1 1)...")
+            primes_list = list(prime_range(2, 200))
+            primorial = 1
+            for p in primes_list:
+                primorial *= p
+                for sign in [1, -1]:
+                    candidate = primorial + sign
+                    if candidate > 1 and n % candidate == 0:
+                        print(f"  Found primorial prime factor: {candidate} = {p}# {'+' if sign == 1 else '-'} 1")
+                        print(f"  Cofactor: {n // candidate}")
+                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
+                        found = True
+            # 3. Fermat primes: 2^(2^k) + 1
+            print()
+            print("Checking Fermat primes (2^(2^k) + 1)...")
+            for k in range(0, 5):
+                fermat = 2**(2**k) + 1
+                if n % fermat == 0:
+                    print(f"  Found Fermat prime factor: 2^(2^{k}) + 1 = {fermat}")
+                    print(f"  Cofactor: {n // fermat}")
+                    print(f"  Verification: {fermat} * {n // fermat} = {n}")
+                    found = True
+            # 4. Fibonacci primes
+            print()
+            print("Checking Fibonacci primes...")
+            fib_primes = [2, 3, 5, 13, 89, 233, 1597, 28657, 514229, 433494437, 2971215073]
+            for fib in fib_primes:
+                if n % fib == 0:
+                    print(f"  Found Fibonacci prime factor: {fib}")
+                    print(f"  Cofactor: {n // fib}")
+                    print(f"  Verification: {fib} * {n // fib} = {n}")
+                    found = True
+            # 5. Repunit primes: (10^p - 1) / 9
+            print()
+            print("Checking repunit primes...")
+            for p in [2, 19, 23, 317, 1031]:
+                try:
+                    repunit = (10**p - 1) // 9
+                    if n % repunit == 0:
+                        print(f"  Found repunit prime factor: R({p}) = {repunit}")
+                        print(f"  Cofactor: {n // repunit}")
+                        print(f"  Verification: {repunit} * {n // repunit} = {n}")
+                        found = True
+                except Exception:
+                    pass
+            # 6. Factorial primes: k! +/- 1
+            print()
+            print("Checking factorial primes (k! \u00b1 1)...")
+            factorial = 1
+            for k in range(1, 101):
+                factorial *= k
+                for sign in [1, -1]:
+                    candidate = factorial + sign
+                    if candidate > 1 and n % candidate == 0:
+                        print(f"  Found factorial prime factor: {k}! {'+' if sign == 1 else '-'} 1")
+                        print(f"  Cofactor: {n // candidate}")
+                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
+                        found = True
+            # 7. Carol and Kynea primes: (2^k - 1)^2 - 2, (2^k + 1)^2 - 2
+            print()
+            print("Checking Carol and Kynea primes...")
+            for k in range(1, 1001):
+                for sign in [-1, 1]:
+                    candidate = (2**k + sign)**2 - 2
+                    if candidate > 1 and n % candidate == 0:
+                        name = "Carol" if sign == -1 else "Kynea"
+                        print(f"  Found {name} prime factor: (2^{k} {'-' if sign == -1 else '+' } 1)^2 - 2")
+                        print(f"  Cofactor: {n // candidate}")
+                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
+                        found = True
+            # 8. Cullen and Woodall primes: k * 2^k +/- 1
+            print()
+            print("Checking Cullen and Woodall primes (k * 2^k \u00b1 1)...")
+            for k in range(1, 1001):
+                for sign in [1, -1]:
+                    candidate = k * 2**k + sign
+                    if candidate > 1 and n % candidate == 0:
+                        name = "Cullen" if sign == 1 else "Woodall"
+                        print(f"  Found {name} prime factor: {k} * 2^{k} {'+' if sign == 1 else '-'} 1")
+                        print(f"  Cofactor: {n // candidate}")
+                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
+                        found = True
+            if found:
+                print("GIMMICKY_PRIMES=SUCCESS")
+            else:
+                print("No gimmicky prime factors found.")
+                print("The factors are likely standard randomly-generated primes.")
+                print("GIMMICKY_PRIMES=FAILED")
+        except Exception as e:
+            print(f"Error in gimmicky primes check: {e}")
+            print("GIMMICKY_PRIMES=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("GIMMICKY_PRIMES=FAILED")
-except Exception as e:
-    print(f"Error in gimmicky primes check: {e}")
-    print("GIMMICKY_PRIMES=FAILED")
-`,proof:`\\textbf{Theorem:} Special-form primes (Mersenne, primorial, Fermat, Fibonacci, repunit) appear in small known lists and can be tested by direct divisibility.
+_attack()`,proof:`\\textbf{Theorem:} If a prime factor $p$ or $q$ of $n = p \\cdot q$ is a special-form prime (e.g. Mersenne, primorial, Fermat, Fibonacci, repunit, Cullen, Woodall, or factorial), then $n$ can be factored in polynomial time by direct divisibility testing against a precomputed search space of candidates.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n = pq — RSA modulus to test
-\\item Mersenne: M_p = 2^p - 1 (51 known as of 2024)
-\\item Primorial: p\\# \\pm 1 where p\\# = \\prod_{q \\leq p} q
-\\item Fermat: F_k = 2^{2^k} + 1 (only 5 known: k = 0..4)
-\\item Fibonacci: F_n prime (very few known)
-\\item Repunit: R_n = (10^n - 1)/9
+\\item $n = p \\cdot q$ — RSA modulus to test
+\\item Mersenne: $M_p = 2^p - 1$
+\\item Primorial: $p\\# \\pm 1$ where $p\\# = \\prod_{r \\leq p} r$
+\\item Fermat: $F_k = 2^{2^k} + 1$
+\\item Fibonacci: $F_n$ prime
+\\item Repunit: $R_k = (10^k - 1)/9$
+\\item Cullen/Woodall: $C_k = k \\cdot 2^k + 1$ and $W_k = k \\cdot 2^k - 1$
+\\item Carol/Kynea: $A_k = (2^k - 1)^2 - 2$ and $B_k = (2^k + 1)^2 - 2$
+\\item Factorial: $k! \\pm 1$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 n &= p \\cdot q, \\quad p \\in \\mathcal{S} \\text{ (special-form set)} \\\\
-\\mathcal{S} &= \\{M_{p_1}, \\ldots\\} \\cup \\{p\\# \\pm 1\\} \\cup \\{F_0, \\ldots, F_4\\} \\cup \\{\\text{Fib primes}\\} \\cup \\{R_n\\} \\\\
-|\\mathcal{S}| &\\ll 100 \\quad \\text{(very small)} \\\\
-n \\bmod s &= 0, \\quad s \\in \\mathcal{S} \\\\
+\\mathcal{S} &= \\{M_p\\} \\cup \\{p\\# \\pm 1\\} \\cup \\{F_k\\} \\cup \\{F_n\\} \\cup \\{R_k\\} \\cup \\{C_k\\} \\cup \\{W_k\\} \\cup \\{A_k\\} \\cup \\{B_k\\} \\cup \\{k! \\pm 1\\} \\\\
+|\\mathcal{S}| &\\ll 5000 \\quad \\text{(extremely small candidate pool)} \\\\
+n \\bmod s &= 0 \\quad \\text{for some } s \\in \\mathcal{S} \\\\
 \\text{If } n \\bmod s = 0 &\\implies s \\mid n, \\quad q = n/s \\\\
-\\text{Cost: } O(|\\mathcal{S}| \\cdot \\log^2 n) & \\qed
+\\text{Complexity: } & O(|\\mathcal{S}| \\cdot \\log^2 n) \\quad \\text{(extremely fast divisibility check)} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Some CTF challenges use primes with recognizable mathematical structure. Since the total number of known special-form primes is very small, testing divisibility against all of them is fast. This exploits poor randomness in CTF key generation.
+\\textbf{Explanation:} Some CTF challenges use primes with recognizable mathematical structures. Since the total number of known or feasible special-form primes up to typical RSA sizes is very small, testing divisibility against all of them is virtually instantaneous. This exploits poor entropy/randomness in custom CTF key generation scripts.
 
-\\textbf{References:} Caldwell, "The Prime Pages" (primes.utm.edu); Ribenboim, "The New Book of Prime Number Records", 1996`,priority:`low`,applicableCheck:e=>!!e.n},og=()=>{let e=[17,19,31,61,89,107,127].map(e=>({p:e,val:(1n<<BigInt(e))-1n})).filter(({val:e})=>Dh(e));return{n:((e.length>0?e[Math.floor(Math.random()*e.length)].val:(1n<<17n)-1n)*Oh(L.q)).toString()}},sg={id:`close-prime`,name:`Close-Prime (Londahl)`,category:`Factorization`,description:`Factor n when p and q are close using Londahl baby-step giant-step phi-approximation. Works for |p - q| up to ~sqrt(n).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    if n < 2:
-        print(f"n = {n} is too small to factor")
+\\textbf{References:} Caldwell, "The Prime Pages" (primes.utm.edu); Ribenboim, "The New Book of Prime Number Records", 1996`,priority:`low`,applicableCheck:e=>!!e.n},og=()=>{let e=[17,19,31,61,89,107,127].map(e=>({p:e,val:(1n<<BigInt(e))-1n})).filter(({val:e})=>Dh(e));return{n:((e.length>0?e[Math.floor(Math.random()*e.length)].val:(1n<<17n)-1n)*Oh(L.q)).toString()}},sg={id:`close-prime`,name:`Close-Prime (Londahl)`,category:`Factorization`,description:`Factor n when p and q are close using Londahl baby-step giant-step phi-approximation. Works for |p - q| up to ~sqrt(n).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            if n < 2:
+                print(f"n = {n} is too small to factor")
+                print("CLOSE_PRIME=FAILED")
+                return
+            if n % 2 == 0:
+                print(f"n is even: {n}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print(f"Verification: 2 * {n // 2} = {n}")
+                print("CLOSE_PRIME=SUCCESS")
+                return
+            if n.is_prime():
+                print(f"n is prime: {n}")
+                print("No factorization possible")
+                print("CLOSE_PRIME=FAILED")
+                return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"p = q = {p}")
+                print("CLOSE_PRIME=SUCCESS")
+                return
+            print(f"Londahl close-prime factorization on n ({n.nbits()} bits)")
+            print()
+            # Londahl baby-step giant-step phi-approximation attack
+            # Source: https://grocid.net/2017/09/16/finding-close-prime-factorizations/
+            b = 500000
+            # Approximate phi(n) = n - (p+q) + 1 ~ n - 2*sqrt(n) + 1 when p ~ q
+            phi_approx = n - 2*isqrt(n) + 1
+            # Baby steps: store 2^j mod n for j = 0..b
+            # Parity optimization halves table size (store only parity matching phi_approx)
+            print(f"Building baby-step table (b={b})...")
+            look_up = {}
+            z = Integer(1)
+            parity = int(phi_approx & 1)
+            for j in range(b + 1):
+                if (j & 1) == parity:
+                    look_up[z] = j
+                z = (z * 2) % n
+            # Giant steps: search for phi = phi_approx + j - i*b
+            # We compute 2^(-phi_approx) * (2^b)^i and look for collision in baby-step table
+            print(f"Searching ({b + 1} giant steps)...")
+            mu = inverse_mod(power_mod(2, phi_approx, n), n)
+            step = power_mod(2, b, n)
+            found = False
+            for i in range(b + 1):
+                if mu in look_up:
+                    j = look_up[mu]
+                    phi = phi_approx + j - i * b
+                    # Factor n from phi: p+q = n - phi + 1, solve x^2 - (p+q)x + n = 0
+                    m = n - phi + 1
+                    disc = m*m - 4*n
+                    if disc > 0:
+                        sqrt_disc = isqrt(disc)
+                        if sqrt_disc*sqrt_disc == disc:
+                            p_candidate = (m - sqrt_disc) // 2
+                            q_candidate = (m + sqrt_disc) // 2
+                            if p_candidate * q_candidate == n and p_candidate > 1 and q_candidate > 1:
+                                print(f"Factor found!")
+                                print(f"p = {p_candidate}")
+                                print(f"q = {q_candidate}")
+                                print(f"|p - q| = {abs(q_candidate - p_candidate)}")
+                                print(f"Verification: p * q = {p_candidate * q_candidate}")
+                                print(f"Baby steps: {b+1}, Giant steps: {i+1}")
+                                found = True
+                                break
+                mu = (mu * step) % n
+            if found:
+                print("CLOSE_PRIME=SUCCESS")
+            else:
+                print("Londahl close-prime factorization failed after baby-step giant-step search.")
+                print("The prime gap may be too large. Try Fermat factorization.")
+                print("CLOSE_PRIME=FAILED")
+        except Exception as e:
+            print(f"Error in close-prime attack: {e}")
+            print("CLOSE_PRIME=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("CLOSE_PRIME=FAILED")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2")
-        print(f"q = {n // 2}")
-        print(f"Verification: 2 * {n // 2} = {n}")
-        print("CLOSE_PRIME=SUCCESS")
-        quit()
-    if n.is_prime():
-        print(f"n is prime: {n}")
-        print("No factorization possible")
-        print("CLOSE_PRIME=FAILED")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print("CLOSE_PRIME=SUCCESS")
-        quit()
-    print(f"Londahl close-prime factorization on n ({n.nbits()} bits)")
-    print()
-    # Londahl baby-step giant-step phi-approximation attack
-    # Source: https://grocid.net/2017/09/16/finding-close-prime-factorizations/
-    b = 500000
-    # Approximate phi(n) = n - (p+q) + 1 ~ n - 2*sqrt(n) + 1 when p ~ q
-    phi_approx = n - 2*isqrt(n) + 1
-    # Baby steps: store 2^j mod n for j = 0..b
-    # Parity optimization halves table size (store only parity matching phi_approx)
-    print(f"Building baby-step table (b={b})...")
-    look_up = {}
-    z = 1
-    parity = int(phi_approx & 1)
-    for j in range(b + 1):
-        if (j & 1) == parity:
-            look_up[z] = j
-        z = (z * 2) % n
-    # Giant steps: search for phi = phi_approx + j - i*b
-    # We compute 2^(-phi_approx) * (2^b)^i and look for collision in baby-step table
-    print(f"Searching ({b + 1} giant steps)...")
-    mu = inverse_mod(pow(2, phi_approx, n), n)
-    step = pow(2, b, n)
-    found = False
-    for i in range(b + 1):
-        if mu in look_up:
-            j = look_up[mu]
-            phi = phi_approx + j - i * b
-            # Factor n from phi: p+q = n - phi + 1, solve x^2 - (p+q)x + n = 0
-            m = n - phi + 1
-            disc = m*m - 4*n
-            if disc > 0:
-                sqrt_disc = isqrt(disc)
-                if sqrt_disc*sqrt_disc == disc:
-                    p_candidate = (m - sqrt_disc) // 2
-                    q_candidate = (m + sqrt_disc) // 2
-                    if p_candidate * q_candidate == n and p_candidate > 1 and q_candidate > 1:
-                        print(f"Factor found!")
-                        print(f"p = {p_candidate}")
-                        print(f"q = {q_candidate}")
-                        print(f"|p - q| = {abs(q_candidate - p_candidate)}")
-                        print(f"Verification: p * q = {p_candidate * q_candidate}")
-                        print(f"Baby steps: {b+1}, Giant steps: {i+1}")
-                        found = True
-                        break
-        mu = (mu * step) % n
-    if found:
-        print("CLOSE_PRIME=SUCCESS")
-    else:
-        print("Londahl close-prime factorization failed after baby-step giant-step search.")
-        print("The prime gap may be too large. Try Fermat factorization.")
-        print("CLOSE_PRIME=FAILED")
-except Exception as e:
-    print(f"Error in close-prime attack: {e}")
-    print("CLOSE_PRIME=FAILED")
-`,proof:`\\textbf{Theorem:} If $n = p \\cdot q$ with $p \\approx q$, then $n$ can be factored by recovering $\\phi(n)$ via a baby-step giant-step discrete log attack.
+_attack()`,proof:`\\textbf{Theorem:} If $n = p \\cdot q$ with $p \\approx q$, then $n$ can be factored by recovering $\\phi(n)$ via a baby-step giant-step discrete log attack.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -1993,88 +2130,94 @@ p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
 
 \\textbf{Explanation:} Londahl's attack uses a baby-step giant-step approach to find $\\phi(n)$ directly, unlike Fermat factorization which iteratively searches for $a^2 - n = b^2$. It exploits the approximation $\\phi(n) \\approx n - 2\\sqrt{n} + 1$ when $p \\approx q$, then solves $2^{\\delta} \\equiv 2^{-\\phi_{\\text{approx}}} \\pmod{n}$ via BSGS. With $b = 500{,}000$, it covers up to $2.5 \\times 10^{11}$ candidate $\\delta$ values, handling prime gaps far larger than pure Fermat.
 
-\\textbf{References:} Carl L\\"ondahl, "Finding close-prime factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,priority:`medium`,applicableCheck:e=>!!e.n},cg=()=>{let e=Oh(L.p),t=Math.floor(Math.random()*5e3)*2+2,n=e+BigInt(t);for(;!Dh(n);)n+=2n;return{n:(e*n).toString()}},lg={id:`novelty-primes`,name:`Novelty Primes`,category:`Factorization`,description:`Detects primes near powers of 2 or math constants. Use when p ≈ 2^k or similar.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    if n < 2:
-        print(f"n = {n} is too small to factor")
+\\textbf{References:} Carl L\\"ondahl, "Finding close-prime factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,priority:`medium`,applicableCheck:e=>!!e.n},cg=()=>{let e=Oh(L.p),t=Math.floor(Math.random()*5e3)*2+2,n=e+BigInt(t);for(;!Dh(n);)n+=2n;return{n:(e*n).toString()}},lg={id:`novelty-primes`,name:`Novelty Primes`,category:`Factorization`,description:`Detects primes near powers of 2 or math constants. Use when p ≈ 2^k or similar.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            if n < 2:
+                print(f"n = {n} is too small to factor")
+                print("NOVELTY_PRIMES=FAILED")
+                return
+            if n % 2 == 0:
+                print(f"n is even: {n}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print(f"Verification: 2 * {n // 2} = {n}")
+                print("NOVELTY_PRIMES=SUCCESS")
+                return
+            if n.is_prime():
+                print(f"n is prime: {n}")
+                print("No factorization possible")
+                print("NOVELTY_PRIMES=FAILED")
+                return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"p = q = {p}")
+                print("NOVELTY_PRIMES=SUCCESS")
+                return
+            print(f"Checking n = {n} against known CTF primes...")
+            print()
+            known_ctf_primes = [
+                # Common weak primes used in CTFs
+                # (In practice, these would be populated from a database of CTF challenges)
+                # Example: primes from CSAW, DEF CON, Plaid CTF, etc.
+                # The list below is illustrative
+            ]
+            found = False
+            print("Checking primes near powers of 2...")
+            for bits in [64, 128, 256]:
+                target = 2**bits
+                for delta in range(-1000, 1000):
+                    candidate = target + delta
+                    if candidate > 1 and candidate.is_prime():
+                        if n % candidate == 0:
+                            print(f"  Found prime near 2^{bits}: {candidate}")
+                            print(f"  Cofactor: {n // candidate}")
+                            print(f"  Verification: {candidate} * {n // candidate} = {n}")
+                            found = True
+            print("\\nChecking primes near common constants...")
+            RF = RealField(200)
+            constants = [
+                ("pi", Integer(str(RF(pi()).n(digits=60).str()).replace('.', '')[:55])),
+                ("e", Integer(str(RF(exp(1)).n(digits=60).str()).replace('.', '')[:55])),
+                ("sqrt(2)", Integer(str(RF(2).sqrt().n(digits=60).str()).replace('.', '')[:55])),
+            ]
+            for name, const in constants:
+                for delta in range(-100, 100):
+                    candidate = const + delta
+                    if candidate > 1 and candidate.is_prime():
+                        if n % candidate == 0:
+                            print(f"  Found prime near {name}: {candidate}")
+                            print(f"  Cofactor: {n // candidate}")
+                            found = True
+            if known_ctf_primes:
+                print("\\nChecking against known CTF primes...")
+                for kp in known_ctf_primes:
+                    kp = Integer(kp)
+                    if n % kp == 0:
+                        print(f"  Found known CTF prime: {kp}")
+                        print(f"  Cofactor: {n // kp}")
+                        found = True
+            if found:
+                print("NOVELTY_PRIMES=SUCCESS")
+            else:
+                print("\\nNo novelty primes found.")
+                print("NOVELTY_PRIMES=FAILED")
+            print("\\nNovelty prime check complete.")
+        except Exception as e:
+            print(f"Error in Novelty Primes check: {e}")
+            print("NOVELTY_PRIMES=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("NOVELTY_PRIMES=FAILED")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2")
-        print(f"q = {n // 2}")
-        print(f"Verification: 2 * {n // 2} = {n}")
-        print("NOVELTY_PRIMES=SUCCESS")
-        quit()
-    if n.is_prime():
-        print(f"n is prime: {n}")
-        print("No factorization possible")
-        print("NOVELTY_PRIMES=FAILED")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print("NOVELTY_PRIMES=SUCCESS")
-        quit()
-    print(f"Checking n = {n} against known CTF primes...")
-    print()
-    known_ctf_primes = [
-        # Common weak primes used in CTFs
-        # (In practice, these would be populated from a database of CTF challenges)
-        # Example: primes from CSAW, DEF CON, Plaid CTF, etc.
-        # The list below is illustrative
-    ]
-    found = False
-    print("Checking primes near powers of 2...")
-    for bits in [64, 128, 256]:
-        target = 2**bits
-        for delta in range(-1000, 1000):
-            candidate = target + delta
-            if candidate > 1 and candidate.is_prime():
-                if n % candidate == 0:
-                    print(f"  Found prime near 2^{bits}: {candidate}")
-                    print(f"  Cofactor: {n // candidate}")
-                    print(f"  Verification: {candidate} * {n // candidate} = {n}")
-                    found = True
-    print("\\nChecking primes near common constants...")
-    RF = RealField(200)
-    constants = [
-        ("pi", Integer(str(RF(pi()).n(digits=60).str()).replace('.', '')[:55])),
-        ("e", Integer(str(RF(exp(1)).n(digits=60).str()).replace('.', '')[:55])),
-        ("sqrt(2)", Integer(str(RF(2).sqrt().n(digits=60).str()).replace('.', '')[:55])),
-    ]
-    for name, const in constants:
-        for delta in range(-100, 100):
-            candidate = const + delta
-            if candidate > 1 and candidate.is_prime():
-                if n % candidate == 0:
-                    print(f"  Found prime near {name}: {candidate}")
-                    print(f"  Cofactor: {n // candidate}")
-                    found = True
-    if known_ctf_primes:
-        print("\\nChecking against known CTF primes...")
-        for kp in known_ctf_primes:
-            kp = Integer(kp)
-            if n % kp == 0:
-                print(f"  Found known CTF prime: {kp}")
-                print(f"  Cofactor: {n // kp}")
-                found = True
-    if found:
-        print("NOVELTY_PRIMES=SUCCESS")
-    else:
-        print("\\nNo novelty primes found.")
-        print("NOVELTY_PRIMES=FAILED")
-    print("\\nNovelty prime check complete.")
-except Exception as e:
-    print(f"Error in Novelty Primes check: {e}")
-    print("NOVELTY_PRIMES=FAILED")
-`,proof:`\\textbf{Theorem:} CTF challenges may reuse primes from previous problems or use primes near structured values, enabling factorization by database lookup.
+_attack()`,proof:`\\textbf{Theorem:} CTF challenges may reuse primes from previous problems or use primes near structured values, enabling factorization by database lookup.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
 \\item n = pq — RSA modulus to test
-\\item \\mathcal{P} = \\{p_1, \\ldots, p_m\\} — database of known CTF primes
+\\item \\mathcal{P} = \\{p\\_1, \\ldots, p\\_m\\} — database of known CTF primes
 \\item Structured candidates: 2^k + \\delta, \\text{constant} + \\delta for small |\\delta|
 \\item Primality test (Miller-Rabin) for candidate verification
 \\end{itemize}
@@ -2091,51 +2234,57 @@ p &\\approx C + \\delta, \\quad C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
 
 \\textbf{Explanation:} CTF challenges sometimes reuse primes or generate primes near recognizable values (powers of 2, mathematical constants). Checking divisibility against a database of known primes and searching small windows around structured values can quickly factor such moduli.
 
-\\textbf{References:} Various CTF writeups; cryptohack.org challenges; RSA CTF problem databases`,priority:`low`,applicableCheck:e=>!!e.n},ug=()=>{let e=L.p,t=1n<<BigInt(e),n=0n;for(let e=0n;e<1000n;e+=1n){let r=t+e;if(Dh(r)){n=r;break}let i=t-e;if(i>1n&&Dh(i)){n=i;break}}let r=Oh(L.q);return{n:(n*r).toString()}},dg={id:`simple-lattice`,name:`Simple Lattice`,category:`Partial Key / Lattice`,description:`Recovers p from an approximation. Use when nearp ≈ p with |nearp - p| < n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`nearp`,label:`nearp (approximate p)`,placeholder:`Enter approximate p value...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    nearp = Integer(${e.nearp})
-    if n <= 0 or nearp <= 0:
-        print("SIMPLE_LATTICE=FAILED: invalid input values")
-        quit()
-    if nearp >= n:
-        print("nearp must be less than n (modulus)")
-        print("SIMPLE_LATTICE=FAILED: nearp >= n")
-        quit()
-    if n % nearp == 0:
-        p = nearp
-        q = n // p
-        print("SIMPLE_LATTICE=SUCCESS: nearp exactly divides n")
-        print(f"p={p}")
-        print(f"q={q}")
-        quit()
-    if n % 2 == 0:
-        print("n is even — cannot apply lattice attack")
-        print("SIMPLE_LATTICE=FAILED: even modulus")
-        quit()
-    R.<x> = PolynomialRing(Zmod(n))
-    f = nearp + x
-    # Bound: |x| < n^(1/4) for Coppersmith with beta=0.5, deg=1
-    bound = n.nth_root(4)
-    print(f"Using bound X = {bound}")
-    roots = f.small_roots(X=bound, beta=0.5, epsilon=0.05)
-    if roots:
-        p = Integer(nearp + roots[0])
-        if n % p == 0:
-            q = n // p
-            print(f"Verification: p * q = {p * q}")
-            if p * q == n:
-                print("SIMPLE_LATTICE=SUCCESS")
+\\textbf{References:} Various CTF writeups; cryptohack.org challenges; RSA CTF problem databases`,priority:`low`,applicableCheck:e=>!!e.n},ug=()=>{let e=L.p,t=1n<<BigInt(e),n=0n;for(let e=0n;e<1000n;e+=1n){let r=t+e;if(Dh(r)){n=r;break}let i=t-e;if(i>1n&&Dh(i)){n=i;break}}let r=Oh(L.q);return{n:(n*r).toString()}},dg={id:`simple-lattice`,name:`Simple Lattice`,category:`Partial Key / Lattice`,description:`Recovers p from an approximation. Use when nearp ≈ p with |nearp - p| < n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`nearp`,label:`nearp (approximate p)`,placeholder:`Enter approximate p value...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            nearp = Integer(${e.nearp})
+            if n <= 0 or nearp <= 0:
+                print("SIMPLE_LATTICE=FAILED: invalid input values")
+                return
+            if nearp >= n:
+                print("nearp must be less than n (modulus)")
+                print("SIMPLE_LATTICE=FAILED: nearp >= n")
+                return
+            if n % nearp == 0:
+                p = nearp
+                q = n // p
+                print("SIMPLE_LATTICE=SUCCESS: nearp exactly divides n")
                 print(f"p={p}")
                 print(f"q={q}")
+                return
+            if n % 2 == 0:
+                print("n is even — cannot apply lattice attack")
+                print("SIMPLE_LATTICE=FAILED: even modulus")
+                return
+            R.<x> = PolynomialRing(Zmod(n))
+            f = nearp + x
+            # Bound: |x| < n^(1/4) for Coppersmith with beta=0.5, deg=1
+            bound = n.nth_root(4)
+            print(f"Using bound X = {bound}")
+            roots = f.small_roots(X=bound, beta=0.5, epsilon=0.05)
+            if roots:
+                p = Integer(nearp + roots[0])
+                if n % p == 0:
+                    q = n // p
+                    print(f"Verification: p * q = {p * q}")
+                    if p * q == n:
+                        print("SIMPLE_LATTICE=SUCCESS")
+                        print(f"p={p}")
+                        print(f"q={q}")
+                    else:
+                        print("SIMPLE_LATTICE=FAILED: verification mismatch")
+                else:
+                    print("SIMPLE_LATTICE=FAILED: recovered p does not divide n")
             else:
-                print("SIMPLE_LATTICE=FAILED: verification mismatch")
-        else:
-            print("SIMPLE_LATTICE=FAILED: recovered p does not divide n")
-    else:
-        print("No roots found with X = %d. Try a smaller epsilon (e.g., 0.01) for a larger lattice if the offset is near the bound." % bound)
-        print("SIMPLE_LATTICE=FAILED: no roots found")
-except Exception as ex:
-    print(f"SIMPLE_LATTICE=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If $p = p_0 + x$ where $|x| < n^{1/4}$, Coppersmith's method recovers $p$ from the approximation $p_0$.
+                print("No roots found with X = %d. Try a smaller epsilon (e.g., 0.01) for a larger lattice if the offset is near the bound." % bound)
+                print("SIMPLE_LATTICE=FAILED: no roots found")
+        except Exception as ex:
+            print(f"SIMPLE_LATTICE=FAILED: {ex}")
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("SIMPLE_LATTICE=FAILED")
+_attack()`,proof:`\\textbf{Theorem:} If $p = p_0 + x$ where $|x| < n^{1/4}$, Coppersmith's method recovers $p$ from the approximation $p_0$.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -2155,39 +2304,45 @@ p &= p_0 + x_0, \\quad q = n / p \\qed
 
 \\textbf{Explanation:} Construct the polynomial $f(x) = p_0 + x$ over $\\mathbb{Z}/n\\mathbb{Z}$. Since $f(x) \\equiv 0 \\pmod{p}$ and $p \\mid n$, Coppersmith's method finds the small root $x$ when $|x| < n^{1/4}$. Then $p = p_0 + x$ and $q = n/p$.
 
-\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.nearp},fg=()=>{let{p:e,n:t}=kh(L.p,L.q),n=(1n<<BigInt(60))-1n,r=new Uint8Array(8);crypto.getRandomValues(r);let i=0n;for(let e=0;e<8;e++)i=i<<8n|BigInt(r[e]);i&=n;let a=new Uint8Array(1);crypto.getRandomValues(a),a[0]&1&&(i=-i);let o=e+i;return o<=0n&&(o=e-i),{n:t.toString(),nearp:o.toString()}},pg={id:`partial-d`,name:`Partial Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from low bits of d. Use when LSBs of private exponent d are leaked.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dLow`,label:`dLow (low bits of d)`,placeholder:`Enter known low bits of d...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    e = Integer(${e.e})
-    dLow = Integer(${e.dLow})
-    if n <= 0 or e <= 0 or dLow < 0:
-        print("PARTIAL_D=FAILED: invalid input values")
-    else:
-        m = dLow.nbits()
-        found = False
-        for k in range(1, e + 1):
-            d_approx = (k * n + 1) // e
-            if d_approx % (2**m) == dLow:
-                d = d_approx
-                phi = (e * d - 1) // k
-                s = n - phi + 1
-                disc = s*s - 4*n
-                if disc >= 0:
-                    sqrt_disc = ZZ(disc).isqrt()
-                    if sqrt_disc * sqrt_disc == disc:
-                        p = (s + sqrt_disc) // 2
-                        q = (s - sqrt_disc) // 2
-                        if p * q == n:
-                            print(f"Verification: p * q = {p * q}")
-                            print(f"PARTIAL_D=SUCCESS")
-                            print(f"d={d}")
-                            print(f"p={p}")
-                            print(f"q={q}")
-                            found = True
-                            break
-        if not found:
-            print("PARTIAL_D=FAILED: no valid d found")
-except Exception as ex:
-    print(f"PARTIAL_D=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If the low $m$ bits of $d$ are known and $d < n$, the full $d$ can be recovered by iterating $k$ in the RSA key equation.
+\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.nearp},fg=()=>{let{p:e,n:t}=kh(L.p,L.q),n=(1n<<BigInt(60))-1n,r=new Uint8Array(8);crypto.getRandomValues(r);let i=0n;for(let e=0;e<8;e++)i=i<<8n|BigInt(r[e]);i&=n;let a=new Uint8Array(1);crypto.getRandomValues(a),a[0]&1&&(i=-i);let o=e+i;return o<=0n&&(o=e-i),{n:t.toString(),nearp:o.toString()}},pg={id:`partial-d`,name:`Partial Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from low bits of d. Use when LSBs of private exponent d are leaked.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dLow`,label:`dLow (low bits of d)`,placeholder:`Enter known low bits of d...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            e = Integer(${e.e})
+            dLow = Integer(${e.dLow})
+            if n <= 0 or e <= 0 or dLow < 0:
+                print("PARTIAL_D=FAILED: invalid input values")
+            else:
+                m = dLow.nbits()
+                found = False
+                for k in range(1, e + 1):
+                    d_approx = (k * n + 1) // e
+                    if d_approx % (2**m) == dLow:
+                        d = d_approx
+                        phi = (e * d - 1) // k
+                        s = n - phi + 1
+                        disc = s*s - 4*n
+                        if disc >= 0:
+                            sqrt_disc = ZZ(disc).isqrt()
+                            if sqrt_disc * sqrt_disc == disc:
+                                p = (s + sqrt_disc) // 2
+                                q = (s - sqrt_disc) // 2
+                                if p * q == n:
+                                    print(f"Verification: p * q = {p * q}")
+                                    print(f"PARTIAL_D=SUCCESS")
+                                    print(f"d={d}")
+                                    print(f"p={p}")
+                                    print(f"q={q}")
+                                    found = True
+                                    break
+                if not found:
+                    print("PARTIAL_D=FAILED: no valid d found")
+        except Exception as ex:
+            print(f"PARTIAL_D=FAILED: {ex}")
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("PARTIAL_D=FAILED")
+_attack()`,proof:`\\textbf{Theorem:} If the low $m$ bits of $d$ are known and $d < n$, the full $d$ can be recovered by iterating $k$ in the RSA key equation.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -2209,67 +2364,73 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\implies p, q \\qed
 
 \\textbf{Explanation:} For each candidate $k \\in [1, e]$, compute $d_{\\text{approx}} = \\lfloor(kn + 1)/e\\rfloor$. If the low $m$ bits match the leaked $d_{\\text{low}}$, recover $\\varphi(n) = (ed - 1)/k$ and solve the quadratic $x^2 - (n - \\varphi + 1)x + n = 0$ to find $p$ and $q$.
 
-\\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.dLow},mg=()=>{let e=Oh(L.p),t=Oh(L.q),n=e*t,r=(e-1n)*(t-1n),i=BigInt(100+Math.floor(Math.random()*1e4));for(;Th(i,r)===null;)i+=1n;let a=Th(i,r),o=i&(1n<<20n)-1n;return{n:n.toString(),e:a.toString(),dLow:o.toString()}},hg={id:`partial-pq-bits`,name:`Partial p/q Bits`,category:`Partial Key / Lattice`,description:`Recovers p from known MSBs or LSBs. Use when partial bits of p are leaked.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`knownBits`,label:`knownBits (known bits of p)`,placeholder:`Enter known bits as integer...`,multiline:!0,rows:3},{name:`bitPosition`,label:`bitPosition`,placeholder:`msb or lsb`,multiline:!1}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    knownBits = Integer(${e.knownBits})
-    bitPosition = "${e.bitPosition}"
-    if n <= 0 or knownBits < 0:
-        print("PARTIAL_PQ_BITS=FAILED: invalid input values")
-    elif bitPosition not in ("msb", "lsb"):
-        print("PARTIAL_PQ_BITS=FAILED: bitPosition must be 'msb' or 'lsb'")
-    elif bitPosition == "msb":
-        k = n.nbits() // 2 - knownBits.nbits()
-        if k <= 0:
-            print("PARTIAL_PQ_BITS=FAILED: not enough unknown bits for Coppersmith")
-        else:
-            R.<x> = PolynomialRing(Zmod(n))
-            f = (knownBits << k) + x
-            bound = 2**k
-            print(f"Using bound X = {bound}")
-            roots = f.small_roots(X=bound, beta=0.5)
-            if roots:
-                p = Integer((knownBits << k) + roots[0])
-                if n % p == 0:
-                    q = n // p
-                    print(f"Verification: p * q = {p * q}")
-                    if p * q == n:
-                        print(f"PARTIAL_PQ_BITS=SUCCESS")
-                        print(f"p={p}")
-                        print(f"q={q}")
-                    else:
-                        print("PARTIAL_PQ_BITS=FAILED: verification mismatch")
+\\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.dLow},mg=()=>{let e=Oh(L.p),t=Oh(L.q),n=e*t,r=(e-1n)*(t-1n),i=BigInt(100+Math.floor(Math.random()*1e4));for(;Th(i,r)===null;)i+=1n;let a=Th(i,r),o=i&(1n<<20n)-1n;return{n:n.toString(),e:a.toString(),dLow:o.toString()}},hg={id:`partial-pq-bits`,name:`Partial p/q Bits`,category:`Partial Key / Lattice`,description:`Recovers p from known MSBs or LSBs. Use when partial bits of p are leaked.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`knownBits`,label:`knownBits (known bits of p)`,placeholder:`Enter known bits as integer...`,multiline:!0,rows:3},{name:`bitPosition`,label:`bitPosition`,placeholder:`msb or lsb`,multiline:!1}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            knownBits = Integer(${e.knownBits})
+            bitPosition = "${e.bitPosition}"
+            if n <= 0 or knownBits < 0:
+                print("PARTIAL_PQ_BITS=FAILED: invalid input values")
+            elif bitPosition not in ("msb", "lsb"):
+                print("PARTIAL_PQ_BITS=FAILED: bitPosition must be 'msb' or 'lsb'")
+            elif bitPosition == "msb":
+                k = n.nbits() // 2 - knownBits.nbits()
+                if k <= 0:
+                    print("PARTIAL_PQ_BITS=FAILED: not enough unknown bits for Coppersmith")
                 else:
-                    print("PARTIAL_PQ_BITS=FAILED: recovered p does not divide n")
-            else:
-                print("PARTIAL_PQ_BITS=FAILED: no roots found")
-    elif bitPosition == "lsb":
-        m = knownBits.nbits()
-        if m <= 0:
-            print("PARTIAL_PQ_BITS=FAILED: knownBits is zero")
-        else:
-            R.<x> = PolynomialRing(Zmod(n))
-            f = x * (2**m) + knownBits
-            f = f.monic()
-            bound = 2**(n.nbits() // 2 - m)
-            print(f"Using bound X = {bound}")
-            roots = f.small_roots(X=bound, beta=0.5)
-            if roots:
-                p = Integer(roots[0] * (2**m) + knownBits)
-                if n % p == 0:
-                    q = n // p
-                    print(f"Verification: p * q = {p * q}")
-                    if p * q == n:
-                        print(f"PARTIAL_PQ_BITS=SUCCESS")
-                        print(f"p={p}")
-                        print(f"q={q}")
+                    R.<x> = PolynomialRing(Zmod(n))
+                    f = (knownBits << k) + x
+                    bound = 2**k
+                    print(f"Using bound X = {bound}")
+                    roots = f.small_roots(X=bound, beta=0.5)
+                    if roots:
+                        p = Integer((knownBits << k) + roots[0])
+                        if n % p == 0:
+                            q = n // p
+                            print(f"Verification: p * q = {p * q}")
+                            if p * q == n:
+                                print(f"PARTIAL_PQ_BITS=SUCCESS")
+                                print(f"p={p}")
+                                print(f"q={q}")
+                            else:
+                                print("PARTIAL_PQ_BITS=FAILED: verification mismatch")
+                        else:
+                            print("PARTIAL_PQ_BITS=FAILED: recovered p does not divide n")
                     else:
-                        print("PARTIAL_PQ_BITS=FAILED: verification mismatch")
+                        print("PARTIAL_PQ_BITS=FAILED: no roots found")
+            elif bitPosition == "lsb":
+                m = knownBits.nbits()
+                if m <= 0:
+                    print("PARTIAL_PQ_BITS=FAILED: knownBits is zero")
                 else:
-                    print("PARTIAL_PQ_BITS=FAILED: recovered p does not divide n")
-            else:
-                print("PARTIAL_PQ_BITS=FAILED: no roots found")
-except Exception as ex:
-    print(f"PARTIAL_PQ_BITS=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If at least half the bits of $p$ are known (as MSBs or LSBs), Coppersmith's method recovers the full factorization of $n$.
+                    R.<x> = PolynomialRing(Zmod(n))
+                    f = x * (2**m) + knownBits
+                    f = f.monic()
+                    bound = 2**(n.nbits() // 2 - m)
+                    print(f"Using bound X = {bound}")
+                    roots = f.small_roots(X=bound, beta=0.5)
+                    if roots:
+                        p = Integer(roots[0] * (2**m) + knownBits)
+                        if n % p == 0:
+                            q = n // p
+                            print(f"Verification: p * q = {p * q}")
+                            if p * q == n:
+                                print(f"PARTIAL_PQ_BITS=SUCCESS")
+                                print(f"p={p}")
+                                print(f"q={q}")
+                            else:
+                                print("PARTIAL_PQ_BITS=FAILED: verification mismatch")
+                        else:
+                            print("PARTIAL_PQ_BITS=FAILED: recovered p does not divide n")
+                    else:
+                        print("PARTIAL_PQ_BITS=FAILED: no roots found")
+        except Exception as ex:
+            print(f"PARTIAL_PQ_BITS=FAILED: {ex}")
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("PARTIAL_PQ_BITS=FAILED")
+_attack()`,proof:`\\textbf{Theorem:} If at least half the bits of $p$ are known (as MSBs or LSBs), Coppersmith's method recovers the full factorization of $n$.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -2291,43 +2452,45 @@ p &= f(x_0), \\quad q = n / p \\qed
 
 \\textbf{Explanation:} Construct a linear polynomial $f(x)$ over $\\mathbb{Z}/n\\mathbb{Z}$ such that $f(x) \\equiv 0 \\pmod{p}$. For MSBs, $f(x) = p_{\\text{known}} \\cdot 2^k + x$. For LSBs, $f(x) = x \\cdot 2^m + p_{\\text{known}}$. Coppersmith's method finds the small root $x_0$, giving $p = f(x_0)$ and $q = n/p$.
 
-\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996; N. Howgrave-Graham, "Approximate Integer Common Divisors", 1997`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},gg=()=>{let{p:e,n:t}=kh(L.p,L.q),n=e.toString(2).length,r=Math.ceil(n*.6),i=e>>BigInt(n-r);return{n:t.toString(),knownBits:i.toString(),bitPosition:`msb`}},_g={id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via brute-force search over k and d_p. Use when the CRT exponent d_p = d mod (p-1) is small (< bound). Each (k, d_p) pair gives a candidate p = (d_p * e - 1) / k + 1.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 1000000`,multiline:!1}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    e = Integer(${e.e})
-    bound = ${e.bound?`Integer(${e.bound})`:`Integer(1000000)`}
-    if n <= 0 or e <= 0 or bound <= 0:
-        print("SMALL_CRT_EXP=FAILED: invalid input values")
-    else:
-        # RSA-CRT: d_p * e ≡ 1 (mod p-1), so d_p * e - 1 = k(p-1)
-        # Rearranged: p = (d_p * e - 1) / k + 1
-        # We brute-force k ∈ [1, e) and step through d_p candidates
-        found = False
-        for k in range(1, e):
-            # k and e must be coprime for inverse_mod(e, k) to exist
-            if gcd(e, k) != 1:
-                continue
-            # d_p0 = e^(-1) mod k is the smallest d_p satisfying the congruence mod k
-            dp0 = inverse_mod(e, k)
-            # Step d_p by k: all d_p ≡ d_p0 (mod k) satisfy d_p * e ≡ 1 (mod k)
-            for dp in range(dp0, bound + 1, k):
-                num = dp * e - 1
-                p_candidate = num // k + 1
-                if p_candidate > 1 and n % p_candidate == 0:
-                    q = n // p_candidate
-                    print(f"Verification: p * q = {p_candidate * q}")
-                    print("SMALL_CRT_EXP=SUCCESS")
-                    print(f"dp={dp}")
-                    print(f"p={p_candidate}")
-                    print(f"q={q}")
-                    found = True
+\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996; N. Howgrave-Graham, "Approximate Integer Common Divisors", 1997`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},gg=()=>{let{p:e,n:t}=kh(L.p,L.q),n=e.toString(2).length,r=Math.ceil(n*.6),i=e>>BigInt(n-r);return{n:t.toString(),knownBits:i.toString(),bitPosition:`msb`}},_g={id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via brute-force search over k and d_p. Use when the CRT exponent d_p = d mod (p-1) is small (< bound). Each (k, d_p) pair gives a candidate p = (d_p * e - 1) / k + 1.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 1000000`,multiline:!1}],sageTemplate:e=>`def _attack():
+    try:
+        n = Integer(${e.n})
+        e = Integer(${e.e})
+        bound = ${e.bound?`Integer(${e.bound})`:`Integer(1000000)`}
+        if n <= 0 or e <= 0 or bound <= 0:
+            print("SMALL_CRT_EXP=FAILED: invalid input values")
+        else:
+            # RSA-CRT: d_p * e ≡ 1 (mod p-1), so d_p * e - 1 = k(p-1)
+            # Rearranged: p = (d_p * e - 1) / k + 1
+            # We brute-force k ∈ [1, e) and step through d_p candidates
+            found = False
+            for k in range(1, e):
+                # k and e must be coprime for inverse_mod(e, k) to exist
+                if gcd(e, k) != 1:
+                    continue
+                # d_p0 = e^(-1) mod k is the smallest d_p satisfying the congruence mod k
+                dp0 = inverse_mod(e, k)
+                # Step d_p by k: all d_p ≡ d_p0 (mod k) satisfy d_p * e ≡ 1 (mod k)
+                for dp in range(dp0, bound + 1, k):
+                    num = dp * e - 1
+                    p_candidate = num // k + 1
+                    if p_candidate > 1 and n % p_candidate == 0:
+                        q = n // p_candidate
+                        print(f"Verification: p * q = {p_candidate * q}")
+                        print("SMALL_CRT_EXP=SUCCESS")
+                        print(f"dp={dp}")
+                        print(f"p={p_candidate}")
+                        print(f"q={q}")
+                        found = True
+                        break
+                if found:
                     break
-            if found:
-                break
-        if not found:
-            print("No small dp found within bound.")
-            print("SMALL_CRT_EXP=FAILED")
-except Exception as ex:
-    print(f"SMALL_CRT_EXP=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small, $p$ can be recovered by exhaustive search over $k$.
+            if not found:
+                print("No small dp found within bound.")
+                print("SMALL_CRT_EXP=FAILED")
+    except Exception as ex:
+        print(f"SMALL_CRT_EXP=FAILED: {ex}")
+_attack()`,proof:`\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small, $p$ can be recovered by exhaustive search over $k$.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -2349,7 +2512,7 @@ p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
 
 \\textbf{Explanation:} From $d_p \\cdot e \\equiv 1 \\pmod{p-1}$, we get $p = (d_p \\cdot e - 1)/k + 1$. For each $k \\in [1, e)$, compute $d_{p0} = e^{-1} \\bmod k$, then iterate $d_p = d_{p0} + j \\cdot k$ up to the bound. For each candidate, check if $p$ divides $n$.
 
-\\textbf{References:} Standard RSA-CRT analysis; see also Jochemsz-May attack on small CRT exponents`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},vg=()=>{let e=65537n;for(let t=3n;t<10000n;t++){let n=t*e-1n;for(let t=1n;t<=e;t++){if(n%t!==0n)continue;let e=n/t+1n;if(e>2n&&Dh(e))return{n:(e*Oh(L.q)).toString(),e:`65537`}}}throw Error(`small-crt-exp: failed to generate testcase`)},yg={id:`dp-dq-leak`,name:`dp/dq Leak`,category:`Partial Key / Lattice`,description:`Recovers p from leaked d_p = d mod (p-1) or q from leaked d_q = d mod (q-1). Use when CRT exponents are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dp`,label:`dp (d mod p-1)`,placeholder:`Enter dp value...`,multiline:!0,rows:3},{name:`dq`,label:`dq (d mod q-1, optional)`,placeholder:`Enter dq value...`,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.e);if(t<=0n||n<=0n)return null;let r=2n;if(e.dp){let i=BigInt(e.dp);if(i>0n){let e=n*i-1n;if(e>0n){let n=Sh(Eh(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(n*e).toString()}\nDP_DQ_LEAK=SUCCESS\ndp=${i.toString()}\np=${n.toString()}\nq=${e.toString()}`}}}}if(e.dq){let i=BigInt(e.dq);if(i>0n){let e=n*i-1n;if(e>0n){let n=Sh(Eh(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(e*n).toString()}\nDP_DQ_LEAK=SUCCESS\ndq=${i.toString()}\np=${e.toString()}\nq=${n.toString()}`}}}}return null}catch{return null}},sageTemplate:e=>{let t=e.dp?`
+\\textbf{References:} Standard RSA-CRT analysis; see also Jochemsz-May attack on small CRT exponents`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},vg=()=>{let e=65537n;for(let t=3n;t<10000n;t++){let n=t*e-1n;for(let t=1n;t<=e;t++){if(n%t!==0n)continue;let e=n/t+1n;if(e>2n&&Dh(e))return{n:(e*Oh(L.q)).toString(),e:`65537`,bound:`1000000`}}}throw Error(`small-crt-exp: failed to generate testcase`)},yg={id:`dp-dq-leak`,name:`dp/dq Leak`,category:`Partial Key / Lattice`,description:`Recovers p from leaked d_p = d mod (p-1) or q from leaked d_q = d mod (q-1). Use when CRT exponents are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dp`,label:`dp (d mod p-1)`,placeholder:`Enter dp value...`,multiline:!0,rows:3},{name:`dq`,label:`dq (d mod q-1, optional)`,placeholder:`Enter dq value...`,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.e);if(t<=0n||n<=0n)return null;let r=2n;if(e.dp){let i=BigInt(e.dp);if(i>0n){let e=n*i-1n;if(e>0n){let n=Sh(Eh(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(n*e).toString()}\nDP_DQ_LEAK=SUCCESS\ndp=${i.toString()}\np=${n.toString()}\nq=${e.toString()}`}}}}if(e.dq){let i=BigInt(e.dq);if(i>0n){let e=n*i-1n;if(e>0n){let n=Sh(Eh(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(e*n).toString()}\nDP_DQ_LEAK=SUCCESS\ndq=${i.toString()}\np=${e.toString()}\nq=${n.toString()}`}}}}return null}catch{return null}},sageTemplate:e=>{let t=e.dp?`
         dp = Integer(${e.dp})
         if dp > 0:
             num = dp * e - 1
@@ -2380,17 +2543,19 @@ p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
                             print(f"p={p_val}")
                             print(f"q={q_candidate}")
                             found = True
-                            break`:``;return`try:
-    n = Integer(${e.n})
-    e = Integer(${e.e})
-    if n <= 0 or e <= 0:
-        print("DP_DQ_LEAK=FAILED: invalid input values")
-    else:
-        found = False${t}${n}
-        if not found:
-            print("DP_DQ_LEAK=FAILED: no valid factor found")
-except Exception as ex:
-    print(f"DP_DQ_LEAK=FAILED: {ex}")`},proof:`\\textbf{Theorem:} Given $d_p = d \\bmod (p-1)$, factor $n$ by iterating $k$ in the equation $d_p \\cdot e - 1 = k(p-1)$. Symmetrically, $d_q = d \\bmod (q-1)$ recovers $q$.
+                            break`:``;return`def _attack():
+    try:
+        n = Integer(${e.n})
+        e = Integer(${e.e})
+        if n <= 0 or e <= 0:
+            print("DP_DQ_LEAK=FAILED: invalid input values")
+        else:
+            found = False${t}${n}
+            if not found:
+                print("DP_DQ_LEAK=FAILED: no valid factor found")
+    except Exception as ex:
+        print(f"DP_DQ_LEAK=FAILED: {ex}")
+_attack()`},proof:`\\textbf{Theorem:} Given $d_p = d \\bmod (p-1)$, factor $n$ by iterating $k$ in the equation $d_p \\cdot e - 1 = k(p-1)$. Symmetrically, $d_q = d \\bmod (q-1)$ recovers $q$.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -2413,52 +2578,58 @@ p &= (d_p \\cdot e - 1)/k + 1, \\quad \\text{check } p \\mid n \\\\
 
 \\textbf{Explanation:} Compute $\\text{num} = d_p \\cdot e - 1$. For each $k \\in [1, e)$, check if $k$ divides num. If so, compute $p = \\text{num}/k + 1$ and verify $p \\mid n$. Since $d_p < p-1$, we have $k < e$, so at most 65536 iterations for standard $e = 65537$. The same method works for $d_q$ to recover $q$. A fast pre-check using GCD: $\\gcd(n, m^{e \\cdot d_p - 1} - 1 \\bmod n) = p$ with high probability for random $m$, providing an O($\\log n$) alternative to the O($e$) iteration scan.
 
-\\textbf{References:} Standard RSA-CRT analysis; M. Campagna, A. Sethi, "Key Recovery Method for CRT Implementation of RSA"`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&(!!e.dp||!!e.dq)},bg=()=>{let{p:e,q:t,n,e:r,d:i}=kh(L.p,L.q),a=i%(e-1n),o=i%(t-1n);return{n:n.toString(),e:r.toString(),dp:a.toString(),dq:o.toString()}},xg={id:`linearly-related-primes`,name:`Linearly Related Primes`,category:`Partial Key / Lattice`,description:`Factors n when q = k·p + δ. Use when primes have a linear relationship.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`k`,label:`k (known multiplier)`,placeholder:`Enter k value...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    k = Integer(${e.k})
-    if n < 2:
-        print("LINEARLY_RELATED=FAILED: n is too small")
-        quit()
-    if k <= 0:
-        print("LINEARLY_RELATED=FAILED: k must be positive")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2")
-        print(f"q = {n // 2}")
-        print(f"Verification: 2 * {n // 2} = {n}")
-        print("LINEARLY_RELATED=SUCCESS")
-        quit()
-    if n.is_prime():
-        print("LINEARLY_RELATED=FAILED: n is prime")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print("LINEARLY_RELATED=SUCCESS")
-        quit()
-    found = False
-    for delta in range(-10000, 10001):
-        disc = delta*delta + 4*k*n
-        sqrt_disc = ZZ(disc).isqrt()
-        if sqrt_disc * sqrt_disc == disc:
-            num = -delta + sqrt_disc
-            if num > 0 and num % (2*k) == 0:
-                p = num // (2*k)
-                if n % p == 0:
-                    q = n // p
-                    print(f"Verification: p * q = {p * q}")
-                    print(f"LINEARLY_RELATED=SUCCESS")
-                    print(f"p={p}")
-                    print(f"q={q}")
-                    print(f"delta={delta}")
-                    found = True
-                    break
-    if not found:
-        print("LINEARLY_RELATED=FAILED: no valid factorization found")
-except Exception as ex:
-    print(f"LINEARLY_RELATED=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta|$, solve the quadratic $kp^2 + \\delta p - n = 0$ to factor $n$.
+\\textbf{References:} Standard RSA-CRT analysis; M. Campagna, A. Sethi, "Key Recovery Method for CRT Implementation of RSA"`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&(!!e.dp||!!e.dq)},bg=()=>{let{p:e,q:t,n,e:r,d:i}=kh(L.p,L.q),a=i%(e-1n),o=i%(t-1n);return{n:n.toString(),e:r.toString(),dp:a.toString(),dq:o.toString()}},xg={id:`linearly-related-primes`,name:`Linearly Related Primes`,category:`Partial Key / Lattice`,description:`Factors n when q = k·p + δ. Use when primes have a linear relationship.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`k`,label:`k (known multiplier)`,placeholder:`Enter k value...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            k = Integer(${e.k})
+            if n < 2:
+                print("LINEARLY_RELATED_PRIMES=FAILED: n is too small")
+                return
+            if k <= 0:
+                print("LINEARLY_RELATED_PRIMES=FAILED: k must be positive")
+                return
+            if n % 2 == 0:
+                print(f"n is even: {n}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print(f"Verification: 2 * {n // 2} = {n}")
+                print("LINEARLY_RELATED_PRIMES=SUCCESS")
+                return
+            if n.is_prime():
+                print("LINEARLY_RELATED_PRIMES=FAILED: n is prime")
+                return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"p = q = {p}")
+                print("LINEARLY_RELATED_PRIMES=SUCCESS")
+                return
+            found = False
+            for delta in range(-10000, 10001):
+                disc = delta*delta + 4*k*n
+                sqrt_disc = ZZ(disc).isqrt()
+                if sqrt_disc * sqrt_disc == disc:
+                    num = -delta + sqrt_disc
+                    if num > 0 and num % (2*k) == 0:
+                        p = num // (2*k)
+                        if n % p == 0:
+                            q = n // p
+                            print(f"Verification: p * q = {p * q}")
+                            print(f"LINEARLY_RELATED_PRIMES=SUCCESS")
+                            print(f"p={p}")
+                            print(f"q={q}")
+                            print(f"delta={delta}")
+                            found = True
+                            break
+            if not found:
+                print("LINEARLY_RELATED_PRIMES=FAILED: no valid factorization found")
+        except Exception as ex:
+            print(f"LINEARLY_RELATED_PRIMES=FAILED: {ex}")
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("LINEARLY_RELATED_PRIMES=FAILED")
+_attack()`,proof:`\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta|$, solve the quadratic $kp^2 + \\delta p - n = 0$ to factor $n$.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -2479,53 +2650,59 @@ p &= \\frac{-\\delta \\pm \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
 
 \\textbf{Explanation:} Substitute $q = kp + \\delta$ into $n = pq$ to get the quadratic $kp^2 + \\delta p - n = 0$. For each candidate $\\delta$ in a small range, check if the discriminant $\\delta^2 + 4kn$ is a perfect square. If so, compute $p$ from the quadratic formula and verify $p \\mid n$.
 
-\\textbf{References:} A. Nitaj, "Cryptanalysis of RSA with Constrained Primes", 1999`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.k},Sg=()=>{let e=Oh(L.p),t=Math.random(),n=t<.4?1n:t<.7?2n:3n,r=BigInt(Math.floor(Math.random()*100)+1);Math.random()<.5&&(r=-r);let i=n*e+r;for(i<2n&&(i=n*e+BigInt(Math.abs(Number(r)))+2n),i%2n==0n&&(i+=1n);!Dh(i)||i===e;)i+=2n;return{n:(e*i).toString(),k:n.toString()}},Cg={id:`dependent-prime`,name:`Dependent-Prime RSA`,category:`Partial Key / Lattice`,description:`Factors n when q·e ≡ 1 (mod p). Use when q is derived from e and p via modular inverse.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    e = Integer(${e.e})
-    if n < 2:
-        print("DEPENDENT_PRIME=FAILED: n is too small")
-        quit()
-    if e < 2:
-        print("DEPENDENT_PRIME=FAILED: e must be >= 2")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2")
-        print(f"q = {n // 2}")
-        print(f"Verification: 2 * {n // 2} = {n}")
-        print("DEPENDENT_PRIME=SUCCESS")
-        quit()
-    if n.is_prime():
-        print("DEPENDENT_PRIME=FAILED: n is prime")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print("DEPENDENT_PRIME=SUCCESS")
-        quit()
-    ne = n * e
-    found = False
-    for k in range(1, 100001):
-        disc = 1 + 4*k*ne
-        sqrt_disc = ZZ(disc).isqrt()
-        if sqrt_disc * sqrt_disc == disc:
-            num = -1 + sqrt_disc
-            if num > 0 and num % (2*k) == 0:
-                p = num // (2*k)
-                if n % p == 0:
-                    q = n // p
-                    print(f"Verification: p * q = {p * q}")
-                    print("DEPENDENT_PRIME=SUCCESS")
-                    print(f"p={p}")
-                    print(f"q={q}")
-                    print(f"k={k}")
-                    found = True
-                    break
-    if not found:
-        print("DEPENDENT_PRIME=FAILED: no valid factorization found")
-except Exception as ex:
-    print(f"DEPENDENT_PRIME=FAILED: {ex}")`,proof:`\\textbf{Theorem:} If $q = e^{-1} \\bmod p$, then $n = pq$ creates a solvable quadratic system $kp^2 + p - ne = 0$.
+\\textbf{References:} A. Nitaj, "Cryptanalysis of RSA with Constrained Primes", 1999`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.k},Sg=()=>{let e=Oh(L.p),t=Math.random(),n=t<.4?1n:t<.7?2n:3n,r=BigInt(Math.floor(Math.random()*100)+1);Math.random()<.5&&(r=-r);let i=n*e+r;for(i<2n&&(i=n*e+BigInt(Math.abs(Number(r)))+2n),i%2n==0n&&(i+=1n);!Dh(i)||i===e;)i+=2n;return{n:(e*i).toString(),k:n.toString()}},Cg={id:`dependent-prime`,name:`Dependent-Prime RSA`,category:`Partial Key / Lattice`,description:`Factors n when q·e ≡ 1 (mod p). Use when q is derived from e and p via modular inverse.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            e = Integer(${e.e})
+            if n < 2:
+                print("DEPENDENT_PRIME=FAILED: n is too small")
+                return
+            if e < 2:
+                print("DEPENDENT_PRIME=FAILED: e must be >= 2")
+                return
+            if n % 2 == 0:
+                print(f"n is even: {n}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print(f"Verification: 2 * {n // 2} = {n}")
+                print("DEPENDENT_PRIME=SUCCESS")
+                return
+            if n.is_prime():
+                print("DEPENDENT_PRIME=FAILED: n is prime")
+                return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"p = q = {p}")
+                print("DEPENDENT_PRIME=SUCCESS")
+                return
+            ne = n * e
+            found = False
+            for k in range(1, 100001):
+                disc = 1 + 4*k*ne
+                sqrt_disc = ZZ(disc).isqrt()
+                if sqrt_disc * sqrt_disc == disc:
+                    num = -1 + sqrt_disc
+                    if num > 0 and num % (2*k) == 0:
+                        p = num // (2*k)
+                        if n % p == 0:
+                            q = n // p
+                            print(f"Verification: p * q = {p * q}")
+                            print("DEPENDENT_PRIME=SUCCESS")
+                            print(f"p={p}")
+                            print(f"q={q}")
+                            print(f"k={k}")
+                            found = True
+                            break
+            if not found:
+                print("DEPENDENT_PRIME=FAILED: no valid factorization found")
+        except Exception as ex:
+            print(f"DEPENDENT_PRIME=FAILED: {ex}")
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("DEPENDENT_PRIME=FAILED")
+_attack()`,proof:`\\textbf{Theorem:} If $q = e^{-1} \\bmod p$, then $n = pq$ creates a solvable quadratic system $kp^2 + p - ne = 0$.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -2548,46 +2725,48 @@ p &= \\frac{-1 + \\sqrt{1 + 4kne}}{2k} \\\\
 \\textbf{Explanation:} From the constraint $q \\cdot e \\equiv 1 \\pmod{p}$, substitute $q = (1 + kp)/e$ into $n = pq$ to get $ne = p + kp^2$. This gives the quadratic $kp^2 + p - ne = 0$. For each $k$, check if the discriminant $1 + 4kne$ is a perfect square. If so, compute $p$ from the quadratic formula and verify $p \\mid n$.
 
 \\textbf{References:} Custom CTF construction; related to Nitaj's constrained prime analysis`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},wg=()=>{let e=65537n;for(let t=0;t<5e3;t++){let t=Oh(L.p),n=Th(e,t);if(n!==null&&n>=2n&&Dh(n)){let r=t*n,i=(n*e-1n)/t;if(i>0n&&i<100001n)return{n:r.toString(),e:`65537`}}}throw Error(`dependent-prime: failed to generate testcase after 5000 attempts`)},Tg={id:`common-modulus`,name:`Common Modulus Attack`,category:`Message / Protocol`,description:`Recovers m from two encryptions under same n. Use when same message encrypted with coprime e1, e2.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e1`,label:`e1 (first exponent)`,placeholder:`Enter first exponent e1...`,multiline:!0,rows:3},{name:`e2`,label:`e2 (second exponent)`,placeholder:`Enter second exponent e2...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e1||!e.e2||!e.c1||!e.c2?`print("ERROR: Missing required inputs (n, e1, e2, c1, c2)")
-print("COMMON_MODULUS=FAILED")`:`try:
-    n = Integer(${e.n})
-    e1 = Integer(${e.e1})
-    e2 = Integer(${e.e2})
-    c1 = Integer(${e.c1})
-    c2 = Integer(${e.c2})
-    # Check gcd(e1, e2) first
-    g = gcd(e1, e2)
-    print(f"gcd(e1, e2) = {g}")
-    if g != 1:
-        print(f"ERROR: gcd(e1, e2) = {g} != 1. Exponents must be coprime.")
-        print("COMMON_MODULUS=FAILED")
-    else:
-        # Extended GCD to find a, b such that a*e1 + b*e2 = 1
-        _, a, b = xgcd(e1, e2)
-        print(f"Bezout coefficients: a = {a}, b = {b}")
-        print(f"Verification: a*e1 + b*e2 = {a*e1 + b*e2}")
-        # Compute m = c1^a * c2^b mod n (power_mod handles negative exponents)
-        part1 = power_mod(c1, a, n)
-        part2 = power_mod(c2, b, n)
-        m = (part1 * part2) % n
-        print(f"Recovered message: m = {m}")
-        # Verify
-        v1 = power_mod(m, e1, n)
-        v2 = power_mod(m, e2, n)
-        print(f"Verification: m^e1 mod n = {v1} (should equal c1 = {c1})")
-        print(f"Verification: m^e2 mod n = {v2} (should equal c2 = {c2})")
-        if v1 == c1 and v2 == c2:
-            print("COMMON_MODULUS=SUCCESS")
-        else:
+print("COMMON_MODULUS=FAILED")`:`def _attack():
+    try:
+        n = Integer(${e.n})
+        e1 = Integer(${e.e1})
+        e2 = Integer(${e.e2})
+        c1 = Integer(${e.c1})
+        c2 = Integer(${e.c2})
+        # Check gcd(e1, e2) first
+        g = gcd(e1, e2)
+        print(f"gcd(e1, e2) = {g}")
+        if g != 1:
+            print(f"ERROR: gcd(e1, e2) = {g} != 1. Exponents must be coprime.")
             print("COMMON_MODULUS=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("COMMON_MODULUS=FAILED")
-`,proof:`\\textbf{Theorem:} Let n be an RSA modulus and e_1, e_2 be coprime exponents. Given c_1 \\equiv m^{e_1} \\pmod{n} and c_2 \\equiv m^{e_2} \\pmod{n}, recover m via Bezout coefficients.
+        else:
+            # Extended GCD to find a, b such that a*e1 + b*e2 = 1
+            _, a, b = xgcd(e1, e2)
+            print(f"Bezout coefficients: a = {a}, b = {b}")
+            print(f"Verification: a*e1 + b*e2 = {a*e1 + b*e2}")
+            # Compute m = c1^a * c2^b mod n (power_mod handles negative exponents)
+            part1 = power_mod(c1, a, n)
+            part2 = power_mod(c2, b, n)
+            m = (part1 * part2) % n
+            print(f"Recovered message: m = {m}")
+            # Verify
+            v1 = power_mod(m, e1, n)
+            v2 = power_mod(m, e2, n)
+            print(f"Verification: m^e1 mod n = {v1} (should equal c1 = {c1})")
+            print(f"Verification: m^e2 mod n = {v2} (should equal c2 = {c2})")
+            if v1 == c1 and v2 == c2:
+                print("COMMON_MODULUS=SUCCESS")
+            else:
+                print("COMMON_MODULUS=FAILED")
+    except Exception as e:
+        print(f"ERROR: {e}")
+        print("COMMON_MODULUS=FAILED")
+    #
+_attack()`,proof:`\\textbf{Theorem:} Let n be an RSA modulus and e\\_1, e\\_2 be coprime exponents. Given c\\_1 \\equiv m^{e\\_1} \\pmod{n} and c\\_2 \\equiv m^{e\\_2} \\pmod{n}, recover m via Bezout coefficients.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n, e_1, e_2, c_1, c_2 (modulus, two exponents, two ciphertexts)
-\\item \\gcd(e_1, e_2) = 1
+\\item n, e\\_1, e\\_2, c\\_1, c\\_2 (modulus, two exponents, two ciphertexts)
+\\item \\gcd(e\\_1, e\\_2) = 1
 \\item Same m encrypted under both exponents
 \\end{itemize}
 
@@ -2606,58 +2785,60 @@ m &= c_1^a \\cdot c_2^b \\pmod{n} \\qed
 \\textbf{Explanation:} Find Bezout coefficients a, b such that a·e₁ + b·e₂ = 1. Compute c₁ᵃ · c₂ᵇ mod n, using modular inverses for negative coefficients. The exponents cancel to leave m.
 
 \\textbf{References:} Simmons & Norris, "Preliminary Comments on the MIT Public Key Cryptosystem", 1977; Boneh, "Twenty Years of Attacks on RSA", 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e1&&!!e.e2&&!!e.c1&&!!e.c2},Eg=()=>{let{n:e}=kh(L.p,L.q),t=BigInt(Math.floor(Math.random()*1e6)+42);return{n:e.toString(),e1:`65537`,e2:`104729`,c1:Ah(t,e,65537n).toString(),c2:Ah(t,e,104729n).toString()}},Dg={id:`hastad`,name:`Hastad's Broadcast Attack`,category:`Message / Protocol`,description:`Recovers m from e encryptions with small e. Use when same m encrypted under e different moduli with exponent e.`,inputs:[{name:`pairs`,label:`Pairs (n1,c1 per line)`,placeholder:`n1,c1\\nn2,c2\\nn3,c3...`,multiline:!0,rows:5},{name:`e`,label:`e (public exponent)`,placeholder:`Enter exponent e (e.g., 3)...`,multiline:!1}],sageTemplate:e=>!e.pairs||!e.e?`print("ERROR: Missing required inputs (pairs, e)")
-print("HASTAD=FAILED")`:`try:
-    e = Integer(${e.e})
-    print(f"Hastad's Broadcast Attack")
-    print(f"Public exponent: e = {e}")
-    if e < 2:
-        print(f"ERROR: e must be >= 2, got e = {e}")
-        print("HASTAD=FAILED")
-    else:
-        pairs_str = """${e.pairs}""".strip()
-        pairs = []
-        for line in pairs_str.split('\\n'):
-            line = line.strip()
-            if not line:
-                continue
-            parts = line.split(',')
-            if len(parts) < 2:
-                continue
-            n_i = Integer(parts[0].strip())
-            c_i = Integer(parts[1].strip())
-            pairs.append((n_i, c_i))
-        print(f"Number of ciphertexts: {len(pairs)}")
-        if len(pairs) < e:
-            print(f"ERROR: Need at least {e} ciphertexts for e = {e}, got {len(pairs)}")
+print("HASTAD=FAILED")`:`def _attack():
+    try:
+        e = Integer(${e.e})
+        print(f"Hastad's Broadcast Attack")
+        print(f"Public exponent: e = {e}")
+        if e < 2:
+            print(f"ERROR: e must be >= 2, got e = {e}")
             print("HASTAD=FAILED")
         else:
-            moduli = [p[0] for p in pairs[:e]]
-            remainders = [p[1] for p in pairs[:e]]
-            m_e = crt(remainders, moduli)
-            N = prod(moduli)
-            print(f"CRT combined m^e = {m_e}")
-            print(f"Modulus product bits: {N.nbits()}")
-            m, exact = m_e.nth_root(e, truncate_mode=True)
-            if exact:
-                print(f"Recovered message: m = {m}")
-                all_ok = True
-                for i, (n_i, c_i) in enumerate(pairs):
-                    v = power_mod(m, e, n_i)
-                    ok = v == c_i
-                    if not ok:
-                        all_ok = False
-                    print(f"  Verify {i+1}: m^{e} mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
-                if all_ok:
-                    print("HASTAD=SUCCESS")
-                else:
-                    print("HASTAD=FAILED")
-            else:
-                print(f"Approximate root: m = {m}")
-                print("Warning: m^e was not a perfect e-th power")
+            pairs_str = """${e.pairs}""".strip()
+            pairs = []
+            for line in pairs_str.split('\\n'):
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split(',')
+                if len(parts) < 2:
+                    continue
+                n_i = Integer(parts[0].strip())
+                c_i = Integer(parts[1].strip())
+                pairs.append((n_i, c_i))
+            print(f"Number of ciphertexts: {len(pairs)}")
+            if len(pairs) < e:
+                print(f"ERROR: Need at least {e} ciphertexts for e = {e}, got {len(pairs)}")
                 print("HASTAD=FAILED")
-except Exception as exc:
-    print(f"ERROR: {exc}")
-    print("HASTAD=FAILED")`,proof:`\\textbf{Theorem:} Let $c_i \\equiv m^e \\pmod{n_i}$ for $i = 1, \\ldots, k$ with $\\gcd(n_i, n_j) = 1$. If $m^e < \\prod n_i$ and $k \\geq e$, recover $m$ via CRT + $e$-th root.
+            else:
+                moduli = [p[0] for p in pairs[:e]]
+                remainders = [p[1] for p in pairs[:e]]
+                m_e = crt(remainders, moduli)
+                N = prod(moduli)
+                print(f"CRT combined m^e = {m_e}")
+                print(f"Modulus product bits: {N.nbits()}")
+                m, exact = m_e.nth_root(e, truncate_mode=True)
+                if exact:
+                    print(f"Recovered message: m = {m}")
+                    all_ok = True
+                    for i, (n_i, c_i) in enumerate(pairs):
+                        v = power_mod(m, e, n_i)
+                        ok = v == c_i
+                        if not ok:
+                            all_ok = False
+                        print(f"  Verify {i+1}: m^{e} mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
+                    if all_ok:
+                        print("HASTAD=SUCCESS")
+                    else:
+                        print("HASTAD=FAILED")
+                else:
+                    print(f"Approximate root: m = {m}")
+                    print("Warning: m^e was not a perfect e-th power")
+                    print("HASTAD=FAILED")
+    except Exception as exc:
+        print(f"ERROR: {exc}")
+        print("HASTAD=FAILED")
+_attack()`,proof:`\\textbf{Theorem:} Let $c_i \\equiv m^e \\pmod{n_i}$ for $i = 1, \\ldots, k$ with $\\gcd(n_i, n_j) = 1$. If $m^e < \\prod n_i$ and $k \\geq e$, recover $m$ via CRT + $e$-th root.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -2680,55 +2861,70 @@ m &= \\sqrt[e]{C} \\qed
 
 \\textbf{References:} J. Hastad, "Solving Linear Equations Modulo Divisors: On Factoring Given Any Bits", Eurocrypt 1988; Boneh, "Twenty Years of Attacks on RSA", 1999`,priority:`high`,applicableCheck:e=>!!e.pairs&&!!e.e},Og=()=>{let e=BigInt(Math.floor(Math.random()*1e6)+42),t=[];for(let n=0;n<3;n++){let{n}=kh(L.p,L.q);t.push(`${n},${Ah(e,n,3n)}`)}return{pairs:t.join(`
 `),e:`3`}},kg={id:`franklin-reiter`,name:`Franklin-Reiter Related Message Attack`,category:`Message / Protocol`,description:`Recovers m from related ciphertexts. Use when c1 = m^e and c2 = (a·m + b)^e mod n.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3},{name:`a`,label:`a (linear coefficient)`,placeholder:`1`,multiline:!1,defaultValue:`1`},{name:`b`,label:`b (constant offset)`,placeholder:`Enter offset b...`,multiline:!0,rows:2}],sageTemplate:e=>{if(!e.n||!e.e||!e.c1||!e.c2||!e.b)return`print("ERROR: Missing required inputs (n, e, c1, c2, b)")
-print("FRANKLIN_REITER=FAILED")`;let t=e.a||`1`;return`try:
-    # Custom GCD for polynomials over Zmod(n) with composite n
-    # Sage's built-in gcd() may fail for non-prime modulus
-    def poly_gcd(a, b):
-        while b != 0:
-            a, b = b, a % b
-        return a.monic()
-    n = Integer(${e.n})
-    e = Integer(${e.e})
-    c1 = Integer(${e.c1})
-    c2 = Integer(${e.c2})
-    a = Integer(${t})
-    b = Integer(${e.b})
-    R.<x> = PolynomialRing(Zmod(n))
-    f1 = x**e - c1
-    f2 = (a*x + b)**e - c2
-    print(f"f1(x) = x^{e} - c1")
-    print(f"f2(x) = ({a}*x + {b})^{e} - c2")
-    print()
-    g = poly_gcd(f1, f2)
-    print(f"GCD degree: {g.degree()}")
-    if g.degree() == 1:
-        m = -g[0] / g[1]
-        print(f"Recovered message: m = {m}")
-        v1 = power_mod(Integer(m), e, n)
-        v2 = power_mod(Integer(a * m + b), e, n)
-        print(f"Verification: m^e mod n = {v1} (c1 = {c1})")
-        print(f"Verification: (a*m+b)^e mod n = {v2} (c2 = {c2})")
-        if v1 == c1 and v2 == c2:
-            print("FRANKLIN_REITER=SUCCESS")
-        else:
+print("FRANKLIN_REITER=FAILED")`;let t=e.a||`1`;return`def _attack():
+    try:
+        # Custom GCD for polynomials over Zmod(n) with composite n
+        # Sage's built-in gcd() may fail for non-prime modulus
+        def poly_gcd(a, b):
+            while b != 0:
+                a, b = b, a % b
+            return a.monic()
+        n = Integer(${e.n})
+        e = Integer(${e.e})
+        c1 = Integer(${e.c1})
+        c2 = Integer(${e.c2})
+        a = Integer(${t})
+        b = Integer(${e.b})
+        R.<x> = PolynomialRing(Zmod(n))
+        f1 = x**e - c1
+        f2 = (a*x + b)**e - c2
+        print(f"f1(x) = x^{e} - c1")
+        print(f"f2(x) = ({a}*x + {b})^{e} - c2")
+        print()
+        g = poly_gcd(f1, f2)
+        print(f"GCD degree: {g.degree()}")
+        if g.degree() == 1:
+            m = -g[0] / g[1]
+            print(f"Recovered message: m = {m}")
+            v1 = power_mod(Integer(m), e, n)
+            v2 = power_mod(Integer(a * m + b), e, n)
+            print(f"Verification: m^e mod n = {v1} (c1 = {c1})")
+            print(f"Verification: (a*m+b)^e mod n = {v2} (c2 = {c2})")
+            if v1 == c1 and v2 == c2:
+                print("FRANKLIN_REITER=SUCCESS")
+            else:
+                print("FRANKLIN_REITER=FAILED")
+        elif g.degree() == 0:
+            print("GCD is constant - no common root found.")
             print("FRANKLIN_REITER=FAILED")
-    elif g.degree() == 0:
-        print("GCD is constant - no common root found.")
+        else:
+            roots = g.roots()
+            if roots:
+                m_val = Integer(roots[0][0])
+                print(f"Recovered m = {m_val}")
+                v1 = power_mod(m_val, e, n)
+                v2 = power_mod(Integer(a * m_val + b), e, n)
+                print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
+                print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
+                if v1 == c1 and v2 == c2:
+                    print("FRANKLIN_REITER=SUCCESS")
+                else:
+                    print("FRANKLIN_REITER=FAILED")
+            else:
+                print(f"GCD has degree {g.degree()}, expected 1.")
+                print(f"GCD: {g}")
+                print("FRANKLIN_REITER=FAILED")
+    except Exception as ex:
+        print(f"ERROR: {ex}")
         print("FRANKLIN_REITER=FAILED")
-    else:
-        print(f"GCD has degree {g.degree()}, expected 1.")
-        print(f"GCD: {g}")
-        print("FRANKLIN_REITER=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("FRANKLIN_REITER=FAILED")
-`},proof:`\\textbf{Theorem:} Given c_1 \\equiv m^e \\pmod{n} and c_2 \\equiv (am + b)^e \\pmod{n} with known a, b, recover m via polynomial GCD over \\mathbb{Z}/n\\mathbb{Z}.
+    #
+_attack()`},proof:`\\textbf{Theorem:} Given $c_1 \\equiv m^e \\pmod{n}$ and $c_2 \\equiv (am + b)^e \\pmod{n}$ with known $a, b$, recover $m$ via polynomial GCD over $\\mathbb{Z}/n\\mathbb{Z}$.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n, e, c_1, c_2, a, b (modulus, exponent, two ciphertexts, linear relation)
-\\item m_2 = a \\cdot m_1 + b (known affine relation)
-\\item \\gcd(a, n) = 1
+\\item $n, e, c_1, c_2, a, b$ (modulus, exponent, two ciphertexts, linear relation)
+\\item $m_2 = a \\cdot m_1 + b$ (known affine relation)
+\\item $\\gcd(a, n) = 1$
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -2737,81 +2933,100 @@ f_1(x) &= x^e - c_1 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
 f_2(x) &= (ax + b)^e - c_2 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
 f_1(m) &= m^e - c_1 \\equiv 0 \\pmod{n} \\\\
 f_2(m) &= (am + b)^e - c_2 \\equiv 0 \\pmod{n} \\\\
-(x - m) \\mid \\gcd(f_1, f_2) & \\\\
+(x - m) &\\mid \\gcd(f_1, f_2) \\\\
 g(x) = \\gcd(f_1, f_2), \\quad \\deg(g) = 1 &\\implies g(x) = x - m \\\\
 m &= -g[0] \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Build two polynomials that both have m as a root. Their GCD is (x − m) for generic a, b. Extract m from the linear GCD's coefficients.
+\\textbf{Explanation:} Build two polynomials that both have $m$ as a root. Their GCD is $(x - m)$ for generic $a, b$. Extract $m$ from the linear GCD's coefficients.
 
-\\textbf{References:} M. Franklin & M. Reiter, "On the Security of RSA Padding", 1996; Boneh, "Twenty Years of Attacks on RSA", 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c1&&!!e.c2&&!!e.b},Ag=()=>{let{n:e,e:t}=kh(L.p,L.q,3n),n=BigInt(Math.floor(Math.random()*1e6)+42);return{n:e.toString(),e:t.toString(),c1:Ah(n,e,t).toString(),c2:Ah((1n*n+12345n)%e,e,t).toString(),a:`1`,b:`12345`}},jg={id:`coppersmith-short-pad`,name:`Coppersmith Short Pad Attack`,category:`Message / Protocol`,description:`Recovers m from short random pads. Use when same message padded with short random values.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.c1||!e.c2?`print("ERROR: Missing required inputs (n, e, c1, c2)")
-print("COPPERSMITH_SHORT_PAD=FAILED")`:`try:
-    n = Integer(${e.n})
-    e = Integer(${e.e})
-    c1 = Integer(${e.c1})
-    c2 = Integer(${e.c2})
-    # Custom GCD for polynomials over Zmod(n) with composite n
-    def composite_gcd(a, b):
-        while b:
-            a, b = b, a % b
-        return a.monic()
-    print("Coppersmith Short Pad Attack")
-    print("n =", n, "e =", e)
-    # Step 1: Compute resultant to find delta = m2 - m1
-    # SageMath's resultant() fails over Zmod(n) with composite n
-    # Workaround: use change_ring to a fresh multivariate ring
-    PRxy.<x, y> = PolynomialRing(Zmod(n))
-    PRx.<xn> = PolynomialRing(Zmod(n))
-    PRZZ.<xz, yz> = PolynomialRing(Zmod(n))
-    g1 = x**e - c1
-    g2 = (x + y)**e - c2
-    q1 = g1.change_ring(PRZZ)
-    q2 = g2.change_ring(PRZZ)
-    print("Computing resultant...")
-    h = q2.resultant(q1)
-    h = h.univariate_polynomial()
-    h = h.change_ring(PRx).subs(y=xn)
-    h = h.monic()
-    print("Resultant degree:", h.degree())
-    # Bound: padding difference must be < n^(1/e^2)
-    kbits = n.nbits() // (2 * e * e)
-    X = 2**kbits
-    print("Small root bound (bits):", kbits)
-    roots = h.small_roots(X=X, beta=0.5)
-    if roots:
-        delta = roots[0]
-        print("Found padding difference: delta =", delta)
-        # Step 2: Franklin-Reiter related message attack
-        g1_fr = xn**e - c1
-        g2_fr = (xn + delta)**e - c2
-        g = composite_gcd(g1_fr, g2_fr)
-        if g.degree() == 1:
-            m = -g[0] / g[1]
-            print("Recovered message: m =", m)
-            v1 = power_mod(Integer(m), e, n)
-            v2 = power_mod(Integer(m) + delta, e, n)
-            print("Verification: m^e mod n =", v1, "(c1 =", c1, ")")
-            print("Verification: (m+delta)^e mod n =", v2, "(c2 =", c2, ")")
-            if v1 == c1 and v2 == c2:
-                print("COPPERSMITH_SHORT_PAD=SUCCESS")
+\\textbf{References:} M. Franklin \\& M. Reiter, "On the Security of RSA Padding", 1996; Boneh, "Twenty Years of Attacks on RSA", 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c1&&!!e.c2&&!!e.b},Ag=()=>{let{n:e,e:t}=kh(L.p,L.q,3n),n=BigInt(Math.floor(Math.random()*1e6)+42);return{n:e.toString(),e:t.toString(),c1:Ah(n,e,t).toString(),c2:Ah((1n*n+12345n)%e,e,t).toString(),a:`1`,b:`12345`}},jg={id:`coppersmith-short-pad`,name:`Coppersmith Short Pad Attack`,category:`Message / Protocol`,description:`Recovers m from short random pads. Use when same message padded with short random values.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.c1||!e.c2?`print("ERROR: Missing required inputs (n, e, c1, c2)")
+print("COPPERSMITH_SHORT_PAD=FAILED")`:`def _attack():
+    try:
+        n = Integer(${e.n})
+        e = Integer(${e.e})
+        c1 = Integer(${e.c1})
+        c2 = Integer(${e.c2})
+        # Custom GCD for polynomials over Zmod(n) with composite n
+        def composite_gcd(a, b):
+            while b:
+                a, b = b, a % b
+            return a.monic()
+        print("Coppersmith Short Pad Attack")
+        print("n =", n, "e =", e)
+        # Step 1: Compute resultant to find delta = m2 - m1
+        # For e=3, the resultant h(y) has only y^0, y^3, y^6, y^9 terms
+        # Substitute z = y^3 to get a cubic, then apply Coppersmith to find z
+        P.<x, y> = PolynomialRing(Zmod(n))
+        P2.<y_s> = PolynomialRing(Zmod(n))
+        g1 = x**e - c1
+        g2 = (x + y)**e - c2
+        g1_p2 = g1.change_ring(P2)
+        g2_p2 = g2.change_ring(P2)
+        print("Computing resultant...")
+        h = g1_p2.resultant(g2_p2, variable=x)
+        h = h.univariate_polynomial().change_ring(Zmod(n))
+        h = h.monic()
+        print("Resultant degree:", h.degree())
+        # Extract coefficients of h(y) = y^(e^2) + ... + C (only y^(i*e) terms)
+        # For e=3: h(y) = y^9 + A*y^6 + B*y^3 + C
+        # Substitute z = y^3 to get cubic H(z) = z^e + ... + C
+        coeffs = [h[i] for i in range(h.degree() + 1)]
+        PRz.<z> = PolynomialRing(Zmod(n))
+        H = PRz(0)
+        for i in range(int(e) + 1):
+            deg = i * int(e)
+            if deg <= h.degree():
+                H += coeffs[deg] * z**i
+        print("Looking for small root of degree-", H.degree(), "polynomial in z = y^e")
+        # Bound for z = delta^e: |delta| < n^(beta/e^2) => |z| < n^(beta/e)
+        # With beta=1.0: |z| < n^(1/e)
+        kbits = n.nbits() // int(e)
+        X_z = 2**kbits
+        print("Small root bound for z (bits):", kbits)
+        roots_z = H.small_roots(X=X_z)
+        if roots_z:
+            z0 = Integer(roots_z[0])
+            # Take integer e-th root to recover delta = z0^(1/e)
+            delta, exact = z0.nth_root(int(e), truncate_mode=True)
+            if exact:
+                print("Found padding difference: delta =", delta)
+                # Step 2: Franklin-Reiter related message attack
+                PRx.<xn> = PolynomialRing(Zmod(n))
+                g1_fr = xn**e - c1
+                g2_fr = (xn + delta)**e - c2
+                g = composite_gcd(g1_fr, g2_fr)
+                if g.degree() == 1:
+                    m = -g[0] / g[1]
+                    print("Recovered message: m =", m)
+                    v1 = power_mod(Integer(m), e, n)
+                    v2 = power_mod(Integer(m) + delta, e, n)
+                    print("Verification: m^e mod n =", v1, "(c1 =", c1, ")")
+                    print("Verification: (m+delta)^e mod n =", v2, "(c2 =", c2, ")")
+                    if v1 == c1 and v2 == c2:
+                        print("COPPERSMITH_SHORT_PAD=SUCCESS")
+                    else:
+                        print("COPPERSMITH_SHORT_PAD=FAILED")
+                else:
+                    print("GCD has degree", g.degree(), "- cannot extract unique solution.")
+                    print("COPPERSMITH_SHORT_PAD=FAILED")
             else:
+                print("Cube root was not exact. z0 =", z0, "may not be delta^e.")
                 print("COPPERSMITH_SHORT_PAD=FAILED")
         else:
-            print("GCD has degree", g.degree(), "- cannot extract unique solution.")
+            print("No small roots found. Padding may be too large for exponent e =", e)
             print("COPPERSMITH_SHORT_PAD=FAILED")
-    else:
-        print("No small roots found. Padding may be too large.")
+    except Exception as e:
+        print("ERROR:", e)
         print("COPPERSMITH_SHORT_PAD=FAILED")
-except Exception as e:
-    print("ERROR:", e)
-    print("COPPERSMITH_SHORT_PAD=FAILED")
-`,proof:`\\textbf{Theorem:} Given c_1 \\equiv (m + \\delta_1)^e \\pmod{n} and c_2 \\equiv (m + \\delta_2)^e \\pmod{n} with |\\delta_1 - \\delta_2| < n^{1/e^2}, recover m via resultant + Coppersmith.
+    #
+_attack()`,proof:`\\textbf{Theorem:} Given $c_1 \\equiv (m + \\delta_1)^e \\pmod{n}$ and $c_2 \\equiv (m + \\delta_2)^e \\pmod{n}$ with $|\\delta_1 - \\delta_2| < n^{1/e^2}$, recover $m$ via resultant $+$ Coppersmith.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n, e, c_1, c_2 (modulus, exponent, two ciphertexts)
-\\item |\\delta_2 - \\delta_1| < n^{1/e^2} (short padding)
-\\item Same base message m under both encryptions
+\\item $n, e, c_1, c_2$ (modulus, exponent, two ciphertexts)
+\\item $|\\delta_2 - \\delta_1| < n^{1/e^2}$ (short padding)
+\\item Same base message $m$ under both encryptions
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -2824,103 +3039,104 @@ r(\\Delta) &= \\text{Res}_x(f_1, f_2) \\equiv 0 \\pmod{n} \\\\
 m &= \\text{root} - \\delta_1 \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Compute the resultant of two polynomials to eliminate x, yielding a polynomial in Δ. Use Coppersmith's small_roots to find the small padding difference. Apply Franklin-Reiter with known Δ to recover m.
+\\textbf{Explanation:} Compute the resultant of two polynomials to eliminate $x$, yielding a polynomial in $\\Delta$. Use Coppersmith's $small\\_roots$ to find the small padding difference. Apply Franklin-Reiter with known $\\Delta$ to recover $m$.
 
 \\textbf{References:} D. Coppersmith, "Small Solutions to Polynomial Equations and Low Exponent RSA Vulnerabilities", J. Cryptology, 1997; Boneh, "Twenty Years of Attacks on RSA", 1999`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c1&&!!e.c2},Mg=()=>{let e=3n,t=Oh(L.p)*Oh(L.q),n=BigInt(Math.floor(Math.random()*1e4)+42),r=2**20,i=BigInt(Math.floor(Math.random()*r)),a=BigInt(Math.floor(Math.random()*r)),o=n<<20n|i,s=n<<20n|a,c=Eh(o,e,t),l=Eh(s,e,t);return{n:t.toString(),e:`3`,c1:c.toString(),c2:l.toString()}},Ng={id:`hastad-linear-pad`,name:`Hastad's Attack with Linear Padding`,category:`Message / Protocol`,description:`Recovers m from linearly padded encryptions. Use when c_i = (a_i·m + b_i)^e mod n_i.`,inputs:[{name:`triples`,label:`Triples (n,c,a,b per line)`,placeholder:`n1,c1,a1,b1\\nn2,c2,a2,b2...`,multiline:!0,rows:5},{name:`e`,label:`e (public exponent)`,placeholder:`Enter exponent e (e.g., 3)...`,multiline:!1}],sageTemplate:e=>!e.triples||!e.e?`print("ERROR: Missing required inputs (triples, e)")
-print("HASTAD_LINEAR_PAD=FAILED")`:`try:
-    e = Integer(${e.e})
-    # Parse triples
-    triples_str = """${e.triples}""".strip()
-    triples = []
-    for line in triples_str.split('\\n'):
-        line = line.strip()
-        if not line:
-            continue
-        parts = line.split(',')
-        if len(parts) < 4:
-            continue
-        n_i = Integer(parts[0].strip())
-        c_i = Integer(parts[1].strip())
-        a_i = Integer(parts[2].strip())
-        b_i = Integer(parts[3].strip())
-        triples.append((n_i, c_i, a_i, b_i))
-    print(f"Number of ciphertexts: {len(triples)}")
-    print(f"Public exponent: e = {e}")
-    if len(triples) < e:
-        print(f"ERROR: Need at least {e} ciphertexts for e = {e}, got {len(triples)}")
-        print("HASTAD_LINEAR_PAD=FAILED")
-    else:
-        # General Hastad with linear padding: c_i = (a_i * m + b_i)^e mod n_i
-        # Combined modulus N = prod(n_i)
-        N = prod([t[0] for t in triples])
-        print(f"Combined modulus N has {N.nbits()} bits")
-        # Build CRT-combined polynomial F(x) = sum_i coeff_i * f_i(x) mod N
-        R.<x> = PolynomialRing(Zmod(N))
-        F = 0
-        for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
-            Ni = N // n_i
-            coeff = Ni * inverse_mod(Ni, n_i)
-            fi = (a_i*x + b_i)**e - c_i
-            F += coeff * fi
-        F = F % N
-        print(f"Combined polynomial degree: {F.degree()}")
-        # Make polynomial monic for Coppersmith's small_roots
-        F = F.monic()
-        print(f"Polynomial made monic, leading coefficient = 1")
-        # Coppersmith: find small root m < N^(1/e)
-        roots = F.small_roots(beta=1.0, epsilon=0.05)
-        if roots:
-            m = roots[0]
-            print(f"Recovered message: m = {m}")
-            # Verify against all triples
-            all_ok = True
-            for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
-                v = power_mod(a_i * Integer(m) + b_i, e, n_i)
-                ok = v == c_i
-                if not ok:
-                    all_ok = False
-                print(f"  Verify {i+1}: (a*m+b)^e mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
-            if all_ok:
-                print("HASTAD_LINEAR_PAD=SUCCESS")
-            else:
-                print("HASTAD_LINEAR_PAD=FAILED")
+print("HASTAD_LINEAR_PAD=FAILED")`:`def _attack():
+    try:
+        e = Integer(${e.e})
+        # Parse triples
+        triples_str = """${e.triples}""".strip()
+        triples = []
+        for line in triples_str.split('\\n'):
+            line = line.strip()
+            if not line:
+                continue
+            parts = line.split(',')
+            if len(parts) < 4:
+                continue
+            n_i = Integer(parts[0].strip())
+            c_i = Integer(parts[1].strip())
+            a_i = Integer(parts[2].strip())
+            b_i = Integer(parts[3].strip())
+            triples.append((n_i, c_i, a_i, b_i))
+        print(f"Number of ciphertexts: {len(triples)}")
+        print(f"Public exponent: e = {e}")
+        if len(triples) < e:
+            print(f"ERROR: Need at least {e} ciphertexts for e = {e}, got {len(triples)}")
+            print("HASTAD_LINEAR_PAD=FAILED")
         else:
-            print("No small roots found. The message may be too large for the Coppersmith bound.")
-            print("Try: smaller epsilon (e.g., 0.01) for larger lattice, or ensure m is sufficiently small.")
-            # Fallback: standard Hastad if all a_i=1, b_i=0
-            all_simple = all(t[2] == 1 and t[3] == 0 for t in triples)
-            if all_simple:
-                print("All a_i=1, b_i=0. Using standard Hastad CRT approach...")
-                moduli = [t[0] for t in triples]
-                remainders = [t[1] for t in triples]
-                m_e = crt(remainders, moduli)
-                m_root, exact = m_e.nth_root(e, truncate_mode=True)
-                if exact:
-                    print(f"Recovered message: m = {m_root}")
-                    all_ok = True
-                    for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
-                        v = power_mod(m_root, e, n_i)
-                        if v != c_i:
-                            all_ok = False
-                    if all_ok:
-                        print("HASTAD_LINEAR_PAD=SUCCESS")
-                    else:
-                        print("HASTAD_LINEAR_PAD=FAILED")
+            # General Hastad with linear padding: c_i = (a_i * m + b_i)^e mod n_i
+            # Combined modulus N = prod(n_i)
+            N = prod([t[0] for t in triples])
+            print(f"Combined modulus N has {N.nbits()} bits")
+            # Build CRT-combined polynomial F(x) = sum_i coeff_i * f_i(x) mod N
+            R.<x> = PolynomialRing(Zmod(N))
+            F = 0
+            for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
+                Ni = N // n_i
+                coeff = Ni * inverse_mod(Ni, n_i)
+                fi = (a_i*x + b_i)**e - c_i
+                F += coeff * fi
+            print(f"Combined polynomial degree: {F.degree()}")
+            # Make polynomial monic for Coppersmith's small_roots
+            F = F.monic()
+            print(f"Polynomial made monic, leading coefficient = 1")
+            # Coppersmith: find small root m < N^(1/e)
+            roots = F.small_roots(beta=1.0, epsilon=0.05)
+            if roots:
+                m = roots[0]
+                print(f"Recovered message: m = {m}")
+                # Verify against all triples
+                all_ok = True
+                for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
+                    v = power_mod(a_i * Integer(m) + b_i, e, n_i)
+                    ok = v == c_i
+                    if not ok:
+                        all_ok = False
+                    print(f"  Verify {i+1}: (a*m+b)^e mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
+                if all_ok:
+                    print("HASTAD_LINEAR_PAD=SUCCESS")
                 else:
-                    print(f"Approximate root: m = {m_root}")
                     print("HASTAD_LINEAR_PAD=FAILED")
             else:
-                print("HASTAD_LINEAR_PAD=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("HASTAD_LINEAR_PAD=FAILED")
-`,proof:`\\textbf{Theorem:} Given c_i \\equiv (a_i m + b_i)^e \\pmod{n_i} for i = 1, \\ldots, k with known a_i, b_i and k \\geq e, recover m via CRT + Coppersmith.
+                print("No small roots found. The message may be too large for the Coppersmith bound.")
+                print("Try: smaller epsilon (e.g., 0.01) for larger lattice, or ensure m is sufficiently small.")
+                # Fallback: standard Hastad if all a_i=1, b_i=0
+                all_simple = all(t[2] == 1 and t[3] == 0 for t in triples)
+                if all_simple:
+                    print("All a_i=1, b_i=0. Using standard Hastad CRT approach...")
+                    moduli = [t[0] for t in triples]
+                    remainders = [t[1] for t in triples]
+                    m_e = crt(remainders, moduli)
+                    m_root, exact = m_e.nth_root(e, truncate_mode=True)
+                    if exact:
+                        print(f"Recovered message: m = {m_root}")
+                        all_ok = True
+                        for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
+                            v = power_mod(m_root, e, n_i)
+                            if v != c_i:
+                                all_ok = False
+                        if all_ok:
+                            print("HASTAD_LINEAR_PAD=SUCCESS")
+                        else:
+                            print("HASTAD_LINEAR_PAD=FAILED")
+                    else:
+                        print(f"Approximate root: m = {m_root}")
+                        print("HASTAD_LINEAR_PAD=FAILED")
+                else:
+                    print("HASTAD_LINEAR_PAD=FAILED")
+    except Exception as ex:
+        print(f"ERROR: {ex}")
+        print("HASTAD_LINEAR_PAD=FAILED")
+    #
+_attack()`,proof:`\\textbf{Theorem:} Given c\\_i \\equiv (a\\_i m + b\\_i)^e \\pmod{n\\_i} for i = 1, \\ldots, k with known a\\_i, b\\_i and k \\geq e, recover m via CRT + Coppersmith.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item k triples (n_i, c_i, a_i, b_i) with pairwise coprime moduli
+\\item k triples (n\\_i, c\\_i, a\\_i, b\\_i) with pairwise coprime moduli
 \\item k \\geq e, known affine transforms
-\\item m < \\min(n_i)
+\\item m < \\min(n\\_i)
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -2934,80 +3150,91 @@ F(m) &\\equiv 0 \\pmod{N} \\\\
 m &= small\\_roots(\\tilde{F}, X = \\lceil \\tfrac{1}{2} N^{1/e - \\varepsilon} \\rceil) \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Build a polynomial per ciphertext, combine via CRT coefficients into F(x) over Zmod(N). The message m is a small root of F. Use Coppersmith's small_roots to extract it.
+\\textbf{Explanation:} Build a polynomial per ciphertext, combine via CRT coefficients into F(x) over Zmod(N). The message m is a small root of F. Use Coppersmith's small\\_roots to extract it.
 
 \\textbf{References:} J. Hastad, "Solving Linear Equations Modulo Divisors", Eurocrypt 1988; Coppersmith et al., "Cryptanalysis of RSA with Related Messages", 1996`,priority:`medium`,applicableCheck:e=>!!e.triples&&!!e.e},Pg=()=>{let e=BigInt(Math.floor(Math.random()*1e6)+42),t=[];for(let n=0;n<3;n++){let{n}=kh(L.p,L.q),r=BigInt(Math.floor(Math.random()*100)+1),i=BigInt(Math.floor(Math.random()*1e3));t.push(`${n},${Ah((r*e+i)%n,n,3n)},${r},${i}`)}return{triples:t.join(`
-`),e:`3`}},Fg={id:`lsb-oracle`,name:`LSB Oracle Attack`,category:`Message / Protocol`,description:`Recovers m via LSB oracle. Use when an oracle reveals LSB(decrypt(c·2^e mod n)).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated LSB bits)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`# LSB Oracle Attack — binary search via 2^e blinding
-if not "${e.n}".strip():
-    print("ERROR: n is required")
-    print("LSB_ORACLE=FAILED")
-    quit()
-if not "${e.c}".strip():
-    print("ERROR: c is required")
-    print("LSB_ORACLE=FAILED")
-    quit()
-if not "${e.oracle_responses}".strip():
-    print("ERROR: oracle_responses is required")
-    print("LSB_ORACLE=FAILED")
-    quit()
-try:
-    n = Integer(${e.n})
-    e_val = "${e.e}".strip()
-    e = Integer(e_val) if e_val else Integer(65537)
-    c = Integer(${e.c})
-    orig_c = Integer(${e.c})
-    # Parse oracle responses (LSB of each blinded query)
-    responses_str = """${e.oracle_responses}""".strip()
-    oracle_bits = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
-    print("LSB Oracle Attack on RSA")
-    print(f"n = {n}")
-    print(f"e = {e}")
-    print(f"c = {c}")
-    print(f"Oracle responses: {len(oracle_bits)} bits")
-    print()
-    n_bits = n.nbits()
-    if len(oracle_bits) < n_bits:
-        print(f"WARNING: Need {n_bits} responses for {n_bits}-bit modulus.")
-        print(f"Got {len(oracle_bits)}. Attack may be incomplete.")
-        print()
-    # Binary search using LSB oracle with 2^e blinding
-    # LSB(2m mod n) = 1 iff 2m >= n (since n is odd) iff m >= current midpoint
-    lower = Integer(0)
-    upper = Integer(n)
-    print("Binary search iterations:")
-    for i, bit in enumerate(oracle_bits):
-        mid = (lower + upper) // 2
-        # Blind ciphertext: c = c * 2^e mod n, so oracle returns LSB(2m mod n)
-        c = (c * power_mod(Integer(2), e, n)) % n
-        if bit == 0:
-            # LSB = 0: 2m mod n is even, so 2m < n => m in lower half
-            upper = mid
-        else:
-            # LSB = 1: 2m mod n is odd, so 2m >= n => m in upper half
-            lower = mid
-        if i < 10 or i % 50 == 0:
-            print(f"  Step {i+1}: LSB={bit}, range bits = {(upper - lower).nbits()}")
-    print()
-    m = (lower + upper) // 2
-    print(f"Recovered message: m = {m}")
-    # Verify against original ciphertext
-    v = power_mod(m, e, n)
-    print(f"Verification: m^e mod n = {v}")
-    print(f"Original c = {orig_c}")
-    if v == orig_c:
-        print("LSB_ORACLE=SUCCESS")
-    else:
+`),e:`3`}},Fg={id:`lsb-oracle`,name:`LSB Oracle Attack`,category:`Message / Protocol`,description:`Recovers m via LSB oracle. Use when an oracle reveals LSB(decrypt(c·2^e mod n)).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated LSB bits)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        # LSB Oracle Attack — binary search via 2^e blinding
+        if not "${e.n}".strip():
+            print("ERROR: n is required")
+            print("LSB_ORACLE=FAILED")
+            return
+        if not "${e.c}".strip():
+            print("ERROR: c is required")
+            print("LSB_ORACLE=FAILED")
+            return
+        if not """${e.oracle_responses||``}""".strip():
+            print("ERROR: oracle_responses is required")
+            print("LSB_ORACLE=FAILED")
+            return
+        try:
+            n = Integer(${e.n})
+            e_val = "${e.e}".strip()
+            e = Integer(e_val) if e_val else Integer(65537)
+            c = Integer(${e.c})
+            orig_c = Integer(${e.c})
+            # Parse oracle responses (LSB of each blinded query)
+            responses_str = """${e.oracle_responses||``}""".strip()
+            oracle_bits = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
+            print("LSB Oracle Attack on RSA")
+            print(f"n = {n}")
+            print(f"e = {e}")
+            print(f"c = {c}")
+            print(f"Oracle responses: {len(oracle_bits)} bits")
+            print()
+            n_bits = n.nbits()
+            if len(oracle_bits) < n_bits:
+                print(f"WARNING: Need {n_bits} responses for {n_bits}-bit modulus.")
+                print(f"Got {len(oracle_bits)}. Attack may be incomplete.")
+                print()
+            # Binary search using LSB oracle with 2^e blinding
+            # LSB(2m mod n) = 1 iff 2m >= n (since n is odd) iff m >= current midpoint
+            # NOTE: Use /2 (Rational) not //2 to avoid floor-division drift
+            lower = Integer(0)
+            upper = Integer(n)
+            print("Binary search iterations:")
+            for i, bit in enumerate(oracle_bits):
+                mid = (lower + upper) / 2  # Rational — exact midpoint
+                # Blind ciphertext: c = c * 2^e mod n, so oracle returns LSB(2m mod n)
+                c = (c * power_mod(Integer(2), e, n)) % n
+                if bit == 0:
+                    # LSB = 0: 2m mod n is even, so 2m < n => m in lower half
+                    upper = mid
+                else:
+                    # LSB = 1: 2m mod n is odd, so 2m >= n => m in upper half
+                    lower = mid
+                if i < 10 or i % 50 == 0:
+                    remaining = n.nbits() - i - 1
+                    print(f"  Step {i+1}: LSB={bit}, remaining ≈ {remaining} bits")
+            print()
+            # Scan exact candidates from rational interval [lower, upper)
+            from math import ceil, floor
+            for m_candidate in range(Integer(ceil(lower)), Integer(floor(upper)) + 1):
+                m = Integer(m_candidate)
+                if power_mod(m, e, n) == orig_c:
+                    print(f"Recovered message: m = {m}")
+                    v = power_mod(m, e, n)
+                    print(f"Verification: m^e mod n = {v}")
+                    print(f"Original c = {orig_c}")
+                    print("LSB_ORACLE=SUCCESS")
+                    break
+            else:
+                print("LSB_ORACLE=FAILED")
+        except Exception as ex:
+            print(f"ERROR: {ex}")
+            print("LSB_ORACLE=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("LSB_ORACLE=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("LSB_ORACLE=FAILED")
-`,proof:`\\textbf{Theorem:} An oracle \\mathcal{O}(c) = (c^d \\bmod n) \\bmod 2 recovers m in O(\\log n) queries via binary search.
+_attack()`,proof:`\\textbf{Theorem:} An oracle \\mathcal{O}(c) = (c^d \\bmod n) \\bmod 2 recovers m in O(\\log n) queries via binary search.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
 \\item Public key (n, e) and ciphertext c = m^e \\bmod n
 \\item Oracle returning the least significant bit of the decrypted blinded ciphertext
-\\item Queries use blinded ciphertexts c_i = c \\cdot (2^i)^e \\bmod n
+\\item Queries use blinded ciphertexts c\\_i = c \\cdot (2^i)^e \\bmod n
 \\item n must be odd (always true for RSA moduli)
 \\end{itemize}
 
@@ -3030,59 +3257,61 @@ u_k - \\ell_k &= \\frac{n}{2^k} \\xrightarrow{k = \\lceil \\log_2 n \\rceil} 1 \
 m &= \\ell_k \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Each oracle query on c \\cdot 2^{ie} \\bmod n determines whether 2^i \\cdot m \\bmod n is even or odd. Because n is odd, this is equivalent to checking whether multiplying m by 2^i overflows n (i.e., whether m \\geq n / 2^i). Each query narrows the search interval by half. After \\lceil \\log_2 n \\rceil queries the interval contains exactly one integer \\textemdash{} the plaintext.
+\\textbf{Explanation:} Each oracle query on c \\cdot 2^{ie} \\bmod n determines whether 2^i \\cdot m \\bmod n is even or odd. Because n is odd, this is equivalent to checking whether multiplying m by 2^i overflows n (i.e., whether m \\geq n / 2^i). Each query narrows the search interval by half. After \\lceil \\log\\_2 n \\rceil queries the interval contains exactly one integer \\textemdash{} the plaintext.
 
 \\textbf{References:} Goldwasser, Micali, "Probabilistic Encryption", 1982; Boneh, "Twenty Years of Attacks on RSA", 1999`,priority:`medium`,applicableCheck:e=>!!(e.n&&e.e&&e.c&&e.oracle_responses)},Ig=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=Ah(BigInt(Math.floor(Math.random()*1e6)+42),e,t),i=[],a=0n,o=e,s=r,c=L.p+L.q;for(let r=0;r<c;r++){let r=(a+o)/2n;s=s*Eh(2n,t,e)%e,(Eh(s,n,e)&1n)==1n?(i.push(`1`),a=r):(i.push(`0`),o=r)}return{n:e.toString(),e:t.toString(),c:r.toString(),oracle_responses:i.join(`,`)}},Lg={id:`rsa-crt-fault`,name:`RSA-CRT Fault Attack (Bellcore)`,category:`Message / Protocol`,description:`Recovers p from faulty CRT signature. Use when a signature was computed with CRT fault.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`m`,label:`m (message)`,placeholder:`Enter message m...`,multiline:!0,rows:3},{name:`sig_valid`,label:`Valid signature`,placeholder:`Enter valid signature...`,multiline:!0,rows:3},{name:`sig_faulty`,label:`Faulty signature`,placeholder:`Enter faulty signature...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.m||!e.sig_valid||!e.sig_faulty?`print("ERROR: Missing required inputs (n, e, m, sig_valid, sig_faulty)")
-print("RSA_CRT_FAULT=FAILED")`:`try:
-    n = Integer(${e.n})
-    e = Integer(${e.e})
-    m = Integer(${e.m})
-    sig_valid = Integer(${e.sig_valid})
-    sig_faulty = Integer(${e.sig_faulty})
-    print(f"RSA-CRT Fault Attack (Bellcore Attack)")
-    print(f"n = {n}")
-    print(f"Valid sig: {sig_valid}")
-    # Verify the valid signature
-    v_valid = power_mod(sig_valid, e, n)
-    print(f"sig_valid^e mod n = {v_valid}")
-    print(f"Expected m = {m}")
-    print(f"Valid sig check: {v_valid == m}")
-    # Faulty signature: correct mod one prime, wrong mod the other
-    # gcd(sig_faulty^e - m, n) reveals the factor
-    sig_faulty_e = power_mod(sig_faulty, e, n)
-    print(f"sig_faulty^e mod n = {sig_faulty_e}")
-    # Compute GCD
-    g = gcd(sig_faulty_e - m, n)
-    print(f"gcd(sig_faulty^e - m, n) = {g}")
-    if 1 < g < n:
-        p = g
-        q = n // g
-        print(f"\\nFactorization found!")
-        print(f"p = {p}")
-        print(f"q = {q}")
-        print(f"p * q = {p * q}")
-        print(f"p is prime: {p.is_prime()}")
-        print(f"q is prime: {q.is_prime()}")
-        # Compute private key
-        phi = (p - 1) * (q - 1)
-        d = inverse_mod(e, phi)
-        print(f"\\nPrivate exponent d = {d}")
-        # Verify with valid signature
-        sig_recovered = power_mod(m, d, n)
-        print(f"Recovered sig: {sig_recovered}")
-        print(f"Matches valid sig: {sig_recovered == sig_valid}")
-        print("RSA_CRT_FAULT=SUCCESS")
-    else:
-        print("GCD did not reveal a factor. The fault may not be a CRT fault.")
+print("RSA_CRT_FAULT=FAILED")`:`def _attack():
+    try:
+        n = Integer(${e.n})
+        e = Integer(${e.e})
+        m = Integer(${e.m})
+        sig_valid = Integer(${e.sig_valid})
+        sig_faulty = Integer(${e.sig_faulty})
+        print(f"RSA-CRT Fault Attack (Bellcore Attack)")
+        print(f"n = {n}")
+        print(f"Valid sig: {sig_valid}")
+        # Verify the valid signature
+        v_valid = power_mod(sig_valid, e, n)
+        print(f"sig_valid^e mod n = {v_valid}")
+        print(f"Expected m = {m}")
+        print(f"Valid sig check: {v_valid == m}")
+        # Faulty signature: correct mod one prime, wrong mod the other
+        # gcd(sig_faulty^e - m, n) reveals the factor
+        sig_faulty_e = power_mod(sig_faulty, e, n)
+        print(f"sig_faulty^e mod n = {sig_faulty_e}")
+        # Compute GCD
+        g = gcd(sig_faulty_e - m, n)
+        print(f"gcd(sig_faulty^e - m, n) = {g}")
+        if 1 < g < n:
+            p = g
+            q = n // g
+            print(f"\\nFactorization found!")
+            print(f"p = {p}")
+            print(f"q = {q}")
+            print(f"p * q = {p * q}")
+            print(f"p is prime: {p.is_prime()}")
+            print(f"q is prime: {q.is_prime()}")
+            # Compute private key
+            phi = (p - 1) * (q - 1)
+            d = inverse_mod(e, phi)
+            print(f"\\nPrivate exponent d = {d}")
+            # Verify with valid signature
+            sig_recovered = power_mod(m, d, n)
+            print(f"Recovered sig: {sig_recovered}")
+            print(f"Matches valid sig: {sig_recovered == sig_valid}")
+            print("RSA_CRT_FAULT=SUCCESS")
+        else:
+            print("GCD did not reveal a factor. The fault may not be a CRT fault.")
+            print("RSA_CRT_FAULT=FAILED")
+    except Exception as e:
+        print(f"ERROR: {e}")
         print("RSA_CRT_FAULT=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("RSA_CRT_FAULT=FAILED")
-`,proof:`\\textbf{Theorem:} A single faulty RSA-CRT signature s' on known message m factors n via \\gcd(s'^e - m, n).
+    #
+_attack()`,proof:`\\textbf{Theorem:} A single faulty RSA-CRT signature s' on known message m factors n via \\gcd(s'^e - m, n).
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n, e, m, s_{valid}, s_{faulty} (modulus, exponent, message, valid and faulty signatures)
+\\item n, e, m, s\\_{valid}, s\\_{faulty} (modulus, exponent, message, valid and faulty signatures)
 \\item n = pq, fault in one CRT component only
 \\item s' \\equiv s \\pmod{p} but s' \\not\\equiv s \\pmod{q}
 \\end{itemize}
@@ -3101,88 +3330,90 @@ q &= n / p \\qed
 \\textbf{Explanation:} A CRT fault makes the signature correct mod one prime but wrong mod the other. Raising the faulty signature to e and subtracting m yields a value divisible by exactly one prime factor. GCD with n extracts it.
 
 \\textbf{References:} Boneh, DeMillo, Lipton, "On the Importance of Checking Cryptographic Protocols for Faults", Eurocrypt 1997; Joye, "Fault Injection Attacks on CRT-RSA", 2012`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.m&&!!e.sig_valid&&!!e.sig_faulty},Rg=()=>{let{p:e,q:t,n,e:r,d:i}=kh(L.p,L.q),a=BigInt(Math.floor(Math.random()*1e6)+42),o=Eh(a,i,n),s=i%(e-1n),c=i%(t-1n),l=Eh(a,s,e),u=Eh(a,c,t)^1n,d=Th(t%e,e),f=Th(e%t,t),p=(l*t%n*d%n+u*e%n*f%n)%n;return{n:n.toString(),e:r.toString(),m:a.toString(),sig_valid:o.toString(),sig_faulty:p.toString()}},zg={id:`non-coprime-exp`,name:`Non-Coprime Exponent Attack`,category:`Message / Protocol`,description:`Decrypts when gcd(e, φ(n)) > 1. Use when public exponent shares factor with φ(n).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`p`,label:`p (prime factor)`,placeholder:`Enter prime factor p...`,multiline:!0,rows:3},{name:`q`,label:`q (prime factor)`,placeholder:`Enter prime factor q...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.c||!e.p||!e.q?`print("ERROR: Missing required inputs (n, e, c, p, q)")
-print("NON_COPRIME_EXP=FAILED")`:`try:
-    n = Integer(${e.n})
-    e = Integer(${e.e})
-    c = Integer(${e.c})
-    p = Integer(${e.p})
-    q = Integer(${e.q})
-    print(f"Non-Coprime Exponent Attack")
-    print(f"n = {n}, e = {e}")
-    print(f"p = {p}, q = {q}")
-    print()
-    phi = (p - 1) * (q - 1)
-    g = gcd(e, phi)
-    print(f"gcd(e, phi(n)) = gcd({e}, {phi}) = {g}")
-    if g == 1:
-        print("gcd(e, phi) = 1. Standard RSA applies. Use extended Euclidean algorithm.")
-        d = inverse_mod(e, phi)
-        m = power_mod(c, d, n)
-        print(f"Private exponent: d = {d}")
-        print(f"Recovered message: m = {m}")
-        # Verify
-        v = power_mod(m, e, n)
-        if v == c:
-            print("NON_COPRIME_EXP=SUCCESS")
-        else:
-            print("NON_COPRIME_EXP=FAILED")
-    else:
-        print(f"gcd(e, phi) = {g} > 1. Multiple plaintexts map to same ciphertext.")
+print("NON_COPRIME_EXP=FAILED")`:`def _attack():
+    try:
+        n = Integer(${e.n})
+        e = Integer(${e.e})
+        c = Integer(${e.c})
+        p = Integer(${e.p})
+        q = Integer(${e.q})
+        print(f"Non-Coprime Exponent Attack")
+        print(f"n = {n}, e = {e}")
+        print(f"p = {p}, q = {q}")
         print()
-        # mod p
-        gp = gcd(e, p - 1)
-        print(f"gcd(e, p-1) = {gp}")
-        roots_p = []
-        if gp == 1:
-            dp = inverse_mod(e, p - 1)
-            mp = power_mod(c, dp, p)
-            roots_p = [mp]
+        phi = (p - 1) * (q - 1)
+        g = gcd(e, phi)
+        print(f"gcd(e, phi(n)) = gcd({e}, {phi}) = {g}")
+        if g == 1:
+            print("gcd(e, phi) = 1. Standard RSA applies. Use extended Euclidean algorithm.")
+            d = inverse_mod(e, phi)
+            m = power_mod(c, d, n)
+            print(f"Private exponent: d = {d}")
+            print(f"Recovered message: m = {m}")
+            # Verify
+            v = power_mod(m, e, n)
+            if v == c:
+                print("NON_COPRIME_EXP=SUCCESS")
+            else:
+                print("NON_COPRIME_EXP=FAILED")
         else:
-            # Find all e-th roots mod p
-            Fp = GF(p)
-            cp = Fp(c)
-            roots_p = cp.nth_root(e, all=True)
-        print(f"e-th roots mod p: {[Integer(r) for r in roots_p]}")
-        # mod q
-        gq = gcd(e, q - 1)
-        print(f"gcd(e, q-1) = {gq}")
-        roots_q = []
-        if gq == 1:
-            dq = inverse_mod(e, q - 1)
-            mq = power_mod(c, dq, q)
-            roots_q = [mq]
-        else:
-            Fq = GF(q)
-            cq = Fq(c)
-            roots_q = cq.nth_root(e, all=True)
-        print(f"e-th roots mod q: {[Integer(r) for r in roots_q]}")
-        # CRT combine all pairs
-        print(f"\\nAll possible plaintexts ({len(roots_p) * len(roots_q)} total):")
-        found_valid = False
-        for rp in roots_p:
-            for rq in roots_q:
-                m = crt([Integer(rp), Integer(rq)], [p, q])
-                print(f"  m = {m}")
-                # Verify
-                v = power_mod(m, e, n)
-                ok = v == c
-                if ok:
-                    found_valid = True
-                print(f"    m^e mod n = {v} (c = {c}) {'OK' if ok else 'FAIL'}")
-        if found_valid:
-            print("NON_COPRIME_EXP=SUCCESS")
-        else:
-            print("NON_COPRIME_EXP=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("NON_COPRIME_EXP=FAILED")
-`,proof:`\\textbf{Theorem:} When \\gcd(e, \\varphi(n)) = g > 1, each ciphertext has g preimages found via e-th roots mod p, mod q + CRT.
+            print(f"gcd(e, phi) = {g} > 1. Multiple plaintexts map to same ciphertext.")
+            print()
+            # mod p
+            gp = gcd(e, p - 1)
+            print(f"gcd(e, p-1) = {gp}")
+            roots_p = []
+            if gp == 1:
+                dp = inverse_mod(e, p - 1)
+                mp = power_mod(c, dp, p)
+                roots_p = [mp]
+            else:
+                # Find all e-th roots mod p
+                Fp = GF(p)
+                cp = Fp(c)
+                roots_p = cp.nth_root(e, all=True)
+            print(f"e-th roots mod p: {[Integer(r) for r in roots_p]}")
+            # mod q
+            gq = gcd(e, q - 1)
+            print(f"gcd(e, q-1) = {gq}")
+            roots_q = []
+            if gq == 1:
+                dq = inverse_mod(e, q - 1)
+                mq = power_mod(c, dq, q)
+                roots_q = [mq]
+            else:
+                Fq = GF(q)
+                cq = Fq(c)
+                roots_q = cq.nth_root(e, all=True)
+            print(f"e-th roots mod q: {[Integer(r) for r in roots_q]}")
+            # CRT combine all pairs
+            print(f"\\nAll possible plaintexts ({len(roots_p) * len(roots_q)} total):")
+            found_valid = False
+            for rp in roots_p:
+                for rq in roots_q:
+                    m = crt([Integer(rp), Integer(rq)], [p, q])
+                    print(f"  m = {m}")
+                    # Verify
+                    v = power_mod(m, e, n)
+                    ok = v == c
+                    if ok:
+                        found_valid = True
+                    print(f"    m^e mod n = {v} (c = {c}) {'OK' if ok else 'FAIL'}")
+            if found_valid:
+                print("NON_COPRIME_EXP=SUCCESS")
+            else:
+                print("NON_COPRIME_EXP=FAILED")
+    except Exception as ex:
+        print(f"ERROR: {ex}")
+        print("NON_COPRIME_EXP=FAILED")
+    #
+_attack()`,proof:`\\textbf{Theorem:} When $\\gcd(e, \\varphi(n)) = g > 1$, each ciphertext has $g$ preimages found via $e$-th roots mod $p$, mod $q$ + CRT.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n, e, c, p, q (modulus, exponent, ciphertext, both prime factors)
-\\item \\gcd(e, \\varphi(n)) = g > 1
-\\item g_p = \\gcd(e, p-1), g_q = \\gcd(e, q-1)
+\\item $n$, $e$, $c$, $p$, $q$ (modulus, exponent, ciphertext, both prime factors)
+\\item $\\gcd(e, \\varphi(n)) = g > 1$
+\\item $g_p = \\gcd(e, p-1)$, $g_q = \\gcd(e, q-1)$
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -3196,66 +3427,68 @@ m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\\\
 m_{i,j}^e &\\equiv c \\pmod{n}, \\quad \\#\\text{solutions} = g_p \\cdot g_q = g \\qed
 \\end{align*}
 
-\\textbf{Explanation:} The map x ↦ xᵉ is g-to-1 when gcd(e, φ(n)) > 1. Find all e-th roots in each field separately, then CRT-combine every pair to get all g preimages.
+\\textbf{Explanation:} The map $x \\mapsto x^e$ is $g$-to-1 when $\\gcd(e, \\varphi(n)) > 1$. Find all $e$-th roots in each field separately, then CRT-combine every pair to get all $g$ preimages.
 
 \\textbf{References:} Williams, "Modification of the RSA Public-Key Encryption Procedure", 1980; May, "New RSA Vulnerabilities Using Lattice Reduction Methods", 2003`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.p&&!!e.q},Bg=()=>{let e=Oh(L.p),t=Oh(L.q),n=e*t,r=BigInt(Math.floor(Math.random()*1e6)+42);return{n:n.toString(),e:`2`,c:Ah(r,n,2n).toString(),p:e.toString(),q:t.toString()}},Vg={id:`cube-root-crt`,name:`Cube Root CRT Attack`,category:`Message / Protocol`,description:`Finds all cube roots of c mod n. Use when e=3 and p ≡ q ≡ 1 (mod 3).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`p`,label:`p (prime factor)`,placeholder:`Enter prime factor p...`,multiline:!0,rows:3},{name:`q`,label:`q (prime factor)`,placeholder:`Enter prime factor q...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.c||!e.p||!e.q?`print("ERROR: Missing required inputs (n, c, p, q)")
-print("CUBE_ROOT_CRT=FAILED")`:`try:
-    n = Integer(${e.n})
-    c = Integer(${e.c})
-    p = Integer(${e.p})
-    q = Integer(${e.q})
-    print(f"Cube Root CRT Attack (e = 3)")
-    print(f"n = {n}")
-    print(f"p = {p}, q = {q}")
-    print()
-    # Check conditions
-    phi = (p - 1) * (q - 1)
-    g = gcd(3, phi)
-    print(f"gcd(3, phi(n)) = {g}")
-    if g != 3:
-        print("WARNING: gcd(3, phi) != 3. Standard cube root may apply.")
-    # Cube roots mod p
-    print(f"\\nFinding cube roots mod p...")
-    Fp = GF(p)
-    cp = Fp(c)
-    roots_p = cp.nth_root(3, all=True)
-    print(f"Cube roots mod p: {[Integer(r) for r in roots_p]}")
-    # Cube roots mod q
-    print(f"Finding cube roots mod q...")
-    Fq = GF(q)
-    cq = Fq(c)
-    roots_q = cq.nth_root(3, all=True)
-    print(f"Cube roots mod q: {[Integer(r) for r in roots_q]}")
-    # CRT combine
-    print(f"\\nAll possible plaintexts ({len(roots_p) * len(roots_q)} total):")
-    found_valid = False
-    for rp in roots_p:
-        for rq in roots_q:
-            m = crt([Integer(rp), Integer(rq)], [p, q])
-            print(f"  m = {m}")
-            v = power_mod(m, 3, n)
-            ok = v == c
-            if ok:
-                found_valid = True
-            print(f"    m^3 mod n = {v} (c = {c}) {'OK' if ok else 'FAIL'}")
-    if len(roots_p) * len(roots_q) == 1:
-        print("\\nUnique solution found!")
-    elif len(roots_p) * len(roots_q) == 9:
-        print("\\n9 solutions (3 mod p × 3 mod q). Additional context needed to identify correct m.")
-    if found_valid:
-        print("CUBE_ROOT_CRT=SUCCESS")
-    else:
+print("CUBE_ROOT_CRT=FAILED")`:`def _attack():
+    try:
+        n = Integer(${e.n})
+        c = Integer(${e.c})
+        p = Integer(${e.p})
+        q = Integer(${e.q})
+        print(f"Cube Root CRT Attack (e = 3)")
+        print(f"n = {n}")
+        print(f"p = {p}, q = {q}")
+        print()
+        # Check conditions
+        phi = (p - 1) * (q - 1)
+        g = gcd(3, phi)
+        print(f"gcd(3, phi(n)) = {g}")
+        if g != 3:
+            print("WARNING: gcd(3, phi) != 3. Standard cube root may apply.")
+        # Cube roots mod p
+        print(f"\\nFinding cube roots mod p...")
+        Fp = GF(p)
+        cp = Fp(c)
+        roots_p = cp.nth_root(3, all=True)
+        print(f"Cube roots mod p: {[Integer(r) for r in roots_p]}")
+        # Cube roots mod q
+        print(f"Finding cube roots mod q...")
+        Fq = GF(q)
+        cq = Fq(c)
+        roots_q = cq.nth_root(3, all=True)
+        print(f"Cube roots mod q: {[Integer(r) for r in roots_q]}")
+        # CRT combine
+        print(f"\\nAll possible plaintexts ({len(roots_p) * len(roots_q)} total):")
+        found_valid = False
+        for rp in roots_p:
+            for rq in roots_q:
+                m = crt([Integer(rp), Integer(rq)], [p, q])
+                print(f"  m = {m}")
+                v = power_mod(m, 3, n)
+                ok = v == c
+                if ok:
+                    found_valid = True
+                print(f"    m^3 mod n = {v} (c = {c}) {'OK' if ok else 'FAIL'}")
+        if len(roots_p) * len(roots_q) == 1:
+            print("\\nUnique solution found!")
+        elif len(roots_p) * len(roots_q) == 9:
+            print("\\n9 solutions (3 mod p × 3 mod q). Additional context needed to identify correct m.")
+        if found_valid:
+            print("CUBE_ROOT_CRT=SUCCESS")
+        else:
+            print("CUBE_ROOT_CRT=FAILED")
+    except Exception as e:
+        print(f"ERROR: {e}")
         print("CUBE_ROOT_CRT=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("CUBE_ROOT_CRT=FAILED")
-`,proof:`\\textbf{Theorem:} When e = 3 and p \\equiv q \\equiv 1 \\pmod{3}, the map x ↦ x³ mod n has 9 preimages via cube roots mod p, mod q + CRT.
+    #
+_attack()`,proof:`\\textbf{Theorem:} When $e = 3$ and $p \\equiv q \\equiv 1 \\pmod{3}$, the map $x \\mapsto x^3 \\bmod n$ has 9 preimages via cube roots mod $p$, mod $q$ + CRT.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
 \\item n, c, p, q (modulus, ciphertext, both prime factors)
-\\item e = 3, p \\equiv q \\equiv 1 \\pmod{3}
-\\item 3 \\mid (p-1) and 3 \\mid (q-1)
+\\item $e = 3$, $p \\equiv q \\equiv 1 \\pmod{3}$
+\\item $3 \\mid (p-1)$ and $3 \\mid (q-1)$
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -3271,43 +3504,45 @@ m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\\\
 \\textbf{Explanation:} When p ≡ q ≡ 1 (mod 3), each field has exactly 3 cube roots of c. CRT-combine all 9 pairs to get all preimages. The correct m is identified by padding or format constraints.
 
 \\textbf{References:} Williams, "Modification of the RSA Public-Key Encryption Procedure", 1980; Rabin, "Digitalized Signatures and Public-Key Functions as Intractable as Factorization", 1979`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.c&&!!e.p&&!!e.q},Hg=()=>{function e(e){for(;;){let t=Oh(e);if(t%3n==1n)return t}}let t=e(L.p),n=e(L.q),r=t*n,i=Eh(BigInt(Math.floor(Math.random()*1e4)+42),3n,r);return{n:r.toString(),c:i.toString(),p:t.toString(),q:n.toString()}},Ug={id:`common-factor`,name:`Common Factor Attack`,category:`Message / Protocol`,description:`Recovers p when p divides m. Use when gcd(c, n) > 1.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.c?`print("ERROR: Missing required inputs (n, c)")
-print("COMMON_FACTOR=FAILED")`:`try:
-    n = Integer(${e.n})
-    c = Integer(${e.c})
-    print(f"Common Factor Attack")
-    print(f"n = {n}")
-    print(f"c = {c}")
-    print()
-    g = gcd(c, n)
-    print(f"gcd(c, n) = {g}")
-    if g == 1:
-        print("gcd(c, n) = 1. No common factor. Message is not a multiple of p or q.")
-        print("This attack does not apply.")
-        print("COMMON_FACTOR=FAILED")
-    elif g == n:
-        print("gcd(c, n) = n. c is a multiple of n (c = 0 mod n).")
-        print("The message m was 0 or a multiple of n.")
-        print("COMMON_FACTOR=FAILED")
-    else:
-        p = g
-        q = n // g
-        print(f"\\nCommon factor found!")
-        print(f"p = {p}")
-        print(f"q = {q}")
-        print(f"Verification: p * q = {p * q}")
-        print(f"p is prime: {p.is_prime()}")
-        print(f"q is prime: {q.is_prime()}")
-        if p.is_prime() and q.is_prime():
-            print(f"\\nThe message m is a multiple of p = {p}")
-            print(f"m = k * {p} for some integer k")
-            print("COMMON_FACTOR=SUCCESS")
-        else:
-            print("gcd(c, n) did not yield valid prime factors.")
+print("COMMON_FACTOR=FAILED")`:`def _attack():
+    try:
+        n = Integer(${e.n})
+        c = Integer(${e.c})
+        print(f"Common Factor Attack")
+        print(f"n = {n}")
+        print(f"c = {c}")
+        print()
+        g = gcd(c, n)
+        print(f"gcd(c, n) = {g}")
+        if g == 1:
+            print("gcd(c, n) = 1. No common factor. Message is not a multiple of p or q.")
+            print("This attack does not apply.")
             print("COMMON_FACTOR=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("COMMON_FACTOR=FAILED")
-`,frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.c),r=Sh(n,t);if(r===1n||r===t)return null;let i=r,a=t/r;return[`Common Factor Attack (browser-side, BigInt)`,`n = ${t}`,`c = ${n}`,`gcd(c, n) = ${r}`,``,`Common factor found!`,`p = ${i}`,`q = ${a}`,`Verification: p * q = ${i*a}`].join(`
+        elif g == n:
+            print("gcd(c, n) = n. c is a multiple of n (c = 0 mod n).")
+            print("The message m was 0 or a multiple of n.")
+            print("COMMON_FACTOR=FAILED")
+        else:
+            p = g
+            q = n // g
+            print(f"\\nCommon factor found!")
+            print(f"p = {p}")
+            print(f"q = {q}")
+            print(f"Verification: p * q = {p * q}")
+            print(f"p is prime: {p.is_prime()}")
+            print(f"q is prime: {q.is_prime()}")
+            if p.is_prime() and q.is_prime():
+                print(f"\\nThe message m is a multiple of p = {p}")
+                print(f"m = k * {p} for some integer k")
+                print("COMMON_FACTOR=SUCCESS")
+            else:
+                print("gcd(c, n) did not yield valid prime factors.")
+                print("COMMON_FACTOR=FAILED")
+    except Exception as e:
+        print(f"ERROR: {e}")
+        print("COMMON_FACTOR=FAILED")
+    #
+_attack()`,frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.c),r=Sh(n,t);if(r===1n||r===t)return null;let i=r,a=t/r;return[`Common Factor Attack (browser-side, BigInt)`,`n = ${t}`,`c = ${n}`,`gcd(c, n) = ${r}`,``,`Common factor found!`,`p = ${i}`,`q = ${a}`,`Verification: p * q = ${i*a}`].join(`
 `)}catch{return null}},proof:`\\textbf{Theorem:} If \\gcd(c, n) > 1 where c = m^e \\bmod n, then \\gcd(c, n) reveals a factor of n.
 
 \\textbf{Prerequisites:}
@@ -3328,75 +3563,77 @@ q &= n / \\gcd(c, n) \\qed
 \\textbf{Explanation:} If the message shares a factor with n, the ciphertext does too. GCD(c, n) extracts that prime factor directly, factoring n. This is a degenerate case — proper RSA padding prevents it.
 
 \\textbf{References:} Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2; Boneh, "Twenty Years of Attacks on RSA", 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.c},Wg=()=>{let{p:e,n:t,e:n}=kh(L.p,L.q),r=Ah(e*BigInt(Math.floor(Math.random()*1e3)+2),t,n);return{n:t.toString(),c:r.toString()}},Gg={id:`homomorphic-forgery`,name:`Homomorphic Forgery Attack`,category:`Message / Protocol`,description:`Forges signature via multiplicative property. Use when oracle signs chosen messages.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`target_m`,label:`Target message to forge`,placeholder:`Enter target message...`,multiline:!0,rows:3},{name:`oracle_pairs`,label:`Oracle pairs (m,s semicolon-separated)`,placeholder:`m1,s1;m2,s2;m3,s3...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.target_m||!e.oracle_pairs?`print("ERROR: Missing required inputs (n, e, target_m, oracle_pairs)")
-print("HOMOMORPHIC_FORGERY=FAILED")`:`from itertools import combinations
-try:
-    n = Integer(${e.n})
-    e = Integer(${e.e})
-    target_m = Integer(${e.target_m})
-    # Parse oracle pairs
-    pairs_str = """${e.oracle_pairs}""".strip()
-    oracle_pairs = []
-    for pair in pairs_str.split(';'):
-        pair = pair.strip()
-        if not pair:
-            continue
-        parts = pair.split(',')
-        if len(parts) < 2:
-            continue
-        m_i = Integer(parts[0].strip())
-        s_i = Integer(parts[1].strip())
-        oracle_pairs.append((m_i, s_i))
-    print("Homomorphic Forgery Attack")
-    print(f"Target message: {target_m}")
-    print(f"Oracle pairs: {len(oracle_pairs)}")
-    # Verify oracle pairs
-    print("Verifying oracle pairs:")
-    for i, (m_i, s_i) in enumerate(oracle_pairs):
-        v = power_mod(s_i, e, n)
-        valid = "OK" if v == m_i else "FAIL"
-        print(f"  Pair {i+1}: s_i^e mod n = {v}, m_i = {m_i} [{valid}]")
-    # Try to factor target_m into oracle messages
-    # target_m = m_1 * m_2 * ... * m_k (mod n)
-    # Then sig = s_1 * s_2 * ... * s_k (mod n)
-    # Simple approach: try all subsets
-    found = False
-    for r in range(1, len(oracle_pairs) + 1):
-        for combo in combinations(range(len(oracle_pairs)), r):
-            product_m = 1
-            product_s = 1
-            for idx in combo:
-                m_i, s_i = oracle_pairs[idx]
-                product_m = (product_m * m_i) % n
-                product_s = (product_s * s_i) % n
-            if product_m == target_m % n:
-                print(f"Found factorization using pairs: {[i+1 for i in combo]}")
-                print(f"Product of messages: {product_m}")
-                print(f"Forged signature: {product_s}")
-                # Verify
-                v = power_mod(product_s, e, n)
-                print(f"Verification: sig^e mod n = {v}")
-                print(f"Target message: {target_m % n}")
-                print(f"Valid: {v == target_m % n}")
-                found = True
+print("HOMOMORPHIC_FORGERY=FAILED")`:`def _attack():
+    from itertools import combinations
+    try:
+        n = Integer(${e.n})
+        e = Integer(${e.e})
+        target_m = Integer(${e.target_m})
+        # Parse oracle pairs
+        pairs_str = """${e.oracle_pairs}""".strip()
+        oracle_pairs = []
+        for pair in pairs_str.split(';'):
+            pair = pair.strip()
+            if not pair:
+                continue
+            parts = pair.split(',')
+            if len(parts) < 2:
+                continue
+            m_i = Integer(parts[0].strip())
+            s_i = Integer(parts[1].strip())
+            oracle_pairs.append((m_i, s_i))
+        print("Homomorphic Forgery Attack")
+        print(f"Target message: {target_m}")
+        print(f"Oracle pairs: {len(oracle_pairs)}")
+        # Verify oracle pairs
+        print("Verifying oracle pairs:")
+        for i, (m_i, s_i) in enumerate(oracle_pairs):
+            v = power_mod(s_i, e, n)
+            valid = "OK" if v == m_i else "FAIL"
+            print(f"  Pair {i+1}: s_i^e mod n = {v}, m_i = {m_i} [{valid}]")
+        # Try to factor target_m into oracle messages
+        # target_m = m_1 * m_2 * ... * m_k (mod n)
+        # Then sig = s_1 * s_2 * ... * s_k (mod n)
+        # Simple approach: try all subsets
+        found = False
+        for r in range(1, len(oracle_pairs) + 1):
+            for combo in combinations(range(len(oracle_pairs)), r):
+                product_m = 1
+                product_s = 1
+                for idx in combo:
+                    m_i, s_i = oracle_pairs[idx]
+                    product_m = (product_m * m_i) % n
+                    product_s = (product_s * s_i) % n
+                if product_m == target_m % n:
+                    print(f"Found factorization using pairs: {[i+1 for i in combo]}")
+                    print(f"Product of messages: {product_m}")
+                    print(f"Forged signature: {product_s}")
+                    # Verify
+                    v = power_mod(product_s, e, n)
+                    print(f"Verification: sig^e mod n = {v}")
+                    print(f"Target message: {target_m % n}")
+                    print(f"Valid: {v == target_m % n}")
+                    found = True
+                    break
+            if found:
                 break
         if found:
-            break
-    if found:
-        print("HOMOMORPHIC_FORGERY=SUCCESS")
-    else:
-        print("Could not factor target_m from oracle pairs using simple multiplication.")
-        print("Try more complex factorizations or additional oracle queries.")
+            print("HOMOMORPHIC_FORGERY=SUCCESS")
+        else:
+            print("Could not factor target_m from oracle pairs using simple multiplication.")
+            print("Try more complex factorizations or additional oracle queries.")
+            print("HOMOMORPHIC_FORGERY=FAILED")
+    except Exception as ex:
+        print(f"ERROR: {ex}")
         print("HOMOMORPHIC_FORGERY=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("HOMOMORPHIC_FORGERY=FAILED")
-`,proof:`\\textbf{Theorem:} Textbook RSA is multiplicatively homomorphic: s_1 \\cdot s_2 \\bmod n is a valid signature for m_1 \\cdot m_2 \\bmod n.
+    #
+_attack()`,proof:`\\textbf{Theorem:} Textbook RSA is multiplicatively homomorphic: \\(s_1 \\cdot s_2 \\bmod n\\) is a valid signature for \\(m_1 \\cdot m_2 \\bmod n\\).
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
 \\item n, e (modulus, public exponent)
-\\item Oracle pairs (m_i, s_i) where s_i = m_i^d \\bmod n
-\\item Target m^* factors as m^* = \\prod m_i \\pmod{n}
+\\item Oracle pairs \\((m_i, s_i)\\) where \\(s_i = m_i^d \\bmod n\\)
+\\item Target \\(m^*\\) factors as \\(m^* = \\prod m_i \\pmod{n}\\)
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -3411,63 +3648,65 @@ s^* &= \\prod_{i=1}^{k} s_i \\bmod n \\\\
 (s^*)^e &= m^* \\bmod n \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Factor the target message into a product of oracle-signed messages. Multiply the corresponding signatures to forge a valid signature on the target. This works because (ab)ᵈ ≡ aᵈ·bᵈ (mod n).
+\\textbf{Explanation:} Factor the target message into a product of oracle-signed messages. Multiply the corresponding signatures to forge a valid signature on the target. This works because \\((ab)^d \\equiv a^d \\cdot b^d \\pmod{n}\\).
 
 \\textbf{References:} Rivest, Shamir, Adleman, "A Method for Obtaining Digital Signatures", 1978; Boneh, "Twenty Years of Attacks on RSA", 1999`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.target_m&&!!e.oracle_pairs},Kg=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=2n,i=3n,a=Eh(r,n,e),o=Eh(i,n,e),s=r*i%e;return{n:e.toString(),e:t.toString(),target_m:s.toString(),oracle_pairs:`${r},${a};${i},${o}`}},qg={id:`bleichenbacher-sig`,name:`Bleichenbacher Signature Forgery (e=3)`,category:`Message / Protocol`,description:`Forges signature with weak PKCS#1 v1.5 verification. Use when e=3 and padding check is loose.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`3`,multiline:!1,defaultValue:`3`},{name:`hash_hex`,label:`Hash (hex)`,placeholder:`Enter hash in hex (e.g., SHA256)...`,multiline:!1}],sageTemplate:e=>!e.n||!e.hash_hex?`print("ERROR: Missing required inputs (n, hash_hex)")
-print("BLEICHENBACHER_SIG=FAILED")`:`try:
-    n = Integer(${e.n})
-    e = Integer(${e.e||`3`})
-    hash_hex = "${e.hash_hex}".strip()
-    if not hash_hex:
-        print("ERROR: hash_hex is empty")
+print("BLEICHENBACHER_SIG=FAILED")`:`def _attack():
+    try:
+        n = Integer(${e.n})
+        e = Integer(${e.e||`3`})
+        hash_hex = "${e.hash_hex}".strip()
+        if not hash_hex:
+            print("ERROR: hash_hex is empty")
+            print("BLEICHENBACHER_SIG=FAILED")
+            return
+        if e != 3:
+            print("This attack requires e=3.")
+            print(f"Got e={e}.")
+            print("BLEICHENBACHER_SIG=FAILED")
+            return
+        n_bytes = (n.nbits() + 7) // 8
+        hash_bytes = len(hash_hex) // 2
+        if hash_bytes == 0:
+            print("ERROR: hash_hex is too short (need at least 2 hex chars)")
+            print("BLEICHENBACHER_SIG=FAILED")
+            return
+        hash_int = Integer("0x" + hash_hex)
+        # PKCS#1 v1.5: 0x00 || 0x01 || 0xFF*min_padding || 0x00 || hash || garbage
+        # Garbage bytes absorb the error from ceil(cuberoot(target))
+        min_padding = 8
+        fixed_overhead = 3 + min_padding
+        garbage_len = n_bytes - fixed_overhead - hash_bytes
+        if garbage_len < 0:
+            print("ERROR: Hash too large for this modulus (need more garbage bytes)")
+            print("BLEICHENBACHER_SIG=FAILED")
+            return
+        # Construct target with garbage = 0
+        # Structure (LSB end): garbage | hash | 0x00 | 0xFF*min_padding | 0x01 | 0x00
+        target = (Integer(1) << (8 * (garbage_len + hash_bytes + 1 + min_padding))) + ((Integer(1) << (8 * min_padding)) - 1) * (Integer(1) << (8 * (garbage_len + hash_bytes + 1))) + hash_int * (Integer(1) << (8 * garbage_len))
+        # Forge S = ceil(cuberoot(target)) over the integers (no mod n needed)
+        sig, exact = target.nth_root(3, truncate_mode=True)
+        if not exact:
+            sig += 1
+        cube = sig ** 3
+        print(f"Bleichenbacher Signature Forgery (e={e})")
+        print(f"n bytes = {n_bytes}")
+        print(f"Target hash: {hash_hex}")
+        print(f"Forged signature S = {sig}")
+        print(f"S^3 = {cube}")
+        # Verify PKCS#1 leading bytes 0x0001 are preserved
+        top_two = cube >> (8 * (n_bytes - 2))
+        if top_two == Integer(0x0001):
+            print("PKCS#1 structure preserved — forged signature valid against lax verifier")
+            print("BLEICHENBACHER_SIG=SUCCESS")
+        else:
+            print("Signature forgery failed — garbage area too small for this hash and modulus")
+            print("BLEICHENBACHER_SIG=FAILED")
+    except Exception as ex:
+        print(f"ERROR: {ex}")
         print("BLEICHENBACHER_SIG=FAILED")
-        quit()
-    if e != 3:
-        print("This attack requires e=3.")
-        print(f"Got e={e}.")
-        print("BLEICHENBACHER_SIG=FAILED")
-        quit()
-    n_bytes = (n.nbits() + 7) // 8
-    hash_bytes = len(hash_hex) // 2
-    if hash_bytes == 0:
-        print("ERROR: hash_hex is too short (need at least 2 hex chars)")
-        print("BLEICHENBACHER_SIG=FAILED")
-        quit()
-    hash_int = Integer("0x" + hash_hex)
-    # PKCS#1 v1.5: 0x00 || 0x01 || 0xFF*min_padding || 0x00 || hash || garbage
-    # Garbage bytes absorb the error from ceil(cuberoot(target))
-    min_padding = 8
-    fixed_overhead = 3 + min_padding + 1
-    garbage_len = n_bytes - fixed_overhead - hash_bytes
-    if garbage_len < 0:
-        print("ERROR: Hash too large for this modulus (need more garbage bytes)")
-        print("BLEICHENBACHER_SIG=FAILED")
-        quit()
-    # Construct target with garbage = 0
-    # Structure (LSB end): garbage | hash | 0x00 | 0xFF*min_padding | 0x01 | 0x00
-    target = (Integer(1) << (8 * (garbage_len + hash_bytes + 1 + min_padding))) + ((Integer(1) << (8 * min_padding)) - 1) * (Integer(1) << (8 * (garbage_len + hash_bytes + 1))) + hash_int * (Integer(1) << (8 * garbage_len))
-    # Forge S = ceil(cuberoot(target)) over the integers (no mod n needed)
-    sig = target.nth_root(3)
-    if sig ** 3 < target:
-        sig += 1
-    cube = sig ** 3
-    print(f"Bleichenbacher Signature Forgery (e={e})")
-    print(f"n bytes = {n_bytes}")
-    print(f"Target hash: {hash_hex}")
-    print(f"Forged signature S = {sig}")
-    print(f"S^3 = {cube}")
-    # Verify PKCS#1 leading bytes 0x0001 are preserved
-    top_two = cube >> (8 * (n_bytes - 2))
-    if top_two == Integer(0x0001):
-        print("PKCS#1 structure preserved — forged signature valid against lax verifier")
-        print("BLEICHENBACHER_SIG=SUCCESS")
-    else:
-        print("Signature forgery failed — garbage area too small for this hash and modulus")
-        print("BLEICHENBACHER_SIG=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("BLEICHENBACHER_SIG=FAILED")
-`,proof:`\\textbf{Theorem:} PKCS#1 v1.5 signature verification with e = 3 is forgeable: construct S such that S³ starts with valid PKCS#1 padding and the target hash, without access to the private key.
+    #
+_attack()`,proof:`\\textbf{Theorem:} PKCS#1 v1.5 signature verification with e = 3 is forgeable: construct S such that S³ starts with valid PKCS#1 padding and the target hash, without access to the private key.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -3491,121 +3730,126 @@ S^3 &= \\text{target} + \\varepsilon \\quad (0 \\leq \\varepsilon < 3S^2)
 \\item Requires e = 3 (small exponent) and at least \\(\\lceil \\log_2(3S^2)/8 \\rceil\\) garbage bytes
 \\end{itemize}
 
-\\textbf{References:} D. Bleichenbacher, "Forging PKCS#1 v1.5 Signatures", Crypto 2006 rump session; A. Langley, "PKCS#1 signature validation", imperialviolet.org (2014)`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.hash_hex},Jg=()=>{let{n:e}=kh(L.p,L.q);return{n:e.toString(),e:`3`,hash_hex:`ab`}},Yg={id:`bleichenbacher`,name:`Bleichenbacher PKCS#1 v1.5`,category:`Oracle`,description:`Decrypts via PKCS#1 v1.5 padding oracle. Use when server reveals padding validity.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`# Bleichenbacher PKCS#1 v1.5 padding oracle attack
-if not "${e.n}".strip():
-    print("ERROR: n is required")
-    print("BLEICHENBACHER=FAILED")
-    quit()
-if not "${e.e}".strip():
-    print("ERROR: e is required")
-    print("BLEICHENBACHER=FAILED")
-    quit()
-if not "${e.c}".strip():
-    print("ERROR: c is required")
-    print("BLEICHENBACHER=FAILED")
-    quit()
-if not "${e.oracle_responses}".strip():
-    print("ERROR: oracle_responses is required")
-    print("BLEICHENBACHER=FAILED")
-    quit()
-
-try:
-    n = Integer(${e.n})
-    e = Integer(${e.e})
-    c = Integer(${e.c})
-    orig_c = Integer(${e.c})
-    # Parse oracle responses
-    responses_str = """${e.oracle_responses}""".strip()
-    oracle_bits = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
-    print(f"Bleichenbacher PKCS#1 v1.5 Attack")
-    print(f"n = {n} ({n.nbits()} bits)")
-    print(f"e = {e}")
-    print(f"c = {c}")
-    print(f"Oracle responses: {len(oracle_bits)}")
-    print()
-    # PKCS#1 v1.5: EM = 0x00 || 0x02 || PS || 0x00 || M
-    # Valid padding: 2B <= m < 3B where B = 2^(8*(k-2)), k = byte length
-    k = (n.nbits() + 7) // 8
-    B = Integer(2)**(8 * (k - 2))
-    print(f"Block size: {k} bytes, B = 2^(8*{k-2})")
-    print(f"Valid padding range: [2B, 3B) = [{2*B}, {3*B})")
-    print()
-    # Collect valid s values from oracle responses
-    valid_s = [Integer(i + 1) for i, r in enumerate(oracle_bits) if r == 1]
-    print(f"Valid padding responses: {len(valid_s)}")
-    if len(valid_s) < 2:
-        print("Need at least 2 valid responses for interval narrowing")
+\\textbf{References:} D. Bleichenbacher, "Forging PKCS#1 v1.5 Signatures", Crypto 2006 rump session; A. Langley, "PKCS#1 signature validation", imperialviolet.org (2014)`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.hash_hex},Jg=()=>{let{n:e}=kh(L.p,L.q);return{n:e.toString(),e:`3`,hash_hex:`ab`}},Yg={id:`bleichenbacher`,name:`Bleichenbacher PKCS#1 v1.5`,category:`Oracle`,description:`Decrypts via PKCS#1 v1.5 padding oracle. Use when server reveals padding validity.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        # Bleichenbacher PKCS#1 v1.5 padding oracle attack
+        if not "${e.n}".strip():
+            print("ERROR: n is required")
+            print("BLEICHENBACHER=FAILED")
+            return
+        if not "${e.e}".strip():
+            print("ERROR: e is required")
+            print("BLEICHENBACHER=FAILED")
+            return
+        if not "${e.c}".strip():
+            print("ERROR: c is required")
+            print("BLEICHENBACHER=FAILED")
+            return
+        if not "${e.oracle_responses}".strip():
+            print("ERROR: oracle_responses is required")
+            print("BLEICHENBACHER=FAILED")
+            return
+        try:
+            n = Integer(${e.n})
+            e = Integer(${e.e})
+            c = Integer(${e.c})
+            orig_c = Integer(${e.c})
+            # Parse oracle responses
+            responses_str = """${e.oracle_responses}""".strip()
+            oracle_bits = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
+            print(f"Bleichenbacher PKCS#1 v1.5 Attack")
+            print(f"n = {n} ({n.nbits()} bits)")
+            print(f"e = {e}")
+            print(f"c = {c}")
+            print(f"Oracle responses: {len(oracle_bits)}")
+            print()
+            # PKCS#1 v1.5: EM = 0x00 || 0x02 || PS || 0x00 || M
+            # Valid padding: 2B <= m < 3B where B = 2^(8*(k-2)), k = byte length
+            k = (n.nbits() + 7) // 8
+            B = Integer(2)**(8 * (k - 2))
+            print(f"Block size: {k} bytes, B = 2^(8*{k-2})")
+            print(f"Valid padding range: [2B, 3B) = [{2*B}, {3*B})")
+            print()
+            # Collect valid s values from oracle responses
+            valid_s = [Integer(i + 1) for i, r in enumerate(oracle_bits) if r == 1]
+            print(f"Valid padding responses: {len(valid_s)}")
+            if len(valid_s) < 2:
+                print("Need at least 2 valid responses for interval narrowing")
+                print("BLEICHENBACHER=FAILED")
+                return
+            s1 = valid_s[0]
+            print(f"s1 = {s1}")
+            # Initial interval from s1
+            if s1 == 1:
+                a = 2 * B
+                b = 3 * B - 1
+            else:
+                # Find r such that interval overlaps with [2B, 3B)
+                for r in range(0, int(s1) + 1):
+                    r_int = Integer(r)
+                    ca = ceil((2 * B + r_int * n) / s1)
+                    cb = floor((3 * B - 1 + r_int * n) / s1)
+                    inter_a = max(2 * B, ca)
+                    inter_b = min(3 * B - 1, cb)
+                    if inter_a <= inter_b:
+                        a = inter_a
+                        b = inter_b
+                        break
+            print(f"Initial interval: [{a}, {b}], size={(b-a+1).nbits()} bits")
+            print()
+            # Narrow using remaining valid s values
+            for idx in range(1, min(len(valid_s), 50)):
+                s = valid_s[idx]
+                # Find r range
+                r_min = ceil((a * s - 3 * B + 1) / n)
+                r_max = floor((b * s - 2 * B) / n)
+                new_a = None
+                new_b = None
+                for r in range(int(r_min), int(r_max) + 1):
+                    r_int = Integer(r)
+                    ca = ceil((2 * B + r_int * n) / s)
+                    cb = floor((3 * B - 1 + r_int * n) / s)
+                    inter_a = max(a, ca)
+                    inter_b = min(b, cb)
+                    if inter_a <= inter_b:
+                        if new_a is None or inter_a > new_a:
+                            new_a = inter_a
+                        if new_b is None or inter_b < new_b:
+                            new_b = inter_b
+                if new_a is not None and new_b is not None:
+                    a = new_a
+                    b = new_b
+                    if idx < 5 or b - a < (B) // 10:
+                        print(f"Step {idx}: s={s}, interval=[{a}, {b}], size={(b-a+1).nbits()} bits")
+                else:
+                    print(f"Step {idx}: s={s}, no valid interval intersection")
+            print()
+            if a == b:
+                m = a
+                print(f"Exact message recovered: m = {m}")
+            else:
+                m = (a + b) // 2
+                print(f"Estimated message: m = {m}")
+                print(f"Final interval: [{a}, {b}]")
+                print(f"Uncertainty: {(b-a+1).nbits()} bits")
+            # Verify
+            v = power_mod(m, e, n)
+            print(f"Verification: m^e mod n = {v}")
+            print(f"Original c = {orig_c}")
+            if v == orig_c:
+                print("VERIFICATION PASSED!")
+                print("BLEICHENBACHER=SUCCESS")
+            else:
+                print("Verification failed - may need more oracle responses")
+                print("BLEICHENBACHER=FAILED")
+        except Exception as ex:
+            print(f"ERROR: {ex}")
+            print("BLEICHENBACHER=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("BLEICHENBACHER=FAILED")
-        quit()
-    s1 = valid_s[0]
-    print(f"s1 = {s1}")
-    # Initial interval from s1
-    if s1 == 1:
-        a = 2 * B
-        b = 3 * B - 1
-    else:
-        # Find r such that interval overlaps with [2B, 3B)
-        for r in range(0, int(s1) + 1):
-            r_int = Integer(r)
-            ca = ceil((2 * B + r_int * n) / s1)
-            cb = floor((3 * B - 1 + r_int * n) / s1)
-            inter_a = max(2 * B, ca)
-            inter_b = min(3 * B - 1, cb)
-            if inter_a <= inter_b:
-                a = inter_a
-                b = inter_b
-                break
-    print(f"Initial interval: [{a}, {b}], size={(b-a+1).nbits()} bits")
-    print()
-    # Narrow using remaining valid s values
-    for idx in range(1, min(len(valid_s), 50)):
-        s = valid_s[idx]
-        # Find r range
-        r_min = ceil((a * s - 3 * B + 1) / n)
-        r_max = floor((b * s - 2 * B) / n)
-        new_a = None
-        new_b = None
-        for r in range(int(r_min), int(r_max) + 1):
-            r_int = Integer(r)
-            ca = ceil((2 * B + r_int * n) / s)
-            cb = floor((3 * B - 1 + r_int * n) / s)
-            inter_a = max(a, ca)
-            inter_b = min(b, cb)
-            if inter_a <= inter_b:
-                if new_a is None or inter_a > new_a:
-                    new_a = inter_a
-                if new_b is None or inter_b < new_b:
-                    new_b = inter_b
-        if new_a is not None and new_b is not None:
-            a = new_a
-            b = new_b
-            if idx < 5 or b - a < (B) // 10:
-                print(f"Step {idx}: s={s}, interval=[{a}, {b}], size={(b-a+1).nbits()} bits")
-        else:
-            print(f"Step {idx}: s={s}, no valid interval intersection")
-    print()
-    if a == b:
-        m = a
-        print(f"Exact message recovered: m = {m}")
-    else:
-        m = (a + b) // 2
-        print(f"Estimated message: m = {m}")
-        print(f"Final interval: [{a}, {b}]")
-        print(f"Uncertainty: {(b-a+1).nbits()} bits")
-    # Verify
-    v = power_mod(m, e, n)
-    print(f"Verification: m^e mod n = {v}")
-    print(f"Original c = {orig_c}")
-    if v == orig_c:
-        print("VERIFICATION PASSED!")
-        print("BLEICHENBACHER=SUCCESS")
-    else:
-        print("Verification failed - may need more oracle responses")
-        print("BLEICHENBACHER=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("BLEICHENBACHER=FAILED")
-`,proof:`\\textbf{Theorem:} A PKCS#1 v1.5 padding oracle allows decryption of any ciphertext in \\(\\approx 2^{17}\\) queries.
+_attack()`,proof:`\\textbf{Theorem:} A PKCS#1 v1.5 padding oracle allows decryption of any ciphertext in \\(\\approx 2^{17}\\) queries.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -3631,143 +3875,146 @@ M_i &= \\bigcup_r \\left[ \\left\\lceil \\frac{2B + r n}{s_i} \\right\\rceil, \\
 
 \\textbf{Explanation:} The attack multiplies the ciphertext by \\(s^e\\) and queries the oracle. A valid response constrains \\(m \\cdot s \\bmod n\\) to \\([2B, 3B)\\), which maps back to a union of intervals for \\(m\\). Intersecting these intervals across multiple \\(s\\) values shrinks the candidate range until \\(m\\) is isolated.
 
-\\textbf{References:} D. Bleichenbacher, "Chosen Ciphertext Attacks Against Protocols Based on the RSA Encryption Standard PKCS #1", CRYPTO 1998`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Xg=()=>{let{n:e,e:t}=kh(L.p,L.q),n=Math.ceil(e.toString(2).length/8),r=256n**BigInt(n-2),i=2n*r,a=3n*r,o=a-i,s=i+BigInt(Math.floor(Math.random()*1e6))*(o/1000000n),c=Ah(s,e,t),l=262144,u=new Set;u.add(1);for(let t=1;t<=8;t++){let n=BigInt(t),r=Number((n*e+i+s-1n)/s),o=Number((n*e+a-1n)/s),c=Math.max(2,r),d=Math.min(l,o);for(let e=c;e<=d;e++)u.add(e)}let d=[];for(let e=1;e<=l;e++)d.push(u.has(e)?`1`:`0`);return{n:e.toString(),e:t.toString(),c:c.toString(),oracle_responses:d.join(`,`)}},Zg={id:`manger`,name:`Manger's OAEP Attack`,category:`Oracle`,description:`Decrypts OAEP via first-byte oracle. Use when oracle reveals if decrypted OAEP starts with 0x00.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`# Manger's OAEP padding oracle attack (3-step algorithm)
-# Reference: J. Manger, CRYPTO 2001
-if not "${e.n}".strip():
-    print("ERROR: n is required")
-    print("MANGER=FAILED")
-    quit()
-if not "${e.e}".strip():
-    print("ERROR: e is required")
-    print("MANGER=FAILED")
-    quit()
-if not "${e.c}".strip():
-    print("ERROR: c is required")
-    print("MANGER=FAILED")
-    quit()
-if not "${e.oracle_responses}".strip():
-    print("ERROR: oracle_responses is required")
-    print("MANGER=FAILED")
-    quit()
-
-try:
-    n = Integer(${e.n})
-    e = Integer(${e.e})
-    c = Integer(${e.c})
-    orig_c = Integer(${e.c})
-
-    # Parse oracle responses into a list
-    responses_str = """${e.oracle_responses}""".strip()
-    oracle_list = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
-    oracle_idx = [0]
-
-    def oracle(query_c):
-        """Simulate oracle using pre-computed responses.
-        Returns True (1) if decrypted value >= B, False (0) if < B."""
-        if oracle_idx[0] >= len(oracle_list):
-            print(f"WARNING: ran out of oracle responses at index {oracle_idx[0]}")
-            return False
-        result = oracle_list[oracle_idx[0]] == 1
-        oracle_idx[0] += 1
-        return result
-
-    def ceil_div(a, b):
-        return (a + b - 1) // b
-
-    def floor_div(a, b):
-        return a // b
-
-    print(f"Manger's OAEP Attack (3-step algorithm)")
-    print(f"n = {n} ({n.nbits()} bits)")
-    print(f"e = {e}")
-    print(f"c = {c}")
-
-    # k = byte length of n, B = 2^(8*(k-1))
-    k = ceil_div(n.nbits(), 8)
-    B = Integer(2) ** (8 * (k - 1))
-    print(f"k = {k}, B = 2^(8*{k-1}) = {B}")
-    print(f"2*B = {2*B}, 2*B < n: {2*B < n}")
-    print()
-
-    queries_used = [0]
-
-    # Step 1: Find f1 such that f1*m mod n >= B
-    # Start with f1=2, double until oracle returns True (>= B)
-    print("=== Step 1: Finding f1 ===")
-    f1 = Integer(2)
-    while not oracle((power_mod(f1, e, n) * c) % n):
-        queries_used[0] += 1
-        f1 *= 2
-    queries_used[0] += 1
-    print(f"f1 = {f1} (f1*m mod n >= B confirmed)")
-    print()
-
-    # Step 2: Find f2 such that f2*m mod n < B (wrapped around)
-    # Start: f2 = floor((n+B)/B) * f1/2
-    # Increment by f1/2 until oracle returns False (< B)
-    print("=== Step 2: Finding f2 ===")
-    f1_half = f1 // 2
-    f2 = floor_div(n + B, B) * f1_half
-    while oracle((power_mod(f2, e, n) * c) % n):
-        queries_used[0] += 1
-        f2 += f1_half
-    queries_used[0] += 1
-    print(f"f2 = {f2} (f2*m mod n < B, wrapped to [n, n+B))")
-    print()
-
-    # Step 3: Binary search to narrow [mmin, mmax] to single value
-    print("=== Step 3: Binary search ===")
-    mmin = ceil_div(n, f2)
-    mmax = floor_div(n + B, f2)
-    print(f"Initial: mmin={mmin}, mmax={mmax}")
-    print(f"Range size: {(mmax - mmin).nbits()} bits")
-    print()
-
-    step_count = 0
-    twoB = Integer(2) * B
-    while mmin < mmax:
-        step_count += 1
-        f_tmp = floor_div(twoB, mmax - mmin)
-        i_val = floor_div(f_tmp * mmin, n)
-        f3 = ceil_div(i_val * n, mmin)
-        if f3 == 0:
-            f3 = Integer(1)
-        # Query oracle with f3
-        oracle_result = oracle((power_mod(f3, e, n) * c) % n)
-        queries_used[0] += 1
-        iNB = i_val * n + B
-        if oracle_result:
-            # f3*m mod n >= B => mmin = ceil((i*n + B) / f3)
-            mmin = ceil_div(iNB, f3)
-        else:
-            # f3*m mod n < B => mmax = floor((i*n + B) / f3)
-            mmax = floor_div(iNB, f3)
-        if step_count <= 5 or (mmax - mmin) <= Integer(2):
-            print(f"Step {step_count}: f3={f3}, oracle={oracle_result}, mmin={mmin}, mmax={mmax}, range={(mmax-mmin).nbits()} bits")
-
-    print()
-    m = mmin
-    print(f"Recovered message: m = {m}")
-    print(f"Total oracle queries: {queries_used[0]}")
-    print(f"Total binary search steps: {step_count}")
-
-    # Verify
-    v = power_mod(m, e, n)
-    print(f"Verification: m^e mod n = {v}")
-    print(f"Original c = {c}")
-    if v == c:
-        print("VERIFICATION PASSED!")
-        print("MANGER=SUCCESS")
-    else:
-        print("Verification failed - may need more oracle responses")
-        print(f"m^e mod n = {v}")
-        print(f"c = {c}")
+\\textbf{References:} D. Bleichenbacher, "Chosen Ciphertext Attacks Against Protocols Based on the RSA Encryption Standard PKCS #1", CRYPTO 1998`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Xg=()=>{let{n:e,e:t}=kh(L.p,L.q),n=Math.ceil(e.toString(2).length/8),r=256n**BigInt(n-2),i=2n*r,a=3n*r,o=a-i,s=i+BigInt(Math.floor(Math.random()*1e6))*(o/1000000n),c=Ah(s,e,t),l=262144,u=new Set;u.add(1);for(let t=1;t<=8;t++){let n=BigInt(t),r=Number((n*e+i+s-1n)/s),o=Number((n*e+a-1n)/s),c=Math.max(2,r),d=Math.min(l,o);for(let e=c;e<=d;e++)u.add(e)}let d=[];for(let e=1;e<=l;e++)d.push(u.has(e)?`1`:`0`);return{n:e.toString(),e:t.toString(),c:c.toString(),oracle_responses:d.join(`,`)}},Zg={id:`manger`,name:`Manger's OAEP Attack`,category:`Oracle`,description:`Decrypts OAEP via first-byte oracle. Use when oracle reveals if decrypted OAEP starts with 0x00.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        # Manger's OAEP padding oracle attack (3-step algorithm)
+        # Reference: J. Manger, CRYPTO 2001
+        if not "${e.n}".strip():
+            print("ERROR: n is required")
+            print("MANGER=FAILED")
+            return
+        if not "${e.e}".strip():
+            print("ERROR: e is required")
+            print("MANGER=FAILED")
+            return
+        if not "${e.c}".strip():
+            print("ERROR: c is required")
+            print("MANGER=FAILED")
+            return
+        if not "${e.oracle_responses}".strip():
+            print("ERROR: oracle_responses is required")
+            print("MANGER=FAILED")
+            return
+        #
+        try:
+            n = Integer(${e.n})
+            e = Integer(${e.e})
+            c = Integer(${e.c})
+            orig_c = Integer(${e.c})
+        #
+            # Parse oracle responses into a list
+            responses_str = """${e.oracle_responses}""".strip()
+            oracle_list = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
+            oracle_idx = [0]
+        #
+            def oracle(query_c):
+                """Simulate oracle using pre-computed responses.
+                Returns True (1) if decrypted value >= B, False (0) if < B."""
+                if oracle_idx[0] >= len(oracle_list):
+                    print(f"WARNING: ran out of oracle responses at index {oracle_idx[0]}")
+                    return False
+                result = oracle_list[oracle_idx[0]] == 1
+                oracle_idx[0] += 1
+                return result
+            def ceil_div(a, b):
+                return (a + b - 1) // b
+            def floor_div(a, b):
+                return a // b
+            print(f"Manger's OAEP Attack (3-step algorithm)")
+            print(f"n = {n} ({n.nbits()} bits)")
+            print(f"e = {e}")
+            print(f"c = {c}")
+            #
+            # k = byte length of n, B = 2^(8*(k-1))
+            k = ceil_div(n.nbits(), 8)
+            B = Integer(2) ** (8 * (k - 1))
+            print(f"k = {k}, B = 2^(8*{k-1}) = {B}")
+            print(f"2*B = {2*B}, 2*B < n: {2*B < n}")
+            print()
+            #
+            queries_used = [0]
+            #
+            # Step 1: Find f1 such that f1*m mod n >= B
+            # Start with f1=2, double until oracle returns True (>= B)
+            print("=== Step 1: Finding f1 ===")
+            f1 = Integer(2)
+            while not oracle((power_mod(f1, e, n) * c) % n):
+                queries_used[0] += 1
+                f1 *= 2
+            queries_used[0] += 1
+            print(f"f1 = {f1} (f1*m mod n >= B confirmed)")
+            print()
+            #
+            # Step 2: Find f2 such that f2*m mod n < B (wrapped around)
+            # Start: f2 = floor((n+B)/B) * f1/2
+            # Increment by f1/2 until oracle returns False (< B)
+            print("=== Step 2: Finding f2 ===")
+            f1_half = f1 // 2
+            f2 = floor_div(n + B, B) * f1_half
+            while oracle((power_mod(f2, e, n) * c) % n):
+                queries_used[0] += 1
+                f2 += f1_half
+            queries_used[0] += 1
+            print(f"f2 = {f2} (f2*m mod n < B, wrapped to [n, n+B))")
+            print()
+            #
+            # Step 3: Binary search to narrow [mmin, mmax] to single value
+            print("=== Step 3: Binary search ===")
+            mmin = ceil_div(n, f2)
+            mmax = floor_div(n + B, f2)
+            print(f"Initial: mmin={mmin}, mmax={mmax}")
+            print(f"Range size: {(mmax - mmin).nbits()} bits")
+            print()
+            #
+            step_count = 0
+            twoB = Integer(2) * B
+            while mmin < mmax:
+                step_count += 1
+                f_tmp = floor_div(twoB, mmax - mmin)
+                i_val = floor_div(f_tmp * mmin, n)
+                f3 = ceil_div(i_val * n, mmin)
+                if f3 == 0:
+                    f3 = Integer(1)
+                # Query oracle with f3
+                oracle_result = oracle((power_mod(f3, e, n) * c) % n)
+                queries_used[0] += 1
+                iNB = i_val * n + B
+                if oracle_result:
+                    # f3*m mod n >= B => mmin = ceil((i*n + B) / f3)
+                    mmin = ceil_div(iNB, f3)
+                else:
+                    # f3*m mod n < B => mmax = floor((i*n + B) / f3)
+                    mmax = floor_div(iNB, f3)
+                if step_count <= 5 or (mmax - mmin) <= Integer(2):
+                    print(f"Step {step_count}: f3={f3}, oracle={oracle_result}, mmin={mmin}, mmax={mmax}, range={(mmax-mmin).nbits()} bits")
+        #
+            #
+            m = mmin
+            print(f"Recovered message: m = {m}")
+            print(f"Total oracle queries: {queries_used[0]}")
+            print(f"Total binary search steps: {step_count}")
+            #
+            # Verify
+            v = power_mod(m, e, n)
+            print(f"Verification: m^e mod n = {v}")
+            print(f"Original c = {orig_c}")
+            if v == orig_c:
+                print("VERIFICATION PASSED!")
+                print("MANGER=SUCCESS")
+            else:
+                print("Verification failed - may need more oracle responses")
+                print(f"m^e mod n = {v}")
+                print(f"c = {orig_c}")
+                print("MANGER=FAILED")
+        #
+        except Exception as ex:
+            print(f"ERROR: {ex}")
+            print("MANGER=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("MANGER=FAILED")
-
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("MANGER=FAILED")
-`,proof:`\\textbf{Theorem:} An OAEP first-byte-zero oracle allows decryption in O(\\log n) queries.
+_attack()`,proof:`\\textbf{Theorem:} An OAEP first-byte-zero oracle allows decryption in O(\\log n) queries.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -3792,87 +4039,118 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r + 1)}{256s} \\
 
 \\textbf{Explanation:} Each oracle query on c·s^e reveals whether m·s mod n falls in [0, n/256). This constrains m to a union of narrow intervals. By choosing s strategically (doubling each step), the interval halves each round, converging to m in logarithmic queries.
 
-\\textbf{References:} J. Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP) as Standardized in PKCS #1 v2.0", CRYPTO 2001`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Qg=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=Math.ceil(Number(e.toString(2).length)/8),i=BigInt(2)**BigInt(8*(r-1)),a=new Uint8Array(r);crypto.getRandomValues(a),a[0]=0;let o=0n;for(let e of a)o=(o<<8n)+BigInt(e);let s=Ah(o,e,t),c=[],l=t=>Eh(t,n,e)>=i,u=2n;for(;!l(s*Eh(u,t,e)%e);)c.push(`0`),u*=2n;c.push(`1`);let d=u/2n,f=(e+i)/i*d;for(;l(s*Eh(f,t,e)%e);)c.push(`1`),f+=d;c.push(`0`);let p=(e+f-1n)/f,m=(e+i)/f,h=2n*i,g=0;for(;p<m&&g<2e3;){let n=h/(m-p)*p/e,r=(n*e+p-1n)/p;r===0n&&(r=1n);let a=l(s*Eh(r,t,e)%e);c.push(a?`1`:`0`);let o=n*e+i;a?p=(o+r-1n)/r:m=o/r,g++}return{n:e.toString(),e:t.toString(),c:s.toString(),oracle_responses:c.join(`,`)}},$g={id:`biased-lsb`,name:`Biased LSB Oracle`,category:`Oracle`,description:`Recovers m via noisy LSB oracle. Use when LSB oracle is correct with probability > 50%.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_runs`,label:`Oracle runs (multiple response strings, newline-separated)`,placeholder:`0,1,0,1,1\\n1,0,1,1,0\\n0,1,1,1,0...`,multiline:!0,rows:6}],sageTemplate:e=>`# Validate inputs
-if not "${e.n}".strip():
-    print("ERROR: n is required")
-    print("BIASED_LSB=FAILED")
-    quit()
-if not "${e.e}".strip():
-    print("ERROR: e is required")
-    print("BIASED_LSB=FAILED")
-    quit()
-if not "${e.c}".strip():
-    print("ERROR: c is required")
-    print("BIASED_LSB=FAILED")
-    quit()
-if not """${e.oracle_runs}""".strip():
-    print("ERROR: oracle_runs is required")
-    print("BIASED_LSB=FAILED")
-    quit()
-try:
-    n = Integer(${e.n})
-    e = Integer(${e.e})
-    orig_c = Integer(${e.c})
-    c = (Integer(${e.c}) * power_mod(Integer(2), e, n)) % n
-    # Parse oracle runs (multiple response strings, newline-separated)
-    runs_str = """${e.oracle_runs}""".strip()
-    runs = []
-    for line in runs_str.split('\\n'):
-        line = line.strip()
-        if not line:
-            continue
-        bits = [int(x.strip()) for x in line.split(',') if x.strip()]
-        runs.append(bits)
-    print(f"Biased LSB Oracle Attack")
-    print(f"n = {n}")
-    print(f"e = {e}")
-    print(f"c = {c}")
-    print(f"Number of oracle runs: {len(runs)}")
-    print()
-    # Per-bit majority voting, then binary search
-    num_bits = min(len(r) for r in runs)
-    n_bits = n.nbits()
-    print(f"Using {num_bits} bit positions (n has {n_bits} bits)")
-    # Majority voting
-    voted_bits = []
-    for i in range(num_bits):
-        votes = sum(runs[j][i] for j in range(len(runs)))
-        majority = 1 if votes > len(runs) / 2 else 0
-        voted_bits.append(majority)
-    print(f"Majority-voted bits: {voted_bits[:20]}{'...' if num_bits > 20 else ''}")
-    print()
-    # Binary search with voted bits
-    lower = Integer(0)
-    upper = Integer(n)
-    for i, bit in enumerate(voted_bits):
-        mid = (lower + upper) // 2
-        if bit == 0:
-            upper = mid
-        else:
-            lower = mid
-        c = (c * power_mod(Integer(2), e, n)) % n
-        if i < 5 or i >= len(voted_bits) - 3:
-            print(f"Step {i+1}: bit={bit}, lower={lower}, upper={upper}")
-    m = (lower + upper) // 2
-    print(f"\\nRecovered message: m = {m}")
-    # Verify
-    v = power_mod(m, e, n)
-    print(f"Verification: m^e mod n = {v}")
-    print(f"Original c = {orig_c}")
-    if v == orig_c:
-        print("VERIFICATION PASSED!")
-        print("BIASED_LSB=SUCCESS")
-    else:
-        print("Verification failed - may need more oracle runs or higher bias")
+\\textbf{References:} J. Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP) as Standardized in PKCS #1 v2.0", CRYPTO 2001`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Qg=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=Math.ceil(Number(e.toString(2).length)/8),i=BigInt(2)**BigInt(8*(r-1)),a=new Uint8Array(r);crypto.getRandomValues(a),a[0]=0;let o=0n;for(let e of a)o=(o<<8n)+BigInt(e);let s=Ah(o,e,t),c=[],l=t=>Eh(t,n,e)>=i,u=2n;for(;!l(s*Eh(u,t,e)%e);)c.push(`0`),u*=2n;c.push(`1`);let d=u/2n,f=(e+i)/i*d;for(;l(s*Eh(f,t,e)%e);)c.push(`1`),f+=d;c.push(`0`);let p=(e+f-1n)/f,m=(e+i)/f,h=2n*i,g=0;for(;p<m&&g<2e3;){let n=h/(m-p)*p/e,r=(n*e+p-1n)/p;r===0n&&(r=1n);let a=l(s*Eh(r,t,e)%e);c.push(a?`1`:`0`);let o=n*e+i;a?p=(o+r-1n)/r:m=o/r,g++}return{n:e.toString(),e:t.toString(),c:s.toString(),oracle_responses:c.join(`,`)}},$g={id:`biased-lsb`,name:`Biased LSB Oracle`,category:`Oracle`,description:`Recovers m via noisy LSB oracle. Use when LSB oracle is correct with probability > 50%.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_runs`,label:`Oracle runs (multiple response strings, newline-separated)`,placeholder:`0,1,0,1,1\\n1,0,1,1,0\\n0,1,1,1,0...`,multiline:!0,rows:6}],sageTemplate:e=>`def _attack():
+    try:
+        # Validate inputs
+        if not "${e.n}".strip():
+            print("ERROR: n is required")
+            print("BIASED_LSB=FAILED")
+            return
+        if not "${e.e}".strip():
+            print("ERROR: e is required")
+            print("BIASED_LSB=FAILED")
+            return
+        if not "${e.c}".strip():
+            print("ERROR: c is required")
+            print("BIASED_LSB=FAILED")
+            return
+        if not """${e.oracle_runs}""".strip():
+            print("ERROR: oracle_runs is required")
+            print("BIASED_LSB=FAILED")
+            return
+        try:
+            n = Integer(${e.n})
+            e_val = "${e.e}".strip()
+            e = Integer(e_val) if e_val else Integer(65537)
+            orig_c = Integer(${e.c})
+            c = (Integer(${e.c}) * power_mod(Integer(2), e, n)) % n
+            # Parse oracle runs (multiple response strings, newline-separated)
+            runs_str = """${e.oracle_runs}""".strip()
+            runs = []
+            for line in runs_str.split('\\n'):
+                line = line.strip()
+                if not line:
+                    continue
+                bits = [int(x.strip()) for x in line.split(',') if x.strip()]
+                runs.append(bits)
+            if not runs:
+                print("ERROR: No valid oracle runs parsed")
+                print("BIASED_LSB=FAILED")
+                return
+            print(f"Biased LSB Oracle Attack")
+            print(f"n = {n}")
+            print(f"e = {e}")
+            print(f"c = {c}")
+            print(f"Number of oracle runs: {len(runs)}")
+            print()
+            # Per-bit majority voting, then binary search
+            num_bits = min(len(r) for r in runs)
+            n_bits = n.nbits()
+            print(f"Using {num_bits} bit positions (n has {n_bits} bits)")
+            # Majority voting
+            voted_bits = []
+            for i in range(num_bits):
+                votes = sum(runs[j][i] for j in range(len(runs)))
+                majority = 1 if votes > len(runs) / 2 else 0
+                voted_bits.append(majority)
+            print(f"Majority-voted bits: {voted_bits[:20]}{'...' if num_bits > 20 else ''}")
+            print()
+            # Binary search with voted bits using exact rational division
+            # NOTE: Must use /2 (Rational) not //2 (floor division) to avoid
+            # accumulated truncation errors that exclude m from the interval.
+            lower = Integer(0)
+            upper = Integer(n)
+            for i, bit in enumerate(voted_bits):
+                mid = (lower + upper) / 2  # Rational — exact midpoint
+                if bit == 0:
+                    upper = mid
+                else:
+                    lower = mid
+                c = (c * power_mod(Integer(2), e, n)) % n
+                if i < 5 or i >= len(voted_bits) - 3:
+                    print(f"Step {i+1}: bit={bit}, lower={lower}, upper={upper}")
+            # Scan candidates near the rational interval [lower, upper)
+            # After log2(n) steps, interval should contain exactly one integer
+            from math import ceil, floor
+            candidate_start = Integer(ceil(lower))
+            candidate_end = Integer(floor(upper)) + 1
+            found_m = None
+            for m_candidate in range(candidate_start, candidate_end + 1):
+                m_test = Integer(m_candidate)
+                if power_mod(m_test, e, n) == orig_c:
+                    found_m = m_test
+                    break
+            if found_m is None:
+                # Fallback: wider scan around midpoint estimate (noisy oracle may have wrong bits)
+                mid_est = Integer(floor((lower + upper) / 2))
+                for m_candidate in range(max(0, mid_est - 20), mid_est + 21):
+                    m_test = Integer(m_candidate)
+                    if power_mod(m_test, e, n) == orig_c:
+                        found_m = m_test
+                        break
+            if found_m is not None:
+                print(f"\\nRecovered message: m = {found_m}")
+                v = power_mod(found_m, e, n)
+                print(f"Verification: m^e mod n = {v}")
+                print(f"Original c = {orig_c}")
+                print("VERIFICATION PASSED!")
+                print("BIASED_LSB=SUCCESS")
+            else:
+                print(f"\\nCandidate scan failed to find m in range [{candidate_start}, {candidate_end}]")
+                print("Verification failed - may need more oracle runs or higher bias")
+                print("BIASED_LSB=FAILED")
+        except Exception as ex:
+            print(f"ERROR: {ex}")
+            print("BIASED_LSB=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("BIASED_LSB=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("BIASED_LSB=FAILED")
-`,proof:`\\textbf{Theorem:} An LSB oracle with bias p > 1/2 recovers m with high probability via majority voting + binary search.
+_attack()`,proof:`\\textbf{Theorem:} An LSB oracle with bias p > 1/2 recovers m with high probability via majority voting + binary search.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item Noisy oracle \\mathcal{O}_j(c) = \\text{LSB}(c^d \\bmod n) with \\Pr[\\text{correct}] = p > 1/2
+\\item Noisy oracle \\mathcal{O}\\_j(c) = \\text{LSB}(c^d \\bmod n) with \\Pr[\\text{correct}] = p > 1/2
 \\item k independent oracle runs available per query
 \\item RSA homomorphism: \\text{LSB}((c \\cdot 2^e)^d) = \\text{LSB}(2m \\bmod n)
 \\item Binary search: \\text{LSB}(2^i m \\bmod n) halves the interval each step
@@ -3894,99 +4172,105 @@ b_i = 1 \\implies [a_{i+1}, b_{i+1}] &= [(a_i + b_i)/2, b_i) \\\\
 \\textbf{Explanation:} Each LSB query on 2^i·m mod n reveals whether m falls in the upper or lower half of the current interval. With noisy oracles, majority voting across k independent runs amplifies the signal. The error drops exponentially with k, so O(log n / (p-1/2)²) runs per bit suffice.
 
 \\textbf{References:} Goldwasser, Micali, "Probabilistic Encryption", 1982; Håstad et al., "Bit Security of RSA", 1989`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_runs},e_=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=e.toString(2).length,i=Ah(BigInt(`0x`+Array.from(crypto.getRandomValues(new Uint8Array(Math.ceil(r/8)))).map(e=>e.toString(16).padStart(2,`0`)).join(``))%(e/2n),e,t),a=[];for(let o=0;o<21;o++){let o=[],s=i*Eh(2n,t,e)%e;for(let i=0;i<r;i++){let r=(Eh(s,n,e)%2n).toString(),i=Math.random()<.75?r:r===`0`?`1`:`0`;o.push(i),s=s*Eh(2n,t,e)%e}a.push(o.join(`,`))}return{n:e.toString(),e:t.toString(),c:i.toString(),oracle_runs:a.join(`
-`)}},t_={id:`roca`,name:`ROCA Vulnerability`,category:`Advanced`,description:`Factors ROCA-vulnerable primes. Use when p = k·M + (65537^i mod M).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`# Validate inputs
-try:
-    if not "${e.n}".strip():
-        print("ERROR: n is required")
-        print("ROCA=FAILED")
-        quit()
-    n = Integer(${e.n})
-    # Even check
-    if n % 2 == 0:
-        print(f"n is even. p = 2, q = {n // 2}")
-        print("ROCA=SUCCESS")
-        quit()
-    # Prime check
-    if is_prime(n):
-        print("n is prime. Not a valid RSA modulus.")
-        print("ROCA=FAILED")
-        quit()
-    # ROCA: Return of Coppersmith's Attack
-    # Primes of form p = k*M + (65537^i mod M)
-    # M = product of first several primes
-    print("ROCA vulnerability check")
-    print(f"n = {n}")
-    print()
-    # Try small M values (M_3, M_5, M_7, ...)
-    primes_list = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53]
-    found = False
-    r1 = 0
-    for num_primes in range(1, len(primes_list) + 1):
-        M = prod(primes_list[:num_primes])
-        if M > 2**80:
-            break
-        # Compute possible remainders: 65537^i mod M
-        ord_val = Mod(65537, M).multiplicative_order()
-        remainders = set()
-        for idx in range(ord_val):
-            r = power_mod(65537, idx, M)
-            remainders.add(r)
-        # Check if n mod M is product of two remainders
-        n_mod = n % M
-        for r in remainders:
-            if n_mod * inverse_mod(r, M) % M in remainders:
-                print(f"Possible match with M = product of first {num_primes} primes")
-                print(f"M = {M}")
-                print(f"n mod M = {n_mod}")
-                print(f"Found compatible remainders: r1 = {r}")
-                found = True
-                r1 = r
-                break
-        if found:
-            break
-    if found:
-        print()
-        print("VULNERABLE: n appears to use ROCA-generated primes.")
-        print("Use Coppersmith's method to recover p.")
-        print()
-        # Coppersmith's method for small M
-        # p = k*M + r, where r is known remainder
-        # We search for k using Coppersmith
-        r = r1
-        R.<x> = PolynomialRing(ZZ)
-        f = M*x + r
-        # Try to find small root
-        # p <= sqrt(n), so k <= sqrt(n)/M
-        bound = ceil(sqrt(n) / M)
-        print(f"Searching for k with bound ~{bound}")
-        # Use Sage's small_roots
-        f_mod = f.change_ring(Zmod(n))
-        roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=0.05)
-        if roots:
-            k = int(roots[0])
-            p = int(M * k + r)
-            if n % p == 0:
-                q = n // p
-                print(f"SUCCESS! Factor found:")
-                print(f"p = {p}")
-                print(f"q = {q}")
-                print(f"Verification: p * q = {p * q}")
-                print("ROCA=SUCCESS")
-            else:
-                print("Root found but does not divide n. Try different parameters.")
+`)}},t_={id:`roca`,name:`ROCA Vulnerability`,category:`Advanced`,description:`Factors ROCA-vulnerable primes. Use when p = k·M + (65537^i mod M).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        # Validate inputs
+        try:
+            if not "${e.n}".strip():
+                print("ERROR: n is required")
                 print("ROCA=FAILED")
-        else:
-            print("No small root found. n may use a larger M value.")
-            print("Try using the full ROCA implementation with larger prime bases.")
+                return
+            n = Integer(${e.n})
+            # Even check
+            if n % 2 == 0:
+                print(f"n is even. p = 2, q = {n // 2}")
+                print("ROCA=SUCCESS")
+                return
+            # Prime check
+            if is_prime(n):
+                print("n is prime. Not a valid RSA modulus.")
+                print("ROCA=FAILED")
+                return
+            # ROCA: Return of Coppersmith's Attack
+            # Primes of form p = k*M + (65537^i mod M)
+            # M = product of first several primes
+            print("ROCA vulnerability check")
+            print(f"n = {n}")
+            print()
+            # Try small M values (M_3, M_5, M_7, ...)
+            primes_list = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53]
+            found = False
+            r1 = 0
+            for num_primes in range(1, len(primes_list) + 1):
+                M = prod(primes_list[:num_primes])
+                if M > 2**80:
+                    break
+                # Compute possible remainders: 65537^i mod M
+                ord_val = Mod(65537, M).multiplicative_order()
+                remainders = set()
+                for idx in range(ord_val):
+                    r = power_mod(65537, idx, M)
+                    remainders.add(r)
+                # Check if n mod M is product of two remainders
+                n_mod = n % M
+                for r in remainders:
+                    if n_mod * inverse_mod(r, M) % M in remainders:
+                        print(f"Possible match with M = product of first {num_primes} primes")
+                        print(f"M = {M}")
+                        print(f"n mod M = {n_mod}")
+                        print(f"Found compatible remainders: r1 = {r}")
+                        found = True
+                        r1 = r
+                        break
+                if found:
+                    break
+            if found:
+                print()
+                print("VULNERABLE: n appears to use ROCA-generated primes.")
+                print("Use Coppersmith's method to recover p.")
+                print()
+                # Coppersmith's method for small M
+                # p = k*M + r, where r is known remainder
+                # We search for k using Coppersmith
+                r = r1
+                R.<x> = PolynomialRing(ZZ)
+                f = M*x + r
+                # Try to find small root
+                # p <= sqrt(n), so k <= sqrt(n)/M
+                bound = ceil(sqrt(n) / M)
+                print(f"Searching for k with bound ~{bound}")
+                # Use Sage's small_roots
+                f_mod = f.change_ring(Zmod(n))
+                roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=0.05)
+                if roots:
+                    k = int(roots[0])
+                    p = int(M * k + r)
+                    if n % p == 0:
+                        q = n // p
+                        print(f"SUCCESS! Factor found:")
+                        print(f"p = {p}")
+                        print(f"q = {q}")
+                        print(f"Verification: p * q = {p * q}")
+                        print("ROCA=SUCCESS")
+                    else:
+                        print("Root found but does not divide n. Try different parameters.")
+                        print("ROCA=FAILED")
+                else:
+                    print("No small root found. n may use a larger M value.")
+                    print("Try using the full ROCA implementation with larger prime bases.")
+                    print("ROCA=FAILED")
+            else:
+                print("n does NOT appear to be ROCA-vulnerable for small M values.")
+                print("The primes were likely not generated by Infineon's library.")
+                print("ROCA=FAILED")
+        except Exception as ex:
+            print(f"ERROR: {ex}")
             print("ROCA=FAILED")
-    else:
-        print("n does NOT appear to be ROCA-vulnerable for small M values.")
-        print("The primes were likely not generated by Infineon's library.")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("ROCA=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("ROCA=FAILED")
-`,proof:`\\textbf{Theorem:} RSA primes generated by Infineon's ROCA-vulnerable library (v1.01.006–v1.02.008) have the form \\(p = k \\cdot M + (65537^{i} \\bmod M)\\), enabling factorization via Coppersmith's method.
+_attack()`,proof:`\\textbf{Theorem:} RSA primes generated by Infineon's ROCA-vulnerable library (v1.01.006–v1.02.008) have the form \\(p = k \\cdot M + (65537^{i} \\bmod M)\\), enabling factorization via Coppersmith's method.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -4008,97 +4292,103 @@ f(x) &= M \\cdot x + r_1 \\equiv 0 \\pmod{p} \\\\
 
 \\textbf{Explanation:} The attack fingerprints \\(n \\bmod M\\) against products of known remainders. A match identifies the correct \\(M\\) and remainder \\(r_1\\), then Coppersmith's method recovers \\(k\\) from the linear polynomial \\(f(x) = Mx + r_1\\) modulo \\(p\\).
 
-\\textbf{References:} M. Nemec et al., "The Return of Coppersmith's Attack: Practical Factorization of Widely Used RSA Moduli", CCS 2017; https://crocs.fi.muni.cz/roca`,priority:`high`,applicableCheck:e=>!!e.n},n_=()=>{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n],t=1n;for(let n of e)t*=n;let n=L.p-77;for(let e=0;e<5e3;e++){let e=Eh(65537n,BigInt(Math.floor(Math.random()*1e4)),t),r=Math.ceil(n/8),i=new Uint8Array(r);crypto.getRandomValues(i);let a=0n;for(let e=0;e<r;e++)a=a<<8n|BigInt(i[e]);a|=1n<<BigInt(n-1),a|=1n;let o=a*t+e;if(Dh(o))return{n:(o*Oh(L.q)).toString()}}return{n:kh(L.p,L.q).n.toString()}},r_={id:`nitros`,name:`Nitros / ROCA Variant`,category:`Advanced`,description:`Factors generalized ROCA primes with arbitrary base. Use when p = k·M + (a^i mod M).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`base`,label:`Base (default 65537)`,placeholder:`65537`,multiline:!1}],sageTemplate:e=>`try:
-    n_input = "${e.n}".strip()
-    if not n_input:
-        print("ERROR: n is required")
-        print("NITROS=FAILED")
-        quit()
-    n = Integer(n_input)
-    base_val = "${e.base}".strip()
-    base = Integer(base_val) if base_val else Integer(65537)
-    # Even check
-    if n % 2 == 0:
-        print(f"n is even. p = 2, q = {n // 2}")
-        print("NITROS=SUCCESS")
-        quit()
-    # Prime check
-    if is_prime(n):
-        print("n is prime. Not a valid RSA modulus.")
-        print("NITROS=FAILED")
-        quit()
-    print("Nitros / Extended ROCA attack")
-    print(f"n = {n}")
-    print(f"base = {base}")
-    print()
-    # Try multiple prime bases for M
-    prime_sets = [
-        [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53],
-        [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59],
-        [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61],
-    ]
-    found = False
-    for primes_subset in prime_sets:
-        M = prod(primes_subset)
-        # Skip if base is not coprime to M — multiplicative_order would crash
-        if gcd(base, M) != 1:
-            print(f"M = {M}: gcd(base, M) = {gcd(base, M)} != 1, skipping...")
-            continue
-        # Compute remainders
-        ord_val = Mod(base, M).multiplicative_order()
-        remainders = set()
-        for idx in range(ord_val):
-            r = power_mod(base, idx, M)
-            remainders.add(r)
-        n_mod = n % M
-        # Check if n_mod factors into two remainders
-        for r1 in remainders:
-            r2 = n_mod * inverse_mod(r1, M) % M
-            if r2 in remainders:
-                print(f"Match found with M = {M}")
-                print(f"r1 = {r1}, r2 = {r2}")
-                print(f"Verification: r1 * r2 mod M = {(r1 * r2) % M} (n mod M = {n_mod})")
-                found = True
-                # Try Coppersmith
-                R.<x> = PolynomialRing(ZZ)
-                f = M*x + r1
-                bound = ceil(sqrt(n) / M)
-                f_mod = f.change_ring(Zmod(n))
-                roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=0.05)
-                if roots:
-                    k = int(roots[0])
-                    p = int(M * k + r1)
-                    if n % p == 0:
-                        q = n // p
-                        print(f"SUCCESS! p = {p}, q = {q}")
-                        print(f"Verification: p * q = {p * q}")
-                        print("NITROS=SUCCESS")
-                    else:
-                        print(f"Root found but doesn't divide n. Trying r2...")
-                        f2 = M*x + r2
-                        roots2 = f2.change_ring(Zmod(n)).small_roots(X=bound, beta=0.5, epsilon=0.05)
-                        if roots2:
-                            k2 = int(roots2[0])
-                            p2 = int(M * k2 + r2)
-                            if n % p2 == 0:
-                                print(f"SUCCESS! p = {p2}, q = {n // p2}")
+\\textbf{References:} M. Nemec et al., "The Return of Coppersmith's Attack: Practical Factorization of Widely Used RSA Moduli", CCS 2017; https://crocs.fi.muni.cz/roca`,priority:`high`,applicableCheck:e=>!!e.n},n_=()=>{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n],t=1n;for(let n of e)t*=n;let n=L.p-77;for(let e=0;e<5e3;e++){let e=Eh(65537n,BigInt(Math.floor(Math.random()*1e4)),t),r=Math.ceil(n/8),i=new Uint8Array(r);crypto.getRandomValues(i);let a=0n;for(let e=0;e<r;e++)a=a<<8n|BigInt(i[e]);a|=1n<<BigInt(n-1),a|=1n;let o=a*t+e;if(Dh(o))return{n:(o*Oh(L.q)).toString()}}return{n:kh(L.p,L.q).n.toString()}},r_={id:`nitros`,name:`Nitros / ROCA Variant`,category:`Advanced`,description:`Factors generalized ROCA primes with arbitrary base. Use when p = k·M + (a^i mod M).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`base`,label:`Base (default 65537)`,placeholder:`65537`,multiline:!1}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n_input = "${e.n}".strip()
+            if not n_input:
+                print("ERROR: n is required")
+                print("NITROS=FAILED")
+                return
+            n = Integer(n_input)
+            base_val = "${e.base}".strip()
+            base = Integer(base_val) if base_val else Integer(65537)
+            # Even check
+            if n % 2 == 0:
+                print(f"n is even. p = 2, q = {n // 2}")
+                print("NITROS=SUCCESS")
+                return
+            # Prime check
+            if is_prime(n):
+                print("n is prime. Not a valid RSA modulus.")
+                print("NITROS=FAILED")
+                return
+            print("Nitros / Extended ROCA attack")
+            print(f"n = {n}")
+            print(f"base = {base}")
+            print()
+            # Try multiple prime bases for M
+            prime_sets = [
+                [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53],
+                [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59],
+                [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61],
+            ]
+            found = False
+            for primes_subset in prime_sets:
+                M = prod(primes_subset)
+                # Skip if base is not coprime to M — multiplicative_order would crash
+                if gcd(base, M) != 1:
+                    print(f"M = {M}: gcd(base, M) = {gcd(base, M)} != 1, skipping...")
+                    continue
+                # Compute remainders
+                ord_val = Mod(base, M).multiplicative_order()
+                remainders = set()
+                for idx in range(ord_val):
+                    r = power_mod(base, idx, M)
+                    remainders.add(r)
+                n_mod = n % M
+                # Check if n_mod factors into two remainders
+                for r1 in remainders:
+                    r2 = n_mod * inverse_mod(r1, M) % M
+                    if r2 in remainders:
+                        print(f"Match found with M = {M}")
+                        print(f"r1 = {r1}, r2 = {r2}")
+                        print(f"Verification: r1 * r2 mod M = {(r1 * r2) % M} (n mod M = {n_mod})")
+                        found = True
+                        # Try Coppersmith
+                        R.<x> = PolynomialRing(ZZ)
+                        f = M*x + r1
+                        bound = ceil(sqrt(n) / M)
+                        f_mod = f.change_ring(Zmod(n))
+                        roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=0.05)
+                        if roots:
+                            k = int(roots[0])
+                            p = int(M * k + r1)
+                            if n % p == 0:
+                                q = n // p
+                                print(f"SUCCESS! p = {p}, q = {q}")
+                                print(f"Verification: p * q = {p * q}")
                                 print("NITROS=SUCCESS")
                             else:
-                                print("NITROS=FAILED")
+                                print(f"Root found but doesn't divide n. Trying r2...")
+                                f2 = M*x + r2
+                                roots2 = f2.change_ring(Zmod(n)).small_roots(X=bound, beta=0.5, epsilon=0.05)
+                                if roots2:
+                                    k2 = int(roots2[0])
+                                    p2 = int(M * k2 + r2)
+                                    if n % p2 == 0:
+                                        print(f"SUCCESS! p = {p2}, q = {n // p2}")
+                                        print("NITROS=SUCCESS")
+                                    else:
+                                        print("NITROS=FAILED")
+                                else:
+                                    print("NITROS=FAILED")
                         else:
                             print("NITROS=FAILED")
-                else:
-                    print("NITROS=FAILED")
-                break
-        if found:
-            break
-    if not found:
-        print("No ROCA/Nitros pattern detected for tested M values.")
+                        break
+                if found:
+                    break
+            if not found:
+                print("No ROCA/Nitros pattern detected for tested M values.")
+                print("NITROS=FAILED")
+        except Exception as ex:
+            print(f"ERROR: {ex}")
+            print("NITROS=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("NITROS=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("NITROS=FAILED")
-`,proof:`\\textbf{Theorem:} The Nitros attack generalizes ROCA to primes of the form \\(p = k \\cdot M + (a^{i} \\bmod M)\\) for arbitrary base \\(a\\).
+_attack()`,proof:`\\textbf{Theorem:} The Nitros attack generalizes ROCA to primes of the form \\(p = k \\cdot M + (a^{i} \\bmod M)\\) for arbitrary base \\(a\\).
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -4121,110 +4411,116 @@ f(x) &= M \\cdot x + r_1 \\equiv 0 \\pmod{p} \\\\
 
 \\textbf{Explanation:} The algorithm tests multiple prime subsets for \\(M\\) and configurable base \\(a\\). Once a matching remainder pair \\((r_1, r_2)\\) is found, Coppersmith's method recovers \\(k\\). Both \\(r_1\\) and \\(r_2\\) are tried as candidate remainders.
 
-\\textbf{References:} Nemec et al., CCS 2017; extended analysis in subsequent ROCA research`,priority:`medium`,applicableCheck:e=>!!e.n},i_=()=>{let e=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n],t=1n;for(let n of e)t*=n;for(let e=0;e<5e3;e++){let e=Eh(65537n,BigInt(Math.floor(Math.random()*1e4)),t),n=new Uint8Array(6);crypto.getRandomValues(n);let r=0n;for(let e=0;e<6;e++)r=r<<8n|BigInt(n[e]);r|=1n<<BigInt(42),r|=1n,r&=(1n<<BigInt(43))-1n;let i=r*t+e;if(Dh(i))return{n:(i*Oh(120)).toString(),base:`65537`}}return{n:kh(120,120).n.toString(),base:`65537`}},a_=class extends Error{status;constructor(e,t){super(e),this.name=`FactorDBError`,this.status=t}},o_=``;function s_(e){o_=e}async function c_(e,t=o_){let n=typeof e==`bigint`?e.toString():e,r=t?`${t}?query=${encodeURIComponent(n)}`:`https://factordb.com/api?query=${encodeURIComponent(n)}`,i=new AbortController,a=setTimeout(()=>i.abort(),1e4);try{let e=await fetch(r,{signal:i.signal});if(!e.ok)throw new a_(`HTTP ${e.status}`,e.status);return e.json()}finally{clearTimeout(a)}}function l_(e){let t=[];if(t.push(`FactorDB Status: ${e.status}`),e.status===`FF`&&e.factors){t.push(`Fully factored!`);for(let[n,r]of e.factors)t.push(`  ${n}^${r}`);if(e.factors.length===2){let n=BigInt(e.factors[0][0])**BigInt(e.factors[0][1]),r=BigInt(e.factors[1][0])**BigInt(e.factors[1][1]);t.push(`p = ${n}`),t.push(`q = ${r}`)}}else if(e.status===`CF`&&e.factors){t.push(`Partially factored:`);for(let[n,r]of e.factors)t.push(`  ${n}^${r}`)}else t.push(`No factors found`);return t.join(`
-`)}var u_={id:`factordb-lookup`,name:`FactorDB Lookup`,category:`Advanced`,description:`Looks up factorization in FactorDB. Use as first step for any unknown modulus.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=await c_(e.n);return t.status===`FF`&&t.factors&&t.factors.length>=2?l_(t):null}catch{return null}},sageTemplate:e=>`try:
-    # Validate inputs
-    if not "${e.n}".strip():
-        print("ERROR: n is required")
-        print("FACTORDB_LOOKUP=FAILED")
-        quit()
-    # Simple Floyd cycle Pollard's rho for fallback factorization
-    def pollard_rho_factor(n):
-        if n % 2 == 0:
-            return 2
-        if n.is_prime():
-            return None
-        for c in range(1, 20):
-            x = 2
-            y = 2
-            d = 1
-            while d == 1:
-                x = (x * x + c) % n
-                y = (y * y + c) % n
-                y = (y * y + c) % n
-                d = gcd(abs(x - y), n)
-            if d != n:
-                return d
-        return None
-    n = Integer(${e.n})
-    # Pre-checks
-    if n < 2:
-        print(f"n = {n} is too small to factor")
-        print("FACTORDB_LOOKUP=FAILED")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even. p = 2, q = {n // 2}")
-        print("FACTORDB_LOOKUP=SUCCESS")
-        quit()
-    if n.is_prime():
-        print("n is prime. Not a valid RSA modulus.")
-        print("FACTORDB_LOOKUP=FAILED")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print("FACTORDB_LOOKUP=SUCCESS")
-        quit()
-    print(f"Checking if n = {n} has known factors")
-    print()
-    # Step 1: Trial division with small primes
-    print("Step 1: Trial division with small primes...")
-    for p in primes(10000):
-        if n % p == 0:
-            q = n // p
-            print(f"Found small factor: p = {p}")
-            print(f"q = {q}")
-            if q.is_prime():
-                print("q is prime. Factorization complete!")
-            else:
-                print("q is composite. Further factorization needed.")
-                print(f"q factors: {factor(q)}")
-            print("FACTORDB_LOOKUP=SUCCESS")
-            quit()
-    print("No factors found below 10000.")
-    # Step 2: ECM factorization
-    print()
-    print("Step 2: ECM factorization...")
+\\textbf{References:} Nemec et al., CCS 2017; extended analysis in subsequent ROCA research`,priority:`medium`,applicableCheck:e=>!!e.n},i_=()=>{let e=65537n,t=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n],n=1n;for(let e of t)n*=e;for(let t=0;t<5e3;t++){let t=Eh(e,BigInt(Math.floor(Math.random()*1e4)),n),r=Eh(e,BigInt(Math.floor(Math.random()*1e4)),n),i=new Uint8Array(6);crypto.getRandomValues(i);let a=0n;for(let e=0;e<6;e++)a=a<<8n|BigInt(i[e]);a|=1n<<BigInt(42),a|=1n,a&=(1n<<BigInt(43))-1n;let o=new Uint8Array(6);crypto.getRandomValues(o);let s=0n;for(let e=0;e<6;e++)s=s<<8n|BigInt(o[e]);s|=1n<<BigInt(42),s|=1n,s&=(1n<<BigInt(43))-1n;let c=a*n+t,l=s*n+r;if(c!==l&&Dh(c)&&Dh(l))return{n:(c*l).toString(),base:`65537`}}return{n:kh(120,120).n.toString(),base:`65537`}},a_=class extends Error{status;constructor(e,t){super(e),this.name=`FactorDBError`,this.status=t}},o_=``;function s_(e){o_=e}async function c_(e,t=o_){let n=typeof e==`bigint`?e.toString():e,r=t?`${t}?query=${encodeURIComponent(n)}`:`https://factordb.com/api?query=${encodeURIComponent(n)}`,i=new AbortController,a=setTimeout(()=>i.abort(),1e4);try{let e=await fetch(r,{signal:i.signal});if(!e.ok)throw new a_(`HTTP ${e.status}`,e.status);return e.json()}finally{clearTimeout(a)}}function l_(e){let t=[];if(t.push(`FactorDB Status: ${e.status}`),e.status===`FF`&&e.factors){t.push(`Fully factored!`);for(let[n,r]of e.factors)t.push(`  ${n}^${r}`);if(e.factors.length===2){let n=BigInt(e.factors[0][0])**BigInt(e.factors[0][1]),r=BigInt(e.factors[1][0])**BigInt(e.factors[1][1]);t.push(`p = ${n}`),t.push(`q = ${r}`)}}else if(e.status===`CF`&&e.factors){t.push(`Partially factored:`);for(let[n,r]of e.factors)t.push(`  ${n}^${r}`)}else t.push(`No factors found`);return t.join(`
+`)}var u_={id:`factordb-lookup`,name:`FactorDB Lookup`,category:`Advanced`,description:`Looks up factorization in FactorDB. Use as first step for any unknown modulus.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=await c_(e.n);return t.status===`FF`&&t.factors&&t.factors.length>=2?l_(t):null}catch{return null}},sageTemplate:e=>`def _attack():
     try:
-        fac = n.factor(algorithm='ecm')
-        if fac:
-            fac_p = None
-            for fp, exp in fac:
-                fac_p = fp
-                break
-            if fac_p is not None and 1 < fac_p < n:
-                q = n // fac_p
-                print(f"p = {fac_p}")
-                print(f"q = {q}")
-                print(f"Verification: p * q = {fac_p * q}")
+        try:
+            # Validate inputs
+            if not "${e.n}".strip():
+                print("ERROR: n is required")
+                print("FACTORDB_LOOKUP=FAILED")
+                return
+            # Simple Floyd cycle Pollard's rho for fallback factorization
+            def pollard_rho_factor(n):
+                if n % 2 == 0:
+                    return 2
+                if n.is_prime():
+                    return None
+                for c in range(1, 20):
+                    x = 2
+                    y = 2
+                    d = 1
+                    while d == 1:
+                        x = (x * x + c) % n
+                        y = (y * y + c) % n
+                        y = (y * y + c) % n
+                        d = gcd(abs(x - y), n)
+                    if d != n:
+                        return d
+                return None
+            n = Integer(${e.n})
+            # Pre-checks
+            if n < 2:
+                print(f"n = {n} is too small to factor")
+                print("FACTORDB_LOOKUP=FAILED")
+                return
+            if n % 2 == 0:
+                print(f"n is even. p = 2, q = {n // 2}")
                 print("FACTORDB_LOOKUP=SUCCESS")
-                quit()
-            else:
-                print("ECM found no non-trivial factors.")
-        else:
-            print("ECM did not find factors.")
-    except Exception as ex:
-        print(f"ECM failed: {ex}")
-    # Step 3: Pollard's rho fallback
-    print()
-    print("Step 3: Pollard's rho...")
-    try:
-        f = pollard_rho_factor(n)
-        if f is not None and f != n:
-            print(f"Pollard's rho found: {f}")
-            print(f"Other factor: {n // f}")
-            print("FACTORDB_LOOKUP=SUCCESS")
-            quit()
-        else:
-            print("Pollard's rho did not find a factor.")
-    except Exception as ex:
-        print(f"Pollard's rho failed: {ex}")
-    print("FACTORDB_LOOKUP=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("FACTORDB_LOOKUP=FAILED")
-`,proof:`\\textbf{Theorem:} Many RSA moduli from CTF challenges and weak key generation have been pre-factored and stored in public databases.
+                return
+            if n.is_prime():
+                print("n is prime. Not a valid RSA modulus.")
+                print("FACTORDB_LOOKUP=FAILED")
+                return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"p = q = {p}")
+                print("FACTORDB_LOOKUP=SUCCESS")
+                return
+            print(f"Checking if n = {n} has known factors")
+            print()
+            # Step 1: Trial division with small primes
+            print("Step 1: Trial division with small primes...")
+            for p in primes(10000):
+                if n % p == 0:
+                    q = n // p
+                    print(f"Found small factor: p = {p}")
+                    print(f"q = {q}")
+                    if q.is_prime():
+                        print("q is prime. Factorization complete!")
+                    else:
+                        print("q is composite. Further factorization needed.")
+                        print(f"q factors: {factor(q)}")
+                    print("FACTORDB_LOOKUP=SUCCESS")
+                    return
+            print("No factors found below 10000.")
+            # Step 2: ECM factorization
+            print()
+            print("Step 2: ECM factorization...")
+            try:
+                fac = n.factor(algorithm='ecm')
+                if fac:
+                    fac_p = None
+                    for fp, exp in fac:
+                        fac_p = fp
+                        break
+                    if fac_p is not None and 1 < fac_p < n:
+                        q = n // fac_p
+                        print(f"p = {fac_p}")
+                        print(f"q = {q}")
+                        print(f"Verification: p * q = {fac_p * q}")
+                        print("FACTORDB_LOOKUP=SUCCESS")
+                        return
+                    else:
+                        print("ECM found no non-trivial factors.")
+                else:
+                    print("ECM did not find factors.")
+            except Exception as ex:
+                print(f"ECM failed: {ex}")
+            # Step 3: Pollard's rho fallback
+            print()
+            print("Step 3: Pollard's rho...")
+            try:
+                f = pollard_rho_factor(n)
+                if f is not None and f != n:
+                    print(f"Pollard's rho found: {f}")
+                    print(f"Other factor: {n // f}")
+                    print("FACTORDB_LOOKUP=SUCCESS")
+                    return
+                else:
+                    print("Pollard's rho did not find a factor.")
+            except Exception as ex:
+                print(f"Pollard's rho failed: {ex}")
+            print("FACTORDB_LOOKUP=FAILED")
+        except Exception as ex:
+            print(f"ERROR: {ex}")
+            print("FACTORDB_LOOKUP=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("FACTORDB_LOOKUP=FAILED")
+_attack()`,proof:`\\textbf{Theorem:} Many RSA moduli from CTF challenges and weak key generation have been pre-factored and stored in public databases.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -4246,81 +4542,83 @@ except Exception as ex:
 \\textbf{Explanation:} FactorDB returns pre-computed factorizations instantly for known moduli. If the database has no entry, the SageMath fallback runs trial division, ECM, and Pollard's rho sequentially.
 
 \\textbf{References:} https://factordb.com; RsaCtfTool project`,priority:`low`,applicableCheck:e=>!!e.n},d_=()=>({n:(Oh(36)*Oh(L.p+L.q-36)).toString()}),f_={id:`known-plaintext`,name:`Known Plaintext Attack`,category:`Advanced`,description:`Recovers m from known prefix via Coppersmith. Use when high-order bytes of m are known and unknown portion is small.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`known_prefix`,label:`Known plaintext prefix`,placeholder:`e.g., flag{`,multiline:!1},{name:`unknown_bits`,label:`Unknown bits after prefix`,placeholder:`32`,defaultValue:`32`,multiline:!1}],sageTemplate:e=>!e.n||!e.c?`print("ERROR: n and c are required")
-print("KNOWN_PLAINTEXT=FAILED")`:`try:
-    n = Integer(${e.n})
-    e_val = "${e.e}".strip()
-    e = Integer(e_val) if e_val else Integer(65537)
-    c = Integer(${e.c})
-    known_prefix = "${e.known_prefix||``}"
-    unknown_bits = Integer("${(e.unknown_bits||`32`).trim()}")
-    print(f"Known plaintext attack on RSA")
-    print(f"n = {n} ({n.nbits()} bits)")
-    print(f"e = {e}")
-    print(f"c = {c}")
-    if known_prefix:
-        print(f"Known prefix: '{known_prefix}'")
-        print(f"Unknown bits: {unknown_bits}")
-        prefix_bytes = known_prefix.encode('utf-8')
-        prefix_int = Integer(int.from_bytes(prefix_bytes, 'big'))
-        print(f"Prefix as integer: {prefix_int}")
-        print(f"Prefix byte length: {len(prefix_bytes)}")
-        shift = Integer(2)**unknown_bits
-        bound = n.nbits() // e
-        if unknown_bits <= 16:
-            print(f"Brute forcing 2^{unknown_bits} possibilities...")
-            found = False
-            for k in range(Integer(2)**unknown_bits):
-                if power_mod(prefix_int * shift + k, e, n) == c:
-                    print(f"FOUND! m = {prefix_int * shift + k}")
-                    m_found = prefix_int * shift + k
+print("KNOWN_PLAINTEXT=FAILED")`:`def _attack():
+    try:
+        n = Integer(${e.n})
+        e_val = "${e.e}".strip()
+        e = Integer(e_val) if e_val else Integer(65537)
+        c = Integer(${e.c})
+        known_prefix = "${e.known_prefix||``}"
+        unknown_bits = Integer("${(e.unknown_bits||`32`).trim()}")
+        print(f"Known plaintext attack on RSA")
+        print(f"n = {n} ({n.nbits()} bits)")
+        print(f"e = {e}")
+        print(f"c = {c}")
+        if known_prefix:
+            print(f"Known prefix: '{known_prefix}'")
+            print(f"Unknown bits: {unknown_bits}")
+            prefix_bytes = known_prefix.encode('utf-8')
+            prefix_int = Integer(int.from_bytes(prefix_bytes, 'big'))
+            print(f"Prefix as integer: {prefix_int}")
+            print(f"Prefix byte length: {len(prefix_bytes)}")
+            shift = Integer(2)**unknown_bits
+            bound = n.nbits() // e
+            if unknown_bits <= 16:
+                print(f"Brute forcing 2^{unknown_bits} possibilities...")
+                found = False
+                for k in range(Integer(2)**unknown_bits):
+                    if power_mod(prefix_int * shift + k, e, n) == c:
+                        print(f"FOUND! m = {prefix_int * shift + k}")
+                        m_found = prefix_int * shift + k
+                        try:
+                            m_hex = hex(m_found)[2:]
+                            if len(m_hex) % 2 != 0:
+                                m_hex = '0' + m_hex
+                            print(f"m as bytes: {bytes.fromhex(m_hex)}")
+                        except:
+                            pass
+                        print("KNOWN_PLAINTEXT=SUCCESS")
+                        found = True
+                        break
+                if not found:
+                    print("Brute force exhausted without finding match.")
+                    print("KNOWN_PLAINTEXT=FAILED")
+            elif unknown_bits <= bound:
+                print(f"Using Coppersmith's method (bound = 2^{bound})...")
+                R.<x> = PolynomialRing(Zmod(n))
+                f = (prefix_int * shift + x)**e - c
+                f = f.monic()
+                roots = f.small_roots(X=shift, beta=1.0, epsilon=0.05)
+                if roots:
+                    x = Integer(roots[0])
+                    m = prefix_int * shift + x
+                    print(f"FOUND! m = {m}")
                     try:
-                        m_hex = hex(m_found)[2:]
+                        m_hex = hex(m)[2:]
                         if len(m_hex) % 2 != 0:
                             m_hex = '0' + m_hex
                         print(f"m as bytes: {bytes.fromhex(m_hex)}")
                     except:
-                        pass
+                        print(f"m as hex: {hex(m)}")
                     print("KNOWN_PLAINTEXT=SUCCESS")
-                    found = True
-                    break
-            if not found:
-                print("Brute force exhausted without finding match.")
-                print("KNOWN_PLAINTEXT=FAILED")
-        elif unknown_bits <= bound:
-            print(f"Using Coppersmith's method (bound = 2^{bound})...")
-            R.<x> = PolynomialRing(Zmod(n))
-            f = (prefix_int * shift + x)**e - c
-            f = f.monic()
-            roots = f.small_roots(X=shift, beta=1.0, epsilon=0.05)
-            if roots:
-                x = Integer(roots[0])
-                m = prefix_int * shift + x
-                print(f"FOUND! m = {m}")
-                try:
-                    m_hex = hex(m)[2:]
-                    if len(m_hex) % 2 != 0:
-                        m_hex = '0' + m_hex
-                    print(f"m as bytes: {bytes.fromhex(m_hex)}")
-                except:
-                    print(f"m as hex: {hex(m)}")
-                print("KNOWN_PLAINTEXT=SUCCESS")
+                else:
+                    print("Coppersmith's method did not find a solution.")
+                    print("Try increasing epsilon, verify the unknown_bits is correct,")
+                    print("or the unknown portion may be too large for current parameters.")
+                    print("KNOWN_PLAINTEXT=FAILED")
             else:
-                print("Coppersmith's method did not find a solution.")
-                print("Try increasing epsilon, verify the unknown_bits is correct,")
-                print("or the unknown portion may be too large for current parameters.")
+                print(f"Unknown portion ({unknown_bits} bits) too large for this attack.")
+                print(f"Maximum feasible unknown bits for e={e} and n={n.nbits()} bits: {bound}")
+                print("Consider: factordb lookup, Fermat factorization, or other methods.")
                 print("KNOWN_PLAINTEXT=FAILED")
         else:
-            print(f"Unknown portion ({unknown_bits} bits) too large for this attack.")
-            print(f"Maximum feasible unknown bits for e={e} and n={n.nbits()} bits: {bound}")
-            print("Consider: factordb lookup, Fermat factorization, or other methods.")
+            print("No known prefix provided.")
+            print("Provide the known portion of the plaintext to attempt recovery.")
             print("KNOWN_PLAINTEXT=FAILED")
-    else:
-        print("No known prefix provided.")
-        print("Provide the known portion of the plaintext to attempt recovery.")
-        print("KNOWN_PLAINTEXT=FAILED")
-except Exception as ex:
-    print(f"KNOWN_PLAINTEXT=FAILED: {ex}")
-`,proof:`\\textbf{Theorem:} Partial knowledge of the plaintext \\(m\\) enables RSA decryption via Coppersmith's method for small unknown portions.
+    except Exception as ex:
+        print(f"KNOWN_PLAINTEXT=FAILED: {ex}")
+    #
+_attack()`,proof:`\\textbf{Theorem:} Partial knowledge of the plaintext \\(m\\) enables RSA decryption via Coppersmith's method for small unknown portions.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -4342,61 +4640,63 @@ m &= m_0 \\cdot 2^k + x \\qed
 \\textbf{Explanation:} The known prefix fixes the high-order bits of \\(m\\). Coppersmith's method finds the small unknown portion \\(x\\) as a root of the polynomial \\(f(x)\\) modulo \\(n\\). For very small unknowns (\\(\\leq 16\\) bits), brute force is faster. The attack works best with small \\(e\\) (e.g., \\(e=3\\)) because \\(n^{1/e}\\) is larger.
 
 \\textbf{References:} D. Coppersmith, "Small Solutions to Polynomial Equations", 1997; May, "New RSA Vulnerabilities Using Lattice Reduction Methods", 2003`,priority:`medium`,applicableCheck:e=>!!(e.n&&e.c)},p_=()=>{let e=3n,{n:t}=kh(L.p,L.q,e),n=new TextEncoder().encode(`flag{`),r=BigInt(`0x`+Array.from(n).map(e=>e.toString(16).padStart(2,`0`)).join(``)),i=BigInt(Math.floor(Math.random()*2**32)),a=r<<BigInt(32)|i;return{n:t.toString(),e:`3`,c:Ah(a,t,e).toString(),known_prefix:`flag{`,unknown_bits:`32`}},m_={id:`small-public-exp`,name:`Small Public Exponent Analysis`,category:`Advanced`,description:`Recovers m when m^e < n. Use when e is small and message is short.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`3`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.c?`print("ERROR: Missing required inputs (n, c)")
-print("SMALL_PUBLIC_EXP=FAILED")`:`try:
-    n = Integer(${e.n})
-    e_val = "${e.e}".strip()
-    e = Integer(e_val) if e_val else Integer(3)
-    c = Integer(${e.c})
-    print(f"Small public exponent analysis")
-    print(f"n = {n}")
-    print(f"e = {e}")
-    print(f"c = {c}")
-    print()
-    # Check if e is small
-    if e >= 100:
-        print(f"e = {e} is not considered 'small' for this attack.")
-        print("This attack is effective for e in {3, 5, 17}.")
-        print("Try other attack methods.")
-        print("SMALL_PUBLIC_EXP=FAILED")
-    else:
-        print(f"e = {e} is small. Checking for vulnerabilities...")
+print("SMALL_PUBLIC_EXP=FAILED")`:`def _attack():
+    try:
+        n = Integer(${e.n})
+        e_val = "${e.e}".strip()
+        e = Integer(e_val) if e_val else Integer(3)
+        c = Integer(${e.c})
+        print(f"Small public exponent analysis")
+        print(f"n = {n}")
+        print(f"e = {e}")
+        print(f"c = {c}")
         print()
-        # Attack 1: e-th root (m^e < n)
-        print("Attack 1: e-th root attack (m^e < n)")
-        m_root, exact = c.nth_root(e, truncate_mode=True)
-        if exact:
-            print(f"SUCCESS! c is a perfect {e}-th power.")
-            print(f"m = {m_root}")
-            try:
-                m_hex = hex(m_root)[2:]
-                if len(m_hex) % 2 != 0:
-                    m_hex = '0' + m_hex
-                m_bytes = bytes.fromhex(m_hex)
-                print(f"m as text: {m_bytes.decode('utf-8', errors='replace')}")
-            except Exception:
-                print(f"m as hex: {hex(m_root)}")
-            print("SMALL_PUBLIC_EXP=SUCCESS")
-        else:
-            print(f"c is not a perfect {e}-th power over integers.")
-            print("m^e >= n, so modular reduction occurred.")
-            print()
-            # Attack 2: Hastad broadcast (need multiple (n, c) pairs)
-            print("Attack 2: Hastad broadcast note")
-            print("If the SAME message m was encrypted with e = 3")
-            print("under 3 DIFFERENT moduli n1, n2, n3, then:")
-            print("  m = CRT(c1, c2, c3)^(1/3) over integers")
-            print("Provide additional (n, c) pairs to attempt this attack.")
-            print()
-            # Attack 3: Franklin-Reiter related message
-            print("Attack 3: Franklin-Reiter related message note")
-            print("If two ciphertexts c1 = m^e and c2 = (m + delta)^e")
-            print("are known with the same (n, e), then m can be recovered.")
-            print("Provide a second ciphertext to attempt this attack.")
+        # Check if e is small
+        if e >= 100:
+            print(f"e = {e} is not considered 'small' for this attack.")
+            print("This attack is effective for e in {3, 5, 17}.")
+            print("Try other attack methods.")
             print("SMALL_PUBLIC_EXP=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("SMALL_PUBLIC_EXP=FAILED")
-`,proof:`\\textbf{Theorem:} RSA with small public exponent \\(e \\in \\{3, 5, 17\\}\\) is vulnerable to e-th root, Hastad broadcast, and Franklin-Reiter attacks.
+        else:
+            print(f"e = {e} is small. Checking for vulnerabilities...")
+            print()
+            # Attack 1: e-th root (m^e < n)
+            print("Attack 1: e-th root attack (m^e < n)")
+            m_root, exact = c.nth_root(e, truncate_mode=True)
+            if exact:
+                print(f"SUCCESS! c is a perfect {e}-th power.")
+                print(f"m = {m_root}")
+                try:
+                    m_hex = hex(m_root)[2:]
+                    if len(m_hex) % 2 != 0:
+                        m_hex = '0' + m_hex
+                    m_bytes = bytes.fromhex(m_hex)
+                    print(f"m as text: {m_bytes.decode('utf-8', errors='replace')}")
+                except Exception:
+                    print(f"m as hex: {hex(m_root)}")
+                print("SMALL_PUBLIC_EXP=SUCCESS")
+            else:
+                print(f"c is not a perfect {e}-th power over integers.")
+                print("m^e >= n, so modular reduction occurred.")
+                print()
+                # Attack 2: Hastad broadcast (need multiple (n, c) pairs)
+                print("Attack 2: Hastad broadcast note")
+                print("If the SAME message m was encrypted with e = 3")
+                print("under 3 DIFFERENT moduli n1, n2, n3, then:")
+                print("  m = CRT(c1, c2, c3)^(1/3) over integers")
+                print("Provide additional (n, c) pairs to attempt this attack.")
+                print()
+                # Attack 3: Franklin-Reiter related message
+                print("Attack 3: Franklin-Reiter related message note")
+                print("If two ciphertexts c1 = m^e and c2 = (m + delta)^e")
+                print("are known with the same (n, e), then m can be recovered.")
+                print("Provide a second ciphertext to attempt this attack.")
+                print("SMALL_PUBLIC_EXP=FAILED")
+    except Exception as ex:
+        print(f"ERROR: {ex}")
+        print("SMALL_PUBLIC_EXP=FAILED")
+    #
+_attack()`,proof:`\\textbf{Theorem:} RSA with small public exponent \\(e \\in \\{3, 5, 17\\}\\) is vulnerable to e-th root, Hastad broadcast, and Franklin-Reiter attacks.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -4418,58 +4718,61 @@ except Exception as ex:
 
 \\textbf{Explanation:} The e-th root attack works when the message is small enough that encryption doesn't wrap modulo \\(n\\). Hastad's broadcast attack combines \\(e\\) encryptions of the same message under different moduli via CRT. Franklin-Reiter exploits known linear relations between two encrypted messages.
 
-\\textbf{References:} Hastad, "Solving linear equations by means of lattice reductions", 1988; Franklin & Reiter, "The relation between short exponents and related-message attacks", 1996`,priority:`high`,applicableCheck:e=>!!(e.n&&e.e&&e.c)},h_=()=>{let{n:e}=kh(L.p,L.q,3n),t=BigInt(Math.floor(Math.random()*1e6)+42);return{n:e.toString(),e:`3`,c:Ah(t,e,3n).toString()}},g_={id:`multi-prime-gcd`,name:`Multi-Prime GCD`,category:`Advanced`,description:`Finds shared primes across multiple moduli via pairwise GCD. Use when given 2+ RSA moduli. Unlike Batch GCD (Factorization category), this attack reports exact moduli pairs that share each factor.`,inputs:[{name:`moduli_list`,label:`Moduli (one per line)`,placeholder:`Enter multiple moduli, one per line...`,multiline:!0,rows:6}],sageTemplate:e=>`# Validate inputs
-moduli_str = """${e.moduli_list}""".strip()
-if not moduli_str:
-    print("ERROR: moduli_list is required")
-    print("MULTI_PRIME_GCD=FAILED")
-    quit()
-try:
-    # Parse moduli
-    moduli = [Integer(x.strip()) for x in moduli_str.split('\\n') if x.strip()]
-    print(f"Multi-Prime GCD attack on {len(moduli)} moduli")
-    print()
-    if len(moduli) < 2:
-        print("Need at least 2 moduli for this attack.")
-        print("MULTI_PRIME_GCD=FAILED")
-    else:
-        # Pairwise GCD: check every modulus pair for shared factors
-        print("Running pairwise GCD across all moduli...")
-        print()
-        found_any = False
-        for i in range(len(moduli)):
-            ni = moduli[i]
-            for j in range(i + 1, len(moduli)):
-                nj = moduli[j]
-                g = gcd(ni, nj)
-                if g > 1 and g < ni:
-                    found_any = True
-                    print(f"SHARED FACTOR FOUND between moduli {i+1} and {j+1}!")
-                    print(f"gcd(n{i+1}, n{j+1}) = {g}")
-                    print(f"n{i+1} = {ni}")
-                    print(f"  p = {g}")
-                    print(f"  q = {ni // g}")
-                    print(f"n{j+1} = {nj}")
-                    print(f"  p' = {g}")
-                    print(f"  q' = {nj // g}")
+\\textbf{References:} Hastad, "Solving linear equations by means of lattice reductions", 1988; Franklin & Reiter, "The relation between short exponents and related-message attacks", 1996`,priority:`high`,applicableCheck:e=>!!(e.n&&e.e&&e.c)},h_=()=>{let{n:e}=kh(L.p,L.q,3n),t=BigInt(Math.floor(Math.random()*1e6)+42);return{n:e.toString(),e:`3`,c:Ah(t,e,3n).toString()}},g_={id:`multi-prime-gcd`,name:`Multi-Prime GCD`,category:`Advanced`,description:`Finds shared primes across multiple moduli via pairwise GCD. Use when given 2+ RSA moduli. Unlike Batch GCD (Factorization category), this attack reports exact moduli pairs that share each factor.`,inputs:[{name:`moduli_list`,label:`Moduli (one per line)`,placeholder:`Enter multiple moduli, one per line...`,multiline:!0,rows:6}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            moduli_str = """${e.moduli_list}""".strip()
+            if not moduli_str:
+                print("ERROR: moduli_list is required")
+                print("MULTI_PRIME_GCD=FAILED")
+                return
+            moduli = [Integer(x.strip()) for x in moduli_str.split('\\n') if x.strip()]
+            print(f"Multi-Prime GCD attack on {len(moduli)} moduli")
+            print()
+            if len(moduli) < 2:
+                print("Need at least 2 moduli for this attack.")
+                print("MULTI_PRIME_GCD=FAILED")
+            else:
+                print("Running pairwise GCD across all moduli...")
+                print()
+                found_any = False
+                for i in range(len(moduli)):
+                    ni = moduli[i]
+                    for j in range(i + 1, len(moduli)):
+                        nj = moduli[j]
+                        g = gcd(ni, nj)
+                        if g > 1 and g < ni:
+                            found_any = True
+                            print(f"SHARED FACTOR FOUND between moduli {i+1} and {j+1}!")
+                            print(f"gcd(n{i+1}, n{j+1}) = {g}")
+                            print(f"n{i+1} = {ni}")
+                            print(f"  p = {g}")
+                            print(f"  q = {ni // g}")
+                            print(f"n{j+1} = {nj}")
+                            print(f"  p' = {g}")
+                            print(f"  q' = {nj // g}")
+                            print()
+                if found_any:
+                    print("MULTI_PRIME_GCD=SUCCESS")
+                else:
+                    print("No shared factors found among the provided moduli.")
                     print()
-        if found_any:
-            print("MULTI_PRIME_GCD=SUCCESS")
-        else:
-            print("No shared factors found among the provided moduli.")
-            print()
-            print("This could mean:")
-            print("  1. All moduli use independently generated primes (good practice)")
-            print("  2. The shared factors are not between the provided pairs")
-            print("  3. More moduli are needed to find common factors")
-            print()
-            print("Note: In real-world scans, ~0.2% of RSA certificates share factors")
-            print("due to poor entropy during key generation.")
+                    print("This could mean:")
+                    print("  1. All moduli use independently generated primes (good practice)")
+                    print("  2. The shared factors are not between the provided pairs")
+                    print("  3. More moduli are needed to find common factors")
+                    print()
+                    print("Note: In real-world scans, ~0.2% of RSA certificates share factors")
+                    print("due to poor entropy during key generation.")
+                    print("MULTI_PRIME_GCD=FAILED")
+        except Exception as ex:
+            print(f"ERROR: {ex}")
             print("MULTI_PRIME_GCD=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("MULTI_PRIME_GCD=FAILED")
-`,proof:`\\textbf{Theorem:} Given RSA moduli \\{n_1, \\ldots, n_k\\} generated with insufficient entropy, pairwise GCD reveals both shared factors and the exact pairs that share them.
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("MULTI_PRIME_GCD=FAILED")
+_attack()`,proof:`\\textbf{Theorem:} Given RSA moduli \\{n\\_1, \\ldots, n\\_k\\} generated with insufficient entropy, pairwise GCD reveals both shared factors and the exact pairs that share them.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -4493,50 +4796,56 @@ n_j &= g_{ij} \\cdot \\frac{n_j}{g_{ij}} \\\\
 \\textbf{References:} N. Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012`,priority:`high`,applicableCheck:e=>{let t=(e.moduli_list||``).trim();return t?t.split(`
 `).filter(e=>e.trim()).length>=2:!1},frontendCheck:async e=>{try{let t=(e.moduli_list||``).trim();if(!t)return null;let n=t.split(`
 `).map(e=>e.trim()).filter(e=>e.length>0).map(e=>BigInt(e));if(n.length<2)return null;let r=[`Multi-Prime GCD Attack (browser-side, BigInt)`,`Running pairwise GCD on ${n.length} moduli...`,``],i=!1;for(let e=0;e<n.length;e++){let t=n[e];for(let a=e+1;a<n.length;a++){let o=n[a],s=Sh(t,o);s>1n&&s<t&&(i=!0,r.push(`SHARED FACTOR FOUND between moduli ${e+1} and ${a+1}!`),r.push(`gcd(n${e+1}, n${a+1}) = ${s}`),r.push(`n${e+1} = ${t}`),r.push(`  p = ${s}`),r.push(`  q = ${t/s}`),r.push(`n${a+1} = ${o}`),r.push(`  p' = ${s}`),r.push(`  q' = ${o/s}`),r.push(``))}}return i?(r.push(`MULTI_PRIME_GCD=SUCCESS`),r.join(`
-`)):null}catch{return null}}},__=()=>{let e=Oh(L.p),t=Oh(L.q),n=Oh(L.q),r=Oh(L.q);return{moduli_list:`${e*t}\n${e*n}\n${e*r}`}},v_={id:`phi-leak`,name:`Phi(n) Leak`,category:`Advanced`,description:`Factors n when φ(n) is leaked. Use when Euler's totient φ(n) is known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`phi`,label:`phi(n) (Euler totient)`,placeholder:`Enter phi(n)...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    phi = Integer(${e.phi})
-    print("Phi(n) leak attack")
-    print(f"n = {n}")
-    print(f"phi(n) = {phi}")
-    print()
-    # For n = p*q: phi(n) = (p-1)(q-1) = pq - p - q + 1 = n - p - q + 1
-    # So: p + q = n - phi + 1
-    # And: p * q = n
-    # We solve: x^2 - (p+q)x + pq = 0
-    # i.e.: x^2 - (n - phi + 1)x + n = 0
-    sum_pq = n - phi + 1
-    print(f"p + q = {sum_pq}")
-    print(f"p * q = {n}")
-    print()
-    # Solve quadratic: x^2 - sum_pq * x + n = 0
-    discriminant = sum_pq**2 - 4*n
-    print(f"Discriminant = {discriminant}")
-    if discriminant < 0:
-        print("ERROR: Negative discriminant. phi(n) is inconsistent with n.")
-        print("PHI_LEAK=FAILED")
-    elif discriminant == 0:
-        print("ERROR: p = q. n is a perfect square (not valid RSA).")
-        print("PHI_LEAK=FAILED")
-    else:
-        sqrt_disc = isqrt(discriminant)
-        if sqrt_disc**2 == discriminant:
-            p = (sum_pq - sqrt_disc) // 2
-            q = (sum_pq + sqrt_disc) // 2
-            print(f"SUCCESS! Factors recovered:")
-            print(f"p = {p}")
-            print(f"q = {q}")
-            print(f"Verification: p * q = {p * q}")
-            print(f"Verification: (p-1)*(q-1) = {(p-1)*(q-1)}")
-            print("PHI_LEAK=SUCCESS")
-        else:
-            print(f"Discriminant is not a perfect square: {discriminant}")
-            print("phi(n) may be incorrect, or n has more than 2 prime factors.")
+`)):null}catch{return null}}},__=()=>{let e=Oh(L.p),t=Oh(L.q),n=Oh(L.q),r=Oh(L.q);return{moduli_list:`${e*t}\n${e*n}\n${e*r}`}},v_={id:`phi-leak`,name:`Phi(n) Leak`,category:`Advanced`,description:`Factors n when φ(n) is leaked. Use when Euler's totient φ(n) is known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`phi`,label:`phi(n) (Euler totient)`,placeholder:`Enter phi(n)...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            phi = Integer(${e.phi})
+            print("Phi(n) leak attack")
+            print(f"n = {n}")
+            print(f"phi(n) = {phi}")
+            print()
+            # For n = p*q: phi(n) = (p-1)(q-1) = pq - p - q + 1 = n - p - q + 1
+            # So: p + q = n - phi + 1
+            # And: p * q = n
+            # We solve: x^2 - (p+q)x + pq = 0
+            # i.e.: x^2 - (n - phi + 1)x + n = 0
+            sum_pq = n - phi + 1
+            print(f"p + q = {sum_pq}")
+            print(f"p * q = {n}")
+            print()
+            # Solve quadratic: x^2 - sum_pq * x + n = 0
+            discriminant = sum_pq**2 - 4*n
+            print(f"Discriminant = {discriminant}")
+            if discriminant < 0:
+                print("ERROR: Negative discriminant. phi(n) is inconsistent with n.")
+                print("PHI_LEAK=FAILED")
+            elif discriminant == 0:
+                print("ERROR: p = q. n is a perfect square (not valid RSA).")
+                print("PHI_LEAK=FAILED")
+            else:
+                sqrt_disc = isqrt(discriminant)
+                if sqrt_disc**2 == discriminant:
+                    p = (sum_pq - sqrt_disc) // 2
+                    q = (sum_pq + sqrt_disc) // 2
+                    print(f"SUCCESS! Factors recovered:")
+                    print(f"p = {p}")
+                    print(f"q = {q}")
+                    print(f"Verification: p * q = {p * q}")
+                    print(f"Verification: (p-1)*(q-1) = {(p-1)*(q-1)}")
+                    print("PHI_LEAK=SUCCESS")
+                else:
+                    print(f"Discriminant is not a perfect square: {discriminant}")
+                    print("phi(n) may be incorrect, or n has more than 2 prime factors.")
+                    print("PHI_LEAK=FAILED")
+        except Exception as ex:
+            print(f"ERROR: {ex}")
             print("PHI_LEAK=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("PHI_LEAK=FAILED")
-`,frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.phi),r=t-n+1n,i=r*r-4n*t;if(i<0n)return`phi(n) is inconsistent with n.\nDiscriminant is negative: ${i}`;let a=Ch(i);if(a*a!==i)return null;let o=(r-a)/2n,s=(r+a)/2n;if(o*s!==t)return null;let c=(o-1n)*(s-1n);return[`Phi(n) Leak Attack (browser-side, BigInt)`,`n = ${t}`,`phi(n) = ${n}`,`p + q = ${r}`,`Discriminant = ${i}`,``,`Factors recovered:`,`p = ${o}`,`q = ${s}`,`Verification: p * q = ${o*s}`,`Verification: (p-1)*(q-1) = ${c}`,`phi(n) matches: ${c===n?`YES`:`NO`}`].join(`
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("PHI_LEAK=FAILED")
+_attack()`,frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.phi),r=t-n+1n,i=r*r-4n*t;if(i<0n)return`phi(n) is inconsistent with n.\nDiscriminant is negative: ${i}`;let a=Ch(i);if(a*a!==i)return null;let o=(r-a)/2n,s=(r+a)/2n;if(o*s!==t)return null;let c=(o-1n)*(s-1n);return[`Phi(n) Leak Attack (browser-side, BigInt)`,`n = ${t}`,`phi(n) = ${n}`,`p + q = ${r}`,`Discriminant = ${i}`,``,`Factors recovered:`,`p = ${o}`,`q = ${s}`,`Verification: p * q = ${o*s}`,`Verification: (p-1)*(q-1) = ${c}`,`phi(n) matches: ${c===n?`YES`:`NO`}`].join(`
 `)}catch{return null}},proof:`\\textbf{Theorem:} Knowing \\(\\phi(n)\\) for \\(n = pq\\) allows factoring \\(n\\) in polynomial time by solving a quadratic equation.
 
 \\textbf{Prerequisites:}
@@ -4556,84 +4865,88 @@ p &= \\frac{s - \\sqrt{\\Delta}}{2}, \\quad q = \\frac{s + \\sqrt{\\Delta}}{2} \
 
 \\textbf{Explanation:} From $n$ and $\\phi(n)$, we derive the sum $s = p + q$. Together with $pq = n$, this gives a quadratic whose roots are $p$ and $q$. The discriminant is always a perfect square $(p-q)^2$ for valid RSA moduli.
 
-\\textbf{References:} Rivest, Shamir, Adleman, 1978; Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2`,priority:`high`,applicableCheck:e=>!!(e.n&&e.phi)},y_=()=>{let{n:e,phi:t}=kh(L.p,L.q);return{n:e.toString(),phi:t.toString()}},b_={id:`parity-oracle`,name:`Parity Oracle Attack`,category:`Advanced`,description:`Recovers m via parity oracle. Use when oracle reveals LSB(decrypt(c)).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated, LSB of each query)`,placeholder:`1,0,1,1,0,...`,multiline:!1}],sageTemplate:e=>`# Validate inputs
-if not "${e.n}".strip():
-    print("ERROR: n is required")
-    print("PARITY_ORACLE=FAILED")
-    quit()
-if not "${e.c}".strip():
-    print("ERROR: c is required")
-    print("PARITY_ORACLE=FAILED")
-    quit()
-if not "${e.oracle_responses}".strip():
-    print("ERROR: oracle_responses is required")
-    print("PARITY_ORACLE=FAILED")
-    quit()
-try:
-    n = Integer(${e.n})
-    e_val = "${e.e}".strip()
-    e = Integer(e_val) if e_val else Integer(65537)
-    c = Integer(${e.c})
-    orig_c = Integer(${e.c})
-    responses_str = "${e.oracle_responses||``}".replace(' ', '')
-    responses = [int(x) for x in responses_str.split(',') if x]
-    print("Parity oracle attack on RSA")
-    print(f"n = {n}")
-    print(f"e = {e}")
-    print(f"c = {c}")
-    print(f"Oracle responses: {len(responses)} bits")
-    print()
-    n_bits = n.nbits()
-    if len(responses) < n_bits:
-        print(f"WARNING: Need {n_bits} responses for {n_bits}-bit modulus.")
-        print(f"Got {len(responses)}. Attack may be incomplete.")
-        print()
-    # Binary search using parity oracle
-    lower = Integer(0)
-    upper = Integer(n)
-
-    print("Binary search iterations:")
-    for i, parity in enumerate(responses):
-        mid = (lower + upper) // 2
-        # Multiply ciphertext by 2^e mod n
-        c = (c * power_mod(Integer(2), e, n)) % n
-        if parity == 0:
-            # 2m mod n is even, so 2m < n, m is in lower half
-            upper = mid
-        else:
-            # 2m mod n is odd (since n is odd), so 2m >= n, m is in upper half
-            lower = mid
-        if i < 10 or i % 50 == 0:
-            print(f"  Step {i+1}: parity={parity}, range bits = {(upper - lower).nbits()}")
-
-    print()
-    print(f"Estimated m in range [{lower}, {upper}]")
-    print(f"Range size: {upper - lower}")
-
-    if upper - lower < 10:
-        for candidate in range(int(lower), int(upper) + 1):
-            m = Integer(candidate)
-            if power_mod(m, e, n) == orig_c:
-                print(f"FOUND! m = {m}")
-                try:
-                    m_bytes = bytes.fromhex(hex(m)[2:] if len(hex(m)) % 2 == 0 else '0' + hex(m)[2:])
-                    print(f"m as text: {m_bytes.decode('utf-8', errors='replace')}")
-                except:
-                    print(f"m as hex: {hex(m)}")
-                print("PARITY_ORACLE=SUCCESS")
-                break
-        else:
-            print("Verification failed. Oracle responses may be inconsistent.")
+\\textbf{References:} Rivest, Shamir, Adleman, 1978; Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2`,priority:`high`,applicableCheck:e=>!!(e.n&&e.phi)},y_=()=>{let{n:e,phi:t}=kh(L.p,L.q);return{n:e.toString(),phi:t.toString()}},b_={id:`parity-oracle`,name:`Parity Oracle Attack`,category:`Advanced`,description:`Recovers m via parity oracle. Use when oracle reveals LSB(decrypt(c)).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated, LSB of each query)`,placeholder:`1,0,1,1,0,...`,multiline:!1}],sageTemplate:e=>`def _attack():
+    try:
+        # Validate inputs
+        if not "${e.n}".strip():
+            print("ERROR: n is required")
             print("PARITY_ORACLE=FAILED")
-    else:
-        print(f"Range too large. Need more oracle responses.")
-        print(f"Current uncertainty: {(upper - lower).nbits()} bits")
+            return
+        if not "${e.c}".strip():
+            print("ERROR: c is required")
+            print("PARITY_ORACLE=FAILED")
+            return
+        if not "${e.oracle_responses}".strip():
+            print("ERROR: oracle_responses is required")
+            print("PARITY_ORACLE=FAILED")
+            return
+        try:
+            n = Integer(${e.n})
+            e_val = "${e.e}".strip()
+            e = Integer(e_val) if e_val else Integer(65537)
+            c = Integer(${e.c})
+            orig_c = Integer(${e.c})
+            responses_str = "${e.oracle_responses||``}".replace(' ', '')
+            responses = [int(x) for x in responses_str.split(',') if x]
+            print("Parity oracle attack on RSA")
+            print(f"n = {n}")
+            print(f"e = {e}")
+            print(f"c = {c}")
+            print(f"Oracle responses: {len(responses)} bits")
+            print()
+            n_bits = n.nbits()
+            if len(responses) < n_bits:
+                print(f"WARNING: Need {n_bits} responses for {n_bits}-bit modulus.")
+                print(f"Got {len(responses)}. Attack may be incomplete.")
+                print()
+            # Binary search using parity oracle with exact rational division
+            # NOTE: Use /2 (Rational) not //2 to avoid floor-division drift
+            lower = Integer(0)
+            upper = Integer(n)
+            #
+            print("Binary search iterations:")
+            for i, parity in enumerate(responses):
+                mid = (lower + upper) / 2  # Rational — exact midpoint
+                # Multiply ciphertext by 2^e mod n
+                c = (c * power_mod(Integer(2), e, n)) % n
+                if parity == 0:
+                    # 2m mod n is even, so 2m < n, m is in lower half
+                    upper = mid
+                else:
+                    # 2m mod n is odd (since n is odd), so 2m >= n, m is in upper half
+                    lower = mid
+                if i < 10 or i % 50 == 0:
+                    print(f"  Step {i+1}: parity={parity}, range bits = {(upper - lower).nbits()}")
+            #
+            print()
+            print(f"Estimated m in range [{lower}, {upper}]")
+            print(f"Range size: {upper - lower}")
+            #
+            # Scan candidates from rational interval [lower, upper)
+            from math import ceil, floor
+            for candidate in range(Integer(ceil(lower)), Integer(floor(upper)) + 1):
+                m = Integer(candidate)
+                if power_mod(m, e, n) == orig_c:
+                    print(f"FOUND! m = {m}")
+                    try:
+                        m_bytes = bytes.fromhex(hex(m)[2:] if len(hex(m)) % 2 == 0 else '0' + hex(m)[2:])
+                        print(f"m as text: {m_bytes.decode('utf-8', errors='replace')}")
+                    except:
+                        print(f"m as hex: {hex(m)}")
+                    print("PARITY_ORACLE=SUCCESS")
+                    break
+            else:
+                print("Verification failed. Oracle responses may be inconsistent.")
+                print("PARITY_ORACLE=FAILED")
+        #
+        except Exception as ex:
+            print(f"ERROR: {ex}")
+            print("PARITY_ORACLE=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("PARITY_ORACLE=FAILED")
-
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("PARITY_ORACLE=FAILED")
-`,proof:`\\textbf{Theorem:} A parity oracle returning \\(\\text{LSB}(m)\\) for \\(m = c^d \\bmod n\\) reveals the full plaintext in \\(\\lceil \\log_2 n \\rceil\\) queries.
+_attack()`,proof:`\\textbf{Theorem:} A parity oracle returning \\(\\text{LSB}(m)\\) for \\(m = c^d \\bmod n\\) reveals the full plaintext in \\(\\lceil \\log_2 n \\rceil\\) queries.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -4656,52 +4969,58 @@ k = \\lceil \\log_2 n \\rceil &\\implies u_k - \\ell_k < 1 \\implies m = \\ell_k
 
 \\textbf{Explanation:} Each query doubles the effective plaintext modulo \\(n\\). The parity of the result reveals whether the doubling wrapped around \\(n\\), halving the search interval. After \\(\\log_2 n\\) steps the interval contains exactly one integer — the plaintext.
 
-\\textbf{References:} D. Bleichenbacher, "Generating ElGamal Signatures Without Knowing the Secret Key", Eurocrypt 1998; Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP)", CRYPTO 2001`,priority:`medium`,applicableCheck:e=>!!(e.n&&e.e&&e.c&&e.oracle_responses)},x_=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=Ah(BigInt(Math.floor(Math.random()*1e6)+42),e,t),i=[],a=r*Eh(2n,t,e)%e,o=L.p+L.q;for(let r=0;r<o;r++)i.push((Eh(a,n,e)%2n).toString()),a=a*Eh(2n,t,e)%e;return{n:e.toString(),e:t.toString(),c:r.toString(),oracle_responses:i.join(`,`)}},S_={id:`partial-key-exposure`,name:`Partial Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from known MSBs. Use when ≥ half the bits of p are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`p_msb`,label:`p_msb (known MSBs of p)`,placeholder:`Enter known high bits of p...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    p_msb = Integer(${e.p_msb})
-    if n < 2 or p_msb < 2:
-        print("PARTIAL_KEY_EXPOSURE=FAILED: invalid input values")
-        quit()
-    if p_msb >= n:
-        print("PARTIAL_KEY_EXPOSURE=FAILED: p_msb must be less than n")
-        quit()
-    if n % p_msb == 0:
-        p = p_msb
-        q = n // p
-        print("PARTIAL_KEY_EXPOSURE=SUCCESS: p_msb exactly divides n")
-        print(f"p={p}")
-        print(f"q={q}")
-        quit()
-    # p = p_msb + x, where x is unknown low bits (trailing zeros = bit count of x)
-    k = p_msb.trailing_zero_bits()
-    X = 2 ** k
-    # Coppersmith bound for beta=0.5: |x| < n^(beta^2) = n^0.25
-    max_X = Integer(n.nth_root(4))
-    if X >= max_X:
-        X = max_X
-    print(f"Partial Key Exposure Attack")
-    print(f"n = {n}")
-    print(f"p_msb = {p_msb}")
-    print(f"Coppersmith bound X = {X}")
-    P.<x> = PolynomialRing(Zmod(n))
-    f = p_msb + x
-    roots = f.small_roots(X=X, beta=0.5, epsilon=0.05)
-    if roots:
-        p = Integer(p_msb + int(roots[0]))
-        if n % p == 0:
-            q = n // p
-            print(f"p = {p}")
-            print(f"q = {q}")
-            print(f"Verification: p * q = {p * q}")
-            print("PARTIAL_KEY_EXPOSURE=SUCCESS")
-        else:
-            print("PARTIAL_KEY_EXPOSURE=FAILED: recovered p does not divide n")
-    else:
-        print("Need approximately half the bits of p for Coppersmith to work.")
+\\textbf{References:} D. Bleichenbacher, "Generating ElGamal Signatures Without Knowing the Secret Key", Eurocrypt 1998; Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP)", CRYPTO 2001`,priority:`medium`,applicableCheck:e=>!!(e.n&&e.e&&e.c&&e.oracle_responses)},x_=()=>{let{n:e,e:t,d:n}=kh(L.p,L.q),r=Ah(BigInt(Math.floor(Math.random()*1e6)+42),e,t),i=[],a=r*Eh(2n,t,e)%e,o=L.p+L.q;for(let r=0;r<o;r++)i.push((Eh(a,n,e)%2n).toString()),a=a*Eh(2n,t,e)%e;return{n:e.toString(),e:t.toString(),c:r.toString(),oracle_responses:i.join(`,`)}},S_={id:`partial-key-exposure`,name:`Partial Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from known MSBs. Use when ≥ half the bits of p are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`p_msb`,label:`p_msb (known MSBs of p)`,placeholder:`Enter known high bits of p...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            p_msb = Integer(${e.p_msb})
+            if n < 2 or p_msb < 2:
+                print("PARTIAL_KEY_EXPOSURE=FAILED: invalid input values")
+                return
+            if p_msb >= n:
+                print("PARTIAL_KEY_EXPOSURE=FAILED: p_msb must be less than n")
+                return
+            if n % p_msb == 0:
+                p = p_msb
+                q = n // p
+                print("PARTIAL_KEY_EXPOSURE=SUCCESS: p_msb exactly divides n")
+                print(f"p={p}")
+                print(f"q={q}")
+                return
+            # p = p_msb + x, where x is unknown low bits (trailing zeros = bit count of x)
+            k = p_msb.trailing_zero_bits()
+            X = 2 ** k
+            # Coppersmith bound for beta=0.5: |x| < n^(beta^2) = n^0.25
+            max_X = Integer(n.nth_root(4))
+            if X >= max_X:
+                X = max_X
+            print(f"Partial Key Exposure Attack")
+            print(f"n = {n}")
+            print(f"p_msb = {p_msb}")
+            print(f"Coppersmith bound X = {X}")
+            P.<x> = PolynomialRing(Zmod(n))
+            f = p_msb + x
+            roots = f.small_roots(X=X, beta=0.5, epsilon=0.05)
+            if roots:
+                p = Integer(p_msb + int(roots[0]))
+                if n % p == 0:
+                    q = n // p
+                    print(f"p = {p}")
+                    print(f"q = {q}")
+                    print(f"Verification: p * q = {p * q}")
+                    print("PARTIAL_KEY_EXPOSURE=SUCCESS")
+                else:
+                    print("PARTIAL_KEY_EXPOSURE=FAILED: recovered p does not divide n")
+            else:
+                print("Need approximately half the bits of p for Coppersmith to work.")
+                print("PARTIAL_KEY_EXPOSURE=FAILED")
+        except Exception as ex:
+            print(f"PARTIAL_KEY_EXPOSURE=FAILED: {ex}")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("PARTIAL_KEY_EXPOSURE=FAILED")
-except Exception as ex:
-    print(f"PARTIAL_KEY_EXPOSURE=FAILED: {ex}")
-`,proof:`\\textbf{Theorem:} If the MSBs of $p$ are known such that $p = p_{\\text{msb}} + x$ with $|x| < n^{\\beta^2}$, Coppersmith recovers $p$.
+_attack()`,proof:`\\textbf{Theorem:} If the MSBs of $p$ are known such that $p = p_{\\text{msb}} + x$ with $|x| < n^{\\beta^2}$, Coppersmith recovers $p$.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -4724,40 +5043,46 @@ p &= p_{\\text{msb}} + x_0 \\qed
 
 \\textbf{Explanation:} Model $p$ as known MSBs plus unknown correction $x$. Build polynomial $f(x) = p_{\\text{msb}} + x$ modulo $n$. Coppersmith finds small roots when the unknown portion is below the bound. Approximately half the bits of $p$ must be known.
 
-\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", Eurocrypt 1996; A. May, "Using Coppersmith's Method to Attack RSA", 2009`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.p_msb},C_=()=>{let{p:e,n:t}=kh(L.p,L.q),n=e.toString(2).length,r=Math.floor(n*.6),i=BigInt(n-r),a=e>>i<<i;return{n:t.toString(),p_msb:a.toString()}},w_={id:`implicit-key-exposure`,name:`Implicit Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from a^p mod n leak. Use when a^p mod n is accidentally exposed.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`a`,label:`a (base)`,placeholder:`Enter base a...`,multiline:!1},{name:`leak`,label:`leak (a^p mod n)`,placeholder:`Enter leaked value...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    a = Integer(${e.a})
-    leak = Integer(${e.leak})
-    if n < 2 or a < 2 or leak < 0:
-        print("Invalid input")
+\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", Eurocrypt 1996; A. May, "Using Coppersmith's Method to Attack RSA", 2009`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.p_msb},C_=()=>{let{p:e,n:t}=kh(L.p,L.q),n=e.toString(2).length,r=Math.floor(n*.6),i=BigInt(n-r),a=e>>i<<i;return{n:t.toString(),p_msb:a.toString()}},w_={id:`implicit-key-exposure`,name:`Implicit Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from a^p mod n leak. Use when a^p mod n is accidentally exposed.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`a`,label:`a (base)`,placeholder:`Enter base a...`,multiline:!1},{name:`leak`,label:`leak (a^p mod n)`,placeholder:`Enter leaked value...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            a = Integer(${e.a})
+            leak = Integer(${e.leak})
+            if n < 2 or a < 2 or leak < 0:
+                print("Invalid input")
+                print("IMPLICIT_KEY_EXPOSURE=FAILED")
+                return
+            print(f"Implicit Key Exposure Attack")
+            print(f"n = {n}")
+            print(f"a = {a}")
+            print(f"leak = a^p mod n = {leak}")
+            print()
+            # By Fermat's little theorem: a^p = a (mod p)
+            # leak = a^p (mod n) => leak = a^p (mod p) => leak = a (mod p)
+            # Therefore: p | (leak - a) => p = gcd(leak - a, n)
+            g = gcd(leak - a, n)
+            print(f"gcd(leak - a, n) = {g}")
+            print()
+            if g > 1 and g < n:
+                p = g
+                q = n // p
+                print(f"p = {p}")
+                print(f"q = {q}")
+                print(f"Verification: p * q = {p * q}")
+                print(f"Verification: a^p mod n = {power_mod(a, p, n)} == leak? {power_mod(a, p, n) == leak}")
+                print("IMPLICIT_KEY_EXPOSURE=SUCCESS")
+            else:
+                print("gcd(leak - a, n) = 1 or n. Fermat trick failed.")
+                print("Possible causes: p divides a, or leak is not a^p mod n.")
+                print("IMPLICIT_KEY_EXPOSURE=FAILED")
+        except Exception as ex:
+            print(f"IMPLICIT_KEY_EXPOSURE=FAILED: {ex}")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("IMPLICIT_KEY_EXPOSURE=FAILED")
-        quit()
-    print(f"Implicit Key Exposure Attack")
-    print(f"n = {n}")
-    print(f"a = {a}")
-    print(f"leak = a^p mod n = {leak}")
-    print()
-    # By Fermat's little theorem: a^p = a (mod p)
-    # leak = a^p (mod n) => leak = a^p (mod p) => leak = a (mod p)
-    # Therefore: p | (leak - a) => p = gcd(leak - a, n)
-    g = gcd(leak - a, n)
-    print(f"gcd(leak - a, n) = {g}")
-    print()
-    if g > 1 and g < n:
-        p = g
-        q = n // p
-        print(f"p = {p}")
-        print(f"q = {q}")
-        print(f"Verification: p * q = {p * q}")
-        print(f"Verification: a^p mod n = {power_mod(a, p, n)} == leak? {power_mod(a, p, n) == leak}")
-        print("IMPLICIT_KEY_EXPOSURE=SUCCESS")
-    else:
-        print("gcd(leak - a, n) = 1 or n. Fermat trick failed.")
-        print("Possible causes: p divides a, or leak is not a^p mod n.")
-        print("IMPLICIT_KEY_EXPOSURE=FAILED")
-except Exception as ex:
-    print(f"IMPLICIT_KEY_EXPOSURE=FAILED: {ex}")
-`,proof:`\\textbf{Theorem:} If $a^p \\bmod n$ is leaked, $p$ is recovered via $\\gcd(a - \\text{leak}, n)$.
+_attack()`,proof:`\\textbf{Theorem:} If $a^p \\bmod n$ is leaked, $p$ is recovered via $\\gcd(a - \\text{leak}, n)$.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -4780,70 +5105,76 @@ p &= \\gcd(\\text{leak} - a, n) \\qed
 \\textbf{Explanation:} By Fermat's little theorem, $a^p \\equiv a \\pmod{p}$ for any $a$ not divisible by $p$. Since leak $\\equiv a^p \\pmod{n}$, we also have leak $\\equiv a^p \\pmod{p}$. Combining: leak $\\equiv a \\pmod{p}$, so $p$ divides $(\\text{leak} - a)$. Computing $\\gcd(\\text{leak} - a, n)$ recovers $p$ in one step.
 
 \\textbf{References:} Common CTF pattern; based on Fermat's Little Theorem`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.a&&!!e.leak,frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.a),r=BigInt(e.leak),i=Sh(r-n,t);if(i>1n&&i<t){let e=i,a=t/e;return[`Implicit Key Exposure Attack (browser-side, BigInt)`,`n = ${t}`,`a = ${n}`,`leak = ${r}`,``,`Factors recovered:`,`p = ${e}`,`q = ${a}`,`Verification: p * q = ${e*a}`,`Verification: a^p mod n = ${Eh(n,e,t)} == leak? ${Eh(n,e,t)===r}`].join(`
-`)}return null}catch{return null}}},T_=()=>{let{p:e,n:t}=kh(L.p,L.q),n=Eh(3n,e,t);return{n:t.toString(),a:`3`,leak:n.toString()}},E_={id:`related-message`,name:`Related Message Attack`,category:`Message / Protocol`,description:`Recovers m from linearly related ciphertexts. Use when c1 = m^e and c2 = (a·m + b)^e mod n.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c1`,label:`c1 (ciphertext of m)`,placeholder:`Enter c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (ciphertext of a·m + b)`,placeholder:`Enter c2...`,multiline:!0,rows:3},{name:`a`,label:`a (linear coefficient)`,placeholder:`2`,multiline:!1},{name:`b`,label:`b (linear offset)`,placeholder:`0`,multiline:!1}],sageTemplate:e=>`try:
-    n = Integer(${e.n})
-    e_val = "${e.e}".strip()
-    e = Integer(e_val) if e_val else Integer(65537)
-    c1 = Integer(${e.c1})
-    c2 = Integer(${e.c2})
-    a_val = "${e.a}".strip()
-    a = Integer(a_val) if a_val else Integer(2)
-    b_val = "${e.b}".strip()
-    b = Integer(b_val) if b_val else Integer(0)
-    if n < 2 or e < 2 or c1 < 0 or c2 < 0:
-        print("Invalid input")
-        print("RELATED_MESSAGE=FAILED")
-        quit()
-    print(f"Related Message Attack")
-    print(f"n = {n}, e = {e}")
-    print(f"c1 = m^e mod n = {c1}")
-    print(f"c2 = (a*m + b)^e mod n = {c2}")
-    print(f"a = {a}, b = {b}")
-    print()
-    # f1(x) = x^e - c1, f2(x) = (a*x + b)^e - c2
-    # Both share root x = m over Zmod(n)
-    # gcd(f1, f2) = (x - m) -> m = -constant / leading_coeff
-    R.<x> = PolynomialRing(Zmod(n))
-    f1 = x**e - c1
-    f2 = (a * x + b)**e - c2
-    g = f1.gcd(f2)
-    print(f"GCD degree: {g.degree()}")
-    if g.degree() == 1:
-        # g(x) = g[1]*x + g[0] -> m = -g[0] / g[1] in Zmod(n)
-        m_int = Integer(-g[0] / g[1])
-        print(f"Recovered m = {m_int}")
-        v1 = power_mod(m_int, e, n)
-        v2 = power_mod(Integer(a * m_int + b), e, n)
-        print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
-        print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
-        if v1 == c1 and v2 == c2:
-            print("RELATED_MESSAGE=SUCCESS")
-        else:
-            print("RELATED_MESSAGE=FAILED")
-    elif g.degree() == 0:
-        print("GCD is constant - no common root found.")
-        print("Check that c1, c2 are related by the given a, b.")
-        print("RELATED_MESSAGE=FAILED")
-    else:
-        roots = g.roots()
-        if roots:
-            m_int = Integer(roots[0][0])
-            print(f"Recovered m = {m_int}")
-            v1 = power_mod(m_int, e, n)
-            v2 = power_mod(Integer(a * m_int + b), e, n)
-            print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
-            print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
-            if v1 == c1 and v2 == c2:
-                print("RELATED_MESSAGE=SUCCESS")
-            else:
+`)}return null}catch{return null}}},T_=()=>{let{p:e,n:t}=kh(L.p,L.q),n=Eh(3n,e,t);return{n:t.toString(),a:`3`,leak:n.toString()}},E_={id:`related-message`,name:`Related Message Attack`,category:`Message / Protocol`,description:`Recovers m from linearly related ciphertexts. Use when c1 = m^e and c2 = (a·m + b)^e mod n.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c1`,label:`c1 (ciphertext of m)`,placeholder:`Enter c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (ciphertext of a·m + b)`,placeholder:`Enter c2...`,multiline:!0,rows:3},{name:`a`,label:`a (linear coefficient)`,placeholder:`2`,multiline:!1},{name:`b`,label:`b (linear offset)`,placeholder:`0`,multiline:!1}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            e_val = "${e.e}".strip()
+            e = Integer(e_val) if e_val else Integer(65537)
+            c1 = Integer(${e.c1})
+            c2 = Integer(${e.c2})
+            a_val = "${e.a}".strip()
+            a = Integer(a_val) if a_val else Integer(2)
+            b_val = "${e.b}".strip()
+            b = Integer(b_val) if b_val else Integer(0)
+            if n < 2 or e < 2 or c1 < 0 or c2 < 0:
+                print("Invalid input")
                 print("RELATED_MESSAGE=FAILED")
-        else:
-            print("GCD found but no roots extractable.")
+                return
+            print(f"Related Message Attack")
+            print(f"n = {n}, e = {e}")
+            print(f"c1 = m^e mod n = {c1}")
+            print(f"c2 = (a*m + b)^e mod n = {c2}")
+            print(f"a = {a}, b = {b}")
+            print()
+            # f1(x) = x^e - c1, f2(x) = (a*x + b)^e - c2
+            # Both share root x = m over Zmod(n)
+            # gcd(f1, f2) = (x - m) -> m = -constant / leading_coeff
+            R.<x> = PolynomialRing(Zmod(n))
+            f1 = x**e - c1
+            f2 = (a * x + b)**e - c2
+            g = f1.gcd(f2)
+            print(f"GCD degree: {g.degree()}")
+            if g.degree() == 1:
+                # g(x) = g[1]*x + g[0] -> m = -g[0] / g[1] in Zmod(n)
+                m_int = Integer(-g[0] / g[1])
+                print(f"Recovered m = {m_int}")
+                v1 = power_mod(m_int, e, n)
+                v2 = power_mod(Integer(a * m_int + b), e, n)
+                print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
+                print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
+                if v1 == c1 and v2 == c2:
+                    print("RELATED_MESSAGE=SUCCESS")
+                else:
+                    print("RELATED_MESSAGE=FAILED")
+            elif g.degree() == 0:
+                print("GCD is constant - no common root found.")
+                print("Check that c1, c2 are related by the given a, b.")
+                print("RELATED_MESSAGE=FAILED")
+            else:
+                roots = g.roots()
+                if roots:
+                    m_int = Integer(roots[0][0])
+                    print(f"Recovered m = {m_int}")
+                    v1 = power_mod(m_int, e, n)
+                    v2 = power_mod(Integer(a * m_int + b), e, n)
+                    print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
+                    print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
+                    if v1 == c1 and v2 == c2:
+                        print("RELATED_MESSAGE=SUCCESS")
+                    else:
+                        print("RELATED_MESSAGE=FAILED")
+                else:
+                    print("GCD found but no roots extractable.")
+                    print("RELATED_MESSAGE=FAILED")
+        except Exception as ex:
+            print(f"ERROR: {ex}")
             print("RELATED_MESSAGE=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("RELATED_MESSAGE=FAILED")
-`,proof:`\\textbf{Theorem:} Given $c_1 = m^e \\bmod n$ and $c_2 = (am + b)^e \\bmod n$, $m$ is recovered via $\\gcd(x^e - c_1, (ax+b)^e - c_2)$.
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("RELATED_MESSAGE=FAILED")
+_attack()`,proof:`\\textbf{Theorem:} Given $c_1 = m^e \\bmod n$ and $c_2 = (am + b)^e \\bmod n$, $m$ is recovered via $\\gcd(x^e - c_1, (ax+b)^e - c_2)$.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -4863,47 +5194,53 @@ m &= -\\frac{\\text{constant term}}{\\text{leading coefficient}} \\pmod{n} \\qed
 
 \\textbf{Explanation:} Both polynomials vanish at $x = m$. Their GCD over $\\mathbb{Z}_n[x]$ is typically $(x - m)$, directly revealing the plaintext. Works for any linear relationship $am + b$.
 
-\\textbf{References:} Coppersmith et al. (1996); related message attacks on RSA`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.c1&&!!e.c2},D_=()=>{let e=3n,t=Oh(L.p)*Oh(L.q),n=BigInt(Math.floor(Math.random()*1e4)+42),r=(2n*n+3n)%t;return{n:t.toString(),e:`3`,c1:Eh(n,e,t).toString(),c2:Eh(r,e,t).toString(),a:`2`,b:`3`}},O_={id:`common-prime-rsa`,name:`Common Prime RSA`,category:`Factorization`,description:`Factors two moduli sharing a prime. Use when n1 and n2 share a factor p.`,inputs:[{name:`n1`,label:`n1 (first modulus)`,placeholder:`Enter n1...`,multiline:!0,rows:3},{name:`n2`,label:`n2 (second modulus)`,placeholder:`Enter n2...`,multiline:!0,rows:3}],sageTemplate:e=>`try:
-    n1 = Integer(${e.n1})
-    n2 = Integer(${e.n2})
-    print(f"Common Prime RSA Attack")
-    print(f"n1 = {n1}")
-    print(f"n2 = {n2}")
-    print()
-    if n1 < 2 or n2 < 2:
-        print("Invalid input: moduli must be >= 2")
+\\textbf{References:} Coppersmith et al. (1996); related message attacks on RSA`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.c1&&!!e.c2},D_=()=>{let e=3n,t=Oh(L.p)*Oh(L.q),n=BigInt(Math.floor(Math.random()*1e4)+42),r=(2n*n+3n)%t;return{n:t.toString(),e:`3`,c1:Eh(n,e,t).toString(),c2:Eh(r,e,t).toString(),a:`2`,b:`3`}},O_={id:`common-prime-rsa`,name:`Common Prime RSA`,category:`Factorization`,description:`Factors two moduli sharing a prime. Use when n1 and n2 share a factor p.`,inputs:[{name:`n1`,label:`n1 (first modulus)`,placeholder:`Enter n1...`,multiline:!0,rows:3},{name:`n2`,label:`n2 (second modulus)`,placeholder:`Enter n2...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    try:
+        try:
+            n1 = Integer(${e.n1})
+            n2 = Integer(${e.n2})
+            print(f"Common Prime RSA Attack")
+            print(f"n1 = {n1}")
+            print(f"n2 = {n2}")
+            print()
+            if n1 < 2 or n2 < 2:
+                print("Invalid input: moduli must be >= 2")
+                print("COMMON_PRIME_RSA=FAILED")
+                return
+            if n1 == n2:
+                print("n1 == n2. No shared factor beyond the number itself.")
+                print("COMMON_PRIME_RSA=FAILED")
+                return
+            p = gcd(n1, n2)
+            print(f"gcd(n1, n2) = {p}")
+            print()
+            if p > 1 and p < n1 and p < n2:
+                q1 = n1 // p
+                q2 = n2 // p
+                print(f"Shared prime: p = {p}")
+                print(f"n1 = {p} x {q1}")
+                print(f"n2 = {p} x {q2}")
+                print(f"Verification: p * q1 = {p * q1} == n1? {p * q1 == n1}")
+                print(f"Verification: p * q2 = {p * q2} == n2? {p * q2 == n2}")
+                print(f"p is prime: {p.is_prime()}")
+                print(f"q1 is prime: {q1.is_prime()}")
+                print(f"q2 is prime: {q2.is_prime()}")
+                print("COMMON_PRIME_RSA=SUCCESS")
+            elif p == 1:
+                print("gcd(n1, n2) = 1. No shared prime factor.")
+                print("These moduli are coprime. Try other factorization methods.")
+                print("COMMON_PRIME_RSA=FAILED")
+            else:
+                print("Unexpected result. One modulus may divide the other.")
+                print("COMMON_PRIME_RSA=FAILED")
+        except Exception as e:
+            print(f"ERROR: {e}")
+            print("COMMON_PRIME_RSA=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("COMMON_PRIME_RSA=FAILED")
-        quit()
-    if n1 == n2:
-        print("n1 == n2. No shared factor beyond the number itself.")
-        print("COMMON_PRIME_RSA=FAILED")
-        quit()
-    p = gcd(n1, n2)
-    print(f"gcd(n1, n2) = {p}")
-    print()
-    if p > 1 and p < n1 and p < n2:
-        q1 = n1 // p
-        q2 = n2 // p
-        print(f"Shared prime: p = {p}")
-        print(f"n1 = {p} x {q1}")
-        print(f"n2 = {p} x {q2}")
-        print(f"Verification: p * q1 = {p * q1} == n1? {p * q1 == n1}")
-        print(f"Verification: p * q2 = {p * q2} == n2? {p * q2 == n2}")
-        print(f"p is prime: {p.is_prime()}")
-        print(f"q1 is prime: {q1.is_prime()}")
-        print(f"q2 is prime: {q2.is_prime()}")
-        print("COMMON_PRIME_RSA=SUCCESS")
-    elif p == 1:
-        print("gcd(n1, n2) = 1. No shared prime factor.")
-        print("These moduli are coprime. Try other factorization methods.")
-        print("COMMON_PRIME_RSA=FAILED")
-    else:
-        print("Unexpected result. One modulus may divide the other.")
-        print("COMMON_PRIME_RSA=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("COMMON_PRIME_RSA=FAILED")
-`,proof:`\\textbf{Theorem:} If $n_1 = p \\cdot q_1$ and $n_2 = p \\cdot q_2$ share a prime $p$, then $\\gcd(n_1, n_2) = p$.
+_attack()`,proof:`\\textbf{Theorem:} If $n_1 = p \\cdot q_1$ and $n_2 = p \\cdot q_2$ share a prime $p$, then $\\gcd(n_1, n_2) = p$.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -4925,74 +5262,63 @@ n_2 &= p \\cdot q_2 \\\\
 \\textbf{Explanation:} When two RSA moduli share a prime factor (common in poor RNG implementations), computing their GCD directly reveals the shared prime. Both moduli are instantly factored.
 
 \\textbf{References:} A. K. Lenstra et al., "Ron was wrong, Whit is right" (2012) — found 0.2\\% of RSA keys shared factors`,priority:`high`,applicableCheck:e=>!!e.n1&&!!e.n2,frontendCheck:async e=>{try{let t=BigInt(e.n1),n=BigInt(e.n2);if(t<2n||n<2n||t===n)return null;let r=Sh(t,n);if(r>1n&&r<t&&r<n){let e=t/r,i=n/r;return[`Common Prime RSA Attack (browser-side, BigInt)`,`n1 = ${t}`,`n2 = ${n}`,``,`gcd(n1, n2) = ${r}`,``,`Shared prime: p = ${r}`,`n1 = ${r} x ${e}`,`n2 = ${r} x ${i}`,`Verification: p * q1 = ${r*e} == n1? ${r*e===t}`,`Verification: p * q2 = ${r*i} == n2? ${r*i===n}`,`COMMON_PRIME_RSA=SUCCESS`].join(`
-`)}return null}catch{return null}}},k_=()=>{let e=Oh(L.p),t=Oh(L.q),n=Oh(L.q),r=e*t,i=e*n;return{n1:r.toString(),n2:i.toString()}},A_={id:`hastad-broadcast`,name:`Hastad's Broadcast Attack`,category:`Message / Protocol`,description:`Recovers m from e broadcasts with small e. Use when same m sent to e recipients with exponent e.`,inputs:[{name:`e`,label:`e (public exponent / number of ciphertexts)`,placeholder:`3`,multiline:!1},{name:`ciphertexts`,label:`ciphertexts (one per line: c, n)`,placeholder:`c1, n1
+`)}return null}catch{return null}}},k_=()=>{let e=Oh(L.p),t=Oh(L.q),n=Oh(L.q),r=e*t,i=e*n;return{n1:r.toString(),n2:i.toString()}},A_={id:`hastad-broadcast`,name:`Hastad's Broadcast Attack (CRT Recovery)`,category:`Message / Protocol`,description:`Recovers m from e ciphertexts with small e using CRT. Use when same m sent to e recipients with exponent e.`,inputs:[{name:`e`,label:`e (public exponent / number of ciphertexts)`,placeholder:`3`,multiline:!1},{name:`ciphertexts`,label:`ciphertexts (one per line: c, n)`,placeholder:`c1, n1
 c2, n2
 c3, n3`,multiline:!0,rows:6}],sageTemplate:e=>!e.e||!e.ciphertexts?`print("ERROR: Missing required inputs (e, ciphertexts)")
-print("HASTAD_BROADCAST=FAILED")`:`try:
-    e = Integer(${e.e})
-    lines = """${e.ciphertexts}""".strip().split('\\n')
-    print(f"Hastad's Broadcast Attack")
-    print(f"e = {e}")
-    print(f"Number of ciphertexts: {len(lines)}")
-    print()
-    if e < 2:
-        print("e must be >= 2 for broadcast attack")
-        print("HASTAD_BROADCAST=FAILED")
-    elif len(lines) < e:
-        print(f"Need at least {e} ciphertexts for e = {e}, got {len(lines)}")
-        print("HASTAD_BROADCAST=FAILED")
-    else:
-        pairs = []
-        parse_ok = True
-        for i, line in enumerate(lines[:e]):
-            parts = line.strip().split(',')
-            if len(parts) != 2:
-                print(f"Line {i+1}: expected 'c, n', got '{line}'")
-                parse_ok = False
-                break
-            c = Integer(parts[0].strip())
-            n = Integer(parts[1].strip())
-            pairs.append((c, n))
-            print(f"c{i+1} = {c}")
-            print(f"n{i+1} = {n}")
-        print()
-        if not parse_ok:
+print("HASTAD_BROADCAST=FAILED")`:`def _attack():
+    try:
+        e = Integer(${e.e})
+        print(f"Hastad's Broadcast Attack")
+        print(f"Public exponent: e = {e}")
+        if e < 2:
+            print(f"ERROR: e must be >= 2, got e = {e}")
             print("HASTAD_BROADCAST=FAILED")
         else:
-            N = 1
-            for _, n_i in pairs:
-                N *= n_i
-            print(f"Product of moduli: N has {N.nbits()} bits")
-            print()
-            M = 0
-            for c_i, n_i in pairs:
-                N_i = N // n_i
-                inv = inverse_mod(N_i, n_i)
-                M += c_i * N_i * inv
-                M = M % N
-            print(f"CRT combined m^e = {M}")
-            print()
-            try:
-                m = M.nth_root(e)
-                print(f"Recovered message: m = {m}")
-                all_ok = True
-                for i, (c_i, n_i) in enumerate(pairs):
-                    v = power_mod(m, e, n_i)
-                    ok = v == c_i
-                    if not ok:
-                        all_ok = False
-                    print(f"  Verify {i+1}: m^{e} mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
-                if all_ok:
-                    print("HASTAD_BROADCAST=SUCCESS")
-                else:
-                    print("HASTAD_BROADCAST=FAILED")
-            except ValueError:
-                print(f"m^e is not a perfect {e}-th power.")
-                print("Messages may differ or ciphertexts are malformed.")
+            lines_str = """${e.ciphertexts}""".strip()
+            pairs = []
+            for line in lines_str.split('\\n'):
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split(',')
+                if len(parts) < 2:
+                    continue
+                c = Integer(parts[0].strip())
+                n = Integer(parts[1].strip())
+                pairs.append((c, n))
+            print(f"Number of ciphertexts: {len(pairs)}")
+            if len(pairs) < e:
+                print(f"ERROR: Need at least {e} ciphertexts for e = {e}, got {len(pairs)}")
                 print("HASTAD_BROADCAST=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("HASTAD_BROADCAST=FAILED")`,proof:`\\textbf{Theorem:} If $m$ is encrypted with the same $e$ to $e$ different moduli, CRT recovers $m^e$ over $\\mathbb{Z}$, then $m = \\sqrt[e]{m^e}$.
+            else:
+                moduli = [p[1] for p in pairs[:e]]
+                remainders = [p[0] for p in pairs[:e]]
+                N = prod(moduli)
+                M = crt(remainders, moduli)
+                print(f"CRT combined m^e = {M}")
+                print(f"Modulus product bits: {N.nbits()}")
+                m, exact = M.nth_root(e, truncate_mode=True)
+                if exact:
+                    print(f"Recovered message: m = {m}")
+                    all_ok = True
+                    for i, (c_i, n_i) in enumerate(pairs):
+                        v = power_mod(m, e, n_i)
+                        ok = v == c_i
+                        if not ok:
+                            all_ok = False
+                        print(f"  Verify {i+1}: m^{e} mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
+                    if all_ok:
+                        print("HASTAD_BROADCAST=SUCCESS")
+                    else:
+                        print("HASTAD_BROADCAST=FAILED")
+                else:
+                    print(f"Approximate root: m = {m}")
+                    print("Warning: m^e was not a perfect e-th power")
+                    print("HASTAD_BROADCAST=FAILED")
+    except Exception as ex:
+        print(f"ERROR: {ex}")
+        print("HASTAD_BROADCAST=FAILED")
+_attack()`,proof:`\\textbf{Theorem:} If $m$ is encrypted with the same $e$ to $e$ different moduli, CRT recovers $m^e$ over $\\mathbb{Z}$, then $m = \\sqrt[e]{m^e}$.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
@@ -5013,7 +5339,7 @@ m &= \\sqrt[e]{M} \\qed
 \\textbf{Explanation:} The same message encrypted with exponent $e$ across $e$ different moduli. CRT reconstructs $m^e$ as an integer (not modulo anything). Since $m^e < \\prod n_i$, no modular reduction occurred — just take the integer $e$-th root.
 
 \\textbf{References:} J. Hastad, "Solving Low-Exponent RSA", 1988`,priority:`high`,applicableCheck:e=>!!e.e&&!!e.ciphertexts},j_=()=>{let e=3n,t=BigInt(Math.floor(Math.random()*1e4)+42),n=[];for(let r=0;r<Number(e);r++){let r=Oh(L.p)*Oh(L.q),i=Eh(t,e,r);n.push(`${i}, ${r}`)}return{e:`3`,ciphertexts:n.join(`
-`)}},M_=[jh,Nh,Fh,Lh,zh,Vh,Uh,Gh,qh,Yh,Zh,$h,tg,rg,ag,sg,lg,dg,pg,hg,_g,yg,xg,Cg,Tg,Dg,kg,jg,Ng,Fg,Lg,zg,Vg,Ug,Gg,qg,Yg,Zg,$g,t_,r_,u_,f_,m_,g_,v_,b_,S_,w_,E_,O_,A_],N_={fermat:Mh,wiener:Ph,bonehDurfee:Ih,ecm:Rh,ecm2:Bh,pollardP1:Hh,pollardRho:Wh,williamsP1:Kh,quadraticSieve:Jh,squfof:Xh,binaryPolyFactor:Qh,smallFraction:eg,batchGcd:ng,multiPrime:ig,gimmickyPrimes:og,closePrime:cg,noveltyPrimes:ug,simpleLattice:fg,partialD:mg,partialPqBits:gg,smallCrtExp:vg,dpDqLeak:bg,linearlyRelatedPrimes:Sg,dependentPrime:wg,commonModulus:Eg,hastad:Og,franklinReiter:Ag,coppersmithShortPad:Mg,hastadLinearPad:Pg,lsbOracle:Ig,rsaCrtFault:Rg,nonCoprimeExp:Bg,cubeRootCrt:Hg,commonFactor:Wg,homomorphicForgery:Kg,bleichenbacherSig:Jg,bleichenbacher:Xg,manger:Qg,biasedLsb:e_,roca:n_,nitros:i_,factordbLookup:d_,knownPlaintext:p_,smallPublicExp:h_,multiPrimeGcd:__,phiLeak:y_,parityOracle:x_,partialKeyExposure:C_,implicitKeyExposure:T_,relatedMessage:D_,commonPrimeRsa:k_,hastadBroadcast:j_},P_=[`Factorization`,`Partial Key / Lattice`,`Message / Protocol`,`Oracle`,`Advanced`],F_=new Map;for(let e of P_)F_.set(e,M_.filter(t=>t.category===e));var I_=(0,j.createContext)(null);function L_(){let e=(0,j.useContext)(I_);if(!e)throw Error(`useAppContext must be used within AppProvider`);return e}var R_=`https://factordb-proxy.octopusyuzu.workers.dev`;function z_(){let{selectedAttack:e,setSelectedAttack:t,setViewMode:n}=L_(),[r,i]=(0,j.useState)(new Set(P_)),[a,o]=(0,j.useState)({factordb:`checking`,sagecell:`checking`});(0,j.useEffect)(()=>{let e=new AbortController,t,n,r;return fetch(`${R_}?query=15`,{signal:e.signal}).then(e=>e.json()).then(()=>o(e=>({...e,factordb:`ok`}))).catch(()=>{e.signal.aborted||o(e=>({...e,factordb:`error`}))}),r=setTimeout(()=>{e.signal.aborted||(e.abort(),o(e=>({...e,factordb:`error`})))},5e3),typeof window<`u`&&window.sagecell?o(e=>({...e,sagecell:`ok`})):(t=setInterval(()=>{window.sagecell&&(clearInterval(t),o(e=>({...e,sagecell:`ok`})))},200),n=setTimeout(()=>{clearInterval(t),window.sagecell||o(e=>({...e,sagecell:`error`}))},8e3)),()=>{e.abort(),t&&clearInterval(t),r&&clearTimeout(r),n&&clearTimeout(n)}},[]);let s=e=>{i(t=>{let n=new Set(t);return n.has(e)?n.delete(e):n.add(e),n})},c=e=>{t(M_.find(t=>t.id===e)||null),n(`attack`)};return(0,M.jsxs)(yd,{variant:`permanent`,sx:{width:220,flexShrink:0,"& .MuiDrawer-paper":{width:220,boxSizing:`border-box`,backgroundColor:I.currentLine,borderRight:`1px solid ${I.comment}`,display:`flex`,flexDirection:`column`}},children:[(0,M.jsxs)(nu,{sx:{p:2},children:[(0,M.jsx)(F,{variant:`h6`,sx:{color:I.purple,fontWeight:700},children:`RSA CTF Tool`}),(0,M.jsx)(F,{variant:`caption`,sx:{color:I.comment},children:`SageMath Powered`})]}),(0,M.jsx)(rd,{sx:{borderColor:I.comment}}),(0,M.jsxs)(Ef,{sx:{flex:1,overflow:`auto`},children:[P_.map(t=>(0,M.jsxs)(nu,{children:[(0,M.jsxs)(Nf,{onClick:()=>s(t),sx:{px:2},children:[(0,M.jsx)(F,{sx:{color:I.cyan,fontWeight:600,fontSize:`0.85rem`,flex:1},children:t}),r.has(t)?(0,M.jsx)(hh,{sx:{color:I.comment}}):(0,M.jsx)(gh,{sx:{color:I.comment}})]}),(0,M.jsx)(xc,{in:r.has(t),timeout:`auto`,unmountOnExit:!0,children:(0,M.jsx)(Ef,{component:`div`,disablePadding:!0,children:(F_.get(t)||[]).map(t=>(0,M.jsx)(Nf,{onClick:()=>c(t.id),sx:{pl:4,borderLeft:e?.id===t.id?`3px solid ${I.purple}`:`3px solid transparent`,backgroundColor:e?.id===t.id?I.background:`transparent`,"&:hover":{backgroundColor:I.background}},children:(0,M.jsx)(qf,{primary:t.name,slotProps:{primary:{sx:{color:I.foreground,fontSize:`0.75rem`}}}})},t.id))})})]},t)),(0,M.jsx)(rd,{sx:{borderColor:I.comment,my:1}}),(0,M.jsxs)(Nf,{onClick:()=>n(`magic`),sx:{mx:1,"&:hover":{backgroundColor:I.background}},children:[(0,M.jsx)(ch,{sx:{color:I.purple,mr:1,fontSize:`1.1rem`}}),(0,M.jsx)(qf,{primary:`Magic`,slotProps:{primary:{sx:{color:I.purple,fontWeight:600,fontSize:`0.85rem`}}}})]}),(0,M.jsxs)(Nf,{onClick:()=>n(`proofs`),sx:{mx:1,mt:.5,"&:hover":{backgroundColor:I.background}},children:[(0,M.jsx)(vh,{sx:{color:I.foreground,mr:1,fontSize:`1.1rem`}}),(0,M.jsx)(qf,{primary:`Proofs Index`,slotProps:{primary:{sx:{color:I.foreground,fontSize:`0.85rem`}}}})]}),(0,M.jsxs)(Nf,{onClick:()=>n(`calculator`),sx:{mx:1,mt:.5,"&:hover":{backgroundColor:I.background}},children:[(0,M.jsx)(lh,{sx:{color:I.cyan,mr:1,fontSize:`1.1rem`}}),(0,M.jsx)(qf,{primary:`Calculator`,slotProps:{primary:{sx:{color:I.cyan,fontSize:`0.85rem`}}}})]}),(0,M.jsx)(rd,{sx:{borderColor:I.comment,my:1}}),(0,M.jsxs)(nu,{sx:{px:2,py:1},children:[(0,M.jsx)(F,{variant:`caption`,sx:{color:I.comment,fontWeight:600,fontSize:`0.7rem`,display:`block`,mb:.5},children:`SERVICE STATUS`}),(0,M.jsxs)(nu,{sx:{display:`flex`,alignItems:`center`,gap:1,mb:.5},children:[a.factordb===`ok`?(0,M.jsx)(fh,{sx:{color:I.green,fontSize:`0.9rem`}}):a.factordb===`error`?(0,M.jsx)(mh,{sx:{color:I.red,fontSize:`0.9rem`}}):(0,M.jsx)(nu,{sx:{width:`0.9rem`,height:`0.9rem`,borderRadius:`50%`,border:`2px solid ${I.comment}`}}),(0,M.jsx)(F,{variant:`caption`,sx:{color:I.foreground,fontSize:`0.7rem`},children:`FactorDB`})]}),(0,M.jsxs)(nu,{sx:{display:`flex`,alignItems:`center`,gap:1},children:[a.sagecell===`ok`?(0,M.jsx)(fh,{sx:{color:I.green,fontSize:`0.9rem`}}):a.sagecell===`error`?(0,M.jsx)(mh,{sx:{color:I.red,fontSize:`0.9rem`}}):(0,M.jsx)(nu,{sx:{width:`0.9rem`,height:`0.9rem`,borderRadius:`50%`,border:`2px solid ${I.comment}`}}),(0,M.jsx)(F,{variant:`caption`,sx:{color:I.foreground,fontSize:`0.7rem`},children:`SageMathCell`})]})]})]}),(0,M.jsx)(rd,{sx:{borderColor:I.comment}}),(0,M.jsxs)(nu,{sx:{p:2},children:[(0,M.jsx)(F,{variant:`caption`,sx:{color:I.comment,display:`block`},children:`© 2026 yuzu-octopus`}),(0,M.jsxs)(F,{variant:`caption`,sx:{color:I.comment,display:`block`},children:[`Powered by`,` `,(0,M.jsx)(xf,{href:`https://pages.github.com`,target:`_blank`,rel:`noopener`,sx:{color:I.purple},children:`GitHub Pages`})]}),(0,M.jsxs)(F,{variant:`caption`,sx:{color:I.comment,display:`block`},children:[`Made with`,` `,(0,M.jsx)(xf,{href:`https://vite.dev`,target:`_blank`,rel:`noopener`,sx:{color:I.purple},children:`Vite`})]})]})]})}function B_({children:e}){let[t,n]=(0,j.useState)(null),[r,i]=(0,j.useState)(`attack`),[a,o]=(0,j.useState)(null),[s,c]=(0,j.useState)(null),[l,u]=(0,j.useState)([]),d=(0,j.useCallback)((e,t,n,r)=>{u(i=>[{attackId:e,attackName:t,timestamp:new Date,result:n,success:r},...i].slice(0,50))},[]);return(0,M.jsx)(I_.Provider,{value:{selectedAttack:t,setSelectedAttack:n,viewMode:r,setViewMode:i,outputResult:a,setOutputResult:o,outputError:s,setOutputError:c,history:l,addToHistory:d},children:e})}function V_(){let e=`sagecell-${Date.now()}-${Math.random().toString(36).slice(2,9)}`,t=document.createElement(`div`);return t.id=e,t.style.position=`absolute`,t.style.left=`-9999px`,t.style.top=`-9999px`,t.style.width=`1px`,t.style.height=`1px`,t.style.overflow=`hidden`,t.style.opacity=`0`,t.style.pointerEvents=`none`,document.body.appendChild(t),t}function H_(e,t){let n=document.createElement(`script`);return n.type=`text/x-sage`,n.textContent=t,e.appendChild(n),n}function U_(e=1e4){return window.sagecell?Promise.resolve():new Promise((t,n)=>{let r=setTimeout(()=>n(Error(`SageCell script failed to load`)),e),i=setInterval(()=>{window.sagecell&&(clearInterval(i),clearTimeout(r),t())},50)})}function W_(){return{execute:async(e,t=35e3,n)=>{if(n?.aborted)return{success:!1,stdout:``,error:`Cancelled`};try{await U_()}catch{return{success:!1,stdout:``,error:`SageCell not loaded. Check network connection.`}}let r=V_();return H_(r,e),new Promise(e=>{let i=!1,a=()=>{n?.removeEventListener(`abort`,o);try{document.body.removeChild(r)}catch{}},o=()=>{i=!0,clearTimeout(s),c.disconnect(),a(),e({success:!1,stdout:``,error:`Cancelled`})},s=setTimeout(()=>{i||(i=!0,a(),e({success:!1,stdout:``,error:`Execution timed out after ${t/1e3}s`}))},t),c=new MutationObserver(()=>{if(i)return;let t=r.querySelector(`.sagecell_stdout`);t&&setTimeout(()=>{if(i)return;let n=t.textContent||``;n.trim()&&(i=!0,clearTimeout(s),c.disconnect(),a(),e({success:!0,stdout:n.trim()}))},500)});c.observe(r,{childList:!0,subtree:!0}),n?.addEventListener(`abort`,o,{once:!0});try{window.sagecell.makeSagecell({inputLocation:`#${r.id}`,template:window.sagecell.templates.minimal,evalButtonText:`Evaluate`,autoeval:!0,callback:()=>{}})}catch(t){i||(i=!0,clearTimeout(s),c.disconnect(),a(),e({success:!1,stdout:``,error:t instanceof Error?t.message:`Failed to execute Sage code`}))}})}}}function G_(){return(0,j.useMemo)(()=>W_(),[])}function K_(){return{executeAll:async(e,t=3,n=35e3,r,i)=>{let a=[],o=e.map((e,t)=>({code:e,index:t})),s=new Set,c=i??new AbortController;return new Promise(e=>{let{execute:i}=W_(),l=async()=>{if(o.length===0&&s.size===0){e(a.sort((e,t)=>e.index-t.index));return}for(;s.size<t&&o.length>0;){let e=o.shift();s.add(e.index),i(e.code,n,c.signal).then(t=>{if(a.push({...t,index:e.index}),r&&r(e.index,t))for(c.abort();o.length>0;){let e=o.shift();a.push({success:!1,stdout:``,error:`Aborted`,index:e.index})}}).catch(t=>{let n=t instanceof Error?t.message:`Unknown error`;a.push({success:!1,stdout:``,error:n,index:e.index})}).finally(()=>{s.delete(e.index),l()})}};l()})},createController:()=>new AbortController}}var R=class e extends Error{constructor(t,n){var r=`KaTeX parse error: `+t,i,a,o=n&&n.loc;if(o&&o.start<=o.end){var s=o.lexer.input;i=o.start,a=o.end,i===s.length?r+=` at end of input: `:r+=` at position `+(i+1)+`: `;var c=s.slice(i,a).replace(/[^]/g,`$&̲`),l=i>15?`…`+s.slice(i-15,i):s.slice(0,i),u=a+15<s.length?s.slice(a,a+15)+`…`:s.slice(a);r+=l+c+u}super(r),this.name=`ParseError`,this.position=void 0,this.length=void 0,this.rawMessage=void 0,Object.setPrototypeOf(this,e.prototype),this.position=i,i!=null&&a!=null&&(this.length=a-i),this.rawMessage=t}},q_=/([A-Z])/g,J_=e=>e.replace(q_,`-$1`).toLowerCase(),Y_={"&":`&amp;`,">":`&gt;`,"<":`&lt;`,'"':`&quot;`,"'":`&#x27;`},X_=/[&><"']/g,Z_=e=>String(e).replace(X_,e=>Y_[e]),Q_=e=>e.type===`ordgroup`||e.type===`color`?e.body.length===1?Q_(e.body[0]):e:e.type===`font`?Q_(e.body):e,$_=new Set([`mathord`,`textord`,`atom`]),ev=e=>$_.has(Q_(e).type),tv=e=>{var t=/^[\x00-\x20]*([^\\/#?]*?)(:|&#0*58|&#x0*3a|&colon)/i.exec(e);return t?t[2]!==`:`||!/^[a-zA-Z][a-zA-Z0-9+\-.]*$/.test(t[1])?null:t[1].toLowerCase():`_relative`},nv={displayMode:{type:`boolean`,description:`Render math in display mode, which puts the math in display style (so \\int and \\sum are large, for example), and centers the math on the page on its own line.`,cli:`-d, --display-mode`},output:{type:{enum:[`htmlAndMathml`,`html`,`mathml`]},description:`Determines the markup language of the output.`,cli:`-F, --format <type>`},leqno:{type:`boolean`,description:`Render display math in leqno style (left-justified tags).`},fleqn:{type:`boolean`,description:`Render display math flush left.`},throwOnError:{type:`boolean`,default:!0,cli:`-t, --no-throw-on-error`,cliDescription:`Render errors (in the color given by --error-color) instead of throwing a ParseError exception when encountering an error.`},errorColor:{type:`string`,default:`#cc0000`,cli:`-c, --error-color <color>`,cliDescription:`A color string given in the format 'rgb' or 'rrggbb' (no #). This option determines the color of errors rendered by the -t option.`,cliProcessor:e=>`#`+e},macros:{type:`object`,cli:`-m, --macro <def>`,cliDescription:`Define custom macro of the form '\\foo:expansion' (use multiple -m arguments for multiple macros).`,cliDefault:[],cliProcessor:(e,t)=>(t.push(e),t)},minRuleThickness:{type:`number`,description:"Specifies a minimum thickness, in ems, for fraction lines, `\\sqrt` top lines, `{array}` vertical lines, `\\hline`, `\\hdashline`, `\\underline`, `\\overline`, and the borders of `\\fbox`, `\\boxed`, and `\\fcolorbox`.",processor:e=>Math.max(0,e),cli:`--min-rule-thickness <size>`,cliProcessor:parseFloat},colorIsTextColor:{type:`boolean`,description:`Makes \\color behave like LaTeX's 2-argument \\textcolor, instead of LaTeX's one-argument \\color mode change.`,cli:`-b, --color-is-text-color`},strict:{type:[{enum:[`warn`,`ignore`,`error`]},`boolean`,`function`],description:`Turn on strict / LaTeX faithfulness mode, which throws an error if the input uses features that are not supported by LaTeX.`,cli:`-S, --strict`,cliDefault:!1},trust:{type:[`boolean`,`function`],description:`Trust the input, enabling all HTML features such as \\url.`,cli:`-T, --trust`},maxSize:{type:`number`,default:1/0,description:`If non-zero, all user-specified sizes, e.g. in \\rule{500em}{500em}, will be capped to maxSize ems. Otherwise, elements and spaces can be arbitrarily large`,processor:e=>Math.max(0,e),cli:`-s, --max-size <n>`,cliProcessor:parseInt},maxExpand:{type:`number`,default:1e3,description:`Limit the number of macro expansions to the specified number, to prevent e.g. infinite macro loops. If set to Infinity, the macro expander will try to fully expand as in LaTeX.`,processor:e=>Math.max(0,e),cli:`-e, --max-expand <n>`,cliProcessor:e=>e===`Infinity`?1/0:parseInt(e)},globalGroup:{type:`boolean`,cli:!1}};function rv(e){if(typeof e!=`string`)return e.enum[0];switch(e){case`boolean`:return!1;case`string`:return``;case`number`:return 0;case`object`:return{};default:throw Error(`Unexpected schema type; settings must declare an explicit default.`)}}function iv(e){return e.default===void 0?rv(Array.isArray(e.type)?e.type[0]:e.type):e.default}function av(e,t,n,r){var i=n[t];e[t]=i===void 0?iv(r):r.processor?r.processor(i):i}var ov=class{constructor(e){e===void 0&&(e={}),this.displayMode=void 0,this.output=void 0,this.leqno=void 0,this.fleqn=void 0,this.throwOnError=void 0,this.errorColor=void 0,this.macros=void 0,this.minRuleThickness=void 0,this.colorIsTextColor=void 0,this.strict=void 0,this.trust=void 0,this.maxSize=void 0,this.maxExpand=void 0,this.globalGroup=void 0,e||={};for(var t of Object.keys(nv)){var n=nv[t];n&&av(this,t,e,n)}}reportNonstrict(e,t,n){var r=this.strict;if(typeof r==`function`&&(r=r(e,t,n)),!(!r||r===`ignore`)){if(r===!0||r===`error`)throw new R(`LaTeX-incompatible input and strict mode is set to 'error': `+(t+` [`+e+`]`),n);r===`warn`?typeof console<`u`&&console.warn(`LaTeX-incompatible input and strict mode is set to 'warn': `+(t+` [`+e+`]`)):typeof console<`u`&&console.warn(`LaTeX-incompatible input and strict mode is set to `+(`unrecognized '`+r+`': `+t+` [`+e+`]`))}}useStrictBehavior(e,t,n){var r=this.strict;if(typeof r==`function`)try{r=r(e,t,n)}catch{r=`error`}return!r||r===`ignore`?!1:r===!0||r===`error`?!0:r===`warn`?(typeof console<`u`&&console.warn(`LaTeX-incompatible input and strict mode is set to 'warn': `+(t+` [`+e+`]`)),!1):(typeof console<`u`&&console.warn(`LaTeX-incompatible input and strict mode is set to `+(`unrecognized '`+r+`': `+t+` [`+e+`]`)),!1)}isTrusted(e){if(`url`in e&&e.url&&!e.protocol){var t=tv(e.url);if(t==null)return!1;e.protocol=t}return!!(typeof this.trust==`function`?this.trust(e):this.trust)}},sv=class{constructor(e,t,n){this.id=void 0,this.size=void 0,this.cramped=void 0,this.id=e,this.size=t,this.cramped=n}sup(){return gv[_v[this.id]]}sub(){return gv[vv[this.id]]}fracNum(){return gv[yv[this.id]]}fracDen(){return gv[bv[this.id]]}cramp(){return gv[xv[this.id]]}text(){return gv[Sv[this.id]]}isTight(){return this.size>=2}},cv=0,lv=1,uv=2,dv=3,fv=4,pv=5,mv=6,hv=7,gv=[new sv(cv,0,!1),new sv(lv,0,!0),new sv(uv,1,!1),new sv(dv,1,!0),new sv(fv,2,!1),new sv(pv,2,!0),new sv(mv,3,!1),new sv(hv,3,!0)],_v=[fv,pv,fv,pv,mv,hv,mv,hv],vv=[pv,pv,pv,pv,hv,hv,hv,hv],yv=[uv,dv,fv,pv,mv,hv,mv,hv],bv=[dv,dv,pv,pv,hv,hv,hv,hv],xv=[lv,lv,dv,dv,pv,pv,hv,hv],Sv=[cv,lv,uv,dv,uv,dv,uv,dv],Cv={DISPLAY:gv[cv],TEXT:gv[uv],SCRIPT:gv[fv],SCRIPTSCRIPT:gv[mv]},wv=[{name:`latin`,blocks:[[256,591],[768,879]]},{name:`cyrillic`,blocks:[[1024,1279]]},{name:`armenian`,blocks:[[1328,1423]]},{name:`brahmic`,blocks:[[2304,4255]]},{name:`georgian`,blocks:[[4256,4351]]},{name:`cjk`,blocks:[[12288,12543],[19968,40879],[65280,65376]]},{name:`hangul`,blocks:[[44032,55215]]}];function Tv(e){for(var t=0;t<wv.length;t++)for(var n=wv[t],r=0;r<n.blocks.length;r++){var i=n.blocks[r];if(e>=i[0]&&e<=i[1])return n.name}return null}var Ev=[];wv.forEach(e=>e.blocks.forEach(e=>Ev.push(...e)));function Dv(e){for(var t=0;t<Ev.length;t+=2)if(e>=Ev[t]&&e<=Ev[t+1])return!0;return!1}var Ov=e=>e+` `+e,kv=80,Av=function(e,t){return`M95,`+(622+e+t)+`
+`)}},M_=[jh,Nh,Fh,Lh,zh,Vh,Uh,Gh,qh,Yh,Zh,$h,tg,rg,ag,sg,lg,dg,pg,hg,_g,yg,xg,Cg,Tg,Dg,kg,jg,Ng,Fg,Lg,zg,Vg,Ug,Gg,qg,Yg,Zg,$g,t_,r_,u_,f_,m_,g_,v_,b_,S_,w_,E_,O_,A_],N_={fermat:Mh,wiener:Ph,"boneh-durfee":Ih,ecm:Rh,ecm2:Bh,"pollard-p1":Hh,"pollard-rho":Wh,"williams-p1":Kh,"quadratic-sieve":Jh,squfof:Xh,"binary-poly-factor":Qh,"small-fraction":eg,"batch-gcd":ng,"multi-prime":ig,"gimmicky-primes":og,"close-prime":cg,"novelty-primes":ug,"simple-lattice":fg,"partial-d":mg,"partial-pq-bits":gg,"small-crt-exp":vg,"dp-dq-leak":bg,"linearly-related-primes":Sg,"dependent-prime":wg,"common-modulus":Eg,hastad:Og,"franklin-reiter":Ag,"coppersmith-short-pad":Mg,"hastad-linear-pad":Pg,"lsb-oracle":Ig,"rsa-crt-fault":Rg,"non-coprime-exp":Bg,"cube-root-crt":Hg,"common-factor":Wg,"homomorphic-forgery":Kg,"bleichenbacher-sig":Jg,bleichenbacher:Xg,manger:Qg,"biased-lsb":e_,roca:n_,nitros:i_,"factordb-lookup":d_,"known-plaintext":p_,"small-public-exp":h_,"multi-prime-gcd":__,"phi-leak":y_,"parity-oracle":x_,"partial-key-exposure":C_,"implicit-key-exposure":T_,"related-message":D_,"common-prime-rsa":k_,"hastad-broadcast":j_},P_=[`Factorization`,`Partial Key / Lattice`,`Message / Protocol`,`Oracle`,`Advanced`],F_=new Map;for(let e of P_)F_.set(e,M_.filter(t=>t.category===e));var I_=(0,j.createContext)(null);function L_(){let e=(0,j.useContext)(I_);if(!e)throw Error(`useAppContext must be used within AppProvider`);return e}var R_=`https://factordb-proxy.octopusyuzu.workers.dev`;function z_(){let{selectedAttack:e,setSelectedAttack:t,setViewMode:n}=L_(),[r,i]=(0,j.useState)(new Set(P_)),[a,o]=(0,j.useState)({factordb:`checking`,sagecell:`checking`});(0,j.useEffect)(()=>{let e=new AbortController,t,n,r;return fetch(`${R_}?query=15`,{signal:e.signal}).then(e=>e.json()).then(()=>o(e=>({...e,factordb:`ok`}))).catch(()=>{e.signal.aborted||o(e=>({...e,factordb:`error`}))}),r=setTimeout(()=>{e.signal.aborted||(e.abort(),o(e=>({...e,factordb:`error`})))},5e3),typeof window<`u`&&window.sagecell?o(e=>({...e,sagecell:`ok`})):(t=setInterval(()=>{window.sagecell&&(clearInterval(t),o(e=>({...e,sagecell:`ok`})))},200),n=setTimeout(()=>{clearInterval(t),window.sagecell||o(e=>({...e,sagecell:`error`}))},8e3)),()=>{e.abort(),t&&clearInterval(t),r&&clearTimeout(r),n&&clearTimeout(n)}},[]);let s=e=>{i(t=>{let n=new Set(t);return n.has(e)?n.delete(e):n.add(e),n})},c=e=>{t(M_.find(t=>t.id===e)||null),n(`attack`)};return(0,M.jsxs)(yd,{variant:`permanent`,sx:{width:220,flexShrink:0,"& .MuiDrawer-paper":{width:220,boxSizing:`border-box`,backgroundColor:I.currentLine,borderRight:`1px solid ${I.comment}`,display:`flex`,flexDirection:`column`}},children:[(0,M.jsxs)(nu,{sx:{p:2},children:[(0,M.jsx)(F,{variant:`h6`,sx:{color:I.purple,fontWeight:700},children:`RSA CTF Tool`}),(0,M.jsx)(F,{variant:`caption`,sx:{color:I.comment},children:`SageMath Powered`})]}),(0,M.jsx)(rd,{sx:{borderColor:I.comment}}),(0,M.jsxs)(Ef,{sx:{flex:1,overflow:`auto`},children:[P_.map(t=>(0,M.jsxs)(nu,{children:[(0,M.jsxs)(Nf,{onClick:()=>s(t),sx:{px:2},children:[(0,M.jsx)(F,{sx:{color:I.cyan,fontWeight:600,fontSize:`0.85rem`,flex:1},children:t}),r.has(t)?(0,M.jsx)(hh,{sx:{color:I.comment}}):(0,M.jsx)(gh,{sx:{color:I.comment}})]}),(0,M.jsx)(xc,{in:r.has(t),timeout:`auto`,unmountOnExit:!0,children:(0,M.jsx)(Ef,{component:`div`,disablePadding:!0,children:(F_.get(t)||[]).map(t=>(0,M.jsx)(Nf,{onClick:()=>c(t.id),sx:{pl:4,borderLeft:e?.id===t.id?`3px solid ${I.purple}`:`3px solid transparent`,backgroundColor:e?.id===t.id?I.background:`transparent`,"&:hover":{backgroundColor:I.background}},children:(0,M.jsx)(qf,{primary:t.name,slotProps:{primary:{sx:{color:I.foreground,fontSize:`0.75rem`}}}})},t.id))})})]},t)),(0,M.jsx)(rd,{sx:{borderColor:I.comment,my:1}}),(0,M.jsxs)(Nf,{onClick:()=>n(`magic`),sx:{mx:1,"&:hover":{backgroundColor:I.background}},children:[(0,M.jsx)(ch,{sx:{color:I.purple,mr:1,fontSize:`1.1rem`}}),(0,M.jsx)(qf,{primary:`Magic`,slotProps:{primary:{sx:{color:I.purple,fontWeight:600,fontSize:`0.85rem`}}}})]}),(0,M.jsxs)(Nf,{onClick:()=>n(`proofs`),sx:{mx:1,mt:.5,"&:hover":{backgroundColor:I.background}},children:[(0,M.jsx)(vh,{sx:{color:I.foreground,mr:1,fontSize:`1.1rem`}}),(0,M.jsx)(qf,{primary:`Proofs Index`,slotProps:{primary:{sx:{color:I.foreground,fontSize:`0.85rem`}}}})]}),(0,M.jsxs)(Nf,{onClick:()=>n(`calculator`),sx:{mx:1,mt:.5,"&:hover":{backgroundColor:I.background}},children:[(0,M.jsx)(lh,{sx:{color:I.cyan,mr:1,fontSize:`1.1rem`}}),(0,M.jsx)(qf,{primary:`Calculator`,slotProps:{primary:{sx:{color:I.cyan,fontSize:`0.85rem`}}}})]}),(0,M.jsx)(rd,{sx:{borderColor:I.comment,my:1}}),(0,M.jsxs)(nu,{sx:{px:2,py:1},children:[(0,M.jsx)(F,{variant:`caption`,sx:{color:I.comment,fontWeight:600,fontSize:`0.7rem`,display:`block`,mb:.5},children:`SERVICE STATUS`}),(0,M.jsxs)(nu,{sx:{display:`flex`,alignItems:`center`,gap:1,mb:.5},children:[a.factordb===`ok`?(0,M.jsx)(fh,{sx:{color:I.green,fontSize:`0.9rem`}}):a.factordb===`error`?(0,M.jsx)(mh,{sx:{color:I.red,fontSize:`0.9rem`}}):(0,M.jsx)(nu,{sx:{width:`0.9rem`,height:`0.9rem`,borderRadius:`50%`,border:`2px solid ${I.comment}`}}),(0,M.jsx)(F,{variant:`caption`,sx:{color:I.foreground,fontSize:`0.7rem`},children:`FactorDB`})]}),(0,M.jsxs)(nu,{sx:{display:`flex`,alignItems:`center`,gap:1},children:[a.sagecell===`ok`?(0,M.jsx)(fh,{sx:{color:I.green,fontSize:`0.9rem`}}):a.sagecell===`error`?(0,M.jsx)(mh,{sx:{color:I.red,fontSize:`0.9rem`}}):(0,M.jsx)(nu,{sx:{width:`0.9rem`,height:`0.9rem`,borderRadius:`50%`,border:`2px solid ${I.comment}`}}),(0,M.jsx)(F,{variant:`caption`,sx:{color:I.foreground,fontSize:`0.7rem`},children:`SageMathCell`})]})]})]}),(0,M.jsx)(rd,{sx:{borderColor:I.comment}}),(0,M.jsxs)(nu,{sx:{p:2},children:[(0,M.jsx)(F,{variant:`caption`,sx:{color:I.comment,display:`block`},children:`© 2026 yuzu-octopus`}),(0,M.jsxs)(F,{variant:`caption`,sx:{color:I.comment,display:`block`},children:[`Powered by`,` `,(0,M.jsx)(xf,{href:`https://pages.github.com`,target:`_blank`,rel:`noopener`,sx:{color:I.purple},children:`GitHub Pages`})]}),(0,M.jsxs)(F,{variant:`caption`,sx:{color:I.comment,display:`block`},children:[`Made with`,` `,(0,M.jsx)(xf,{href:`https://vite.dev`,target:`_blank`,rel:`noopener`,sx:{color:I.purple},children:`Vite`})]})]})]})}function B_({children:e}){let[t,n]=(0,j.useState)(null),[r,i]=(0,j.useState)(`attack`),[a,o]=(0,j.useState)(null),[s,c]=(0,j.useState)(null),[l,u]=(0,j.useState)([]),d=(0,j.useCallback)((e,t,n,r)=>{u(i=>[{attackId:e,attackName:t,timestamp:new Date,result:n,success:r},...i].slice(0,50))},[]);return(0,M.jsx)(I_.Provider,{value:{selectedAttack:t,setSelectedAttack:n,viewMode:r,setViewMode:i,outputResult:a,setOutputResult:o,outputError:s,setOutputError:c,history:l,addToHistory:d},children:e})}function V_(){let e=`sagecell-${Date.now()}-${Math.random().toString(36).slice(2,9)}`,t=document.createElement(`div`);return t.id=e,t.style.position=`absolute`,t.style.left=`-9999px`,t.style.top=`-9999px`,t.style.width=`1px`,t.style.height=`1px`,t.style.overflow=`hidden`,t.style.opacity=`0`,t.style.pointerEvents=`none`,document.body.appendChild(t),t}function H_(e,t){let n=document.createElement(`script`);return n.type=`text/x-sage`,n.textContent=t,e.appendChild(n),n}function U_(e=1e4){return window.sagecell?Promise.resolve():new Promise((t,n)=>{let r=setTimeout(()=>n(Error(`SageCell script failed to load`)),e),i=setInterval(()=>{window.sagecell&&(clearInterval(i),clearTimeout(r),t())},50)})}function W_(){return{execute:async(e,t=35e3,n)=>{if(n?.aborted)return{success:!1,stdout:``,error:`Cancelled`};try{await U_()}catch{return{success:!1,stdout:``,error:`SageCell not loaded. Check network connection.`}}let r=V_();return H_(r,e),new Promise(e=>{let i=!1,a=()=>{n?.removeEventListener(`abort`,o);try{document.body.removeChild(r)}catch{}},o=()=>{i=!0,clearTimeout(s),c.disconnect(),a(),e({success:!1,stdout:``,error:`Cancelled`})},s=setTimeout(()=>{i||(i=!0,a(),e({success:!1,stdout:``,error:`Execution timed out after ${t/1e3}s`}))},t),c=new MutationObserver(()=>{if(i)return;let t=r.querySelector(`.sagecell_stdout`);t&&setTimeout(()=>{if(i)return;let n=t.textContent||``;n.trim()&&(i=!0,clearTimeout(s),c.disconnect(),a(),e({success:!0,stdout:n.trim()}))},500)});c.observe(r,{childList:!0,subtree:!0}),n?.addEventListener(`abort`,o,{once:!0});try{window.sagecell.makeSagecell({inputLocation:`#${r.id}`,template:window.sagecell.templates.minimal,evalButtonText:`Evaluate`,autoeval:!0,callback:()=>{}})}catch(t){i||(i=!0,clearTimeout(s),c.disconnect(),a(),e({success:!1,stdout:``,error:t instanceof Error?t.message:`Failed to execute Sage code`}))}})}}}function G_(){return(0,j.useMemo)(()=>W_(),[])}function K_(){return{executeAll:async(e,t=3,n=35e3,r,i)=>{let a=[],o=e.map((e,t)=>({code:e,index:t})),s=new Set,c=i??new AbortController;return new Promise(e=>{let{execute:i}=W_(),l=async()=>{if(o.length===0&&s.size===0){e(a.sort((e,t)=>e.index-t.index));return}for(;s.size<t&&o.length>0;){let e=o.shift();s.add(e.index),i(e.code,n,c.signal).then(t=>{if(a.push({...t,index:e.index}),r&&r(e.index,t))for(c.abort();o.length>0;){let e=o.shift();a.push({success:!1,stdout:``,error:`Aborted`,index:e.index})}}).catch(t=>{let n=t instanceof Error?t.message:`Unknown error`;a.push({success:!1,stdout:``,error:n,index:e.index})}).finally(()=>{s.delete(e.index),l()})}};l()})},createController:()=>new AbortController}}var R=class e extends Error{constructor(t,n){var r=`KaTeX parse error: `+t,i,a,o=n&&n.loc;if(o&&o.start<=o.end){var s=o.lexer.input;i=o.start,a=o.end,i===s.length?r+=` at end of input: `:r+=` at position `+(i+1)+`: `;var c=s.slice(i,a).replace(/[^]/g,`$&̲`),l=i>15?`…`+s.slice(i-15,i):s.slice(0,i),u=a+15<s.length?s.slice(a,a+15)+`…`:s.slice(a);r+=l+c+u}super(r),this.name=`ParseError`,this.position=void 0,this.length=void 0,this.rawMessage=void 0,Object.setPrototypeOf(this,e.prototype),this.position=i,i!=null&&a!=null&&(this.length=a-i),this.rawMessage=t}},q_=/([A-Z])/g,J_=e=>e.replace(q_,`-$1`).toLowerCase(),Y_={"&":`&amp;`,">":`&gt;`,"<":`&lt;`,'"':`&quot;`,"'":`&#x27;`},X_=/[&><"']/g,Z_=e=>String(e).replace(X_,e=>Y_[e]),Q_=e=>e.type===`ordgroup`||e.type===`color`?e.body.length===1?Q_(e.body[0]):e:e.type===`font`?Q_(e.body):e,$_=new Set([`mathord`,`textord`,`atom`]),ev=e=>$_.has(Q_(e).type),tv=e=>{var t=/^[\x00-\x20]*([^\\/#?]*?)(:|&#0*58|&#x0*3a|&colon)/i.exec(e);return t?t[2]!==`:`||!/^[a-zA-Z][a-zA-Z0-9+\-.]*$/.test(t[1])?null:t[1].toLowerCase():`_relative`},nv={displayMode:{type:`boolean`,description:`Render math in display mode, which puts the math in display style (so \\int and \\sum are large, for example), and centers the math on the page on its own line.`,cli:`-d, --display-mode`},output:{type:{enum:[`htmlAndMathml`,`html`,`mathml`]},description:`Determines the markup language of the output.`,cli:`-F, --format <type>`},leqno:{type:`boolean`,description:`Render display math in leqno style (left-justified tags).`},fleqn:{type:`boolean`,description:`Render display math flush left.`},throwOnError:{type:`boolean`,default:!0,cli:`-t, --no-throw-on-error`,cliDescription:`Render errors (in the color given by --error-color) instead of throwing a ParseError exception when encountering an error.`},errorColor:{type:`string`,default:`#cc0000`,cli:`-c, --error-color <color>`,cliDescription:`A color string given in the format 'rgb' or 'rrggbb' (no #). This option determines the color of errors rendered by the -t option.`,cliProcessor:e=>`#`+e},macros:{type:`object`,cli:`-m, --macro <def>`,cliDescription:`Define custom macro of the form '\\foo:expansion' (use multiple -m arguments for multiple macros).`,cliDefault:[],cliProcessor:(e,t)=>(t.push(e),t)},minRuleThickness:{type:`number`,description:"Specifies a minimum thickness, in ems, for fraction lines, `\\sqrt` top lines, `{array}` vertical lines, `\\hline`, `\\hdashline`, `\\underline`, `\\overline`, and the borders of `\\fbox`, `\\boxed`, and `\\fcolorbox`.",processor:e=>Math.max(0,e),cli:`--min-rule-thickness <size>`,cliProcessor:parseFloat},colorIsTextColor:{type:`boolean`,description:`Makes \\color behave like LaTeX's 2-argument \\textcolor, instead of LaTeX's one-argument \\color mode change.`,cli:`-b, --color-is-text-color`},strict:{type:[{enum:[`warn`,`ignore`,`error`]},`boolean`,`function`],description:`Turn on strict / LaTeX faithfulness mode, which throws an error if the input uses features that are not supported by LaTeX.`,cli:`-S, --strict`,cliDefault:!1},trust:{type:[`boolean`,`function`],description:`Trust the input, enabling all HTML features such as \\url.`,cli:`-T, --trust`},maxSize:{type:`number`,default:1/0,description:`If non-zero, all user-specified sizes, e.g. in \\rule{500em}{500em}, will be capped to maxSize ems. Otherwise, elements and spaces can be arbitrarily large`,processor:e=>Math.max(0,e),cli:`-s, --max-size <n>`,cliProcessor:parseInt},maxExpand:{type:`number`,default:1e3,description:`Limit the number of macro expansions to the specified number, to prevent e.g. infinite macro loops. If set to Infinity, the macro expander will try to fully expand as in LaTeX.`,processor:e=>Math.max(0,e),cli:`-e, --max-expand <n>`,cliProcessor:e=>e===`Infinity`?1/0:parseInt(e)},globalGroup:{type:`boolean`,cli:!1}};function rv(e){if(typeof e!=`string`)return e.enum[0];switch(e){case`boolean`:return!1;case`string`:return``;case`number`:return 0;case`object`:return{};default:throw Error(`Unexpected schema type; settings must declare an explicit default.`)}}function iv(e){return e.default===void 0?rv(Array.isArray(e.type)?e.type[0]:e.type):e.default}function av(e,t,n,r){var i=n[t];e[t]=i===void 0?iv(r):r.processor?r.processor(i):i}var ov=class{constructor(e){e===void 0&&(e={}),this.displayMode=void 0,this.output=void 0,this.leqno=void 0,this.fleqn=void 0,this.throwOnError=void 0,this.errorColor=void 0,this.macros=void 0,this.minRuleThickness=void 0,this.colorIsTextColor=void 0,this.strict=void 0,this.trust=void 0,this.maxSize=void 0,this.maxExpand=void 0,this.globalGroup=void 0,e||={};for(var t of Object.keys(nv)){var n=nv[t];n&&av(this,t,e,n)}}reportNonstrict(e,t,n){var r=this.strict;if(typeof r==`function`&&(r=r(e,t,n)),!(!r||r===`ignore`)){if(r===!0||r===`error`)throw new R(`LaTeX-incompatible input and strict mode is set to 'error': `+(t+` [`+e+`]`),n);r===`warn`?typeof console<`u`&&console.warn(`LaTeX-incompatible input and strict mode is set to 'warn': `+(t+` [`+e+`]`)):typeof console<`u`&&console.warn(`LaTeX-incompatible input and strict mode is set to `+(`unrecognized '`+r+`': `+t+` [`+e+`]`))}}useStrictBehavior(e,t,n){var r=this.strict;if(typeof r==`function`)try{r=r(e,t,n)}catch{r=`error`}return!r||r===`ignore`?!1:r===!0||r===`error`?!0:r===`warn`?(typeof console<`u`&&console.warn(`LaTeX-incompatible input and strict mode is set to 'warn': `+(t+` [`+e+`]`)),!1):(typeof console<`u`&&console.warn(`LaTeX-incompatible input and strict mode is set to `+(`unrecognized '`+r+`': `+t+` [`+e+`]`)),!1)}isTrusted(e){if(`url`in e&&e.url&&!e.protocol){var t=tv(e.url);if(t==null)return!1;e.protocol=t}return!!(typeof this.trust==`function`?this.trust(e):this.trust)}},sv=class{constructor(e,t,n){this.id=void 0,this.size=void 0,this.cramped=void 0,this.id=e,this.size=t,this.cramped=n}sup(){return gv[_v[this.id]]}sub(){return gv[vv[this.id]]}fracNum(){return gv[yv[this.id]]}fracDen(){return gv[bv[this.id]]}cramp(){return gv[xv[this.id]]}text(){return gv[Sv[this.id]]}isTight(){return this.size>=2}},cv=0,lv=1,uv=2,dv=3,fv=4,pv=5,mv=6,hv=7,gv=[new sv(cv,0,!1),new sv(lv,0,!0),new sv(uv,1,!1),new sv(dv,1,!0),new sv(fv,2,!1),new sv(pv,2,!0),new sv(mv,3,!1),new sv(hv,3,!0)],_v=[fv,pv,fv,pv,mv,hv,mv,hv],vv=[pv,pv,pv,pv,hv,hv,hv,hv],yv=[uv,dv,fv,pv,mv,hv,mv,hv],bv=[dv,dv,pv,pv,hv,hv,hv,hv],xv=[lv,lv,dv,dv,pv,pv,hv,hv],Sv=[cv,lv,uv,dv,uv,dv,uv,dv],Cv={DISPLAY:gv[cv],TEXT:gv[uv],SCRIPT:gv[fv],SCRIPTSCRIPT:gv[mv]},wv=[{name:`latin`,blocks:[[256,591],[768,879]]},{name:`cyrillic`,blocks:[[1024,1279]]},{name:`armenian`,blocks:[[1328,1423]]},{name:`brahmic`,blocks:[[2304,4255]]},{name:`georgian`,blocks:[[4256,4351]]},{name:`cjk`,blocks:[[12288,12543],[19968,40879],[65280,65376]]},{name:`hangul`,blocks:[[44032,55215]]}];function Tv(e){for(var t=0;t<wv.length;t++)for(var n=wv[t],r=0;r<n.blocks.length;r++){var i=n.blocks[r];if(e>=i[0]&&e<=i[1])return n.name}return null}var Ev=[];wv.forEach(e=>e.blocks.forEach(e=>Ev.push(...e)));function Dv(e){for(var t=0;t<Ev.length;t+=2)if(e>=Ev[t]&&e<=Ev[t+1])return!0;return!1}var Ov=e=>e+` `+e,kv=80,Av=function(e,t){return`M95,`+(622+e+t)+`
 c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14
 c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54
 c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10

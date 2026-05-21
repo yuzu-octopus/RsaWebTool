@@ -16,43 +16,45 @@ export const attack: Attack = {
       return `print("ERROR: Missing required inputs (n, c)")
 print("COMMON_FACTOR=FAILED")`;
     }
-    return `try:
-    n = Integer(${vals.n})
-    c = Integer(${vals.c})
-    print(f"Common Factor Attack")
-    print(f"n = {n}")
-    print(f"c = {c}")
-    print()
-    g = gcd(c, n)
-    print(f"gcd(c, n) = {g}")
-    if g == 1:
-        print("gcd(c, n) = 1. No common factor. Message is not a multiple of p or q.")
-        print("This attack does not apply.")
-        print("COMMON_FACTOR=FAILED")
-    elif g == n:
-        print("gcd(c, n) = n. c is a multiple of n (c = 0 mod n).")
-        print("The message m was 0 or a multiple of n.")
-        print("COMMON_FACTOR=FAILED")
-    else:
-        p = g
-        q = n // g
-        print(f"\\nCommon factor found!")
-        print(f"p = {p}")
-        print(f"q = {q}")
-        print(f"Verification: p * q = {p * q}")
-        print(f"p is prime: {p.is_prime()}")
-        print(f"q is prime: {q.is_prime()}")
-        if p.is_prime() and q.is_prime():
-            print(f"\\nThe message m is a multiple of p = {p}")
-            print(f"m = k * {p} for some integer k")
-            print("COMMON_FACTOR=SUCCESS")
-        else:
-            print("gcd(c, n) did not yield valid prime factors.")
+    return `def _attack():
+    try:
+        n = Integer(${vals.n})
+        c = Integer(${vals.c})
+        print(f"Common Factor Attack")
+        print(f"n = {n}")
+        print(f"c = {c}")
+        print()
+        g = gcd(c, n)
+        print(f"gcd(c, n) = {g}")
+        if g == 1:
+            print("gcd(c, n) = 1. No common factor. Message is not a multiple of p or q.")
+            print("This attack does not apply.")
             print("COMMON_FACTOR=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("COMMON_FACTOR=FAILED")
-`;
+        elif g == n:
+            print("gcd(c, n) = n. c is a multiple of n (c = 0 mod n).")
+            print("The message m was 0 or a multiple of n.")
+            print("COMMON_FACTOR=FAILED")
+        else:
+            p = g
+            q = n // g
+            print(f"\\nCommon factor found!")
+            print(f"p = {p}")
+            print(f"q = {q}")
+            print(f"Verification: p * q = {p * q}")
+            print(f"p is prime: {p.is_prime()}")
+            print(f"q is prime: {q.is_prime()}")
+            if p.is_prime() and q.is_prime():
+                print(f"\\nThe message m is a multiple of p = {p}")
+                print(f"m = k * {p} for some integer k")
+                print("COMMON_FACTOR=SUCCESS")
+            else:
+                print("gcd(c, n) did not yield valid prime factors.")
+                print("COMMON_FACTOR=FAILED")
+    except Exception as e:
+        print(f"ERROR: {e}")
+        print("COMMON_FACTOR=FAILED")
+    #
+_attack()`;
   },
   frontendCheck: async (vals: Record<string, string>) => {
     try {

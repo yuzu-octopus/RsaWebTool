@@ -11,53 +11,59 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (v) => `try:
-    n = Integer(${v.n})
-    e = Integer(${v.e})
-    if n < 2:
-        print("DEPENDENT_PRIME=FAILED: n is too small")
-        quit()
-    if e < 2:
-        print("DEPENDENT_PRIME=FAILED: e must be >= 2")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2")
-        print(f"q = {n // 2}")
-        print(f"Verification: 2 * {n // 2} = {n}")
-        print("DEPENDENT_PRIME=SUCCESS")
-        quit()
-    if n.is_prime():
-        print("DEPENDENT_PRIME=FAILED: n is prime")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print("DEPENDENT_PRIME=SUCCESS")
-        quit()
-    ne = n * e
-    found = False
-    for k in range(1, 100001):
-        disc = 1 + 4*k*ne
-        sqrt_disc = ZZ(disc).isqrt()
-        if sqrt_disc * sqrt_disc == disc:
-            num = -1 + sqrt_disc
-            if num > 0 and num % (2*k) == 0:
-                p = num // (2*k)
-                if n % p == 0:
-                    q = n // p
-                    print(f"Verification: p * q = {p * q}")
-                    print("DEPENDENT_PRIME=SUCCESS")
-                    print(f"p={p}")
-                    print(f"q={q}")
-                    print(f"k={k}")
-                    found = True
-                    break
-    if not found:
-        print("DEPENDENT_PRIME=FAILED: no valid factorization found")
-except Exception as ex:
-    print(f"DEPENDENT_PRIME=FAILED: {ex}")`,
+  sageTemplate: (v) => `def _attack():
+    try:
+        try:
+            n = Integer(${v.n})
+            e = Integer(${v.e})
+            if n < 2:
+                print("DEPENDENT_PRIME=FAILED: n is too small")
+                return
+            if e < 2:
+                print("DEPENDENT_PRIME=FAILED: e must be >= 2")
+                return
+            if n % 2 == 0:
+                print(f"n is even: {n}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print(f"Verification: 2 * {n // 2} = {n}")
+                print("DEPENDENT_PRIME=SUCCESS")
+                return
+            if n.is_prime():
+                print("DEPENDENT_PRIME=FAILED: n is prime")
+                return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"p = q = {p}")
+                print("DEPENDENT_PRIME=SUCCESS")
+                return
+            ne = n * e
+            found = False
+            for k in range(1, 100001):
+                disc = 1 + 4*k*ne
+                sqrt_disc = ZZ(disc).isqrt()
+                if sqrt_disc * sqrt_disc == disc:
+                    num = -1 + sqrt_disc
+                    if num > 0 and num % (2*k) == 0:
+                        p = num // (2*k)
+                        if n % p == 0:
+                            q = n // p
+                            print(f"Verification: p * q = {p * q}")
+                            print("DEPENDENT_PRIME=SUCCESS")
+                            print(f"p={p}")
+                            print(f"q={q}")
+                            print(f"k={k}")
+                            found = True
+                            break
+            if not found:
+                print("DEPENDENT_PRIME=FAILED: no valid factorization found")
+        except Exception as ex:
+            print(f"DEPENDENT_PRIME=FAILED: {ex}")
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("DEPENDENT_PRIME=FAILED")
+_attack()`,
   proof: `\\textbf{Theorem:} If $q = e^{-1} \\bmod p$, then $n = pq$ creates a solvable quadratic system $kp^2 + p - ne = 0$.
 
 \\textbf{Prerequisites:}

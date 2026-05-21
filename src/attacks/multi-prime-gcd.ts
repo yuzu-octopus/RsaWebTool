@@ -10,59 +10,62 @@ export const attack: Attack = {
   inputs: [
     { name: 'moduli_list', label: 'Moduli (one per line)', placeholder: 'Enter multiple moduli, one per line...', multiline: true, rows: 6 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `# Validate inputs
-moduli_str = """${vals.moduli_list}""".strip()
-if not moduli_str:
-    print("ERROR: moduli_list is required")
-    print("MULTI_PRIME_GCD=FAILED")
-    quit()
-try:
-    # Parse moduli
-    moduli = [Integer(x.strip()) for x in moduli_str.split('\\n') if x.strip()]
-    print(f"Multi-Prime GCD attack on {len(moduli)} moduli")
-    print()
-    if len(moduli) < 2:
-        print("Need at least 2 moduli for this attack.")
-        print("MULTI_PRIME_GCD=FAILED")
-    else:
-        # Pairwise GCD: check every modulus pair for shared factors
-        print("Running pairwise GCD across all moduli...")
-        print()
-        found_any = False
-        for i in range(len(moduli)):
-            ni = moduli[i]
-            for j in range(i + 1, len(moduli)):
-                nj = moduli[j]
-                g = gcd(ni, nj)
-                if g > 1 and g < ni:
-                    found_any = True
-                    print(f"SHARED FACTOR FOUND between moduli {i+1} and {j+1}!")
-                    print(f"gcd(n{i+1}, n{j+1}) = {g}")
-                    print(f"n{i+1} = {ni}")
-                    print(f"  p = {g}")
-                    print(f"  q = {ni // g}")
-                    print(f"n{j+1} = {nj}")
-                    print(f"  p' = {g}")
-                    print(f"  q' = {nj // g}")
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
+    try:
+        try:
+            moduli_str = """${vals.moduli_list}""".strip()
+            if not moduli_str:
+                print("ERROR: moduli_list is required")
+                print("MULTI_PRIME_GCD=FAILED")
+                return
+            moduli = [Integer(x.strip()) for x in moduli_str.split('\\n') if x.strip()]
+            print(f"Multi-Prime GCD attack on {len(moduli)} moduli")
+            print()
+            if len(moduli) < 2:
+                print("Need at least 2 moduli for this attack.")
+                print("MULTI_PRIME_GCD=FAILED")
+            else:
+                print("Running pairwise GCD across all moduli...")
+                print()
+                found_any = False
+                for i in range(len(moduli)):
+                    ni = moduli[i]
+                    for j in range(i + 1, len(moduli)):
+                        nj = moduli[j]
+                        g = gcd(ni, nj)
+                        if g > 1 and g < ni:
+                            found_any = True
+                            print(f"SHARED FACTOR FOUND between moduli {i+1} and {j+1}!")
+                            print(f"gcd(n{i+1}, n{j+1}) = {g}")
+                            print(f"n{i+1} = {ni}")
+                            print(f"  p = {g}")
+                            print(f"  q = {ni // g}")
+                            print(f"n{j+1} = {nj}")
+                            print(f"  p' = {g}")
+                            print(f"  q' = {nj // g}")
+                            print()
+                if found_any:
+                    print("MULTI_PRIME_GCD=SUCCESS")
+                else:
+                    print("No shared factors found among the provided moduli.")
                     print()
-        if found_any:
-            print("MULTI_PRIME_GCD=SUCCESS")
-        else:
-            print("No shared factors found among the provided moduli.")
-            print()
-            print("This could mean:")
-            print("  1. All moduli use independently generated primes (good practice)")
-            print("  2. The shared factors are not between the provided pairs")
-            print("  3. More moduli are needed to find common factors")
-            print()
-            print("Note: In real-world scans, ~0.2% of RSA certificates share factors")
-            print("due to poor entropy during key generation.")
+                    print("This could mean:")
+                    print("  1. All moduli use independently generated primes (good practice)")
+                    print("  2. The shared factors are not between the provided pairs")
+                    print("  3. More moduli are needed to find common factors")
+                    print()
+                    print("Note: In real-world scans, ~0.2% of RSA certificates share factors")
+                    print("due to poor entropy during key generation.")
+                    print("MULTI_PRIME_GCD=FAILED")
+        except Exception as ex:
+            print(f"ERROR: {ex}")
             print("MULTI_PRIME_GCD=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("MULTI_PRIME_GCD=FAILED")
-`,
-  proof: `\\textbf{Theorem:} Given RSA moduli \\{n_1, \\ldots, n_k\\} generated with insufficient entropy, pairwise GCD reveals both shared factors and the exact pairs that share them.
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("MULTI_PRIME_GCD=FAILED")
+_attack()`,
+  proof: `\\textbf{Theorem:} Given RSA moduli \\{n\\_1, \\ldots, n\\_k\\} generated with insufficient entropy, pairwise GCD reveals both shared factors and the exact pairs that share them.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}

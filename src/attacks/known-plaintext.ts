@@ -18,81 +18,83 @@ export const attack: Attack = {
       return `print("ERROR: n and c are required")
 print("KNOWN_PLAINTEXT=FAILED")`;
     }
-    return `try:
-    n = Integer(${vals.n})
-    e_val = "${vals.e}".strip()
-    e = Integer(e_val) if e_val else Integer(65537)
-    c = Integer(${vals.c})
-    known_prefix = "${vals.known_prefix || ''}"
-    unknown_bits = Integer("${(vals.unknown_bits || '32').trim()}")
-    print(f"Known plaintext attack on RSA")
-    print(f"n = {n} ({n.nbits()} bits)")
-    print(f"e = {e}")
-    print(f"c = {c}")
-    if known_prefix:
-        print(f"Known prefix: '{known_prefix}'")
-        print(f"Unknown bits: {unknown_bits}")
-        prefix_bytes = known_prefix.encode('utf-8')
-        prefix_int = Integer(int.from_bytes(prefix_bytes, 'big'))
-        print(f"Prefix as integer: {prefix_int}")
-        print(f"Prefix byte length: {len(prefix_bytes)}")
-        shift = Integer(2)**unknown_bits
-        bound = n.nbits() // e
-        if unknown_bits <= 16:
-            print(f"Brute forcing 2^{unknown_bits} possibilities...")
-            found = False
-            for k in range(Integer(2)**unknown_bits):
-                if power_mod(prefix_int * shift + k, e, n) == c:
-                    print(f"FOUND! m = {prefix_int * shift + k}")
-                    m_found = prefix_int * shift + k
+    return `def _attack():
+    try:
+        n = Integer(${vals.n})
+        e_val = "${vals.e}".strip()
+        e = Integer(e_val) if e_val else Integer(65537)
+        c = Integer(${vals.c})
+        known_prefix = "${vals.known_prefix || ''}"
+        unknown_bits = Integer("${(vals.unknown_bits || '32').trim()}")
+        print(f"Known plaintext attack on RSA")
+        print(f"n = {n} ({n.nbits()} bits)")
+        print(f"e = {e}")
+        print(f"c = {c}")
+        if known_prefix:
+            print(f"Known prefix: '{known_prefix}'")
+            print(f"Unknown bits: {unknown_bits}")
+            prefix_bytes = known_prefix.encode('utf-8')
+            prefix_int = Integer(int.from_bytes(prefix_bytes, 'big'))
+            print(f"Prefix as integer: {prefix_int}")
+            print(f"Prefix byte length: {len(prefix_bytes)}")
+            shift = Integer(2)**unknown_bits
+            bound = n.nbits() // e
+            if unknown_bits <= 16:
+                print(f"Brute forcing 2^{unknown_bits} possibilities...")
+                found = False
+                for k in range(Integer(2)**unknown_bits):
+                    if power_mod(prefix_int * shift + k, e, n) == c:
+                        print(f"FOUND! m = {prefix_int * shift + k}")
+                        m_found = prefix_int * shift + k
+                        try:
+                            m_hex = hex(m_found)[2:]
+                            if len(m_hex) % 2 != 0:
+                                m_hex = '0' + m_hex
+                            print(f"m as bytes: {bytes.fromhex(m_hex)}")
+                        except:
+                            pass
+                        print("KNOWN_PLAINTEXT=SUCCESS")
+                        found = True
+                        break
+                if not found:
+                    print("Brute force exhausted without finding match.")
+                    print("KNOWN_PLAINTEXT=FAILED")
+            elif unknown_bits <= bound:
+                print(f"Using Coppersmith's method (bound = 2^{bound})...")
+                R.<x> = PolynomialRing(Zmod(n))
+                f = (prefix_int * shift + x)**e - c
+                f = f.monic()
+                roots = f.small_roots(X=shift, beta=1.0, epsilon=0.05)
+                if roots:
+                    x = Integer(roots[0])
+                    m = prefix_int * shift + x
+                    print(f"FOUND! m = {m}")
                     try:
-                        m_hex = hex(m_found)[2:]
+                        m_hex = hex(m)[2:]
                         if len(m_hex) % 2 != 0:
                             m_hex = '0' + m_hex
                         print(f"m as bytes: {bytes.fromhex(m_hex)}")
                     except:
-                        pass
+                        print(f"m as hex: {hex(m)}")
                     print("KNOWN_PLAINTEXT=SUCCESS")
-                    found = True
-                    break
-            if not found:
-                print("Brute force exhausted without finding match.")
-                print("KNOWN_PLAINTEXT=FAILED")
-        elif unknown_bits <= bound:
-            print(f"Using Coppersmith's method (bound = 2^{bound})...")
-            R.<x> = PolynomialRing(Zmod(n))
-            f = (prefix_int * shift + x)**e - c
-            f = f.monic()
-            roots = f.small_roots(X=shift, beta=1.0, epsilon=0.05)
-            if roots:
-                x = Integer(roots[0])
-                m = prefix_int * shift + x
-                print(f"FOUND! m = {m}")
-                try:
-                    m_hex = hex(m)[2:]
-                    if len(m_hex) % 2 != 0:
-                        m_hex = '0' + m_hex
-                    print(f"m as bytes: {bytes.fromhex(m_hex)}")
-                except:
-                    print(f"m as hex: {hex(m)}")
-                print("KNOWN_PLAINTEXT=SUCCESS")
+                else:
+                    print("Coppersmith's method did not find a solution.")
+                    print("Try increasing epsilon, verify the unknown_bits is correct,")
+                    print("or the unknown portion may be too large for current parameters.")
+                    print("KNOWN_PLAINTEXT=FAILED")
             else:
-                print("Coppersmith's method did not find a solution.")
-                print("Try increasing epsilon, verify the unknown_bits is correct,")
-                print("or the unknown portion may be too large for current parameters.")
+                print(f"Unknown portion ({unknown_bits} bits) too large for this attack.")
+                print(f"Maximum feasible unknown bits for e={e} and n={n.nbits()} bits: {bound}")
+                print("Consider: factordb lookup, Fermat factorization, or other methods.")
                 print("KNOWN_PLAINTEXT=FAILED")
         else:
-            print(f"Unknown portion ({unknown_bits} bits) too large for this attack.")
-            print(f"Maximum feasible unknown bits for e={e} and n={n.nbits()} bits: {bound}")
-            print("Consider: factordb lookup, Fermat factorization, or other methods.")
+            print("No known prefix provided.")
+            print("Provide the known portion of the plaintext to attempt recovery.")
             print("KNOWN_PLAINTEXT=FAILED")
-    else:
-        print("No known prefix provided.")
-        print("Provide the known portion of the plaintext to attempt recovery.")
-        print("KNOWN_PLAINTEXT=FAILED")
-except Exception as ex:
-    print(f"KNOWN_PLAINTEXT=FAILED: {ex}")
-`;
+    except Exception as ex:
+        print(f"KNOWN_PLAINTEXT=FAILED: {ex}")
+    #
+_attack()`;
   },
   proof: `\\textbf{Theorem:} Partial knowledge of the plaintext \\(m\\) enables RSA decryption via Coppersmith's method for small unknown portions.
 

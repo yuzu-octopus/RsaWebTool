@@ -10,49 +10,55 @@ export const attack: Attack = {
   inputs: [
     { name: 'n_values', label: 'Moduli (one per line or comma-separated)', placeholder: 'n1\\nn2\\nn3...', multiline: true, rows: 5 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `try:
-    n_list_str = """${vals.n_values}"""
-    import re
-    n_list = [Integer(x.strip()) for x in re.split(r'[\\s,]+', n_list_str.strip()) if x.strip()]
-    if len(n_list) < 2:
-        print("Error: Need at least 2 moduli for Batch GCD attack.")
-        print("BATCH_GCD=FAILED")
-    else:
-        print(f"Processing {len(n_list)} moduli...")
-        print()
-        product = prod(n_list)
-        found_any = False
-        for i, n in enumerate(n_list):
-            if n <= 1:
-                print(f"n[{i}] = {n}: invalid")
-                continue
-            others_product = product // n
-            g = gcd(n, others_product)
-            if g > 1 and g < n:
-                found_any = True
-                p = g
-                q = n // g
-                print(f"n[{i}] = {n}")
-                print(f"  Shared factor found: p = {p}")
-                print(f"  q = {q}")
-                print(f"  Verification: p * q = {p * q}")
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
+    try:
+        try:
+            n_list_str = """${vals.n_values}"""
+            import re
+            n_list = [Integer(x.strip()) for x in re.split(r'[\\s,]+', n_list_str.strip()) if x.strip()]
+            if len(n_list) < 2:
+                print("Error: Need at least 2 moduli for Batch GCD attack.")
+                print("BATCH_GCD=FAILED")
+            else:
+                print(f"Processing {len(n_list)} moduli...")
                 print()
-            elif g == n:
-                print(f"n[{i}] = {n}")
-                print(f"  WARNING: n divides product of others (duplicate or fully shared)")
-                print()
-        if not found_any:
-            print("No shared factors found among the provided moduli.")
-            print()
-        print("Batch GCD complete.")
-        if found_any:
-            print("BATCH_GCD=SUCCESS")
-        else:
+                product = prod(n_list)
+                found_any = False
+                for i, n in enumerate(n_list):
+                    if n <= 1:
+                        print(f"n[{i}] = {n}: invalid")
+                        continue
+                    others_product = product // n
+                    g = gcd(n, others_product)
+                    if g > 1 and g < n:
+                        found_any = True
+                        p = g
+                        q = n // g
+                        print(f"n[{i}] = {n}")
+                        print(f"  Shared factor found: p = {p}")
+                        print(f"  q = {q}")
+                        print(f"  Verification: p * q = {p * q}")
+                        print()
+                    elif g == n:
+                        print(f"n[{i}] = {n}")
+                        print(f"  WARNING: n divides product of others (duplicate or fully shared)")
+                        print()
+                if not found_any:
+                    print("No shared factors found among the provided moduli.")
+                    print()
+                print("Batch GCD complete.")
+                if found_any:
+                    print("BATCH_GCD=SUCCESS")
+                else:
+                    print("BATCH_GCD=FAILED")
+        except Exception as e:
+            print(f"Error in Batch GCD: {e}")
             print("BATCH_GCD=FAILED")
-except Exception as e:
-    print(f"Error in Batch GCD: {e}")
-    print("BATCH_GCD=FAILED")
-`,
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("BATCH_GCD=FAILED")
+_attack()`,
   frontendCheck: async (vals: Record<string, string>) => {
     try {
       const raw = (vals.n_values || '').trim();
@@ -113,13 +119,13 @@ except Exception as e:
       return null;
     }
   },
-  proof: `\\textbf{Theorem:} Given moduli \\{n_1, \\ldots, n_k\\}, if any two share a prime, \\gcd(n_i, \\prod_{j \\neq i} n_j) reveals it.
+  proof: `\\textbf{Theorem:} Given moduli \\{n\\_1, \\ldots, n\\_k\\}, if any two share a prime, \\gcd(n\\_i, \\prod\\_{j \\neq i} n\\_j) reveals it.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item \\{n_1, \\ldots, n_k\\} — set of RSA moduli, n_i = p_i q_i
-\\item Shared prime: p_i = p_j for some i \\neq j
-\\item Product tree for efficient computation of \\prod_{j \\neq i} n_j \\bmod n_i
+\\item \\{n\\_1, \\ldots, n\\_k\\} — set of RSA moduli, n\\_i = p\\_i q\\_i
+\\item Shared prime: p\\_i = p\\_j for some i \\neq j
+\\item Product tree for efficient computation of \\prod\\_{j \\neq i} n\\_j \\bmod n\\_i
 \\item Euclidean GCD: O(\\log^2(\\max(a, b)))
 \\end{itemize}
 

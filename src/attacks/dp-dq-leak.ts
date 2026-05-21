@@ -91,17 +91,19 @@ export const attack: Attack = {
                             found = True
                             break` : '';
 
-    return `try:
-    n = Integer(${v.n})
-    e = Integer(${v.e})
-    if n <= 0 or e <= 0:
-        print("DP_DQ_LEAK=FAILED: invalid input values")
-    else:
-        found = False${dpBlock}${dqBlock}
-        if not found:
-            print("DP_DQ_LEAK=FAILED: no valid factor found")
-except Exception as ex:
-    print(f"DP_DQ_LEAK=FAILED: {ex}")`;
+    return `def _attack():
+    try:
+        n = Integer(${v.n})
+        e = Integer(${v.e})
+        if n <= 0 or e <= 0:
+            print("DP_DQ_LEAK=FAILED: invalid input values")
+        else:
+            found = False${dpBlock}${dqBlock}
+            if not found:
+                print("DP_DQ_LEAK=FAILED: no valid factor found")
+    except Exception as ex:
+        print(f"DP_DQ_LEAK=FAILED: {ex}")
+_attack()`;
   },
   proof: `\\textbf{Theorem:} Given $d_p = d \\bmod (p-1)$, factor $n$ by iterating $k$ in the equation $d_p \\cdot e - 1 = k(p-1)$. Symmetrically, $d_q = d \\bmod (q-1)$ recovers $q$.
 

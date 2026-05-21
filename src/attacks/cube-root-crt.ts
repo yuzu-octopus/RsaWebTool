@@ -18,65 +18,67 @@ export const attack: Attack = {
       return `print("ERROR: Missing required inputs (n, c, p, q)")
 print("CUBE_ROOT_CRT=FAILED")`;
     }
-    return `try:
-    n = Integer(${vals.n})
-    c = Integer(${vals.c})
-    p = Integer(${vals.p})
-    q = Integer(${vals.q})
-    print(f"Cube Root CRT Attack (e = 3)")
-    print(f"n = {n}")
-    print(f"p = {p}, q = {q}")
-    print()
-    # Check conditions
-    phi = (p - 1) * (q - 1)
-    g = gcd(3, phi)
-    print(f"gcd(3, phi(n)) = {g}")
-    if g != 3:
-        print("WARNING: gcd(3, phi) != 3. Standard cube root may apply.")
-    # Cube roots mod p
-    print(f"\\nFinding cube roots mod p...")
-    Fp = GF(p)
-    cp = Fp(c)
-    roots_p = cp.nth_root(3, all=True)
-    print(f"Cube roots mod p: {[Integer(r) for r in roots_p]}")
-    # Cube roots mod q
-    print(f"Finding cube roots mod q...")
-    Fq = GF(q)
-    cq = Fq(c)
-    roots_q = cq.nth_root(3, all=True)
-    print(f"Cube roots mod q: {[Integer(r) for r in roots_q]}")
-    # CRT combine
-    print(f"\\nAll possible plaintexts ({len(roots_p) * len(roots_q)} total):")
-    found_valid = False
-    for rp in roots_p:
-        for rq in roots_q:
-            m = crt([Integer(rp), Integer(rq)], [p, q])
-            print(f"  m = {m}")
-            v = power_mod(m, 3, n)
-            ok = v == c
-            if ok:
-                found_valid = True
-            print(f"    m^3 mod n = {v} (c = {c}) {'OK' if ok else 'FAIL'}")
-    if len(roots_p) * len(roots_q) == 1:
-        print("\\nUnique solution found!")
-    elif len(roots_p) * len(roots_q) == 9:
-        print("\\n9 solutions (3 mod p × 3 mod q). Additional context needed to identify correct m.")
-    if found_valid:
-        print("CUBE_ROOT_CRT=SUCCESS")
-    else:
+    return `def _attack():
+    try:
+        n = Integer(${vals.n})
+        c = Integer(${vals.c})
+        p = Integer(${vals.p})
+        q = Integer(${vals.q})
+        print(f"Cube Root CRT Attack (e = 3)")
+        print(f"n = {n}")
+        print(f"p = {p}, q = {q}")
+        print()
+        # Check conditions
+        phi = (p - 1) * (q - 1)
+        g = gcd(3, phi)
+        print(f"gcd(3, phi(n)) = {g}")
+        if g != 3:
+            print("WARNING: gcd(3, phi) != 3. Standard cube root may apply.")
+        # Cube roots mod p
+        print(f"\\nFinding cube roots mod p...")
+        Fp = GF(p)
+        cp = Fp(c)
+        roots_p = cp.nth_root(3, all=True)
+        print(f"Cube roots mod p: {[Integer(r) for r in roots_p]}")
+        # Cube roots mod q
+        print(f"Finding cube roots mod q...")
+        Fq = GF(q)
+        cq = Fq(c)
+        roots_q = cq.nth_root(3, all=True)
+        print(f"Cube roots mod q: {[Integer(r) for r in roots_q]}")
+        # CRT combine
+        print(f"\\nAll possible plaintexts ({len(roots_p) * len(roots_q)} total):")
+        found_valid = False
+        for rp in roots_p:
+            for rq in roots_q:
+                m = crt([Integer(rp), Integer(rq)], [p, q])
+                print(f"  m = {m}")
+                v = power_mod(m, 3, n)
+                ok = v == c
+                if ok:
+                    found_valid = True
+                print(f"    m^3 mod n = {v} (c = {c}) {'OK' if ok else 'FAIL'}")
+        if len(roots_p) * len(roots_q) == 1:
+            print("\\nUnique solution found!")
+        elif len(roots_p) * len(roots_q) == 9:
+            print("\\n9 solutions (3 mod p × 3 mod q). Additional context needed to identify correct m.")
+        if found_valid:
+            print("CUBE_ROOT_CRT=SUCCESS")
+        else:
+            print("CUBE_ROOT_CRT=FAILED")
+    except Exception as e:
+        print(f"ERROR: {e}")
         print("CUBE_ROOT_CRT=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("CUBE_ROOT_CRT=FAILED")
-`;
+    #
+_attack()`;
   },
-  proof: `\\textbf{Theorem:} When e = 3 and p \\equiv q \\equiv 1 \\pmod{3}, the map x ↦ x³ mod n has 9 preimages via cube roots mod p, mod q + CRT.
+  proof: `\\textbf{Theorem:} When $e = 3$ and $p \\equiv q \\equiv 1 \\pmod{3}$, the map $x \\mapsto x^3 \\bmod n$ has 9 preimages via cube roots mod $p$, mod $q$ + CRT.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
 \\item n, c, p, q (modulus, ciphertext, both prime factors)
-\\item e = 3, p \\equiv q \\equiv 1 \\pmod{3}
-\\item 3 \\mid (p-1) and 3 \\mid (q-1)
+\\item $e = 3$, $p \\equiv q \\equiv 1 \\pmod{3}$
+\\item $3 \\mid (p-1)$ and $3 \\mid (q-1)$
 \\end{itemize}
 
 \\textbf{Proof:}

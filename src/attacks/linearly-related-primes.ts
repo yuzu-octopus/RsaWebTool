@@ -10,52 +10,58 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'k', label: 'k (known multiplier)', placeholder: 'Enter k value...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (v) => `try:
-    n = Integer(${v.n})
-    k = Integer(${v.k})
-    if n < 2:
-        print("LINEARLY_RELATED=FAILED: n is too small")
-        quit()
-    if k <= 0:
-        print("LINEARLY_RELATED=FAILED: k must be positive")
-        quit()
-    if n % 2 == 0:
-        print(f"n is even: {n}")
-        print(f"p = 2")
-        print(f"q = {n // 2}")
-        print(f"Verification: 2 * {n // 2} = {n}")
-        print("LINEARLY_RELATED=SUCCESS")
-        quit()
-    if n.is_prime():
-        print("LINEARLY_RELATED=FAILED: n is prime")
-        quit()
-    if n.is_square():
-        p = isqrt(n)
-        print(f"n is a perfect square: {p}^2 = {n}")
-        print(f"p = q = {p}")
-        print("LINEARLY_RELATED=SUCCESS")
-        quit()
-    found = False
-    for delta in range(-10000, 10001):
-        disc = delta*delta + 4*k*n
-        sqrt_disc = ZZ(disc).isqrt()
-        if sqrt_disc * sqrt_disc == disc:
-            num = -delta + sqrt_disc
-            if num > 0 and num % (2*k) == 0:
-                p = num // (2*k)
-                if n % p == 0:
-                    q = n // p
-                    print(f"Verification: p * q = {p * q}")
-                    print(f"LINEARLY_RELATED=SUCCESS")
-                    print(f"p={p}")
-                    print(f"q={q}")
-                    print(f"delta={delta}")
-                    found = True
-                    break
-    if not found:
-        print("LINEARLY_RELATED=FAILED: no valid factorization found")
-except Exception as ex:
-    print(f"LINEARLY_RELATED=FAILED: {ex}")`,
+  sageTemplate: (v) => `def _attack():
+    try:
+        try:
+            n = Integer(${v.n})
+            k = Integer(${v.k})
+            if n < 2:
+                print("LINEARLY_RELATED_PRIMES=FAILED: n is too small")
+                return
+            if k <= 0:
+                print("LINEARLY_RELATED_PRIMES=FAILED: k must be positive")
+                return
+            if n % 2 == 0:
+                print(f"n is even: {n}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print(f"Verification: 2 * {n // 2} = {n}")
+                print("LINEARLY_RELATED_PRIMES=SUCCESS")
+                return
+            if n.is_prime():
+                print("LINEARLY_RELATED_PRIMES=FAILED: n is prime")
+                return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"p = q = {p}")
+                print("LINEARLY_RELATED_PRIMES=SUCCESS")
+                return
+            found = False
+            for delta in range(-10000, 10001):
+                disc = delta*delta + 4*k*n
+                sqrt_disc = ZZ(disc).isqrt()
+                if sqrt_disc * sqrt_disc == disc:
+                    num = -delta + sqrt_disc
+                    if num > 0 and num % (2*k) == 0:
+                        p = num // (2*k)
+                        if n % p == 0:
+                            q = n // p
+                            print(f"Verification: p * q = {p * q}")
+                            print(f"LINEARLY_RELATED_PRIMES=SUCCESS")
+                            print(f"p={p}")
+                            print(f"q={q}")
+                            print(f"delta={delta}")
+                            found = True
+                            break
+            if not found:
+                print("LINEARLY_RELATED_PRIMES=FAILED: no valid factorization found")
+        except Exception as ex:
+            print(f"LINEARLY_RELATED_PRIMES=FAILED: {ex}")
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("LINEARLY_RELATED_PRIMES=FAILED")
+_attack()`,
   proof: `\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta|$, solve the quadratic $kp^2 + \\delta p - n = 0$ to factor $n$.
 
 \\textbf{Prerequisites:}

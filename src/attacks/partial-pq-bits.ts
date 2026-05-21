@@ -11,67 +11,73 @@ export const attack: Attack = {
     { name: 'knownBits', label: 'knownBits (known bits of p)', placeholder: 'Enter known bits as integer...', multiline: true, rows: 3 },
     { name: 'bitPosition', label: 'bitPosition', placeholder: 'msb or lsb', multiline: false },
   ],
-  sageTemplate: (v) => `try:
-    n = Integer(${v.n})
-    knownBits = Integer(${v.knownBits})
-    bitPosition = "${v.bitPosition}"
-    if n <= 0 or knownBits < 0:
-        print("PARTIAL_PQ_BITS=FAILED: invalid input values")
-    elif bitPosition not in ("msb", "lsb"):
-        print("PARTIAL_PQ_BITS=FAILED: bitPosition must be 'msb' or 'lsb'")
-    elif bitPosition == "msb":
-        k = n.nbits() // 2 - knownBits.nbits()
-        if k <= 0:
-            print("PARTIAL_PQ_BITS=FAILED: not enough unknown bits for Coppersmith")
-        else:
-            R.<x> = PolynomialRing(Zmod(n))
-            f = (knownBits << k) + x
-            bound = 2**k
-            print(f"Using bound X = {bound}")
-            roots = f.small_roots(X=bound, beta=0.5)
-            if roots:
-                p = Integer((knownBits << k) + roots[0])
-                if n % p == 0:
-                    q = n // p
-                    print(f"Verification: p * q = {p * q}")
-                    if p * q == n:
-                        print(f"PARTIAL_PQ_BITS=SUCCESS")
-                        print(f"p={p}")
-                        print(f"q={q}")
-                    else:
-                        print("PARTIAL_PQ_BITS=FAILED: verification mismatch")
+  sageTemplate: (v) => `def _attack():
+    try:
+        try:
+            n = Integer(${v.n})
+            knownBits = Integer(${v.knownBits})
+            bitPosition = "${v.bitPosition}"
+            if n <= 0 or knownBits < 0:
+                print("PARTIAL_PQ_BITS=FAILED: invalid input values")
+            elif bitPosition not in ("msb", "lsb"):
+                print("PARTIAL_PQ_BITS=FAILED: bitPosition must be 'msb' or 'lsb'")
+            elif bitPosition == "msb":
+                k = n.nbits() // 2 - knownBits.nbits()
+                if k <= 0:
+                    print("PARTIAL_PQ_BITS=FAILED: not enough unknown bits for Coppersmith")
                 else:
-                    print("PARTIAL_PQ_BITS=FAILED: recovered p does not divide n")
-            else:
-                print("PARTIAL_PQ_BITS=FAILED: no roots found")
-    elif bitPosition == "lsb":
-        m = knownBits.nbits()
-        if m <= 0:
-            print("PARTIAL_PQ_BITS=FAILED: knownBits is zero")
-        else:
-            R.<x> = PolynomialRing(Zmod(n))
-            f = x * (2**m) + knownBits
-            f = f.monic()
-            bound = 2**(n.nbits() // 2 - m)
-            print(f"Using bound X = {bound}")
-            roots = f.small_roots(X=bound, beta=0.5)
-            if roots:
-                p = Integer(roots[0] * (2**m) + knownBits)
-                if n % p == 0:
-                    q = n // p
-                    print(f"Verification: p * q = {p * q}")
-                    if p * q == n:
-                        print(f"PARTIAL_PQ_BITS=SUCCESS")
-                        print(f"p={p}")
-                        print(f"q={q}")
+                    R.<x> = PolynomialRing(Zmod(n))
+                    f = (knownBits << k) + x
+                    bound = 2**k
+                    print(f"Using bound X = {bound}")
+                    roots = f.small_roots(X=bound, beta=0.5)
+                    if roots:
+                        p = Integer((knownBits << k) + roots[0])
+                        if n % p == 0:
+                            q = n // p
+                            print(f"Verification: p * q = {p * q}")
+                            if p * q == n:
+                                print(f"PARTIAL_PQ_BITS=SUCCESS")
+                                print(f"p={p}")
+                                print(f"q={q}")
+                            else:
+                                print("PARTIAL_PQ_BITS=FAILED: verification mismatch")
+                        else:
+                            print("PARTIAL_PQ_BITS=FAILED: recovered p does not divide n")
                     else:
-                        print("PARTIAL_PQ_BITS=FAILED: verification mismatch")
+                        print("PARTIAL_PQ_BITS=FAILED: no roots found")
+            elif bitPosition == "lsb":
+                m = knownBits.nbits()
+                if m <= 0:
+                    print("PARTIAL_PQ_BITS=FAILED: knownBits is zero")
                 else:
-                    print("PARTIAL_PQ_BITS=FAILED: recovered p does not divide n")
-            else:
-                print("PARTIAL_PQ_BITS=FAILED: no roots found")
-except Exception as ex:
-    print(f"PARTIAL_PQ_BITS=FAILED: {ex}")`,
+                    R.<x> = PolynomialRing(Zmod(n))
+                    f = x * (2**m) + knownBits
+                    f = f.monic()
+                    bound = 2**(n.nbits() // 2 - m)
+                    print(f"Using bound X = {bound}")
+                    roots = f.small_roots(X=bound, beta=0.5)
+                    if roots:
+                        p = Integer(roots[0] * (2**m) + knownBits)
+                        if n % p == 0:
+                            q = n // p
+                            print(f"Verification: p * q = {p * q}")
+                            if p * q == n:
+                                print(f"PARTIAL_PQ_BITS=SUCCESS")
+                                print(f"p={p}")
+                                print(f"q={q}")
+                            else:
+                                print("PARTIAL_PQ_BITS=FAILED: verification mismatch")
+                        else:
+                            print("PARTIAL_PQ_BITS=FAILED: recovered p does not divide n")
+                    else:
+                        print("PARTIAL_PQ_BITS=FAILED: no roots found")
+        except Exception as ex:
+            print(f"PARTIAL_PQ_BITS=FAILED: {ex}")
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("PARTIAL_PQ_BITS=FAILED")
+_attack()`,
   proof: `\\textbf{Theorem:} If at least half the bits of $p$ are known (as MSBs or LSBs), Coppersmith's method recovers the full factorization of $n$.
 
 \\textbf{Prerequisites:}

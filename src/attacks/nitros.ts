@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { randomPrime, isPrimeMR, generateKeyPair } from '../utils/testcases/core';
+import { isPrimeMR, generateKeyPair } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 
 export const attack: Attack = {
@@ -11,97 +11,103 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'base', label: 'Base (default 65537)', placeholder: '65537', multiline: false },
   ],
-  sageTemplate: (vals: Record<string, string>) => `try:
-    n_input = "${vals.n}".strip()
-    if not n_input:
-        print("ERROR: n is required")
-        print("NITROS=FAILED")
-        quit()
-    n = Integer(n_input)
-    base_val = "${vals.base}".strip()
-    base = Integer(base_val) if base_val else Integer(65537)
-    # Even check
-    if n % 2 == 0:
-        print(f"n is even. p = 2, q = {n // 2}")
-        print("NITROS=SUCCESS")
-        quit()
-    # Prime check
-    if is_prime(n):
-        print("n is prime. Not a valid RSA modulus.")
-        print("NITROS=FAILED")
-        quit()
-    print("Nitros / Extended ROCA attack")
-    print(f"n = {n}")
-    print(f"base = {base}")
-    print()
-    # Try multiple prime bases for M
-    prime_sets = [
-        [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53],
-        [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59],
-        [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61],
-    ]
-    found = False
-    for primes_subset in prime_sets:
-        M = prod(primes_subset)
-        # Skip if base is not coprime to M — multiplicative_order would crash
-        if gcd(base, M) != 1:
-            print(f"M = {M}: gcd(base, M) = {gcd(base, M)} != 1, skipping...")
-            continue
-        # Compute remainders
-        ord_val = Mod(base, M).multiplicative_order()
-        remainders = set()
-        for idx in range(ord_val):
-            r = power_mod(base, idx, M)
-            remainders.add(r)
-        n_mod = n % M
-        # Check if n_mod factors into two remainders
-        for r1 in remainders:
-            r2 = n_mod * inverse_mod(r1, M) % M
-            if r2 in remainders:
-                print(f"Match found with M = {M}")
-                print(f"r1 = {r1}, r2 = {r2}")
-                print(f"Verification: r1 * r2 mod M = {(r1 * r2) % M} (n mod M = {n_mod})")
-                found = True
-                # Try Coppersmith
-                R.<x> = PolynomialRing(ZZ)
-                f = M*x + r1
-                bound = ceil(sqrt(n) / M)
-                f_mod = f.change_ring(Zmod(n))
-                roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=0.05)
-                if roots:
-                    k = int(roots[0])
-                    p = int(M * k + r1)
-                    if n % p == 0:
-                        q = n // p
-                        print(f"SUCCESS! p = {p}, q = {q}")
-                        print(f"Verification: p * q = {p * q}")
-                        print("NITROS=SUCCESS")
-                    else:
-                        print(f"Root found but doesn't divide n. Trying r2...")
-                        f2 = M*x + r2
-                        roots2 = f2.change_ring(Zmod(n)).small_roots(X=bound, beta=0.5, epsilon=0.05)
-                        if roots2:
-                            k2 = int(roots2[0])
-                            p2 = int(M * k2 + r2)
-                            if n % p2 == 0:
-                                print(f"SUCCESS! p = {p2}, q = {n // p2}")
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
+    try:
+        try:
+            n_input = "${vals.n}".strip()
+            if not n_input:
+                print("ERROR: n is required")
+                print("NITROS=FAILED")
+                return
+            n = Integer(n_input)
+            base_val = "${vals.base}".strip()
+            base = Integer(base_val) if base_val else Integer(65537)
+            # Even check
+            if n % 2 == 0:
+                print(f"n is even. p = 2, q = {n // 2}")
+                print("NITROS=SUCCESS")
+                return
+            # Prime check
+            if is_prime(n):
+                print("n is prime. Not a valid RSA modulus.")
+                print("NITROS=FAILED")
+                return
+            print("Nitros / Extended ROCA attack")
+            print(f"n = {n}")
+            print(f"base = {base}")
+            print()
+            # Try multiple prime bases for M
+            prime_sets = [
+                [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53],
+                [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59],
+                [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61],
+            ]
+            found = False
+            for primes_subset in prime_sets:
+                M = prod(primes_subset)
+                # Skip if base is not coprime to M — multiplicative_order would crash
+                if gcd(base, M) != 1:
+                    print(f"M = {M}: gcd(base, M) = {gcd(base, M)} != 1, skipping...")
+                    continue
+                # Compute remainders
+                ord_val = Mod(base, M).multiplicative_order()
+                remainders = set()
+                for idx in range(ord_val):
+                    r = power_mod(base, idx, M)
+                    remainders.add(r)
+                n_mod = n % M
+                # Check if n_mod factors into two remainders
+                for r1 in remainders:
+                    r2 = n_mod * inverse_mod(r1, M) % M
+                    if r2 in remainders:
+                        print(f"Match found with M = {M}")
+                        print(f"r1 = {r1}, r2 = {r2}")
+                        print(f"Verification: r1 * r2 mod M = {(r1 * r2) % M} (n mod M = {n_mod})")
+                        found = True
+                        # Try Coppersmith
+                        R.<x> = PolynomialRing(ZZ)
+                        f = M*x + r1
+                        bound = ceil(sqrt(n) / M)
+                        f_mod = f.change_ring(Zmod(n))
+                        roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=0.05)
+                        if roots:
+                            k = int(roots[0])
+                            p = int(M * k + r1)
+                            if n % p == 0:
+                                q = n // p
+                                print(f"SUCCESS! p = {p}, q = {q}")
+                                print(f"Verification: p * q = {p * q}")
                                 print("NITROS=SUCCESS")
                             else:
-                                print("NITROS=FAILED")
+                                print(f"Root found but doesn't divide n. Trying r2...")
+                                f2 = M*x + r2
+                                roots2 = f2.change_ring(Zmod(n)).small_roots(X=bound, beta=0.5, epsilon=0.05)
+                                if roots2:
+                                    k2 = int(roots2[0])
+                                    p2 = int(M * k2 + r2)
+                                    if n % p2 == 0:
+                                        print(f"SUCCESS! p = {p2}, q = {n // p2}")
+                                        print("NITROS=SUCCESS")
+                                    else:
+                                        print("NITROS=FAILED")
+                                else:
+                                    print("NITROS=FAILED")
                         else:
                             print("NITROS=FAILED")
-                else:
-                    print("NITROS=FAILED")
-                break
-        if found:
-            break
-    if not found:
-        print("No ROCA/Nitros pattern detected for tested M values.")
+                        break
+                if found:
+                    break
+            if not found:
+                print("No ROCA/Nitros pattern detected for tested M values.")
+                print("NITROS=FAILED")
+        except Exception as ex:
+            print(f"ERROR: {ex}")
+            print("NITROS=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("NITROS=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("NITROS=FAILED")
-`,
+_attack()`,
   proof: `\\textbf{Theorem:} The Nitros attack generalizes ROCA to primes of the form \\(p = k \\cdot M + (a^{i} \\bmod M)\\) for arbitrary base \\(a\\).
 
 \\textbf{Prerequisites:}
@@ -131,30 +137,38 @@ f(x) &= M \\cdot x + r_1 \\equiv 0 \\pmod{p} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const base = 65537n; // Must be coprime to ALL primes in M — 7 would fail since 7|M
+  const base = 65537n; // Must be coprime to ALL primes in M
   const primes_list = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n];
   let M = 1n;
   for (const p of primes_list) { M *= p; }
   // M ≈ 2^77, Coppersmith bound ~N^0.2 for degree-1 polynomial.
-  // For 512-bit N: bound ≈ 2^102, but k ≈ 2^179 → won't work.
   // Use p ≈ 120 bits so k ≈ 44 bits < bound ≈ 2^48 for N ≈ 240 bits.
+  // Both p and q must be Nitros-form so that the template's remainder check passes.
   const pBits = 120;
   const kBits = pBits - 77; // ≈ 43
+  const kBytes = Math.ceil(kBits / 8);
   for (let attempt = 0; attempt < 5000; attempt++) {
-    const i = BigInt(Math.floor(Math.random() * 10000));
-    const r = modPow(base, i, M);
-    // Generate random k of appropriate bit size
-    const kBytes = Math.ceil(kBits / 8);
-    const bytes = new Uint8Array(kBytes);
-    crypto.getRandomValues(bytes);
-    let k = 0n;
-    for (let j = 0; j < kBytes; j++) { k = (k << 8n) | BigInt(bytes[j]); }
-    k |= (1n << BigInt(kBits - 1));
-    k |= 1n;
-    k &= (1n << BigInt(kBits)) - 1n;
-    const p = k * M + r;
-    if (isPrimeMR(p)) {
-      const q = randomPrime(120);
+    const i1 = BigInt(Math.floor(Math.random() * 10000));
+    const r1 = modPow(base, i1, M);
+    const i2 = BigInt(Math.floor(Math.random() * 10000));
+    const r2 = modPow(base, i2, M);
+    const bytes1 = new Uint8Array(kBytes);
+    crypto.getRandomValues(bytes1);
+    let k1 = 0n;
+    for (let j = 0; j < kBytes; j++) { k1 = (k1 << 8n) | BigInt(bytes1[j]); }
+    k1 |= (1n << BigInt(kBits - 1));
+    k1 |= 1n;
+    k1 &= (1n << BigInt(kBits)) - 1n;
+    const bytes2 = new Uint8Array(kBytes);
+    crypto.getRandomValues(bytes2);
+    let k2 = 0n;
+    for (let j = 0; j < kBytes; j++) { k2 = (k2 << 8n) | BigInt(bytes2[j]); }
+    k2 |= (1n << BigInt(kBits - 1));
+    k2 |= 1n;
+    k2 &= (1n << BigInt(kBits)) - 1n;
+    const p = k1 * M + r1;
+    const q = k2 * M + r2;
+    if (p !== q && isPrimeMR(p) && isPrimeMR(q)) {
       return { n: (p * q).toString(), base: base.toString() };
     }
   }

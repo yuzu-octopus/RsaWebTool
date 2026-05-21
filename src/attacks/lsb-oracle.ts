@@ -13,78 +13,89 @@ export const attack: Attack = {
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
     { name: 'oracle_responses', label: 'Oracle responses (comma-separated LSB bits)', placeholder: '1,0,1,1,0,...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `# LSB Oracle Attack — binary search via 2^e blinding
-if not "${vals.n}".strip():
-    print("ERROR: n is required")
-    print("LSB_ORACLE=FAILED")
-    quit()
-if not "${vals.c}".strip():
-    print("ERROR: c is required")
-    print("LSB_ORACLE=FAILED")
-    quit()
-if not "${vals.oracle_responses}".strip():
-    print("ERROR: oracle_responses is required")
-    print("LSB_ORACLE=FAILED")
-    quit()
-try:
-    n = Integer(${vals.n})
-    e_val = "${vals.e}".strip()
-    e = Integer(e_val) if e_val else Integer(65537)
-    c = Integer(${vals.c})
-    orig_c = Integer(${vals.c})
-    # Parse oracle responses (LSB of each blinded query)
-    responses_str = """${vals.oracle_responses}""".strip()
-    oracle_bits = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
-    print("LSB Oracle Attack on RSA")
-    print(f"n = {n}")
-    print(f"e = {e}")
-    print(f"c = {c}")
-    print(f"Oracle responses: {len(oracle_bits)} bits")
-    print()
-    n_bits = n.nbits()
-    if len(oracle_bits) < n_bits:
-        print(f"WARNING: Need {n_bits} responses for {n_bits}-bit modulus.")
-        print(f"Got {len(oracle_bits)}. Attack may be incomplete.")
-        print()
-    # Binary search using LSB oracle with 2^e blinding
-    # LSB(2m mod n) = 1 iff 2m >= n (since n is odd) iff m >= current midpoint
-    lower = Integer(0)
-    upper = Integer(n)
-    print("Binary search iterations:")
-    for i, bit in enumerate(oracle_bits):
-        mid = (lower + upper) // 2
-        # Blind ciphertext: c = c * 2^e mod n, so oracle returns LSB(2m mod n)
-        c = (c * power_mod(Integer(2), e, n)) % n
-        if bit == 0:
-            # LSB = 0: 2m mod n is even, so 2m < n => m in lower half
-            upper = mid
-        else:
-            # LSB = 1: 2m mod n is odd, so 2m >= n => m in upper half
-            lower = mid
-        if i < 10 or i % 50 == 0:
-            print(f"  Step {i+1}: LSB={bit}, range bits = {(upper - lower).nbits()}")
-    print()
-    m = (lower + upper) // 2
-    print(f"Recovered message: m = {m}")
-    # Verify against original ciphertext
-    v = power_mod(m, e, n)
-    print(f"Verification: m^e mod n = {v}")
-    print(f"Original c = {orig_c}")
-    if v == orig_c:
-        print("LSB_ORACLE=SUCCESS")
-    else:
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
+    try:
+        # LSB Oracle Attack — binary search via 2^e blinding
+        if not "${vals.n}".strip():
+            print("ERROR: n is required")
+            print("LSB_ORACLE=FAILED")
+            return
+        if not "${vals.c}".strip():
+            print("ERROR: c is required")
+            print("LSB_ORACLE=FAILED")
+            return
+        if not """${vals.oracle_responses || ''}""".strip():
+            print("ERROR: oracle_responses is required")
+            print("LSB_ORACLE=FAILED")
+            return
+        try:
+            n = Integer(${vals.n})
+            e_val = "${vals.e}".strip()
+            e = Integer(e_val) if e_val else Integer(65537)
+            c = Integer(${vals.c})
+            orig_c = Integer(${vals.c})
+            # Parse oracle responses (LSB of each blinded query)
+            responses_str = """${vals.oracle_responses || ''}""".strip()
+            oracle_bits = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
+            print("LSB Oracle Attack on RSA")
+            print(f"n = {n}")
+            print(f"e = {e}")
+            print(f"c = {c}")
+            print(f"Oracle responses: {len(oracle_bits)} bits")
+            print()
+            n_bits = n.nbits()
+            if len(oracle_bits) < n_bits:
+                print(f"WARNING: Need {n_bits} responses for {n_bits}-bit modulus.")
+                print(f"Got {len(oracle_bits)}. Attack may be incomplete.")
+                print()
+            # Binary search using LSB oracle with 2^e blinding
+            # LSB(2m mod n) = 1 iff 2m >= n (since n is odd) iff m >= current midpoint
+            # NOTE: Use /2 (Rational) not //2 to avoid floor-division drift
+            lower = Integer(0)
+            upper = Integer(n)
+            print("Binary search iterations:")
+            for i, bit in enumerate(oracle_bits):
+                mid = (lower + upper) / 2  # Rational — exact midpoint
+                # Blind ciphertext: c = c * 2^e mod n, so oracle returns LSB(2m mod n)
+                c = (c * power_mod(Integer(2), e, n)) % n
+                if bit == 0:
+                    # LSB = 0: 2m mod n is even, so 2m < n => m in lower half
+                    upper = mid
+                else:
+                    # LSB = 1: 2m mod n is odd, so 2m >= n => m in upper half
+                    lower = mid
+                if i < 10 or i % 50 == 0:
+                    remaining = n.nbits() - i - 1
+                    print(f"  Step {i+1}: LSB={bit}, remaining ≈ {remaining} bits")
+            print()
+            # Scan exact candidates from rational interval [lower, upper)
+            from math import ceil, floor
+            for m_candidate in range(Integer(ceil(lower)), Integer(floor(upper)) + 1):
+                m = Integer(m_candidate)
+                if power_mod(m, e, n) == orig_c:
+                    print(f"Recovered message: m = {m}")
+                    v = power_mod(m, e, n)
+                    print(f"Verification: m^e mod n = {v}")
+                    print(f"Original c = {orig_c}")
+                    print("LSB_ORACLE=SUCCESS")
+                    break
+            else:
+                print("LSB_ORACLE=FAILED")
+        except Exception as ex:
+            print(f"ERROR: {ex}")
+            print("LSB_ORACLE=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("LSB_ORACLE=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("LSB_ORACLE=FAILED")
-`,
+_attack()`,
   proof: `\\textbf{Theorem:} An oracle \\mathcal{O}(c) = (c^d \\bmod n) \\bmod 2 recovers m in O(\\log n) queries via binary search.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
 \\item Public key (n, e) and ciphertext c = m^e \\bmod n
 \\item Oracle returning the least significant bit of the decrypted blinded ciphertext
-\\item Queries use blinded ciphertexts c_i = c \\cdot (2^i)^e \\bmod n
+\\item Queries use blinded ciphertexts c\\_i = c \\cdot (2^i)^e \\bmod n
 \\item n must be odd (always true for RSA moduli)
 \\end{itemize}
 
@@ -107,7 +118,7 @@ u_k - \\ell_k &= \\frac{n}{2^k} \\xrightarrow{k = \\lceil \\log_2 n \\rceil} 1 \
 m &= \\ell_k \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Each oracle query on c \\cdot 2^{ie} \\bmod n determines whether 2^i \\cdot m \\bmod n is even or odd. Because n is odd, this is equivalent to checking whether multiplying m by 2^i overflows n (i.e., whether m \\geq n / 2^i). Each query narrows the search interval by half. After \\lceil \\log_2 n \\rceil queries the interval contains exactly one integer \\textemdash{} the plaintext.
+\\textbf{Explanation:} Each oracle query on c \\cdot 2^{ie} \\bmod n determines whether 2^i \\cdot m \\bmod n is even or odd. Because n is odd, this is equivalent to checking whether multiplying m by 2^i overflows n (i.e., whether m \\geq n / 2^i). Each query narrows the search interval by half. After \\lceil \\log\\_2 n \\rceil queries the interval contains exactly one integer \\textemdash{} the plaintext.
 
 \\textbf{References:} Goldwasser, Micali, "Probabilistic Encryption", 1982; Boneh, "Twenty Years of Attacks on RSA", 1999`,
   priority: 'medium',

@@ -18,48 +18,50 @@ export const attack: Attack = {
       return `print("ERROR: Missing required inputs (n, e1, e2, c1, c2)")
 print("COMMON_MODULUS=FAILED")`;
     }
-    return `try:
-    n = Integer(${vals.n})
-    e1 = Integer(${vals.e1})
-    e2 = Integer(${vals.e2})
-    c1 = Integer(${vals.c1})
-    c2 = Integer(${vals.c2})
-    # Check gcd(e1, e2) first
-    g = gcd(e1, e2)
-    print(f"gcd(e1, e2) = {g}")
-    if g != 1:
-        print(f"ERROR: gcd(e1, e2) = {g} != 1. Exponents must be coprime.")
-        print("COMMON_MODULUS=FAILED")
-    else:
-        # Extended GCD to find a, b such that a*e1 + b*e2 = 1
-        _, a, b = xgcd(e1, e2)
-        print(f"Bezout coefficients: a = {a}, b = {b}")
-        print(f"Verification: a*e1 + b*e2 = {a*e1 + b*e2}")
-        # Compute m = c1^a * c2^b mod n (power_mod handles negative exponents)
-        part1 = power_mod(c1, a, n)
-        part2 = power_mod(c2, b, n)
-        m = (part1 * part2) % n
-        print(f"Recovered message: m = {m}")
-        # Verify
-        v1 = power_mod(m, e1, n)
-        v2 = power_mod(m, e2, n)
-        print(f"Verification: m^e1 mod n = {v1} (should equal c1 = {c1})")
-        print(f"Verification: m^e2 mod n = {v2} (should equal c2 = {c2})")
-        if v1 == c1 and v2 == c2:
-            print("COMMON_MODULUS=SUCCESS")
-        else:
+    return `def _attack():
+    try:
+        n = Integer(${vals.n})
+        e1 = Integer(${vals.e1})
+        e2 = Integer(${vals.e2})
+        c1 = Integer(${vals.c1})
+        c2 = Integer(${vals.c2})
+        # Check gcd(e1, e2) first
+        g = gcd(e1, e2)
+        print(f"gcd(e1, e2) = {g}")
+        if g != 1:
+            print(f"ERROR: gcd(e1, e2) = {g} != 1. Exponents must be coprime.")
             print("COMMON_MODULUS=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("COMMON_MODULUS=FAILED")
-`;
+        else:
+            # Extended GCD to find a, b such that a*e1 + b*e2 = 1
+            _, a, b = xgcd(e1, e2)
+            print(f"Bezout coefficients: a = {a}, b = {b}")
+            print(f"Verification: a*e1 + b*e2 = {a*e1 + b*e2}")
+            # Compute m = c1^a * c2^b mod n (power_mod handles negative exponents)
+            part1 = power_mod(c1, a, n)
+            part2 = power_mod(c2, b, n)
+            m = (part1 * part2) % n
+            print(f"Recovered message: m = {m}")
+            # Verify
+            v1 = power_mod(m, e1, n)
+            v2 = power_mod(m, e2, n)
+            print(f"Verification: m^e1 mod n = {v1} (should equal c1 = {c1})")
+            print(f"Verification: m^e2 mod n = {v2} (should equal c2 = {c2})")
+            if v1 == c1 and v2 == c2:
+                print("COMMON_MODULUS=SUCCESS")
+            else:
+                print("COMMON_MODULUS=FAILED")
+    except Exception as e:
+        print(f"ERROR: {e}")
+        print("COMMON_MODULUS=FAILED")
+    #
+_attack()`;
   },
-  proof: `\\textbf{Theorem:} Let n be an RSA modulus and e_1, e_2 be coprime exponents. Given c_1 \\equiv m^{e_1} \\pmod{n} and c_2 \\equiv m^{e_2} \\pmod{n}, recover m via Bezout coefficients.
+  proof: `\\textbf{Theorem:} Let n be an RSA modulus and e\\_1, e\\_2 be coprime exponents. Given c\\_1 \\equiv m^{e\\_1} \\pmod{n} and c\\_2 \\equiv m^{e\\_2} \\pmod{n}, recover m via Bezout coefficients.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n, e_1, e_2, c_1, c_2 (modulus, two exponents, two ciphertexts)
-\\item \\gcd(e_1, e_2) = 1
+\\item n, e\\_1, e\\_2, c\\_1, c\\_2 (modulus, two exponents, two ciphertexts)
+\\item \\gcd(e\\_1, e\\_2) = 1
 \\item Same m encrypted under both exponents
 \\end{itemize}
 

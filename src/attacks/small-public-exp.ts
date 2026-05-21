@@ -16,61 +16,63 @@ export const attack: Attack = {
       return `print("ERROR: Missing required inputs (n, c)")
 print("SMALL_PUBLIC_EXP=FAILED")`;
     }
-    return `try:
-    n = Integer(${vals.n})
-    e_val = "${vals.e}".strip()
-    e = Integer(e_val) if e_val else Integer(3)
-    c = Integer(${vals.c})
-    print(f"Small public exponent analysis")
-    print(f"n = {n}")
-    print(f"e = {e}")
-    print(f"c = {c}")
-    print()
-    # Check if e is small
-    if e >= 100:
-        print(f"e = {e} is not considered 'small' for this attack.")
-        print("This attack is effective for e in {3, 5, 17}.")
-        print("Try other attack methods.")
-        print("SMALL_PUBLIC_EXP=FAILED")
-    else:
-        print(f"e = {e} is small. Checking for vulnerabilities...")
+    return `def _attack():
+    try:
+        n = Integer(${vals.n})
+        e_val = "${vals.e}".strip()
+        e = Integer(e_val) if e_val else Integer(3)
+        c = Integer(${vals.c})
+        print(f"Small public exponent analysis")
+        print(f"n = {n}")
+        print(f"e = {e}")
+        print(f"c = {c}")
         print()
-        # Attack 1: e-th root (m^e < n)
-        print("Attack 1: e-th root attack (m^e < n)")
-        m_root, exact = c.nth_root(e, truncate_mode=True)
-        if exact:
-            print(f"SUCCESS! c is a perfect {e}-th power.")
-            print(f"m = {m_root}")
-            try:
-                m_hex = hex(m_root)[2:]
-                if len(m_hex) % 2 != 0:
-                    m_hex = '0' + m_hex
-                m_bytes = bytes.fromhex(m_hex)
-                print(f"m as text: {m_bytes.decode('utf-8', errors='replace')}")
-            except Exception:
-                print(f"m as hex: {hex(m_root)}")
-            print("SMALL_PUBLIC_EXP=SUCCESS")
-        else:
-            print(f"c is not a perfect {e}-th power over integers.")
-            print("m^e >= n, so modular reduction occurred.")
-            print()
-            # Attack 2: Hastad broadcast (need multiple (n, c) pairs)
-            print("Attack 2: Hastad broadcast note")
-            print("If the SAME message m was encrypted with e = 3")
-            print("under 3 DIFFERENT moduli n1, n2, n3, then:")
-            print("  m = CRT(c1, c2, c3)^(1/3) over integers")
-            print("Provide additional (n, c) pairs to attempt this attack.")
-            print()
-            # Attack 3: Franklin-Reiter related message
-            print("Attack 3: Franklin-Reiter related message note")
-            print("If two ciphertexts c1 = m^e and c2 = (m + delta)^e")
-            print("are known with the same (n, e), then m can be recovered.")
-            print("Provide a second ciphertext to attempt this attack.")
+        # Check if e is small
+        if e >= 100:
+            print(f"e = {e} is not considered 'small' for this attack.")
+            print("This attack is effective for e in {3, 5, 17}.")
+            print("Try other attack methods.")
             print("SMALL_PUBLIC_EXP=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("SMALL_PUBLIC_EXP=FAILED")
-`;
+        else:
+            print(f"e = {e} is small. Checking for vulnerabilities...")
+            print()
+            # Attack 1: e-th root (m^e < n)
+            print("Attack 1: e-th root attack (m^e < n)")
+            m_root, exact = c.nth_root(e, truncate_mode=True)
+            if exact:
+                print(f"SUCCESS! c is a perfect {e}-th power.")
+                print(f"m = {m_root}")
+                try:
+                    m_hex = hex(m_root)[2:]
+                    if len(m_hex) % 2 != 0:
+                        m_hex = '0' + m_hex
+                    m_bytes = bytes.fromhex(m_hex)
+                    print(f"m as text: {m_bytes.decode('utf-8', errors='replace')}")
+                except Exception:
+                    print(f"m as hex: {hex(m_root)}")
+                print("SMALL_PUBLIC_EXP=SUCCESS")
+            else:
+                print(f"c is not a perfect {e}-th power over integers.")
+                print("m^e >= n, so modular reduction occurred.")
+                print()
+                # Attack 2: Hastad broadcast (need multiple (n, c) pairs)
+                print("Attack 2: Hastad broadcast note")
+                print("If the SAME message m was encrypted with e = 3")
+                print("under 3 DIFFERENT moduli n1, n2, n3, then:")
+                print("  m = CRT(c1, c2, c3)^(1/3) over integers")
+                print("Provide additional (n, c) pairs to attempt this attack.")
+                print()
+                # Attack 3: Franklin-Reiter related message
+                print("Attack 3: Franklin-Reiter related message note")
+                print("If two ciphertexts c1 = m^e and c2 = (m + delta)^e")
+                print("are known with the same (n, e), then m can be recovered.")
+                print("Provide a second ciphertext to attempt this attack.")
+                print("SMALL_PUBLIC_EXP=FAILED")
+    except Exception as ex:
+        print(f"ERROR: {ex}")
+        print("SMALL_PUBLIC_EXP=FAILED")
+    #
+_attack()`;
   },
   proof: `\\textbf{Theorem:} RSA with small public exponent \\(e \\in \\{3, 5, 17\\}\\) is vulnerable to e-th root, Hastad broadcast, and Franklin-Reiter attacks.
 

@@ -10,52 +10,58 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'p_msb', label: 'p_msb (known MSBs of p)', placeholder: 'Enter known high bits of p...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (v) => `try:
-    n = Integer(${v.n})
-    p_msb = Integer(${v.p_msb})
-    if n < 2 or p_msb < 2:
-        print("PARTIAL_KEY_EXPOSURE=FAILED: invalid input values")
-        quit()
-    if p_msb >= n:
-        print("PARTIAL_KEY_EXPOSURE=FAILED: p_msb must be less than n")
-        quit()
-    if n % p_msb == 0:
-        p = p_msb
-        q = n // p
-        print("PARTIAL_KEY_EXPOSURE=SUCCESS: p_msb exactly divides n")
-        print(f"p={p}")
-        print(f"q={q}")
-        quit()
-    # p = p_msb + x, where x is unknown low bits (trailing zeros = bit count of x)
-    k = p_msb.trailing_zero_bits()
-    X = 2 ** k
-    # Coppersmith bound for beta=0.5: |x| < n^(beta^2) = n^0.25
-    max_X = Integer(n.nth_root(4))
-    if X >= max_X:
-        X = max_X
-    print(f"Partial Key Exposure Attack")
-    print(f"n = {n}")
-    print(f"p_msb = {p_msb}")
-    print(f"Coppersmith bound X = {X}")
-    P.<x> = PolynomialRing(Zmod(n))
-    f = p_msb + x
-    roots = f.small_roots(X=X, beta=0.5, epsilon=0.05)
-    if roots:
-        p = Integer(p_msb + int(roots[0]))
-        if n % p == 0:
-            q = n // p
-            print(f"p = {p}")
-            print(f"q = {q}")
-            print(f"Verification: p * q = {p * q}")
-            print("PARTIAL_KEY_EXPOSURE=SUCCESS")
-        else:
-            print("PARTIAL_KEY_EXPOSURE=FAILED: recovered p does not divide n")
-    else:
-        print("Need approximately half the bits of p for Coppersmith to work.")
+  sageTemplate: (v) => `def _attack():
+    try:
+        try:
+            n = Integer(${v.n})
+            p_msb = Integer(${v.p_msb})
+            if n < 2 or p_msb < 2:
+                print("PARTIAL_KEY_EXPOSURE=FAILED: invalid input values")
+                return
+            if p_msb >= n:
+                print("PARTIAL_KEY_EXPOSURE=FAILED: p_msb must be less than n")
+                return
+            if n % p_msb == 0:
+                p = p_msb
+                q = n // p
+                print("PARTIAL_KEY_EXPOSURE=SUCCESS: p_msb exactly divides n")
+                print(f"p={p}")
+                print(f"q={q}")
+                return
+            # p = p_msb + x, where x is unknown low bits (trailing zeros = bit count of x)
+            k = p_msb.trailing_zero_bits()
+            X = 2 ** k
+            # Coppersmith bound for beta=0.5: |x| < n^(beta^2) = n^0.25
+            max_X = Integer(n.nth_root(4))
+            if X >= max_X:
+                X = max_X
+            print(f"Partial Key Exposure Attack")
+            print(f"n = {n}")
+            print(f"p_msb = {p_msb}")
+            print(f"Coppersmith bound X = {X}")
+            P.<x> = PolynomialRing(Zmod(n))
+            f = p_msb + x
+            roots = f.small_roots(X=X, beta=0.5, epsilon=0.05)
+            if roots:
+                p = Integer(p_msb + int(roots[0]))
+                if n % p == 0:
+                    q = n // p
+                    print(f"p = {p}")
+                    print(f"q = {q}")
+                    print(f"Verification: p * q = {p * q}")
+                    print("PARTIAL_KEY_EXPOSURE=SUCCESS")
+                else:
+                    print("PARTIAL_KEY_EXPOSURE=FAILED: recovered p does not divide n")
+            else:
+                print("Need approximately half the bits of p for Coppersmith to work.")
+                print("PARTIAL_KEY_EXPOSURE=FAILED")
+        except Exception as ex:
+            print(f"PARTIAL_KEY_EXPOSURE=FAILED: {ex}")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("PARTIAL_KEY_EXPOSURE=FAILED")
-except Exception as ex:
-    print(f"PARTIAL_KEY_EXPOSURE=FAILED: {ex}")
-`,
+_attack()`,
   proof: `\\textbf{Theorem:} If the MSBs of $p$ are known such that $p = p_{\\text{msb}} + x$ with $|x| < n^{\\beta^2}$, Coppersmith recovers $p$.
 
 \\textbf{Prerequisites:}

@@ -11,99 +11,105 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `# Validate inputs
-try:
-    if not "${vals.n}".strip():
-        print("ERROR: n is required")
-        print("ROCA=FAILED")
-        quit()
-    n = Integer(${vals.n})
-    # Even check
-    if n % 2 == 0:
-        print(f"n is even. p = 2, q = {n // 2}")
-        print("ROCA=SUCCESS")
-        quit()
-    # Prime check
-    if is_prime(n):
-        print("n is prime. Not a valid RSA modulus.")
-        print("ROCA=FAILED")
-        quit()
-    # ROCA: Return of Coppersmith's Attack
-    # Primes of form p = k*M + (65537^i mod M)
-    # M = product of first several primes
-    print("ROCA vulnerability check")
-    print(f"n = {n}")
-    print()
-    # Try small M values (M_3, M_5, M_7, ...)
-    primes_list = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53]
-    found = False
-    r1 = 0
-    for num_primes in range(1, len(primes_list) + 1):
-        M = prod(primes_list[:num_primes])
-        if M > 2**80:
-            break
-        # Compute possible remainders: 65537^i mod M
-        ord_val = Mod(65537, M).multiplicative_order()
-        remainders = set()
-        for idx in range(ord_val):
-            r = power_mod(65537, idx, M)
-            remainders.add(r)
-        # Check if n mod M is product of two remainders
-        n_mod = n % M
-        for r in remainders:
-            if n_mod * inverse_mod(r, M) % M in remainders:
-                print(f"Possible match with M = product of first {num_primes} primes")
-                print(f"M = {M}")
-                print(f"n mod M = {n_mod}")
-                print(f"Found compatible remainders: r1 = {r}")
-                found = True
-                r1 = r
-                break
-        if found:
-            break
-    if found:
-        print()
-        print("VULNERABLE: n appears to use ROCA-generated primes.")
-        print("Use Coppersmith's method to recover p.")
-        print()
-        # Coppersmith's method for small M
-        # p = k*M + r, where r is known remainder
-        # We search for k using Coppersmith
-        r = r1
-        R.<x> = PolynomialRing(ZZ)
-        f = M*x + r
-        # Try to find small root
-        # p <= sqrt(n), so k <= sqrt(n)/M
-        bound = ceil(sqrt(n) / M)
-        print(f"Searching for k with bound ~{bound}")
-        # Use Sage's small_roots
-        f_mod = f.change_ring(Zmod(n))
-        roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=0.05)
-        if roots:
-            k = int(roots[0])
-            p = int(M * k + r)
-            if n % p == 0:
-                q = n // p
-                print(f"SUCCESS! Factor found:")
-                print(f"p = {p}")
-                print(f"q = {q}")
-                print(f"Verification: p * q = {p * q}")
-                print("ROCA=SUCCESS")
-            else:
-                print("Root found but does not divide n. Try different parameters.")
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
+    try:
+        # Validate inputs
+        try:
+            if not "${vals.n}".strip():
+                print("ERROR: n is required")
                 print("ROCA=FAILED")
-        else:
-            print("No small root found. n may use a larger M value.")
-            print("Try using the full ROCA implementation with larger prime bases.")
+                return
+            n = Integer(${vals.n})
+            # Even check
+            if n % 2 == 0:
+                print(f"n is even. p = 2, q = {n // 2}")
+                print("ROCA=SUCCESS")
+                return
+            # Prime check
+            if is_prime(n):
+                print("n is prime. Not a valid RSA modulus.")
+                print("ROCA=FAILED")
+                return
+            # ROCA: Return of Coppersmith's Attack
+            # Primes of form p = k*M + (65537^i mod M)
+            # M = product of first several primes
+            print("ROCA vulnerability check")
+            print(f"n = {n}")
+            print()
+            # Try small M values (M_3, M_5, M_7, ...)
+            primes_list = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53]
+            found = False
+            r1 = 0
+            for num_primes in range(1, len(primes_list) + 1):
+                M = prod(primes_list[:num_primes])
+                if M > 2**80:
+                    break
+                # Compute possible remainders: 65537^i mod M
+                ord_val = Mod(65537, M).multiplicative_order()
+                remainders = set()
+                for idx in range(ord_val):
+                    r = power_mod(65537, idx, M)
+                    remainders.add(r)
+                # Check if n mod M is product of two remainders
+                n_mod = n % M
+                for r in remainders:
+                    if n_mod * inverse_mod(r, M) % M in remainders:
+                        print(f"Possible match with M = product of first {num_primes} primes")
+                        print(f"M = {M}")
+                        print(f"n mod M = {n_mod}")
+                        print(f"Found compatible remainders: r1 = {r}")
+                        found = True
+                        r1 = r
+                        break
+                if found:
+                    break
+            if found:
+                print()
+                print("VULNERABLE: n appears to use ROCA-generated primes.")
+                print("Use Coppersmith's method to recover p.")
+                print()
+                # Coppersmith's method for small M
+                # p = k*M + r, where r is known remainder
+                # We search for k using Coppersmith
+                r = r1
+                R.<x> = PolynomialRing(ZZ)
+                f = M*x + r
+                # Try to find small root
+                # p <= sqrt(n), so k <= sqrt(n)/M
+                bound = ceil(sqrt(n) / M)
+                print(f"Searching for k with bound ~{bound}")
+                # Use Sage's small_roots
+                f_mod = f.change_ring(Zmod(n))
+                roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=0.05)
+                if roots:
+                    k = int(roots[0])
+                    p = int(M * k + r)
+                    if n % p == 0:
+                        q = n // p
+                        print(f"SUCCESS! Factor found:")
+                        print(f"p = {p}")
+                        print(f"q = {q}")
+                        print(f"Verification: p * q = {p * q}")
+                        print("ROCA=SUCCESS")
+                    else:
+                        print("Root found but does not divide n. Try different parameters.")
+                        print("ROCA=FAILED")
+                else:
+                    print("No small root found. n may use a larger M value.")
+                    print("Try using the full ROCA implementation with larger prime bases.")
+                    print("ROCA=FAILED")
+            else:
+                print("n does NOT appear to be ROCA-vulnerable for small M values.")
+                print("The primes were likely not generated by Infineon's library.")
+                print("ROCA=FAILED")
+        except Exception as ex:
+            print(f"ERROR: {ex}")
             print("ROCA=FAILED")
-    else:
-        print("n does NOT appear to be ROCA-vulnerable for small M values.")
-        print("The primes were likely not generated by Infineon's library.")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
         print("ROCA=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("ROCA=FAILED")
-`,
+_attack()`,
   proof: `\\textbf{Theorem:} RSA primes generated by Infineon's ROCA-vulnerable library (v1.01.006–v1.02.008) have the form \\(p = k \\cdot M + (65537^{i} \\bmod M)\\), enabling factorization via Coppersmith's method.
 
 \\textbf{Prerequisites:}

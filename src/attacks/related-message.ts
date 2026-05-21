@@ -15,70 +15,76 @@ export const attack: Attack = {
     { name: 'a', label: 'a (linear coefficient)', placeholder: '2', multiline: false },
     { name: 'b', label: 'b (linear offset)', placeholder: '0', multiline: false },
   ],
-  sageTemplate: (vals: Record<string, string>) => `try:
-    n = Integer(${vals.n})
-    e_val = "${vals.e}".strip()
-    e = Integer(e_val) if e_val else Integer(65537)
-    c1 = Integer(${vals.c1})
-    c2 = Integer(${vals.c2})
-    a_val = "${vals.a}".strip()
-    a = Integer(a_val) if a_val else Integer(2)
-    b_val = "${vals.b}".strip()
-    b = Integer(b_val) if b_val else Integer(0)
-    if n < 2 or e < 2 or c1 < 0 or c2 < 0:
-        print("Invalid input")
-        print("RELATED_MESSAGE=FAILED")
-        quit()
-    print(f"Related Message Attack")
-    print(f"n = {n}, e = {e}")
-    print(f"c1 = m^e mod n = {c1}")
-    print(f"c2 = (a*m + b)^e mod n = {c2}")
-    print(f"a = {a}, b = {b}")
-    print()
-    # f1(x) = x^e - c1, f2(x) = (a*x + b)^e - c2
-    # Both share root x = m over Zmod(n)
-    # gcd(f1, f2) = (x - m) -> m = -constant / leading_coeff
-    R.<x> = PolynomialRing(Zmod(n))
-    f1 = x**e - c1
-    f2 = (a * x + b)**e - c2
-    g = f1.gcd(f2)
-    print(f"GCD degree: {g.degree()}")
-    if g.degree() == 1:
-        # g(x) = g[1]*x + g[0] -> m = -g[0] / g[1] in Zmod(n)
-        m_int = Integer(-g[0] / g[1])
-        print(f"Recovered m = {m_int}")
-        v1 = power_mod(m_int, e, n)
-        v2 = power_mod(Integer(a * m_int + b), e, n)
-        print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
-        print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
-        if v1 == c1 and v2 == c2:
-            print("RELATED_MESSAGE=SUCCESS")
-        else:
-            print("RELATED_MESSAGE=FAILED")
-    elif g.degree() == 0:
-        print("GCD is constant - no common root found.")
-        print("Check that c1, c2 are related by the given a, b.")
-        print("RELATED_MESSAGE=FAILED")
-    else:
-        roots = g.roots()
-        if roots:
-            m_int = Integer(roots[0][0])
-            print(f"Recovered m = {m_int}")
-            v1 = power_mod(m_int, e, n)
-            v2 = power_mod(Integer(a * m_int + b), e, n)
-            print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
-            print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
-            if v1 == c1 and v2 == c2:
-                print("RELATED_MESSAGE=SUCCESS")
-            else:
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
+    try:
+        try:
+            n = Integer(${vals.n})
+            e_val = "${vals.e}".strip()
+            e = Integer(e_val) if e_val else Integer(65537)
+            c1 = Integer(${vals.c1})
+            c2 = Integer(${vals.c2})
+            a_val = "${vals.a}".strip()
+            a = Integer(a_val) if a_val else Integer(2)
+            b_val = "${vals.b}".strip()
+            b = Integer(b_val) if b_val else Integer(0)
+            if n < 2 or e < 2 or c1 < 0 or c2 < 0:
+                print("Invalid input")
                 print("RELATED_MESSAGE=FAILED")
-        else:
-            print("GCD found but no roots extractable.")
+                return
+            print(f"Related Message Attack")
+            print(f"n = {n}, e = {e}")
+            print(f"c1 = m^e mod n = {c1}")
+            print(f"c2 = (a*m + b)^e mod n = {c2}")
+            print(f"a = {a}, b = {b}")
+            print()
+            # f1(x) = x^e - c1, f2(x) = (a*x + b)^e - c2
+            # Both share root x = m over Zmod(n)
+            # gcd(f1, f2) = (x - m) -> m = -constant / leading_coeff
+            R.<x> = PolynomialRing(Zmod(n))
+            f1 = x**e - c1
+            f2 = (a * x + b)**e - c2
+            g = f1.gcd(f2)
+            print(f"GCD degree: {g.degree()}")
+            if g.degree() == 1:
+                # g(x) = g[1]*x + g[0] -> m = -g[0] / g[1] in Zmod(n)
+                m_int = Integer(-g[0] / g[1])
+                print(f"Recovered m = {m_int}")
+                v1 = power_mod(m_int, e, n)
+                v2 = power_mod(Integer(a * m_int + b), e, n)
+                print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
+                print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
+                if v1 == c1 and v2 == c2:
+                    print("RELATED_MESSAGE=SUCCESS")
+                else:
+                    print("RELATED_MESSAGE=FAILED")
+            elif g.degree() == 0:
+                print("GCD is constant - no common root found.")
+                print("Check that c1, c2 are related by the given a, b.")
+                print("RELATED_MESSAGE=FAILED")
+            else:
+                roots = g.roots()
+                if roots:
+                    m_int = Integer(roots[0][0])
+                    print(f"Recovered m = {m_int}")
+                    v1 = power_mod(m_int, e, n)
+                    v2 = power_mod(Integer(a * m_int + b), e, n)
+                    print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
+                    print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
+                    if v1 == c1 and v2 == c2:
+                        print("RELATED_MESSAGE=SUCCESS")
+                    else:
+                        print("RELATED_MESSAGE=FAILED")
+                else:
+                    print("GCD found but no roots extractable.")
+                    print("RELATED_MESSAGE=FAILED")
+        except Exception as ex:
+            print(f"ERROR: {ex}")
             print("RELATED_MESSAGE=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("RELATED_MESSAGE=FAILED")
-`,
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("RELATED_MESSAGE=FAILED")
+_attack()`,
   proof: `\\textbf{Theorem:} Given $c_1 = m^e \\bmod n$ and $c_2 = (am + b)^e \\bmod n$, $m$ is recovered via $\\gcd(x^e - c_1, (ax+b)^e - c_2)$.
 
 \\textbf{Prerequisites:}

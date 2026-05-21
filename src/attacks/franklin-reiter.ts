@@ -20,57 +20,72 @@ export const attack: Attack = {
 print("FRANKLIN_REITER=FAILED")`;
     }
     const aVal = vals.a || '1';
-    return `try:
-    # Custom GCD for polynomials over Zmod(n) with composite n
-    # Sage's built-in gcd() may fail for non-prime modulus
-    def poly_gcd(a, b):
-        while b != 0:
-            a, b = b, a % b
-        return a.monic()
-    n = Integer(${vals.n})
-    e = Integer(${vals.e})
-    c1 = Integer(${vals.c1})
-    c2 = Integer(${vals.c2})
-    a = Integer(${aVal})
-    b = Integer(${vals.b})
-    R.<x> = PolynomialRing(Zmod(n))
-    f1 = x**e - c1
-    f2 = (a*x + b)**e - c2
-    print(f"f1(x) = x^{e} - c1")
-    print(f"f2(x) = ({a}*x + {b})^{e} - c2")
-    print()
-    g = poly_gcd(f1, f2)
-    print(f"GCD degree: {g.degree()}")
-    if g.degree() == 1:
-        m = -g[0] / g[1]
-        print(f"Recovered message: m = {m}")
-        v1 = power_mod(Integer(m), e, n)
-        v2 = power_mod(Integer(a * m + b), e, n)
-        print(f"Verification: m^e mod n = {v1} (c1 = {c1})")
-        print(f"Verification: (a*m+b)^e mod n = {v2} (c2 = {c2})")
-        if v1 == c1 and v2 == c2:
-            print("FRANKLIN_REITER=SUCCESS")
-        else:
+    return `def _attack():
+    try:
+        # Custom GCD for polynomials over Zmod(n) with composite n
+        # Sage's built-in gcd() may fail for non-prime modulus
+        def poly_gcd(a, b):
+            while b != 0:
+                a, b = b, a % b
+            return a.monic()
+        n = Integer(${vals.n})
+        e = Integer(${vals.e})
+        c1 = Integer(${vals.c1})
+        c2 = Integer(${vals.c2})
+        a = Integer(${aVal})
+        b = Integer(${vals.b})
+        R.<x> = PolynomialRing(Zmod(n))
+        f1 = x**e - c1
+        f2 = (a*x + b)**e - c2
+        print(f"f1(x) = x^{e} - c1")
+        print(f"f2(x) = ({a}*x + {b})^{e} - c2")
+        print()
+        g = poly_gcd(f1, f2)
+        print(f"GCD degree: {g.degree()}")
+        if g.degree() == 1:
+            m = -g[0] / g[1]
+            print(f"Recovered message: m = {m}")
+            v1 = power_mod(Integer(m), e, n)
+            v2 = power_mod(Integer(a * m + b), e, n)
+            print(f"Verification: m^e mod n = {v1} (c1 = {c1})")
+            print(f"Verification: (a*m+b)^e mod n = {v2} (c2 = {c2})")
+            if v1 == c1 and v2 == c2:
+                print("FRANKLIN_REITER=SUCCESS")
+            else:
+                print("FRANKLIN_REITER=FAILED")
+        elif g.degree() == 0:
+            print("GCD is constant - no common root found.")
             print("FRANKLIN_REITER=FAILED")
-    elif g.degree() == 0:
-        print("GCD is constant - no common root found.")
+        else:
+            roots = g.roots()
+            if roots:
+                m_val = Integer(roots[0][0])
+                print(f"Recovered m = {m_val}")
+                v1 = power_mod(m_val, e, n)
+                v2 = power_mod(Integer(a * m_val + b), e, n)
+                print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
+                print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
+                if v1 == c1 and v2 == c2:
+                    print("FRANKLIN_REITER=SUCCESS")
+                else:
+                    print("FRANKLIN_REITER=FAILED")
+            else:
+                print(f"GCD has degree {g.degree()}, expected 1.")
+                print(f"GCD: {g}")
+                print("FRANKLIN_REITER=FAILED")
+    except Exception as ex:
+        print(f"ERROR: {ex}")
         print("FRANKLIN_REITER=FAILED")
-    else:
-        print(f"GCD has degree {g.degree()}, expected 1.")
-        print(f"GCD: {g}")
-        print("FRANKLIN_REITER=FAILED")
-except Exception as ex:
-    print(f"ERROR: {ex}")
-    print("FRANKLIN_REITER=FAILED")
-`;
+    #
+_attack()`;
   },
-  proof: `\\textbf{Theorem:} Given c_1 \\equiv m^e \\pmod{n} and c_2 \\equiv (am + b)^e \\pmod{n} with known a, b, recover m via polynomial GCD over \\mathbb{Z}/n\\mathbb{Z}.
+  proof: `\\textbf{Theorem:} Given $c_1 \\equiv m^e \\pmod{n}$ and $c_2 \\equiv (am + b)^e \\pmod{n}$ with known $a, b$, recover $m$ via polynomial GCD over $\\mathbb{Z}/n\\mathbb{Z}$.
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n, e, c_1, c_2, a, b (modulus, exponent, two ciphertexts, linear relation)
-\\item m_2 = a \\cdot m_1 + b (known affine relation)
-\\item \\gcd(a, n) = 1
+\\item $n, e, c_1, c_2, a, b$ (modulus, exponent, two ciphertexts, linear relation)
+\\item $m_2 = a \\cdot m_1 + b$ (known affine relation)
+\\item $\\gcd(a, n) = 1$
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -79,14 +94,14 @@ f_1(x) &= x^e - c_1 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
 f_2(x) &= (ax + b)^e - c_2 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
 f_1(m) &= m^e - c_1 \\equiv 0 \\pmod{n} \\\\
 f_2(m) &= (am + b)^e - c_2 \\equiv 0 \\pmod{n} \\\\
-(x - m) \\mid \\gcd(f_1, f_2) & \\\\
+(x - m) &\\mid \\gcd(f_1, f_2) \\\\
 g(x) = \\gcd(f_1, f_2), \\quad \\deg(g) = 1 &\\implies g(x) = x - m \\\\
 m &= -g[0] \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Build two polynomials that both have m as a root. Their GCD is (x − m) for generic a, b. Extract m from the linear GCD's coefficients.
+\\textbf{Explanation:} Build two polynomials that both have $m$ as a root. Their GCD is $(x - m)$ for generic $a, b$. Extract $m$ from the linear GCD's coefficients.
 
-\\textbf{References:} M. Franklin & M. Reiter, "On the Security of RSA Padding", 1996; Boneh, "Twenty Years of Attacks on RSA", 1999`,
+\\textbf{References:} M. Franklin \\& M. Reiter, "On the Security of RSA Padding", 1996; Boneh, "Twenty Years of Attacks on RSA", 1999`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c1 && !!p.c2 && !!p.b,
 };

@@ -19,58 +19,60 @@ export const attack: Attack = {
       return `print("ERROR: Missing required inputs (n, e, m, sig_valid, sig_faulty)")
 print("RSA_CRT_FAULT=FAILED")`;
     }
-    return `try:
-    n = Integer(${vals.n})
-    e = Integer(${vals.e})
-    m = Integer(${vals.m})
-    sig_valid = Integer(${vals.sig_valid})
-    sig_faulty = Integer(${vals.sig_faulty})
-    print(f"RSA-CRT Fault Attack (Bellcore Attack)")
-    print(f"n = {n}")
-    print(f"Valid sig: {sig_valid}")
-    # Verify the valid signature
-    v_valid = power_mod(sig_valid, e, n)
-    print(f"sig_valid^e mod n = {v_valid}")
-    print(f"Expected m = {m}")
-    print(f"Valid sig check: {v_valid == m}")
-    # Faulty signature: correct mod one prime, wrong mod the other
-    # gcd(sig_faulty^e - m, n) reveals the factor
-    sig_faulty_e = power_mod(sig_faulty, e, n)
-    print(f"sig_faulty^e mod n = {sig_faulty_e}")
-    # Compute GCD
-    g = gcd(sig_faulty_e - m, n)
-    print(f"gcd(sig_faulty^e - m, n) = {g}")
-    if 1 < g < n:
-        p = g
-        q = n // g
-        print(f"\\nFactorization found!")
-        print(f"p = {p}")
-        print(f"q = {q}")
-        print(f"p * q = {p * q}")
-        print(f"p is prime: {p.is_prime()}")
-        print(f"q is prime: {q.is_prime()}")
-        # Compute private key
-        phi = (p - 1) * (q - 1)
-        d = inverse_mod(e, phi)
-        print(f"\\nPrivate exponent d = {d}")
-        # Verify with valid signature
-        sig_recovered = power_mod(m, d, n)
-        print(f"Recovered sig: {sig_recovered}")
-        print(f"Matches valid sig: {sig_recovered == sig_valid}")
-        print("RSA_CRT_FAULT=SUCCESS")
-    else:
-        print("GCD did not reveal a factor. The fault may not be a CRT fault.")
+    return `def _attack():
+    try:
+        n = Integer(${vals.n})
+        e = Integer(${vals.e})
+        m = Integer(${vals.m})
+        sig_valid = Integer(${vals.sig_valid})
+        sig_faulty = Integer(${vals.sig_faulty})
+        print(f"RSA-CRT Fault Attack (Bellcore Attack)")
+        print(f"n = {n}")
+        print(f"Valid sig: {sig_valid}")
+        # Verify the valid signature
+        v_valid = power_mod(sig_valid, e, n)
+        print(f"sig_valid^e mod n = {v_valid}")
+        print(f"Expected m = {m}")
+        print(f"Valid sig check: {v_valid == m}")
+        # Faulty signature: correct mod one prime, wrong mod the other
+        # gcd(sig_faulty^e - m, n) reveals the factor
+        sig_faulty_e = power_mod(sig_faulty, e, n)
+        print(f"sig_faulty^e mod n = {sig_faulty_e}")
+        # Compute GCD
+        g = gcd(sig_faulty_e - m, n)
+        print(f"gcd(sig_faulty^e - m, n) = {g}")
+        if 1 < g < n:
+            p = g
+            q = n // g
+            print(f"\\nFactorization found!")
+            print(f"p = {p}")
+            print(f"q = {q}")
+            print(f"p * q = {p * q}")
+            print(f"p is prime: {p.is_prime()}")
+            print(f"q is prime: {q.is_prime()}")
+            # Compute private key
+            phi = (p - 1) * (q - 1)
+            d = inverse_mod(e, phi)
+            print(f"\\nPrivate exponent d = {d}")
+            # Verify with valid signature
+            sig_recovered = power_mod(m, d, n)
+            print(f"Recovered sig: {sig_recovered}")
+            print(f"Matches valid sig: {sig_recovered == sig_valid}")
+            print("RSA_CRT_FAULT=SUCCESS")
+        else:
+            print("GCD did not reveal a factor. The fault may not be a CRT fault.")
+            print("RSA_CRT_FAULT=FAILED")
+    except Exception as e:
+        print(f"ERROR: {e}")
         print("RSA_CRT_FAULT=FAILED")
-except Exception as e:
-    print(f"ERROR: {e}")
-    print("RSA_CRT_FAULT=FAILED")
-`;
+    #
+_attack()`;
   },
   proof: `\\textbf{Theorem:} A single faulty RSA-CRT signature s' on known message m factors n via \\gcd(s'^e - m, n).
 
 \\textbf{Prerequisites:}
 \\begin{itemize}
-\\item n, e, m, s_{valid}, s_{faulty} (modulus, exponent, message, valid and faulty signatures)
+\\item n, e, m, s\\_{valid}, s\\_{faulty} (modulus, exponent, message, valid and faulty signatures)
 \\item n = pq, fault in one CRT component only
 \\item s' \\equiv s \\pmod{p} but s' \\not\\equiv s \\pmod{q}
 \\end{itemize}
