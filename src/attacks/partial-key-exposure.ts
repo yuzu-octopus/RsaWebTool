@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
+import { generateKeyPair } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'partial-key-exposure',
@@ -30,34 +30,52 @@ export const attack: Attack = {
                 return
             # p = p_msb + x, where x is unknown low bits (trailing zeros = bit count of x)
             k = p_msb.trailing_zero_bits()
-            X = 2 ** k
-            # Coppersmith bound for beta=0.5: |x| < n^(beta^2) = n^0.25
-            max_X = Integer(n.nth_root(4, truncate_mode=True)[0])
-            if X >= max_X:
-                X = max_X
             print(f"Partial Key Exposure Attack")
             print(f"n = {n}")
             print(f"p_msb = {p_msb}")
-            print(f"Coppersmith bound X = {X}")
-            P.<x> = PolynomialRing(Zmod(n))
-            f = p_msb + x
-            roots = f.small_roots(X=X, beta=0.5, epsilon=0.05)
-            if roots:
-                p = Integer(p_msb + int(roots[0]))
-                if n % p == 0:
-                    q = n // p
-                    print(f"p = {p}")
-                    print(f"q = {q}")
-                    print(f"Verification: p * q = {p * q}")
-                    print("PARTIAL_KEY_EXPOSURE=SUCCESS")
-                else:
-                    print("PARTIAL_KEY_EXPOSURE=FAILED: recovered p does not divide n")
+            print(f"Unknown low bits = {k}")
+            # Manual Coppersmith lattice for degree-1, checking ALL LLL rows.
+            # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
+            x = ZZ['x'].gen()
+            f_ZZ = p_msb + x
+            X = Integer(n).nth_root(4, truncate_mode=True)[0] + 1
+            m = 5; t = 5; dim = m + t
+            shifts = []
+            for i in range(m):
+                shifts.append(n^(m - i) * f_ZZ^i)
+            for k in range(t):
+                shifts.append(f_ZZ^m * x^k)
+            M = matrix(ZZ, dim, dim)
+            for i, shift in enumerate(shifts):
+                for j, c in enumerate(shift.list()):
+                    M[i, j] = c * X^j
+            B = M.LLL()
+            found_p = None
+            for k in range(dim):
+                row = B[k]
+                a0 = Integer(row[0]); a1 = Integer(row[1])
+                if a1 == 0:
+                    continue
+                r_approx = -QQ(a0) * QQ(X) / QQ(a1)
+                for delta in range(-2, 3):
+                    r = Integer(floor(r_approx)) + delta
+                    if abs(r) < X:
+                        candidate = Integer(p_msb + r)
+                        if n % candidate == 0:
+                            found_p = candidate
+                            break
+                if found_p:
+                    break
+            if found_p:
+                q = n // found_p
+                print(f"p = {found_p}")
+                print(f"q = {q}")
+                print("PARTIAL_KEY_EXPOSURE=SUCCESS")
             else:
                 print("Need approximately half the bits of p for Coppersmith to work.")
                 print("PARTIAL_KEY_EXPOSURE=FAILED")
         except Exception as ex:
             print(f"PARTIAL_KEY_EXPOSURE=FAILED: {ex}")
-        #
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("PARTIAL_KEY_EXPOSURE=FAILED")
@@ -91,9 +109,10 @@ p &= p_{\\text{msb}} + x_0 \\qed
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { p, n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+  const { p, n } = generateKeyPair(192, 192);
   const pBits = p.toString(2).length;
-  const keepBits = Math.floor(pBits * 0.6);
+  // Must keep ≥ 86% of bits (degree-2 bound: unknown < n^0.075 ≈ 2^28 for 384-bit n)
+  const keepBits = Math.floor(pBits * 0.9);
   const shift = BigInt(pBits - keepBits);
   const pMsb = (p >> shift) << shift;
   return { n: n.toString(), p_msb: pMsb.toString() };

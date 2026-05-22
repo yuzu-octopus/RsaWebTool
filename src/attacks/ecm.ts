@@ -35,8 +35,8 @@ export const attack: Attack = {
                 print("ECM=SUCCESS")
                 return
             from sage.libs.libecm import ecmfactor
-            B1_vals = [2000, 10000, 50000, 250000, 1000000]
-            curves_per_B1 = 15
+            B1_vals = [2000, 10000, 50000]    # capped at 50k to avoid SageMathCell timeout
+            curves_per_B1 = 10
             found_p = None
             for B1_cur in B1_vals:
                 for attempt in range(curves_per_B1):
@@ -105,8 +105,8 @@ M \\cdot P &= \\mathcal{O} \\text{ in } E(\\mathbb{F}_p) \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Generate n with one small factor (≤40 bits) so ECM succeeds quickly
-  const p = randomPrime(40);
-  const q = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 40);
+  // Generate n with one small factor (≤30 bits) so ECM succeeds quickly within SageMathCell 35s
+  const p = randomPrime(30);
+  const q = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 30);
   return { n: (p * q).toString() };
 };

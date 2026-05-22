@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
+import { randomPrime, isPrimeMR } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'close-prime',
@@ -39,7 +39,7 @@ export const attack: Attack = {
             print()
             # Londahl baby-step giant-step phi-approximation attack
             # Source: https://grocid.net/2017/09/16/finding-close-prime-factorizations/
-            b = 500000
+            b = 50000
             # Approximate phi(n) = n - (p+q) + 1 ~ n - 2*sqrt(n) + 1 when p ~ q
             phi_approx = n - 2*isqrt(n) + 1
             # Baby steps: store 2^j mod n for j = 0..b
@@ -125,7 +125,9 @@ p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const p = randomPrime(TESTCASE_BITS.p);
+  // Use 128-bit close primes — keeps modular arithmetic fast
+  // while BSGS finds phi(n) in < 1s at b = 50000
+  const p = randomPrime(128);
   const delta = Math.floor(Math.random() * 5000) * 2 + 2;
   let q = p + BigInt(delta);
   while (!isPrimeMR(q)) q += 2n;

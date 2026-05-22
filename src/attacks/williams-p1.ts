@@ -112,8 +112,7 @@ export const attack: Attack = {
             configs = [
                 (100, 1000),
                 (1000, 10000),
-                (10000, 100000),
-                (100000, 500000)
+                (10000, 50000)     # capped at 50k to avoid SageMathCell timeout
             ]
         else:
             configs = [(B1_orig, B2_orig)]
@@ -132,7 +131,7 @@ export const attack: Attack = {
                         print(f", B2 = {B2_cur}")
                     else:
                         print()
-                for P in range(3, 10):
+                for P in range(3, 8):
                     g = williams_p1_stage(n, B1_cur, B2_cur, P)
                     if g is not None:
                         p = Integer(g)
@@ -205,7 +204,7 @@ export const generateTestcase = (): Record<string, string> => {
     primes.sort(() => Math.random() - 0.5);
     let currentBits = 0;
     let idx = 0;
-    while (currentBits < 250 && idx < primes.length) {
+    while (currentBits < 128 && idx < primes.length) {
       pPlus1 *= primes[idx];
       currentBits += primes[idx].toString(2).length;
       idx++;
@@ -226,5 +225,5 @@ export const generateTestcase = (): Record<string, string> => {
 
   const q = randomPrime(TESTCASE_BITS.q);
   const n = p * q;
-  return { n: n.toString() };
+  return { n: n.toString(), B: '10000', B2: '0' };
 };

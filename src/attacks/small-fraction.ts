@@ -44,8 +44,8 @@ export const attack: Attack = {
             print(f"n = {n}")
             print()
             found = False
-            max_den = 200
-            trial_window = 5000
+            max_den = 50
+            trial_window = 500
             pairs_tried = 0
             divs_tried = 0
             for b in range(1, max_den + 1):

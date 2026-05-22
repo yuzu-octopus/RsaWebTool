@@ -27,7 +27,11 @@ export const attack: Attack = {
         def composite_gcd(a, b):
             while b:
                 a, b = b, a % b
-            return a.monic()
+            try:
+                return a.monic()
+            except Exception:
+                # Lead coeff not invertible mod composite n; return as-is
+                return a
         print("Coppersmith Short Pad Attack")
         print("n =", n, "e =", e)
         # Step 1: Compute resultant to find delta = m2 - m1
@@ -42,7 +46,6 @@ export const attack: Attack = {
         print("Computing resultant...")
         h = g1_p2.resultant(g2_p2, variable=x)
         h = h.univariate_polynomial().change_ring(Zmod(n))
-        h = h.monic()
         print("Resultant degree:", h.degree())
         # Extract coefficients of h(y) = y^(e^2) + ... + C (only y^(i*e) terms)
         # For e=3: h(y) = y^9 + A*y^6 + B*y^3 + C
@@ -55,12 +58,12 @@ export const attack: Attack = {
             if deg <= h.degree():
                 H += coeffs[deg] * z**i
         print("Looking for small root of degree-", H.degree(), "polynomial in z = y^e")
-        # Bound for z = delta^e: |delta| < n^(beta/e^2) => |z| < n^(beta/e)
-        # With beta=1.0: |z| < n^(1/e)
-        kbits = n.nbits() // int(e)
+        # Howgrave-Graham bound for z = delta^e with beta=1.0, epsilon=0.05:
+        # |z| < n^(1/e - 0.05)
+        kbits = max(int(n.nbits() * (1/int(e) - 0.06)), 8)
         X_z = 2**kbits
         print("Small root bound for z (bits):", kbits)
-        roots_z = H.small_roots(X=X_z)
+        roots_z = H.small_roots(X=X_z, epsilon=0.05)
         if roots_z:
             z0 = Integer(roots_z[0])
             # Take integer e-th root to recover delta = z0^(1/e)
@@ -95,7 +98,10 @@ export const attack: Attack = {
     except Exception as e:
         print("ERROR:", e)
         print("COPPERSMITH_SHORT_PAD=FAILED")
-    #
+        #
+    except BaseException as e:
+        print("ERROR:", e)
+        print("COPPERSMITH_SHORT_PAD=FAILED")
 _attack()`;
   },
   proof: `\\textbf{Theorem:} Given $c_1 \\equiv (m + \\delta_1)^e \\pmod{n}$ and $c_2 \\equiv (m + \\delta_2)^e \\pmod{n}$ with $|\\delta_1 - \\delta_2| < n^{1/e^2}$, recover $m$ via resultant $+$ Coppersmith.
@@ -131,7 +137,7 @@ export const generateTestcase = (): Record<string, string> => {
   const q = randomPrime(64);
   const n = p * q;
   const m = BigInt(Math.floor(Math.random() * 10000) + 42);
-  const maxPad = 2 ** 20;
+  const maxPad = 2 ** 10;
   const r1 = BigInt(Math.floor(Math.random() * maxPad));
   const r2 = BigInt(Math.floor(Math.random() * maxPad));
   const m1 = (m << 20n) | r1;

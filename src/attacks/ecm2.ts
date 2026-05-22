@@ -22,10 +22,10 @@ export const attack: Attack = {
                     print(f"{indent}Prime: {m}")
                     return [m]
                 print(f"{indent}Composite: {m} ({m.nbits()} bits)")
-                B1_vals = [2000, 10000, 50000, 250000]
+                B1_vals = [2000, 10000, 50000]    # capped at 50k to avoid SageMathCell timeout
                 found_p = None
                 for B1_cur in B1_vals:
-                    for attempt in range(20):
+                    for attempt in range(10):
                         try:
                             result = ecmfactor(m, B1_cur)
                             if result[0]:
@@ -131,8 +131,9 @@ n > n/p_{i_1} > n/(p_{i_1}p_{i_2}) > \\cdots &> 1 \\\\
 
 export const generateTestcase = (): Record<string, string> => {
   // Generate n with 3 prime factors for multi-round ECM demonstration
-  const p1 = randomPrime(40);
-  const p2 = randomPrime(50);
-  const p3 = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 90);
+  // Factors use smaller sizes so ECM converges within SageMathCell 35s
+  const p1 = randomPrime(32);
+  const p2 = randomPrime(40);
+  const p3 = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 72);
   return { n: (p1 * p2 * p3).toString() };
 };

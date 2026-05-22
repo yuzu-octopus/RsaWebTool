@@ -120,8 +120,8 @@ p &\\approx C + \\delta, \\quad C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Generate a prime near a power of 2
-  const bits = TESTCASE_BITS.p;
+  // Generate a prime near a power of 2 (128-bit — fast primality check)
+  const bits = 128;
   const target = 1n << BigInt(bits);
   let p = 0n;
   for (let delta = 0n; delta < 1000n; delta += 1n) {

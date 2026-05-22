@@ -66,7 +66,7 @@ export const attack: Attack = {
                             break
                 return g if 1 < g < n else None
             found = False
-            for c_val in range(1, 20):
+            for c_val in range(1, 10):
                 d = brent_rho_batch(n, c_val)
                 if d is not None:
                     p = d
@@ -123,9 +123,9 @@ p &\\mid \\gcd\\left(\\prod_{k} |x - y_k|, n\\right) \\;\\;\\; \\text{(batch pro
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Generate n with one SMALL factor (≤40 bits) so rho succeeds quickly
-  // Rho runs in O(sqrt(p)) — with p=40 bits, ~2^20 iterations, well within limits
-  const p = randomPrime(40);
-  const q = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 40);
+  // Generate n with one SMALL factor (≤32 bits) so rho succeeds quickly within SageMathCell 35s
+  // Rho runs in O(sqrt(p)) — with p=32 bits, ~2^16 iterations
+  const p = randomPrime(32);
+  const q = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 32);
   return { n: (p * q).toString() };
 };

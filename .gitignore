@@ -14,9 +14,15 @@ src/.DS_Store
 page-verify.md
 bun.lockb
 *.png
-workers/node_modules/
-workers/.wrangler/
-workers/bun.lock
 test-*.ts
 HANDOFF.md
 scratch/
+AGENTS.md
+GEMINI.md
+scripts/
+public/test-api-suite.html
+workers/
+
+# Attack test artifacts (generated)
+scripts/test-results/*.json
+scripts/test-results/templates/

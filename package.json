@@ -9,7 +9,11 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -b --noEmit",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:attacks": "bun scripts/test-attacks.ts",
+    "test:attacks:fail": "bun scripts/test-attacks.ts -- --fail",
+    "test:attacks:json": "bun scripts/test-attacks.ts -- --json",
+    "test:attacks:sage": "bun scripts/test-sage-docker.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -23,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.60.0",
     "@types/katex": "^0.16.7",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
@@ -33,6 +38,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
+    "playwright": "^1.60.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.12"

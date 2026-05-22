@@ -33,28 +33,48 @@ export const attack: Attack = {
                 print("n is even — cannot apply lattice attack")
                 print("SIMPLE_LATTICE=FAILED: even modulus")
                 return
-            R.<x> = PolynomialRing(Zmod(n))
-            f = nearp + x
-            # Bound: |x| < n^(1/4) for Coppersmith with beta=0.5, deg=1
-            bound = n.nth_root(4, truncate_mode=True)[0]
-            print(f"Using bound X = {bound}")
-            roots = f.small_roots(X=bound, beta=0.5, epsilon=0.05)
-            if roots:
-                p = Integer(nearp + roots[0])
-                if n % p == 0:
-                    q = n // p
-                    print(f"Verification: p * q = {p * q}")
-                    if p * q == n:
-                        print("SIMPLE_LATTICE=SUCCESS")
-                        print(f"p={p}")
-                        print(f"q={q}")
-                    else:
-                        print("SIMPLE_LATTICE=FAILED: verification mismatch")
-                else:
-                    print("SIMPLE_LATTICE=FAILED: recovered p does not divide n")
+            # Manual Coppersmith lattice (same shifts as Sage's small_roots).
+            # Checks ALL LLL rows to bypass Sage's Row-0 (degree-1) bug.
+            x = ZZ['x'].gen()
+            f_ZZ = nearp + x
+            X = Integer(n).nth_root(4, truncate_mode=True)[0] + 1
+            m = 5; t = 5; dim = m + t
+            shifts = []
+            for i in range(m):
+                shifts.append(n^(m - i) * f_ZZ^i)
+            for k in range(t):
+                shifts.append(f_ZZ^m * x^k)
+            M = matrix(ZZ, dim, dim)
+            for i, shift in enumerate(shifts):
+                for j, c in enumerate(shift.list()):
+                    M[i, j] = c * X^j
+            B = M.LLL()
+            found_p = None
+            for k in range(dim):
+                row = B[k]
+                a0 = Integer(row[0]); a1 = Integer(row[1])
+                if a1 == 0:
+                    continue
+                # g(y) = sum row[i] * y^i, y = r/X.
+                # g(r/X) = 0 → two-term: r ≈ -a0 * X / a1.
+                # Error from higher terms: |r/X|^2 ≪ 1 → accurate within 1.
+                r_approx = -QQ(a0) * QQ(X) / QQ(a1)
+                for delta in range(-2, 3):
+                    r = Integer(floor(r_approx)) + delta
+                    if abs(r) < X:
+                        candidate = Integer(nearp + r)
+                        if n % candidate == 0:
+                            found_p = candidate
+                            break
+                if found_p:
+                    break
+            if found_p:
+                q = n // found_p
+                print("SIMPLE_LATTICE=SUCCESS")
+                print(f"p={found_p}")
+                print(f"q={q}")
             else:
-                print("No roots found with X = %d. Try a smaller epsilon (e.g., 0.01) for a larger lattice if the offset is near the bound." % bound)
-                print("SIMPLE_LATTICE=FAILED: no roots found")
+                print("SIMPLE_LATTICE=FAILED: no roots found in any LLL row")
         except Exception as ex:
             print(f"SIMPLE_LATTICE=FAILED: {ex}")
     except BaseException as ex:
@@ -90,7 +110,7 @@ export const generateTestcase = (): Record<string, string> => {
   const { p, n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
   // Offset within Coppersmith bound: |offset| < n^(1/4) ≈ 2^128 for 512-bit n
   // Use up to 2^60 for a realistic but solvable testcase
-  const offsetBits = 60;
+  const offsetBits = 30;
   const maxOffset = (1n << BigInt(offsetBits)) - 1n;
   // Generate random offset using crypto.getRandomValues for full BigInt range
   const bytes = new Uint8Array(8);

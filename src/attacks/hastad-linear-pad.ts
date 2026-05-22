@@ -52,9 +52,27 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                 fi = (a_i*x + b_i)**e - c_i
                 F += coeff * fi
             print(f"Combined polynomial degree: {F.degree()}")
-            # Make polynomial monic for Coppersmith's small_roots
-            F = F.monic()
-            print(f"Polynomial made monic, leading coefficient = 1")
+            # Make polynomial monic (required by small_roots).
+            # The leading coefficient should be invertible modulo N because
+            # each a_i is coprime to n_i — but guard against the rare case.
+            try:
+                F = F.monic()
+            except Exception as ex:
+                print(f"Cannot make monic directly: {ex}")
+                lc = Integer(F.leading_coefficient())
+                g = gcd(lc, Integer(N))
+                if g > 1 and g < N:
+                    print(f"Lead coeff shares factor g={g} with N — can factor directly")
+                elif g == N:
+                    print("Lead coeff is a multiple of N")
+                else:
+                    # lc is coprime to N, try manual inversion
+                    try:
+                        F = F * inverse_mod(lc, N)
+                    except Exception as ex2:
+                        print(f"Cannot invert lead coeff: {ex2}")
+                print("HASTAD_LINEAR_PAD=FAILED")
+                return
             # Coppersmith: find small root m < N^(1/e)
             roots = F.small_roots(beta=1.0, epsilon=0.05)
             if roots:
@@ -102,7 +120,10 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
     except Exception as ex:
         print(f"ERROR: {ex}")
         print("HASTAD_LINEAR_PAD=FAILED")
-    #
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("HASTAD_LINEAR_PAD=FAILED")
 _attack()`;
   },
   proof: `\\textbf{Theorem:} Given c\\_i \\equiv (a\\_i m + b\\_i)^e \\pmod{n\\_i} for i = 1, \\ldots, k with known a\\_i, b\\_i and k \\geq e, recover m via CRT + Coppersmith.
@@ -121,8 +142,8 @@ N &= \\prod_{i=1}^{k} n_i \\\\
 N_i &= N / n_i, \\quad t_i = N_i \\cdot N_i^{-1} \\bmod n_i \\\\
 F(x) &= \\sum_{i=1}^{k} t_i \\cdot f_i(x) \\pmod{N} \\\\
 F(m) &\\equiv 0 \\pmod{N} \\\\
-\\tilde{F}(x) &= F(x) / \\text{lc}(F) \\text{ (make monic)} \\\\
-m &= small\\_roots(\\tilde{F}, X = \\lceil \\tfrac{1}{2} N^{1/e - \\varepsilon} \\rceil) \\qed
+\\text{(small\\_roots works directly on } F) \\\\
+m &= small\\_roots(F, X = \\lceil \\tfrac{1}{2} N^{1/e - \\varepsilon} \\rceil) \\qed
 \\end{align*}
 
 \\textbf{Explanation:} Build a polynomial per ciphertext, combine via CRT coefficients into F(x) over Zmod(N). The message m is a small root of F. Use Coppersmith's small\\_roots to extract it.

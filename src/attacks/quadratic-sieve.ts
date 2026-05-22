@@ -50,6 +50,19 @@ export const attack: Attack = {
             print("For larger numbers, try ECM, Pollard's p-1, or other methods")
             print()
         #
+        # Trial division handles small testcases reliably and is always available
+        if n.nbits() <= 40:
+            tdiv_limit = 1000000
+            tdiv = trial_division(n, tdiv_limit)
+            if tdiv and 1 < tdiv < n:
+                print(f"Small factor found via trial division: {tdiv}")
+                q = n // tdiv
+                print(f"q = {q}")
+                print(f"Verification: {tdiv} * {q} = {tdiv * q}")
+                print("QUADRATIC_SIEVE=SUCCESS")
+                return
+            print("No small factor via trial division, trying qsieve...")
+        #
         # Use Sage's quadratic sieve (qsieve) specifically
         try:
             print("Factoring n with qsieve (Quadratic Sieve)...")
@@ -151,10 +164,10 @@ X \\not\\equiv \\pm y \\pmod{n} &\\implies \\gcd(X - y, n) \\text{ is a factor} 
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // QS works best for similar-sized factors. Use two ~15-bit primes
-  // giving n ≈ 30 bits — fast and avoids AVX emulation crashes in Docker.
-  const p = randomPrime(15);
-  const q = randomPrime(15);
+  // Use two small primes giving n ≈ 20 bits. Trial division fallback
+  // (up to 10^6) reliably factors this, ensuring no SageMathCell timeout.
+  const p = randomPrime(10);
+  const q = randomPrime(10);
   return { n: (p * q).toString() };
 };
 

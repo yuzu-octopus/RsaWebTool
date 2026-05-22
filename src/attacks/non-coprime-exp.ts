@@ -59,7 +59,22 @@ print("NON_COPRIME_EXP=FAILED")`;
                 # Find all e-th roots mod p
                 Fp = GF(p)
                 cp = Fp(c)
-                roots_p = cp.nth_root(e, all=True)
+                try:
+                    roots_p = cp.nth_root(e, all=True)
+                except (NotImplementedError, TypeError, AttributeError):
+                    roots_p = []
+                    # Manual fallback for small e: iterate candidates
+                    if e <= 10 and p < 2000000:
+                        for x in range(p):
+                            if (x**e) % p == cp:
+                                roots_p.append(Fp(x))
+                if not roots_p:
+                    # Manual Tonelli-Shanks fallback for e=2, p ≡ 3 mod 4
+                    if e == 2 and p % 4 == 3:
+                        r = cp ** ((p + 1) // 4)
+                        if r**2 == cp:
+                            roots_p = [r, -r]
+                            print("  (found via Tonelli-Shanks fallback)")
             print(f"e-th roots mod p: {[Integer(r) for r in roots_p]}")
             # mod q
             gq = gcd(e, q - 1)
@@ -72,7 +87,20 @@ print("NON_COPRIME_EXP=FAILED")`;
             else:
                 Fq = GF(q)
                 cq = Fq(c)
-                roots_q = cq.nth_root(e, all=True)
+                try:
+                    roots_q = cq.nth_root(e, all=True)
+                except (NotImplementedError, TypeError, AttributeError):
+                    roots_q = []
+                    if e <= 10 and q < 2000000:
+                        for x in range(q):
+                            if (x**e) % q == cq:
+                                roots_q.append(Fq(x))
+                if not roots_q:
+                    if e == 2 and q % 4 == 3:
+                        r = cq ** ((q + 1) // 4)
+                        if r**2 == cq:
+                            roots_q = [r, -r]
+                            print("  (found via Tonelli-Shanks fallback)")
             print(f"e-th roots mod q: {[Integer(r) for r in roots_q]}")
             # CRT combine all pairs
             print(f"\\nAll possible plaintexts ({len(roots_p) * len(roots_q)} total):")

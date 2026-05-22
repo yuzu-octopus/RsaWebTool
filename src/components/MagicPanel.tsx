@@ -19,21 +19,7 @@ import { useSageMathParallel } from '../hooks/useSageMath';
 import { attacks } from '../attacks';
 import { detectFormat, parsePEM } from '../utils/converters';
 import { generateKeyPair, encrypt, TESTCASE_BITS } from '../utils/testcases/core';
-
-function isActualSuccess(output: string): boolean {
-  const trimmed = output.trim();
-  // Check for explicit SUCCESS/FAILED markers (preferred)
-  const failedIdx = trimmed.lastIndexOf('=FAILED');
-  const successIdx = trimmed.lastIndexOf('=SUCCESS');
-  if (failedIdx > -1 || successIdx > -1) {
-    return successIdx > failedIdx;
-  }
-  // Heuristic fallback for older templates without markers
-  const text = trimmed.toLowerCase();
-  if (/failed|error|impossible|no factor found|could not|unable to/.test(text)) return false;
-  if (/=success|p =|q =|factors:|recovered|found|decrypted/.test(text)) return true;
-  return false;
-}
+import { isActualSuccess } from '../utils/sage-output';
 
 function detectParams(input: string): Record<string, string> {
   const params: Record<string, string> = {};

@@ -36,68 +36,62 @@ export const attack: Attack = {
             print(f"n = {n}")
             print(f"base = {base}")
             print()
-            # Try multiple prime bases for M
-            prime_sets = [
-                [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53],
-                [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59],
-                [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61],
-            ]
-            found = False
-            for primes_subset in prime_sets:
-                M = prod(primes_subset)
-                # Skip if base is not coprime to M — multiplicative_order would crash
-                if gcd(base, M) != 1:
-                    print(f"M = {M}: gcd(base, M) = {gcd(base, M)} != 1, skipping...")
-                    continue
-                # Compute remainders
-                ord_val = Mod(base, M).multiplicative_order()
-                remainders = set()
-                for idx in range(ord_val):
-                    r = power_mod(base, idx, M)
-                    remainders.add(r)
-                n_mod = n % M
-                # Check if n_mod factors into two remainders
-                for r1 in remainders:
-                    r2 = n_mod * inverse_mod(r1, M) % M
-                    if r2 in remainders:
-                        print(f"Match found with M = {M}")
-                        print(f"r1 = {r1}, r2 = {r2}")
-                        print(f"Verification: r1 * r2 mod M = {(r1 * r2) % M} (n mod M = {n_mod})")
-                        found = True
-                        # Try Coppersmith
-                        R.<x> = PolynomialRing(ZZ)
-                        f = M*x + r1
-                        bound = ceil(sqrt(n) / M)
-                        f_mod = f.change_ring(Zmod(n))
-                        roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=0.05)
-                        if roots:
-                            k = int(roots[0])
-                            p = int(M * k + r1)
-                            if n % p == 0:
-                                q = n // p
-                                print(f"SUCCESS! p = {p}, q = {q}")
-                                print(f"Verification: p * q = {p * q}")
-                                print("NITROS=SUCCESS")
-                            else:
-                                print(f"Root found but doesn't divide n. Trying r2...")
-                                f2 = M*x + r2
-                                roots2 = f2.change_ring(Zmod(n)).small_roots(X=bound, beta=0.5, epsilon=0.05)
-                                if roots2:
-                                    k2 = int(roots2[0])
-                                    p2 = int(M * k2 + r2)
-                                    if n % p2 == 0:
-                                        print(f"SUCCESS! p = {p2}, q = {n // p2}")
-                                        print("NITROS=SUCCESS")
-                                    else:
-                                        print("NITROS=FAILED")
-                                else:
-                                    print("NITROS=FAILED")
-                        else:
-                            print("NITROS=FAILED")
-                        break
-                if found:
-                    break
-            if not found:
+            # Use a single well-chosen M (product of first 16 primes ≈ 2^53)
+            # This keeps Coppersmith fast while covering typical Nitros/ROCA primes
+            primes_subset = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53]
+            M = prod(primes_subset)
+            if gcd(base, M) != 1:
+                print(f"M = {M}: gcd(base, M) = {gcd(base, M)} != 1, skipping...")
+                print("NITROS=FAILED")
+                return
+            # Compute remainders
+            ord_val = Mod(base, M).multiplicative_order()
+            remainders = set()
+            for idx in range(ord_val):
+                r = power_mod(base, idx, M)
+                remainders.add(r)
+            n_mod = n % M
+            # Collect all valid remainder pairs
+            pairs = []
+            for r1 in remainders:
+                r2 = n_mod * inverse_mod(r1, M) % M
+                if r2 in remainders:
+                    pairs.append((r1, r2))
+            if not pairs:
+                print("No valid remainder pairs found with this M.")
+                print("NITROS=FAILED")
+                return
+            print(f"Found {len(pairs)} valid remainder pair(s) with M = {M}")
+            # Try Coppersmith with the first pair
+            factored = False
+            try:
+                R.<x> = PolynomialRing(ZZ)
+                r1_try, r2_try = pairs[0]
+                f = M*x + r1_try
+                bound = ceil(sqrt(n) / M)
+                f_mod = f.change_ring(Zmod(n)).monic()
+                roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=0.05)
+                if roots:
+                    k = int(roots[0])
+                    p = int(M * k + r1_try)
+                    if n % p == 0:
+                        q = n // p
+                        print(f"SUCCESS! p = {p}, q = {q}")
+                        print("NITROS=SUCCESS")
+                        factored = True
+                if not factored:
+                    f2 = M*x + r2_try
+                    roots2 = f2.change_ring(Zmod(n)).monic().small_roots(X=bound, beta=0.5, epsilon=0.05)
+                    if roots2:
+                        k2 = int(roots2[0])
+                        p2 = int(M * k2 + r2_try)
+                        if n % p2 == 0:
+                            print(f"SUCCESS! p = {p2}, q = {n // p2}")
+                            print("NITROS=SUCCESS")
+                            factored = True
+            except BaseException:
+                pass
+            if not factored:
                 print("No ROCA/Nitros pattern detected for tested M values.")
                 print("NITROS=FAILED")
         except Exception as ex:
@@ -138,14 +132,14 @@ f(x) &= M \\cdot x + r_1 \\equiv 0 \\pmod{p} \\\\
 
 export const generateTestcase = (): Record<string, string> => {
   const base = 65537n; // Must be coprime to ALL primes in M
-  const primes_list = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n];
+  // Use the same 16-prime set as the template (M ≈ 2^53)
+  const primes_list = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n];
   let M = 1n;
   for (const p of primes_list) { M *= p; }
-  // M ≈ 2^77, Coppersmith bound ~N^0.2 for degree-1 polynomial.
-  // Use p ≈ 120 bits so k ≈ 44 bits < bound ≈ 2^48 for N ≈ 240 bits.
+  // Use p ≈ 80 bits so k ≈ 27 bits — Coppersmith finds this easily in < 1s.
   // Both p and q must be Nitros-form so that the template's remainder check passes.
-  const pBits = 120;
-  const kBits = pBits - 77; // ≈ 43
+  const pBits = 80;
+  const kBits = pBits - 53; // ≈ 27
   const kBytes = Math.ceil(kBits / 8);
   for (let attempt = 0; attempt < 5000; attempt++) {
     const i1 = BigInt(Math.floor(Math.random() * 10000));

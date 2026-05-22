@@ -63,8 +63,13 @@ print("KNOWN_PLAINTEXT=FAILED")`;
                 print(f"Using Coppersmith's method (bound = 2^{bound})...")
                 R.<x> = PolynomialRing(Zmod(n))
                 f = (prefix_int * shift + x)**e - c
-                f = f.monic()
-                roots = f.small_roots(X=shift, beta=1.0, epsilon=0.05)
+                # small_roots handles non-monic polynomials; skip monic() since Zmod(n) with composite n may have non-invertible lead coefficient
+                try:
+                    roots = f.small_roots(X=shift, beta=1.0, epsilon=0.05)
+                except Exception as ex:
+                    print(f"small_roots error: {ex}")
+                    print("KNOWN_PLAINTEXT=FAILED")
+                    return
                 if roots:
                     x = Integer(roots[0])
                     m = prefix_int * shift + x
@@ -93,7 +98,6 @@ print("KNOWN_PLAINTEXT=FAILED")`;
             print("KNOWN_PLAINTEXT=FAILED")
     except Exception as ex:
         print(f"KNOWN_PLAINTEXT=FAILED: {ex}")
-    #
 _attack()`;
   },
   proof: `\\textbf{Theorem:} Partial knowledge of the plaintext \\(m\\) enables RSA decryption via Coppersmith's method for small unknown portions.
@@ -127,7 +131,7 @@ export const generateTestcase = (): Record<string, string> => {
   const { n } = generateKeyPair(64, 64, e);
   const prefix = new TextEncoder().encode('flag{');
   const prefixInt = BigInt('0x' + Array.from(prefix).map(b => b.toString(16).padStart(2, '0')).join(''));
-  const unknownBits = 32;
+  const unknownBits = 24;
   const unknown = BigInt(Math.floor(Math.random() * 2 ** unknownBits));
   const m = (prefixInt << BigInt(unknownBits)) | unknown;
   return { n: n.toString(), e: e.toString(), c: encrypt(m, n, e).toString(), known_prefix: 'flag{', unknown_bits: unknownBits.toString() };

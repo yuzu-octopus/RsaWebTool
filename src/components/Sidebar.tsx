@@ -148,6 +148,7 @@ export function Sidebar() {
                   <ListItemButton
                     key={attack.id}
                     onClick={() => handleAttackClick(attack.id)}
+                    data-testid={`attack-${attack.id}`}
                     sx={{
                       pl: 4,
                       borderLeft: selectedAttack?.id === attack.id ? `3px solid ${draculaColors.purple}` : '3px solid transparent',

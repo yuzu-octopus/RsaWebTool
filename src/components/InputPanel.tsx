@@ -14,6 +14,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { useSageMath } from '../hooks/useSageMath';
 import { ProofRenderer } from './ProofRenderer';
 import { testcaseGenerators } from '../attacks';
+import { isActualSuccess } from '../utils/sage-output';
 
 const inputSx = {
   '& .MuiOutlinedInput-root': {
@@ -33,22 +34,6 @@ const inputSx = {
     fontFamily: "'JetBrains Mono', monospace",
   },
 };
-
-function isActualSuccess(output: string): boolean {
-  const text = output.trim();
-  // Check for explicit FAILED marker first
-  const failedIdx = text.lastIndexOf('=FAILED');
-  const successIdx = text.lastIndexOf('=SUCCESS');
-  if (failedIdx > -1 || successIdx > -1) {
-    return successIdx > failedIdx;
-  }
-  // Heuristic fallback for older attack templates without markers
-  const failureWords = ['failed', 'error', 'impossible', 'no factor found', 'could not', 'unable to'];
-  const lower = text.toLowerCase();
-  if (failureWords.some(w => lower.includes(w))) return false;
-  const successWords = ['p =', 'q =', 'factors:', 'recovered', 'found', 'decrypted'];
-  return successWords.some(w => lower.includes(w));
-}
 
 export function InputPanel() {
   const { selectedAttack, viewMode, setOutputResult, setOutputError, addToHistory } = useAppContext();
@@ -155,7 +140,7 @@ export function InputPanel() {
         }}
       >
         <Tab label="Explanation" />
-        <Tab label="Input" />
+        <Tab label="Input" data-testid="input-tab" />
       </Tabs>
 
       {/* Explanation tab - left aligned */}
@@ -205,6 +190,7 @@ export function InputPanel() {
                   fullWidth
                   variant="outlined"
                   onClick={handleGenerateTestcase}
+                  data-testid="generate-testcase"
                   sx={{
                     borderColor: draculaColors.cyan,
                     color: draculaColors.cyan,
@@ -242,7 +228,7 @@ export function InputPanel() {
                   <Stop sx={{ mr: 1 }} /> Stop
                 </Button>
                 <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                  <CircularProgress size={16} sx={{ color: draculaColors.orange }} />
+                  <CircularProgress size={16} data-testid="loading-spinner" sx={{ color: draculaColors.orange }} />
                   Running... click Stop to cancel
                 </Typography>
               </>
@@ -251,6 +237,7 @@ export function InputPanel() {
                 fullWidth
                 variant="outlined"
                 onClick={handleRun}
+                data-testid="run-attack"
                 sx={{
                   mt: 2,
                   borderColor: draculaColors.purple,

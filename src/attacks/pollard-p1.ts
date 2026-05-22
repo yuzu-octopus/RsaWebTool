@@ -52,8 +52,7 @@ export const attack: Attack = {
                 configs = [
                     (100, 1000),
                     (1000, 10000),
-                    (10000, 100000),
-                    (100000, 1000000)
+                    (10000, 50000)     # capped at 50k to avoid SageMathCell timeout
                 ]
             else:
                 configs = [(B1_orig, B2_orig)]
@@ -160,7 +159,7 @@ export const generateTestcase = (): Record<string, string> => {
     primes.sort(() => Math.random() - 0.5);
     let currentBits = 0;
     let idx = 0;
-    while (currentBits < 250 && idx < primes.length) {
+    while (currentBits < 128 && idx < primes.length) {
       pMinus1 *= primes[idx];
       currentBits += primes[idx].toString(2).length;
       idx++;
@@ -181,5 +180,5 @@ export const generateTestcase = (): Record<string, string> => {
 
   const q = randomPrime(TESTCASE_BITS.q);
   const n = p * q;
-  return { n: n.toString() };
+  return { n: n.toString(), B: '10000', B2: '0' };
 };

@@ -15,7 +15,6 @@ export const attack: Attack = {
   ],
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
-        # Validate inputs
         if not "${vals.n}".strip():
             print("ERROR: n is required")
             print("PARITY_ORACLE=FAILED")
@@ -24,7 +23,8 @@ export const attack: Attack = {
             print("ERROR: c is required")
             print("PARITY_ORACLE=FAILED")
             return
-        if not "${vals.oracle_responses}".strip():
+        responses_raw = """${vals.oracle_responses || ''}""".strip()
+        if not responses_raw:
             print("ERROR: oracle_responses is required")
             print("PARITY_ORACLE=FAILED")
             return
@@ -33,64 +33,44 @@ export const attack: Attack = {
             e_val = "${vals.e}".strip()
             e = Integer(e_val) if e_val else Integer(65537)
             c = Integer(${vals.c})
-            orig_c = Integer(${vals.c})
-            responses_str = "${vals.oracle_responses || ''}".replace(' ', '')
-            responses = [int(x) for x in responses_str.split(',') if x]
+            orig_c = c
+            responses = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
             print("Parity oracle attack on RSA")
-            print(f"n = {n}")
+            print(f"n = {n} ({n.nbits()} bits)")
             print(f"e = {e}")
-            print(f"c = {c}")
             print(f"Oracle responses: {len(responses)} bits")
             print()
-            n_bits = n.nbits()
-            if len(responses) < n_bits:
-                print(f"WARNING: Need {n_bits} responses for {n_bits}-bit modulus.")
-                print(f"Got {len(responses)}. Attack may be incomplete.")
+            if len(responses) < n.nbits():
+                print(f"WARNING: Need {n.nbits()} responses for full recovery, got {len(responses)}.")
+                print("Result may be approximate.")
                 print()
-            # Binary search using parity oracle with exact rational division
-            # NOTE: Use /2 (Rational) not //2 to avoid floor-division drift
+            # Integer binary search using parity oracle with 2^e blinding
             lower = Integer(0)
             upper = Integer(n)
-            #
             print("Binary search iterations:")
             for i, parity in enumerate(responses):
-                mid = (lower + upper) / 2  # Rational — exact midpoint
-                # Multiply ciphertext by 2^e mod n
+                mid = (lower + upper) // 2
                 c = (c * power_mod(Integer(2), e, n)) % n
                 if parity == 0:
-                    # 2m mod n is even, so 2m < n, m is in lower half
                     upper = mid
                 else:
-                    # 2m mod n is odd (since n is odd), so 2m >= n, m is in upper half
                     lower = mid
-                if i < 10 or i % 50 == 0:
-                    print(f"  Step {i+1}: parity={parity}, range bits = {(upper - lower).nbits()}")
-            #
+                if i < 5 or i % 50 == 0:
+                    remaining = n.nbits() - i - 1
+                    print(f"  Step {i+1}: parity={parity}, remaining ~ {max(0, remaining)} bits")
             print()
-            print(f"Estimated m in range [{lower}, {upper}]")
-            print(f"Range size: {upper - lower}")
-            #
-            # Scan candidates from rational interval [lower, upper)
-            from math import ceil, floor
-            for candidate in range(Integer(ceil(lower)), Integer(floor(upper)) + 1):
+            # Scan candidates from integer interval [lower, upper]
+            for candidate in range(lower, upper + 1):
                 m = Integer(candidate)
                 if power_mod(m, e, n) == orig_c:
                     print(f"FOUND! m = {m}")
-                    try:
-                        m_bytes = bytes.fromhex(hex(m)[2:] if len(hex(m)) % 2 == 0 else '0' + hex(m)[2:])
-                        print(f"m as text: {m_bytes.decode('utf-8', errors='replace')}")
-                    except:
-                        print(f"m as hex: {hex(m)}")
                     print("PARITY_ORACLE=SUCCESS")
                     break
             else:
-                print("Verification failed. Oracle responses may be inconsistent.")
                 print("PARITY_ORACLE=FAILED")
-        #
         except Exception as ex:
             print(f"ERROR: {ex}")
             print("PARITY_ORACLE=FAILED")
-        #
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("PARITY_ORACLE=FAILED")
@@ -124,17 +104,18 @@ k = \\lceil \\log_2 n \\rceil &\\implies u_k - \\ell_k < 1 \\implies m = \\ell_k
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n, e, d } = generateKeyPair(32, 32);
-  const m = BigInt(Math.floor(Math.random() * 1000000) + 42);
+  // Use small primes (12-bit) so the attack completes in SageMathCell's 35s timeout.
+  const { n, e, d } = generateKeyPair(12, 12);
+  const m = BigInt(Math.floor(Math.random() * 1000) + 42);
   const c = encrypt(m, n, e);
   const responses: string[] = [];
-  // Start from c * 2^e mod n so that responses[0] = LSB(2m mod n)
+  // Start from c so that c*2^e mod n on first iteration = encrypted(2m mod n),
   // matching the sage template which multiplies c by 2^e before each check
-  let curC = (c * modPow(2n, e, n)) % n;
-  const nBits = 32 + 32;
+  const nBits = n.toString(2).length;
+  let curC = c;
   for (let i = 0; i < nBits; i++) {
-    responses.push((modPow(curC, d, n) % 2n).toString());
     curC = (curC * modPow(2n, e, n)) % n;
+    responses.push((modPow(curC, d, n) % 2n).toString());
   }
   return { n: n.toString(), e: e.toString(), c: c.toString(), oracle_responses: responses.join(',') };
 };

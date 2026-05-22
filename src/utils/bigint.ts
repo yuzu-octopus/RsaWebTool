@@ -18,17 +18,12 @@ export function isqrt(x: bigint): bigint {
   if (x < 0n) throw new RangeError("isqrt: negative input");
   if (x < 2n) return x;
 
-  const bits = x.toString(2).length;
-  let n = 1n << BigInt(Math.floor(bits / 2));
-
-  while (true) {
-    const n1 = (n + x / n) >> 1n;
-    if (n1 >= n) break;
+  let n = x;
+  let n1 = (n + x / n) >> 1n;
+  while (n1 < n) {
     n = n1;
+    n1 = (n + x / n) >> 1n;
   }
-
-  while ((n + 1n) * (n + 1n) <= x) n++;
-  while (n * n > x) n--;
 
   return n;
 }

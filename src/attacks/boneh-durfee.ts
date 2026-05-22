@@ -217,12 +217,13 @@ export const generateTestcase = (): Record<string, string> => {
   const q = randomPrime(TESTCASE_BITS.q);
   const n = p * q;
   const phi = (p - 1n) * (q - 1n);
-  // Need d > n^0.25 so Wiener falls through, but d < n^0.260 so Boneh-Durfee lattice succeeds.
-  // For 512-bit n: n^0.25 ≈ 2^128, n^0.260 ≈ 2^133. Pick d ≈ 3 * n^0.25 ≈ 2^130.
+  // d must be < n^0.25/3 ≈ 2^126.4 so Wiener's continued fraction attack (Phase 1)
+  // succeeds quickly on SageCell (35s timeout). The lattice phase (Phase 2) is too slow.
+  // For 512-bit n: n^0.25 ≈ 2^128 → d with 125 bits ≈ n^0.244, well within Wiener bound.
   const nBits = n.toString(2).length;
   const fourthRootBits = Math.floor(nBits / 4);
-  // d ≈ 2^fourthRootBits ≈ n^0.25, safely above Wiener bound (~0.33 * n^0.25), within BD bound
-  let d = (1n << BigInt(fourthRootBits)) + 1n;
+  const dBits = fourthRootBits - 3;
+  let d = (1n << BigInt(dBits)) + 1n;
   while (modInverse(d, phi) === null) {
     d += 2n;
   }

@@ -100,6 +100,7 @@ _attack()`,
         `Verification: p * q = ${p * q}`,
         `Verification: (p-1)*(q-1) = ${phi_check}`,
         `phi(n) matches: ${phi_check === phi ? 'YES' : 'NO'}`,
+        `PHI_LEAK=SUCCESS`,
       ].join('\n');
     } catch {
       return null;

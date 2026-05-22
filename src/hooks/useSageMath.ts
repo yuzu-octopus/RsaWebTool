@@ -80,26 +80,29 @@ export function createSageMathExecutor() {
 
     return new Promise<SageResult>((resolve) => {
       let resolved = false;
+      let pollTimer: ReturnType<typeof setInterval> | null = null;
 
       const cleanup = () => {
         signal?.removeEventListener('abort', onAbort);
+        if (pollTimer) clearInterval(pollTimer);
         try { document.body.removeChild(container); } catch { /* already removed */ }
       };
 
-      const onAbort = () => {
+      const finish = (result: SageResult) => {
+        if (resolved) return;
         resolved = true;
         clearTimeout(timeout);
         observer.disconnect();
         cleanup();
-        resolve({ success: false, stdout: '', error: 'Cancelled' });
+        resolve(result);
+      };
+
+      const onAbort = () => {
+        finish({ success: false, stdout: '', error: 'Cancelled' });
       };
 
       const timeout = setTimeout(() => {
-        if (!resolved) {
-          resolved = true;
-          cleanup();
-          resolve({ success: false, stdout: '', error: `Execution timed out after ${timeoutMs / 1000}s` });
-        }
+        finish({ success: false, stdout: '', error: `Execution timed out after ${timeoutMs / 1000}s` });
       }, timeoutMs);
 
       const observer = new MutationObserver(() => {
@@ -107,20 +110,31 @@ export function createSageMathExecutor() {
         const stdoutDiv = container.querySelector('.sagecell_stdout');
         if (!stdoutDiv) return;
 
-        setTimeout(() => {
+        // Start polling stdout for completion markers (once)
+        if (pollTimer) return;
+        pollTimer = setInterval(() => {
           if (resolved) return;
           const text = stdoutDiv.textContent || '';
           if (!text.trim()) return;
 
-          resolved = true;
-          clearTimeout(timeout);
-          observer.disconnect();
-          cleanup();
-          resolve({ success: true, stdout: text.trim() });
-        }, 500);
+          // Detect completion markers
+          if (text.includes('=SUCCESS') || text.includes('=FAILED')) {
+            finish({ success: true, stdout: text.trim() });
+            return;
+          }
+        }, 200);
+
+        // Fallback: if no markers after 30s, capture whatever output exists
+        setTimeout(() => {
+          if (resolved) return;
+          const text = stdoutDiv.textContent || '';
+          if (text.trim()) {
+            finish({ success: true, stdout: text.trim() });
+          }
+        }, 30000);
       });
 
-      observer.observe(container, { childList: true, subtree: true });
+      observer.observe(container, { childList: true, subtree: true, characterData: true });
 
       signal?.addEventListener('abort', onAbort, { once: true });
 
@@ -136,12 +150,11 @@ export function createSageMathExecutor() {
         });
       } catch (err: unknown) {
         if (!resolved) {
-          resolved = true;
           clearTimeout(timeout);
           observer.disconnect();
-          cleanup();
+          if (pollTimer) clearInterval(pollTimer);
           const message = err instanceof Error ? err.message : 'Failed to execute Sage code';
-          resolve({ success: false, stdout: '', error: message });
+          finish({ success: false, stdout: '', error: message });
         }
       }
     });

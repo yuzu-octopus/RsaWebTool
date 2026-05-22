@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
+import { generateKeyPair } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'partial-pq-bits',
@@ -26,24 +26,43 @@ export const attack: Attack = {
                 if k <= 0:
                     print("PARTIAL_PQ_BITS=FAILED: not enough unknown bits for Coppersmith")
                 else:
-                    R.<x> = PolynomialRing(Zmod(n))
-                    f = (knownBits << k) + x
-                    bound = 2**k
-                    print(f"Using bound X = {bound}")
-                    roots = f.small_roots(X=bound, beta=0.5)
-                    if roots:
-                        p = Integer((knownBits << k) + roots[0])
-                        if n % p == 0:
-                            q = n // p
-                            print(f"Verification: p * q = {p * q}")
-                            if p * q == n:
-                                print(f"PARTIAL_PQ_BITS=SUCCESS")
-                                print(f"p={p}")
-                                print(f"q={q}")
-                            else:
-                                print("PARTIAL_PQ_BITS=FAILED: verification mismatch")
-                        else:
-                            print("PARTIAL_PQ_BITS=FAILED: recovered p does not divide n")
+                    # Manual Coppersmith lattice for degree-1, checking ALL LLL rows.
+                    # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
+                    x = ZZ['x'].gen()
+                    f_ZZ = (knownBits << k) + x
+                    X = Integer(n).nth_root(4, truncate_mode=True)[0] + 1
+                    m = 5; t = 5; dim = m + t
+                    shifts = []
+                    for i in range(m):
+                        shifts.append(n^(m - i) * f_ZZ^i)
+                    for kk in range(t):
+                        shifts.append(f_ZZ^m * x^kk)
+                    M = matrix(ZZ, dim, dim)
+                    for i, shift in enumerate(shifts):
+                        for j, c in enumerate(shift.list()):
+                            M[i, j] = c * X^j
+                    B = M.LLL()
+                    found_p = None
+                    for row_idx in range(dim):
+                        row = B[row_idx]
+                        a0 = Integer(row[0]); a1 = Integer(row[1])
+                        if a1 == 0:
+                            continue
+                        r_approx = -QQ(a0) * QQ(X) / QQ(a1)
+                        for delta in range(-2, 3):
+                            r = Integer(floor(r_approx)) + delta
+                            if abs(r) < X:
+                                candidate = Integer((knownBits << k) + r)
+                                if n % candidate == 0:
+                                    found_p = candidate
+                                    break
+                        if found_p:
+                            break
+                    if found_p:
+                        q = n // found_p
+                        print(f"PARTIAL_PQ_BITS=SUCCESS")
+                        print(f"p={found_p}")
+                        print(f"q={q}")
                     else:
                         print("PARTIAL_PQ_BITS=FAILED: no roots found")
             elif bitPosition == "lsb":
@@ -51,25 +70,43 @@ export const attack: Attack = {
                 if m <= 0:
                     print("PARTIAL_PQ_BITS=FAILED: knownBits is zero")
                 else:
-                    R.<x> = PolynomialRing(Zmod(n))
-                    f = x * (2**m) + knownBits
-                    f = f.monic()
-                    bound = 2**(n.nbits() // 2 - m)
-                    print(f"Using bound X = {bound}")
-                    roots = f.small_roots(X=bound, beta=0.5)
-                    if roots:
-                        p = Integer(roots[0] * (2**m) + knownBits)
-                        if n % p == 0:
-                            q = n // p
-                            print(f"Verification: p * q = {p * q}")
-                            if p * q == n:
-                                print(f"PARTIAL_PQ_BITS=SUCCESS")
-                                print(f"p={p}")
-                                print(f"q={q}")
-                            else:
-                                print("PARTIAL_PQ_BITS=FAILED: verification mismatch")
-                        else:
-                            print("PARTIAL_PQ_BITS=FAILED: recovered p does not divide n")
+                    # Manual Coppersmith lattice for degree-1, checking ALL LLL rows.
+                    # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
+                    x = ZZ['x'].gen()
+                    f_ZZ = (2**m) * x + knownBits
+                    X = Integer(n).nth_root(4, truncate_mode=True)[0] + 1
+                    mm = 5; tt = 5; dim = mm + tt
+                    shifts = []
+                    for i in range(mm):
+                        shifts.append(n^(mm - i) * f_ZZ^i)
+                    for kk in range(tt):
+                        shifts.append(f_ZZ^mm * x^kk)
+                    M = matrix(ZZ, dim, dim)
+                    for i, shift in enumerate(shifts):
+                        for j, c in enumerate(shift.list()):
+                            M[i, j] = c * X^j
+                    B = M.LLL()
+                    found_p = None
+                    for row_idx in range(dim):
+                        row = B[row_idx]
+                        a0 = Integer(row[0]); a1 = Integer(row[1])
+                        if a1 == 0:
+                            continue
+                        r_approx = -QQ(a0) * QQ(X) / QQ(a1)
+                        for delta in range(-2, 3):
+                            r = Integer(floor(r_approx)) + delta
+                            if abs(r) < X:
+                                candidate = Integer(r * (2**m) + knownBits)
+                                if n % candidate == 0:
+                                    found_p = candidate
+                                    break
+                        if found_p:
+                            break
+                    if found_p:
+                        q = n // found_p
+                        print(f"PARTIAL_PQ_BITS=SUCCESS")
+                        print(f"p={found_p}")
+                        print(f"q={q}")
                     else:
                         print("PARTIAL_PQ_BITS=FAILED: no roots found")
         except Exception as ex:
@@ -106,10 +143,10 @@ p &= f(x_0), \\quad q = n / p \\qed
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { p, n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+  const { p, n } = generateKeyPair(192, 192);
   const bitLen = p.toString(2).length;
-  // Keep 60% of MSBs — enough for Coppersmith (needs > 50%)
-  const keepBits = Math.ceil(bitLen * 0.6);
+  // Keep ≥ 86% of bits for degree-2 lattice (needs unknown < n^0.075 ≈ 2^28)
+  const keepBits = Math.ceil(bitLen * 0.9);
   const knownBits = p >> BigInt(bitLen - keepBits);
   return { n: n.toString(), knownBits: knownBits.toString(), bitPosition: 'msb' };
 };

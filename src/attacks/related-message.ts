@@ -37,17 +37,38 @@ export const attack: Attack = {
             print(f"c2 = (a*m + b)^e mod n = {c2}")
             print(f"a = {a}, b = {b}")
             print()
+            # Custom GCD for polynomials over Zmod(n) with composite n
+            # Sage's built-in gcd() fails for non-prime modulus.
+            # Avoid monic() since leading coeff may not be invertible
+            # in Zmod(n) for composite n — just return the raw gcd.
+            def poly_gcd(p, q):
+                while q != 0:
+                    p, q = q, p % q
+                return p
             # f1(x) = x^e - c1, f2(x) = (a*x + b)^e - c2
             # Both share root x = m over Zmod(n)
             # gcd(f1, f2) = (x - m) -> m = -constant / leading_coeff
             R.<x> = PolynomialRing(Zmod(n))
             f1 = x**e - c1
             f2 = (a * x + b)**e - c2
-            g = f1.gcd(f2)
+            g = poly_gcd(f1, f2)
             print(f"GCD degree: {g.degree()}")
             if g.degree() == 1:
-                # g(x) = g[1]*x + g[0] -> m = -g[0] / g[1] in Zmod(n)
-                m_int = Integer(-g[0] / g[1])
+                # g(x) = a*x + b over Zmod(n); root m = -b * a^(-1) mod n
+                a_coeff = Integer(g[1])
+                b_coeff = Integer(g[0])
+                try:
+                    m_int = Integer((-b_coeff) * inverse_mod(a_coeff, n) % n)
+                except (ZeroDivisionError, ValueError):
+                    # Leading coeff not invertible — try all candidates
+                    m_int = None
+                    for r, _ in g.roots():
+                        m_int = Integer(r)
+                        break
+                if m_int is None:
+                    print("Could not extract root from degree-1 GCD.")
+                    print("RELATED_MESSAGE=FAILED")
+                    return
                 print(f"Recovered m = {m_int}")
                 v1 = power_mod(m_int, e, n)
                 v2 = power_mod(Integer(a * m_int + b), e, n)

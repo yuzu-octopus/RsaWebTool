@@ -97,6 +97,7 @@ p &= \\gcd(\\text{leak} - a, n) \\qed
           `q = ${q}`,
           `Verification: p * q = ${p * q}`,
           `Verification: a^p mod n = ${modPow(a, p, n)} == leak? ${modPow(a, p, n) === leak}`,
+        `IMPLICIT_KEY_EXPOSURE=SUCCESS`,
         ].join('\n');
       }
       return null;

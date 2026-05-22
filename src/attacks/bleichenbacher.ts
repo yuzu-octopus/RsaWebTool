@@ -27,7 +27,8 @@ export const attack: Attack = {
             print("ERROR: c is required")
             print("BLEICHENBACHER=FAILED")
             return
-        if not "${vals.oracle_responses}".strip():
+        responses_raw = """${vals.oracle_responses || ''}""".strip()
+        if not responses_raw:
             print("ERROR: oracle_responses is required")
             print("BLEICHENBACHER=FAILED")
             return
@@ -36,9 +37,7 @@ export const attack: Attack = {
             e = Integer(${vals.e})
             c = Integer(${vals.c})
             orig_c = Integer(${vals.c})
-            # Parse oracle responses
-            responses_str = """${vals.oracle_responses}""".strip()
-            oracle_bits = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
+            oracle_bits = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
             print(f"Bleichenbacher PKCS#1 v1.5 Attack")
             print(f"n = {n} ({n.nbits()} bits)")
             print(f"e = {e}")
@@ -164,23 +163,29 @@ M_i &= \\bigcup_r \\left[ \\left\\lceil \\frac{2B + r n}{s_i} \\right\\rceil, \\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n, e } = generateKeyPair(64, 64);
+  // Use small primes (10-bit → n ≈ 20 bits) so the oracle response array stays small
+  // and the template converges within SageMathCell's 35s timeout.
+  // B = 2^(8*(k-2)) where k = ceil(nbits/8). For n≈20 bits: k=3, B=256.
+  const { n, e } = generateKeyPair(10, 10);
   const k = Math.ceil(n.toString(2).length / 8);
   const B = 256n ** BigInt(k - 2);
   const lower = 2n * B;
   const upper = 3n * B;
   const range = upper - lower;
-  const m = lower + (BigInt(Math.floor(Math.random() * 1000000)) * (range / 1000000n));
+  const m = lower + BigInt(Math.floor(Math.random() * Number(range)));
   const c = encrypt(m, n, e);
 
   // Compute valid s positions: m*s mod n ∈ [2B, 3B)
   // For wrapping round r: s ∈ [ceil((r·n+2B)/m), floor((r·n+3B-1)/m)]
-  // Use maxS = 2^18 = 1048576 to get ~4 valid responses
-  const maxS = 1048576;
+  // maxS=8192 gives ~16KB response string, enough for 5-10 valid s values
+  const maxS = 8192;
   const validPositions = new Set<number>();
   validPositions.add(1); // s=1 always valid
 
-  for (let r = 1; r <= 8; r++) {
+  const sStep = Number(n / m) || 256;
+  const maxR = Math.min(maxS, Math.floor(maxS / Math.max(1, sStep)) + 10);
+
+  for (let r = 1; r <= maxR; r++) {
     const rBig = BigInt(r);
     const sMin = Number((rBig * n + lower + m - 1n) / m);
     const sMax = Number((rBig * n + upper - 1n) / m);

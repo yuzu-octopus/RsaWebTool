@@ -65,13 +65,19 @@ export const attack: Attack = {
                 Po = sqrtD
                 P = Po
                 Q = D - Po**2
+                if Q <= 0:
+                    return None
                 Qprev = 1
                 # Step 1: forward cycle — find a square form
-                limit = 2 * isqrt(isqrt(n)) + 2
+                limit = 2 * isqrt(isqrt(n)) + 10
                 for i in range(limit):
+                    if Q == 0:
+                        break
                     b = (sqrtD + P) // Q
                     Pnew = b * Q - P
                     Qnew = D - Pnew**2
+                    if Qnew <= 0:
+                        break
                     Qnew //= Q
                     if i % 2 == 0 and Qnew.is_square() and Qnew > 0:
                         r = isqrt(Qnew)
@@ -83,6 +89,8 @@ export const attack: Attack = {
                             Q = (D - P**2) // Qprev
                             # Step 3: reverse cycle — find symmetry
                             for _ in range(limit):
+                                if Q == 0:
+                                    break
                                 b = (sqrtD + P) // Q
                                 P_old = P
                                 P = b * Q - P

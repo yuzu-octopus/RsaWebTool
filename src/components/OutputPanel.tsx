@@ -165,7 +165,7 @@ export function OutputPanel({ width, onWidthChange }: { width: number; onWidthCh
 
         {outputResult && (
           <>
-            <Box sx={{
+            <Box data-testid="output-result" sx={{
               maxHeight: '50vh',
               overflow: 'auto',
               borderRadius: 1,
@@ -228,7 +228,7 @@ export function OutputPanel({ width, onWidthChange }: { width: number; onWidthCh
         )}
 
         {outputError && (
-          <Typography sx={{ color: draculaColors.red, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem', whiteSpace: 'pre-wrap' }}>
+          <Typography data-testid="output-error" sx={{ color: draculaColors.red, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem', whiteSpace: 'pre-wrap' }}>
             {outputError}
           </Typography>
         )}

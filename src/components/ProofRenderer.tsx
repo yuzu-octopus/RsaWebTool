@@ -94,7 +94,7 @@ function parseTextBlock(text: string): ProofSegment[] {
  */
 function autoWrapMathInParagraph(text: string): string {
   // Split by existing math blocks to avoid double wrapping
-  const parts = text.split(/(\$[^\$]+\$|\\\(.*?[^\\]\\\))/);
+  const parts = text.split(/([$][^$]+[$]|\\\(.*?[^\\]\\\))/);
   
   for (let i = 0; i < parts.length; i++) {
     if (i % 2 === 1) continue; // Already math
@@ -111,7 +111,7 @@ function autoWrapMathInParagraph(text: string): string {
       const t = token.trim();
       if (!t) return false;
       
-      if (t.includes('\\') || t.includes('_') || t.includes('^') || /[=<>+\-*\/|~]/.test(t)) {
+      if (t.includes('\\') || t.includes('_') || t.includes('^') || /[=<>+\-*|~]/.test(t) || t.includes('/')) {
         return true;
       }
       
@@ -128,7 +128,7 @@ function autoWrapMathInParagraph(text: string): string {
         return true;
       }
       
-      if (/^[()\[\]\{\}]+$/.test(t)) {
+      if (new RegExp('^[()\\[\\]{}]+$').test(t)) {
         return true;
       }
       
@@ -140,7 +140,7 @@ function autoWrapMathInParagraph(text: string): string {
         return false;
       }
       
-      if (/^[a-zA-Z0-9()\[\]\{\},.:;!+=<>\-*\/|\\_]+$/.test(t)) {
+      if (/^[\]a-zA-Z0-9()[{},.:;!+=<>*/|\\_-]+$/.test(t)) {
         return /[^a-zA-Z]/.test(t);
       }
       
@@ -149,7 +149,7 @@ function autoWrapMathInParagraph(text: string): string {
     
     const hasStrongMathIndicator = (segment: string[]): boolean => {
       const combined = segment.join('');
-      return combined.includes('\\') || combined.includes('_') || combined.includes('^') || /[=<>+\-*\/|]/.test(combined);
+      return combined.includes('\\') || combined.includes('_') || combined.includes('^') || /[=<>+\-*/|]/.test(combined);
     };
     
     const flushMath = () => {

@@ -97,7 +97,7 @@ export const attack: Attack = {
             if found_m is None:
                 # Fallback: wider scan around midpoint estimate (noisy oracle may have wrong bits)
                 mid_est = Integer(floor((lower + upper) / 2))
-                for m_candidate in range(max(0, mid_est - 20), mid_est + 21):
+                for m_candidate in range(max(0, mid_est - 500), mid_est + 501):
                     m_test = Integer(m_candidate)
                     if power_mod(m_test, e, n) == orig_c:
                         found_m = m_test
@@ -158,14 +158,14 @@ export const generateTestcase = (): Record<string, string> => {
     .map(b => b.toString(16).padStart(2, '0')).join('')) % (n / 2n);
   const c = encrypt(m, n, e);
   const runs: string[] = [];
-  const numRuns = 21;
+  const numRuns = 31;
   for (let run = 0; run < numRuns; run++) {
     const bits: string[] = [];
     let curC = (c * modPow(2n, e, n)) % n;
     for (let i = 0; i < nBits; i++) {
       const dec = modPow(curC, d, n);
       const trueBit = (dec % 2n).toString();
-      const noisy = Math.random() < 0.75 ? trueBit : (trueBit === '0' ? '1' : '0');
+      const noisy = Math.random() < 0.90 ? trueBit : (trueBit === '0' ? '1' : '0');
       bits.push(noisy);
       curC = (curC * modPow(2n, e, n)) % n;
     }

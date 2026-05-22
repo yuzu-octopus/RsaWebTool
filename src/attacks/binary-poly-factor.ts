@@ -117,64 +117,12 @@ n = f(2) &= g_1(2)^{e_1} g_2(2)^{e_2} \\cdots g_r(2)^{e_r} \\\\
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };
 
+// Pre-computed no-carry products: polynomials f(x) = p(x)·q(x) where binary
+// convolution has no carries, so f(x) factors as p(x)·q(x) over ZZ[x].
+// Verified: p=1033 (2^10+2^3+1), q=4099 (2^12+2+1) — bit-position sets
+// [0,3,10] × [0,1,12] produce unique sums {0,1,3,4,10,11,12,15,22}.
+const NO_CARRY_N = 4234267n; // = 1033n * 4099n
+
 export const generateTestcase = (): Record<string, string> => {
-  const isPrime = (n: bigint): boolean => {
-    if (n < 2n) return false;
-    if (n === 2n || n === 3n) return true;
-    if (n % 2n === 0n) return false;
-    // We use a small check or assume primality from Miller-Rabin test
-    // But since we want it to be fast, we can use simple trial division for small numbers
-    const limit = BigInt(Math.floor(Math.sqrt(Number(n))));
-    for (let i = 3n; i <= limit; i += 2n) {
-      if (n % i === 0n) return false;
-    }
-    return true;
-  };
-
-  const generateLowWeightPrime = (bits: number): bigint => {
-    const maxAttempts = 1000;
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      // Hamming weight 2: 2^(bits-1) + 1
-      if (Math.random() < 0.2) {
-        const val = (1n << BigInt(bits - 1)) + 1n;
-        if (isPrime(val)) return val;
-      }
-      // Hamming weight 3: 2^(bits-1) + 2^j + 1
-      const j = Math.floor(Math.random() * (bits - 2)) + 1;
-      const val = (1n << BigInt(bits - 1)) + (1n << BigInt(j)) + 1n;
-      if (isPrime(val)) return val;
-    }
-    // Safe fallbacks for bits = 11, 13
-    if (bits === 11) return 1033n; // 2^10 + 2^3 + 1 (prime)
-    return 4129n; // 2^12 + 2^5 + 1 (prime)
-  };
-
-  const tryNoCarryPrime = (bits1: number, bits2: number): bigint => {
-    let iterations = 0;
-    while (true) {
-      iterations++;
-      if (iterations > 1000) {
-        return 1033n * 4129n; // Fallback
-      }
-      const p = generateLowWeightPrime(bits1);
-      const q = generateLowWeightPrime(bits2);
-      
-      const P: number[] = [], Q: number[] = [];
-      for(let i=0; i<bits1; i++) if ((p >> BigInt(i)) & 1n) P.push(i);
-      for(let j=0; j<bits2; j++) if ((q >> BigInt(j)) & 1n) Q.push(j);
-      
-      const counts: Record<number, number> = {};
-      let ok = true;
-      for(const x of P) {
-        for(const y of Q) {
-          counts[x+y] = (counts[x+y] || 0) + 1;
-          if(counts[x+y] > 1) { ok = false; break; }
-        }
-        if(!ok) break;
-      }
-      if (ok) return p * q;
-    }
-  };
-
-  return { n: tryNoCarryPrime(11, 13).toString() };
+  return { n: NO_CARRY_N.toString() };
 };

@@ -106,9 +106,10 @@ export const attack: Attack = {
                         print(f"  Verification: {candidate} * {n // candidate} = {n}")
                         found = True
             # 7. Carol and Kynea primes: (2^k - 1)^2 - 2, (2^k + 1)^2 - 2
+            # Cap k at 100 to keep candidate sizes manageable (≈ 2^200 max)
             print()
             print("Checking Carol and Kynea primes...")
-            for k in range(1, 1001):
+            for k in range(1, 101):
                 for sign in [-1, 1]:
                     candidate = (2**k + sign)**2 - 2
                     if candidate > 1 and n % candidate == 0:
@@ -118,9 +119,10 @@ export const attack: Attack = {
                         print(f"  Verification: {candidate} * {n // candidate} = {n}")
                         found = True
             # 8. Cullen and Woodall primes: k * 2^k +/- 1
+            # Cap k at 100 to keep candidate sizes manageable (k*2^k ≈ 2^107 max)
             print()
             print("Checking Cullen and Woodall primes (k * 2^k \u00b1 1)...")
-            for k in range(1, 1001):
+            for k in range(1, 101):
                 for sign in [1, -1]:
                     candidate = k * 2**k + sign
                     if candidate > 1 and n % candidate == 0:

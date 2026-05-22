@@ -78,9 +78,10 @@ export const attack: Attack = {
                 # p <= sqrt(n), so k <= sqrt(n)/M
                 bound = ceil(sqrt(n) / M)
                 print(f"Searching for k with bound ~{bound}")
-                # Use Sage's small_roots
+                # Use Sage's small_roots (polynomial must be monic)
                 f_mod = f.change_ring(Zmod(n))
-                roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=0.05)
+                f_monic = f_mod.monic()
+                roots = f_monic.small_roots(X=bound, beta=0.5, epsilon=0.05)
                 if roots:
                     k = int(roots[0])
                     p = int(M * k + r)

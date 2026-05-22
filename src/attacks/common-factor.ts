@@ -81,6 +81,7 @@ _attack()`;
         `p = ${p}`,
         `q = ${q}`,
         `Verification: p * q = ${p * q}`,
+        `COMMON_FACTOR=SUCCESS`,
       ].join('\n');
     } catch {
       return null;

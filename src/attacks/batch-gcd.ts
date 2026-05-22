@@ -114,6 +114,7 @@ _attack()`,
       }
 
       lines.push('Batch GCD complete.');
+      lines.push('BATCH_GCD=SUCCESS');
       return lines.join('\n');
     } catch {
       return null;

@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
+import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 
 export const attack: Attack = {
@@ -29,20 +29,18 @@ export const attack: Attack = {
             print("ERROR: c is required")
             print("MANGER=FAILED")
             return
-        if not "${vals.oracle_responses}".strip():
+        responses_raw = """${vals.oracle_responses || ''}""".strip()
+        if not responses_raw:
             print("ERROR: oracle_responses is required")
             print("MANGER=FAILED")
             return
-        #
         try:
             n = Integer(${vals.n})
             e = Integer(${vals.e})
             c = Integer(${vals.c})
-            orig_c = Integer(${vals.c})
-        #
+            orig_c = c
             # Parse oracle responses into a list
-            responses_str = """${vals.oracle_responses}""".strip()
-            oracle_list = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
+            oracle_list = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
             oracle_idx = [0]
         #
             def oracle(query_c):
@@ -184,7 +182,8 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r + 1)}{256s} \\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n, e, d } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
+  // Use small primes (12-bit → n ≈ 24 bits) so the attack completes in SageMathCell's 35s timeout.
+  const { n, e, d } = generateKeyPair(12, 12);
   // k = byte length, B = 2^(8*(k-1))
   const k = Math.ceil(Number(n.toString(2).length) / 8);
   const B = BigInt(2) ** BigInt(8 * (k - 1));

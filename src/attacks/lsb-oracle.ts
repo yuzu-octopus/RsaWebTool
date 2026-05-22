@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
+import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 
 export const attack: Attack = {
@@ -24,7 +24,8 @@ export const attack: Attack = {
             print("ERROR: c is required")
             print("LSB_ORACLE=FAILED")
             return
-        if not """${vals.oracle_responses || ''}""".strip():
+        responses_raw = """${vals.oracle_responses || ''}""".strip()
+        if not responses_raw:
             print("ERROR: oracle_responses is required")
             print("LSB_ORACLE=FAILED")
             return
@@ -33,50 +34,37 @@ export const attack: Attack = {
             e_val = "${vals.e}".strip()
             e = Integer(e_val) if e_val else Integer(65537)
             c = Integer(${vals.c})
-            orig_c = Integer(${vals.c})
-            # Parse oracle responses (LSB of each blinded query)
-            responses_str = """${vals.oracle_responses || ''}""".strip()
-            oracle_bits = [int(x.strip()) for x in responses_str.split(',') if x.strip()]
+            orig_c = c
+            oracle_bits = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
             print("LSB Oracle Attack on RSA")
-            print(f"n = {n}")
+            print(f"n = {n} ({n.nbits()} bits)")
             print(f"e = {e}")
-            print(f"c = {c}")
             print(f"Oracle responses: {len(oracle_bits)} bits")
             print()
-            n_bits = n.nbits()
-            if len(oracle_bits) < n_bits:
-                print(f"WARNING: Need {n_bits} responses for {n_bits}-bit modulus.")
-                print(f"Got {len(oracle_bits)}. Attack may be incomplete.")
+            if len(oracle_bits) < n.nbits():
+                print(f"WARNING: Need {n.nbits()} responses for full recovery, got {len(oracle_bits)}.")
+                print("Result may be approximate.")
                 print()
-            # Binary search using LSB oracle with 2^e blinding
-            # LSB(2m mod n) = 1 iff 2m >= n (since n is odd) iff m >= current midpoint
-            # NOTE: Use /2 (Rational) not //2 to avoid floor-division drift
+            # Integer binary search using LSB oracle with 2^e blinding
+            # LSB(2*m mod n) = 1 iff 2*m >= n (since n is odd) iff m >= current midpoint
             lower = Integer(0)
             upper = Integer(n)
-            print("Binary search iterations:")
             for i, bit in enumerate(oracle_bits):
-                mid = (lower + upper) / 2  # Rational — exact midpoint
-                # Blind ciphertext: c = c * 2^e mod n, so oracle returns LSB(2m mod n)
+                mid = (lower + upper) // 2
                 c = (c * power_mod(Integer(2), e, n)) % n
                 if bit == 0:
-                    # LSB = 0: 2m mod n is even, so 2m < n => m in lower half
                     upper = mid
                 else:
-                    # LSB = 1: 2m mod n is odd, so 2m >= n => m in upper half
                     lower = mid
-                if i < 10 or i % 50 == 0:
+                if i < 5 or i % 50 == 0:
                     remaining = n.nbits() - i - 1
-                    print(f"  Step {i+1}: LSB={bit}, remaining ≈ {remaining} bits")
+                    print(f"  Step {i+1}: LSB={bit}, remaining ~ {max(0, remaining)} bits")
             print()
-            # Scan exact candidates from rational interval [lower, upper)
-            from math import ceil, floor
-            for m_candidate in range(Integer(ceil(lower)), Integer(floor(upper)) + 1):
+            # Scan exact candidates from integer interval [lower, upper]
+            for m_candidate in range(lower, upper + 1):
                 m = Integer(m_candidate)
                 if power_mod(m, e, n) == orig_c:
                     print(f"Recovered message: m = {m}")
-                    v = power_mod(m, e, n)
-                    print(f"Verification: m^e mod n = {v}")
-                    print(f"Original c = {orig_c}")
                     print("LSB_ORACLE=SUCCESS")
                     break
             else:
@@ -84,7 +72,6 @@ export const attack: Attack = {
         except Exception as ex:
             print(f"ERROR: {ex}")
             print("LSB_ORACLE=FAILED")
-        #
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("LSB_ORACLE=FAILED")
@@ -126,15 +113,17 @@ m &= \\ell_k \\qed
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n, e, d } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
-  const m = BigInt(Math.floor(Math.random() * 1000000) + 42);
+  // Use small primes (12-bit) so the attack completes in SageMathCell's 35s timeout.
+  // 12+12=24 bits → 24 oracle iterations with integer arithmetic, sub-second execution.
+  const { n, e, d } = generateKeyPair(12, 12);
+  const m = BigInt(Math.floor(Math.random() * 1000) + 42);
   const c = encrypt(m, n, e);
   const responses: string[] = [];
   // Simulate LSB oracle: at each step, blind curC by 2^e and check LSB of decrypted value
   // LSB(2*m mod n) = 1 iff 2*m >= n (since n is odd) iff m >= mid
   let lower = 0n, upper = n;
   let curC = c;
-  const nBits = TESTCASE_BITS.p + TESTCASE_BITS.q;
+  const nBits = n.toString(2).length;
   for (let i = 0; i < nBits; i++) {
     const mid = (lower + upper) / 2n;
     // Blind: curC = curC * 2^e mod n
