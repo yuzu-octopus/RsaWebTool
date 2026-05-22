@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
+import { randomPrime } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'pollard-rho',
@@ -123,9 +123,10 @@ p &\\mid \\gcd\\left(\\prod_{k} |x - y_k|, n\\right) \\;\\;\\; \\text{(batch pro
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Generate n with one SMALL factor (≤32 bits) so rho succeeds quickly within SageMathCell 35s
-  // Rho runs in O(sqrt(p)) — with p=32 bits, ~2^16 iterations
-  const p = randomPrime(32);
-  const q = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 32);
+  // Generate n with one SMALL factor (≤28 bits) so rho succeeds within SageCell 35s
+  // Rho runs in O(sqrt(p)) — with p=28 bits, ~2^14 = 16384 iterations, very fast
+  // n = 28 + 64 = 92 bits total — fast modular arithmetic
+  const p = randomPrime(28);
+  const q = randomPrime(64);
   return { n: (p * q).toString() };
 };

@@ -1,5 +1,4 @@
 import type { Attack } from '../types';
-import { randomPrime } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 import { generateKeyPair } from '../utils/testcases/core';
 
@@ -37,12 +36,17 @@ export const attack: Attack = {
             print(f"n = {n}")
             print()
             # Try small M values (M_3, M_5, M_7, ...)
-            primes_list = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53]
-            found = False
-            r1 = 0
-            for num_primes in range(1, len(primes_list) + 1):
+            # Skip M=2,6,30 (num_primes <= 3) — they trivially match all odd n
+            # and give too small M for Coppersmith to work.
+            # We find the largest matching M for the best bound.
+            # Must match testcase generator (up to 61 = 18 primes, M ≈ 2^77)
+            primes_list = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61]
+            best_M = None
+            best_r = 0
+            best_num = 0
+            for num_primes in range(4, len(primes_list) + 1):
                 M = prod(primes_list[:num_primes])
-                if M > 2**80:
+                if M > 2**96:
                     break
                 # Compute possible remainders: 65537^i mod M
                 ord_val = Mod(65537, M).multiplicative_order()
@@ -58,11 +62,14 @@ export const attack: Attack = {
                         print(f"M = {M}")
                         print(f"n mod M = {n_mod}")
                         print(f"Found compatible remainders: r1 = {r}")
-                        found = True
-                        r1 = r
-                        break
-                if found:
-                    break
+                        best_M = M
+                        best_r = r
+                        best_num = num_primes
+                        break  # found a match for this M, continue to larger M
+            if best_M is not None:
+                found = True
+                r1 = best_r
+                M = best_M
             if found:
                 print()
                 print("VULNERABLE: n appears to use ROCA-generated primes.")
@@ -142,22 +149,30 @@ export const generateTestcase = (): Record<string, string> => {
   const primes_list = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n];
   let M = 1n;
   for (const p of primes_list) { M *= p; }
-  // M ≈ 2^77, p should be ~256 bits → k needs ~179 bits
+  // M ≈ 2^77. Both primes generated with ROCA form so n mod M is always
+  // a valid remainder product — detection is deterministic.
   const kBits = 10;
   for (let attempt = 0; attempt < 5000; attempt++) {
-    const i = BigInt(Math.floor(Math.random() * 10000));
-    const r = modPow(65537n, i, M);
-    // Generate random k of appropriate bit size
+    const i1 = BigInt(Math.floor(Math.random() * 10000));
+    const i2 = BigInt(Math.floor(Math.random() * 10000));
+    const r1 = modPow(65537n, i1, M);
+    const r2 = modPow(65537n, i2, M);
+    // Generate random ks of appropriate bit size
     const kBytes = Math.ceil(kBits / 8);
-    const bytes = new Uint8Array(kBytes);
-    crypto.getRandomValues(bytes);
-    let k = 0n;
-    for (let j = 0; j < kBytes; j++) { k = (k << 8n) | BigInt(bytes[j]); }
-    k |= (1n << BigInt(kBits - 1)); // set top bit
-    k |= 1n; // ensure odd
-    const p = k * M + r;
-    if ((p)) {
-      const q = randomPrime(64);
+    const bytes1 = new Uint8Array(kBytes);
+    const bytes2 = new Uint8Array(kBytes);
+    crypto.getRandomValues(bytes1);
+    crypto.getRandomValues(bytes2);
+    let k1 = 0n, k2 = 0n;
+    for (let j = 0; j < kBytes; j++) {
+      k1 = (k1 << 8n) | BigInt(bytes1[j]);
+      k2 = (k2 << 8n) | BigInt(bytes2[j]);
+    }
+    k1 |= (1n << BigInt(kBits - 1)) | 1n; // top bit + odd
+    k2 |= (1n << BigInt(kBits - 1)) | 1n;
+    const p = k1 * M + r1;
+    const q = k2 * M + r2;
+    if (p > 1 && q > 1 && p !== q) {
       return { n: (p * q).toString() };
     }
   }

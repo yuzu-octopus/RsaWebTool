@@ -87,8 +87,11 @@ export const attack: Attack = {
         #
         def williams_p1_stage(n, B1, B2, P):
             M = 1
-            for i in range(2, B1 + 1):
-                M = lcm(M, i)
+            for p in prime_range(B1 + 1):
+                pp = p
+                while pp * p <= B1:
+                    pp *= p
+                M *= pp
             VM = lucas_V(M, P, n)
             g = gcd(VM - 2, n)
             if 1 < g < n:

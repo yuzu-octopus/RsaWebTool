@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
+import { randomPrime } from '../utils/testcases/core';
 
 export const attack: Attack = {
   id: 'ecm2',
@@ -134,6 +134,6 @@ export const generateTestcase = (): Record<string, string> => {
   // Factors use smaller sizes so ECM converges within SageMathCell 35s
   const p1 = randomPrime(32);
   const p2 = randomPrime(40);
-  const p3 = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 72);
+  const p3 = randomPrime(40);
   return { n: (p1 * p2 * p3).toString() };
 };

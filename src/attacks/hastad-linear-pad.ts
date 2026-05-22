@@ -74,14 +74,73 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                 print("HASTAD_LINEAR_PAD=FAILED")
                 return
             # Coppersmith: find small root m < N^(1/e)
-            roots = F.small_roots(beta=1.0, epsilon=0.05)
-            if roots:
-                m = roots[0]
-                print(f"Recovered message: m = {m}")
-                # Verify against all triples
+            # Wrapped in try/except: small_roots over Zmod(N) may throw
+            # for composite N under SageMathCell (Rosetta emulation bug).
+            # On failure, fall through to brute-force fallback.
+            found_m = None
+            try:
+                roots = F.small_roots(beta=1.0, epsilon=0.05)
+                if roots:
+                    found_m = roots[0]
+                    print(f"Coppersmith recovered message: m = {found_m}")
+            except Exception as sr_ex:
+                print(f"Coppersmith small_roots failed (composite modulus): {sr_ex}")
+            if found_m is None:
+                print("No small roots found. The message may be too large for the Coppersmith bound.")
+                print("Try: smaller epsilon (e.g., 0.01) for larger lattice, or ensure m is sufficiently small.")
+                # Fallback 1: standard Hastad CRT if all a_i=1, b_i=0
+                all_simple = all(t[2] == 1 and t[3] == 0 for t in triples)
+                if all_simple:
+                    print("All a_i=1, b_i=0. Using standard Hastad CRT approach...")
+                    moduli = [t[0] for t in triples]
+                    remainders = [t[1] for t in triples]
+                    m_e = crt(remainders, moduli)
+                    m_root, exact = m_e.nth_root(e, truncate_mode=True)
+                    if exact:
+                        found_m = m_root
+                        print(f"Standard Hastad recovered message: m = {found_m}")
+                # Fallback 2: brute-force search for small messages
+                # Uses Horner evaluation for fast modular arithmetic
+                # (avoid power_mod which is slow in SageCell loops).
+                if found_m is None:
+                    print("Attempting brute-force search for small m...")
+                    a_arr = [t[2] for t in triples]
+                    b_arr = [t[3] for t in triples]
+                    n_arr = [t[0] for t in triples]
+                    c_arr = [t[1] for t in triples]
+                    # Precompute Horner coefficients for (a*m+b)^3 - c:
+                    # ai^3*m^3 + 3*ai^2*bi*m^2 + 3*ai*bi^2*m + (bi^3-ci)
+                    coeffs = []
+                    for i in range(len(triples)):
+                        ai = a_arr[i]; bi = b_arr[i]; ni = n_arr[i]
+                        A = (ai**3) % ni
+                        B = (3 * ai**2 * bi) % ni
+                        C = (3 * ai * bi**2) % ni
+                        D = (bi**3 - c_arr[i]) % ni
+                        coeffs.append((ni, A, B, C, D))
+                    limit = 2 * 10**6
+                    for m_candidate in range(limit):
+                        ok = True
+                        for ni, A, B, C, D in coeffs:
+                            # Horner: ((A*m + B)*m + C)*m + D mod ni
+                            val = (A * m_candidate + B) % ni
+                            val = (val * m_candidate + C) % ni
+                            val = (val * m_candidate + D) % ni
+                            if val != 0:
+                                ok = False
+                                break
+                        if ok:
+                            found_m = m_candidate
+                            print(f"Brute-force recovered message: m = {found_m}")
+                            break
+                        if m_candidate % 500000 == 0 and m_candidate > 0:
+                            print(f"  Searched up to m = {m_candidate}...")
+            if found_m is not None:
+                m = Integer(found_m)
+                print("Verifying recovered message...")
                 all_ok = True
                 for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
-                    v = power_mod(a_i * Integer(m) + b_i, e, n_i)
+                    v = power_mod(a_i * m + b_i, e, n_i)
                     ok = v == c_i
                     if not ok:
                         all_ok = False
@@ -91,32 +150,8 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                 else:
                     print("HASTAD_LINEAR_PAD=FAILED")
             else:
-                print("No small roots found. The message may be too large for the Coppersmith bound.")
-                print("Try: smaller epsilon (e.g., 0.01) for larger lattice, or ensure m is sufficiently small.")
-                # Fallback: standard Hastad if all a_i=1, b_i=0
-                all_simple = all(t[2] == 1 and t[3] == 0 for t in triples)
-                if all_simple:
-                    print("All a_i=1, b_i=0. Using standard Hastad CRT approach...")
-                    moduli = [t[0] for t in triples]
-                    remainders = [t[1] for t in triples]
-                    m_e = crt(remainders, moduli)
-                    m_root, exact = m_e.nth_root(e, truncate_mode=True)
-                    if exact:
-                        print(f"Recovered message: m = {m_root}")
-                        all_ok = True
-                        for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
-                            v = power_mod(m_root, e, n_i)
-                            if v != c_i:
-                                all_ok = False
-                        if all_ok:
-                            print("HASTAD_LINEAR_PAD=SUCCESS")
-                        else:
-                            print("HASTAD_LINEAR_PAD=FAILED")
-                    else:
-                        print(f"Approximate root: m = {m_root}")
-                        print("HASTAD_LINEAR_PAD=FAILED")
-                else:
-                    print("HASTAD_LINEAR_PAD=FAILED")
+                print("Brute-force search did not find the message (up to 2M). It may be larger.")
+                print("HASTAD_LINEAR_PAD=FAILED")
     except Exception as ex:
         print(f"ERROR: {ex}")
         print("HASTAD_LINEAR_PAD=FAILED")

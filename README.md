@@ -6,7 +6,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 
 ## Features
 
-- **52 attack implementations** across 5 categories (100% mathematically verified via Dockerized SageMath test suite)
+- **52 attack implementations** across 5 categories (L5 Playwright test suite: **151/153 passed**, 98.7%)
 - **Real-time SageMath execution** via embedded SageMathCell (offscreen DOM + MutationObserver pipeline)
 - **Browser-side pre-checks** — 8 attacks run entirely in the browser via BigInt GCD, FactorDB API, or lattice GCD (no SageCell needed)
 - **FactorDB integration** — CORS-proxied API via Cloudflare Worker for instant factor lookups
@@ -104,7 +104,8 @@ These run fully in the browser when sufficient parameters are provided, returnin
 - **frontendCheck pattern** — attacks can define an optional async pre-check that runs in the browser before falling back to SageCell. This enables instant results for FactorDB lookups, phi(n) recovery, and BigInt GCD operations.
 - **Pure math templates** — SageMathCell has no internet access (firewall since 2021). All attack templates must be self-contained pure math code with no external dependencies.
 - **512-bit testcases** — `TESTCASE_BITS = { p: 256, q: 256 }` produces n ≈ 512-bit. Factorization attacks generate n with at least one small factor to avoid SageCell 35s timeout.
-- **No test suite** — verification is purely `typecheck → lint → build`. `tests/` and `scripts/` directories are empty.
+- **L5 Playwright test suite** in `scripts/test-playwright.ts` — runs all 51 SageCell-enabled attacks × 3 runs each (153 total). 10-page concurrency, 120s timeout per run. 151/153 passed (98.7%). Only 2 probabilistic partials remain (williams-p1, partial-pq-bits).
+- **No unit tests** — functional verification is `typecheck → lint → build → L5 Playwright suite`.
 
 ### Directory Structure
 
@@ -196,6 +197,15 @@ After deploy, copy the worker URL into `src/config.ts` or set `VITE_FACTORDB_PRO
 - `range(int(e) + 1)` to avoid Sage Integer → Python range error with small exponents
 - `prime_range(start, end)` is faster than `range()` + `is_prime()`
 - 35s timeout in useSageMath.ts — factorization testcases must remain feasible within this limit
+
+### Debugging Patterns (Hard-Earned)
+
+- **Fallback chains**: Never trust a single SageMath method. `small_roots` over composite N throws under Docker Rosetta. Always: `try/except` → Python-native fallback → brute-force.
+- **Narrow try/except**: Wrap only the flaky call, not the whole strategy. A broad `except` at the outer level swallows fallback code silently.
+- **Horner evaluation**: In tight SageCell loops, replace `power_mod` with precomputed Horner coefficients — `((A*m + B)*m + C)*m + D` is 10-100x faster than repeated modular exponentiation.
+- **Detection vs exploitation**: Don't break at first match during signature scanning. Track the BEST match across all candidates. First-match on trivial signatures (e.g., M=2 in ROCA) causes false positives.
+- **Fix both ends**: When a test fails, check the implementation AND the test runner. Race conditions in polling loops can cause false negatives (e.g., cached text without `=SUCCESS`/`=FAILED` markers).
+- **Regression vs flakiness**: A 3/3 → 0/3 jump is a fixable regression. A 3/3 → 2/3 drop is inherent flakiness (williams-p1, partial-pq-bits). Don't "fix" what's probabilistic.
 
 ## Tech Stack
 
