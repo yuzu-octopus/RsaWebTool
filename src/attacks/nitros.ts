@@ -44,12 +44,13 @@ export const attack: Attack = {
                 print(f"M = {M}: gcd(base, M) = {gcd(base, M)} != 1, skipping...")
                 print("NITROS=FAILED")
                 return
-            # Compute remainders
+            # Compute remainders via iterative multiplication (much faster than repeated power_mod)
             ord_val = Mod(base, M).multiplicative_order()
             remainders = set()
-            for idx in range(ord_val):
-                r = power_mod(base, idx, M)
-                remainders.add(r)
+            r = Mod(1, M)
+            for _ in range(ord_val):
+                remainders.add(Integer(r))
+                r *= base
             n_mod = n % M
             # Collect all valid remainder pairs
             pairs = []
@@ -62,35 +63,36 @@ export const attack: Attack = {
                 print("NITROS=FAILED")
                 return
             print(f"Found {len(pairs)} valid remainder pair(s) with M = {M}")
-            # Try Coppersmith with the first pair
+            # Try Coppersmith with each remainder pair (limit to first 100 pairs)
+            # to avoid combinatorial explosion when n_mod is in the subgroup
             factored = False
-            try:
-                R.<x> = PolynomialRing(ZZ)
-                r1_try, r2_try = pairs[0]
-                f = M*x + r1_try
-                bound = ceil(sqrt(n) / M)
-                f_mod = f.change_ring(Zmod(n)).monic()
-                roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=0.05)
-                if roots:
-                    k = int(roots[0])
-                    p = int(M * k + r1_try)
-                    if n % p == 0:
-                        q = n // p
-                        print(f"SUCCESS! p = {p}, q = {q}")
-                        print("NITROS=SUCCESS")
-                        factored = True
-                if not factored:
-                    f2 = M*x + r2_try
-                    roots2 = f2.change_ring(Zmod(n)).monic().small_roots(X=bound, beta=0.5, epsilon=0.05)
-                    if roots2:
-                        k2 = int(roots2[0])
-                        p2 = int(M * k2 + r2_try)
-                        if n % p2 == 0:
-                            print(f"SUCCESS! p = {p2}, q = {n // p2}")
-                            print("NITROS=SUCCESS")
-                            factored = True
-            except BaseException:
-                pass
+            R.<x_lll> = PolynomialRing(ZZ)
+            bound = ceil(sqrt(n) / M)
+            pairs_to_try = pairs[:100]
+            for eps in [0.05, 0.03, 0.02]:
+                for r1_try, r2_try in pairs_to_try:
+                    try:
+                        for r_candidate in [r1_try, r2_try]:
+                            f = M*x_lll + r_candidate
+                            f_mod = f.change_ring(Zmod(n)).monic()
+                            roots = f_mod.small_roots(X=bound, beta=0.5, epsilon=eps)
+                            if roots:
+                                k = int(roots[0])
+                                p_candidate = int(M * k + r_candidate)
+                                if n % p_candidate == 0:
+                                    q = n // p_candidate
+                                    print(f"SUCCESS! p = {p_candidate}, q = {q}")
+                                    print("NITROS=SUCCESS")
+                                    factored = True
+                                    break
+                        if factored:
+                            break
+                    except BaseException:
+                        continue
+                    if factored:
+                        break
+                if factored:
+                    break
             if not factored:
                 print("No ROCA/Nitros pattern detected for tested M values.")
                 print("NITROS=FAILED")
@@ -141,9 +143,12 @@ export const generateTestcase = (): Record<string, string> => {
   const pBits = 80;
   const kBits = pBits - 53; // ≈ 27
   const kBytes = Math.ceil(kBits / 8);
+  // Use r1=base^0=1 so pairs[0] in the template's remainder list
+  // has r1=1 = p's actual remainder. This avoids the combinatorial
+  // explosion of trying 8M+ remainder pairs when n_mod falls in
+  // the subgroup (both primes Nitros-form).
+  const r1 = 1n;
   for (let attempt = 0; attempt < 5000; attempt++) {
-    const i1 = BigInt(Math.floor(Math.random() * 10000));
-    const r1 = modPow(base, i1, M);
     const i2 = BigInt(Math.floor(Math.random() * 10000));
     const r2 = modPow(base, i2, M);
     const bytes1 = new Uint8Array(kBytes);

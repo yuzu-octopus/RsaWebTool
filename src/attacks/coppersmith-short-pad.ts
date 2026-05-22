@@ -35,28 +35,31 @@ export const attack: Attack = {
         print("Coppersmith Short Pad Attack")
         print("n =", n, "e =", e)
         # Step 1: Compute resultant to find delta = m2 - m1
-        # For e=3, the resultant h(y) has only y^0, y^3, y^6, y^9 terms
-        # Substitute z = y^3 to get a cubic, then apply Coppersmith to find z
-        P.<x, y> = PolynomialRing(Zmod(n))
-        P2.<y_s> = PolynomialRing(Zmod(n))
-        g1 = x**e - c1
-        g2 = (x + y)**e - c2
-        g1_p2 = g1.change_ring(P2)
-        g2_p2 = g2.change_ring(P2)
+        # Compute resultant over ZZ first, then reduce mod n
+        # (Zmod(n) for composite n does not support resultant)
         print("Computing resultant...")
-        h = g1_p2.resultant(g2_p2, variable=x)
-        h = h.univariate_polynomial().change_ring(Zmod(n))
-        print("Resultant degree:", h.degree())
-        # Extract coefficients of h(y) = y^(e^2) + ... + C (only y^(i*e) terms)
-        # For e=3: h(y) = y^9 + A*y^6 + B*y^3 + C
-        # Substitute z = y^3 to get cubic H(z) = z^e + ... + C
-        coeffs = [h[i] for i in range(h.degree() + 1)]
-        PRz.<z> = PolynomialRing(Zmod(n))
+        ZZxy.<x, y> = PolynomialRing(ZZ)
+        g1_zz = x**Integer(e) - Integer(c1)
+        g2_zz = (x + y)**Integer(e) - Integer(c2)
+        h_zz = g1_zz.resultant(g2_zz, variable=x)
+        print("Resultant degree (in y):", h_zz.degree(y))
+        # h_zz is multivariate (ZZ[x,y]) but only has y terms after resultant
+        # Convert to univariate polynomial in y over ZZ
+        ZZ_y = ZZ['y']
+        yv = ZZ_y.gen()
+        h_y = ZZ_y(0)
+        for (exp_x, exp_y), coeff_val in h_zz.dict().items():
+            h_y += ZZ(coeff_val) * yv**int(exp_y)
+        # For e=3, h(y) has only y^0, y^3, y^6, y^9 terms
+        # Reduce mod n and substitute z = y^e to get H(z) of degree e
+        Zn = Zmod(n)
+        PRz.<z> = PolynomialRing(Zn)
         H = PRz(0)
+        coeffs_list = h_y.list()
         for i in range(int(e) + 1):
             deg = i * int(e)
-            if deg <= h.degree():
-                H += coeffs[deg] * z**i
+            if deg < len(coeffs_list):
+                H += Zn(coeffs_list[deg]) * z**i
         print("Looking for small root of degree-", H.degree(), "polynomial in z = y^e")
         # Howgrave-Graham bound for z = delta^e with beta=1.0, epsilon=0.05:
         # |z| < n^(1/e - 0.05)
@@ -66,9 +69,37 @@ export const attack: Attack = {
         roots_z = H.small_roots(X=X_z, epsilon=0.05)
         if roots_z:
             z0 = Integer(roots_z[0])
-            # Take integer e-th root to recover delta = z0^(1/e)
-            delta, exact = z0.nth_root(int(e), truncate_mode=True)
-            if exact:
+            # Recover delta from z0 = delta^e
+            # nth_root may not be exact if z0 is delta^e + k*n (small_roots over Zmod(n))
+            # Try integer e-th root and nearby values
+            try:
+                delta, exact = z0.nth_root(int(e), truncate_mode=True)
+            except Exception:
+                delta = Integer(z0.nth_root(int(e)))
+                exact = False
+            if not exact:
+                print(f"z0={z0} is not a perfect {e}th power; trying nearby values...")
+                # Try delta-10..delta+10 to handle the composite-modulus offset
+                for delta_try in range(max(0, delta - 10), delta + 11):
+                    if delta_try == 0:
+                        continue
+                    # Test with Franklin-Reiter GCD
+                    PRx.<xn> = PolynomialRing(Zmod(n))
+                    g1_fr = xn**e - c1
+                    g2_fr = (xn + Integer(delta_try))**e - c2
+                    g = composite_gcd(g1_fr, g2_fr)
+                    if g.degree() == 1:
+                        m = -g[0] / g[1]
+                        v1 = power_mod(Integer(m), e, n)
+                        v2 = power_mod(Integer(m) + Integer(delta_try), e, n)
+                        if v1 == c1 and v2 == c2:
+                            print("Found padding difference: delta =", delta_try)
+                            print("Recovered message: m =", m)
+                            print("COPPERSMITH_SHORT_PAD=SUCCESS")
+                            return
+                print("Could not recover delta from nearby values.")
+                print("COPPERSMITH_SHORT_PAD=FAILED")
+            else:
                 print("Found padding difference: delta =", delta)
                 # Step 2: Franklin-Reiter related message attack
                 PRx.<xn> = PolynomialRing(Zmod(n))
@@ -89,9 +120,6 @@ export const attack: Attack = {
                 else:
                     print("GCD has degree", g.degree(), "- cannot extract unique solution.")
                     print("COPPERSMITH_SHORT_PAD=FAILED")
-            else:
-                print("Cube root was not exact. z0 =", z0, "may not be delta^e.")
-                print("COPPERSMITH_SHORT_PAD=FAILED")
         else:
             print("No small roots found. Padding may be too large for exponent e =", e)
             print("COPPERSMITH_SHORT_PAD=FAILED")

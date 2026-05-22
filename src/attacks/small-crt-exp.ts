@@ -15,21 +15,21 @@ export const attack: Attack = {
     try:
         n = Integer(${v.n})
         e = Integer(${v.e})
-        bound = ${v.bound ? `Integer(${v.bound})` : 'Integer(1000000)'}
+        bound = ${v.bound ? `Integer(${v.bound})` : 'Integer(50000)'}
         if n <= 0 or e <= 0 or bound <= 0:
             print("SMALL_CRT_EXP=FAILED: invalid input values")
         else:
             # RSA-CRT: d_p * e ≡ 1 (mod p-1), so d_p * e - 1 = k(p-1)
             # Rearranged: p = (d_p * e - 1) / k + 1
-            # We brute-force k ∈ [1, e) and step through d_p candidates
+            # We brute-force k ∈ [1, e) and step through d_p candidates.
+            # For each k, d_p0 = e^(-1) mod k, then step d_p by k.
+            # Total iterations ≈ bound * H_e ≈ bound * 11 for e=65537,
+            # so bound=50000 gives ~550k iterations (< 5s in SageCell).
             found = False
             for k in range(1, e):
-                # k and e must be coprime for inverse_mod(e, k) to exist
                 if gcd(e, k) != 1:
                     continue
-                # d_p0 = e^(-1) mod k is the smallest d_p satisfying the congruence mod k
                 dp0 = inverse_mod(e, k)
-                # Step d_p by k: all d_p ≡ d_p0 (mod k) satisfy d_p * e ≡ 1 (mod k)
                 for dp in range(dp0, bound + 1, k):
                     num = dp * e - 1
                     p_candidate = num // k + 1
@@ -91,7 +91,7 @@ export const generateTestcase = (): Record<string, string> => {
       const p = num / k + 1n;
       if (p > 2n && isPrimeMR(p)) {
         const q = randomPrime(TESTCASE_BITS.q);
-        return { n: (p * q).toString(), e: e.toString(), bound: '1000000' };
+        return { n: (p * q).toString(), e: e.toString(), bound: '50000' };
       }
     }
   }

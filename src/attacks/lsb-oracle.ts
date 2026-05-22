@@ -45,12 +45,13 @@ export const attack: Attack = {
                 print(f"WARNING: Need {n.nbits()} responses for full recovery, got {len(oracle_bits)}.")
                 print("Result may be approximate.")
                 print()
-            # Integer binary search using LSB oracle with 2^e blinding
-            # LSB(2*m mod n) = 1 iff 2*m >= n (since n is odd) iff m >= current midpoint
-            lower = Integer(0)
-            upper = Integer(n)
+            # Binary search using LSB oracle with 2^e blinding
+            # Use QQ (rational) arithmetic to avoid integer-division convergence errors.
+            # LSB(m * 2^(i+1) mod n) = 1 iff m >= n / 2^(i+1) (since n is odd)
+            lower = QQ(0)
+            upper = QQ(n)
             for i, bit in enumerate(oracle_bits):
-                mid = (lower + upper) // 2
+                mid = (lower + upper) / 2
                 c = (c * power_mod(Integer(2), e, n)) % n
                 if bit == 0:
                     upper = mid
@@ -58,17 +59,19 @@ export const attack: Attack = {
                     lower = mid
                 if i < 5 or i % 50 == 0:
                     remaining = n.nbits() - i - 1
-                    print(f"  Step {i+1}: LSB={bit}, remaining ~ {max(0, remaining)} bits")
+                    print(f"  Step {i+1}: LSB={bit}, interval ~ [{lower.numerator()}/{lower.denominator()}, {upper.numerator()}/{upper.denominator()}], remaining ~ {max(0, remaining)} bits")
             print()
-            # Scan exact candidates from integer interval [lower, upper]
-            for m_candidate in range(lower, upper + 1):
+            # Scan exact candidates from integer hull of rational interval
+            lo_int = floor(lower)
+            hi_int = ceil(upper)
+            for m_candidate in range(lo_int, hi_int + 1):
                 m = Integer(m_candidate)
                 if power_mod(m, e, n) == orig_c:
                     print(f"Recovered message: m = {m}")
                     print("LSB_ORACLE=SUCCESS")
                     break
             else:
-                print("LSB_ORACLE=FAILED")
+                print(f"LSB_ORACLE=FAILED (scanned {lo_int}..{hi_int})")
         except Exception as ex:
             print(f"ERROR: {ex}")
             print("LSB_ORACLE=FAILED")

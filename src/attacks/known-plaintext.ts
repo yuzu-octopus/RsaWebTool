@@ -60,16 +60,19 @@ print("KNOWN_PLAINTEXT=FAILED")`;
                     print("Brute force exhausted without finding match.")
                     print("KNOWN_PLAINTEXT=FAILED")
             elif unknown_bits <= bound:
-                print(f"Using Coppersmith's method (bound = 2^{bound})...")
+                print(f"Using Coppersmith's method (bound = 2^{bound}, unknown = {unknown_bits} bits)...")
                 R.<x> = PolynomialRing(Zmod(n))
                 f = (prefix_int * shift + x)**e - c
-                # small_roots handles non-monic polynomials; skip monic() since Zmod(n) with composite n may have non-invertible lead coefficient
-                try:
-                    roots = f.small_roots(X=shift, beta=1.0, epsilon=0.05)
-                except Exception as ex:
-                    print(f"small_roots error: {ex}")
-                    print("KNOWN_PLAINTEXT=FAILED")
-                    return
+                # Try multiple epsilon values; composite Zmod(n) may require tighter epsilon
+                roots = None
+                for eps in [0.05, 0.03, 0.01]:
+                    try:
+                        roots = f.small_roots(X=shift, beta=1.0, epsilon=eps)
+                        if roots:
+                            print(f"small_roots succeeded with epsilon={eps}")
+                            break
+                    except Exception as ex:
+                        print(f"small_roots with epsilon={eps} error: {ex}")
                 if roots:
                     x = Integer(roots[0])
                     m = prefix_int * shift + x

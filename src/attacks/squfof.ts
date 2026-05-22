@@ -38,8 +38,9 @@ export const attack: Attack = {
                 print("SQUFOF=SUCCESS")
                 return
             # SQUFOF works best for small factors; extract small factor first
+            # Use prime_range for ~3x faster traversal vs trial division by odds
             found_small = False
-            for trial in range(3, 100000, 2):
+            for trial in prime_range(3, 200000):
                 if n % trial == 0:
                     p = Integer(trial)
                     q = n // p

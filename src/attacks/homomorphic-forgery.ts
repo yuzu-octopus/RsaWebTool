@@ -19,13 +19,20 @@ export const attack: Attack = {
 print("HOMOMORPHIC_FORGERY=FAILED")`;
     }
     return `def _attack():
-    from itertools import combinations
     try:
         n = Integer(${vals.n})
         e = Integer(${vals.e})
         target_m = Integer(${vals.target_m})
+        if n < 3 or e < 2:
+            print("ERROR: Invalid n or e")
+            print("HOMOMORPHIC_FORGERY=FAILED")
+            return
         # Parse oracle pairs
-        pairs_str = """${vals.oracle_pairs}""".strip()
+        pairs_str = "${vals.oracle_pairs}".strip()
+        if not pairs_str:
+            print("ERROR: Empty oracle_pairs")
+            print("HOMOMORPHIC_FORGERY=FAILED")
+            return
         oracle_pairs = []
         for pair in pairs_str.split(';'):
             pair = pair.strip()
@@ -37,46 +44,42 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
             m_i = Integer(parts[0].strip())
             s_i = Integer(parts[1].strip())
             oracle_pairs.append((m_i, s_i))
+        if len(oracle_pairs) < 1:
+            print("ERROR: No valid oracle pairs parsed")
+            print("HOMOMORPHIC_FORGERY=FAILED")
+            return
         print("Homomorphic Forgery Attack")
         print(f"Target message: {target_m}")
         print(f"Oracle pairs: {len(oracle_pairs)}")
         # Verify oracle pairs
-        print("Verifying oracle pairs:")
         for i, (m_i, s_i) in enumerate(oracle_pairs):
             v = power_mod(s_i, e, n)
             valid = "OK" if v == m_i else "FAIL"
-            print(f"  Pair {i+1}: s_i^e mod n = {v}, m_i = {m_i} [{valid}]")
-        # Try to factor target_m into oracle messages
-        # target_m = m_1 * m_2 * ... * m_k (mod n)
-        # Then sig = s_1 * s_2 * ... * s_k (mod n)
-        # Simple approach: try all subsets
+            print(f"Pair {i+1}: s_i^e mod n = {v}, m_i = {m_i} [{valid}]")
+        # Multiplicative forgery: compute product of all oracle signatures
+        # If target_m = product of oracle messages (mod n), then
+        # forged_sig = product of oracle signatures (mod n)
+        from itertools import combinations
         found = False
         for r in range(1, len(oracle_pairs) + 1):
             for combo in combinations(range(len(oracle_pairs)), r):
-                product_m = 1
-                product_s = 1
+                prod_m = 1
+                prod_s = 1
                 for idx in combo:
                     m_i, s_i = oracle_pairs[idx]
-                    product_m = (product_m * m_i) % n
-                    product_s = (product_s * s_i) % n
-                if product_m == target_m % n:
-                    print(f"Found factorization using pairs: {[i+1 for i in combo]}")
-                    print(f"Product of messages: {product_m}")
-                    print(f"Forged signature: {product_s}")
-                    # Verify
-                    v = power_mod(product_s, e, n)
-                    print(f"Verification: sig^e mod n = {v}")
-                    print(f"Target message: {target_m % n}")
-                    print(f"Valid: {v == target_m % n}")
-                    found = True
-                    break
-            if found:
-                break
-        if found:
-            print("HOMOMORPHIC_FORGERY=SUCCESS")
-        else:
-            print("Could not factor target_m from oracle pairs using simple multiplication.")
-            print("Try more complex factorizations or additional oracle queries.")
+                    prod_m = (prod_m * m_i) % n
+                    prod_s = (prod_s * s_i) % n
+                if prod_m == target_m % n:
+                    v = power_mod(prod_s, e, n)
+                    if v == target_m % n:
+                        print(f"Forged signature from pairs {[i+1 for i in combo]}: {prod_s}")
+                        print(f"Verification: sig^e mod n = {v}")
+                        print("HOMOMORPHIC_FORGERY=SUCCESS")
+                        found = True
+                        return
+        if not found:
+            print("Could not factor target_m from oracle pairs using multiplication.")
+            print("Try more oracle queries or different combination patterns.")
             print("HOMOMORPHIC_FORGERY=FAILED")
     except Exception as ex:
         print(f"ERROR: {ex}")
