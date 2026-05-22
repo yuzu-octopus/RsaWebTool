@@ -44,12 +44,13 @@ export const attack: Attack = {
                 print(f"WARNING: Need {n.nbits()} responses for full recovery, got {len(responses)}.")
                 print("Result may be approximate.")
                 print()
-            # Integer binary search using parity oracle with 2^e blinding
-            lower = Integer(0)
-            upper = Integer(n)
+            # Binary search using parity oracle with 2^e blinding
+            # Use QQ (rational) arithmetic to avoid integer-division convergence errors
+            lower = QQ(0)
+            upper = QQ(n)
             print("Binary search iterations:")
             for i, parity in enumerate(responses):
-                mid = (lower + upper) // 2
+                mid = (lower + upper) / 2
                 c = (c * power_mod(Integer(2), e, n)) % n
                 if parity == 0:
                     upper = mid
@@ -59,15 +60,17 @@ export const attack: Attack = {
                     remaining = n.nbits() - i - 1
                     print(f"  Step {i+1}: parity={parity}, remaining ~ {max(0, remaining)} bits")
             print()
-            # Scan candidates from integer interval [lower, upper]
-            for candidate in range(lower, upper + 1):
+            # Scan exact candidates from integer hull of rational interval
+            lo_int = floor(lower)
+            hi_int = ceil(upper)
+            for candidate in range(lo_int, hi_int + 1):
                 m = Integer(candidate)
                 if power_mod(m, e, n) == orig_c:
                     print(f"FOUND! m = {m}")
                     print("PARITY_ORACLE=SUCCESS")
                     break
             else:
-                print("PARITY_ORACLE=FAILED")
+                print(f"PARITY_ORACLE=FAILED (scanned {lo_int}..{hi_int})")
         except Exception as ex:
             print(f"ERROR: {ex}")
             print("PARITY_ORACLE=FAILED")

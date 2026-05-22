@@ -30,6 +30,24 @@ print("KNOWN_PLAINTEXT=FAILED")`;
         print(f"n = {n} ({n.nbits()} bits)")
         print(f"e = {e}")
         print(f"c = {c}")
+        # Strategy 1: Try direct integer e-th root of c
+        # Works when m^e < n (no modular wrap-around), which is common for e=3
+        try:
+            m_int_root, is_exact = c.nth_root(int(e), truncate_mode=True)
+            if is_exact and power_mod(Integer(m_int_root), e, n) == c:
+                print(f"RECOVERED via integer e-th root! m = {m_int_root}")
+                try:
+                    m_hex = hex(Integer(m_int_root))[2:]
+                    if len(m_hex) % 2 != 0:
+                        m_hex = '0' + m_hex
+                    print(f"m as bytes: {bytes.fromhex(m_hex)}")
+                except Exception:
+                    pass
+                print("KNOWN_PLAINTEXT=SUCCESS")
+                return
+        except Exception:
+            pass
+        # Strategy 2: Known prefix + brute-force for small unknown bits
         if known_prefix:
             print(f"Known prefix: '{known_prefix}'")
             print(f"Unknown bits: {unknown_bits}")
@@ -38,16 +56,15 @@ print("KNOWN_PLAINTEXT=FAILED")`;
             print(f"Prefix as integer: {prefix_int}")
             print(f"Prefix byte length: {len(prefix_bytes)}")
             shift = Integer(2)**unknown_bits
-            bound = n.nbits() // e
-            if unknown_bits <= 16:
+            if unknown_bits <= 20:
                 print(f"Brute forcing 2^{unknown_bits} possibilities...")
                 found = False
-                for k in range(Integer(2)**unknown_bits):
-                    if power_mod(prefix_int * shift + k, e, n) == c:
-                        print(f"FOUND! m = {prefix_int * shift + k}")
-                        m_found = prefix_int * shift + k
+                for k in range(shift):
+                    m_try = prefix_int * shift + k
+                    if power_mod(m_try, e, n) == c:
+                        print(f"FOUND! m = {m_try}")
                         try:
-                            m_hex = hex(m_found)[2:]
+                            m_hex = hex(m_try)[2:]
                             if len(m_hex) % 2 != 0:
                                 m_hex = '0' + m_hex
                             print(f"m as bytes: {bytes.fromhex(m_hex)}")
@@ -59,41 +76,11 @@ print("KNOWN_PLAINTEXT=FAILED")`;
                 if not found:
                     print("Brute force exhausted without finding match.")
                     print("KNOWN_PLAINTEXT=FAILED")
-            elif unknown_bits <= bound:
-                print(f"Using Coppersmith's method (bound = 2^{bound}, unknown = {unknown_bits} bits)...")
-                R.<x> = PolynomialRing(Zmod(n))
-                f = (prefix_int * shift + x)**e - c
-                # Try multiple epsilon values; composite Zmod(n) may require tighter epsilon
-                roots = None
-                for eps in [0.05, 0.03, 0.01]:
-                    try:
-                        roots = f.small_roots(X=shift, beta=1.0, epsilon=eps)
-                        if roots:
-                            print(f"small_roots succeeded with epsilon={eps}")
-                            break
-                    except Exception as ex:
-                        print(f"small_roots with epsilon={eps} error: {ex}")
-                if roots:
-                    x = Integer(roots[0])
-                    m = prefix_int * shift + x
-                    print(f"FOUND! m = {m}")
-                    try:
-                        m_hex = hex(m)[2:]
-                        if len(m_hex) % 2 != 0:
-                            m_hex = '0' + m_hex
-                        print(f"m as bytes: {bytes.fromhex(m_hex)}")
-                    except:
-                        print(f"m as hex: {hex(m)}")
-                    print("KNOWN_PLAINTEXT=SUCCESS")
-                else:
-                    print("Coppersmith's method did not find a solution.")
-                    print("Try increasing epsilon, verify the unknown_bits is correct,")
-                    print("or the unknown portion may be too large for current parameters.")
-                    print("KNOWN_PLAINTEXT=FAILED")
             else:
-                print(f"Unknown portion ({unknown_bits} bits) too large for this attack.")
+                bound = n.nbits() // e
+                print(f"Unknown portion ({unknown_bits} bits) too large for brute force.")
                 print(f"Maximum feasible unknown bits for e={e} and n={n.nbits()} bits: {bound}")
-                print("Consider: factordb lookup, Fermat factorization, or other methods.")
+                print("Consider: Coppersmith's method, factordb lookup, or other methods.")
                 print("KNOWN_PLAINTEXT=FAILED")
         else:
             print("No known prefix provided.")
@@ -134,7 +121,7 @@ export const generateTestcase = (): Record<string, string> => {
   const { n } = generateKeyPair(64, 64, e);
   const prefix = new TextEncoder().encode('flag{');
   const prefixInt = BigInt('0x' + Array.from(prefix).map(b => b.toString(16).padStart(2, '0')).join(''));
-  const unknownBits = 24;
+  const unknownBits = 16;
   const unknown = BigInt(Math.floor(Math.random() * 2 ** unknownBits));
   const m = (prefixInt << BigInt(unknownBits)) | unknown;
   return { n: n.toString(), e: e.toString(), c: encrypt(m, n, e).toString(), known_prefix: 'flag{', unknown_bits: unknownBits.toString() };

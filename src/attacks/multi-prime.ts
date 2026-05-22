@@ -127,11 +127,12 @@ p_i &\\approx n^{1/r} \\implies \\text{ECM, QS more effective} \\qed
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Use three small factors so Sage's factor() runs instantly.
-  // 28-bit factor found by trial division; 48-bit factors by quick ECM.
-  // n ≈ 124 bits total — well under SageCell 35s timeout.
-  const p1 = randomPrime(28);
-  const p2 = randomPrime(48);
-  const p3 = randomPrime(48);
+  // Use three small factors so trial division + Sage factor() runs instantly.
+  // p1 = 10-bit (≈1K) found by trial division up to 10000.
+  // p2, p3 = 28-bit (≈268M) found by Sage's ECM with default bounds.
+  // n ≈ 66 bits total.
+  const p1 = randomPrime(10);
+  const p2 = randomPrime(28);
+  const p3 = randomPrime(28);
   return { n: (p1 * p2 * p3).toString() };
 };
