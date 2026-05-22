@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Typography,
@@ -16,6 +16,7 @@ import type { SyntaxHighlighterProps } from 'react-syntax-highlighter';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { hexToBytes, hexToAscii, decToHex, decToAscii, base64ToText } from '../utils/converters';
+import { useDragResize } from '../hooks/useDragResize';
 
 const utilBtnSx = {
   borderColor: draculaColors.purple,
@@ -25,23 +26,13 @@ const utilBtnSx = {
   '&:hover': { backgroundColor: draculaColors.purple, color: draculaColors.background },
 };
 
-const MIN_WIDTH = 200;
-const MAX_WIDTH = 600;
-
-export function OutputPanel({ width, onWidthChange }: { width: number; onWidthChange: (w: number) => void }) {
+export function OutputPanel() {
   const { outputResult, outputError, history } = useAppContext();
   const [conversionState, setConversionState] = useState<{ result: string; sourceOutput: string } | null>(null);
   const conversionResult = conversionState?.sourceOutput === outputResult ? conversionState.result : null;
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [notepadOpen, setNotepadOpen] = useState(false);
-  const [notepadHeight, setNotepadHeight] = useState(() => {
-    try {
-      const h = localStorage.getItem('notepadHeight');
-      if (h) { const n = parseInt(h, 10); if (n >= 80 && n <= 200) return n; }
-    } catch { /* ignore */ }
-    return 80;
-  });
   const [notepadText, setNotepadText] = useState(() => {
     try {
       const stored = localStorage.getItem('notepad');
@@ -52,63 +43,20 @@ export function OutputPanel({ width, onWidthChange }: { width: number; onWidthCh
     } catch { /* ignore */ }
     return '';
   });
-  const isDragging = useRef(false);
-  const isNotepadDragging = useRef(false);
-
-  const handleNotepadResizeMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    isNotepadDragging.current = true;
-    const startY = e.clientY;
-    const startHeight = notepadHeight;
-
-    const handleMouseMove = (ev: MouseEvent) => {
-      if (!isNotepadDragging.current) return;
-      const delta = ev.clientY - startY;
-      const newHeight = Math.min(200, Math.max(80, startHeight - delta));
-      setNotepadHeight(newHeight);
-      try { localStorage.setItem('notepadHeight', String(newHeight)); } catch { /* ignore */ }
-    };
-
-    const handleMouseUp = () => {
-      isNotepadDragging.current = false;
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    document.body.style.cursor = 'row-resize';
-    document.body.style.userSelect = 'none';
-  }, [notepadHeight]);
-
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    isDragging.current = true;
-    const startX = e.clientX;
-    const startWidth = width;
-
-    const handleMouseMove = (ev: MouseEvent) => {
-      if (!isDragging.current) return;
-      const delta = startX - ev.clientX;
-      const newWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startWidth + delta));
-      onWidthChange(newWidth);
-    };
-
-    const handleMouseUp = () => {
-      isDragging.current = false;
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-  }, [width, onWidthChange]);
+  const [notepadHeight, handleNotepadResizeMouseDown] = useDragResize({
+    axis: 'y',
+    min: 80,
+    max: 200,
+    defaultValue: 80,
+    storageKey: 'notepadHeight',
+  });
+  const [width, handleMouseDown] = useDragResize({
+    axis: 'x',
+    min: 200,
+    max: 600,
+    defaultValue: 300,
+    storageKey: 'outputPanelWidth',
+  });
 
   const handleConvert = (fn: (s: string) => string) => {
     if (outputResult) {

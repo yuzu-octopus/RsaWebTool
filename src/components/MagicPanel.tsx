@@ -16,39 +16,50 @@ import { AutoFixHigh, Science, CheckCircle, Cancel, HourglassEmpty, SkipNext, St
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useSageMathParallel } from '../hooks/useSageMath';
-import { attacks } from '../attacks';
+import { attacks, attacksByCategory } from '../attacks';
 import { detectFormat, parsePEM } from '../utils/converters';
 import { generateKeyPair, encrypt, TESTCASE_BITS } from '../utils/testcases/core';
 import { isActualSuccess } from '../utils/sage-output';
+import { reportFactor, extractPQ } from '../utils/factordb';
+import { inputSx } from '../styles/inputSx';
 
-function detectParams(input: string): Record<string, string> {
+// Categorized parameter names for key=value extraction
+const kvParamNames = [
+  // Core RSA parameters
+  'n', 'e', 'c', 'd', 'p', 'q', 'dp', 'dq', 'qinv',
+  // Lattice / partial key
+  'dLow', 'nearp', 'bound', 'B2', 'B', 'a', 'b', 'e1', 'e2', 'c1', 'c2',
+  // Broadcast / related messages
+  'ciphertexts', 'hash_hex', 'target_m', 'sig_valid', 'sig_faulty', 'k_phi',
+  // Advanced / Coppersmith
+  'base', 'bitOffset', 'bitLength', 'num_primes', 'knownBits', 'bitPosition',
+  // Oracle / protocol
+  'oracle_responses', 'oracle_runs', 'phi', 'moduli_list', 'n_values',
+  'pairs', 'triples', 'oracle_pairs', 'known_prefix', 'p_msb', 'leak', 'unknown_bits',
+];
+const kvRegex = new RegExp(`(?<name>${kvParamNames.join('|')})\\s*=\\s*(?<value>[0-9a-fA-F,\\n]+)`, 'g');
+
+function extractParams(input: string): Record<string, string> {
   const params: Record<string, string> = {};
-  const kvRegex = /(n|e|c|d|p|q|dp|dq|qinv|dLow|nearp|bound|B2|B|a|b|e1|e2|c1|c2|ciphertexts|hash_hex|target_m|sig_valid|sig_faulty|k_phi|base|bitOffset|bitLength|num_primes|knownBits|bitPosition|oracle_responses|oracle_runs|phi|moduli_list|n_values|pairs|triples|oracle_pairs|known_prefix|p_msb|leak|unknown_bits)\s*=\s*([0-9a-fA-F,\n]+)/g;
   let match;
   while ((match = kvRegex.exec(input)) !== null) {
-    params[match[1]] = match[2].trim();
+    if (match.groups?.name && match.groups?.value) {
+      params[match.groups.name] = match.groups.value.trim();
+    }
+  }
+  const detectedFmt = detectFormat(input.trim());
+  if (detectedFmt === 'hex' && !params.n) {
+    params.n = input.trim().replace(/^0x/, '').replace(/\s/g, '');
+  } else if (detectedFmt === 'decimal' && !params.n) {
+    params.n = input.trim();
+  }
+  const pemResult = parsePEM(input);
+  if (pemResult) {
+    params.n = pemResult.n;
+    if (!params.e) params.e = pemResult.e;
   }
   return params;
 }
-
-const inputSx = {
-  '& .MuiOutlinedInput-root': {
-    backgroundColor: draculaColors.currentLine,
-    color: draculaColors.foreground,
-    fontFamily: "'JetBrains Mono', monospace",
-    '& fieldset': { borderColor: draculaColors.comment },
-    '&:hover fieldset': { borderColor: draculaColors.purple },
-    '&.Mui-focused fieldset': { borderColor: draculaColors.purple },
-  },
-  '& .MuiInputLabel-root': {
-    color: draculaColors.comment,
-    fontFamily: "'JetBrains Mono', monospace",
-    '&.Mui-focused': { color: draculaColors.purple },
-  },
-  '& .MuiInputBase-input': {
-    fontFamily: "'JetBrains Mono', monospace",
-  },
-};
 
 interface MagicJob {
   attackId: string;
@@ -59,7 +70,7 @@ interface MagicJob {
 }
 
 export function MagicPanel() {
-  const { viewMode, setOutputResult, setOutputError, addToHistory } = useAppContext();
+  const { viewMode, setOutputResult, setOutputError, addToHistory, showNotification } = useAppContext();
   const { executeAll, createController } = useSageMathParallel();
   const [rawInput, setRawInput] = useState('');
   const [jobs, setJobs] = useState<MagicJob[]>([]);
@@ -71,18 +82,7 @@ export function MagicPanel() {
 
   const applicablePreview = useMemo(() => {
     if (!rawInput.trim()) return [];
-    const params = detectParams(rawInput);
-    const detectedFmt = detectFormat(rawInput.trim());
-    if (detectedFmt === 'hex' && !params.n) {
-      params.n = rawInput.trim().replace(/^0x/, '').replace(/\s/g, '');
-    } else if (detectedFmt === 'decimal' && !params.n) {
-      params.n = rawInput.trim();
-    }
-    const pemResult = parsePEM(rawInput);
-    if (pemResult) {
-      params.n = pemResult.n;
-      if (!params.e) params.e = pemResult.e;
-    }
+    const params = extractParams(rawInput);
     return attacks.filter(a => {
       try { return a.applicableCheck(params); } catch { return false; }
     });
@@ -99,20 +99,7 @@ export function MagicPanel() {
     setOutputResult(null);
     setOutputError(null);
 
-    const params = detectParams(rawInput);
-    const detectedFmt = detectFormat(rawInput.trim());
-
-    if (detectedFmt === 'hex' && !params.n) {
-      params.n = rawInput.trim().replace(/^0x/, '').replace(/\s/g, '');
-    } else if (detectedFmt === 'decimal' && !params.n) {
-      params.n = rawInput.trim();
-    }
-
-    const pemResult = parsePEM(rawInput);
-    if (pemResult) {
-      params.n = pemResult.n;
-      if (!params.e) params.e = pemResult.e;
-    }
+    const params = extractParams(rawInput);
 
     const applicable = attacks.filter(a => {
       try { return a.applicableCheck(params); } catch { return false; }
@@ -188,6 +175,17 @@ export function MagicPanel() {
       if (firstSuccess) {
         setOutputResult(firstSuccess.result || '');
         addToHistory(firstSuccess.attackId, firstSuccess.attackName, firstSuccess.result || '', true);
+        showNotification(`${firstSuccess.attackName}: success`);
+        const attack = attacks.find(a => a.id === firstSuccess.attackId);
+        if (attack && attacksByCategory.get('Factorization')?.includes(attack)) {
+          const pq = extractPQ(firstSuccess.result || '');
+          if (pq && params.n) {
+            reportFactor(params.n, [pq.p, pq.q]).then(
+              resp => showNotification(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB'),
+              () => {},
+            );
+          }
+        }
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Magic cracker failed';

@@ -13,30 +13,13 @@ import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useSageMath } from '../hooks/useSageMath';
 import { ProofRenderer } from './ProofRenderer';
-import { testcaseGenerators } from '../attacks';
+import { testcaseGenerators, attacksByCategory } from '../attacks';
 import { isActualSuccess } from '../utils/sage-output';
-
-const inputSx = {
-  '& .MuiOutlinedInput-root': {
-    backgroundColor: draculaColors.currentLine,
-    color: draculaColors.foreground,
-    fontFamily: "'JetBrains Mono', monospace",
-    '& fieldset': { borderColor: draculaColors.comment },
-    '&:hover fieldset': { borderColor: draculaColors.purple },
-    '&.Mui-focused fieldset': { borderColor: draculaColors.purple },
-  },
-  '& .MuiInputLabel-root': {
-    color: draculaColors.comment,
-    fontFamily: "'JetBrains Mono', monospace",
-    '&.Mui-focused': { color: draculaColors.purple },
-  },
-  '& .MuiInputBase-input': {
-    fontFamily: "'JetBrains Mono', monospace",
-  },
-};
+import { reportFactor, extractPQ } from '../utils/factordb';
+import { inputSx } from '../styles/inputSx';
 
 export function InputPanel() {
-  const { selectedAttack, viewMode, setOutputResult, setOutputError, addToHistory } = useAppContext();
+  const { selectedAttack, viewMode, setOutputResult, setOutputError, addToHistory, showNotification } = useAppContext();
   const { execute } = useSageMath();
   const [tab, setTab] = useState(0);
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
@@ -90,6 +73,17 @@ export function InputPanel() {
         if (preResult !== null) {
           setOutputResult(preResult);
           addToHistory(selectedAttack.id, selectedAttack.name, preResult, isActualSuccess(preResult));
+          const preSuccess = isActualSuccess(preResult);
+          showNotification(`${selectedAttack.name}: ${preSuccess ? 'success' : 'failed'}`);
+          if (preSuccess && attacksByCategory.get('Factorization')?.includes(selectedAttack)) {
+            const pq = extractPQ(preResult);
+            if (pq && inputValues.n) {
+              reportFactor(inputValues.n, [pq.p, pq.q]).then(
+                resp => showNotification(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB'),
+                () => {},
+              );
+            }
+          }
           setLoading(false);
           return;
         }
@@ -100,6 +94,17 @@ export function InputPanel() {
       if (result.success) {
         setOutputResult(result.stdout);
         addToHistory(selectedAttack.id, selectedAttack.name, result.stdout, isActualSuccess(result.stdout));
+        const runSuccess = isActualSuccess(result.stdout);
+        showNotification(`${selectedAttack.name}: ${runSuccess ? 'success' : 'failed'}`);
+        if (runSuccess && attacksByCategory.get('Factorization')?.includes(selectedAttack)) {
+          const pq = extractPQ(result.stdout);
+          if (pq && inputValues.n) {
+            reportFactor(inputValues.n, [pq.p, pq.q]).then(
+              resp => showNotification(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB'),
+              () => {},
+            );
+          }
+        }
       } else {
         setOutputError(result.error || 'Unknown error');
         addToHistory(selectedAttack.id, selectedAttack.name, result.error || 'Unknown error', false);

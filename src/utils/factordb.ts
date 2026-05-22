@@ -67,3 +67,59 @@ export function formatFactorDBResult(result: FactorDBResult): string {
 
   return lines.join("\n")
 }
+
+/**
+ * Report factors to FactorDB for a given number.
+ * If corsProxy is set, POSTs JSON { number, factors } to ${corsProxy}/report.
+ * Otherwise POSTs form-encoded data directly to factordb.com/reportfactor.php.
+ */
+export async function reportFactor(
+  number: string,
+  factors: string[],
+  corsProxy = proxyUrl,
+): Promise<string> {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 10_000)
+
+  try {
+    if (corsProxy) {
+      const url = `${corsProxy}/report`
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ number, factors }),
+        signal: controller.signal,
+      })
+      if (!res.ok) throw new FactorDBError(`HTTP ${res.status}`, res.status)
+      return res.text()
+    }
+
+    const params = new URLSearchParams()
+    params.set("number", number)
+    for (const factor of factors) {
+      params.append("factor", factor)
+    }
+    const res = await fetch("https://factordb.com/reportfactor.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: params.toString(),
+      signal: controller.signal,
+    })
+    if (!res.ok) throw new FactorDBError(`HTTP ${res.status}`, res.status)
+    return res.text()
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+/**
+ * Extract p and q from a SageMath stdout string that contains
+ * `p = <digits>` and `q = <digits>` on their own lines.
+ * Returns null if either p or q is missing.
+ */
+export function extractPQ(output: string): { p: string; q: string } | null {
+  const pMatch = output.match(/^p\s*=\s*(\d+)\s*$/m)
+  const qMatch = output.match(/^q\s*=\s*(\d+)\s*$/m)
+  if (!pMatch || !qMatch) return null
+  return { p: pMatch[1], q: qMatch[1] }
+}

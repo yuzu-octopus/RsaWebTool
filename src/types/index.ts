@@ -32,6 +32,11 @@ export interface HistoryEntry {
   success: boolean;
 }
 
+export interface NotificationState {
+  message: string;
+  key: number;
+}
+
 export interface AppContextType {
   selectedAttack: Attack | null;
   setSelectedAttack: (attack: Attack | null) => void;
@@ -43,4 +48,6 @@ export interface AppContextType {
   setOutputError: (error: string | null) => void;
   history: HistoryEntry[];
   addToHistory: (attackId: string, attackName: string, result: string, success: boolean) => void;
+  notification: NotificationState | null;
+  showNotification: (message: string) => void;
 }
