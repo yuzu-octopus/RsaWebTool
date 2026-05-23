@@ -45,6 +45,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 | `RsaCalculator` | `RsaCalculator.tsx` | Pure BigInt calculator: Key Gen / Encrypt / Decrypt tabs, auto-format detection (hex/decimal/base64/ASCII), printable ASCII detection |
 | `ProofIndex` | `ProofIndex.tsx` | Searchable index of all 52 attacks with category tags and descriptions, click to navigate |
 | `ProofRenderer` | `ProofRenderer.tsx` | Full KaTeX parser: display math (align\*/equation\*/gather\*/aligned), inline math via $...$ (with auto-wrap heuristics for unadorned math tokens), itemize lists, heading detection, References section stripper |
+| `ErrorBoundary` | `ErrorBoundary.tsx` | Class component catching render crashes in content panels, Dracula-themed fallback UI, prevents sidebar/output/snackbar from going down |
 
 ### State Management
 
@@ -88,7 +89,7 @@ These run fully in the browser when sufficient parameters are provided, returnin
 2. **Script injection**: `<script type="text/x-sage">` with generated template code appended as textContent
 3. **Execution**: `window.sagecell.makeSagecell()` targets container by ID with `template: sagecell.templates.minimal`, `autoeval: true`
 4. **Polling**: `MutationObserver` on container waits for `.sagecell_stdout` to appear, then settles for 500ms before extracting text
-5. **Timeout**: 35s default (10s for SageCell script load), returns error on timeout
+5. **Timeout**: 35s default (10s for SageCell script load + 25s execution), returns error on timeout
 6. **Cleanup**: container removed from DOM, observer disconnected, event listeners cleaned
 
 ### Parallel Execution (Magic Mode)
@@ -151,6 +152,7 @@ src/
     RsaCalculator.tsx       — Key Gen / Encrypt / Decrypt tabs with auto-format detection
     ProofIndex.tsx          — Searchable filtered list of all 52 attacks with category tags
     ProofRenderer.tsx       — KaTeX renderer: parseProof → segments (displayMath, text, list) → render
+    ErrorBoundary.tsx       — Class-based error boundary with Dracula fallback UI for content panels
 workers/
   factordb-proxy.js         — Cloudflare Worker: CORS proxy for FactorDB (GET /query) + submit endpoint (POST /report)
   wrangler.toml             — Wrangler config (name, main, compatibility_date)

@@ -1,9 +1,10 @@
-import { useState, useRef, useMemo, useCallback } from 'react';
+import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import {
   Box,
   Typography,
   TextField,
   Button,
+  IconButton,
   List,
   ListItem,
   ListItemText,
@@ -12,17 +13,18 @@ import {
   LinearProgress,
   CircularProgress,
 } from '@mui/material';
-import { AutoFixHigh, Science, CheckCircle, Cancel, HourglassEmpty, SkipNext, Stop, ExpandMore, ExpandLess, Casino } from '@mui/icons-material';
+import { AutoFixHigh, Science, CheckCircle, Cancel, HourglassEmpty, SkipNext, Stop, ExpandMore, ExpandLess, Casino, ContentCopy } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
-import { useSageMathParallel } from '../hooks/useSageMath';
-import { attacks, attacksByCategory } from '../attacks';
+import { useSageMathParallel, DEFAULT_SAGE_TIMEOUT } from '../hooks/useSageMath';
+import { attacks, submitToFactorDB, autoDecrypt } from '../attacks';
 import { detectFormat, parsePEM } from '../utils/converters';
 import { generateKeyPair, encrypt, TESTCASE_BITS } from '../utils/testcases/core';
 import { isActualSuccess } from '../utils/sage-output';
-import { reportFactor, extractPQ } from '../utils/factordb';
 import { inputSx } from '../styles/inputSx';
 import type { Attack } from '../types';
+
+const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
 
 // Categorized parameter names for key=value extraction
 const kvParamNames = [
@@ -38,9 +40,17 @@ const kvParamNames = [
   'oracle_responses', 'oracle_runs', 'phi', 'moduli_list', 'n_values',
   'pairs', 'triples', 'oracle_pairs', 'known_prefix', 'p_msb', 'leak', 'unknown_bits',
 ];
-const kvRegex = new RegExp(`(?<name>${kvParamNames.join('|')})\\s*=\\s*(?<value>[0-9a-fA-F,\\n]+)`, 'g');
+const kvRegex = new RegExp(`(?<name>${kvParamNames.join('|')})\\s*=\\s*(?<value>[0-9a-fA-FxX,\\n]+)`, 'g');
+
+// Common JSON key aliases for structured input
+const KEY_ALIASES: Record<string, string> = {
+  ct: 'c', ciphertext: 'c', cipher: 'c', cipher_text: 'c',
+  modulus: 'n', mod: 'n', exponent: 'e', exp: 'e',
+  plaintext: 'm', plain: 'm', message: 'm', msg: 'm',
+};
 
 function extractParams(input: string): Record<string, string> {
+  const trimmed = input.trim();
   const params: Record<string, string> = {};
   let match;
   while ((match = kvRegex.exec(input)) !== null) {
@@ -48,11 +58,25 @@ function extractParams(input: string): Record<string, string> {
       params[match.groups.name] = match.groups.value.trim();
     }
   }
-  const detectedFmt = detectFormat(input.trim());
+  // JSON structured input support ({ "n": "0x...", "e": "65537", "ct": "..." })
+  try {
+    const json = JSON.parse(trimmed) as Record<string, unknown>;
+    if (typeof json === 'object' && !Array.isArray(json) && json !== null) {
+      for (const [key, value] of Object.entries(json)) {
+        const mapped = KEY_ALIASES[key.toLowerCase()] || key;
+        if (typeof value === 'string' && !params[mapped]) {
+          params[mapped] = value.replace(/^0x/i, '');
+        } else if (typeof value === 'number' && !params[mapped]) {
+          params[mapped] = value.toString();
+        }
+      }
+    }
+  } catch { /* not JSON */ }
+  const detectedFmt = detectFormat(trimmed);
   if (detectedFmt === 'hex' && !params.n) {
-    params.n = input.trim().replace(/^0x/, '').replace(/\s/g, '');
+    params.n = trimmed.replace(/^0x/, '').replace(/\s/g, '');
   } else if (detectedFmt === 'decimal' && !params.n) {
-    params.n = input.trim();
+    params.n = trimmed;
   }
   const pemResult = parsePEM(input);
   if (pemResult) {
@@ -69,6 +93,30 @@ function statusIcon(status: MagicJob['status']) {
   if (status === 'cancelled') return <Stop sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5 }} />;
   if (status === 'aborted') return <SkipNext sx={{ color: draculaColors.comment, fontSize: '1rem', mr: 0.5 }} />;
   return <HourglassEmpty sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5 }} />;
+}
+
+/**
+ * Build error insights summary from frontendCheck and (optionally) SageCell results.
+ * Returns null when there's nothing to report.
+ */
+function buildErrorInsights(
+  preCheckResults: ({ result?: string; error?: string; isSuccess?: boolean } | null)[],
+  sageResults?: { success: boolean; stdout: string; error?: string }[],
+): string | null {
+  const errParts: string[] = [];
+  for (const r of preCheckResults) {
+    if (r?.error) {
+      const label = r.error.includes('timed out') ? 'frontendCheck timed out' : 'frontendCheck error';
+      if (!errParts.includes(label)) errParts.push(label);
+    }
+  }
+  if (sageResults) {
+    const sageTimeouts = sageResults.filter(r => !r.success && r.error?.includes('timed out')).length;
+    const sageErrors = sageResults.filter(r => !r.success && r.error && !r.error.includes('timed out')).length;
+    if (sageTimeouts > 0) errParts.push(`${sageTimeouts} SageCell timed out`);
+    if (sageErrors > 0) errParts.push(`${sageErrors} execution errors`);
+  }
+  return errParts.length > 0 ? errParts.join(', ') : null;
 }
 
 interface MagicJob {
@@ -90,14 +138,49 @@ export function MagicPanel() {
   const runIdRef = useRef(0);
   const [showApplicable, setShowApplicable] = useState(false);
   const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
+  const [expandedJob, setExpandedJob] = useState<string | null>(null);
+  const [errorInsights, setErrorInsights] = useState<string | null>(null);
+  const testcaseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (testcaseTimerRef.current) clearTimeout(testcaseTimerRef.current);
+    };
+  }, []);
+
+  // Compute raw params once, share between applicablePreview and extractedParams
+  const paramsFromInput = useMemo(() => {
+    if (!rawInput.trim()) return null;
+    return extractParams(rawInput);
+  }, [rawInput]);
 
   const applicablePreview = useMemo(() => {
-    if (!rawInput.trim()) return [];
-    const params = extractParams(rawInput);
+    if (!paramsFromInput) return [];
     return attacks.filter(a => {
-      try { return a.applicableCheck(params); } catch { return false; }
+      if (a.category === 'Oracle') return false;
+      try { return a.applicableCheck(paramsFromInput); } catch { return false; }
     });
-  }, [rawInput]);
+  }, [paramsFromInput]);
+
+  const sortedApplicable = useMemo(() =>
+    [...applicablePreview].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]),
+    [applicablePreview],
+  );
+
+  const extractedParams = useMemo(() => {
+    if (!paramsFromInput) return null;
+    return Object.keys(paramsFromInput).length > 0 ? paramsFromInput : null;
+  }, [paramsFromInput]);
+
+  const applicableByCategory = useMemo(() => {
+    const grouped: Record<string, typeof applicablePreview> = {};
+    for (const a of applicablePreview) {
+      const cat = a.category;
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(a);
+    }
+    return grouped;
+  }, [applicablePreview]);
 
   const handleCrack = async () => {
     abortControllerRef.current?.abort();
@@ -109,50 +192,99 @@ export function MagicPanel() {
     setEarlyStop(false);
     setOutputResult(null);
     setOutputError(null);
+    setErrorInsights(null);
 
-    const params = extractParams(rawInput);
+    const params = paramsFromInput ?? {};
+    const applicable = sortedApplicable;
 
-    const applicable = applicablePreview;
-
-    const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
-    const sorted = [...applicable].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
-
-    const initialJobs: MagicJob[] = sorted.map(a => ({
+    const initialJobs: MagicJob[] = applicable.map(a => ({
       attackId: a.id,
       attackName: a.name,
       status: 'running',
     }));
     setJobs(initialJobs);
 
-    const preCheckResults = await Promise.all(
-      sorted.map(async (a, i) => {
-        if (a.frontendCheck) {
-          try {
-            const result = await a.frontendCheck(params);
-            if (result !== null) {
-              return { index: i, result };
-            }
-          } catch (e) {
-            return { index: i, error: e instanceof Error ? e.message : 'Unknown frontendCheck error' };
-          }
+    // Run all frontendChecks concurrently, updating job status as each completes
+    const preCheckPromises = applicable.map(async (a, i) => {
+      if (!a.frontendCheck) return null;
+      try {
+        const result = await a.frontendCheck(params);
+        if (result !== null) {
+          const isSuccess = isActualSuccess(result);
+          setJobs(prev => {
+            const updated = [...prev];
+            updated[i] = { ...updated[i], status: isSuccess ? 'success' : 'error', result };
+            return updated;
+          });
+          return { index: i, result, isSuccess };
         }
-        return null;
-      }),
-    );
-
-    const remaining: { attack: Attack; originalIndex: number }[] = [];
-
-    for (let i = 0; i < sorted.length; i++) {
-      if (!preCheckResults[i]) {
-        remaining.push({ attack: sorted[i], originalIndex: i });
+      } catch (e) {
+        const error = e instanceof Error ? e.message : 'Unknown frontendCheck error';
+        setJobs(prev => {
+          const updated = [...prev];
+          updated[i] = { ...updated[i], status: 'error', error };
+          return updated;
+        });
+        return { index: i, error };
       }
+      return null;
+    });
+
+    const settledPreChecks = await Promise.all(preCheckPromises);
+    // preCheckResults uses sparse entries: attacks without frontendCheck (or that returned null)
+    // remain at undefined indexes. The remaining-loop below treats undefined as "needs SageCell".
+    const preCheckResults: ({ result?: string; error?: string; isSuccess?: boolean } | null)[] = [];
+    for (const r of settledPreChecks) {
+      if (r) preCheckResults[r.index] = r;
+    }
+
+    // Build remaining list (attacks that need SageCell)
+    const remaining: { attack: Attack; originalIndex: number }[] = [];
+    for (let i = 0; i < applicable.length; i++) {
+      if (!preCheckResults[i]) {
+        remaining.push({ attack: applicable[i], originalIndex: i });
+      }
+    }
+
+    // If all attacks resolved by frontendCheck, short-circuit
+    if (remaining.length === 0) {
+      if (currentRunId !== runIdRef.current) return;
+      setRunning(false);
+      abortControllerRef.current = null;
+      const firstSuccess = preCheckResults.find(r => r?.isSuccess);
+      if (firstSuccess && firstSuccess.result) {
+        const idx = preCheckResults.indexOf(firstSuccess);
+        const attack = applicable[idx];
+        let displayResult = firstSuccess.result;
+        const decrypted = autoDecrypt(attack, params, firstSuccess.result);
+        if (decrypted) displayResult += '\n\n## Decrypted message\n' + decrypted;
+        setOutputResult(displayResult);
+        addToHistory(attack.id, attack.name, firstSuccess.result, true);
+        showNotification(`${attack.name}: success`, 'success');
+        submitToFactorDB(attack, firstSuccess.result, params.n, showNotification);
+        if (decrypted) {
+          setJobs(prev => prev.map(j =>
+            j.attackId === attack.id ? { ...j, result: displayResult } : j
+          ));
+        }
+      } else {
+        setErrorInsights(buildErrorInsights(preCheckResults));
+      }
+      return;
     }
 
     const codes = remaining.map(r => r.attack.sageTemplate(params));
 
     try {
-      const results = await executeAll(codes, 3, 35000, (_index, result) => {
+      const results = await executeAll(codes, 6, DEFAULT_SAGE_TIMEOUT, (remainingIndex, result) => {
         if (currentRunId !== runIdRef.current) return true;
+        const originalIndex = remaining[remainingIndex].originalIndex;
+        const jobStatus: MagicJob['status'] = result.success && isActualSuccess(result.stdout) ? 'success' : 'error';
+        setJobs(prev => {
+          const updated = [...prev];
+          updated[originalIndex] = { ...updated[originalIndex], status: jobStatus, result: result.stdout, error: result.error };
+          return updated;
+        });
         if (result.success && isActualSuccess(result.stdout)) {
           setEarlyStop(true);
           return true;
@@ -161,48 +293,31 @@ export function MagicPanel() {
       }, controller);
 
       if (currentRunId !== runIdRef.current) return;
-      const updatedJobs = initialJobs.map((job, i) => {
-        const pre = preCheckResults[i];
-        if (pre) {
-          if ('error' in pre) {
-            return { ...job, status: 'error' as const, error: pre.error };
-          }
-          const isSuccess = isActualSuccess(pre.result);
-          return { ...job, status: (isSuccess ? 'success' : 'error') as MagicJob['status'], result: pre.result };
-        }
-        const ri = remaining.findIndex(r => r.originalIndex === i);
-        if (ri >= 0 && ri < results.length) {
-          const r = results[ri];
-          const jobStatus: MagicJob['status'] =
-            r.success && isActualSuccess(r.stdout) ? 'success' : r.error === 'Aborted' ? 'aborted' : r.error === 'Cancelled' ? 'cancelled' : 'error';
-          return {
-            ...job,
-            status: jobStatus,
-            result: r.stdout,
-            error: r.error,
-          };
-        }
-        // Job wasn't reached (early stop)
-        return { ...job, status: 'aborted' as const };
-      });
-      setJobs(updatedJobs);
 
-      if (currentRunId !== runIdRef.current) return;
-      const firstSuccess = updatedJobs.find(j => j.status === 'success');
-      if (firstSuccess) {
-        setOutputResult(firstSuccess.result || '');
-        addToHistory(firstSuccess.attackId, firstSuccess.attackName, firstSuccess.result || '', true);
-        showNotification(`${firstSuccess.attackName}: success`, 'success');
-        const attack = attacks.find(a => a.id === firstSuccess.attackId);
-        if (attack && attacksByCategory.get('Factorization')?.includes(attack)) {
-          const pq = extractPQ(firstSuccess.result || '');
-          if (pq && params.n) {
-            reportFactor(params.n, [pq.p, pq.q]).then(
-              resp => showNotification(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB', 'info'),
-              err => { console.error('FactorDB submission failed:', err); showNotification('Failed to submit to FactorDB', 'error'); },
-            );
+      // Mark un-reached jobs as aborted (early stop)
+      setJobs(prev => prev.map(j => j.status === 'running' ? { ...j, status: 'aborted' as const } : j));
+
+      // Find and surface first success
+      const firstSuccessResult = results.find(r => r.success && isActualSuccess(r.stdout));
+      if (firstSuccessResult) {
+        const ri = remaining[firstSuccessResult.index];
+        const attack = attacks.find(a => a.id === applicable[ri.originalIndex].id);
+        if (attack) {
+          let displayResult = firstSuccessResult.stdout;
+          const decrypted = autoDecrypt(attack, params, firstSuccessResult.stdout);
+          if (decrypted) displayResult += '\n\n## Decrypted message\n' + decrypted;
+          setOutputResult(displayResult);
+          addToHistory(attack.id, attack.name, firstSuccessResult.stdout, true);
+          showNotification(`${attack.name}: success`, 'success');
+          submitToFactorDB(attack, firstSuccessResult.stdout, params.n, showNotification);
+          if (decrypted) {
+            setJobs(prev => prev.map(j =>
+              j.attackId === attack.id ? { ...j, result: displayResult } : j
+            ));
           }
         }
+      } else {
+        setErrorInsights(buildErrorInsights(preCheckResults, results));
       }
     } catch (err: unknown) {
       if (currentRunId !== runIdRef.current) return;
@@ -221,6 +336,7 @@ export function MagicPanel() {
   }, []);
 
   const handleGenerateTestcase = useCallback(() => {
+    if (testcaseTimerRef.current) clearTimeout(testcaseTimerRef.current);
     const { p, q, n, e, d } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
     // Use crypto.getRandomValues for unbiased random message
     const rand = new Uint32Array(1);
@@ -243,7 +359,7 @@ export function MagicPanel() {
     ];
     setRawInput(lines.join('\n'));
     setTestcaseMsg('Testcase generated — click Crack It to try all applicable attacks');
-    setTimeout(() => setTestcaseMsg(null), 3000);
+    testcaseTimerRef.current = setTimeout(() => setTestcaseMsg(null), 3000);
   }, []);
 
   if (viewMode !== 'magic') return null;
@@ -270,6 +386,45 @@ export function MagicPanel() {
             sx={inputSx}
           />
 
+          {/* Empty state — show format examples */}
+          {!rawInput.trim() && !running && jobs.length === 0 && (
+            <Box sx={{ mt: 2, p: 2, borderRadius: 1, backgroundColor: draculaColors.currentLine, border: `1px solid ${draculaColors.comment}` }}>
+              <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", mb: 1 }}>
+                Paste any of these formats:
+              </Typography>
+              <Box sx={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.7rem', color: draculaColors.foreground, '& div': { mb: 0.5 } }}>
+                <div>n = <span style={{ color: draculaColors.cyan }}>1234567890abcdef...</span></div>
+                <div>e = <span style={{ color: draculaColors.cyan }}>65537</span></div>
+                <div style={{ color: draculaColors.comment }}>— or PEM public key —</div>
+                <div style={{ color: draculaColors.comment }}>-----BEGIN RSA PUBLIC KEY-----</div>
+                <div style={{ color: draculaColors.comment }}>— or just hex/decimal n —</div>
+                <div style={{ color: draculaColors.comment }}>00c3a7...</div>
+                <div style={{ color: draculaColors.comment }}>— or JSON —</div>
+                <div style={{ color: draculaColors.cyan }}>{`{"n": "0x...", "e": 65537, "ct": "..."}`}</div>
+              </Box>
+            </Box>
+          )}
+
+          {/* Extracted params preview */}
+          {extractedParams && !running && (
+            <Box sx={{ mt: 2, p: 1.5, borderRadius: 1, backgroundColor: draculaColors.currentLine, border: `1px solid ${draculaColors.comment}` }}>
+              <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", mb: 0.75 }}>
+                Extracted parameters
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                {Object.entries(extractedParams).map(([key, value]) => (
+                  <Box key={key} sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.25, backgroundColor: draculaColors.background, borderRadius: 0.5, px: 0.75, py: 0.25 }}>
+                    <Typography sx={{ color: draculaColors.purple, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>{key}</Typography>
+                    <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>=</Typography>
+                    <Typography sx={{ color: value.length > 50 ? draculaColors.orange : draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {value.length > 50 ? `${value.slice(0, 47)}...` : value}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          )}
+
           {/* Applicable preview */}
           {rawInput.trim() && !running && (
             <Box sx={{ mt: 1 }}>
@@ -291,10 +446,17 @@ export function MagicPanel() {
               </Button>
               <Collapse in={showApplicable}>
                 <Box sx={{ px: 2, py: 1 }}>
-                  {applicablePreview.map(a => (
-                    <Typography key={a.id} sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", py: 0.25 }}>
-                      {a.name} <Typography component="span" sx={{ color: draculaColors.comment }}>({a.priority})</Typography>
-                    </Typography>
+                  {Object.entries(applicableByCategory).map(([cat, catAttacks]) => (
+                    <Box key={cat} sx={{ mb: 1 }}>
+                      <Typography sx={{ color: draculaColors.cyan, fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", mb: 0.5 }}>
+                        {cat}
+                      </Typography>
+                      {catAttacks.map(a => (
+                        <Typography key={a.id} sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", py: 0.25 }}>
+                          {a.name} <Typography component="span" sx={{ color: draculaColors.comment }}>({a.priority})</Typography>
+                        </Typography>
+                      ))}
+                    </Box>
                   ))}
                 </Box>
               </Collapse>
@@ -403,30 +565,68 @@ export function MagicPanel() {
             </Typography>
           )}
 
+          {/* Error insights */}
+          {errorInsights && !running && (
+            <Box sx={{ mt: 1.5, p: 1, borderRadius: 1, backgroundColor: draculaColors.currentLine, border: `1px solid ${draculaColors.comment}` }}>
+              <Typography sx={{ color: draculaColors.orange, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>
+                No attack succeeded — {errorInsights}
+              </Typography>
+              <Typography sx={{ color: draculaColors.comment, fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", mt: 0.5 }}>
+                Try checking parameter names, using a PEM key, or selecting a specific attack from the sidebar
+              </Typography>
+            </Box>
+          )}
+
           {jobs.length > 0 && (
             <>
               <Divider sx={{ borderColor: draculaColors.comment, my: 2 }} />
               <List dense>
                 {jobs.map(job => (
-                  <ListItem key={job.attackId} sx={{ px: 0 }}>
-                    <ListItemText
-                      primary={
-                        <Typography sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          fontFamily: "'JetBrains Mono', monospace",
-                          fontSize: '0.8rem',
-                          color: job.status === 'success' ? draculaColors.green : job.status === 'error' ? draculaColors.red : job.status === 'cancelled' ? draculaColors.orange : draculaColors.orange,
-                        }}>
-                          {statusIcon(job.status)} {job.attackName}
-                        </Typography>
-                      }
-                      secondary={job.error && (
-                        <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>
-                          {job.error}
+                  <ListItem key={job.attackId} sx={{ px: 0, flexDirection: 'column', alignItems: 'stretch' }}>
+                    <Box
+                      onClick={() => { if (job.result || job.error) setExpandedJob(expandedJob === job.attackId ? null : job.attackId); }}
+                      sx={{ display: 'flex', alignItems: 'center', cursor: (job.result || job.error) ? 'pointer' : 'default', width: '100%' }}
+                    >
+                      <ListItemText
+                        primary={
+                          <Typography sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontFamily: "'JetBrains Mono', monospace",
+                            fontSize: '0.8rem',
+                            color: job.status === 'success' ? draculaColors.green : job.status === 'error' ? draculaColors.red : job.status === 'cancelled' ? draculaColors.orange : draculaColors.orange,
+                          }}>
+                            {statusIcon(job.status)} {job.attackName}
+                          </Typography>
+                        }
+                        secondary={job.error && !(expandedJob === job.attackId) && (
+                          <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>
+                            {job.error.length > 80 ? `${job.error.slice(0, 77)}...` : job.error}
+                          </Typography>
+                        )}
+                      />
+                      {(job.result || job.error) && (
+                        <Typography sx={{ color: draculaColors.comment, display: 'flex', alignItems: 'center', mr: 1 }}>
+                          {expandedJob === job.attackId ? <ExpandLess sx={{ fontSize: '1rem' }} /> : <ExpandMore sx={{ fontSize: '1rem' }} />}
                         </Typography>
                       )}
-                    />
+                    </Box>
+                    <Collapse in={expandedJob === job.attackId}>
+                      <Box sx={{ ml: 2, mt: 0.5, p: 1, borderRadius: 1, backgroundColor: draculaColors.background, maxHeight: 200, overflow: 'auto', position: 'relative' }}>
+                        {(job.result || job.error) && (
+                          <IconButton
+                            size="small"
+                            onClick={() => { void navigator.clipboard.writeText(job.result || job.error || ''); }}
+                            sx={{ position: 'absolute', top: 2, right: 2, color: draculaColors.comment, zIndex: 1 }}
+                          >
+                            <ContentCopy sx={{ fontSize: '0.8rem' }} />
+                          </IconButton>
+                        )}
+                        <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                          {job.result || job.error || ''}
+                        </Typography>
+                      </Box>
+                    </Collapse>
                   </ListItem>
                 ))}
               </List>

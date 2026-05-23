@@ -1,4 +1,7 @@
 import type { Attack, AttackCategory } from '../types';
+import { extractPQ, reportFactor } from '../utils/factordb';
+import { modInverse, modPow } from '../utils/bigint';
+import { bigIntToBytes } from '../utils/converters';
 
 // Import all attacks (single import per file)
 import { attack as fermat, generateTestcase as genFermat } from './fermat';
@@ -142,4 +145,61 @@ export const CATEGORIES = [
 export const attacksByCategory = new Map<string, Attack[]>();
 for (const cat of CATEGORIES) {
   attacksByCategory.set(cat, attacks.filter(a => a.category === cat));
+}
+
+/**
+ * Submit p,q to FactorDB if the attack is a Factorization-category attack
+ * and the result contains extractable p,q values.
+ */
+export function submitToFactorDB(
+  attack: Attack,
+  result: string,
+  n: string | undefined,
+  notify: (msg: string, severity?: 'success' | 'error' | 'info') => void,
+) {
+  if (attacksByCategory.get('Factorization')?.includes(attack)) {
+    const pq = extractPQ(result);
+    if (pq && n) {
+      reportFactor(n, [pq.p, pq.q]).then(
+        resp => notify(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB', 'info'),
+        () => notify('Failed to submit to FactorDB', 'error'),
+      );
+    }
+  }
+}
+
+/**
+ * If a factorization attack found p,q and the user provided e and c,
+ * compute the decrypted message and return a human-readable string.
+ * Returns null if decryption isn't possible.
+ */
+export function autoDecrypt(
+  attack: Attack,
+  params: Record<string, string>,
+  resultStdout: string,
+): string | null {
+  if (!attacksByCategory.get('Factorization')?.includes(attack)) return null;
+  const pq = extractPQ(resultStdout);
+  if (!pq || !params.e || !params.c || !params.n) return null;
+  try {
+    const e = BigInt(params.e);
+    const c = BigInt(params.c);
+    const n = BigInt(params.n);
+    const p = BigInt(pq.p);
+    const q = BigInt(pq.q);
+    const phi = (p - 1n) * (q - 1n);
+    const d = modInverse(e, phi);
+    if (!d) return null;
+    const m = modPow(c, d, n);
+    const bytes = bigIntToBytes(m);
+    try {
+      const text = new TextDecoder().decode(bytes);
+      return text;
+    } catch {
+      // Not valid UTF-8 — return hex
+      return m.toString(16);
+    }
+  } catch {
+    return null;
+  }
 }

@@ -13,9 +13,8 @@ import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useSageMath } from '../hooks/useSageMath';
 import { ProofRenderer } from './ProofRenderer';
-import { testcaseGenerators, attacksByCategory } from '../attacks';
+import { testcaseGenerators, submitToFactorDB, autoDecrypt } from '../attacks';
 import { isActualSuccess } from '../utils/sage-output';
-import { reportFactor, extractPQ } from '../utils/factordb';
 import { inputSx } from '../styles/inputSx';
 
 export function InputPanel() {
@@ -28,9 +27,14 @@ export function InputPanel() {
   const attackIdRef = useRef<string | null>(null);
   const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
   const mountedRef = useRef(true);
+  const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   useEffect(() => {
     mountedRef.current = true;
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+      for (const id of timeoutIdsRef.current) clearTimeout(id);
+      timeoutIdsRef.current = [];
+    };
   }, []);
 
   if (viewMode !== 'attack') return null;
@@ -57,13 +61,15 @@ export function InputPanel() {
     const gen = testcaseGenerators[selectedAttack.id];
     if (!gen) {
       setTestcaseMsg('No testcase generator for this attack');
-      setTimeout(() => { if (mountedRef.current) setTestcaseMsg(null); }, 2000);
+      const id = setTimeout(() => { if (mountedRef.current) setTestcaseMsg(null); }, 2000);
+      timeoutIdsRef.current.push(id);
       return;
     }
     const values = gen();
     setInputValues(values);
     setTestcaseMsg('Testcase generated');
-    setTimeout(() => { if (mountedRef.current) setTestcaseMsg(null); }, 2000);
+    const id = setTimeout(() => { if (mountedRef.current) setTestcaseMsg(null); }, 2000);
+    timeoutIdsRef.current.push(id);
   };
 
   const handleRun = async () => {
@@ -80,19 +86,14 @@ export function InputPanel() {
         const preResult = await selectedAttack.frontendCheck(inputValues);
         if (preResult !== null) {
           if (attackIdRef.current !== currentAttackId) return;
-          setOutputResult(preResult);
+          let displayPreResult = preResult;
+          const decryptedPre = autoDecrypt(selectedAttack, inputValues, preResult);
+          if (decryptedPre) displayPreResult += '\n\n## Decrypted message\n' + decryptedPre;
+          setOutputResult(displayPreResult);
           addToHistory(selectedAttack.id, selectedAttack.name, preResult, isActualSuccess(preResult));
           const preSuccess = isActualSuccess(preResult);
           showNotification(`${selectedAttack.name}: ${preSuccess ? 'success' : 'failed'}`, preSuccess ? 'success' : 'error');
-          if (preSuccess && attacksByCategory.get('Factorization')?.includes(selectedAttack)) {
-            const pq = extractPQ(preResult);
-            if (pq && inputValues.n) {
-              reportFactor(inputValues.n, [pq.p, pq.q]).then(
-                resp => showNotification(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB', 'info'),
-                () => showNotification('Failed to submit to FactorDB', 'error'),
-              );
-            }
-          }
+          if (preSuccess) submitToFactorDB(selectedAttack, preResult, inputValues.n, showNotification);
           setLoading(false);
           return;
         }
@@ -102,19 +103,14 @@ export function InputPanel() {
       const result = await execute(code, 35000, controller.signal);
       if (attackIdRef.current !== currentAttackId) return;
       if (result.success) {
-        setOutputResult(result.stdout);
+        let displayStdout = result.stdout;
+        const decryptedSage = autoDecrypt(selectedAttack, inputValues, result.stdout);
+        if (decryptedSage) displayStdout += '\n\n## Decrypted message\n' + decryptedSage;
+        setOutputResult(displayStdout);
         addToHistory(selectedAttack.id, selectedAttack.name, result.stdout, isActualSuccess(result.stdout));
         const runSuccess = isActualSuccess(result.stdout);
         showNotification(`${selectedAttack.name}: ${runSuccess ? 'success' : 'failed'}`, runSuccess ? 'success' : 'error');
-        if (runSuccess && attacksByCategory.get('Factorization')?.includes(selectedAttack)) {
-          const pq = extractPQ(result.stdout);
-          if (pq && inputValues.n) {
-            reportFactor(inputValues.n, [pq.p, pq.q]).then(
-              resp => showNotification(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB', 'info'),
-              () => showNotification('Failed to submit to FactorDB', 'error'),
-            );
-          }
-        }
+        if (runSuccess) submitToFactorDB(selectedAttack, result.stdout, inputValues.n, showNotification);
       } else {
         setOutputError(result.error || 'Unknown error');
         addToHistory(selectedAttack.id, selectedAttack.name, result.error || 'Unknown error', false);

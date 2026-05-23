@@ -25,6 +25,9 @@ declare global {
   }
 }
 
+// Default timeout: 10s for SageCell script load + 25s for execution
+export const DEFAULT_SAGE_TIMEOUT = 35000;
+
 // Feature-detect AbortSignal.any() — available in Chrome 93+, Firefox 97+, Safari 15.4+
 const supportsAbortSignalAny = typeof AbortSignal !== 'undefined' && typeof AbortSignal.any === 'function';
 
@@ -90,7 +93,7 @@ function waitForSageCell(timeoutMs = 10000, signal?: AbortSignal): Promise<void>
 }
 
 export function createSageMathExecutor() {
-  const execute = async (code: string, timeoutMs = 35000, signal?: AbortSignal): Promise<SageResult> => {
+  const execute = async (code: string, timeoutMs = DEFAULT_SAGE_TIMEOUT, signal?: AbortSignal): Promise<SageResult> => {
     if (signal?.aborted) {
       return { success: false, stdout: '', error: 'Cancelled' };
     }
@@ -237,7 +240,7 @@ export function useSageMathParallel() {
   const executeAll = useCallback(async (
     codes: string[],
     concurrency = 3,
-    timeoutMs = 35000,
+    timeoutMs = DEFAULT_SAGE_TIMEOUT,
     onResult?: (index: number, result: SageResult) => boolean,
     externalController?: AbortController
   ): Promise<(SageResult & { index: number })[]> => {

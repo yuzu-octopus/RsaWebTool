@@ -359,7 +359,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
                 const para = paragraphs[j];
                 // Detect heading patterns like \textbf{Theorem}: or Theorem:
                 // Generic: captures any \textbf{...}: or CapitalWord: pattern
-                const headingMatch = para.match(/^\\textbf\{([^:]+):\}\s*(.*)/s) || para.match(/^([A-Z][a-zA-Z]+):\s*(.*)/s);
+                const headingMatch = para.match(/^\\textbf\{([^:]+):\}\s*(.*)/s) || para.match(/^([A-Z][a-zA-Z\s]+):\s*(.*)/s);
                 if (headingMatch && headingMatch[1] === 'References') {
                   skipRest = true;
                   break;

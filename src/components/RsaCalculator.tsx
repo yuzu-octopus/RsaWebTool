@@ -91,63 +91,53 @@ export function RsaCalculator() {
   const { viewMode } = useAppContext();
   const [tab, setTab] = useState(0);
 
-  // Key Gen state
+  // Input states for each tab
+  // Key Gen inputs
   const [kgP, setKgP] = useState('');
   const [kgQ, setKgQ] = useState('');
   const [kgE, setKgE] = useState('65537');
-  const [kgOutput, setKgOutput] = useState<string | null>(null);
-  const [kgError, setKgError] = useState<string | null>(null);
-
-  // Encrypt state
+  // Encrypt inputs
   const [encM, setEncM] = useState('');
   const [encN, setEncN] = useState('');
   const [encE, setEncE] = useState('');
-  const [encOutput, setEncOutput] = useState<string | null>(null);
-  const [encError, setEncError] = useState<string | null>(null);
-
-  // Decrypt state
+  // Decrypt inputs
   const [decC, setDecC] = useState('');
   const [decN, setDecN] = useState('');
   const [decD, setDecD] = useState('');
   const [decP, setDecP] = useState('');
   const [decQ, setDecQ] = useState('');
   const [decE, setDecE] = useState('');
-  const [decOutput, setDecOutput] = useState<string | null>(null);
-  const [decError, setDecError] = useState<string | null>(null);
+
+  // Unified result state for all three tabs
+  const [calcResult, setCalcResult] = useState<{ output: string | null; error: string | null }>({ output: null, error: null });
 
   if (viewMode !== 'calculator') return null;
 
   const handleTabChange = (_e: React.SyntheticEvent, v: number) => {
     setTab(v);
-    setKgOutput(null);
-    setKgError(null);
-    setEncOutput(null);
-    setEncError(null);
-    setDecOutput(null);
-    setDecError(null);
+    setCalcResult({ output: null, error: null });
   };
 
   const handleKeyGen = () => {
-    setKgOutput(null);
-    setKgError(null);
+    setCalcResult({ output: null, error: null });
     const p = parseBigInt(kgP);
     const q = parseBigInt(kgQ);
     const e = parseBigInt(kgE);
 
     if (p === null || q === null) {
-      setKgError('p and q must be valid numbers');
+      setCalcResult({ output: null, error: 'p and q must be valid numbers' });
       return;
     }
     if (p <= 1n || q <= 1n) {
-      setKgError('p and q must be > 1');
+      setCalcResult({ output: null, error: 'p and q must be > 1' });
       return;
     }
     if (e === null) {
-      setKgError('e must be a valid number');
+      setCalcResult({ output: null, error: 'e must be a valid number' });
       return;
     }
     if (e <= 0n) {
-      setKgError('e must be positive');
+      setCalcResult({ output: null, error: 'e must be positive' });
       return;
     }
 
@@ -155,61 +145,59 @@ export function RsaCalculator() {
     const phi = (p - 1n) * (q - 1n);
     const d = modInverse(e, phi);
 
-    let result = `n  = ${n}\n`;
-    result += `phi = ${phi}\n`;
-    result += d !== null ? `d  = ${d}` : `d  = undefined (e and phi not coprime)`;
-    setKgOutput(result);
+    let outputText = `n  = ${n}\n`;
+    outputText += `phi = ${phi}\n`;
+    outputText += d !== null ? `d  = ${d}` : `d  = undefined (e and phi not coprime)`;
+    setCalcResult({ output: outputText, error: null });
   };
 
   const handleEncrypt = () => {
-    setEncOutput(null);
-    setEncError(null);
+    setCalcResult({ output: null, error: null });
     const m = parseBigInt(encM);
     const n = parseBigInt(encN);
     const e = parseBigInt(encE);
 
     if (m === null || n === null || e === null) {
-      setEncError('m, n, and e must be valid numbers');
+      setCalcResult({ output: null, error: 'm, n, and e must be valid numbers' });
       return;
     }
     if (n <= 1n) {
-      setEncError('n must be > 1');
+      setCalcResult({ output: null, error: 'n must be > 1' });
       return;
     }
     if (e <= 0n) {
-      setEncError('e must be positive');
+      setCalcResult({ output: null, error: 'e must be positive' });
       return;
     }
     if (m >= n) {
-      setEncError('m must be < n');
+      setCalcResult({ output: null, error: 'm must be < n' });
       return;
     }
 
     const c = modPow(m, e, n);
-    let result = `c = ${c}\n`;
-    result += `c (hex) = ${toHex(c)}\n`;
+    let outputText = `c = ${c}\n`;
+    outputText += `c (hex) = ${toHex(c)}\n`;
     if (isPrintableAscii(c)) {
-      result += `c (ascii) = ${toAscii(c)}`;
+      outputText += `c (ascii) = ${toAscii(c)}`;
     }
-    setEncOutput(result);
+    setCalcResult({ output: outputText, error: null });
   };
 
   const handleDecrypt = () => {
-    setDecOutput(null);
-    setDecError(null);
+    setCalcResult({ output: null, error: null });
     const c = parseBigInt(decC);
     const n = parseBigInt(decN);
 
     if (c === null || n === null) {
-      setDecError('c and n must be valid numbers');
+      setCalcResult({ output: null, error: 'c and n must be valid numbers' });
       return;
     }
     if (n <= 1n) {
-      setDecError('n must be > 1');
+      setCalcResult({ output: null, error: 'n must be > 1' });
       return;
     }
     if (c >= n) {
-      setDecError('c must be < n');
+      setCalcResult({ output: null, error: 'c must be < n' });
       return;
     }
 
@@ -240,16 +228,16 @@ export function RsaCalculator() {
     }
 
     if (m === null) {
-      setDecError('Provide d, or p+q+e');
+      setCalcResult({ output: null, error: 'Provide d, or p+q+e' });
       return;
     }
 
-    let result = `m = ${m}\n`;
-    result += `m (hex) = ${toHex(m)}\n`;
+    let outputText = `m = ${m}\n`;
+    outputText += `m (hex) = ${toHex(m)}\n`;
     if (isPrintableAscii(m)) {
-      result += `m (ascii) = ${toAscii(m)}`;
+      outputText += `m (ascii) = ${toAscii(m)}`;
     }
-    setDecOutput(result);
+    setCalcResult({ output: outputText, error: null });
   };
 
   return (
@@ -297,8 +285,8 @@ export function RsaCalculator() {
               >
                 Compute
               </Button>
-              {kgOutput && <Box sx={outputBoxSx}>{kgOutput}</Box>}
-              {kgError && <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem' }}>{kgError}</Typography>}
+              {calcResult.output && <Box sx={outputBoxSx}>{calcResult.output}</Box>}
+              {calcResult.error && <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem' }}>{calcResult.error}</Typography>}
             </>
           )}
 
@@ -322,8 +310,8 @@ export function RsaCalculator() {
               >
                 Encrypt
               </Button>
-              {encOutput && <Box sx={outputBoxSx}>{encOutput}</Box>}
-              {encError && <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem' }}>{encError}</Typography>}
+              {calcResult.output && <Box sx={outputBoxSx}>{calcResult.output}</Box>}
+              {calcResult.error && <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem' }}>{calcResult.error}</Typography>}
             </>
           )}
 
@@ -352,8 +340,8 @@ export function RsaCalculator() {
               >
                 Decrypt
               </Button>
-              {decOutput && <Box sx={outputBoxSx}>{decOutput}</Box>}
-              {decError && <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem' }}>{decError}</Typography>}
+              {calcResult.output && <Box sx={outputBoxSx}>{calcResult.output}</Box>}
+              {calcResult.error && <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem' }}>{calcResult.error}</Typography>}
             </>
           )}
         </Box>

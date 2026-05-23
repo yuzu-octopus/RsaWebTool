@@ -119,81 +119,106 @@ function bytesToHex(bytes: number[]): string {
   return bytes.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
+function tryParsePkcs1(bytes: number[]): { n: string; e: string } | null {
+  try {
+    let offset = 0;
+    if (bytes[offset++] !== 0x30) return null;
+    offset = skipDerLength(bytes, offset);
+
+    if (bytes[offset++] !== 0x02) return null;
+    const { value: nBytes, newOffset: nEnd } = parseDerInteger(bytes, offset);
+    const n = bytesToHex(nBytes);
+    offset = nEnd;
+
+    if (bytes[offset++] !== 0x02) return null;
+    const { value: eBytes } = parseDerInteger(bytes, offset);
+    const e = bytesToHex(eBytes);
+
+    return { n, e };
+  } catch {
+    return null;
+  }
+}
+
+function tryParseSpki(bytes: number[]): { n: string; e: string } | null {
+  try {
+    let offset = 0;
+    // SPKI: SEQUENCE { AlgorithmIdentifier, BIT STRING { SEQUENCE { INTEGER n, INTEGER e } } }
+    if (bytes[offset++] !== 0x30) return null;
+    offset = skipDerLength(bytes, offset);
+
+    // Skip AlgorithmIdentifier (SEQUENCE + OID + NULL)
+    if (bytes[offset++] !== 0x30) return null;
+    offset = skipDerLength(bytes, offset);
+
+    // Skip BIT STRING wrapper
+    if (bytes[offset++] !== 0x03) return null;
+    offset = skipDerLength(bytes, offset);
+    const unusedBits = bytes[offset++];
+    if (unusedBits !== 0x00) {
+      console.warn(`parsePEM: unexpected BIT STRING unused bits 0x${unusedBits.toString(16)}, expected 0x00`);
+      return null;
+    }
+
+    // Now at inner SEQUENCE { n, e }
+    if (bytes[offset++] !== 0x30) return null;
+    offset = skipDerLength(bytes, offset);
+
+    if (bytes[offset++] !== 0x02) return null;
+    const { value: nBytes, newOffset: nEnd } = parseDerInteger(bytes, offset);
+    const n = bytesToHex(nBytes);
+    offset = nEnd;
+
+    if (bytes[offset++] !== 0x02) return null;
+    const { value: eBytes } = parseDerInteger(bytes, offset);
+    const e = bytesToHex(eBytes);
+
+    return { n, e };
+  } catch {
+    return null;
+  }
+}
+
 export function parsePEM(input: string): { n: string; e: string } | null {
   const spkiRegex =
     /-----BEGIN PUBLIC KEY-----(.+?)-----END PUBLIC KEY-----/s;
   const pkcs1Regex =
     /-----BEGIN RSA PUBLIC KEY-----(.+?)-----END RSA PUBLIC KEY-----/s;
 
-  let bytes: number[];
-  let isPkcs1 = false;
-
   const spkiMatch = spkiRegex.exec(input);
   const pkcs1Match = pkcs1Regex.exec(input);
 
   if (pkcs1Match) {
-    isPkcs1 = true;
     const b64 = pkcs1Match[1].replace(/\s/g, '');
     const der = atob(b64);
-    bytes = Array.from(der).map((c) => c.charCodeAt(0));
-  } else if (spkiMatch) {
+    const bytes = Array.from(der).map((c) => c.charCodeAt(0));
+    // Try PKCS#1 first, fall back to SPKI in case of header mismatch
+    const result = tryParsePkcs1(bytes);
+    if (result) return result;
+    return tryParseSpki(bytes);
+  }
+
+  if (spkiMatch) {
     const b64 = spkiMatch[1].replace(/\s/g, '');
     const der = atob(b64);
-    bytes = Array.from(der).map((c) => c.charCodeAt(0));
-  } else {
-    return null;
+    const bytes = Array.from(der).map((c) => c.charCodeAt(0));
+    return tryParseSpki(bytes);
   }
 
-  try {
-    let offset = 0;
+  return null;
+}
 
-    if (bytes[offset++] !== 0x30) return null;
-    offset = skipDerLength(bytes, offset);
-
-    if (isPkcs1) {
-      // PKCS#1: SEQUENCE { INTEGER n, INTEGER e } — n and e directly
-      if (bytes[offset++] !== 0x02) return null;
-      const { value: nBytes, newOffset: nEnd } = parseDerInteger(bytes, offset);
-      const n = bytesToHex(nBytes);
-      offset = nEnd;
-
-      if (bytes[offset++] !== 0x02) return null;
-      const { value: eBytes } = parseDerInteger(bytes, offset);
-      const e = bytesToHex(eBytes);
-
-      return { n, e };
-    } else {
-      // SPKI: SEQUENCE { AlgorithmIdentifier, BIT STRING { SEQUENCE { INTEGER n, INTEGER e } } }
-      // Skip AlgorithmIdentifier (SEQUENCE + OID + NULL)
-      if (bytes[offset++] !== 0x30) return null;
-      offset = skipDerLength(bytes, offset);
-
-      // Skip BIT STRING wrapper
-      if (bytes[offset++] !== 0x03) return null;
-      offset = skipDerLength(bytes, offset);
-      const unusedBits = bytes[offset++]; // skip unused bits byte
-      // DER requires unused bits to be 0 for octet-aligned data
-      if (unusedBits !== 0x00) {
-        console.warn(`parsePEM: unexpected BIT STRING unused bits 0x${unusedBits.toString(16)}, expected 0x00`);
-        return null;
-      }
-
-      // Now at inner SEQUENCE { n, e }
-      if (bytes[offset++] !== 0x30) return null;
-      offset = skipDerLength(bytes, offset);
-
-      if (bytes[offset++] !== 0x02) return null;
-      const { value: nBytes, newOffset: nEnd } = parseDerInteger(bytes, offset);
-      const n = bytesToHex(nBytes);
-      offset = nEnd;
-
-      if (bytes[offset++] !== 0x02) return null;
-      const { value: eBytes } = parseDerInteger(bytes, offset);
-      const e = bytesToHex(eBytes);
-
-      return { n, e };
-    }
-  } catch {
-    return null;
+/**
+ * Convert a BigInt to a Uint8Array (Python's `long_to_bytes` equivalent).
+ * Decodes to UTF-8 if valid, otherwise returns hex representation.
+ */
+export function bigIntToBytes(m: bigint): Uint8Array {
+  if (m === 0n) return new Uint8Array([0]);
+  const hex = m.toString(16);
+  const padded = hex.length % 2 === 0 ? hex : '0' + hex;
+  const bytes = new Uint8Array(padded.length / 2);
+  for (let i = 0; i < bytes.length; i++) {
+    bytes[i] = parseInt(padded.substring(i * 2, i * 2 + 2), 16);
   }
+  return bytes;
 }

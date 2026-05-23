@@ -7,12 +7,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [viewMode, setViewMode] = useState<AppContextType['viewMode']>('attack');
   const [outputResult, setOutputResult] = useState<string | null>(null);
   const [outputError, setOutputError] = useState<string | null>(null);
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [history, setHistory] = useState<HistoryEntry[]>(() => {
+    try {
+      const stored = localStorage.getItem('rsa-history');
+      if (!stored) return [];
+      const entries = JSON.parse(stored) as HistoryEntry[];
+      const cutoff = Date.now() - 86_400_000; // 24 hours
+      return entries.filter(e => new Date(e.timestamp).getTime() > cutoff);
+    } catch {
+      return [];
+    }
+  });
   const [notification, setNotification] = useState<NotificationState | null>(null);
   const keyCounter = useRef(0);
 
   const addToHistory = useCallback((attackId: string, attackName: string, result: string, success: boolean) => {
-    setHistory(prev => [{ attackId, attackName, timestamp: new Date(), result, success }, ...prev].slice(0, 50));
+    setHistory(prev => {
+      const entry: HistoryEntry = { attackId, attackName, timestamp: new Date(), result, success };
+      const updated = [entry, ...prev].slice(0, 50);
+      // Persist to localStorage (truncate result to 200 chars to stay under quota)
+      try {
+        const stored = updated.map(e => ({ ...e, result: e.result.length > 200 ? e.result.slice(0, 200) + '...' : e.result }));
+        localStorage.setItem('rsa-history', JSON.stringify(stored));
+      } catch { /* localStorage full or unavailable — silently ignore */ }
+      return updated;
+    });
   }, []);
 
   const showNotification = useCallback((message: string, severity?: 'success' | 'error' | 'info') => {

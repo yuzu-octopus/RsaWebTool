@@ -35,6 +35,7 @@ export function OutputPanel() {
     mountedRef.current = true;
     return () => { mountedRef.current = false; };
   }, []);
+
   const [historyOpen, setHistoryOpen] = useState(false);
   const [notepadOpen, setNotepadOpen] = useState(false);
   const [notepadText, setNotepadText] = useState(() => {
@@ -76,11 +77,19 @@ export function OutputPanel() {
     }
   };
 
+  // Debounced localStorage write for notepad (500ms)
+  useEffect(() => {
+    if (!notepadOpen) return;
+    const timer = setTimeout(() => {
+      try {
+        localStorage.setItem('notepad', JSON.stringify({ text: notepadText, timestamp: Date.now() }));
+      } catch { /* ignore */ }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [notepadText, notepadOpen]);
+
   const handleNotepadChange = (text: string) => {
     setNotepadText(text);
-    try {
-      localStorage.setItem('notepad', JSON.stringify({ text, timestamp: Date.now() }));
-    } catch { /* ignore */ }
   };
 
   return (

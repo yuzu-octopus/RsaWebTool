@@ -12,7 +12,8 @@ import {
 } from '@mui/material';
 import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, Calculate, CheckCircle, ErrorOutlined } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
-import { CATEGORIES, attacksByCategory, attacks } from '../attacks';
+import { CATEGORIES, attacksByCategory } from '../attacks';
+import type { Attack } from '../types';
 import { useAppContext } from '../hooks/useAppContext';
 import { FACTORDB_PROXY_URL } from '../config';
 
@@ -98,8 +99,7 @@ export function Sidebar() {
     });
   };
 
-  const handleAttackClick = (attackId: string) => {
-    const attack = attacks.find(a => a.id === attackId) || null;
+  const handleAttackClick = (attack: Attack) => {
     setSelectedAttack(attack);
     setViewMode('attack');
   };
@@ -145,7 +145,7 @@ export function Sidebar() {
                 {(attacksByCategory.get(cat) || []).map(attack => (
                   <ListItemButton
                     key={attack.id}
-                    onClick={() => handleAttackClick(attack.id)}
+                    onClick={() => handleAttackClick(attack)}
                     data-testid={`attack-${attack.id}`}
                     sx={{
                       pl: 4,
