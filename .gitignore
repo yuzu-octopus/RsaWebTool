@@ -17,6 +17,7 @@ scratch/
 AGENTS.md
 GEMINI.md
 scripts/
+test-results/
 public/test-api-suite.html
 workers/
 
