@@ -6,5 +6,12 @@ export default defineConfig({
   base: '/RsaWebTool/',
   build: {
     outDir: 'docs',
+    rollupOptions: {
+      output: {
+        entryFileNames: 'assets/index.js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name][extname]',
+      },
+    },
   },
 })
