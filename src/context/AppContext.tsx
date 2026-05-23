@@ -13,7 +13,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (!stored) return [];
       const entries = JSON.parse(stored) as HistoryEntry[];
       const cutoff = Date.now() - 86_400_000; // 24 hours
-      return entries.filter(e => new Date(e.timestamp).getTime() > cutoff);
+      return entries
+        .map(e => ({ ...e, timestamp: new Date(e.timestamp) }))
+        .filter(e => e.timestamp.getTime() > cutoff);
     } catch {
       return [];
     }
