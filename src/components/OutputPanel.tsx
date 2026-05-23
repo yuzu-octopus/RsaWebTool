@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -12,7 +12,6 @@ import {
 import { ExpandLess, ExpandMore, ContentCopy, CheckCircle, Cancel } from '@mui/icons-material';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula as draculaStyle } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import type { SyntaxHighlighterProps } from 'react-syntax-highlighter';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { hexToBytes, hexToAscii, decToHex, decToAscii, base64ToText } from '../utils/converters';
@@ -31,13 +30,18 @@ export function OutputPanel() {
   const [conversionState, setConversionState] = useState<{ result: string; sourceOutput: string } | null>(null);
   const conversionResult = conversionState?.sourceOutput === outputResult ? conversionState.result : null;
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [notepadOpen, setNotepadOpen] = useState(false);
   const [notepadText, setNotepadText] = useState(() => {
     try {
       const stored = localStorage.getItem('notepad');
       if (stored) {
-        const { text, timestamp } = JSON.parse(stored);
+        const { text, timestamp } = JSON.parse(stored) as { text: string; timestamp: number };
         if (Date.now() - timestamp < 3600000) return text;
       }
     } catch { /* ignore */ }
@@ -66,9 +70,9 @@ export function OutputPanel() {
 
   const handleCopy = () => {
     if (outputResult) {
-      navigator.clipboard.writeText(outputResult);
+      void navigator.clipboard.writeText(outputResult);
       setCopyMessage('Copied to clipboard!');
-      setTimeout(() => setCopyMessage(null), 2000);
+      setTimeout(() => { if (mountedRef.current) setCopyMessage(null); }, 2000);
     }
   };
 
@@ -121,7 +125,7 @@ export function OutputPanel() {
             }}>
               <SyntaxHighlighter
                 language="text"
-                style={draculaStyle as NonNullable<SyntaxHighlighterProps['style']>}
+                style={draculaStyle}
                 customStyle={{ margin: 0, borderRadius: 'inherit', fontSize: '0.8rem' }}
               >
                 {outputResult}
@@ -257,8 +261,8 @@ export function OutputPanel() {
 
         <Collapse in={historyOpen}>
           <List dense sx={{ maxHeight: '200px', overflow: 'auto' }}>
-            {history.map((entry, i) => (
-              <ListItem key={i} sx={{ px: 0 }}>
+            {history.map((entry) => (
+              <ListItem key={entry.timestamp.getTime() + '-' + entry.attackId} sx={{ px: 0 }}>
                 <ListItemText
                   primary={
                     <Typography sx={{ display: 'flex', alignItems: 'center', color: entry.success ? draculaColors.green : draculaColors.red, fontSize: '0.75rem', fontFamily: "'JetBrains Mono', monospace" }}>

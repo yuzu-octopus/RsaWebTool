@@ -10,11 +10,11 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'nearp', label: 'nearp (approximate p)', placeholder: 'Enter approximate p value...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (v) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
         try:
-            n = Integer(${v.n})
-            nearp = Integer(${v.nearp})
+            n = Integer(${vals.n})
+            nearp = Integer(${vals.nearp})
             if n <= 0 or nearp <= 0:
                 print("SIMPLE_LATTICE=FAILED: invalid input values")
                 return
@@ -103,7 +103,7 @@ p &= p_0 + x_0, \\quad q = n / p \\qed
 
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996`,
   priority: 'high',
-  applicableCheck: (p) => !!p.n && !!p.nearp,
+  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.nearp,
 };
 
 export const generateTestcase = (): Record<string, string> => {

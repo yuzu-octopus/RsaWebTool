@@ -2,8 +2,6 @@ node_modules
 dist
 docs
 .DS_Store
-src/.DS_Store
-.github/.DS_Store
 .env
 .env.local
 .env.*.local
@@ -12,7 +10,6 @@ src/.DS_Store
 .superpowers/
 .playwright-mcp/
 page-verify.md
-bun.lockb
 *.png
 test-*.ts
 HANDOFF.md

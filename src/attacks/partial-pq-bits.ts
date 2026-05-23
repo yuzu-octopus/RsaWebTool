@@ -11,12 +11,12 @@ export const attack: Attack = {
     { name: 'knownBits', label: 'knownBits (known bits of p)', placeholder: 'Enter known bits as integer...', multiline: true, rows: 3 },
     { name: 'bitPosition', label: 'bitPosition', placeholder: 'msb or lsb', multiline: false },
   ],
-  sageTemplate: (v) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
         try:
-            n = Integer(${v.n})
-            knownBits = Integer(${v.knownBits})
-            bitPosition = "${v.bitPosition}"
+            n = Integer(${vals.n})
+            knownBits = Integer(${vals.knownBits})
+            bitPosition = "${vals.bitPosition}"
             if n <= 0 or knownBits < 0:
                 print("PARTIAL_PQ_BITS=FAILED: invalid input values")
             elif bitPosition not in ("msb", "lsb"):
@@ -34,13 +34,13 @@ export const attack: Attack = {
                     m = 5; t = 5; dim = m + t
                     shifts = []
                     for i in range(m):
-                        shifts.append(n^(m - i) * f_ZZ^i)
+                        shifts.append(n**(m - i) * f_ZZ**i)
                     for kk in range(t):
-                        shifts.append(f_ZZ^m * x^kk)
+                        shifts.append(f_ZZ**m * x**kk)
                     M = matrix(ZZ, dim, dim)
                     for i, shift in enumerate(shifts):
                         for j, c in enumerate(shift.list()):
-                            M[i, j] = c * X^j
+                            M[i, j] = c * X**j
                     B = M.LLL()
                     found_p = None
                     for row_idx in range(dim):
@@ -78,13 +78,13 @@ export const attack: Attack = {
                     mm = 5; tt = 5; dim = mm + tt
                     shifts = []
                     for i in range(mm):
-                        shifts.append(n^(mm - i) * f_ZZ^i)
+                        shifts.append(n**(mm - i) * f_ZZ**i)
                     for kk in range(tt):
-                        shifts.append(f_ZZ^mm * x^kk)
+                        shifts.append(f_ZZ**mm * x**kk)
                     M = matrix(ZZ, dim, dim)
                     for i, shift in enumerate(shifts):
                         for j, c in enumerate(shift.list()):
-                            M[i, j] = c * X^j
+                            M[i, j] = c * X**j
                     B = M.LLL()
                     found_p = None
                     for row_idx in range(dim):
@@ -139,7 +139,7 @@ p &= f(x_0), \\quad q = n / p \\qed
 
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996; N. Howgrave-Graham, "Approximate Integer Common Divisors", 1997`,
   priority: 'high',
-  applicableCheck: (p) => !!p.n && !!p.knownBits && !!p.bitPosition,
+  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.knownBits && !!p.bitPosition,
 };
 
 export const generateTestcase = (): Record<string, string> => {

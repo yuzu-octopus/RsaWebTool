@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef, useCallback } from 'react';
 
 export interface SageResult {
   success: boolean;
@@ -25,6 +25,25 @@ declare global {
   }
 }
 
+// Feature-detect AbortSignal.any() — available in Chrome 93+, Firefox 97+, Safari 15.4+
+const supportsAbortSignalAny = typeof AbortSignal !== 'undefined' && typeof AbortSignal.any === 'function';
+
+function combineSignals(signals: AbortSignal[]): AbortSignal | undefined {
+  if (signals.length === 0) return undefined;
+  if (signals.length === 1) return signals[0];
+  if (supportsAbortSignalAny) return AbortSignal.any(signals);
+  // Fallback: create a controller that aborts when any input signal aborts
+  const controller = new AbortController();
+  for (const signal of signals) {
+    if (signal.aborted) {
+      controller.abort(signal.reason);
+      return controller.signal;
+    }
+    signal.addEventListener('abort', () => controller.abort(signal.reason), { once: true });
+  }
+  return controller.signal;
+}
+
 function createOffscreenContainer(): HTMLDivElement {
   const id = `sagecell-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
   const el = document.createElement('div');
@@ -41,25 +60,32 @@ function createOffscreenContainer(): HTMLDivElement {
   return el;
 }
 
-function injectSageScript(container: HTMLElement, code: string): HTMLScriptElement {
+function injectSageScript(container: HTMLElement, code: string): void {
   const script = document.createElement('script');
   script.type = 'text/x-sage';
   script.textContent = code;
   container.appendChild(script);
-  return script;
 }
 
-function waitForSageCell(timeoutMs = 10000): Promise<void> {
+function waitForSageCell(timeoutMs = 10000, signal?: AbortSignal): Promise<void> {
   if (window.sagecell) return Promise.resolve();
+  if (signal?.aborted) return Promise.reject(new Error('Aborted'));
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error('SageCell script failed to load')), timeoutMs);
     const check = setInterval(() => {
       if (window.sagecell) {
         clearInterval(check);
         clearTimeout(timer);
+        signal?.removeEventListener('abort', onAbort);
         resolve();
       }
     }, 50);
+    const onAbort = () => {
+      clearInterval(check);
+      clearTimeout(timer);
+      reject(new Error('Aborted'));
+    };
+    signal?.addEventListener('abort', onAbort, { once: true });
   });
 }
 
@@ -70,7 +96,7 @@ export function createSageMathExecutor() {
     }
 
     try {
-      await waitForSageCell();
+      await waitForSageCell(10000, signal);
     } catch {
       return { success: false, stdout: '', error: 'SageCell not loaded. Check network connection.' };
     }
@@ -123,15 +149,6 @@ export function createSageMathExecutor() {
             return;
           }
         }, 200);
-
-        // Fallback: if no markers after 30s, capture whatever output exists
-        setTimeout(() => {
-          if (resolved) return;
-          const text = stdoutDiv.textContent || '';
-          if (text.trim()) {
-            finish({ success: true, stdout: text.trim() });
-          }
-        }, 30000);
       });
 
       observer.observe(container, { childList: true, subtree: true, characterData: true });
@@ -164,11 +181,60 @@ export function createSageMathExecutor() {
 }
 
 export function useSageMath() {
-  return useMemo(() => createSageMathExecutor(), []);
+  // AbortController that fires when the consuming component unmounts.
+  // This ensures in-flight executions are cancelled and their side effects
+  // (timers, observers, DOM elements) are cleaned up.
+  const controllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    controllerRef.current = controller;
+    return () => {
+      controller.abort();
+      controllerRef.current = null;
+    };
+  }, []);
+
+  const executor = useMemo(() => createSageMathExecutor(), []);
+
+  const execute = async (
+    code: string,
+    timeoutMs = 35000,
+    signal?: AbortSignal,
+  ): Promise<SageResult> => {
+    const lifecycleSignal = controllerRef.current?.signal;
+    if (lifecycleSignal?.aborted) {
+      return { success: false, stdout: '', error: 'Component unmounted' };
+    }
+
+    // Merge lifecycle signal with any user-provided signal so that
+    // both component unmount and manual abort trigger cancellation.
+    const signals: AbortSignal[] = [];
+    if (lifecycleSignal) signals.push(lifecycleSignal);
+    if (signal) signals.push(signal);
+
+    const combinedSignal = combineSignals(signals);
+
+    return executor.execute(code, timeoutMs, combinedSignal);
+  };
+
+  return { execute };
 }
 
 export function useSageMathParallel() {
-  const executeAll = async (
+  // Lifecycle AbortController — aborts on component unmount
+  const lifecycleRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    lifecycleRef.current = controller;
+    return () => {
+      controller.abort();
+      lifecycleRef.current = null;
+    };
+  }, []);
+
+  const executeAll = useCallback(async (
     codes: string[],
     concurrency = 3,
     timeoutMs = 35000,
@@ -180,10 +246,17 @@ export function useSageMathParallel() {
     const inProgress = new Set<number>();
     const controller = externalController ?? new AbortController();
 
+    // Merge lifecycle signal with controller signal so that
+    // both component unmount and manual/early-stop abort trigger cancellation.
+    const lifecycleSignal = lifecycleRef.current?.signal;
+    const combinedSignal = combineSignals(
+      lifecycleSignal ? [controller.signal, lifecycleSignal] : [controller.signal]
+    );
+
     return new Promise((resolve) => {
       const { execute } = createSageMathExecutor();
 
-      const processNext = async () => {
+      const processNext = () => {
         if (queue.length === 0 && inProgress.size === 0) {
           resolve(results.sort((a, b) => a.index - b.index));
           return;
@@ -193,7 +266,7 @@ export function useSageMathParallel() {
           const item = queue.shift()!;
           inProgress.add(item.index);
 
-          execute(item.code, timeoutMs, controller.signal)
+          execute(item.code, timeoutMs, combinedSignal)
             .then((result) => {
               results.push({ ...result, index: item.index });
               if (onResult && onResult(item.index, result)) {
@@ -217,7 +290,7 @@ export function useSageMathParallel() {
 
       processNext();
     });
-  };
+  }, []);
 
   return { executeAll, createController: () => new AbortController() };
 }

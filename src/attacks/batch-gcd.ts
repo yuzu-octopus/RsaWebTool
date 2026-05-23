@@ -59,6 +59,7 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("BATCH_GCD=FAILED")
 _attack()`,
+  // eslint-disable-next-line @typescript-eslint/require-await
   frontendCheck: async (vals: Record<string, string>) => {
     try {
       const raw = (vals.n_values || '').trim();

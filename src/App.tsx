@@ -8,24 +8,40 @@ import { OutputPanel } from './components/OutputPanel';
 import { MagicPanel } from './components/MagicPanel';
 import { ProofIndex } from './components/ProofIndex';
 import { RsaCalculator } from './components/RsaCalculator';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { setFactorDBProxy } from './utils/factordb';
 import { FACTORDB_PROXY_URL } from './config';
 import { useAppContext } from './hooks/useAppContext';
 
+const severityBackground: Record<string, string> = {
+  success: draculaColors.green,
+  error: draculaColors.red,
+  info: draculaColors.cyan,
+};
+
 function AppContent() {
   const { notification, showNotification } = useAppContext();
+  const bgColor = notification?.severity ? severityBackground[notification.severity] : draculaColors.currentLine;
+
+  useEffect(() => {
+    if (FACTORDB_PROXY_URL) {
+      setFactorDBProxy(FACTORDB_PROXY_URL);
+    }
+  }, []);
 
   return (
     <>
       <Box sx={{ display: 'flex', height: '100vh' }}>
         <Sidebar />
         <Box sx={{ flex: 1, display: 'flex', minWidth: 0, overflow: 'hidden' }}>
-          <Box sx={{ flex: 1, display: 'flex', minWidth: 0, overflow: 'hidden' }}>
-            <InputPanel />
-            <MagicPanel />
-            <ProofIndex />
-            <RsaCalculator />
-          </Box>
+          <ErrorBoundary>
+            <Box sx={{ flex: 1, display: 'flex', minWidth: 0, overflow: 'hidden' }}>
+              <InputPanel />
+              <MagicPanel />
+              <ProofIndex />
+              <RsaCalculator />
+            </Box>
+          </ErrorBoundary>
           <OutputPanel />
         </Box>
       </Box>
@@ -39,7 +55,7 @@ function AppContent() {
         slotProps={{
           content: {
             sx: {
-              backgroundColor: draculaColors.currentLine,
+              backgroundColor: bgColor,
               color: draculaColors.foreground,
               fontFamily: "'JetBrains Mono', monospace",
               fontSize: '0.8rem',
@@ -52,12 +68,6 @@ function AppContent() {
 }
 
 function App() {
-  useEffect(() => {
-    if (FACTORDB_PROXY_URL) {
-      setFactorDBProxy(FACTORDB_PROXY_URL);
-    }
-  }, []);
-
   return (
     <ThemeProvider theme={draculaTheme}>
       <CssBaseline />

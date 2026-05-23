@@ -12,12 +12,12 @@ export const attack: Attack = {
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
     { name: 'dLow', label: 'dLow (low bits of d)', placeholder: 'Enter known low bits of d...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (v) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
         try:
-            n = Integer(${v.n})
-            e = Integer(${v.e})
-            dLow = Integer(${v.dLow})
+            n = Integer(${vals.n})
+            e = Integer(${vals.e})
+            dLow = Integer(${vals.dLow})
             if n <= 0 or e <= 0 or dLow < 0:
                 print("PARTIAL_D=FAILED: invalid input values")
             else:
@@ -75,7 +75,7 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\implies p, q \\qed
 
 \\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,
   priority: 'high',
-  applicableCheck: (p) => !!p.n && !!p.e && !!p.dLow,
+  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.dLow,
 };
 
 export const generateTestcase = (): Record<string, string> => {

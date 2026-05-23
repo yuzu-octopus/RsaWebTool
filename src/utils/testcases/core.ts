@@ -27,8 +27,11 @@ export function isPrimeMR(n: bigint): boolean {
   return true;
 }
 
-export function randomPrime(bits: number): bigint {
+export function randomPrime(bits: number, maxRetries = 10000): bigint {
+  if (bits < 2) throw new Error('randomPrime: bits must be >= 2');
+  let retries = 0;
   while (true) {
+    if (retries++ >= maxRetries) throw new Error('randomPrime: failed to find prime after maxRetries attempts');
     const numBytes = Math.ceil(bits / 8);
     const bytes = new Uint8Array(numBytes);
     crypto.getRandomValues(bytes);

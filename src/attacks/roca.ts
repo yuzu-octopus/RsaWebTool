@@ -176,6 +176,6 @@ export const generateTestcase = (): Record<string, string> => {
       return { n: (p * q).toString() };
     }
   }
-  const pair = generateKeyPair(64, 64);
+  const pair = generateKeyPair(256, 256);
   return { n: pair.n.toString() };
 };

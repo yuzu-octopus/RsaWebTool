@@ -1,4 +1,4 @@
-import type { Attack } from '../types';
+import type { Attack, AttackCategory } from '../types';
 
 // Import all attacks (single import per file)
 import { attack as fermat, generateTestcase as genFermat } from './fermat';
@@ -137,7 +137,7 @@ export const CATEGORIES = [
   'Message / Protocol',
   'Oracle',
   'Advanced',
-] as const;
+] as const satisfies readonly AttackCategory[];
 
 export const attacksByCategory = new Map<string, Attack[]>();
 for (const cat of CATEGORIES) {

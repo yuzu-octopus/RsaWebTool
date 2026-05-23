@@ -11,11 +11,11 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (v) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
         try:
-            n = Integer(${v.n})
-            e = Integer(${v.e})
+            n = Integer(${vals.n})
+            e = Integer(${vals.e})
             if n < 2:
                 print("DEPENDENT_PRIME=FAILED: n is too small")
                 return
@@ -88,7 +88,7 @@ p &= \\frac{-1 + \\sqrt{1 + 4kne}}{2k} \\\\
 
 \\textbf{References:} Custom CTF construction; related to Nitaj's constrained prime analysis`,
   priority: 'medium',
-  applicableCheck: (p) => !!p.n && !!p.e,
+  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e,
 };
 
 export const generateTestcase = (): Record<string, string> => {

@@ -13,7 +13,8 @@ export const attack: Attack = {
     { name: 'dp', label: 'dp (d mod p-1)', placeholder: 'Enter dp value...', multiline: true, rows: 3 },
     { name: 'dq', label: 'dq (d mod q-1, optional)', placeholder: 'Enter dq value...', multiline: true, rows: 3 },
   ],
-  frontendCheck: async (vals) => {
+  // eslint-disable-next-line @typescript-eslint/require-await
+  frontendCheck: async (vals: Record<string, string>) => {
     try {
       const n = BigInt(vals.n);
       const e = BigInt(vals.e);
@@ -55,9 +56,9 @@ export const attack: Attack = {
       return null;
     }
   },
-  sageTemplate: (v) => {
-    const dpBlock = v.dp ? `
-        dp = Integer(${v.dp})
+  sageTemplate: (vals: Record<string, string>) => {
+    const dpBlock = vals.dp ? `
+        dp = Integer(${vals.dp})
         if dp > 0:
             num = dp * e - 1
             for k in range(1, e):
@@ -73,9 +74,9 @@ export const attack: Attack = {
                         found = True
                         break` : '';
 
-    const dqBlock = v.dq ? `
+    const dqBlock = vals.dq ? `
         if not found:
-            dq = Integer(${v.dq})
+            dq = Integer(${vals.dq})
             if dq > 0:
                 num = dq * e - 1
                 for k in range(1, e):
@@ -93,8 +94,8 @@ export const attack: Attack = {
 
     return `def _attack():
     try:
-        n = Integer(${v.n})
-        e = Integer(${v.e})
+        n = Integer(${vals.n})
+        e = Integer(${vals.e})
         if n <= 0 or e <= 0:
             print("DP_DQ_LEAK=FAILED: invalid input values")
         else:
@@ -130,7 +131,7 @@ p &= (d_p \\cdot e - 1)/k + 1, \\quad \\text{check } p \\mid n \\\\
 
 \\textbf{References:} Standard RSA-CRT analysis; M. Campagna, A. Sethi, "Key Recovery Method for CRT Implementation of RSA"`,
   priority: 'high',
-  applicableCheck: (p) => !!p.n && !!p.e && (!!p.dp || !!p.dq),
+  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && (!!p.dp || !!p.dq),
 };
 
 export const generateTestcase = (): Record<string, string> => {

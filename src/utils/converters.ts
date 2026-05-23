@@ -1,30 +1,22 @@
 export function hexToBytes(hex: string): string {
-  try {
-    hex = hex.replace(/^0x/, '').replace(/\s/g, '');
-    if (hex.length % 2 !== 0) hex = '0' + hex;
-    const bytes: string[] = [];
-    for (let i = 0; i < hex.length; i += 2) {
-      bytes.push('0x' + hex.slice(i, i + 2));
-    }
-    return bytes.join(' ');
-  } catch {
-    return 'Error: Invalid hex string';
+  hex = hex.replace(/^0x/, '').replace(/\s/g, '');
+  if (hex.length % 2 !== 0) hex = '0' + hex;
+  const bytes: string[] = [];
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes.push('0x' + hex.slice(i, i + 2));
   }
+  return bytes.join(' ');
 }
 
 export function hexToAscii(hex: string): string {
-  try {
-    hex = hex.replace(/^0x/, '').replace(/\s/g, '');
-    if (hex.length % 2 !== 0) hex = '0' + hex;
-    let result = '';
-    for (let i = 0; i < hex.length; i += 2) {
-      const code = parseInt(hex.slice(i, i + 2), 16);
-      result += String.fromCharCode(code);
-    }
-    return result;
-  } catch {
-    return 'Error: Invalid hex string';
+  hex = hex.replace(/^0x/, '').replace(/\s/g, '');
+  if (hex.length % 2 !== 0) hex = '0' + hex;
+  let result = '';
+  for (let i = 0; i < hex.length; i += 2) {
+    const code = parseInt(hex.slice(i, i + 2), 16);
+    result += String.fromCharCode(code);
   }
+  return result;
 }
 
 export function decToHex(dec: string): string {
@@ -69,6 +61,10 @@ export function detectFormat(input: string): DetectedFormat {
   if (/^[0-9]+$/.test(trimmed)) {
     return 'decimal';
   }
+  // Short pure-alpha strings are likely ASCII, not base64
+  if (trimmed.length <= 3 && /^[A-Za-z]+$/.test(trimmed)) {
+    return 'ascii';
+  }
   if (/^[A-Za-z0-9+/]+=*$/.test(trimmed)) {
     try {
       atob(trimmed);
@@ -84,15 +80,20 @@ export function detectFormat(input: string): DetectedFormat {
 }
 
 function skipDerLength(bytes: number[], offset: number): number {
+  if (offset >= bytes.length) return offset;
   if (bytes[offset] < 0x80) return offset + 1;
   const numBytes = bytes[offset] & 0x7f;
-  return offset + 1 + numBytes;
+  const newOffset = offset + 1 + numBytes;
+  return newOffset > bytes.length ? bytes.length : newOffset;
 }
 
 function parseDerInteger(
   bytes: number[],
   offset: number,
 ): { value: number[]; newOffset: number } {
+  if (offset >= bytes.length) {
+    return { value: [], newOffset: offset };
+  }
   const length =
     bytes[offset] < 0x80
       ? bytes[offset]
@@ -100,6 +101,7 @@ function parseDerInteger(
           const numBytes = bytes[offset] & 0x7f;
           let len = 0;
           for (let i = 0; i < numBytes; i++) {
+            if (offset + 1 + i >= bytes.length) break;
             len = (len << 8) | bytes[offset + 1 + i];
           }
           return len;
@@ -169,7 +171,12 @@ export function parsePEM(input: string): { n: string; e: string } | null {
       // Skip BIT STRING wrapper
       if (bytes[offset++] !== 0x03) return null;
       offset = skipDerLength(bytes, offset);
-      offset++; // skip unused bits byte
+      const unusedBits = bytes[offset++]; // skip unused bits byte
+      // DER requires unused bits to be 0 for octet-aligned data
+      if (unusedBits !== 0x00) {
+        console.warn(`parsePEM: unexpected BIT STRING unused bits 0x${unusedBits.toString(16)}, expected 0x00`);
+        return null;
+      }
 
       // Now at inner SEQUENCE { n, e }
       if (bytes[offset++] !== 0x30) return null;

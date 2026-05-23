@@ -11,11 +11,11 @@ export const attack: Attack = {
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
     { name: 'bound', label: 'bound (max d_p, optional)', placeholder: 'Default 1000000', multiline: false },
   ],
-  sageTemplate: (v) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
-        n = Integer(${v.n})
-        e = Integer(${v.e})
-        bound = ${v.bound ? `Integer(${v.bound})` : 'Integer(50000)'}
+        n = Integer(${vals.n})
+        e = Integer(${vals.e})
+        bound = ${vals.bound ? `Integer(${vals.bound})` : 'Integer(50000)'}
         if n <= 0 or e <= 0 or bound <= 0:
             print("SMALL_CRT_EXP=FAILED: invalid input values")
         else:
@@ -74,7 +74,7 @@ p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
 
 \\textbf{References:} Standard RSA-CRT analysis; see also Jochemsz-May attack on small CRT exponents`,
   priority: 'medium',
-  applicableCheck: (p) => !!p.n && !!p.e,
+  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e,
 };
 
 export const generateTestcase = (): Record<string, string> => {

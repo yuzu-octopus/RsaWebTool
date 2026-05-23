@@ -128,7 +128,7 @@ m &= -\\frac{\\text{constant term}}{\\text{leading coefficient}} \\pmod{n} \\qed
 
 \\textbf{References:} Coppersmith et al. (1996); related message attacks on RSA`,
   priority: 'high',
-  applicableCheck: (p) => !!p.n && !!p.c1 && !!p.c2,
+  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.c1 && !!p.c2,
 };
 
 export const generateTestcase = (): Record<string, string> => {

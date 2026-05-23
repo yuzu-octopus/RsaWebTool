@@ -10,11 +10,13 @@ export interface InputField {
   defaultValue?: string;
 }
 
+export type AttackCategory = 'Factorization' | 'Partial Key / Lattice' | 'Message / Protocol' | 'Oracle' | 'Advanced';
+
 export interface Attack {
   id: string;
   name: string;
   description: string;
-  category: string;
+  category: AttackCategory;
   inputs: InputField[];
   sageTemplate: (vals: Record<string, string>) => string;
   proof: string;
@@ -35,6 +37,7 @@ export interface HistoryEntry {
 export interface NotificationState {
   message: string;
   key: number;
+  severity?: 'success' | 'error' | 'info';
 }
 
 export interface AppContextType {
@@ -49,5 +52,5 @@ export interface AppContextType {
   history: HistoryEntry[];
   addToHistory: (attackId: string, attackName: string, result: string, success: boolean) => void;
   notification: NotificationState | null;
-  showNotification: (message: string) => void;
+  showNotification: (message: string, severity?: 'success' | 'error' | 'info') => void;
 }

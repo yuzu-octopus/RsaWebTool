@@ -36,13 +36,6 @@ export const attack: Attack = {
                 print("NOVELTY_PRIMES=SUCCESS")
                 return
             print(f"Checking n = {n} against known CTF primes...")
-            print()
-            known_ctf_primes = [
-                # Common weak primes used in CTFs
-                # (In practice, these would be populated from a database of CTF challenges)
-                # Example: primes from CSAW, DEF CON, Plaid CTF, etc.
-                # The list below is illustrative
-            ]
             found = False
             print("Checking primes near powers of 2...")
             for bits in [64, 128, 256]:
@@ -70,14 +63,6 @@ export const attack: Attack = {
                             print(f"  Found prime near {name}: {candidate}")
                             print(f"  Cofactor: {n // candidate}")
                             found = True
-            if known_ctf_primes:
-                print("\\nChecking against known CTF primes...")
-                for kp in known_ctf_primes:
-                    kp = Integer(kp)
-                    if n % kp == 0:
-                        print(f"  Found known CTF prime: {kp}")
-                        print(f"  Cofactor: {n // kp}")
-                        found = True
             if found:
                 print("NOVELTY_PRIMES=SUCCESS")
             else:

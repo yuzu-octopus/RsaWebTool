@@ -214,30 +214,33 @@ function InlineMath({ text }: { text: string }) {
     const inlineRegex = /\$([^$]+)\$|\\\(([^)]+)\\\)/g;
     let lastIdx = 0;
     let match;
-    let key = 0;
 
     while ((match = inlineRegex.exec(processedText)) !== null) {
       if (match.index > lastIdx) {
+        const textContent = processedText.slice(lastIdx, match.index);
         result.push(
-          <span key={key} dangerouslySetInnerHTML={{ __html: renderInlineText(processedText.slice(lastIdx, match.index)) }} />
+          <span key={"txt-" + result.length} dangerouslySetInnerHTML={{ __html: renderInlineText(textContent) }} />
         );
-        key++;
       }
       const mathContent = match[1] ?? match[2];
+      let html: string | undefined;
       try {
-        const html = katex.renderToString(mathContent, { throwOnError: false, displayMode: false });
-        result.push(<span key={key} dangerouslySetInnerHTML={{ __html: html }} />);
-        key++;
+        html = katex.renderToString(mathContent, { throwOnError: false, displayMode: false });
       } catch {
-        result.push(<span key={key}>{`$${mathContent}$`}</span>);
-        key++;
+        /* fall through — html stays undefined, render raw fallback below */
       }
+      result.push(
+        html !== undefined
+          ? <span key={"math-" + result.length} dangerouslySetInnerHTML={{ __html: html }} />
+          : <span key={"math-" + result.length}>{`$${mathContent}$`}</span>
+      );
       lastIdx = match.index + match[0].length;
     }
 
     if (lastIdx < processedText.length) {
+      const textContent = processedText.slice(lastIdx);
       result.push(
-        <span key={key} dangerouslySetInnerHTML={{ __html: renderInlineText(processedText.slice(lastIdx)) }} />
+        <span key={"txt-" + result.length} dangerouslySetInnerHTML={{ __html: renderInlineText(textContent) }} />
       );
     }
 
@@ -319,7 +322,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
                 );
               } catch {
                 return (
-                  <Box key={i} sx={{ my: 2, color: draculaColors.red, fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                  <Box key={i} sx={{ my: 2, color: draculaColors.red, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.8rem' }}>
                     Math render error
                   </Box>
                 );

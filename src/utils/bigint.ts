@@ -31,11 +31,25 @@ export function isqrt(x: bigint): bigint {
 /**
  * Extended Euclidean Algorithm.
  * Returns { gcd, x, y } such that a*x + b*y = gcd.
+ * Inputs are normalized to non-negative values internally.
  */
 export function extendedGcd(a: bigint, b: bigint): { gcd: bigint; x: bigint; y: bigint } {
-  if (a === 0n) return { gcd: b, x: 0n, y: 1n };
-  const { gcd, x: x1, y: y1 } = extendedGcd(b % a, a);
-  return { gcd, x: y1 - (b / a) * x1, y: x1 };
+  // Normalize to non-negative inputs
+  const aNeg = a < 0n;
+  const bNeg = b < 0n;
+  a = aNeg ? -a : a;
+  b = bNeg ? -b : b;
+
+  let oldR = a, r = b;
+  let oldS = 1n, s = 0n;
+  let oldT = 0n, t = 1n;
+  while (r !== 0n) {
+    const quotient = oldR / r;
+    [oldR, r] = [r, oldR - quotient * r];
+    [oldS, s] = [s, oldS - quotient * s];
+    [oldT, t] = [t, oldT - quotient * t];
+  }
+  return { gcd: oldR, x: aNeg ? -oldS : oldS, y: bNeg ? -oldT : oldT };
 }
 
 /**
@@ -49,8 +63,11 @@ export function modInverse(a: bigint, m: bigint): bigint | null {
 
 /**
  * Modular exponentiation: base^exp mod mod.
+ * exp must be non-negative.
  */
 export function modPow(base: bigint, exp: bigint, mod: bigint): bigint {
+  if (exp < 0n) throw new RangeError('modPow: negative exponent not supported');
+  if (mod <= 0n) throw new RangeError('modPow: modulus must be positive');
   if (mod === 1n) return 0n;
   let result = 1n;
   base = ((base % mod) + mod) % mod;

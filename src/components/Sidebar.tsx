@@ -26,15 +26,15 @@ interface ServiceStatus {
 export function Sidebar() {
   const { selectedAttack, setSelectedAttack, setViewMode } = useAppContext();
   const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set(CATEGORIES));
-  const [status, setStatus] = useState<ServiceStatus>({ factordb: 'checking', sagecell: 'checking' });
+  const [status, setStatus] = useState<ServiceStatus>({
+    factordb: 'checking',
+    sagecell: typeof window !== 'undefined' && window.sagecell ? 'ok' : 'checking',
+  });
 
   useEffect(() => {
     const abortController = new AbortController();
-    let timer: ReturnType<typeof setInterval> | undefined;
-    let timeout: ReturnType<typeof setTimeout> | undefined;
     let factorDbTimeout: ReturnType<typeof setTimeout> | undefined;
 
-    // Check FactorDB proxy
     if (FACTORDB_PROXY_URL) {
       fetch(`${FACTORDB_PROXY_URL}?query=15`, { signal: abortController.signal })
         .then(r => r.json())
@@ -48,7 +48,6 @@ export function Sidebar() {
             setStatus(prev => ({ ...prev, factordb: 'error' }));
           }
         });
-      // Timeout fallback
       factorDbTimeout = setTimeout(() => {
         if (!abortController.signal.aborted) {
           abortController.abort();
@@ -59,34 +58,33 @@ export function Sidebar() {
       queueMicrotask(() => setStatus(prev => ({ ...prev, factordb: 'error' })));
     }
 
-    // Check SageMathCell
-    const checkSageCell = () => {
-      if (typeof window !== 'undefined' && window.sagecell) {
-        setStatus(prev => ({ ...prev, sagecell: 'ok' }));
-      } else {
-        timer = setInterval(() => {
-          if (window.sagecell) {
-            clearInterval(timer!);
-            setStatus(prev => ({ ...prev, sagecell: 'ok' }));
-          }
-        }, 200);
-        timeout = setTimeout(() => {
-          clearInterval(timer!);
-          if (!window.sagecell) {
-            setStatus(prev => ({ ...prev, sagecell: 'error' }));
-          }
-        }, 8000);
-      }
-    };
-    checkSageCell();
-
     return () => {
       abortController.abort();
-      if (timer) clearInterval(timer);
       if (factorDbTimeout) clearTimeout(factorDbTimeout);
-      if (timeout) clearTimeout(timeout);
     };
   }, []);
+
+  useEffect(() => {
+    if (status.sagecell !== 'checking') return;
+
+    const timer = setInterval(() => {
+      if (window.sagecell) {
+        clearInterval(timer);
+        setStatus(prev => ({ ...prev, sagecell: 'ok' }));
+      }
+    }, 200);
+    const timeout = setTimeout(() => {
+      clearInterval(timer);
+      if (!window.sagecell) {
+        setStatus(prev => ({ ...prev, sagecell: 'error' }));
+      }
+    }, 8000);
+
+    return () => {
+      clearInterval(timer);
+      clearTimeout(timeout);
+    };
+  }, [status.sagecell]);
 
   const toggleCat = (cat: string) => {
     setExpandedCats(prev => {
@@ -142,7 +140,7 @@ export function Sidebar() {
               </Typography>
               {expandedCats.has(cat) ? <ExpandLess sx={{ color: draculaColors.comment }} /> : <ExpandMore sx={{ color: draculaColors.comment }} />}
             </ListItemButton>
-            <Collapse in={expandedCats.has(cat)} timeout="auto" unmountOnExit>
+            <Collapse in={expandedCats.has(cat)} unmountOnExit>
               <List component="div" disablePadding>
                 {(attacksByCategory.get(cat) || []).map(attack => (
                   <ListItemButton

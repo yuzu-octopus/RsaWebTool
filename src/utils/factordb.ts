@@ -1,6 +1,7 @@
 export interface FactorDBResult {
   id: string
-  status: "FF" | "CF" | "PRP" | "Composite" | "Unknown" | string
+  // Known values: "FF" | "CF" | "PRP" | "Composite" | "Unknown"
+  status: string
   factors: [string, number][] | null
 }
 
@@ -20,11 +21,20 @@ export function setFactorDBProxy(url: string) {
   proxyUrl = url
 }
 
+function powWithBound(base: string | bigint, exp: number, maxExp = 100): bigint {
+  if (exp > maxExp) throw new Error(`Exponent ${exp} exceeds maximum ${maxExp}`)
+  let result = 1n
+  const b = typeof base === 'bigint' ? base : BigInt(base)
+  for (let i = 0; i < exp; i++) result *= b
+  return result
+}
+
 export async function queryFactorDB(
   n: string | bigint,
   corsProxy = proxyUrl,
 ): Promise<FactorDBResult> {
   const nStr = typeof n === "bigint" ? n.toString() : n
+  if (!nStr) throw new FactorDBError("queryFactorDB: n is empty")
   const baseUrl = corsProxy
     ? `${corsProxy}?query=${encodeURIComponent(nStr)}`
     : `https://factordb.com/api?query=${encodeURIComponent(nStr)}`
@@ -35,7 +45,11 @@ export async function queryFactorDB(
   try {
     const res = await fetch(baseUrl, { signal: controller.signal })
     if (!res.ok) throw new FactorDBError(`HTTP ${res.status}`, res.status)
-    return res.json()
+    const data: unknown = await res.json()
+    if (typeof data !== 'object' || data === null || typeof (data as Record<string, unknown>).id !== 'string') {
+      throw new FactorDBError('Invalid FactorDB response format')
+    }
+    return data as FactorDBResult
   } finally {
     clearTimeout(timeout)
   }
@@ -51,8 +65,8 @@ export function formatFactorDBResult(result: FactorDBResult): string {
       lines.push(`  ${factor}^${exp}`)
     }
     if (result.factors.length === 2) {
-      const p = BigInt(result.factors[0][0]) ** BigInt(result.factors[0][1])
-      const q = BigInt(result.factors[1][0]) ** BigInt(result.factors[1][1])
+      const p = powWithBound(result.factors[0][0], result.factors[0][1])
+      const q = powWithBound(result.factors[1][0], result.factors[1][1])
       lines.push(`p = ${p}`)
       lines.push(`q = ${q}`)
     }
@@ -78,6 +92,8 @@ export async function reportFactor(
   factors: string[],
   corsProxy = proxyUrl,
 ): Promise<string> {
+  if (!number) throw new FactorDBError("reportFactor: number is empty")
+  if (!Array.isArray(factors) || factors.length === 0) throw new FactorDBError("reportFactor: factors array is empty")
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 10_000)
 

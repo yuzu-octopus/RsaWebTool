@@ -117,6 +117,16 @@ export function RsaCalculator() {
 
   if (viewMode !== 'calculator') return null;
 
+  const handleTabChange = (_e: React.SyntheticEvent, v: number) => {
+    setTab(v);
+    setKgOutput(null);
+    setKgError(null);
+    setEncOutput(null);
+    setEncError(null);
+    setDecOutput(null);
+    setDecError(null);
+  };
+
   const handleKeyGen = () => {
     setKgOutput(null);
     setKgError(null);
@@ -255,7 +265,7 @@ export function RsaCalculator() {
 
           <Tabs
             value={tab}
-            onChange={(_e, v) => setTab(v)}
+            onChange={handleTabChange}
             sx={{
               mb: 2,
               borderBottom: `1px solid ${draculaColors.comment}`,

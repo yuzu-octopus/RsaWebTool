@@ -15,6 +15,7 @@ export const draculaColors = {
 };
 
 export const draculaTheme = createTheme({
+  cssVariables: true,
   palette: {
     mode: 'dark',
     background: {
@@ -34,11 +35,10 @@ export const draculaTheme = createTheme({
   },
   typography: {
     fontFamily: "'JetBrains Mono', monospace",
-    h1: { fontFamily: "'JetBrains Mono', monospace", fontWeight: 700 },
-    h2: { fontFamily: "'JetBrains Mono', monospace", fontWeight: 700 },
-    h3: { fontFamily: "'JetBrains Mono', monospace", fontWeight: 700 },
-    body1: { fontFamily: "'JetBrains Mono', monospace" },
-    body2: { fontFamily: "'JetBrains Mono', monospace" },
+    h1: { fontWeight: 700 },
+    h2: { fontWeight: 700 },
+    h3: { fontWeight: 700 },
+
   },
   components: {
     MuiCssBaseline: {

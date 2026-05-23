@@ -82,6 +82,7 @@ n_2 &= p \\cdot q_2 \\\\
 \\textbf{References:} A. K. Lenstra et al., "Ron was wrong, Whit is right" (2012) — found 0.2\\% of RSA keys shared factors`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n1 && !!p.n2,
+  // eslint-disable-next-line @typescript-eslint/require-await
   frontendCheck: async (vals: Record<string, string>) => {
     try {
       const n1 = BigInt(vals.n1);

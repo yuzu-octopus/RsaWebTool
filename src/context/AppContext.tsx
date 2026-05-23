@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, type ReactNode } from 'react';
+import { useState, useCallback, useRef, useMemo, type ReactNode } from 'react';
 import type { AppContextType, HistoryEntry, NotificationState } from '../types';
 import { AppContext } from './ctx';
 
@@ -15,17 +15,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setHistory(prev => [{ attackId, attackName, timestamp: new Date(), result, success }, ...prev].slice(0, 50));
   }, []);
 
-  const showNotification = useCallback((message: string) => {
+  const showNotification = useCallback((message: string, severity?: 'success' | 'error' | 'info') => {
     if (!message) {
       setNotification(null);
       return;
     }
     const key = ++keyCounter.current;
-    setNotification({ message, key });
+    setNotification({ message, key, severity });
   }, []);
 
+  const value = useMemo(() => ({
+    selectedAttack, setSelectedAttack, viewMode, setViewMode,
+    outputResult, setOutputResult, outputError, setOutputError,
+    history, addToHistory, notification, showNotification,
+  }), [
+    selectedAttack, setSelectedAttack, viewMode, setViewMode,
+    outputResult, setOutputResult, outputError, setOutputError,
+    history, addToHistory, notification, showNotification,
+  ]);
+
   return (
-    <AppContext.Provider value={{ selectedAttack, setSelectedAttack, viewMode, setViewMode, outputResult, setOutputResult, outputError, setOutputError, history, addToHistory, notification, showNotification }}>
+    <AppContext.Provider value={value}>
       {children}
     </AppContext.Provider>
   );

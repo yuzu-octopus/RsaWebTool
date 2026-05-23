@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react';
+import { useState, useRef, useMemo, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -22,6 +22,7 @@ import { generateKeyPair, encrypt, TESTCASE_BITS } from '../utils/testcases/core
 import { isActualSuccess } from '../utils/sage-output';
 import { reportFactor, extractPQ } from '../utils/factordb';
 import { inputSx } from '../styles/inputSx';
+import type { Attack } from '../types';
 
 // Categorized parameter names for key=value extraction
 const kvParamNames = [
@@ -61,6 +62,15 @@ function extractParams(input: string): Record<string, string> {
   return params;
 }
 
+// Status icon render function extracted outside component
+function statusIcon(status: MagicJob['status']) {
+  if (status === 'success') return <CheckCircle sx={{ color: draculaColors.green, fontSize: '1rem', mr: 0.5 }} />;
+  if (status === 'error') return <Cancel sx={{ color: draculaColors.red, fontSize: '1rem', mr: 0.5 }} />;
+  if (status === 'cancelled') return <Stop sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5 }} />;
+  if (status === 'aborted') return <SkipNext sx={{ color: draculaColors.comment, fontSize: '1rem', mr: 0.5 }} />;
+  return <HourglassEmpty sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5 }} />;
+}
+
 interface MagicJob {
   attackId: string;
   attackName: string;
@@ -77,6 +87,7 @@ export function MagicPanel() {
   const [running, setRunning] = useState(false);
   const [earlyStop, setEarlyStop] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const runIdRef = useRef(0);
   const [showApplicable, setShowApplicable] = useState(false);
   const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
 
@@ -88,9 +99,9 @@ export function MagicPanel() {
     });
   }, [rawInput]);
 
-  if (viewMode !== 'magic') return null;
-
   const handleCrack = async () => {
+    abortControllerRef.current?.abort();
+    const currentRunId = ++runIdRef.current;
     const controller = createController();
     abortControllerRef.current = controller;
     setRunning(true);
@@ -101,9 +112,7 @@ export function MagicPanel() {
 
     const params = extractParams(rawInput);
 
-    const applicable = attacks.filter(a => {
-      try { return a.applicableCheck(params); } catch { return false; }
-    });
+    const applicable = applicablePreview;
 
     const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
     const sorted = [...applicable].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
@@ -123,15 +132,15 @@ export function MagicPanel() {
             if (result !== null) {
               return { index: i, result };
             }
-          } catch {
-            /* fall through to SageCell */
+          } catch (e) {
+            return { index: i, error: e instanceof Error ? e.message : 'Unknown frontendCheck error' };
           }
         }
         return null;
       }),
     );
 
-    const remaining: { attack: typeof sorted[0]; originalIndex: number }[] = [];
+    const remaining: { attack: Attack; originalIndex: number }[] = [];
 
     for (let i = 0; i < sorted.length; i++) {
       if (!preCheckResults[i]) {
@@ -143,6 +152,7 @@ export function MagicPanel() {
 
     try {
       const results = await executeAll(codes, 3, 35000, (_index, result) => {
+        if (currentRunId !== runIdRef.current) return true;
         if (result.success && isActualSuccess(result.stdout)) {
           setEarlyStop(true);
           return true;
@@ -150,18 +160,24 @@ export function MagicPanel() {
         return false;
       }, controller);
 
+      if (currentRunId !== runIdRef.current) return;
       const updatedJobs = initialJobs.map((job, i) => {
         const pre = preCheckResults[i];
         if (pre) {
+          if ('error' in pre) {
+            return { ...job, status: 'error' as const, error: pre.error };
+          }
           const isSuccess = isActualSuccess(pre.result);
           return { ...job, status: (isSuccess ? 'success' : 'error') as MagicJob['status'], result: pre.result };
         }
         const ri = remaining.findIndex(r => r.originalIndex === i);
         if (ri >= 0 && ri < results.length) {
           const r = results[ri];
+          const jobStatus: MagicJob['status'] =
+            r.success && isActualSuccess(r.stdout) ? 'success' : r.error === 'Aborted' ? 'aborted' : r.error === 'Cancelled' ? 'cancelled' : 'error';
           return {
             ...job,
-            status: (r.success && isActualSuccess(r.stdout) ? 'success' : r.error === 'Aborted' ? 'aborted' : r.error === 'Cancelled' ? 'cancelled' : 'error') as 'success' | 'error' | 'aborted' | 'cancelled',
+            status: jobStatus,
             result: r.stdout,
             error: r.error,
           };
@@ -171,36 +187,40 @@ export function MagicPanel() {
       });
       setJobs(updatedJobs);
 
+      if (currentRunId !== runIdRef.current) return;
       const firstSuccess = updatedJobs.find(j => j.status === 'success');
       if (firstSuccess) {
         setOutputResult(firstSuccess.result || '');
         addToHistory(firstSuccess.attackId, firstSuccess.attackName, firstSuccess.result || '', true);
-        showNotification(`${firstSuccess.attackName}: success`);
+        showNotification(`${firstSuccess.attackName}: success`, 'success');
         const attack = attacks.find(a => a.id === firstSuccess.attackId);
         if (attack && attacksByCategory.get('Factorization')?.includes(attack)) {
           const pq = extractPQ(firstSuccess.result || '');
           if (pq && params.n) {
             reportFactor(params.n, [pq.p, pq.q]).then(
-              resp => showNotification(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB'),
-              () => {},
+              resp => showNotification(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB', 'info'),
+              err => { console.error('FactorDB submission failed:', err); showNotification('Failed to submit to FactorDB', 'error'); },
             );
           }
         }
       }
     } catch (err: unknown) {
+      if (currentRunId !== runIdRef.current) return;
       const message = err instanceof Error ? err.message : 'Magic cracker failed';
       setOutputError(message);
     } finally {
-      setRunning(false);
-      abortControllerRef.current = null;
+      if (currentRunId === runIdRef.current) {
+        setRunning(false);
+        abortControllerRef.current = null;
+      }
     }
   };
 
-  const handleStop = () => {
+  const handleStop = useCallback(() => {
     abortControllerRef.current?.abort();
-  };
+  }, []);
 
-  const handleGenerateTestcase = () => {
+  const handleGenerateTestcase = useCallback(() => {
     const { p, q, n, e, d } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
     // Use crypto.getRandomValues for unbiased random message
     const rand = new Uint32Array(1);
@@ -224,15 +244,9 @@ export function MagicPanel() {
     setRawInput(lines.join('\n'));
     setTestcaseMsg('Testcase generated — click Crack It to try all applicable attacks');
     setTimeout(() => setTestcaseMsg(null), 3000);
-  };
+  }, []);
 
-  const statusIcon = (status: MagicJob['status']) => {
-    if (status === 'success') return <CheckCircle sx={{ color: draculaColors.green, fontSize: '1rem', mr: 0.5 }} />;
-    if (status === 'error') return <Cancel sx={{ color: draculaColors.red, fontSize: '1rem', mr: 0.5 }} />;
-    if (status === 'cancelled') return <Stop sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5 }} />;
-    if (status === 'aborted') return <SkipNext sx={{ color: draculaColors.comment, fontSize: '1rem', mr: 0.5 }} />;
-    return <HourglassEmpty sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5 }} />;
-  };
+  if (viewMode !== 'magic') return null;
 
   return (
     <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -332,7 +346,7 @@ export function MagicPanel() {
             <Button
               fullWidth
               variant="outlined"
-              onClick={handleCrack}
+              onClick={() => { void handleCrack(); }}
               disabled={!rawInput.trim()}
               sx={{
                 mt: 2,
@@ -350,30 +364,21 @@ export function MagicPanel() {
           {/* Progress bar and status */}
           {running && (
             <Box sx={{ mt: 2, width: '100%' }}>
-              {jobs.length > 0 ? (
-                <>
-                  <LinearProgress
-                    variant="determinate"
-                    value={(jobs.filter(j => j.status !== 'running').length / jobs.length) * 100}
-                    sx={{
-                      height: 6,
-                      borderRadius: 3,
-                      backgroundColor: draculaColors.currentLine,
-                      '& .MuiLinearProgress-bar': { backgroundColor: draculaColors.purple },
-                    }}
-                  />
-                  <Typography variant="body2" sx={{ color: draculaColors.purple, mt: 1, textAlign: 'center', fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                    <CircularProgress size={16} sx={{ color: draculaColors.purple }} />
-                    {jobs.filter(j => j.status !== 'running').length}/{jobs.length} completed
-                    {jobs.filter(j => j.status === 'running').length > 0 && `, ${jobs.filter(j => j.status === 'running').length} running`}
-                  </Typography>
-                </>
-              ) : (
-                <Typography variant="body2" sx={{ color: draculaColors.purple, mt: 1, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                  <CircularProgress size={16} sx={{ color: draculaColors.purple }} />
-                  Preparing attacks...
-                </Typography>
-              )}
+              <LinearProgress
+                variant="determinate"
+                value={jobs.length > 0 ? (jobs.filter(j => j.status !== 'running').length / jobs.length) * 100 : 0}
+                sx={{
+                  height: 6,
+                  borderRadius: 3,
+                  backgroundColor: draculaColors.currentLine,
+                  '& .MuiLinearProgress-bar': { backgroundColor: draculaColors.purple },
+                }}
+              />
+              <Typography variant="body2" sx={{ color: draculaColors.purple, mt: 1, textAlign: 'center', fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                <CircularProgress size={16} sx={{ color: draculaColors.purple }} />
+                {jobs.filter(j => j.status !== 'running').length}/{jobs.length} completed
+                {jobs.filter(j => j.status === 'running').length > 0 && `, ${jobs.filter(j => j.status === 'running').length} running`}
+              </Typography>
             </Box>
           )}
 

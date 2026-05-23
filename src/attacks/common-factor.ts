@@ -56,6 +56,7 @@ print("COMMON_FACTOR=FAILED")`;
     #
 _attack()`;
   },
+  // eslint-disable-next-line @typescript-eslint/require-await
   frontendCheck: async (vals: Record<string, string>) => {
     try {
       const n = BigInt(vals.n);

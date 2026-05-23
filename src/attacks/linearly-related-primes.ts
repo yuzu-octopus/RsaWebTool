@@ -10,11 +10,11 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'k', label: 'k (known multiplier)', placeholder: 'Enter k value...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (v) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
         try:
-            n = Integer(${v.n})
-            k = Integer(${v.k})
+            n = Integer(${vals.n})
+            k = Integer(${vals.k})
             if n < 2:
                 print("LINEARLY_RELATED_PRIMES=FAILED: n is too small")
                 return
@@ -85,7 +85,7 @@ p &= \\frac{-\\delta \\pm \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
 
 \\textbf{References:} A. Nitaj, "Cryptanalysis of RSA with Constrained Primes", 1999`,
   priority: 'medium',
-  applicableCheck: (p) => !!p.n && !!p.k,
+  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.k,
 };
 
 export const generateTestcase = (): Record<string, string> => {

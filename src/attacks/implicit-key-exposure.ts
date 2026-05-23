@@ -12,12 +12,12 @@ export const attack: Attack = {
     { name: 'a', label: 'a (base)', placeholder: 'Enter base a...', multiline: false },
     { name: 'leak', label: 'leak (a^p mod n)', placeholder: 'Enter leaked value...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (v) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
         try:
-            n = Integer(${v.n})
-            a = Integer(${v.a})
-            leak = Integer(${v.leak})
+            n = Integer(${vals.n})
+            a = Integer(${vals.a})
+            leak = Integer(${vals.leak})
             if n < 2 or a < 2 or leak < 0:
                 print("Invalid input")
                 print("IMPLICIT_KEY_EXPOSURE=FAILED")
@@ -76,8 +76,9 @@ p &= \\gcd(\\text{leak} - a, n) \\qed
 
 \\textbf{References:} Common CTF pattern; based on Fermat's Little Theorem`,
   priority: 'high',
-  applicableCheck: (p) => !!p.n && !!p.a && !!p.leak,
-  frontendCheck: async (vals) => {
+  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.a && !!p.leak,
+  // eslint-disable-next-line @typescript-eslint/require-await
+  frontendCheck: async (vals: Record<string, string>) => {
     try {
       const n = BigInt(vals.n);
       const a = BigInt(vals.a);

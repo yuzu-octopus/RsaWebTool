@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -19,13 +19,16 @@ export function ProofIndex() {
   const { viewMode, setSelectedAttack, setViewMode } = useAppContext();
   const [search, setSearch] = useState('');
 
-  if (viewMode !== 'proofs') return null;
-
-  const filtered = attacks.filter(a =>
-    a.name.toLowerCase().includes(search.toLowerCase()) ||
-    a.description.toLowerCase().includes(search.toLowerCase()) ||
-    a.category.toLowerCase().includes(search.toLowerCase())
+  const filtered = useMemo(() =>
+    attacks.filter(a =>
+      a.name.toLowerCase().includes(search.toLowerCase()) ||
+      a.description.toLowerCase().includes(search.toLowerCase()) ||
+      a.category.toLowerCase().includes(search.toLowerCase())
+    ),
+    [search]
   );
+
+  if (viewMode !== 'proofs') return null;
 
   const handleClick = (attack: typeof attacks[0]) => {
     setSelectedAttack(attack);

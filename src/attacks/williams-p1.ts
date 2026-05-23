@@ -204,7 +204,11 @@ export const generateTestcase = (): Record<string, string> => {
     let pPlus1 = 2n;
     const primes = [];
     for(let i=2; i<=2000; i++) if(isPrimeMR(BigInt(i))) primes.push(BigInt(i));
-    primes.sort(() => Math.random() - 0.5);
+    // Fisher-Yates shuffle for unbiased random ordering
+    for (let i = primes.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [primes[i], primes[j]] = [primes[j], primes[i]];
+    }
     let currentBits = 0;
     let idx = 0;
     while (currentBits < 128 && idx < primes.length) {

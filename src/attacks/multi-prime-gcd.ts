@@ -93,6 +93,7 @@ n_j &= g_{ij} \\cdot \\frac{n_j}{g_{ij}} \\\\
     if (!vals) return false;
     return vals.split('\n').filter(x => x.trim()).length >= 2;
   },
+  // eslint-disable-next-line @typescript-eslint/require-await
   frontendCheck: async (vals: Record<string, string>) => {
     try {
       const raw = (vals.moduli_list || '').trim();

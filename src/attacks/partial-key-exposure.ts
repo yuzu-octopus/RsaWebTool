@@ -10,11 +10,11 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'p_msb', label: 'p_msb (known MSBs of p)', placeholder: 'Enter known high bits of p...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (v) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
         try:
-            n = Integer(${v.n})
-            p_msb = Integer(${v.p_msb})
+            n = Integer(${vals.n})
+            p_msb = Integer(${vals.p_msb})
             if n < 2 or p_msb < 2:
                 print("PARTIAL_KEY_EXPOSURE=FAILED: invalid input values")
                 return
@@ -105,7 +105,7 @@ p &= p_{\\text{msb}} + x_0 \\qed
 
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", Eurocrypt 1996; A. May, "Using Coppersmith's Method to Attack RSA", 2009`,
   priority: 'high',
-  applicableCheck: (p) => !!p.n && !!p.p_msb,
+  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.p_msb,
 };
 
 export const generateTestcase = (): Record<string, string> => {

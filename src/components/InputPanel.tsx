@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -25,7 +25,13 @@ export function InputPanel() {
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const attackIdRef = useRef<string | null>(null);
   const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
   if (viewMode !== 'attack') return null;
 
@@ -48,39 +54,42 @@ export function InputPanel() {
   };
 
   const handleGenerateTestcase = () => {
-    if (!selectedAttack) return;
     const gen = testcaseGenerators[selectedAttack.id];
     if (!gen) {
       setTestcaseMsg('No testcase generator for this attack');
-      setTimeout(() => setTestcaseMsg(null), 2000);
+      setTimeout(() => { if (mountedRef.current) setTestcaseMsg(null); }, 2000);
       return;
     }
     const values = gen();
     setInputValues(values);
     setTestcaseMsg('Testcase generated');
-    setTimeout(() => setTestcaseMsg(null), 2000);
+    setTimeout(() => { if (mountedRef.current) setTestcaseMsg(null); }, 2000);
   };
 
   const handleRun = async () => {
+    abortControllerRef.current?.abort();
     const controller = new AbortController();
     abortControllerRef.current = controller;
     setLoading(true);
     setOutputResult(null);
     setOutputError(null);
+    const currentAttackId = selectedAttack.id;
+    attackIdRef.current = currentAttackId;
     try {
       if (selectedAttack.frontendCheck) {
         const preResult = await selectedAttack.frontendCheck(inputValues);
         if (preResult !== null) {
+          if (attackIdRef.current !== currentAttackId) return;
           setOutputResult(preResult);
           addToHistory(selectedAttack.id, selectedAttack.name, preResult, isActualSuccess(preResult));
           const preSuccess = isActualSuccess(preResult);
-          showNotification(`${selectedAttack.name}: ${preSuccess ? 'success' : 'failed'}`);
+          showNotification(`${selectedAttack.name}: ${preSuccess ? 'success' : 'failed'}`, preSuccess ? 'success' : 'error');
           if (preSuccess && attacksByCategory.get('Factorization')?.includes(selectedAttack)) {
             const pq = extractPQ(preResult);
             if (pq && inputValues.n) {
               reportFactor(inputValues.n, [pq.p, pq.q]).then(
-                resp => showNotification(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB'),
-                () => {},
+                resp => showNotification(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB', 'info'),
+                () => showNotification('Failed to submit to FactorDB', 'error'),
               );
             }
           }
@@ -91,17 +100,18 @@ export function InputPanel() {
 
       const code = selectedAttack.sageTemplate(inputValues);
       const result = await execute(code, 35000, controller.signal);
+      if (attackIdRef.current !== currentAttackId) return;
       if (result.success) {
         setOutputResult(result.stdout);
         addToHistory(selectedAttack.id, selectedAttack.name, result.stdout, isActualSuccess(result.stdout));
         const runSuccess = isActualSuccess(result.stdout);
-        showNotification(`${selectedAttack.name}: ${runSuccess ? 'success' : 'failed'}`);
+        showNotification(`${selectedAttack.name}: ${runSuccess ? 'success' : 'failed'}`, runSuccess ? 'success' : 'error');
         if (runSuccess && attacksByCategory.get('Factorization')?.includes(selectedAttack)) {
           const pq = extractPQ(result.stdout);
           if (pq && inputValues.n) {
             reportFactor(inputValues.n, [pq.p, pq.q]).then(
-              resp => showNotification(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB'),
-              () => {},
+              resp => showNotification(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB', 'info'),
+              () => showNotification('Failed to submit to FactorDB', 'error'),
             );
           }
         }
@@ -110,12 +120,15 @@ export function InputPanel() {
         addToHistory(selectedAttack.id, selectedAttack.name, result.error || 'Unknown error', false);
       }
     } catch (err: unknown) {
+      if (attackIdRef.current !== currentAttackId) { return; }
       const message = err instanceof Error ? err.message : 'Execution failed';
       setOutputError(message);
       addToHistory(selectedAttack.id, selectedAttack.name, message, false);
     } finally {
-      setLoading(false);
-      abortControllerRef.current = null;
+      if (attackIdRef.current === currentAttackId) {
+        setLoading(false);
+        abortControllerRef.current = null;
+      }
     }
   };
 
@@ -124,7 +137,7 @@ export function InputPanel() {
       {/* Tabs at top-left */}
       <Tabs
         value={tab}
-        onChange={(_, v) => setTab(v)}
+        onChange={(_, v) => setTab(v as number)}
         sx={{
           minHeight: 40,
           px: 2,
@@ -189,26 +202,24 @@ export function InputPanel() {
               </Box>
             ))}
 
-            {selectedAttack && (
-              <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  onClick={handleGenerateTestcase}
-                  data-testid="generate-testcase"
-                  sx={{
-                    borderColor: draculaColors.cyan,
-                    color: draculaColors.cyan,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    fontSize: '0.8rem',
-                    '&:hover': { backgroundColor: draculaColors.cyan, color: draculaColors.background },
-                  }}
-                  startIcon={<Casino sx={{ fontSize: '1rem' }} />}
-                >
-                  Generate Testcase
-                </Button>
-              </Box>
-            )}
+            <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={handleGenerateTestcase}
+                data-testid="generate-testcase"
+                sx={{
+                  borderColor: draculaColors.cyan,
+                  color: draculaColors.cyan,
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: '0.8rem',
+                  '&:hover': { backgroundColor: draculaColors.cyan, color: draculaColors.background },
+                }}
+                startIcon={<Casino sx={{ fontSize: '1rem' }} />}
+              >
+                Generate Testcase
+              </Button>
+            </Box>
 
             {testcaseMsg && (
               <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, textAlign: 'center', fontSize: '0.75rem' }}>
@@ -241,7 +252,7 @@ export function InputPanel() {
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={handleRun}
+                onClick={() => { void handleRun(); }}
                 data-testid="run-attack"
                 sx={{
                   mt: 2,
