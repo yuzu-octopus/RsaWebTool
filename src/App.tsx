@@ -13,7 +13,7 @@ import { setFactorDBProxy } from './utils/factordb';
 import { FACTORDB_PROXY_URL } from './config';
 import { useAppContext } from './hooks/useAppContext';
 
-const severityBackground: Record<string, string> = {
+const severityBorder: Record<string, string> = {
   success: draculaColors.green,
   error: draculaColors.red,
   info: draculaColors.cyan,
@@ -21,7 +21,7 @@ const severityBackground: Record<string, string> = {
 
 function AppContent() {
   const { notification, showNotification } = useAppContext();
-  const bgColor = notification?.severity ? severityBackground[notification.severity] : draculaColors.currentLine;
+  const borderColor = notification?.severity ? severityBorder[notification.severity] : draculaColors.currentLine;
 
   useEffect(() => {
     if (FACTORDB_PROXY_URL) {
@@ -55,7 +55,9 @@ function AppContent() {
         slotProps={{
           content: {
             sx: {
-              backgroundColor: bgColor,
+              backgroundColor: draculaColors.background,
+              border: `2px solid ${borderColor}`,
+              borderRadius: '4px',
               color: draculaColors.foreground,
               fontFamily: "'JetBrains Mono', monospace",
               fontSize: '0.8rem',

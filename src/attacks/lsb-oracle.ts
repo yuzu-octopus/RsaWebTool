@@ -108,7 +108,7 @@ u_k - \\ell_k &= \\frac{n}{2^k} \\xrightarrow{k = \\lceil \\log_2 n \\rceil} 1 \
 m &= \\ell_k \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Each oracle query on c \\cdot 2^{ie} \\bmod n determines whether 2^i \\cdot m \\bmod n is even or odd. Because n is odd, this is equivalent to checking whether multiplying m by 2^i overflows n (i.e., whether m \\geq n / 2^i). Each query narrows the search interval by half. After \\lceil \\log\\_2 n \\rceil queries the interval contains exactly one integer \\textemdash{} the plaintext.
+\\textbf{Explanation:} Each oracle query on c \\cdot 2^{ie} \\bmod n determines whether 2^i \\cdot m \\bmod n is even or odd. Because n is odd, this is equivalent to checking whether multiplying m by 2^i overflows n (i.e., whether m \\geq n / 2^i). Each query narrows the search interval by half. After \\lceil \\log\\_2 n \\rceil queries the interval contains exactly one integer — the plaintext.
 
 \\textbf{References:} Goldwasser, Micali, "Probabilistic Encryption", 1982; Boneh, "Twenty Years of Attacks on RSA", 1999`,
   priority: 'medium',
