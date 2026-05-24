@@ -15,7 +15,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 - **Notification toasts** — Dracula-themed Snackbar at top-center (3s auto-dismiss) on attack completion, with auto-submit status for Factorization results
 - **Mathematical proofs** — every attack includes a formal LaTeX proof rendered with KaTeX (display math, inline math heuristics, itemize, References section stripper)
 - **PEM parser** — SPKI and PKCS#1 public key format auto-detection
-- **Converters** — Hex→Bytes, Hex→ASCII, Dec→Hex, Dec→ASCII, Base64→Text
+- **Format Converter** — standalone tool to convert between Hex, Decimal, Base64, and Text with auto-conversion on every keystroke
 - **Notepad** — persistent scratchpad with 80-200px drag-resizable height, 1-hour localStorage expiry
 - **Service status** — live FactorDB proxy and SageMathCell availability indicators (colored icons in sidebar)
 - **History** — last 50 executions, success/failure status with timestamps
@@ -40,9 +40,10 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 |-----------|------|---------|
 | `Sidebar` | `Sidebar.tsx` | Collapsible category tree (5 categories) + Magic/Proofs/Calculator nav buttons + FactorDB/SageCell service status indicators (ok/error/checking) |
 | `InputPanel` | `InputPanel.tsx` | Shows when an attack is selected: Explanation tab (KaTeX proof rendering) / Input tab (form fields + Generate Testcase + Run/Stop with AbortController). Shows completion toast; auto-submits p,q to FactorDB for Factorization-category attacks |
-| `OutputPanel` | `OutputPanel.tsx` | Results display (react-syntax-highlighter Dracula) + 5 format converters + copy button + history (collapsible, cap 50) + Notepad (drag-resize via `useDragResize`) |
+| `OutputPanel` | `OutputPanel.tsx` | Results display (react-syntax-highlighter Dracula) + copy button + clickable history (collapsible, cap 50) + Notepad (drag-resize via `useDragResize`) |
 | `MagicPanel` | `MagicPanel.tsx` | Paste-all mode: auto-detect params via regex (key=value, PEM, hex, decimal), show applicable attacks preview, priority-ordered parallel execution (concurrency=6), early-stop on first `=SUCCESS`, per-attack status list. Shows success toast; auto-submits p,q to FactorDB for Factorization-category attacks |
 | `RsaCalculator` | `RsaCalculator.tsx` | Pure BigInt calculator: Key Gen / Encrypt / Decrypt tabs, auto-format detection (hex/decimal/base64/ASCII), printable ASCII detection |
+| `FormatConverter` | `FormatConverter.tsx` | Standalone Hex / Decimal / Base64 / Text converter with dropdown format selectors and live auto-conversion |
 | `ProofIndex` | `ProofIndex.tsx` | Searchable index of all 52 attacks with category tags and descriptions, click to navigate |
 | `ProofRenderer` | `ProofRenderer.tsx` | Full KaTeX parser: display math (align\*/equation\*/gather\*/aligned), inline math via $...$ (with auto-wrap heuristics for unadorned math tokens), itemize lists, heading detection, References section stripper |
 | `ErrorBoundary` | `ErrorBoundary.tsx` | Class component catching render crashes in content panels, Dracula-themed fallback UI, prevents sidebar/output/snackbar from going down |
@@ -50,7 +51,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 ### State Management
 
 - **AppContext** (`src/context/`) — single flat context with separated context object (`ctx.ts`) and provider (`AppContext.tsx`) for clean imports
-- State: `selectedAttack`, `viewMode` ('attack' | 'magic' | 'proofs' | 'calculator'), `outputResult`, `outputError`, `history` (capped at 50), `notification` (`NotificationState` | null)
+- State: `selectedAttack`, `viewMode` ('attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter'), `outputResult`, `outputError`, `history` (capped at 50), `notification` (`NotificationState` | null)
 - Methods: `showNotification(msg, severity)` — triggers Dracula-themed Snackbar toast with key-based re-animation
 - Hook: `useAppContext()` in `src/hooks/useAppContext.ts`
 
@@ -136,7 +137,7 @@ src/
     inputSx.ts              — Shared Dracula-themed MUI TextField SxProps (used by InputPanel, MagicPanel, ProofIndex, RsaCalculator)
   utils/
     bigint.ts               — gcd, isqrt, extendedGcd, modInverse, modPow (all BigInt)
-    converters.ts           — hexToBytes, hexToAscii, decToHex, decToAscii, base64ToText, detectFormat, parsePEM
+    converters.ts           — convertFormat, detectFormat, parsePEM, Format type
     factordb.ts             — queryFactorDB, formatFactorDBResult, FactorDBError, setFactorDBProxy, reportFactor, extractPQ
     testcases/core.ts       — randomPrime, isPrimeMR, generateKeyPair, encrypt, TESTCASE_BITS
   attacks/
@@ -145,9 +146,10 @@ src/
     wiener.ts               — Wiener's Continued Fraction attack
     ... (50 more)
   components/
-    Sidebar.tsx             — 220px Drawer, collapsible category tree, Magic/Proofs/Calculator nav, service status
+    FormatConverter.tsx     — Standalone Hex/Decimal/Base64/Text format converter (dropdowns + live auto-conversion)
+    Sidebar.tsx             — 220px Drawer, collapsible category tree, Magic/Proofs/Calculator/Converter nav, service status
     InputPanel.tsx          — Explanation tab (ProofRenderer) + Input tab (form + Generate Testcase + Run/Stop)
-    OutputPanel.tsx         — Results (SyntaxHighlighter) + converters + copy + history + Notepad
+    OutputPanel.tsx         — Results (SyntaxHighlighter) + copy + clickable history + Notepad
     MagicPanel.tsx          — Parameter auto-detect, applicable preview, parallel execution, per-attack status
     RsaCalculator.tsx       — Key Gen / Encrypt / Decrypt tabs with auto-format detection
     ProofIndex.tsx          — Searchable filtered list of all 52 attacks with category tags

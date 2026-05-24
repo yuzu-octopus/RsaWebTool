@@ -43,8 +43,8 @@ export interface NotificationState {
 export interface AppContextType {
   selectedAttack: Attack | null;
   setSelectedAttack: (attack: Attack | null) => void;
-  viewMode: 'attack' | 'magic' | 'proofs' | 'calculator';
-  setViewMode: (mode: 'attack' | 'magic' | 'proofs' | 'calculator') => void;
+  viewMode: 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter';
+  setViewMode: (mode: 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter') => void;
   outputResult: string | null;
   setOutputResult: (result: string | null) => void;
   outputError: string | null;

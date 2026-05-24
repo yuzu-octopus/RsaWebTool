@@ -1,49 +1,78 @@
-export function hexToBytes(hex: string): string {
-  hex = hex.replace(/^0x/, '').replace(/\s/g, '');
-  if (hex.length % 2 !== 0) hex = '0' + hex;
-  const bytes: string[] = [];
-  for (let i = 0; i < hex.length; i += 2) {
-    bytes.push('0x' + hex.slice(i, i + 2));
-  }
-  return bytes.join(' ');
+export type Format = 'hex' | 'dec' | 'base64' | 'text';
+
+function parseHexToBytes(hex: string): Uint8Array {
+  const cleaned = hex.replace(/^0x/i, '').replace(/\s/g, '');
+  if (cleaned.length === 0) return new Uint8Array(0);
+  if (!/^[0-9a-fA-F]*$/.test(cleaned)) throw new Error('Invalid hex string');
+  const padded = cleaned.length % 2 === 0 ? cleaned : '0' + cleaned;
+  const bytes = new Uint8Array(padded.length / 2);
+  for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(padded.substring(i * 2, i * 2 + 2), 16);
+  return bytes;
 }
 
-export function hexToAscii(hex: string): string {
-  hex = hex.replace(/^0x/, '').replace(/\s/g, '');
-  if (hex.length % 2 !== 0) hex = '0' + hex;
-  let result = '';
-  for (let i = 0; i < hex.length; i += 2) {
-    const code = parseInt(hex.slice(i, i + 2), 16);
-    result += String.fromCharCode(code);
-  }
-  return result;
+function parseDecToBytes(dec: string): Uint8Array {
+  const cleaned = dec.replace(/\s/g, '');
+  if (cleaned.length === 0) return new Uint8Array(0);
+  const hex = BigInt(cleaned).toString(16);
+  const padded = hex.length % 2 === 0 ? hex : '0' + hex;
+  return parseHexToBytes(padded);
 }
 
-export function decToHex(dec: string): string {
-  try {
-    const big = BigInt(dec.trim());
-    let hex = big.toString(16);
-    if (hex.length % 2 !== 0) hex = '0' + hex;
-    return '0x' + hex;
-  } catch {
-    return 'Error: Invalid decimal number';
-  }
+function parseBase64ToBytes(b64: string): Uint8Array {
+  const cleaned = b64.replace(/\s/g, '');
+  if (cleaned.length === 0) return new Uint8Array(0);
+  const binaryStr = atob(cleaned);
+  const bytes = new Uint8Array(binaryStr.length);
+  for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
+  return bytes;
 }
 
-export function decToAscii(dec: string): string {
-  try {
-    const hex = BigInt(dec.trim()).toString(16);
-    return hexToAscii(hex);
-  } catch {
-    return 'Error: Invalid decimal number';
-  }
+function parseTextToBytes(text: string): Uint8Array {
+  const bytes = new Uint8Array(text.length);
+  for (let i = 0; i < text.length; i++) bytes[i] = text.charCodeAt(i);
+  return bytes;
 }
 
-export function base64ToText(b64: string): string {
-  try {
-    return atob(b64.trim());
-  } catch {
-    return 'Error: Invalid base64 string';
+function formatBytesAsHex(bytes: Uint8Array): string {
+  const parts: string[] = [];
+  for (const b of bytes) parts.push(b.toString(16).padStart(2, '0'));
+  return '0x' + parts.join('');
+}
+
+function formatBytesAsDec(bytes: Uint8Array): string {
+  let hex = '';
+  for (const b of bytes) hex += b.toString(16).padStart(2, '0');
+  return hex ? BigInt('0x' + hex).toString() : '0';
+}
+
+function formatBytesAsBase64(bytes: Uint8Array): string {
+  let binary = '';
+  for (const b of bytes) binary += String.fromCharCode(b);
+  return btoa(binary);
+}
+
+function formatBytesAsText(bytes: Uint8Array): string {
+  let text = '';
+  for (const b of bytes) text += String.fromCharCode(b);
+  return text;
+}
+
+export function convertFormat(input: string, from: Format, to: Format): string {
+  if (!input) return '';
+  if (from === to) return input.trim();
+  const bytes = (() => {
+    switch (from) {
+      case 'hex': return parseHexToBytes(input);
+      case 'dec': return parseDecToBytes(input);
+      case 'base64': return parseBase64ToBytes(input);
+      case 'text': return parseTextToBytes(input);
+    }
+  })();
+  switch (to) {
+    case 'hex': return formatBytesAsHex(bytes);
+    case 'dec': return formatBytesAsDec(bytes);
+    case 'base64': return formatBytesAsBase64(bytes);
+    case 'text': return formatBytesAsText(bytes);
   }
 }
 

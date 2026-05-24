@@ -65,7 +65,7 @@ function extractParams(input: string): Record<string, string> {
       for (const [key, value] of Object.entries(json)) {
         const mapped = KEY_ALIASES[key.toLowerCase()] || key;
         if (typeof value === 'string' && !params[mapped]) {
-          params[mapped] = value.replace(/^0x/i, '');
+          params[mapped] = value;
         } else if (typeof value === 'number' && !params[mapped]) {
           params[mapped] = value.toString();
         }
@@ -74,7 +74,9 @@ function extractParams(input: string): Record<string, string> {
   } catch { /* not JSON */ }
   const detectedFmt = detectFormat(trimmed);
   if (detectedFmt === 'hex' && !params.n) {
-    params.n = trimmed.replace(/^0x/, '').replace(/\s/g, '');
+    let hex = trimmed.replace(/\s/g, '');
+    if (!/^0x/i.test(hex)) hex = '0x' + hex;
+    params.n = hex;
   } else if (detectedFmt === 'decimal' && !params.n) {
     params.n = trimmed;
   }

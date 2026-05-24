@@ -10,7 +10,7 @@ import {
   Divider,
   Link,
 } from '@mui/material';
-import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, Calculate, CheckCircle, ErrorOutlined } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, Calculate, SwapHoriz, CheckCircle, ErrorOutlined } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { CATEGORIES, attacksByCategory } from '../attacks';
 import type { Attack } from '../types';
@@ -208,6 +208,21 @@ export function Sidebar() {
           <ListItemText
             primary="Calculator"
             slotProps={{ primary: { sx: { color: draculaColors.cyan, fontSize: '0.85rem' } } }}
+          />
+        </ListItemButton>
+
+        <ListItemButton
+          onClick={() => setViewMode('format-converter')}
+          sx={{
+            mx: 1,
+            mt: 0.5,
+            '&:hover': { backgroundColor: draculaColors.background },
+          }}
+        >
+          <SwapHoriz sx={{ color: draculaColors.orange, mr: 1, fontSize: '1.1rem' }} />
+          <ListItemText
+            primary="Converter"
+            slotProps={{ primary: { sx: { color: draculaColors.orange, fontSize: '0.85rem' } } }}
           />
         </ListItemButton>
 

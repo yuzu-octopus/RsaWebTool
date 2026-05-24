@@ -8,6 +8,7 @@ import { OutputPanel } from './components/OutputPanel';
 import { MagicPanel } from './components/MagicPanel';
 import { ProofIndex } from './components/ProofIndex';
 import { RsaCalculator } from './components/RsaCalculator';
+import { FormatConverter } from './components/FormatConverter';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { setFactorDBProxy } from './utils/factordb';
 import { FACTORDB_PROXY_URL } from './config';
@@ -40,6 +41,7 @@ function AppContent() {
               <MagicPanel />
               <ProofIndex />
               <RsaCalculator />
+              <FormatConverter />
             </Box>
           </ErrorBoundary>
           <OutputPanel />
