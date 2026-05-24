@@ -1,25 +1,45 @@
+# Dependencies
 node_modules
+
+# Build output
 dist
+dist-ssr
 docs
-.DS_Store
+
+# Environment
 .env
 .env.local
 .env.*.local
+
+# IDE / Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.sw?
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# TypeScript
 *.tsbuildinfo
+
+# Agent config (local)
 .opencode/
 .superpowers/
 .playwright-mcp/
-page-verify.md
-*.png
-test-*.ts
-scratch/
-AGENTS.md
-GEMINI.md
-scripts/
-test-results/
-public/test-api-suite.html
-workers/
 
-# Attack test artifacts (generated)
+# Test artifacts
+test-results/
 scripts/test-results/*.json
 scripts/test-results/templates/
+
+# Workers (Node.js deps)
+workers/node_modules/
+workers/.wrangler/
+workers/bun.lock
+workers/package-lock.json
+public/test-api-suite.html
