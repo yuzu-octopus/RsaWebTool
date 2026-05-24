@@ -42,6 +42,7 @@ scripts/test-results/templates/
 workers/
 
 # Agent config (local)
+opencode.json
 .opencode/
 .superpowers/
 .playwright-mcp/
