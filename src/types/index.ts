@@ -7,7 +7,6 @@ export interface InputField {
   type?: 'text' | 'number' | 'textarea' | 'select';
   required?: boolean;
   options?: { label: string; value: string }[];
-  defaultValue?: string;
 }
 
 export type AttackCategory = 'Factorization' | 'Partial Key / Lattice' | 'Message / Protocol' | 'Oracle' | 'Advanced';

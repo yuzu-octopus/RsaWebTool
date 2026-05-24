@@ -53,7 +53,6 @@ print("COMMON_FACTOR=FAILED")`;
     except Exception as e:
         print(f"ERROR: {e}")
         print("COMMON_FACTOR=FAILED")
-    #
 _attack()`;
   },
   // eslint-disable-next-line @typescript-eslint/require-await

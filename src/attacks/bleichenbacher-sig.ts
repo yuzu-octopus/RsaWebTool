@@ -8,7 +8,7 @@ export const attack: Attack = {
   description: 'Forges signature with weak PKCS#1 v1.5 verification. Use when e=3 and padding check is loose.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
-    { name: 'e', label: 'e (public exponent)', placeholder: '3', multiline: false, defaultValue: '3' },
+    { name: 'e', label: 'e (public exponent)', placeholder: '3', multiline: false },
     { name: 'hash_hex', label: 'Hash (hex)', placeholder: 'Enter hash in hex (e.g., SHA256)...', multiline: false },
   ],
   sageTemplate: (vals: Record<string, string>) => {

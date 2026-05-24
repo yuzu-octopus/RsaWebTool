@@ -6,7 +6,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 
 ## Features
 
-- **49 attack implementations** across 5 categories (L5 Playwright test suite: **147/147 passed**, 100%)
+- **49 attack implementations** across 5 categories (L5 Playwright test suite: **141/144 passing**, 98%; 3 expected probabilistic failures)
 - **Real-time SageMath execution** via embedded SageMathCell (offscreen DOM + MutationObserver pipeline)
 - **Browser-side pre-checks** — 8 attacks run entirely in the browser via BigInt GCD, FactorDB API, or lattice GCD (no SageCell needed)
 - **FactorDB integration** — CORS-proxied API via Cloudflare Worker for instant factor lookups, with **auto-submit** of factorized results from all 18 Factorization-category attacks
@@ -20,7 +20,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 - **Service status** — live FactorDB proxy and SageMathCell availability indicators (colored icons in sidebar)
 - **History** — last 50 executions, success/failure status with timestamps
 - **Dracula theme** — full dark mode with JetBrains Mono typography, Material Icons (no emojis), no box-shadows
-- **512-bit modulus support** — all testcase generators produce 256-bit primes (n ≈ 512-bit)
+- **512-bit modulus support** — most testcase generators produce 256-bit primes (n ≈ 512-bit); some attacks use custom overrides (pisano-period: 8-bit, roca: 8-bit) for fast SageCell execution
 
 ## Attack Categories
 
@@ -110,7 +110,7 @@ These run fully in the browser when sufficient parameters are provided, returnin
 - **frontendCheck pattern** — attacks can define an optional async pre-check that runs in the browser before falling back to SageCell. This enables instant results for FactorDB lookups, phi(n) recovery, and BigInt GCD operations.
 - **Pure math templates** — SageMathCell has no internet access (firewall since 2021). All attack templates must be self-contained pure math code with no external dependencies.
 - **512-bit testcases** — `TESTCASE_BITS = { p: 256, q: 256 }` produces n ≈ 512-bit. Factorization attacks generate n with at least one small factor to avoid SageCell 120s timeout.
-- **L5 Playwright test suite** in `scripts/test-playwright.ts` — runs all 49 attacks × 3 runs each (147 total). 10-page concurrency, 120s timeout per run.
+- **L5 Playwright test suite** in `scripts/test-playwright.ts` — runs all 49 attacks × 3 runs each (147 total, factordb-lookup skipped in CI = 144 runnable). 10-page concurrency, 120s timeout per run. Current: 141/144 passing, 3 expected probabilistic failures (williams-p1 1/3, partial-pq-bits 2/3).
 - **No unit tests** — functional verification is `typecheck → lint → build → L5 Playwright suite`.
 - **DRY conventions** — shared MUI TextField styles in `src/styles/inputSx.ts`, reusable drag-to-resize hook in `src/hooks/useDragResize.ts`.
 
@@ -225,10 +225,10 @@ After deploy, copy the worker URL into `src/config.ts` or set `VITE_FACTORDB_PRO
 
 | Layer | Technology |
 |-------|------------|
-| Framework | React 19 + TypeScript 6 |
-| Build | Vite 8 + Rolldown |
-| UI | Material UI 9 (Dracula themed) |
-| Math Rendering | KaTeX 0.16 |
+| Framework | React 19.2 + TypeScript 6.0 |
+| Build | Vite 8.0 + Rolldown |
+| UI | Material UI 9.0 (Dracula themed) |
+| Math Rendering | KaTeX 0.17 |
 | Code Highlighting | react-syntax-highlighter (Dracula) |
 | Math Engine | SageMathCell (embedded makeSagecell JS) |
 | External API | FactorDB (via Cloudflare Worker CORS proxy) |

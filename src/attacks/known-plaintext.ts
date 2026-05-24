@@ -11,7 +11,7 @@ export const attack: Attack = {
     { name: 'e', label: 'e (public exponent)', placeholder: '65537', multiline: false },
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
     { name: 'known_prefix', label: 'Known plaintext prefix', placeholder: 'e.g., flag{', multiline: false },
-    { name: 'unknown_bits', label: 'Unknown bits after prefix', placeholder: '32', defaultValue: '32', multiline: false },
+    { name: 'unknown_bits', label: 'Unknown bits after prefix', placeholder: '32', multiline: false },
   ],
   sageTemplate: (vals: Record<string, string>) => {
     if (!vals.n || !vals.c) {
