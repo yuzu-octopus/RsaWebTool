@@ -87,30 +87,23 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
     #
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} Textbook RSA is multiplicatively homomorphic: \\(s_1 \\cdot s_2 \\bmod n\\) is a valid signature for \\(m_1 \\cdot m_2 \\bmod n\\).
+  proof: `\\textbf{Theorem:} Textbook RSA is multiplicatively homomorphic: \\(s_1 s_2 \\bmod n\\) signs \\(m_1 m_2 \\bmod n\\).
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item n, e (modulus, public exponent)
-\\item Oracle pairs \\((m_i, s_i)\\) where \\(s_i = m_i^d \\bmod n\\)
-\\item Target \\(m^*\\) factors as \\(m^* = \\prod m_i \\pmod{n}\\)
+\\item Oracle signs \\(m_i \\to s_i = m_i^d \\bmod n\\)
+\\item Target \\(m^* = \\prod m_i \\pmod{n}\\)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-s_1 &= m_1^d \\bmod n, \\quad s_2 = m_2^d \\bmod n \\\\
-s &= s_1 \\cdot s_2 \\bmod n \\\\
-s^e &= (s_1 \\cdot s_2)^e \\bmod n \\\\
-&= s_1^e \\cdot s_2^e \\bmod n \\\\
-&= m_1 \\cdot m_2 \\bmod n \\\\
-m^* &= \\prod_{i=1}^{k} m_i \\pmod{n} \\\\
-s^* &= \\prod_{i=1}^{k} s_i \\bmod n \\\\
-(s^*)^e &= m^* \\bmod n \\qed
+s_1 &= m_1^d, \\quad s_2 = m_2^d \\pmod{n} \\\\
+s^* &= s_1 \\cdot s_2 \\equiv m_1^d \\cdot m_2^d \\pmod{n} \\\\
+&\\equiv (m_1 \\cdot m_2)^d \\pmod{n} \\\\
+(s^*)^e &\\equiv m^* \\pmod{n} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Factor the target message into a product of oracle-signed messages. Multiply the corresponding signatures to forge a valid signature on the target. This works because \\((ab)^d \\equiv a^d \\cdot b^d \\pmod{n}\\).
-
-\\textbf{References:} Rivest, Shamir, Adleman, "A Method for Obtaining Digital Signatures", 1978; Boneh, "Twenty Years of Attacks on RSA", 1999`,
+\\textbf{References:} Rivest, Shamir, Adleman, 1978; Boneh, 1999`,
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.target_m && !!p.oracle_pairs,
 };

@@ -56,30 +56,23 @@ print("COMMON_MODULUS=FAILED")`;
     #
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} Let n be an RSA modulus and e\\_1, e\\_2 be coprime exponents. Given c\\_1 \\equiv m^{e\\_1} \\pmod{n} and c\\_2 \\equiv m^{e\\_2} \\pmod{n}, recover m via Bezout coefficients.
+  proof: `\\textbf{Theorem:} Given c\\_1 \\equiv m^{e\\_1} \\pmod{n} and c\\_2 \\equiv m^{e\\_2} \\pmod{n} with \\gcd(e\\_1, e\\_2) = 1, recover m via Bezout coefficients.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item n, e\\_1, e\\_2, c\\_1, c\\_2 (modulus, two exponents, two ciphertexts)
 \\item \\gcd(e\\_1, e\\_2) = 1
-\\item Same m encrypted under both exponents
+\\item c_i \\equiv m^{e_i} \\pmod{n}
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\gcd(e_1, e_2) = 1 \\implies \\exists a, b \\in \\mathbb{Z} &: \\\\
-a \\cdot e_1 + b \\cdot e_2 &= 1 \\\\
-c_1^a \\cdot c_2^b &\\equiv (m^{e_1})^a \\cdot (m^{e_2})^b \\pmod{n} \\\\
-&\\equiv m^{a e_1 + b e_2} \\pmod{n} \\\\
-&\\equiv m \\\\
+\\gcd(e_1, e_2) = 1 \\implies \\exists a, b &: a e_1 + b e_2 = 1 \\\\
+c_1^a \\cdot c_2^b &\\equiv m^{a e_1 + b e_2} \\equiv m \\pmod{n} \\\\
 a < 0 \\implies c_1^a &= (c_1^{-1})^{|a|} \\pmod{n} \\\\
-b < 0 \\implies c_2^b &= (c_2^{-1})^{|b|} \\pmod{n} \\\\
 m &= c_1^a \\cdot c_2^b \\pmod{n} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Find Bezout coefficients a, b such that a·e₁ + b·e₂ = 1. Compute c₁ᵃ · c₂ᵇ mod n, using modular inverses for negative coefficients. The exponents cancel to leave m.
-
-\\textbf{References:} Simmons & Norris, "Preliminary Comments on the MIT Public Key Cryptosystem", 1977; Boneh, "Twenty Years of Attacks on RSA", 1999`,
+\\textbf{References:} Simmons & Norris, 1977; Boneh, 1999`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e1 && !!p.e2 && !!p.c1 && !!p.c2,
 };

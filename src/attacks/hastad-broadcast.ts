@@ -71,25 +71,21 @@ print("HASTAD_BROADCAST=FAILED")`;
         print("HASTAD_BROADCAST=FAILED")
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} If $m$ is encrypted with the same $e$ to $e$ different moduli, CRT recovers $m^e$ over $\\mathbb{Z}$, then $m = \\sqrt[e]{m^e}$.
+  proof: `\\textbf{Theorem:} If $m$ is encrypted with the same $e$ to $e$ moduli, CRT recovers $m^e$ over $\\mathbb{Z}$, then $m = \\sqrt[e]{m^e}$.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item $c_i = m^e \\bmod n_i$ for $i = 1, \\ldots, e$
-\\item All $n_i$ are pairwise coprime
-\\item $m^e < \\prod_{i=1}^{e} n_i$ (guaranteed when $m < \\min(n_i)$)
-\\item Chinese Remainder Theorem
+\\item $m$ encrypted with same $e$ to $e$ distinct moduli
+\\item $m^e < \\prod n_i$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 c_i &\\equiv m^e \\pmod{n_i} \\\\
-\\text{CRT} \\implies M &\\equiv m^e \\pmod{\\prod n_i} \\\\
-m^e &< \\prod n_i \\implies M = m^e \\text{ (over } \\mathbb{Z}\\text{)} \\\\
+M &\\equiv m^e \\pmod{\\prod n_i} \\quad \\text{(CRT)} \\\\
+m^e < \\prod n_i &\\implies M = m^e \\quad \\text{(over } \\mathbb{Z}\\text{)} \\\\
 m &= \\sqrt[e]{M} \\qed
 \\end{align*}
-
-\\textbf{Explanation:} The same message encrypted with exponent $e$ across $e$ different moduli. CRT reconstructs $m^e$ as an integer (not modulo anything). Since $m^e < \\prod n_i$, no modular reduction occurred — just take the integer $e$-th root.
 
 \\textbf{References:} J. Hastad, "Solving Low-Exponent RSA", 1988`,
   priority: 'high',

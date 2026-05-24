@@ -106,28 +106,21 @@ export const attack: Attack = {
         print(f"DP_DQ_LEAK=FAILED: {ex}")
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} Given $d_p = d \\bmod (p-1)$, factor $n$ by iterating $k$ in the equation $d_p \\cdot e - 1 = k(p-1)$. Symmetrically, $d_q = d \\bmod (q-1)$ recovers $q$.
+  proof: `\\textbf{Theorem:} Given $d_p = d \\bmod (p-1)$, factor $n$ by iterating $k$ in $d_p \\cdot e - 1 = k(p-1)$.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item RSA-CRT: $d_p = d \\bmod (p-1)$ satisfies $d_p \\cdot e \\equiv 1 \\pmod{p-1}$
-\\item Symmetrically: $d_q = d \\bmod (q-1)$ satisfies $d_q \\cdot e \\equiv 1 \\pmod{q-1}$
-\\item $d_p \\cdot e - 1 = k(p-1)$ for some integer $k \\in [1, e)$
-\\item $n = p \\cdot q$ is the RSA modulus
+\\item $d_p \\cdot e \\equiv 1 \\pmod{p-1}$
+\\item $d_p \\cdot e - 1 = k(p-1)$, $k < e$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-d_p \\cdot e &\\equiv 1 \\pmod{p-1} \\\\
-d_p \\cdot e - 1 &= k(p-1) \\\\
 p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
-\\text{Since } d_p < p-1, \\quad k &= \\frac{d_p \\cdot e - 1}{p-1} < e \\\\
-\\text{Iterate } k &= 1, \\ldots, e-1: \\quad \\text{check if } k \\mid (d_p \\cdot e - 1) \\\\
-p &= (d_p \\cdot e - 1)/k + 1, \\quad \\text{check } p \\mid n \\\\
-\\text{Symmetric for } d_q:\\quad q &= (d_q \\cdot e - 1)/k + 1, \\quad \\text{check } q \\mid n \\qed
+\\text{Iterate } k &= 1, \\ldots, e-1: \\quad \\text{check } k \\mid (d_p \\cdot e - 1) \\\\
+p &= (d_p \\cdot e - 1)/k + 1, \\quad \\text{verify } p \\mid n \\\\
+\\text{Symmetric for } d_q:\\quad q &= (d_q \\cdot e - 1)/k + 1 \\qed
 \\end{align*}
-
-\\textbf{Explanation:} Compute $\\text{num} = d_p \\cdot e - 1$. For each $k \\in [1, e)$, check if $k$ divides num. If so, compute $p = \\text{num}/k + 1$ and verify $p \\mid n$. Since $d_p < p-1$, we have $k < e$, so at most 65536 iterations for standard $e = 65537$. The same method works for $d_q$ to recover $q$. A fast pre-check using GCD: $\\gcd(n, m^{e \\cdot d_p - 1} - 1 \\bmod n) = p$ with high probability for random $m$, providing an O($\\log n$) alternative to the O($e$) iteration scan.
 
 \\textbf{References:} Standard RSA-CRT analysis; M. Campagna, A. Sethi, "Key Recovery Method for CRT Implementation of RSA"`,
   priority: 'high',

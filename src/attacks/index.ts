@@ -61,12 +61,15 @@ import { attack as implicitKeyExposure, generateTestcase as genImplicitKeyExposu
 import { attack as relatedMessage, generateTestcase as genRelatedMessage } from './related-message';
 import { attack as commonPrimeRsa, generateTestcase as genCommonPrimeRsa } from './common-prime-rsa';
 import { attack as hastadBroadcast, generateTestcase as genHastadBroadcast } from './hastad-broadcast';
+import { attack as euler, generateTestcase as genEuler } from './euler';
+import { attack as pollardStrassen, generateTestcase as genPollardStrassen } from './pollard-strassen';
+import { attack as pisanoPeriod, generateTestcase as genPisanoPeriod } from './pisano-period';
 
 // Public exports
 export const attacks: Attack[] = [
   fermat, wiener, bonehDurfee, ecm, ecm2, pollardP1, pollardRho, williamsP1,
   quadraticSieve, squfof, binaryPolyFactor, smallFraction, batchGcd, multiPrime,
-  gimmickyPrimes, closePrime, noveltyPrimes,
+  gimmickyPrimes, closePrime, noveltyPrimes, euler, pollardStrassen, pisanoPeriod,
   simpleLattice, partialD, partialPqBits, smallCrtExp, dpDqLeak,
   linearlyRelatedPrimes, dependentPrime,
   commonModulus, hastad, franklinReiter, coppersmithShortPad, hastadLinearPad,
@@ -132,6 +135,9 @@ export const testcaseGenerators: Record<string, () => Record<string, string>> = 
   'related-message': genRelatedMessage,
   'common-prime-rsa': genCommonPrimeRsa,
   'hastad-broadcast': genHastadBroadcast,
+  euler: genEuler,
+  'pollard-strassen': genPollardStrassen,
+  'pisano-period': genPisanoPeriod,
 };
 
 export const CATEGORIES = [

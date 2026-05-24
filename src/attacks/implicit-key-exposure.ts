@@ -54,10 +54,9 @@ export const attack: Attack = {
 _attack()`,
   proof: `\\textbf{Theorem:} If $a^p \\bmod n$ is leaked, $p$ is recovered via $\\gcd(a - \\text{leak}, n)$.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item $n = pq$ — RSA modulus
-\\item $a$ — known base, $p \\nmid a$
+\\item $n = pq$, $p \\nmid a$
 \\item $\\text{leak} = a^p \\bmod n$
 \\item Fermat's little theorem: $a^p \\equiv a \\pmod{p}$
 \\end{itemize}
@@ -65,14 +64,10 @@ _attack()`,
 \\textbf{Proof:}
 \\begin{align*}
 \\text{leak} &\\equiv a^p \\pmod{n} \\\\
-\\text{leak} &\\equiv a^p \\pmod{p} \\\\
-a^p &\\equiv a \\pmod{p} \\quad \\text{(Fermat's little theorem)} \\\\
-\\text{leak} &\\equiv a \\pmod{p} \\\\
+\\text{leak} &\\equiv a^p \\equiv a \\pmod{p} \\quad \\text{(FLT)} \\\\
 p &\\mid (\\text{leak} - a) \\\\
 p &= \\gcd(\\text{leak} - a, n) \\qed
 \\end{align*}
-
-\\textbf{Explanation:} By Fermat's little theorem, $a^p \\equiv a \\pmod{p}$ for any $a$ not divisible by $p$. Since leak $\\equiv a^p \\pmod{n}$, we also have leak $\\equiv a^p \\pmod{p}$. Combining: leak $\\equiv a \\pmod{p}$, so $p$ divides $(\\text{leak} - a)$. Computing $\\gcd(\\text{leak} - a, n)$ recovers $p$ in one step.
 
 \\textbf{References:} Common CTF pattern; based on Fermat's Little Theorem`,
   priority: 'high',

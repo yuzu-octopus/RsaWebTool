@@ -77,29 +77,25 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("NOVELTY_PRIMES=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} CTF challenges may reuse primes from previous problems or use primes near structured values, enabling factorization by database lookup.
+  proof: `\\textbf{Theorem:} CTF primes may be reused or near structured values; check via database lookup and window search.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item n = pq — RSA modulus to test
-\\item \\mathcal{P} = \\{p\\_1, \\ldots, p\\_m\\} — database of known CTF primes
-\\item Structured candidates: 2^k + \\delta, \\text{constant} + \\delta for small |\\delta|
-\\item Primality test (Miller-Rabin) for candidate verification
+\\item n = pq
+\\item Known prime database \\mathcal{P}
+\\item Structured windows around 2^k, constants
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\mathcal{P} &= \\{p_1, \\ldots, p_m\\} \\quad \\text{(known CTF primes)} \\\\
-n \\bmod p_i &= 0 \\implies p_i \\mid n, \\quad q = n/p_i \\\\
-p &\\approx 2^k + \\delta, \\quad |\\delta| \\leq W \\\\
-p &\\approx C + \\delta, \\quad C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
-\\text{Candidate } c &= C + \\delta, \\quad \\text{isPrime}(c) \\land (n \\bmod c = 0) \\\\
-\\text{Cost: } O(m \\log^2 n + W \\cdot \\text{primality}) & \\qed
+\\mathcal{P} &= \\{p_1, \\ldots, p_m\\} \\\\
+n \\bmod p_i &= 0 \\implies p_i \\mid n,\\; q = n/p_i \\\\
+p &\\approx 2^k + \\delta,\\; |\\delta| \\leq W \\\\
+p &\\approx C + \\delta,\\; C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
+\\text{isPrime}(C + \\delta) \\land (n \\bmod (C + \\delta) = 0) &\\implies \\text{factor} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} CTF challenges sometimes reuse primes or generate primes near recognizable values (powers of 2, mathematical constants). Checking divisibility against a database of known primes and searching small windows around structured values can quickly factor such moduli.
-
-\\textbf{References:} Various CTF writeups; cryptohack.org challenges; RSA CTF problem databases`,
+\\textbf{References:} Various CTF writeups; cryptohack.org`,
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

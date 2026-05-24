@@ -90,28 +90,24 @@ print("KNOWN_PLAINTEXT=FAILED")`;
         print(f"KNOWN_PLAINTEXT=FAILED: {ex}")
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} Partial knowledge of the plaintext \\(m\\) enables RSA decryption via Coppersmith's method for small unknown portions.
+  proof: `\\textbf{Theorem:} Partial plaintext knowledge + Coppersmith recovers m when unknown portion < n^{1/e}.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item Public key \\((n, e)\\) and ciphertext \\(c\\)
-\\item Known prefix \\(m_0\\) such that \\(m = m_0 \\cdot 2^k + x\\) with unknown \\(x < 2^k\\)
-\\item \\(k\\) — number of unknown bits, determines attack feasibility
-\\item For brute force: \\(k \\leq 16\\); for Coppersmith: \\(k < \\frac{\\log_2 n}{e}\\)
+\\item $m = m_0 \\cdot 2^k + x$, $|x| < n^{1/e}$
+\\item $n$, $e$, $c$ known
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-m &= m_0 \\cdot 2^k + x, \\quad |x| < X = 2^k \\\\
-c &\\equiv m^e \\pmod{n} \\\\
+m &= m_0 \\cdot 2^k + x, \\quad |x| < X \\\\
+c &\\equiv (m_0 \\cdot 2^k + x)^e \\pmod{n} \\\\
 f(x) &= (m_0 \\cdot 2^k + x)^e - c \\equiv 0 \\pmod{n} \\\\
 |x| &< n^{1/e} \\implies \\text{Coppersmith recovers } x \\\\
 m &= m_0 \\cdot 2^k + x \\qed
 \\end{align*}
 
-\\textbf{Explanation:} The known prefix fixes the high-order bits of \\(m\\). Coppersmith's method finds the small unknown portion \\(x\\) as a root of the polynomial \\(f(x)\\) modulo \\(n\\). For very small unknowns (\\(\\leq 16\\) bits), brute force is faster. The attack works best with small \\(e\\) (e.g., \\(e=3\\)) because \\(n^{1/e}\\) is larger.
-
-\\textbf{References:} D. Coppersmith, "Small Solutions to Polynomial Equations", 1997; May, "New RSA Vulnerabilities Using Lattice Reduction Methods", 2003`,
+\\textbf{References:} D. Coppersmith, 1997; May, 2003`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!(p.n && p.c),
 };

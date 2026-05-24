@@ -114,35 +114,23 @@ export const attack: Attack = {
         print(f"FATAL: {ex}")
         print("POLLARD_P1=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If p-1 is B\\_1-smooth, then p can be found in time O(B\\_1 \\log B\\_1 \\log^2 n). Stage 2 catches p-1 with one prime factor \\leq B\\_2 > B\\_1.
+  proof: `\\textbf{Theorem:} If p-1 is B\\_1-smooth, find p via a^M mod n. Stage 2: one factor up to B\\_2.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item Fermat's Little Theorem: a^{p-1} \\equiv 1 \\pmod{p} for \\gcd(a, p) = 1
-\\item p-1 is B\\_1-smooth: all prime factors of p-1 are \\leq B\\_1
-\\item M = \\operatorname{lcm}(1, 2, \\ldots, B\\_1) = \\prod\\_{q \\leq B\\_1} q^{\\lfloor \\log\\_q B\\_1 \\rfloor}
-\\item Stage 2: p-1 = q\\_0 \\cdot s where s is B\\_1-smooth and q\\_0 \\in (B\\_1, B\\_2]
+\\item Fermat's Little Theorem: a^{p-1} \\equiv 1 \\pmod{p}
+\\item p-1 is B\\_1-smooth
+\\item M = \\operatorname{lcm}(1, 2, \\ldots, B\\_1)
 \\end{itemize}
 
-\\textbf{Proof (Stage 1):}
+\\textbf{Proof:}
 \\begin{align*}
-p-1 &= q_0^{e_0} q_1^{e_1} \\cdots q_r^{e_r}, \\quad q_i \\leq B_1 \\\\
-M &= \\prod_{q \\leq B_1} q^{\\lfloor \\log_q B_1 \\rfloor} \\\\
-(p-1) &\\mid M \\implies a^M \\equiv 1 \\pmod{p} \\\\
-p &\\mid (a^M - 1) \\implies 1 < \\gcd(a^M - 1, n) < n
+p-1 &\\mid M \\implies a^M \\equiv 1 \\pmod{p} \\\\
+p &\\mid (a^M - 1) \\implies \\gcd(a^M - 1, n) = p \\\\
+\\text{Stage 2: } p-1 &= q_0 \\cdot s,\\; s \\mid M,\\; q_0 \\in (B_1, B_2] \\\\
+H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
+\\gcd\\left(\\prod_{q \\in (B_1, B_2]} (H^q - 1), n\\right) &= p \\qed
 \\end{align*}
-
-\\textbf{Proof (Stage 2):}
-\\begin{align*}
-p-1 &= q_0 \\cdot s, \\quad s \\text{ is } B_1\\text{-smooth}, \\; q_0 \\in (B_1, B_2] \\\\
-s &\\mid M \\implies H = a^M \\equiv 1 \\pmod{p} \\\\
-H^{q_0} &\\equiv 1 \\pmod{p} \\;\\;\\; (\\text{since } p-1 \\mid M \\cdot q_0) \\\\
-p &\\mid (H^{q_0} - 1) \\implies 1 < \\gcd\\left(\\prod_{q \\in (B_1, B_2]} (H^q - 1), n\\right) < n \\\\
-\\text{Prime-difference trick: } H^{q_j} &= H^{q_{j-1}} \\cdot H^{d_j}, \\; d_j = q_j - q_{j-1} \\\\
-\\text{Runtime: } O(B_1 \\log B_1 \\log^2 n) &+ O(\\pi(B_2) - \\pi(B_1)) \\; \\text{multiplications} \\qed
-\\end{align*}
-
-\\textbf{Explanation:} Stage 1 computes M = lcm(1, \\ldots, B\\_1) and then a^M \\bmod n. If p-1 divides M, then \\gcd(a^M - 1, n) reveals p. Stage 2 extends the search when p-1 has one prime factor q\\_0 between B\\_1 and B\\_2: after computing H = a^M, check \\gcd(H^q - 1, n) for each prime q in (B\\_1, B\\_2]. The prime-difference optimization reuses H^{q\\_{j-1}} to compute H^{q\\_j} efficiently.
 
 \\textbf{References:} J. M. Pollard, "Theorems on Factorization and Primality Testing", Proc. Cambridge Philos. Soc., 1974`,
   priority: 'medium',

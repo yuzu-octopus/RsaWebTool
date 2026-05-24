@@ -90,34 +90,26 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("POLLARD_RHO=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} Pollard's rho (Brent variant) with batched GCD finds a nontrivial factor of n in expected O(n^{1/4}) time, reducing GCD overhead from O(n^{1/4} \\log n) to O(n^{1/4}).
+  proof: `\\textbf{Theorem:} Pollard rho (Brent + batched GCD) finds a factor in expected O(n^{1/4}).
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item Birthday paradox: collision among \\sqrt{N} random elements with prob \\approx 1/2
-\\item Brent's cycle detection: saves sequence value at powers of 2, one function eval per step
-\\item Pseudorandom sequence: x\\_{i+1} = x\\_i^2 + c \\pmod{n}
-\\item Batched GCD: accumulate \\prod |x - y\\_i| \\bmod n for m iterations, then one gcd
-\\item Backtracking: when gcd = n, find individual factor via per-step gcd
+\\item Birthday paradox: collision among \\sqrt{N} random elements
+\\item Brent cycle detection
+\\item Batched GCD
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 x_{i+1} &= x_i^2 + c \\pmod{n} \\\\
-x_i \\pmod{p} &\\text{ lives in a set of size } p \\\\
-\\text{Birthday paradox: collision after } &O(\\sqrt{p}) \\text{ steps} \\\\
+\\text{Collision after } O(\\sqrt{p}) &\\text{ steps (birthday paradox)} \\\\
 \\exists i \\neq j: \\; x_i &\\equiv x_j \\pmod{p} \\\\
 p &\\mid (x_i - x_j) \\\\
-p &\\mid \\gcd\\left(\\prod_{k} |x - y_k|, n\\right) \\;\\;\\; \\text{(batch property)} \\\\
-\\text{Brent: save } x \\text{ at powers of 2, } &\\text{advance } y \\text{ single step} \\\\
-\\text{Batched GCD: 1 gcd per m steps } &\\text{(vs 1 per step standard)} \\\\
-\\text{GCD reduction: } O(n^{1/4} \\log n) &\\to O(n^{1/4}) \\\\
-\\text{Expected total time: } O(n^{1/4}) & \\qed
+\\text{Brent: save } x \\text{ at powers of 2} &\\;\\;\\; \\text{1 eval per step} \\\\
+\\text{Batched GCD: 1 gcd per } m \\text{ steps } &\\implies O(n^{1/4}) \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Generate a pseudorandom sequence x\\_{i+1} = x\\_i^2 + c mod n. Brent's cycle detection saves x at powers of 2. Batched GCD accumulates \\prod |x - y| mod n for m = 100 iterations, computing gcd once per batch. If gcd = n (all factors in product), backtrack per-step to isolate the individual factor. Expected O(\\sqrt{p}) iterations.
-
-\\textbf{References:} R. P. Brent, "An Improved Monte Carlo Factorization Algorithm", BIT Numerical Mathematics, 20(2):176-184, 1980. J. M. Pollard, "A Monte Carlo Method for Factorization", BIT Numerical Mathematics, 1975. primefac v2.0.12, "pollardrho\\_brent" implementation, 2023`,
+\\textbf{References:} Pollard, 1975; Brent, BIT 1980`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

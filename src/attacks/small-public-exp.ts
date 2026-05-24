@@ -74,29 +74,23 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
     #
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} RSA with small public exponent \\(e \\in \\{3, 5, 17\\}\\) is vulnerable to e-th root, Hastad broadcast, and Franklin-Reiter attacks.
+  proof: `\\textbf{Theorem:} Small e (3,5,17) enables e-th root, Hastad broadcast, and Franklin-Reiter attacks.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item Public key \\((n, e)\\) with \\(e < 100\\) and ciphertext \\(c\\)
-\\item For e-th root: \\(m^e < n\\) (no modular reduction occurred)
-\\item For Hastad: \\(e\\) ciphertexts \\(c_i = m^e \\bmod n_i\\) under distinct moduli
-\\item For Franklin-Reiter: two ciphertexts with known linear relation between plaintexts
+\\item $e \\in \\{3,5,17\\}$
+\\item Known attacks become viable
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{e-th root:} &\\quad m^e < n \\implies c = m^e \\implies m = \\sqrt[e]{c} \\\\
-\\text{Hastad:} &\\quad c_i \\equiv m^e \\pmod{n_i}, \\; i = 1, \\ldots, e \\\\
-&\\quad C \\equiv m^e \\pmod{N}, \\quad N = \\prod_{i=1}^{e} n_i \\\\
+\\text{e-th root:} &\\quad m^e < n \\implies m = \\sqrt[e]{c} \\\\
+\\text{Hastad:} &\\quad C \\equiv m^e \\pmod{N}, \\; N = \\prod n_i \\\\
 &\\quad m^e < N \\implies m = \\sqrt[e]{C} \\\\
-\\text{Franklin-Reiter:} &\\quad c_1 \\equiv m^e \\pmod{n}, \\quad c_2 \\equiv (am + b)^e \\pmod{n} \\\\
-&\\quad \\gcd(x^e - c_1, \\; (ax + b)^e - c_2) = x - m \\quad \\text{over } \\mathbb{Z}_n \\qed
+\\text{Franklin-Reiter:} &\\quad \\gcd(x^e - c_1, (ax+b)^e - c_2) = x - m \\qed
 \\end{align*}
 
-\\textbf{Explanation:} The e-th root attack works when the message is small enough that encryption doesn't wrap modulo \\(n\\). Hastad's broadcast attack combines \\(e\\) encryptions of the same message under different moduli via CRT. Franklin-Reiter exploits known linear relations between two encrypted messages.
-
-\\textbf{References:} Hastad, "Solving linear equations by means of lattice reductions", 1988; Franklin & Reiter, "The relation between short exponents and related-message attacks", 1996`,
+\\textbf{References:} Hastad, 1988; Franklin \\& Reiter, 1996`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!(p.n && p.e && p.c),
 };

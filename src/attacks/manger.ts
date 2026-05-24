@@ -151,32 +151,24 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("MANGER=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} An OAEP first-byte-zero oracle allows decryption in O(\\log n) queries.
+  proof: `\\textbf{Theorem:} An OAEP first-byte oracle allows decryption in O(\\log n) queries.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item RSA-OAEP format: EM = 0x00 \\,\\|\\, maskedSeed \\,\\|\\, maskedDB
-\\item Oracle \\mathcal{O}(c) returns 1 iff first byte of c^d \\bmod n is 0x00
-\\item First byte zero \\iff c^d \\bmod n < n / 256
-\\item RSA homomorphism: (c \\cdot s^e)^d \\equiv m \\cdot s \\pmod{n}
+\\item Oracle O(c) = 1 iff first byte is 0x00
+\\item First byte 0 $\\iff m < n/256$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-c &= m^e \\bmod n \\\\
-\\mathcal{O}(c) = 1 &\\iff m < n / 256 \\\\
-\\text{Query } \\mathcal{O}(c \\cdot s^e \\bmod n): & \\\\
-\\mathcal{O} = 1 \\implies m \\cdot s \\bmod n &< n / 256 \\\\
-m \\cdot s - r \\cdot n &< n / 256, \\quad r \\in \\mathbb{Z} \\\\
-m &< \\frac{n(256r + 1)}{256s} \\\\
-m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r + 1)}{256s} \\right) \\\\
-[a_{i+1}, b_{i+1}] &= [a_i, b_i] \\cap \\{ m : \\mathcal{O}(c \\cdot s_i^e) = 1 \\} \\\\
-\\text{After } \\lceil \\log_2 n \\rceil + 8 \\text{ queries: } b - a &= 0 \\implies m = a
+\\mathcal{O}(c) = 1 &\\iff m < n/256 \\\\
+\\mathcal{O}(c \\cdot s^e) = 1 &\\implies m \\cdot s - rn < n/256 \\\\
+m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r+1)}{256s} \\right) \\\\
+[a_{i+1}, b_{i+1}] &= [a_i, b_i] \\cap \\{m : \\mathcal{O}(c \\cdot s_i^e) = 1\\} \\\\
+\\lceil \\log_2 n \\rceil + 8 \\text{ queries} &\\implies b - a = 0 \\implies m = a \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Each oracle query on c·s^e reveals whether m·s mod n falls in [0, n/256). This constrains m to a union of narrow intervals. By choosing s strategically (doubling each step), the interval halves each round, converging to m in logarithmic queries.
-
-\\textbf{References:} J. Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP) as Standardized in PKCS #1 v2.0", CRYPTO 2001`,
+\\textbf{References:} J. Manger, CRYPTO 2001`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_responses,
 };

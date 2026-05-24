@@ -125,29 +125,24 @@ print("NON_COPRIME_EXP=FAILED")`;
     #
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} When $\\gcd(e, \\varphi(n)) = g > 1$, each ciphertext has $g$ preimages found via $e$-th roots mod $p$, mod $q$ + CRT.
+  proof: `\\textbf{Theorem:} When $\\gcd(e,\\varphi(n)) = g > 1$, ciphertext has $g$ preimages via $e$-th roots mod $p$, mod $q$ + CRT.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item $n$, $e$, $c$, $p$, $q$ (modulus, exponent, ciphertext, both prime factors)
-\\item $\\gcd(e, \\varphi(n)) = g > 1$
-\\item $g_p = \\gcd(e, p-1)$, $g_q = \\gcd(e, q-1)$
+\\item $g_p = \\gcd(e,p-1)$, $g_q = \\gcd(e,q-1)$
+\\item $g = g_p \\cdot g_q > 1$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-g_p &= \\gcd(e, p-1), \\quad g_q = \\gcd(e, q-1) \\\\
-x \\mapsto x^e \\text{ in } \\mathbb{F}_p^* &: g_p\\text{-to-1} \\\\
-x \\mapsto x^e \\text{ in } \\mathbb{F}_q^* &: g_q\\text{-to-1} \\\\
+g_p &= \\gcd(e,p-1), \\quad g_q = \\gcd(e,q-1) \\\\
 \\{r_{p,1}, \\ldots, r_{p,g_p}\\} &= \\{x \\in \\mathbb{F}_p : x^e = c\\} \\\\
 \\{r_{q,1}, \\ldots, r_{q,g_q}\\} &= \\{x \\in \\mathbb{F}_q : x^e = c\\} \\\\
 m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\\\
-m_{i,j}^e &\\equiv c \\pmod{n}, \\quad \\#\\text{solutions} = g_p \\cdot g_q = g \\qed
+\\#\\text{solutions} &= g_p \\cdot g_q = g \\qed
 \\end{align*}
 
-\\textbf{Explanation:} The map $x \\mapsto x^e$ is $g$-to-1 when $\\gcd(e, \\varphi(n)) > 1$. Find all $e$-th roots in each field separately, then CRT-combine every pair to get all $g$ preimages.
-
-\\textbf{References:} Williams, "Modification of the RSA Public-Key Encryption Procedure", 1980; May, "New RSA Vulnerabilities Using Lattice Reduction Methods", 2003`,
+\\textbf{References:} Williams, 1980; May, 2003`,
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.p && !!p.q,
 };

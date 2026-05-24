@@ -115,27 +115,22 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("PARTIAL_PQ_BITS=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If at least half the bits of $p$ are known (as MSBs or LSBs), Coppersmith's method recovers the full factorization of $n$.
+  proof: `\\textbf{Theorem:} If $\\ge$ half the bits of $p$ are known (MSBs or LSBs), Coppersmith recovers full factorization.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item $n = p \\cdot q$ with balanced primes ($p \\approx q \\approx \\sqrt{n}$)
-\\item Known MSBs: $p = p_{\\text{known}} \\cdot 2^k + x$ where $|x| < 2^k$
-\\item Known LSBs: $p = x \\cdot 2^m + p_{\\text{known}}$ where $|x| < 2^{\\text{bits}(p) - m}$
-\\item Coppersmith's bound: small roots found when $|x| < n^{1/4}$
+\\item $n = p \\cdot q$ with balanced primes
+\\item MSB: $p = p_{\\text{known}} \\cdot 2^k + x$, $|x| < n^{1/4}$
+\\item LSB: $p = x \\cdot 2^m + p_{\\text{known}}$, $|x| < n^{1/4}$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{MSB case:} \\quad p &= p_{\\text{known}} \\cdot 2^k + x \\\\
-f(x) &= p_{\\text{known}} \\cdot 2^k + x \\equiv 0 \\pmod{p} \\\\
-\\text{LSB case:} \\quad p &= x \\cdot 2^m + p_{\\text{known}} \\\\
-f(x) &= x \\cdot 2^m + p_{\\text{known}} \\equiv 0 \\pmod{p} \\\\
+\\text{MSB: } f(x) &= p_{\\text{known}} \\cdot 2^k + x \\equiv 0 \\pmod{p} \\\\
+\\text{LSB: } f(x) &= x \\cdot 2^m + p_{\\text{known}} \\equiv 0 \\pmod{p} \\\\
 \\text{Coppersmith finds } x &\\text{ when } |x| < n^{1/4} \\quad (\\beta = 0.5) \\\\
-p &= f(x_0), \\quad q = n / p \\qed
+p &= f(x_0), \\quad q = n/p \\qed
 \\end{align*}
-
-\\textbf{Explanation:} Construct a linear polynomial $f(x)$ over $\\mathbb{Z}/n\\mathbb{Z}$ such that $f(x) \\equiv 0 \\pmod{p}$. For MSBs, $f(x) = p_{\\text{known}} \\cdot 2^k + x$. For LSBs, $f(x) = x \\cdot 2^m + p_{\\text{known}}$. Coppersmith's method finds the small root $x_0$, giving $p = f(x_0)$ and $q = n/p$.
 
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996; N. Howgrave-Graham, "Approximate Integer Common Divisors", 1997`,
   priority: 'high',

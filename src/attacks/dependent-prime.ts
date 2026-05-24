@@ -64,27 +64,22 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("DEPENDENT_PRIME=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If $q = e^{-1} \\bmod p$, then $n = pq$ creates a solvable quadratic system $kp^2 + p - ne = 0$.
+  proof: `\\textbf{Theorem:} If $q \\cdot e \\equiv 1 \\pmod{p}$, solve $kp^2 + p - ne = 0$ for $p$.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item $q \\cdot e \\equiv 1 \\pmod{p}$ (q is the modular inverse of e mod p)
 \\item $q \\cdot e = 1 + kp$ for some integer $k$
 \\item $n = p \\cdot q$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-q \\cdot e &= 1 + kp \\\\
-n &= p \\cdot q = p \\cdot \\frac{1 + kp}{e} \\\\
 ne &= p + kp^2 \\\\
 kp^2 + p - ne &= 0 \\\\
 p &= \\frac{-1 + \\sqrt{1 + 4kne}}{2k} \\\\
-\\text{Iterate } k = 1, \\ldots, 10^5: \\quad &\\text{check if } 1 + 4kne \\text{ is a perfect square} \\\\
-\\text{If so, compute } p &\\text{ and verify } p \\mid n \\qed
+\\text{Iterate } k = 1, \\ldots, 10^5: \\quad &\\text{check if } 1 + 4kne \\text{ is square} \\\\
+\\text{If so, } p &\\mid n \\implies \\text{found} \\qed
 \\end{align*}
-
-\\textbf{Explanation:} From the constraint $q \\cdot e \\equiv 1 \\pmod{p}$, substitute $q = (1 + kp)/e$ into $n = pq$ to get $ne = p + kp^2$. This gives the quadratic $kp^2 + p - ne = 0$. For each $k$, check if the discriminant $1 + 4kne$ is a perfect square. If so, compute $p$ from the quadratic formula and verify $p \\mid n$.
 
 \\textbf{References:} Custom CTF construction; related to Nitaj's constrained prime analysis`,
   priority: 'medium',

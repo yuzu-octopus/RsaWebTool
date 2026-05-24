@@ -99,30 +99,21 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("ECM2=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} Repeated ECM with factor removal yields the complete prime factorization of n.
+  proof: `\\textbf{Theorem:} Repeated ECM with factor removal yields complete factorization.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item ECM finds one prime factor p of n at a time
-\\item Fundamental Theorem of Arithmetic: n = p\\_1^{e\\_1} \\cdots p\\_k^{e\\_k} uniquely
-\\item After finding p, reduce to n' = n / p and recurse
-\\item Primality test (Miller-Rabin) for termination
+\\item ECM finds one prime factor at a time
+\\item n = \\prod p_i^{e_i}
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-n &= p_1^{e_1} p_2^{e_2} \\cdots p_k^{e_k}, \\quad p_1 < p_2 < \\cdots < p_k \\\\
-\\text{ECM finds } p_i &\\text{ with prob. depending on smoothness of } \\#E(\\mathbb{F}_{p_i}) \\\\
-n' &= n / p_i \\\\
-\\text{Repeat until } n' = 1 &\\text{ or } n' \\text{ is prime} \\\\
-n > n/p_{i_1} > n/(p_{i_1}p_{i_2}) > \\cdots &> 1 \\\\
-\\text{Each step reduces } \\Omega(n) &\\text{ (total prime factors with multiplicity)} \\\\
-\\text{Terminates in } \\Omega(n) &\\text{ iterations} \\\\
-\\text{Total time: } \\sum_{i=1}^{k} O(\\exp(\\sqrt{2 \\ln p_i \\ln \\ln p_i})) & \\\\
-\\text{Dominated by the largest prime factor.} & \\qed
+n &= p_1^{e_1} p_2^{e_2} \\cdots p_k^{e_k} \\\\
+\\text{ECM finds } p_i &\\implies n' = n / p_i \\\\
+\\text{Repeat until } n' &= 1 \\text{ or prime} \\\\
+\\text{Total time dominated by } &\\text{largest prime factor} \\qed
 \\end{align*}
-
-\\textbf{Explanation:} Run ECM to find one factor, divide it out, and repeat on the quotient. The process terminates when the remainder is 1 or prime. Each iteration strictly reduces the number of prime factors, guaranteeing termination. The total cost is dominated by finding the largest prime factor.
 
 \\textbf{References:} Lenstra, "Factoring Integers with Elliptic Curves", 1987`,
   priority: 'medium',

@@ -65,28 +65,22 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("MULTI_PRIME_GCD=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} Given RSA moduli \\{n\\_1, \\ldots, n\\_k\\} generated with insufficient entropy, pairwise GCD reveals both shared factors and the exact pairs that share them.
+  proof: `\\textbf{Theorem:} Pairwise GCD of moduli reveals shared factors and their pairs.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item At least 2 moduli $n_1, n_2, \\ldots, n_k$ to compare
-\\item Each $n_i = p_i \\cdot q_i$ where $p_i, q_i$ are primes
-\\item At least one pair shares a factor: $\\exists\\, i \\neq j : \\gcd(n_i, n_j) > 1$
+\\item Moduli $\\{n_i\\}$
+\\item Some pair shares a factor
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 g_{ij} &= \\gcd(n_i, n_j) \\quad (1 \\leq i < j \\leq k) \\\\
-g_{ij} &> 1 \\implies \\exists\\, p : p \\mid n_i \\land p \\mid n_j \\\\
-n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}} \\\\
-n_j &= g_{ij} \\cdot \\frac{n_j}{g_{ij}} \\\\
-\\text{GCD complexity:} &\\quad O(\\log^2 \\max(n_i, n_j)) \\text{ per pair} \\\\
-\\text{Total complexity:} &\\quad O(k^2 \\log^2 n) \\qed
+g_{ij} > 1 &\\implies p \\mid n_i \\land p \\mid n_j \\\\
+n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}}, \\quad n_j = g_{ij} \\cdot \\frac{n_j}{g_{ij}} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Pairwise GCD checks every modulus pair individually, reporting exactly which pairs share a factor. This is simpler than batch GCD (Bernstein remainder tree) and provides pair-level detail, at the cost of $O(k^2)$ operations vs. $O(k \\log k)$ for the batch variant. Useful when investigating which specific keys are related (e.g., hardware RNG failure analysis).
-
-\\textbf{References:} N. Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012`,
+\\textbf{References:} Heninger et al., USENIX Security 2012`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => {
     const vals = (p.moduli_list || '').trim();

@@ -73,31 +73,29 @@ print("BLEICHENBACHER_SIG=FAILED")`;
     #
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} PKCS#1 v1.5 signature verification with e = 3 is forgeable: construct S such that S³ starts with valid PKCS#1 padding and the target hash, without access to the private key.
+  proof: `\\textbf{Theorem:} PKCS#1 v1.5 signature verification with e = 3 is forgeable: construct S such that S³ has valid padding and target hash.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item RSA public key (n, e = 3)
-\\item Target hash H (hex)
-\\item Verifier does not check that the hash is right-justified (trailing garbage ignored)
+\\item n, e = 3
+\\item Verifier ignores trailing garbage after hash
 \\end{itemize}
 
 \\textbf{Construction:}
 \\begin{align*}
-\\text{target} &= \\text{0x00} \\,||\\, \\text{0x01} \\,||\\, \\text{FF}^{8} \\,||\\, \\text{0x00} \\,||\\, H \\,||\\, \\text{0x00}^{\\text{garbage}} \\\\
-S &= \\lceil \\sqrt[3]{\\text{target}} \\rceil \\quad \\text{(integer cube root)} \\\\
-S^3 &= \\text{target} + \\varepsilon \\quad (0 \\leq \\varepsilon < 3S^2)
+\\text{target} &= \\text{0x00||0x01||FF}^8\\text{||0x00||}H\\text{||garbage} \\\\
+S &= \\lceil \\sqrt[3]{\\text{target}} \\rceil \\\\
+S^3 &= \\text{target} + \\varepsilon, \\quad 0 \\leq \\varepsilon < 3S^2
 \\end{align*}
 
 \\textbf{Analysis:}
 \\begin{itemize}
-\\item The error \\(\\varepsilon\\) from rounding the cube root is bounded by \\(3S^2 \\approx 3 \\cdot 2^{2|n|/3}\\)
-\\item Garbage bytes at the LSB end absorb \\(\\varepsilon\\), leaving the prefix \\(\\text{0x0001FF}^8\\text{00}H\\) intact
-\\item The forged signature S verifies as valid against a verifier that ignores trailing data after the hash
-\\item Requires e = 3 (small exponent) and at least \\(\\lceil \\log_2(3S^2)/8 \\rceil\\) garbage bytes
+\\item Error \\(\\varepsilon\\) from rounding bounded by \\(3S^2\\)
+\\item Garbage bytes absorb \\(\\varepsilon\\), prefix \\text{0x0001FF}^8\\text{00}H stays intact
+\\item Requires e = 3 and sufficient garbage bytes
 \\end{itemize}
 
-\\textbf{References:} D. Bleichenbacher, "Forging PKCS#1 v1.5 Signatures", Crypto 2006 rump session; A. Langley, "PKCS#1 signature validation", imperialviolet.org (2014)`,
+\\textbf{References:} D. Bleichenbacher, Crypto 2006 rump session`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.hash_hex,
 };

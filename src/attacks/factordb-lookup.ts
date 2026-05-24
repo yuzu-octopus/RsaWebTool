@@ -129,28 +129,24 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("FACTORDB_LOOKUP=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} Many RSA moduli from CTF challenges and weak key generation have been pre-factored and stored in public databases.
+  proof: `\\textbf{Theorem:} Pre-factored moduli from public databases plus local fallbacks.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item Modulus $n$ to check against known factorizations
-\\item Network access to FactorDB API (or CORS proxy)
-\\item Fallback: trial division primes up to bound $B$, ECM curves, Pollard's rho iterations
+\\item n to factor
+\\item FactorDB API available
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Query:} &\\quad \\text{factordb.com/api}?query = n \\\\
-\\text{Response:} &\\quad \\{ \\text{status}, \\text{factors} = [p_1, p_2, \\ldots, p_k] \\} \\\\
-\\text{Verify:} &\\quad \\prod_{i=1}^{k} p_i = n \\\\
-\\text{Fallback 1:} &\\quad \\exists\\, p \\in \\text{primes}(B) : n \\bmod p = 0 \\\\
-\\text{Fallback 2:} &\\quad \\text{ECM}(n, \\text{curves}) \\rightarrow [p, q] \\\\
-\\text{Fallback 3:} &\\quad \\text{PollardRho}(n) \\rightarrow p, \\quad q = n / p
+\\text{Query} &\\;\\text{factordb.com/api}?query = n \\\\
+\\text{Verify} &\\; \\prod p_i = n \\\\
+\\text{Fallback 1:} &\\; \\text{trial division up to bound } B \\\\
+\\text{Fallback 2:} &\\; \\text{ECM}(n) \\\\
+\\text{Fallback 3:} &\\; \\text{PollardRho}(n) \\qed
 \\end{align*}
 
-\\textbf{Explanation:} FactorDB returns pre-computed factorizations instantly for known moduli. If the database has no entry, the SageMath fallback runs trial division, ECM, and Pollard's rho sequentially.
-
-\\textbf{References:} https://factordb.com; RsaCtfTool project`,
+\\textbf{References:} https://factordb.com`,
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

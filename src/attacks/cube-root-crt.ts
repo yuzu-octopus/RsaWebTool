@@ -72,28 +72,23 @@ print("CUBE_ROOT_CRT=FAILED")`;
     #
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} When $e = 3$ and $p \\equiv q \\equiv 1 \\pmod{3}$, the map $x \\mapsto x^3 \\bmod n$ has 9 preimages via cube roots mod $p$, mod $q$ + CRT.
+  proof: `\\textbf{Theorem:} When $e = 3$ and $p \\equiv q \\equiv 1 \\pmod{3}$, there are 9 cube roots via CRT.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item n, c, p, q (modulus, ciphertext, both prime factors)
-\\item $e = 3$, $p \\equiv q \\equiv 1 \\pmod{3}$
-\\item $3 \\mid (p-1)$ and $3 \\mid (q-1)$
+\\item $e = 3$
+\\item $3 \\mid (p-1)$, $3 \\mid (q-1)$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-p \\equiv 1 \\pmod{3} &\\implies 3 \\mid (p-1) \\\\
-x \\mapsto x^3 \\text{ in } \\mathbb{F}_p^* &: \\text{3-to-1} \\\\
 \\{r_{p,1}, r_{p,2}, r_{p,3}\\} &= \\{x \\in \\mathbb{F}_p : x^3 = c\\} \\\\
 \\{r_{q,1}, r_{q,2}, r_{q,3}\\} &= \\{x \\in \\mathbb{F}_q : x^3 = c\\} \\\\
 m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\\\
 \\#\\text{solutions} &= 3 \\times 3 = 9 \\qed
 \\end{align*}
 
-\\textbf{Explanation:} When p ≡ q ≡ 1 (mod 3), each field has exactly 3 cube roots of c. CRT-combine all 9 pairs to get all preimages. The correct m is identified by padding or format constraints.
-
-\\textbf{References:} Williams, "Modification of the RSA Public-Key Encryption Procedure", 1980; Rabin, "Digitalized Signatures and Public-Key Functions as Intractable as Factorization", 1979`,
+\\textbf{References:} Williams, 1980; Rabin, 1979`,
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.c && !!p.p && !!p.q,
 };

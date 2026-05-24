@@ -90,27 +90,21 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("BINARY_POLY_FACTOR=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If n's binary polynomial f(x) factors over \\mathbb{Z}[x] as f(x) = g(x)h(x), then n = g(2)h(2).
+  proof: `\\textbf{Theorem:} If $n$'s binary polynomial $f(x) = \\sum b_i x^i$ factors over $\\mathbb{Z}[x]$, then evaluating at $x=2$ reveals factors of $n$.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item n — integer to factor, with binary digits b\\_i \\in \\{0, 1\\}
-\\item f(x) = \\sum b\\_i x^i \\in \\mathbb{Z}[x] — polynomial with f(2) = n
-\\item Unique factorization in \\mathbb{Z}[x]
-\\item Evaluation homomorphism \\text{ev}\\_2: \\mathbb{Z}[x] \\to \\mathbb{Z}
+\\item $n = \\sum b_i 2^i$, binary digits $b_i \\in \\{0,1\\}$
+\\item $f(x) = \\sum b_i x^i \\in \\mathbb{Z}[x]$, $f(2) = n$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-n &= \\sum_{i=0}^{k} b_i 2^i, \\quad b_i \\in \\{0, 1\\} \\\\
-f(x) &= \\sum_{i=0}^{k} b_i x^i \\in \\mathbb{Z}[x], \\quad f(2) = n \\\\
-f(x) &= g_1(x)^{e_1} g_2(x)^{e_2} \\cdots g_r(x)^{e_r} \\\\
-n = f(2) &= g_1(2)^{e_1} g_2(2)^{e_2} \\cdots g_r(2)^{e_r} \\\\
-\\exists i: g_i(2) &= p \\text{ or } q \\quad \\text{(when factorization aligns)} \\\\
-\\text{Test each } g_i(2) &\\text{ for divisibility of } n \\qed
+f(x) &= \\sum b_i x^i \\\\
+f(x) &= \\prod g_i(x)^{e_i} \\quad\\text{(factor over } \\mathbb{Z}[x]\\text{)} \\\\
+n = f(2) &= \\prod g_i(2)^{e_i} \\\\
+\\exists i: g_i(2) &= p \\text{ or } q \\qed
 \\end{align*}
-
-\\textbf{Explanation:} Convert n to a polynomial by treating its binary digits as coefficients. Factor this polynomial over the integers, then evaluate each factor at x=2. If the polynomial factorization aligns with the integer factorization, the evaluations reveal p and q. Works best when p and q have structured binary patterns.
 
 \\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen & Gerhard, "Modern Computer Algebra", Chapter 5`,
   priority: 'low',

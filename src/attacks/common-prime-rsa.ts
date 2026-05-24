@@ -60,24 +60,17 @@ export const attack: Attack = {
 _attack()`,
   proof: `\\textbf{Theorem:} If $n_1 = p \\cdot q_1$ and $n_2 = p \\cdot q_2$ share a prime $p$, then $\\gcd(n_1, n_2) = p$.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item $n_1 = p \\cdot q_1$, $n_2 = p \\cdot q_2$ — two RSA moduli
-\\item $p$ — shared prime factor
-\\item $q_1 \\neq q_2$ — distinct cofactors
-\\item $\\gcd(q_1, q_2) = 1$ — cofactors are coprime
+\\item $n_1 = p \\cdot q_1$, $n_2 = p \\cdot q_2$
+\\item $q_1 \\neq q_2$, $\\gcd(q_1, q_2) = 1$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-n_1 &= p \\cdot q_1 \\\\
-n_2 &= p \\cdot q_2 \\\\
 \\gcd(n_1, n_2) &= \\gcd(p \\cdot q_1, p \\cdot q_2) \\\\
-&= p \\cdot \\gcd(q_1, q_2) \\\\
-&= p \\cdot 1 = p \\qed
+&= p \\cdot \\gcd(q_1, q_2) = p \\qed
 \\end{align*}
-
-\\textbf{Explanation:} When two RSA moduli share a prime factor (common in poor RNG implementations), computing their GCD directly reveals the shared prime. Both moduli are instantly factored.
 
 \\textbf{References:} A. K. Lenstra et al., "Ron was wrong, Whit is right" (2012) — found 0.2\\% of RSA keys shared factors`,
   priority: 'high',

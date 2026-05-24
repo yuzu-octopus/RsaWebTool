@@ -81,36 +81,28 @@ export const attack: Attack = {
 _attack()`,
   proof: `\\textbf{Theorem:} An oracle \\mathcal{O}(c) = (c^d \\bmod n) \\bmod 2 recovers m in O(\\log n) queries via binary search.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item Public key (n, e) and ciphertext c = m^e \\bmod n
-\\item Oracle returning the least significant bit of the decrypted blinded ciphertext
-\\item Queries use blinded ciphertexts c\\_i = c \\cdot (2^i)^e \\bmod n
-\\item n must be odd (always true for RSA moduli)
+\\item Oracle O(c) = (c^d \\bmod n) \\bmod 2
+\\item Blind via c \\cdot 2^{ie} \\bmod n
 \\end{itemize}
 
-\\textbf{Proof (Collection Phase --- Blinding):}
+\\textbf{Proof:}
 \\begin{align*}
-c_i &= c \\cdot (2^{i})^e \\bmod n, \\quad i = 0, 1, \\ldots, \\lceil \\log_2 n \\rceil \\\\
-b_i &= \\mathcal{O}(c_i) = \\text{LSB}((c_i)^d \\bmod n) = \\text{LSB}(m \\cdot 2^{i} \\bmod n) \\\\
-b_i = 0 &\\iff m \\cdot 2^{i} < n \\iff m < \\frac{n}{2^{i}} \\\\
-b_i = 1 &\\iff m \\cdot 2^{i} \\geq n \\iff m \\geq \\frac{n}{2^{i}}
-\\end{align*}
-
-\\textbf{Proof (Decoding Phase --- Binary Search):}
-\\begin{align*}
+c_i &= c \\cdot 2^{ie} \\bmod n \\\\
+b_i &= \\text{LSB}(m \\cdot 2^{i} \\bmod n) \\\\
+b_i = 0 &\\iff m < n/2^{i} \\\\
 [\\ell_0, u_0) &= [0, n) \\\\
 [\\ell_{i+1}, u_{i+1}) &= \\begin{cases}
-[\\ell_i, (\\ell_i + u_i)/2) & \\text{if } b_i = 0 \\\\
-[(\\ell_i + u_i)/2, u_i) & \\text{if } b_i = 1
+[\\ell_i, (\\ell_i+u_i)/2) & b_i = 0 \\\\
+[(\\ell_i+u_i)/2, u_i) & b_i = 1
 \\end{cases} \\\\
-u_k - \\ell_k &= \\frac{n}{2^k} \\xrightarrow{k = \\lceil \\log_2 n \\rceil} 1 \\\\
-m &= \\ell_k \\qed
+\\lceil \\log_2 n \\rceil \\text{ queries} &\\implies u_k - \\ell_k = 1 \\implies m = \\ell_k \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Each oracle query on c \\cdot 2^{ie} \\bmod n determines whether 2^i \\cdot m \\bmod n is even or odd. Because n is odd, this is equivalent to checking whether multiplying m by 2^i overflows n (i.e., whether m \\geq n / 2^i). Each query narrows the search interval by half. After \\lceil \\log\\_2 n \\rceil queries the interval contains exactly one integer — the plaintext.
+\\textbf{Explanation:} Each query halves the search interval. After \\lceil \\log_2 n \\rceil queries the interval contains exactly one integer.
 
-\\textbf{References:} Goldwasser, Micali, "Probabilistic Encryption", 1982; Boneh, "Twenty Years of Attacks on RSA", 1999`,
+\\textbf{References:} Goldwasser, Micali, 1982; Boneh, 1999`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!(p.n && p.e && p.c && p.oracle_responses),
 };

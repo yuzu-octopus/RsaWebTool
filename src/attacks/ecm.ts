@@ -72,32 +72,25 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("ECM=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} ECM finds a prime factor p of n in expected time O(\\exp(\\sqrt{2 \\ln p \\ln \\ln p})).
+  proof: `\\textbf{Theorem:} ECM finds a prime factor p in time exp(\\sqrt{2 \\ln p \\ln \\ln p}).
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item Elliptic curve E: y^2 = x^3 + ax + b over \\mathbb{Z}/n\\mathbb{Z}
-\\item Group law on E: point addition and scalar multiplication
-\\item Hasse's theorem: |\\#E(\\mathbb{F}\\_p) - (p + 1)| \\leq 2\\sqrt{p}
-\\item B-smooth: all prime factors \\leq B
-\\item M = \\prod\\_{q \\leq B\\_1} q^{\\lfloor \\log\\_q B\\_1 \\rfloor}
+\\item Elliptic curve E over \\mathbb{Z}/n\\mathbb{Z}
+\\item B\\_1-smooth group order
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Choose random } E: y^2 &= x^3 + ax + b \\pmod{n}, \\; P \\in E \\\\
-Q = M \\cdot P, \\quad M &= \\prod_{q \\leq B_1} q^{\\lfloor \\log_q B_1 \\rfloor} \\\\
-\\#E(\\mathbb{F}_p) \\text{ is } B_1\\text{-smooth} &\\implies M \\equiv 0 \\pmod{\\#E(\\mathbb{F}_p)} \\\\
-M \\cdot P &= \\mathcal{O} \\text{ in } E(\\mathbb{F}_p) \\\\
-\\text{Scalar multiplication encounters} & \\\\
-\\text{non-invertible denominator } d &\\pmod{n} \\\\
+\\text{Choose } E: y^2 &= x^3 + ax + b \\pmod{n}, \\; P \\in E \\\\
+M &= \\prod_{q \\leq B_1} q^{\\lfloor \\log_q B_1 \\rfloor} \\\\
+\\#E(\\mathbb{F}_p) \\text{ smooth } &\\implies M \\cdot P = \\mathcal{O} \\text{ in } E(\\mathbb{F}_p) \\\\
+\\text{Non-invertible denominator } d &\\pmod{n} \\\\
 \\gcd(d, n) &= p \\\\
-\\#E(\\mathbb{F}_p) &\\in [p + 1 - 2\\sqrt{p}, \\; p + 1 + 2\\sqrt{p}] \\\\
-\\text{Vary curve } (a, b) \\implies \\text{different } \\#E &\\implies \\text{one is smooth} \\\\
-\\text{Expected time: } O(&\\exp(\\sqrt{2 \\ln p \\ln \\ln p})) \\qed
+\\text{Vary curve } (a,b) \\implies \\text{different } \\#E &\\implies \\text{one eventually smooth} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Pick a random elliptic curve and point. Compute M \\cdot P where M is the product of all prime powers up to B\\_1. If the curve order modulo p is B\\_1-smooth, the computation fails modulo p but not modulo other factors, revealing p via gcd. Try different curves until one succeeds.
+\\textbf{Explanation:} Pick a random curve. If its order mod p is B1-smooth, scalar multiplication by M fails mod p but not mod q, revealing p via gcd.
 
 \\textbf{References:} H. W. Lenstra Jr., "Factoring Integers with Elliptic Curves", Annals of Mathematics, 1987`,
   priority: 'high',

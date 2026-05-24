@@ -88,26 +88,23 @@ _attack()`;
       return null;
     }
   },
-  proof: `\\textbf{Theorem:} If \\gcd(c, n) > 1 where c = m^e \\bmod n, then \\gcd(c, n) reveals a factor of n.
+  proof: `\\textbf{Theorem:} If \\gcd(m,n) > 1, then \\gcd(c,n) reveals a factor of n.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item n, c (modulus, ciphertext)
-\\item \\gcd(m, n) > 1 (message is a multiple of p or q)
+\\item n = pq
+\\item p \\mid m
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 p \\mid m &\\implies m \\equiv 0 \\pmod{p} \\\\
 c = m^e &\\equiv 0 \\pmod{p} \\\\
-p \\mid c, \\quad p \\mid n &\\implies p \\mid \\gcd(c, n) \\\\
-\\gcd(c, n) < n &\\implies \\gcd(c, n) = p \\text{ (or } q\\text{)} \\\\
-q &= n / \\gcd(c, n) \\qed
+p \\mid c, \\quad p \\mid n &\\implies p = \\gcd(c,n) \\\\
+q &= n/p \\qed
 \\end{align*}
 
-\\textbf{Explanation:} If the message shares a factor with n, the ciphertext does too. GCD(c, n) extracts that prime factor directly, factoring n. This is a degenerate case — proper RSA padding prevents it.
-
-\\textbf{References:} Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2; Boneh, "Twenty Years of Attacks on RSA", 1999`,
+\\textbf{References:} Menezes et al., "HAC"; Boneh, 1999`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.c,
 };

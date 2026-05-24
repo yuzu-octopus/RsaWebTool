@@ -89,30 +89,23 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("NITROS=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} The Nitros attack generalizes ROCA to primes of the form \\(p = k \\cdot M + (a^{i} \\bmod M)\\) for arbitrary base \\(a\\).
+  proof: `\\textbf{Theorem:} Generalized ROCA: $p = k \\cdot M + (a^i \\bmod M)$ for arbitrary base $a$.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item Modulus \\(n = pq\\) with at least one prime of the generalized form
-\\item Base \\(a\\) with \\(\\gcd(a, M) = 1\\) (default: \\(a = 65537\\))
-\\item \\(M\\) — product of a subset of small primes
-\\item Remainder set \\(\\mathcal{R} = \\{a^i \\bmod M : i \\geq 0\\}\\) must be enumerable
-\\item \\(M > n^{1/4}\\) for Coppersmith's method
+\\item n = pq
+\\item $a^i \\bmod M$ enumeration, $M > n^{1/4}$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-p &= k \\cdot M + r_1, \\quad r_1 \\in \\mathcal{R} \\\\
-n &\\equiv r_1 \\cdot r_2 \\pmod{M}, \\quad r_2 \\in \\mathcal{R} \\\\
-r_2 &\\equiv n \\cdot r_1^{-1} \\pmod{M} \\\\
-f(x) &= M \\cdot x + r_1 \\equiv 0 \\pmod{p} \\\\
-|x_0| = k &< \\frac{\\sqrt{n}}{M} < p^{1/\\delta} \\quad (\\delta = 1) \\\\
-\\text{Coppersmith recovers } x_0 = k &\\implies p = M \\cdot k + r_1 \\qed
+p &= kM + r_1, \\quad r_1 \\in \\mathcal{R} = \\{a^i \\bmod M\\} \\\\
+n &\\equiv r_1 \\cdot r_2 \\pmod{M} \\\\
+f(x) &= Mx + r_1 \\equiv 0 \\pmod{p} \\\\
+\\text{Coppersmith} &\\implies p = Mk + r_1 \\qed
 \\end{align*}
 
-\\textbf{Explanation:} The algorithm tests multiple prime subsets for \\(M\\) and configurable base \\(a\\). Once a matching remainder pair \\((r_1, r_2)\\) is found, Coppersmith's method recovers \\(k\\). Both \\(r_1\\) and \\(r_2\\) are tried as candidate remainders.
-
-\\textbf{References:} Nemec et al., CCS 2017; extended analysis in subsequent ROCA research`,
+\\textbf{References:} Nemec et al., CCS 2017`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

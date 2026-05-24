@@ -70,28 +70,23 @@ print("HASTAD=FAILED")`;
         print("HASTAD=FAILED")
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} Let $c_i \\equiv m^e \\pmod{n_i}$ for $i = 1, \\ldots, k$ with $\\gcd(n_i, n_j) = 1$. If $m^e < \\prod n_i$ and $k \\geq e$, recover $m$ via CRT + $e$-th root.
+  proof: `\\textbf{Theorem:} Given $c_i \\equiv m^e \\pmod{n_i}$ with pairwise coprime $n_i$ and $k \\geq e$, recover $m$ via CRT + $e$-th root.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item $k$ pairs of $(n_i, c_i)$ with pairwise coprime moduli
-\\item Same exponent $e$ for all, same message $m$
-\\item $k \\geq e$, $m^e < \\prod_{i=1}^{k} n_i$
+\\item $c_i \\equiv m^e \\pmod{n_i}$, $\\gcd(n_i,n_j) = 1$
+\\item $k \\geq e$, $m^e < \\prod n_i$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-c_i &\\equiv m^e \\pmod{n_i}, \\quad i = 1, \\ldots, k \\\\
-N &= \\prod_{i=1}^{k} n_i \\\\
 C &\\equiv c_i \\pmod{n_i} \\quad \\text{(CRT)} \\\\
-C &\\equiv m^e \\pmod{N} \\\\
-m^e < N \\implies C &= m^e \\quad \\text{(over } \\mathbb{Z}\\text{)} \\\\
+C &\\equiv m^e \\pmod{N}, \\quad N = \\prod_{i=1}^{k} n_i \\\\
+m^e < N &\\implies C = m^e \\quad \\text{(over } \\mathbb{Z}\\text{)} \\\\
 m &= \\sqrt[e]{C} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Combine ciphertexts via CRT to get $C \\equiv m^e \\pmod{N}$. When $m^e < N$, the congruence becomes an exact equality over integers. Take the integer $e$-th root to recover $m$.
-
-\\textbf{References:} J. Hastad, "Solving Linear Equations Modulo Divisors: On Factoring Given Any Bits", Eurocrypt 1988; Boneh, "Twenty Years of Attacks on RSA", 1999`,
+\\textbf{References:} J. Hastad, Eurocrypt 1988; Boneh, 1999`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.pairs && !!p.e,
 };

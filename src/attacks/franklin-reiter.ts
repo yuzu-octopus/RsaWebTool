@@ -79,29 +79,23 @@ print("FRANKLIN_REITER=FAILED")`;
     #
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} Given $c_1 \\equiv m^e \\pmod{n}$ and $c_2 \\equiv (am + b)^e \\pmod{n}$ with known $a, b$, recover $m$ via polynomial GCD over $\\mathbb{Z}/n\\mathbb{Z}$.
+  proof: `\\textbf{Theorem:} Given $c_1 \\equiv m^e \\pmod{n}$ and $c_2 \\equiv (am + b)^e \\pmod{n}$, recover $m$ via polynomial GCD.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item $n, e, c_1, c_2, a, b$ (modulus, exponent, two ciphertexts, linear relation)
-\\item $m_2 = a \\cdot m_1 + b$ (known affine relation)
-\\item $\\gcd(a, n) = 1$
+\\item $c_1 \\equiv m^e \\pmod{n}$, $c_2 \\equiv (am+b)^e \\pmod{n}$
+\\item $\\gcd(a,n) = 1$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-f_1(x) &= x^e - c_1 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
-f_2(x) &= (ax + b)^e - c_2 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
-f_1(m) &= m^e - c_1 \\equiv 0 \\pmod{n} \\\\
-f_2(m) &= (am + b)^e - c_2 \\equiv 0 \\pmod{n} \\\\
-(x - m) &\\mid \\gcd(f_1, f_2) \\\\
-g(x) = \\gcd(f_1, f_2), \\quad \\deg(g) = 1 &\\implies g(x) = x - m \\\\
-m &= -g[0] \\qed
+f_1(x) &= x^e - c_1, \\quad f_2(x) = (ax+b)^e - c_2 \\\\
+f_1(m) &\\equiv 0 \\pmod{n}, \\quad f_2(m) \\equiv 0 \\pmod{n} \\\\
+\\gcd(f_1,f_2) &= (x - m) \\quad \\text{(with high probability)} \\\\
+m &= -g[0] \\cdot g[1]^{-1} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Build two polynomials that both have $m$ as a root. Their GCD is $(x - m)$ for generic $a, b$. Extract $m$ from the linear GCD's coefficients.
-
-\\textbf{References:} M. Franklin \\& M. Reiter, "On the Security of RSA Padding", 1996; Boneh, "Twenty Years of Attacks on RSA", 1999`,
+\\textbf{References:} Franklin \\& Reiter, 1996; Boneh, 1999`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c1 && !!p.c2 && !!p.b,
 };

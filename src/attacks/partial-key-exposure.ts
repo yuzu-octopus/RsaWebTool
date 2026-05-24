@@ -80,28 +80,24 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("PARTIAL_KEY_EXPOSURE=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If the MSBs of $p$ are known such that $p = p_{\\text{msb}} + x$ with $|x| < n^{\\beta^2}$, Coppersmith recovers $p$.
+  proof: `\\textbf{Theorem:} If MSBs of $p$ are known with $|x| < n^{\\beta^2}$, Coppersmith recovers $p$.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item $n = pq$ — RSA modulus
-\\item $p_{\\text{msb}}$ — known high bits of $p$
-\\item $p = p_{\\text{msb}} + x$, $|x| < X$ — unknown low bits
-\\item Coppersmith bound: $|x| < n^{\\beta^2}$ for $\\beta = 0.5$
+\\item $n = pq$
+\\item $p = p_{\\text{msb}} + x$, $|x| < X$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-p &= p_{\\text{msb}} + x, \\quad |x| < X \\\\
 f(x) &= p_{\\text{msb}} + x \\equiv 0 \\pmod{p} \\\\
-\\text{Coppersmith: } |x| &< n^{\\beta^2} = n^{0.25} \\text{ for } \\beta=0.5 \\\\
 \\text{Construct lattice from } x^i f(x)^j &\\cdot n^{m-j} \\\\
 \\text{LLL} \\implies \\text{short vector } g(x) &\\in \\mathbb{Z}[x] \\\\
 g(x_0) = 0 &\\implies \\text{recover } x_0 \\\\
 p &= p_{\\text{msb}} + x_0 \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Model $p$ as known MSBs plus unknown correction $x$. Build polynomial $f(x) = p_{\\text{msb}} + x$ modulo $n$. Coppersmith finds small roots when the unknown portion is below the bound. Approximately half the bits of $p$ must be known.
+\\textbf{Explanation:} Coppersmith's method constructs a lattice embedding $f(x) = p_{\\text{msb}} + x$; LLL finds the small root $x_0$ when $|x_0| < n^{\\beta^2}$, recovering $p$.
 
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", Eurocrypt 1996; A. May, "Using Coppersmith's Method to Attack RSA", 2009`,
   priority: 'high',

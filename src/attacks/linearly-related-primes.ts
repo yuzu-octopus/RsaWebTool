@@ -62,26 +62,22 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("LINEARLY_RELATED_PRIMES=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta|$, solve the quadratic $kp^2 + \\delta p - n = 0$ to factor $n$.
+  proof: `\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta|$, solve $kp^2 + \\delta p - n = 0$ for $p$.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item $n = p \\cdot q$ where $q = kp + \\delta$
-\\item $k$ is known, $\\delta$ is small (e.g., $|\\delta| < 10^4$)
-\\item Quadratic formula: $p = \\frac{-\\delta + \\sqrt{\\delta^2 + 4kn}}{2k}$
+\\item $n = p \\cdot q$, $q = kp + \\delta$
+\\item $k$ known, $\\delta$ small ($|\\delta| < 10^4$)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-n &= p \\cdot q = p(kp + \\delta) = kp^2 + \\delta p \\\\
+n &= kp^2 + \\delta p \\\\
 kp^2 + \\delta p - n &= 0 \\\\
-p &= \\frac{-\\delta \\pm \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
-\\text{Since } p > 0: \\quad p &= \\frac{-\\delta + \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
-\\text{Iterate } \\delta \\in [-B, B]: \\quad &\\text{check if } \\delta^2 + 4kn \\text{ is a perfect square} \\\\
-\\text{If so, compute } p &\\text{ and verify } p \\mid n \\qed
+p &= \\frac{-\\delta + \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
+\\text{Iterate } \\delta \\in [-B, B]: \\quad &\\text{check if } \\delta^2 + 4kn \\text{ is square} \\\\
+\\text{If so, } p &\\mid n \\implies \\text{found} \\qed
 \\end{align*}
-
-\\textbf{Explanation:} Substitute $q = kp + \\delta$ into $n = pq$ to get the quadratic $kp^2 + \\delta p - n = 0$. For each candidate $\\delta$ in a small range, check if the discriminant $\\delta^2 + 4kn$ is a perfect square. If so, compute $p$ from the quadratic formula and verify $p \\mid n$.
 
 \\textbf{References:} A. Nitaj, "Cryptanalysis of RSA with Constrained Primes", 1999`,
   priority: 'medium',

@@ -121,28 +121,21 @@ _attack()`,
       return null;
     }
   },
-  proof: `\\textbf{Theorem:} Given moduli \\{n\\_1, \\ldots, n\\_k\\}, if any two share a prime, \\gcd(n\\_i, \\prod\\_{j \\neq i} n\\_j) reveals it.
+  proof: `\\textbf{Theorem:} Given moduli $\\{n_1, \\ldots, n_k\\}$, if any two share a prime, $\\gcd(n_i, \\prod_{j \\neq i} n_j)$ reveals it.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item \\{n\\_1, \\ldots, n\\_k\\} — set of RSA moduli, n\\_i = p\\_i q\\_i
-\\item Shared prime: p\\_i = p\\_j for some i \\neq j
-\\item Product tree for efficient computation of \\prod\\_{j \\neq i} n\\_j \\bmod n\\_i
-\\item Euclidean GCD: O(\\log^2(\\max(a, b)))
+\\item RSA moduli $n_i = p_i q_i$
+\\item $p_i = p_j$ for some $i \\neq j$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-n_i &= p_i q_i, \\quad i = 1, \\ldots, k \\\\
-p_1 = p_2 = p &\\implies p \\mid n_1 \\land p \\mid n_2 \\\\
-p &\\mid \\gcd(n_1, n_2) \\\\
-g_i = \\gcd\\left(n_i, \\prod_{j \\neq i} n_j\\right) & \\\\
-g_i > 1 &\\implies g_i \\text{ is a shared prime factor} \\\\
-\\text{Product tree: } T &= \\text{tree}(n_1, \\ldots, n_k), \\quad \\text{depth } O(\\log k) \\\\
-\\text{Time: } O(M(k \\log N) &\\log k) \\quad \\text{vs } O(k^2) \\text{ pairwise} \\qed
+p \\mid n_i, \\; p \\mid n_j &\\implies p \\mid \\gcd(n_i, n_j) \\\\
+g_i &= \\gcd\\left(n_i, \\prod_{j \\neq i} n_j\\right) \\\\
+g_i > 1 &\\implies g_i \\text{ is a shared prime} \\\\
+\\text{Product tree: } O(k \\log k) &\\text{ vs } O(k^2) \\text{ pairwise} \\qed
 \\end{align*}
-
-\\textbf{Explanation:} If two RSA moduli share a prime factor, computing the GCD of each modulus against the product of all others exposes the shared factor. A product tree makes this efficient — O(k \\log k) instead of O(k^2) pairwise comparisons.
 
 \\textbf{References:} Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012; Bernstein, "How to Find Small Factors of Products", 2004`,
   priority: 'high',

@@ -106,27 +106,23 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("RELATED_MESSAGE=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} Given $c_1 = m^e \\bmod n$ and $c_2 = (am + b)^e \\bmod n$, $m$ is recovered via $\\gcd(x^e - c_1, (ax+b)^e - c_2)$.
+  proof: `\\textbf{Theorem:} Given $c_1 = m^e$ and $c_2 = (am+b)^e \\bmod n$, recover $m$ via $\\gcd(x^e - c_1, (ax+b)^e - c_2)$.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item $c_1 = m^e \\bmod n$, $c_2 = (am + b)^e \\bmod n$
-\\item $a, b$ — known linear relationship parameters, $a \\not\\equiv 0 \\pmod{n}$
-\\item $f_1(x) = x^e - c_1$, $f_2(x) = (ax + b)^e - c_2$
-\\item Both polynomials share root $x = m$ over $\\mathbb{Z}_n$
+\\item $f_1(m) \\equiv 0$, $f_2(m) \\equiv 0 \\pmod{n}$
+\\item $\\gcd(a,n) = 1$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-f_1(m) &= m^e - c_1 \\equiv 0 \\pmod{n} \\\\
-f_2(m) &= (am + b)^e - c_2 \\equiv 0 \\pmod{n} \\\\
-\\gcd(f_1, f_2) &= (x - m) \\quad \\text{(with high probability)} \\\\
-m &= -\\frac{\\text{constant term}}{\\text{leading coefficient}} \\pmod{n} \\qed
+f_1(x) &= x^e - c_1, \\quad f_2(x) = (ax+b)^e - c_2 \\\\
+f_1(m) &\\equiv 0 \\pmod{n}, \\quad f_2(m) \\equiv 0 \\pmod{n} \\\\
+\\gcd(f_1,f_2) &= (x - m) \\quad \\text{(with high probability)} \\\\
+m &= -\\text{const} / \\text{lc} \\pmod{n} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Both polynomials vanish at $x = m$. Their GCD over $\\mathbb{Z}_n[x]$ is typically $(x - m)$, directly revealing the plaintext. Works for any linear relationship $am + b$.
-
-\\textbf{References:} Coppersmith et al. (1996); related message attacks on RSA`,
+\\textbf{References:} Coppersmith et al., 1996`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.c1 && !!p.c2,
 };

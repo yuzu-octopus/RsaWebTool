@@ -88,28 +88,24 @@ export const attack: Attack = {
         print("COPPERSMITH_SHORT_PAD=FAILED")
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} Given $c_1 \\equiv (m + \\delta_1)^e \\pmod{n}$ and $c_2 \\equiv (m + \\delta_2)^e \\pmod{n}$ with $|\\delta_1 - \\delta_2| < n^{1/e^2}$, recover $m$ via resultant $+$ Coppersmith.
+  proof: `\\textbf{Theorem:} Given $c_1 \\equiv (m + \\delta_1)^e \\pmod{n}$ and $c_2 \\equiv (m + \\delta_2)^e \\pmod{n}$ with $|\\Delta| < n^{1/e^2}$, recover $m$ via resultant + Coppersmith.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item $n, e, c_1, c_2$ (modulus, exponent, two ciphertexts)
-\\item $|\\delta_2 - \\delta_1| < n^{1/e^2}$ (short padding)
-\\item Same base message $m$ under both encryptions
+\\item $c_1 \\equiv m^e \\pmod{n}$, $c_2 \\equiv (m+\\Delta)^e \\pmod{n}$
+\\item $|\\Delta| < n^{1/e^2}$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-f_1(x) &= x^e - c_1 \\\\
-f_2(x) &= (x + \\Delta)^e - c_2, \\quad \\Delta = \\delta_2 - \\delta_1 \\\\
-r(\\Delta) &= \\text{Res}_x(f_1, f_2) \\equiv 0 \\pmod{n} \\\\
-|\\Delta| < n^{1/e^2} &\\implies \\Delta \\text{ found via } small\\_roots \\\\
-\\gcd(x^e - c_1, (x + \\Delta)^e - c_2) &= x - (m + \\delta_1) \\\\
+f_1(x) &= x^e - c_1, \\quad f_2(x) = (x+\\Delta)^e - c_2 \\\\
+r(\\Delta) &= \\text{Res}_x(f_1,f_2) \\equiv 0 \\pmod{n} \\\\
+|\\Delta| < n^{1/e^2} &\\implies \\text{small\\_roots finds } \\Delta \\\\
+\\gcd(f_1, f_2|_{\\Delta}) &= x - (m+\\delta_1) \\\\
 m &= \\text{root} - \\delta_1 \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Compute the resultant of two polynomials to eliminate $x$, yielding a polynomial in $\\Delta$. Use Coppersmith's $small\\_roots$ to find the small padding difference. Apply Franklin-Reiter with known $\\Delta$ to recover $m$.
-
-\\textbf{References:} D. Coppersmith, "Small Solutions to Polynomial Equations and Low Exponent RSA Vulnerabilities", J. Cryptology, 1997; Boneh, "Twenty Years of Attacks on RSA", 1999`,
+\\textbf{References:} D. Coppersmith, J. Cryptology, 1997; Boneh, 1999`,
 
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c1 && !!p.c2,

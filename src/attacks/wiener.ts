@@ -79,30 +79,25 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("WIENER=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If d < n^{1/4}/3 and q < p < 2q, then d can be recovered from the continued fraction expansion of e/n.
+  proof: `\\textbf{Theorem:} If $d < n^{1/4}/3$, then $d$ can be recovered from the continued fraction expansion of $e/n$.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item RSA public key (n, e), private key d with ed \\equiv 1 \\pmod{\\varphi(n)}
-\\item ed - 1 = k\\varphi(n) for some integer k
-\\item q < p < 2q (balanced primes)
-\\item d < n^{1/4}/3
-\\item Legendre's theorem: if |\\alpha - a/b| < 1/(2b^2), then a/b is a convergent of \\alpha
+\\item $ed \\equiv 1 \\pmod{\\varphi(n)}$, so $ed - 1 = k\\varphi(n)$
+\\item $d < n^{1/4}/3$
+\\item Convergents of $e/n$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-ed - 1 &= k\\varphi(n) \\implies \\frac{e}{\\varphi(n)} = \\frac{k}{d} + \\frac{1}{d\\varphi(n)} \\\\
-\\left|\\frac{e}{n} - \\frac{k}{d}\\right| &= \\left|\\frac{e(\\varphi(n) - n)}{n\\varphi(n)} - \\frac{1}{d\\varphi(n)}\\right| \\\\
-&= \\left|\\frac{e(p + q - 1)}{n\\varphi(n)} - \\frac{1}{d\\varphi(n)}\\right| \\\\
-&< \\frac{e(p + q)}{n\\varphi(n)} < \\frac{3e}{2\\sqrt{n} \\cdot \\varphi(n)} \\\\
-d < n^{1/4}/3 &\\implies \\left|\\frac{e}{n} - \\frac{k}{d}\\right| < \\frac{1}{2d^2} \\\\
-\\text{By Legendre's theorem, } k/d &\\text{ is a convergent of } e/n \\\\
-\\text{For each convergent } k/d: \\quad \\varphi &= (ed - 1)/k \\\\
+ed - 1 &= k\\varphi(n) \\\\
+\\left|\\frac{e}{n} - \\frac{k}{d}\\right| &< \\frac{1}{2d^2} \\qquad (\\text{using } d < n^{1/4}/3) \\\\
+\\therefore \\frac{k}{d} &\\text{ is a convergent of } \\frac{e}{n} \\\\
+\\text{For each convergent: } \\varphi &= \\frac{ed - 1}{k} \\\\
 x^2 - (n - \\varphi + 1)x + n &= 0 \\implies p, q \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Compute the continued fraction convergents of e/n. For each convergent k/d, check if (ed - 1) is divisible by k, then solve the quadratic x^2 - (n - \\varphi + 1)x + n = 0. If the roots are integers multiplying to n, you've found d.
+\\textbf{Explanation:} Compute the continued fraction convergents of $e/n$. For each convergent $k/d$, test if $(ed-1)/k$ is integer, then solve the quadratic to recover $p, q$.
 
 \\textbf{References:} M. Wiener, "Cryptanalysis of Short RSA Secret Exponents", IEEE Trans. Info. Theory, 1990`,
   priority: 'high',

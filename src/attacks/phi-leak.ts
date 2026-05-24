@@ -107,24 +107,21 @@ _attack()`,
       return null;
     }
   },
-  proof: `\\textbf{Theorem:} Knowing \\(\\phi(n)\\) for \\(n = pq\\) allows factoring \\(n\\) in polynomial time by solving a quadratic equation.
+  proof: `\\textbf{Theorem:} Knowing $\\phi(n)$ factors $n = pq$ in polynomial time by solving a quadratic.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item Modulus \\(n = pq\\) (product of exactly two primes)
-\\item Euler's totient \\(\\phi(n) = (p-1)(q-1)\\)
-\\item \\(\\Delta = (n - \\phi(n) + 1)^2 - 4n\\) must be a perfect square
+\\item $n = pq$
+\\item $\\phi(n) = (p-1)(q-1)$ is known
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\phi(n) &= (p-1)(q-1) = n - (p + q) + 1 \\\\
-s &= p + q = n - \\phi(n) + 1 \\\\
+\\phi(n) &= (p-1)(q-1) = n - (p+q) + 1 \\\\
+s &= n - \\phi + 1 = p + q \\\\
 \\Delta &= s^2 - 4n = (p - q)^2 \\\\
-p &= \\frac{s - \\sqrt{\\Delta}}{2}, \\quad q = \\frac{s + \\sqrt{\\Delta}}{2} \\qed
+p, q &= \\frac{s \\pm \\sqrt{\\Delta}}{2} \\qed
 \\end{align*}
-
-\\textbf{Explanation:} From $n$ and $\\phi(n)$, we derive the sum $s = p + q$. Together with $pq = n$, this gives a quadratic whose roots are $p$ and $q$. The discriminant is always a perfect square $(p-q)^2$ for valid RSA moduli.
 
 \\textbf{References:} Rivest, Shamir, Adleman, 1978; Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2`,
   priority: 'high',

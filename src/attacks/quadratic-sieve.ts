@@ -129,34 +129,24 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("QUADRATIC_SIEVE=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} Quadratic Sieve factors n in expected time O(\\exp(\\sqrt{\\ln n \\ln \\ln n})).
+  proof: `\\textbf{Theorem:} QS factors n in expected exp(\\sqrt{\\ln n \\ln \\ln n}).
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item Congruent squares: x^2 \\equiv y^2 \\pmod{n}, x \\not\\equiv \\pm y \\implies \\gcd(x - y, n) is a factor
-\\item Factor base \\mathcal{F} = \\{-1\\} \\cup \\{p : p \\leq B, (n/p) = 1\\}
-\\item Q(x) = (x + \\lfloor\\sqrt{n}\\rfloor)^2 - n, sieved for B-smooth values
-\\item Linear algebra over \\mathbb{F}\\_2 on exponent vectors
-\\item Smoothness bound B = \\exp(\\frac{1}{2}\\sqrt{\\ln n \\ln \\ln n})
+\\item Congruent squares: x^2 \\equiv y^2 \\pmod{n} \\implies \\gcd(x - y, n) factor
+\\item Factor base \\mathcal{F}
+\\item Q(x) = (x + \\lfloor\\sqrt{n}\\rfloor)^2 - n
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 m &= \\lfloor\\sqrt{n}\\rfloor, \\quad Q(x) = (x + m)^2 - n \\\\
-Q(x) &\\equiv (x + m)^2 \\pmod{n} \\\\
-\\mathcal{F} &= \\{-1\\} \\cup \\{p \\leq B : (n/p) = 1\\} \\\\
-\\text{Find } x \\text{ such that } Q(x) &\\text{ is B-smooth over } \\mathcal{F} \\\\
-Q(x) &= \\prod_{p \\in \\mathcal{F}} p^{e_p} \\\\
+\\text{Sieve } Q(x) &\\text{ for B-smooth values over } \\mathcal{F} \\\\
 \\vec{v}_x &= (e_p \\bmod 2)_{p \\in \\mathcal{F}} \\in \\mathbb{F}_2^{|\\mathcal{F}|} \\\\
-\\text{Collect } |\\mathcal{F}| + 1 \\text{ vectors, find dependency: } & \\\\
-\\sum_{i \\in S} \\vec{v}_{x_i} &= \\vec{0} \\pmod{2} \\\\
-\\prod_{i \\in S} Q(x_i) &= y^2 \\\\
-X &= \\prod_{i \\in S} (x_i + m), \\quad X^2 \\equiv y^2 \\pmod{n} \\\\
-X \\not\\equiv \\pm y \\pmod{n} &\\implies \\gcd(X - y, n) \\text{ is a factor} \\\\
-\\text{Success prob: } \\geq 1/2, \\quad \\text{time: } O(&\\exp(\\sqrt{\\ln n \\ln \\ln n})) \\qed
+\\sum_{i \\in S} \\vec{v}_{x_i} &= \\vec{0} \\pmod{2} \\quad \\text{(linear dependency)} \\\\
+X &= \\prod_{i \\in S} (x_i + m), \\quad X^2 \\equiv \\prod Q(x_i) = y^2 \\pmod{n} \\\\
+\\gcd(X - y, n) &= \\text{factor} \\quad \\text{(prob } \\geq 1/2\\text{)} \\qed
 \\end{align*}
-
-\\textbf{Explanation:} Sieve values of Q(x) = (x + \\sqrt{n})^2 - n for smoothness over a factor base. Each smooth value gives an exponent vector mod 2. Find a linear dependency over \\mathbb{F}\\_2 to get a congruence of squares X^2 \\equiv y^2 \\pmod{n}. Then gcd(X - y, n) yields a factor with probability \\geq 1/2.
 
 \\textbf{References:} C. Pomerance, "The Quadratic Sieve Factoring Algorithm", Eurocrypt 1984`,
   priority: 'high',

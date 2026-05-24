@@ -180,34 +180,28 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("BONEH_DURFEE=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} The private exponent d can be recovered in polynomial time when d < n^{0.292} using lattice reduction.
+  proof: `\\textbf{Theorem:} Recover d when d < n^{0.292} via lattice reduction.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item RSA: ed \\equiv 1 \\pmod{\\varphi(n)}, so ed - 1 = k\\varphi(n)
-\\item \\varphi(n) = n - (p + q) + 1, let A = (n + 1)/2 and y = -(p + q)/2
-\\item Herrmann-May bivariate Coppersmith method with lattice linearization
-\\item LLL lattice basis reduction algorithm
+\\item ed \\equiv 1 \\pmod{\\varphi(n)}, so ed - 1 = k\\varphi(n)
+\\item \\varphi(n) \\approx 2(A + y) with A = (n+1)/2, y = -(p+q)/2
+\\item LLL lattice basis reduction
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-ed - 1 &= k\\varphi(n) = k(n - (p + q) + 1) \\\\
-\\text{Let } A &= \\frac{n + 1}{2}, \\quad y = -\\frac{p + q}{2} \\\\
-\\varphi(n) &= n + 1 - (p + q) = 2A + 2y \\\\
-ed &= k(2A + 2y) + 1 = 2k(A + y) + 1 \\\\
-\\text{So } 2k(A + y) + 1 &\\equiv 0 \\pmod{e} \\quad \\text{(since } ed \\equiv 0 \\pmod{e}\\text{)} \\\\
-f(x, y) &= 1 + x(A + y) \\equiv 0 \\pmod{e} \\quad \\text{with root } (2k, y) \\\\
-\\text{Substitute } u &= xy + 1 \\text{ (Herrmann-May) to linearize } \\varphi(n) \\text{ term} \\\\
-\\text{Construct lattice from shifts } x^i f^k e^{m-k} &\\text{ and } y^j f^k e^{m-k} \\\\
-\\text{Apply LLL} \\implies \\text{short vectors } g_1, g_2 &\\in \\mathbb{Z}[u, x, y] \\\\
-\\text{Resultant } \\operatorname{Res}_w(g_1(w, z), g_2(w, z)) &\\implies \\text{root } z = y \\\\
-\\varphi(n) = n + 1 + 2y, \\quad p + q &= -2y,\\quad \\text{solve } x^2 - (p+q)x + n = 0 \\qed
+ed - 1 &= k\\varphi(n) = k(2A + 2y) \\\\
+f(x, y) &= 1 + x(A + y) \\equiv 0 \\pmod{e} \\quad \\text{root } (2k, y) \\\\
+u &= xy + 1 \\quad \\text{(Herrmann-May linearization)} \\\\
+\\text{Construct lattice from shifts of } f^k e^{m-k} &\\text{, apply LLL} \\\\
+\\text{Resultant of short vectors } &\\implies y, \\; \\varphi(n), \\; p+q \\\\
+x^2 - (p+q)x + n &= 0 \\implies p, q \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Build a bivariate polynomial f(x, y) = 1 + x(A + y) \\pmod{e} with small root (2k, -(p+q)/2). Use the Herrmann-May substitution u = xy + 1 to simplify lattice construction. Build shifts from powers of f and the modulus e, apply LLL to find short vectors, then extract y via resultant. Recover \\varphi(n) and factor n. The bound d < n^{0.292} comes from lattice dimension analysis.
+\\textbf{Explanation:} Build bivariate polynomial, apply Herrmann-May linearization, construct lattice, find short vectors via LLL, recover \\varphi(n) via resultant. The bound d < n^{0.292} comes from lattice dimension analysis.
 
-\\textbf{References:} D. Boneh & G. Durfee, "Cryptanalysis of RSA with Private Key d Less than n^0.292", IEEE Trans. Info. Theory, 1999; M. Herrmann & A. May, "Maximizing Small Root Bounds by Linearization and Applications to Small Secret Exponent RSA", PKC 2008`,
+\\textbf{References:} Boneh \\& Durfee, 1999; Herrmann \\& May, PKC 2008`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e,
 };

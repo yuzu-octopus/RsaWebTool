@@ -50,27 +50,22 @@ export const attack: Attack = {
     except Exception as ex:
         print(f"SMALL_CRT_EXP=FAILED: {ex}")
 _attack()`,
-  proof: `\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small, $p$ can be recovered by exhaustive search over $k$.
+  proof: `\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small ($< 10^6$), exhaustive search over $k$ recovers $p$.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item RSA-CRT: $d_p = d \\bmod (p-1)$, $d_q = d \\bmod (q-1)$
 \\item $d_p \\cdot e \\equiv 1 \\pmod{p-1}$
-\\item $d_p \\cdot e - 1 = k(p-1)$ for some integer $k$
-\\item $d_p$ is small (e.g., $d_p < 10^6$)
+\\item $d_p \\cdot e - 1 = k(p-1)$ for some $k$
+\\item $d_p$ small ($< 10^6$)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-d_p \\cdot e &\\equiv 1 \\pmod{p-1} \\\\
-d_p \\cdot e - 1 &= k(p-1) \\\\
 p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
-\\text{For each } k \\in [1, e): \\quad &\\text{compute } d_p \\equiv e^{-1} \\pmod{k} \\\\
+\\text{For } k \\in [1, e): \\quad d_p &\\equiv e^{-1} \\pmod{k} \\\\
 \\text{Iterate } d_p &= d_{p0}, d_{p0}+k, d_{p0}+2k, \\ldots \\le \\text{bound} \\\\
-\\text{Check if } p \\mid n &\\implies \\text{factorization found} \\qed
+\\text{Check } p \\mid n &\\implies \\text{factorization found} \\qed
 \\end{align*}
-
-\\textbf{Explanation:} From $d_p \\cdot e \\equiv 1 \\pmod{p-1}$, we get $p = (d_p \\cdot e - 1)/k + 1$. For each $k \\in [1, e)$, compute $d_{p0} = e^{-1} \\bmod k$, then iterate $d_p = d_{p0} + j \\cdot k$ up to the bound. For each candidate, check if $p$ divides $n$.
 
 \\textbf{References:} Standard RSA-CRT analysis; see also Jochemsz-May attack on small CRT exponents`,
   priority: 'medium',

@@ -131,33 +131,28 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("BLEICHENBACHER=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} A PKCS#1 v1.5 padding oracle allows decryption of any ciphertext in \\(\\approx 2^{17}\\) queries.
+  proof: `\\textbf{Theorem:} A PKCS#1 v1.5 padding oracle decrypts any ciphertext in \\(\\approx 2^{17}\\) queries.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item PKCS#1 v1.5 format: EM = 0x00 \\,\\|\\, 0x02 \\,\\|\\, PS \\,\\|\\, 0x00 \\,\\|\\, M
-\\item Oracle \\(\\mathcal{O}(c)\\) returns 1 iff \\(c^d \\bmod n\\) has valid padding
-\\item \\(B = 2^{8(k-2)}\\) where \\(k = \\lceil \\log_{256} n \\rceil\\) (byte length of n)
-\\item Valid padding range: \\(2B \\leq m < 3B\\)
-\\item RSA homomorphism: \\((c \\cdot s^e)^d \\equiv m \\cdot s \\pmod{n}\\)
+\\item Oracle O(c) = 1 iff valid PKCS#1 v1.5 padding
+\\item $B = 2^{8(k-2)}$, $k = \\lceil \\log_{256} n \\rceil$
+\\item $(c \\cdot s^e)^d \\equiv m \\cdot s \\pmod{n}$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 c &= m^e \\bmod n, \\quad 2B \\leq m < 3B \\\\
-\\text{Choose } s, \\text{ query } \\mathcal{O}(c \\cdot s^e \\bmod n) & \\\\
-\\mathcal{O} = 1 \\implies 2B \\leq (m \\cdot s \\bmod n) &< 3B \\\\
-m \\cdot s \\bmod n = m \\cdot s - r \\cdot n, \\quad r \\in \\mathbb{Z} & \\\\
-2B + r \\cdot n \\leq m \\cdot s &< 3B + r \\cdot n \\\\
-\\frac{2B + r \\cdot n}{s} \\leq m &< \\frac{3B + r \\cdot n}{s} \\\\
-M_i &= \\bigcup_r \\left[ \\left\\lceil \\frac{2B + r n}{s_i} \\right\\rceil, \\left\\lfloor \\frac{3B - 1 + r n}{s_i} \\right\\rfloor \\right] \\\\
+\\mathcal{O}(c \\cdot s^e) = 1 &\\implies 2B \\leq m \\cdot s - rn < 3B \\\\
+\\frac{2B + rn}{s} &\\leq m < \\frac{3B + rn}{s} \\\\
+M_i &= \\bigcup_r \\left[\\left\\lceil \\frac{2B+rn}{s_i}\\right\\rceil, \\left\\lfloor \\frac{3B-1+rn}{s_i}\\right\\rfloor\\right] \\\\
 [a_{i+1}, b_{i+1}] &= [a_i, b_i] \\cap M_i \\\\
-\\text{Repeat until } b - a &= 0 \\implies m = a \\qed
+b - a = 0 &\\implies m = a \\qed
 \\end{align*}
 
-\\textbf{Explanation:} The attack multiplies the ciphertext by \\(s^e\\) and queries the oracle. A valid response constrains \\(m \\cdot s \\bmod n\\) to \\([2B, 3B)\\), which maps back to a union of intervals for \\(m\\). Intersecting these intervals across multiple \\(s\\) values shrinks the candidate range until \\(m\\) is isolated.
+\\textbf{Explanation:} Each valid response constrains m to intervals. Intersecting across s values shrinks until m is isolated.
 
-\\textbf{References:} D. Bleichenbacher, "Chosen Ciphertext Attacks Against Protocols Based on the RSA Encryption Standard PKCS #1", CRYPTO 1998`,
+\\textbf{References:} D. Bleichenbacher, CRYPTO 1998`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_responses,
 };

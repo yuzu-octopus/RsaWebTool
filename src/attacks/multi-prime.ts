@@ -98,28 +98,22 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("MULTI_PRIME=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} Multi-prime RSA uses n = \\prod\\_{i=1}^{r} p\\_i with r > 2 primes and \\varphi(n) = \\prod (p\\_i - 1).
+  proof: `\\textbf{Theorem:} Multi-prime RSA uses $n = \\prod_{i=1}^{r} p_i$ with $r > 2$ primes and $\\varphi(n) = \\prod (p_i - 1)$.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item n = p\\_1 p\\_2 \\cdots p\\_r — product of r \\geq 3 distinct primes
-\\item Euler's totient: \\varphi(n) = \\prod\\_{i=1}^{r} (p\\_i - 1)
-\\item RSA: ed \\equiv 1 \\pmod{\\varphi(n)}
-\\item CRT decryption: m\\_i = c^d \\bmod p\\_i, then combine
+\\item $n = p_1 p_2 \\cdots p_r$, $r \\geq 3$
+\\item $\\varphi(n) = \\prod_{i=1}^{r} (p_i - 1)$
+\\item $ed \\equiv 1 \\pmod{\\varphi(n)}$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-n &= p_1 p_2 \\cdots p_r, \\quad r \\geq 3 \\\\
-\\varphi(n) &= \\prod_{i=1}^{r} \\varphi(p_i) = \\prod_{i=1}^{r} (p_i - 1) \\\\
-ed &\\equiv 1 \\pmod{\\varphi(n)} \\\\
-m &= c^d \\bmod n \\\\
-m_i &= c^d \\bmod p_i, \\quad i = 1, \\ldots, r \\\\
-m &= \\text{CRT}(m_1, \\ldots, m_r; p_1, \\ldots, p_r) \\\\
-p_i &\\approx n^{1/r} \\implies \\text{ECM, QS more effective} \\qed
+n &= \\prod_{i=1}^{r} p_i \\\\
+\\varphi(n) &= \\prod_{i=1}^{r} (p_i - 1) \\\\
+m_i &= c^d \\bmod p_i \\quad\\text{(CRT decryption)} \\\\
+p_i &\\approx n^{1/r} \\implies \\text{smaller primes, easier factoring} \\qed
 \\end{align*}
-
-\\textbf{Explanation:} Multi-prime RSA splits n into more than two primes for faster CRT-based decryption. However, each prime is smaller (n^{1/r} bits), making factorization easier. For a 2048-bit modulus with r=3, each prime is only ~683 bits.
 
 \\textbf{References:} Simmons & Norris, "Preliminary Comments on the MIT Public Key Cryptosystem", 1976; Boneh, "Twenty Years of Attacks on RSA", 1999`,
   priority: 'medium',

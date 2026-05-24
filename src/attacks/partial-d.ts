@@ -51,27 +51,25 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("PARTIAL_D=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If the low $m$ bits of $d$ are known and $d < n$, the full $d$ can be recovered by iterating $k$ in the RSA key equation.
+  proof: `\\textbf{Theorem:} If low $m$ bits of $d$ are known and $d < n$, recover $d$ by iterating $k$ in the key equation.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item RSA key equation: $ed \\equiv 1 \\pmod{\\varphi(n)}$
-\\item $ed - 1 = k\\varphi(n)$ for some integer $k$
-\\item Known low $m$ bits of $d$: $d_{\\text{low}} = d \\bmod 2^m$
-\\item $\\varphi(n) = n - (p + q) + 1 \\approx n$
+\\item $ed \\equiv 1 \\pmod{\\varphi(n)}$
+\\item $d_{\\text{low}} = d \\bmod 2^m$ known
+\\item $k \\in [1, e]$ where $ed-1 = k\\varphi(n)$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-ed - 1 &= k\\varphi(n) \\\\
-d &= \\frac{k\\varphi(n) + 1}{e} \\approx \\frac{kn + 1}{e} \\\\
+d &\\approx \\frac{kn + 1}{e} \\\\
 d_{\\text{approx}} &= \\left\\lfloor \\frac{kn + 1}{e} \\right\\rfloor \\\\
-\\text{Check: } d_{\\text{approx}} \\bmod 2^m &\\stackrel{?}{=} d_{\\text{low}} \\\\
-\\text{If match: } \\varphi &= (ed - 1)/k \\\\
+d_{\\text{approx}} \\bmod 2^m &\\stackrel{?}{=} d_{\\text{low}} \\\\
+\\varphi &= (ed - 1)/k \\\\
 x^2 - (n - \\varphi + 1)x + n &= 0 \\implies p, q \\qed
 \\end{align*}
 
-\\textbf{Explanation:} For each candidate $k \\in [1, e]$, compute $d_{\\text{approx}} = \\lfloor(kn + 1)/e\\rfloor$. If the low $m$ bits match the leaked $d_{\\text{low}}$, recover $\\varphi(n) = (ed - 1)/k$ and solve the quadratic $x^2 - (n - \\varphi + 1)x + n = 0$ to find $p$ and $q$.
+\\textbf{Explanation:} For each $k \\in [1,e]$, compute $d_{\\text{approx}} = \\lfloor(kn+1)/e\\rfloor$; if low $m$ bits match $d_{\\text{low}}$, recover $\\varphi(n) = (ed-1)/k$ and solve $x^2 - (n-\\varphi+1)x + n = 0$ for $p,q$.
 
 \\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,
   priority: 'high',

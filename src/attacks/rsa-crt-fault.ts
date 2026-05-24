@@ -68,29 +68,23 @@ print("RSA_CRT_FAULT=FAILED")`;
     #
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} A single faulty RSA-CRT signature s' on known message m factors n via \\gcd(s'^e - m, n).
+  proof: `\\textbf{Theorem:} A single faulty CRT signature s' on known m factors n via \\gcd(s'^e - m, n).
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item n, e, m, s\\_{valid}, s\\_{faulty} (modulus, exponent, message, valid and faulty signatures)
-\\item n = pq, fault in one CRT component only
-\\item s' \\equiv s \\pmod{p} but s' \\not\\equiv s \\pmod{q}
+\\item s' \\equiv s \\pmod{p}, s' \\not\\equiv s \\pmod{q} (single-fault)
+\\item n = pq
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-s &\\equiv m^d \\pmod{n} \\\\
-s' &\\equiv s \\pmod{p}, \\quad s' \\not\\equiv s \\pmod{q} \\\\
-s'^e &\\equiv s^e \\equiv m \\pmod{p} \\\\
+s'^e &\\equiv m \\pmod{p} \\\\
 s'^e &\\not\\equiv m \\pmod{q} \\\\
 p \\mid (s'^e - m), \\quad q &\\nmid (s'^e - m) \\\\
-\\gcd(s'^e - m, n) &= p \\\\
-q &= n / p \\qed
+\\gcd(s'^e - m, n) &= p, \\quad q = n/p \\qed
 \\end{align*}
 
-\\textbf{Explanation:} A CRT fault makes the signature correct mod one prime but wrong mod the other. Raising the faulty signature to e and subtracting m yields a value divisible by exactly one prime factor. GCD with n extracts it.
-
-\\textbf{References:} Boneh, DeMillo, Lipton, "On the Importance of Checking Cryptographic Protocols for Faults", Eurocrypt 1997; Joye, "Fault Injection Attacks on CRT-RSA", 2012`,
+\\textbf{References:} Boneh, DeMillo, Lipton, Eurocrypt 1997`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.m && !!p.sig_valid && !!p.sig_faulty,
 };

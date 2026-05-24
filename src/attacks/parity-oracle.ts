@@ -78,30 +78,23 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("PARITY_ORACLE=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} A parity oracle returning \\(\\text{LSB}(m)\\) for \\(m = c^d \\bmod n\\) reveals the full plaintext in \\(\\lceil \\log_2 n \\rceil\\) queries.
+  proof: `\\textbf{Theorem:} A parity oracle (LSB) recovers m in $\\lceil \\log_2 n \\rceil$ queries.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item Public key \\((n, e)\\) and ciphertext \\(c\\)
-\\item Oracle \\(\\mathcal{O}(c') = \\text{LSB}((c')^d \\bmod n)\\)
-\\item \\(\\lceil \\log_2 n \\rceil\\) oracle queries needed for exact recovery
-\\item \\(n\\) must be odd (always true for RSA moduli)
+\\item Oracle O(c') = LSB((c')^d \\bmod n)
+\\item n odd
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-c_0 &= c, \\quad m_0 = m \\\\
-c_{i+1} &= c_i \\cdot 2^e \\bmod n \\\\
-m_{i+1} &= 2 \\cdot m_i \\bmod n \\\\
-\\mathcal{O}(c_{i+1}) = 0 &\\implies 2m_i < n \\implies m \\in [\\ell_i, \\tfrac{\\ell_i + u_i}{2}) \\\\
-\\mathcal{O}(c_{i+1}) = 1 &\\implies 2m_i \\geq n \\implies m \\in [\\tfrac{\\ell_i + u_i}{2}, u_i) \\\\
-\\text{After } k \\text{ steps:} &\\quad u_k - \\ell_k = \\frac{n}{2^k} \\\\
-k = \\lceil \\log_2 n \\rceil &\\implies u_k - \\ell_k < 1 \\implies m = \\ell_k \\qed
+c_{i+1} &= c_i \\cdot 2^e \\bmod n, \\quad m_{i+1} = 2m_i \\bmod n \\\\
+\\mathcal{O}(c_{i+1}) = 0 &\\implies 2m_i < n \\implies \\text{lower half} \\\\
+\\mathcal{O}(c_{i+1}) = 1 &\\implies 2m_i \\geq n \\implies \\text{upper half} \\\\
+\\lceil \\log_2 n \\rceil \\text{ queries} &\\implies u_k - \\ell_k < 1 \\implies m = \\ell_k \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Each query doubles the effective plaintext modulo \\(n\\). The parity of the result reveals whether the doubling wrapped around \\(n\\), halving the search interval. After \\(\\log_2 n\\) steps the interval contains exactly one integer — the plaintext.
-
-\\textbf{References:} D. Bleichenbacher, "Generating ElGamal Signatures Without Knowing the Secret Key", Eurocrypt 1998; Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP)", CRYPTO 2001`,
+\\textbf{References:} Bleichenbacher, 1998; Manger, CRYPTO 2001`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!(p.n && p.e && p.c && p.oracle_responses),
 };

@@ -145,34 +145,23 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("GIMMICKY_PRIMES=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If a prime factor $p$ or $q$ of $n = p \\cdot q$ is a special-form prime (e.g. Mersenne, primorial, Fermat, Fibonacci, repunit, Cullen, Woodall, or factorial), then $n$ can be factored in polynomial time by direct divisibility testing against a precomputed search space of candidates.
+  proof: `\\textbf{Theorem:} If p is a special-form prime (Mersenne, primorial, Fermat, etc.), test divisibility against a precomputed set.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item $n = p \\cdot q$ — RSA modulus to test
-\\item Mersenne: $M_p = 2^p - 1$
-\\item Primorial: $p\\# \\pm 1$ where $p\\# = \\prod_{r \\leq p} r$
-\\item Fermat: $F_k = 2^{2^k} + 1$
-\\item Fibonacci: $F_n$ prime
-\\item Repunit: $R_k = (10^k - 1)/9$
-\\item Cullen/Woodall: $C_k = k \\cdot 2^k + 1$ and $W_k = k \\cdot 2^k - 1$
-\\item Carol/Kynea: $A_k = (2^k - 1)^2 - 2$ and $B_k = (2^k + 1)^2 - 2$
-\\item Factorial: $k! \\pm 1$
+\\item n = pq
+\\item p \\in \\mathcal{S} (known special-form set, |\\mathcal{S}| \\ll 5000)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-n &= p \\cdot q, \\quad p \\in \\mathcal{S} \\text{ (special-form set)} \\\\
-\\mathcal{S} &= \\{M_p\\} \\cup \\{p\\# \\pm 1\\} \\cup \\{F_k\\} \\cup \\{F_n\\} \\cup \\{R_k\\} \\cup \\{C_k\\} \\cup \\{W_k\\} \\cup \\{A_k\\} \\cup \\{B_k\\} \\cup \\{k! \\pm 1\\} \\\\
-|\\mathcal{S}| &\\ll 5000 \\quad \\text{(extremely small candidate pool)} \\\\
+n &= p \\cdot q, \\quad p \\in \\mathcal{S} \\\\
 n \\bmod s &= 0 \\quad \\text{for some } s \\in \\mathcal{S} \\\\
-\\text{If } n \\bmod s = 0 &\\implies s \\mid n, \\quad q = n/s \\\\
-\\text{Complexity: } & O(|\\mathcal{S}| \\cdot \\log^2 n) \\quad \\text{(extremely fast divisibility check)} \\qed
+s &\\mid n \\implies q = n/s \\\\
+\\text{Cost: } O(|\\mathcal{S}| \\cdot \\log^2 n) & \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Some CTF challenges use primes with recognizable mathematical structures. Since the total number of known or feasible special-form primes up to typical RSA sizes is very small, testing divisibility against all of them is virtually instantaneous. This exploits poor entropy/randomness in custom CTF key generation scripts.
-
-\\textbf{References:} Caldwell, "The Prime Pages" (primes.utm.edu); Ribenboim, "The New Book of Prime Number Records", 1996`,
+\\textbf{References:} Caldwell, "The Prime Pages"; Ribenboim, "The New Book of Prime Number Records", 1996`,
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

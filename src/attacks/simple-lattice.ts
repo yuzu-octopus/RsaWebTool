@@ -81,25 +81,20 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("SIMPLE_LATTICE=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If $p = p_0 + x$ where $|x| < n^{1/4}$, Coppersmith's method recovers $p$ from the approximation $p_0$.
+  proof: `\\textbf{Theorem:} If $|p-p_0| < n^{1/4}$, Coppersmith recovers $p$ from approximation $p_0$.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item $n = p \\cdot q$ with balanced primes ($p \\approx q \\approx \\sqrt{n}$)
-\\item Approximation $p_0$ such that $|p - p_0| < n^{1/4}$
-\\item Coppersmith's method for finding small roots of modular polynomials
+\\item $n = p \\cdot q$ with balanced primes
+\\item $p = p_0 + x$, $|x| < n^{1/4}$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-p &= p_0 + x \\quad \\text{where } |x| < n^{1/4} \\\\
 f(x) &= p_0 + x \\equiv 0 \\pmod{p} \\\\
-\\text{Since } p \\mid n, \\quad f(x) &\\equiv 0 \\pmod{p} \\implies \\gcd(f(x), n) \\ge p \\\\
-\\text{Coppersmith finds } x_0 \\text{ when } |x_0| &< n^{1/4} \\quad (\\beta = 0.5 \\text{ for factor of size } \\sqrt{n}) \\\\
-p &= p_0 + x_0, \\quad q = n / p \\qed
+\\text{Coppersmith finds } x_0 \\text{ when } |x_0| &< n^{1/4} \\quad (\\beta = 0.5) \\\\
+p &= p_0 + x_0, \\quad q = n/p \\qed
 \\end{align*}
-
-\\textbf{Explanation:} Construct the polynomial $f(x) = p_0 + x$ over $\\mathbb{Z}/n\\mathbb{Z}$. Since $f(x) \\equiv 0 \\pmod{p}$ and $p \\mid n$, Coppersmith's method finds the small root $x$ when $|x| < n^{1/4}$. Then $p = p_0 + x$ and $q = n/p$.
 
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996`,
   priority: 'high',

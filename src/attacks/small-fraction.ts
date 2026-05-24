@@ -119,32 +119,23 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("SMALL_FRACTION=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If p/q \\approx a/b for small coprime a, b, then q \\approx \\sqrt{nb/a} and trial division near q\\_0 recovers the factor.
+  proof: `\\textbf{Theorem:} If $p/q \\approx a/b$ for small coprime $a, b$, then $q \\approx \\sqrt{nb/a}$ and trial division near $q_0$ recovers the factor.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item n = pq — RSA modulus with p \\leq q
-\\item a, b — small coprime integers such that p/q \\approx a/b
-\\item q\\_0 = \\lfloor\\sqrt{nb/a}\\rfloor — initial approximation of q
-\\item \\delta = |p - aq/b| — deviation from exact rational ratio
-\\item |q - q\\_0| \\approx \\delta — q\\_0 error equals the prime adjustment
+\\item $n = pq$
+\\item $p/q \\approx a/b$, $\\gcd(a,b) = 1$, small $a,b$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\frac{p}{q} &\\approx \\frac{a}{b}, \\quad \\gcd(a, b) = 1 \\\\
+\\frac{p}{q} &\\approx \\frac{a}{b} \\\\
 n = pq &\\approx \\frac{a}{b} q^2 \\\\
-q &\\approx \\sqrt{\\frac{nb}{a}} = q_0 \\\\
-p &= \\frac{aq}{b} + \\delta \\quad\\text{(integer adjustment for primality)} \\\\
-n &= pq = \\frac{aq^2}{b} + \\delta q \\\\
-q_0 &= \\left\\lfloor\\sqrt{nb/a}\\right\\rfloor = \\left\\lfloor\\sqrt{q^2 + \\delta bq/a}\\right\\rfloor \\\\
-|q - q_0| &\\approx \\delta \\quad\\text{(for small }\\delta \\text{ relative to }q) \\\\
-\\text{Trial divide: } q_0 \\pm k &\\text{ for } k = 0, 1, \\ldots, \\Delta \\\\
-\\text{Search: } 1 \\leq b &\\leq B, \\quad 1 \\leq a \\leq b, \\quad \\gcd(a,b) = 1 \\\\
-\\text{Complexity: } O(B^2 \\cdot \\Delta) &\\text{ integer divisions} \\qed
+q_0 &= \\left\\lfloor\\sqrt{\\frac{nb}{a}}\\right\\rfloor \\\\
+\\text{Trial divide } q_0 \\pm k &\\text{ for small } k \\\\
+\\text{Search: } 1 \\leq b &\\leq B, \\; 1 \\leq a \\leq b, \\; \\gcd(a,b) = 1 \\\\
+\\text{Complexity: } O(B^2 \\cdot \\Delta) &\\text{ divisions} \\qed
 \\end{align*}
-
-\\textbf{Explanation:} When p/q is close to a small rational a/b, we approximate q as \\sqrt{nb/a}. The error |q - q\\_0| equals the primality adjustment \\delta (e.g., < 500 bits in practice). Trial division for q\\_0 \\pm \\Delta finds the exact factor using only fast integer operations — orders of magnitude faster than calling Coppersmith's LLL for each candidate pair.
 
 \\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,
   priority: 'medium',

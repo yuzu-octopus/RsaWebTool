@@ -125,31 +125,24 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("SQUFOF=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} SQUFOF factors a composite integer n by finding a square form in the cycle of reduced binary quadratic forms of discriminant D = kn.
+  proof: `\\textbf{Theorem:} SQUFOF factors n by finding a square form in the cycle of reduced forms of discriminant D = kn.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item n — composite integer to factor (semiprime works best)
-\\item k — multiplier with \\left(\\frac{k}{n}\\right) = -1 (Kronecker symbol)
-\\item D = kn — discriminant of the binary quadratic forms
-\\item Reduction operator \\rho(a, b, c) = (c, b', (b'^2 - D)/(4c)) where b' \\equiv -b \\pmod{2c}
+\\item Binary quadratic forms ax^2 + bxy + cy^2, discriminant D = b^2 - 4ac
+\\item D = kn where \\left(\\frac{k}{n}\\right) = -1
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 n = pq, \\quad \\left(\\frac{k}{n}\\right) &= -1, \\quad D = kn \\\\
-f(x, y) = ax^2 + bxy + cy^2, \\quad D &= b^2 - 4ac \\\\
-\\rho(a, b, c) &= \\left(c,\\; b' \\bmod 2c,\\; \\frac{b'^2 - D}{4c}\\right), \\quad |b'| \\leq \\sqrt{D} \\\\
 (a_0, b_0, c_0) &\\xrightarrow{\\rho} (a_1, b_1, c_1) \\xrightarrow{\\rho} \\cdots \\xrightarrow{\\rho} (a_L, b_L, c_L) = (a_0, b_0, c_0) \\\\
-\\exists i: c_i &= q^2 \\text{ (perfect square)} \\\\
-\\text{Let } s = \\sqrt{c_i}, \\quad (a', b', s^2) &\\xrightarrow{\\rho^{\\text{inv}}} \\cdots \\xrightarrow{\\rho} (s, b^*, s) \\\\
-\\gcd(s, n) &= p \\text{ or } q \\\\
-\\text{Runtime: } O(n^{1/4}) & \\qed
+\\exists i: c_i &= q^2 \\;\\text{(perfect square)} \\\\
+s &= \\sqrt{c_i}, \\quad \\text{reverse } \\rho \\text{ to find } (s, b^*, s) \\\\
+\\gcd(s, n) &= p \\text{ or } q \\qed
 \\end{align*}
 
-\\textbf{Explanation:} SQUFOF traverses the cycle of reduced binary quadratic forms of discriminant D = kn. When a form with a square coefficient c is found, the inverse square root is computed and the cycle is continued until a factor emerges via GCD.
-
-\\textbf{References:} D. Shanks, "SQUFOF: A Quadratic Form Factorization Algorithm", 1975; Gower & Wagstaff, "Square Form Factorization", Mathematics of Computation, 2008`,
+\\textbf{References:} Shanks, 1975; Gower \\& Wagstaff, Math. Comp., 2008`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

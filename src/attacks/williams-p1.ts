@@ -161,37 +161,24 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("WILLIAMS_P1=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If p+1 is B1-smooth, then p can be found using Lucas sequences in time O(B \\log B \\log^2 n). Stage 2 extends to p+1 with one prime factor between B1 and B2.
+  proof: `\\textbf{Theorem:} If p+1 is B1-smooth, find p via Lucas sequences V\\_M(P,1). Stage 2 extends to B2.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item Lucas sequences: V\\_k(P, 1) with V\\_0 = 2, V\\_1 = P, V\\_k = P \\cdot V\\_{k-1} - V\\_{k-2}
-\\item V\\_k(\\alpha + \\alpha^{-1}, 1) = \\alpha^k + \\alpha^{-k} where \\alpha, \\alpha^{-1} are roots of x^2 - Px + 1 = 0
-\\item For (D/p) = -1 with D = P^2 - 4: \\alpha^{p+1} = 1 in \\mathbb{F}\\_{p^2}^*
-\\item M = \\text{lcm}(1, 2, \\ldots, B1)
-\\item Lucas recurrence with Q=1: V\\_{a+b} = V\\_a \\cdot V\\_b - V\\_{a-b}
+\\item Lucas sequences V\\_k(P,1) = \\alpha^k + \\alpha^{-k}
+\\item (D/p) = -1 \\implies \\alpha^{p+1} = 1 in \\mathbb{F}\\_{p^2}
+\\item M = \\operatorname{lcm}(1, 2, \\ldots, B1)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-p+1 &= q_1^{e_1} q_2^{e_2} \\cdots q_r^{e_r}, \\quad q_i \\leq B1 \\\\
-\\text{Choose } P: \\; D = P^2 - 4, \\quad (D/p) &= -1 \\\\
-x^2 - Px + 1 &= 0 \\text{ has roots } \\alpha, \\beta = \\alpha^{-1} \\text{ in } \\mathbb{F}_{p^2} \\\\
-V_k &= \\alpha^k + \\alpha^{-k} \\\\
-\\alpha^{p+1} &= 1 \\text{ in } \\mathbb{F}_{p^2}^* \\\\
-M &= \\text{lcm}(1, 2, \\ldots, B1), \\quad (p+1) \\mid M \\\\
-\\alpha^M &= 1 \\\\
-V_M &= \\alpha^M + \\alpha^{-M} = 1 + 1 = 2 \\pmod{p} \\\\
-p &\\mid (V_M - 2) \\\\
-p &\\mid \\gcd(V_M - 2, n) \\\\
-\\text{Stage 2: } p+1 &= q \\cdot s, \\; B1 < q \\leq B2, \\; s \\text{ is B1-smooth} \\\\
-V_{qM} &\\equiv 2 \\pmod{p} \\\\
-V_{(k+1)M} &= V_{kM} \\cdot V_M - V_{(k-1)M} \\pmod{n} \\\\
-\\text{Iterate } k=2..B2, \\text{ check when } k &> B1 \\text{ and } k \\text{ is prime} \\\\
-\\text{Try different } P &\\text{ until } (D/p) = -1 \\qed
+\\text{Choose } P: \\; D &= P^2 - 4, \\quad (D/p) = -1 \\\\
+p+1 &\\mid M \\implies \\alpha^M = 1 \\\\
+V_M &= \\alpha^M + \\alpha^{-M} = 2 \\pmod{p} \\\\
+\\gcd(V_M - 2, n) &= p \\\\
+\\text{Stage 2: } p+1 &= q \\cdot s,\\; s \\mid M,\\; q \\in (B1, B2] \\\\
+\\text{Check } \\gcd(V_{qM} - 2, n) &\\text{ via recurrence } V_{(k+1)M} = V_{kM}V_M - V_{(k-1)M} \\qed
 \\end{align*}
-
-\\textbf{Explanation:} Choose P and compute V\\_M(P, 1) mod n using Lucas sequences. If p+1 is B1-smooth and (P^2-4/p) = -1, then V\\_M \\equiv 2 \\pmod{p}, so gcd(V\\_M - 2, n) reveals p. Stage 2 checks V\\_{kM} for k > B1 up to B2 using the recurrence V\\_{(k+1)M} = V\\_{kM} \\cdot V\\_M - V\\_{(k-1)M}, catching cases where p+1 has one prime factor between B1 and B2. Try different P values to find one with the right Legendre symbol.
 
 \\textbf{References:} H. C. Williams, "A p+1 Method of Factoring", Mathematics of Computation, 1982`,
   priority: 'medium',

@@ -161,29 +161,24 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
         print("HASTAD_LINEAR_PAD=FAILED")
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} Given c\\_i \\equiv (a\\_i m + b\\_i)^e \\pmod{n\\_i} for i = 1, \\ldots, k with known a\\_i, b\\_i and k \\geq e, recover m via CRT + Coppersmith.
+  proof: `\\textbf{Theorem:} Given c\\_i \\equiv (a\\_i m + b\\_i)^e \\pmod{n\\_i} with k \\geq e, recover m via CRT + Coppersmith.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item k triples (n\\_i, c\\_i, a\\_i, b\\_i) with pairwise coprime moduli
-\\item k \\geq e, known affine transforms
-\\item m < \\min(n\\_i)
+\\item c_i \\equiv (a_i m + b_i)^e \\pmod{n_i}, $\\gcd(n_i,n_j) = 1$
+\\item $k \\geq e$, affine transforms known
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 f_i(x) &= (a_i x + b_i)^e - c_i \\in (\\mathbb{Z}/n_i\\mathbb{Z})[x] \\\\
-N &= \\prod_{i=1}^{k} n_i \\\\
-N_i &= N / n_i, \\quad t_i = N_i \\cdot N_i^{-1} \\bmod n_i \\\\
+N &= \\prod_{i=1}^{k} n_i, \\quad t_i = N_i \\cdot N_i^{-1} \\bmod n_i \\\\
 F(x) &= \\sum_{i=1}^{k} t_i \\cdot f_i(x) \\pmod{N} \\\\
 F(m) &\\equiv 0 \\pmod{N} \\\\
-\\text{(small\\_roots works directly on } F) \\\\
-m &= small\\_roots(F, X = \\lceil \\tfrac{1}{2} N^{1/e - \\varepsilon} \\rceil) \\qed
+m &= small\\_roots(F) \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Build a polynomial per ciphertext, combine via CRT coefficients into F(x) over Zmod(N). The message m is a small root of F. Use Coppersmith's small\\_roots to extract it.
-
-\\textbf{References:} J. Hastad, "Solving Linear Equations Modulo Divisors", Eurocrypt 1988; Coppersmith et al., "Cryptanalysis of RSA with Related Messages", 1996`,
+\\textbf{References:} J. Hastad, Eurocrypt 1988; Coppersmith et al., 1996`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.triples && !!p.e,
 };

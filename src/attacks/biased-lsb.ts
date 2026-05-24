@@ -121,32 +121,25 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("BIASED_LSB=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} An LSB oracle with bias p > 1/2 recovers m with high probability via majority voting + binary search.
+  proof: `\\textbf{Theorem:} A noisy LSB oracle with bias p > 1/2 recovers m via majority voting + binary search.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item Noisy oracle \\mathcal{O}\\_j(c) = \\text{LSB}(c^d \\bmod n) with \\Pr[\\text{correct}] = p > 1/2
-\\item k independent oracle runs available per query
-\\item RSA homomorphism: \\text{LSB}((c \\cdot 2^e)^d) = \\text{LSB}(2m \\bmod n)
-\\item Binary search: \\text{LSB}(2^i m \\bmod n) halves the interval each step
+\\item Oracle correct with prob $p > 1/2$
+\\item k runs per query for majority voting
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-b_i &= \\text{LSB}(2^i m \\bmod n), \\quad i = 0, 1, \\ldots, \\lfloor \\log_2 n \\rfloor \\\\
-\\text{Collect } k \\text{ responses per position: } & b_{i,1}, \\ldots, b_{i,k} \\\\
+b_i &= \\text{LSB}(2^i m \\bmod n) \\\\
 \\hat{b}_i &= \\text{majority}(b_{i,1}, \\ldots, b_{i,k}) \\\\
-\\Pr[\\hat{b}_i \\neq b_i] &\\leq \\exp\\!\\bigl(-2k(p - 1/2)^2\\bigr) \\\\
-k &= O\\!\\left(\\frac{\\log n}{(p - 1/2)^2}\\right) \\implies \\Pr[\\hat{b}_i \\neq b_i] = O(1/n) \\\\
-[a_0, b_0] &= [0, n) \\\\
-b_i = 0 \\implies [a_{i+1}, b_{i+1}] &= [a_i, (a_i + b_i)/2) \\\\
-b_i = 1 \\implies [a_{i+1}, b_{i+1}] &= [(a_i + b_i)/2, b_i) \\\\
-\\text{After } \\log_2 n \\text{ steps: } b - a &= 0 \\implies m = a
+\\Pr[\\hat{b}_i \\neq b_i] &\\leq \\exp(-2k(p-\\tfrac12)^2) \\\\
+k = O\\!\\left(\\frac{\\log n}{(p-1/2)^2}\\right) &\\implies \\Pr[\\hat{b}_i \\neq b_i] = O(1/n) \\\\
+b_i = 0 &\\implies \\text{lower half}, \\quad b_i = 1 \\implies \\text{upper half} \\\\
+\\log_2 n \\text{ steps} &\\implies m = a \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Each LSB query on 2^i·m mod n reveals whether m falls in the upper or lower half of the current interval. With noisy oracles, majority voting across k independent runs amplifies the signal. The error drops exponentially with k, so O(log n / (p-1/2)²) runs per bit suffice.
-
-\\textbf{References:} Goldwasser, Micali, "Probabilistic Encryption", 1982; Håstad et al., "Bit Security of RSA", 1989`,
+\\textbf{References:} Goldwasser, Micali, 1982; Håstad et al., 1989`,
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_runs,
 };

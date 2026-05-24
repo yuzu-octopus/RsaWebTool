@@ -111,30 +111,25 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("CLOSE_PRIME=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If $n = p \\cdot q$ with $p \\approx q$, then $n$ can be factored by recovering $\\phi(n)$ via a baby-step giant-step discrete log attack.
+  proof: `\\textbf{Theorem:} If $p \\approx q$, then $\\phi(n)$ can be recovered via a BSGS discrete log attack, factoring $n$.
 
-\\textbf{Prerequisites:}
+\\textbf{Setup:}
 \\begin{itemize}
-\\item $n = p \\cdot q$, $p$ and $q$ odd primes
-\\item $\\phi(n) = (p-1)(q-1) = n - (p+q) + 1$ (Euler totient)
-\\item $2^{\\phi(n)} \\equiv 1 \\pmod{n}$ (Euler's theorem)
-\\item $\\phi_{\\text{approx}} = n - 2\\lfloor\\sqrt{n}\\rfloor + 1 \\approx \\phi(n)$ for close primes
+\\item $n = pq$, $p$ and $q$ odd primes
+\\item $\\phi_{\\text{approx}} = n - 2\\lfloor\\sqrt{n}\\rfloor + 1 \\approx \\phi(n)$ when $p \\approx q$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\delta &= \\phi(n) - \\phi_{\\text{approx}} \\quad \\text{(small when } p \\approx q\\text{)} \\\\
-2^{\\phi_{\\text{approx}} + \\delta} &\\equiv 1 \\pmod{n} \\quad \\text{(by Euler)} \\\\
+\\delta &= \\phi(n) - \\phi_{\\text{approx}} \\\\
 2^{\\delta} &\\equiv 2^{-\\phi_{\\text{approx}}} \\pmod{n} \\\\
-\\text{Baby steps: store } 2^j &\\bmod n \\text{ for } j = 0,\\dots,b \\\\
-\\text{Giant steps: compute } 2^{-\\phi_{\\text{approx}}} \\cdot (2^b)^i &\\bmod n \\text{ for } i = 0,\\dots,b \\\\
-\\text{Match: } 2^j &\\equiv 2^{-\\phi_{\\text{approx}} + i \\cdot b} \\pmod{n} \\\\
+\\text{BSGS: store } 2^j \\bmod n, &\\quad \\text{search } 2^{-\\phi_{\\text{approx}}}(2^b)^i \\\\
 \\phi(n) &= \\phi_{\\text{approx}} + j - i \\cdot b \\\\
-p+q &= n - \\phi(n) + 1 \\\\
-p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
+p + q &= n - \\phi(n) + 1 \\\\
+p, q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Londahl's attack uses a baby-step giant-step approach to find $\\phi(n)$ directly, unlike Fermat factorization which iteratively searches for $a^2 - n = b^2$. It exploits the approximation $\\phi(n) \\approx n - 2\\sqrt{n} + 1$ when $p \\approx q$, then solves $2^{\\delta} \\equiv 2^{-\\phi_{\\text{approx}}} \\pmod{n}$ via BSGS. With $b = 500{,}000$, it covers up to $2.5 \\times 10^{11}$ candidate $\\delta$ values, handling prime gaps far larger than pure Fermat.
+\\textbf{Explanation:} Londahl's BSGS attack recovers $\\phi(n)$ by solving $2^\\delta \\equiv 2^{-\\phi_{\\text{approx}}} \\pmod{n}$, then factors $n$ via the quadratic.
 
 \\textbf{References:} Carl L\\"ondahl, "Finding close-prime factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,
   priority: 'medium',
