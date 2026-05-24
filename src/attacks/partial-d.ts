@@ -4,7 +4,7 @@ import { modInverse } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'partial-d',
-  name: 'Partial Key Exposure',
+  name: 'Partial d Key Exposure',
   category: 'Partial Key / Lattice',
   description: 'Recovers p from low bits of d. Use when LSBs of private exponent d are leaked.',
   inputs: [

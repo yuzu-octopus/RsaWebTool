@@ -31,7 +31,7 @@ import { attack as linearlyRelatedPrimes, generateTestcase as genLinearlyRelated
 import { attack as dependentPrime, generateTestcase as genDependentPrime } from './dependent-prime';
 
 import { attack as commonModulus, generateTestcase as genCommonModulus } from './common-modulus';
-import { attack as hastad, generateTestcase as genHastad } from './hastad';
+
 import { attack as franklinReiter, generateTestcase as genFranklinReiter } from './franklin-reiter';
 import { attack as coppersmithShortPad, generateTestcase as genCoppersmithShortPad } from './coppersmith-short-pad';
 import { attack as hastadLinearPad, generateTestcase as genHastadLinearPad } from './hastad-linear-pad';
@@ -54,7 +54,7 @@ import { attack as knownPlaintext, generateTestcase as genKnownPlaintext } from 
 import { attack as smallPublicExp, generateTestcase as genSmallPublicExp } from './small-public-exp';
 import { attack as multiPrimeGcd, generateTestcase as genMultiPrimeGcd } from './multi-prime-gcd';
 import { attack as phiLeak, generateTestcase as genPhiLeak } from './phi-leak';
-import { attack as parityOracle, generateTestcase as genParityOracle } from './parity-oracle';
+
 
 import { attack as partialKeyExposure, generateTestcase as genPartialKeyExposure } from './partial-key-exposure';
 import { attack as implicitKeyExposure, generateTestcase as genImplicitKeyExposure } from './implicit-key-exposure';
@@ -72,12 +72,12 @@ export const attacks: Attack[] = [
   gimmickyPrimes, closePrime, noveltyPrimes, euler, pollardStrassen, pisanoPeriod,
   simpleLattice, partialD, partialPqBits, smallCrtExp, dpDqLeak,
   linearlyRelatedPrimes, dependentPrime,
-  commonModulus, hastad, franklinReiter, coppersmithShortPad, hastadLinearPad,
+  commonModulus, franklinReiter, coppersmithShortPad, hastadLinearPad,
   lsbOracle, rsaCrtFault, nonCoprimeExp, cubeRootCrt, commonFactor,
   homomorphicForgery, bleichenbacherSig,
   bleichenbacher, manger, biasedLsb,
   roca, nitros, factordbLookup, knownPlaintext, smallPublicExp,
-  multiPrimeGcd, phiLeak, parityOracle,
+  multiPrimeGcd, phiLeak,
   partialKeyExposure, implicitKeyExposure, relatedMessage,
   commonPrimeRsa, hastadBroadcast,
 ];
@@ -108,7 +108,7 @@ export const testcaseGenerators: Record<string, () => Record<string, string>> = 
   'linearly-related-primes': genLinearlyRelatedPrimes,
   'dependent-prime': genDependentPrime,
   'common-modulus': genCommonModulus,
-  hastad: genHastad,
+
   'franklin-reiter': genFranklinReiter,
   'coppersmith-short-pad': genCoppersmithShortPad,
   'hastad-linear-pad': genHastadLinearPad,
@@ -129,7 +129,6 @@ export const testcaseGenerators: Record<string, () => Record<string, string>> = 
   'small-public-exp': genSmallPublicExp,
   'multi-prime-gcd': genMultiPrimeGcd,
   'phi-leak': genPhiLeak,
-  'parity-oracle': genParityOracle,
   'partial-key-exposure': genPartialKeyExposure,
   'implicit-key-exposure': genImplicitKeyExposure,
   'related-message': genRelatedMessage,

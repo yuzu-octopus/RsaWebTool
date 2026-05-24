@@ -5,7 +5,7 @@ import { gcd } from '../utils/bigint';
 export const attack: Attack = {
   id: 'common-factor',
   name: 'Common Factor Attack',
-  category: 'Message / Protocol',
+  category: 'Factorization',
   description: 'Recovers p when p divides m. Use when gcd(c, n) > 1.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },

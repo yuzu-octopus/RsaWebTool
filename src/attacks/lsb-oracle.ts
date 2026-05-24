@@ -5,7 +5,7 @@ import { modPow } from '../utils/bigint';
 export const attack: Attack = {
   id: 'lsb-oracle',
   name: 'LSB Oracle Attack',
-  category: 'Message / Protocol',
+  category: 'Oracle',
   description: 'Recovers m via LSB oracle. Use when an oracle reveals LSB(decrypt(c·2^e mod n)).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },

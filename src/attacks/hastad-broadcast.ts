@@ -4,7 +4,7 @@ import { modPow } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'hastad-broadcast',
-  name: "Hastad's Broadcast Attack (CRT Recovery)",
+  name: "Hastad's Broadcast Attack",
   category: 'Message / Protocol',
   description: 'Recovers m from e ciphertexts with small e using CRT. Use when same m sent to e recipients with exponent e.',
   inputs: [
