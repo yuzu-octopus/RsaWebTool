@@ -3,8 +3,8 @@ import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 
 export const attack: Attack = {
-  id: 'related-message',
-  name: 'Related Message Attack',
+  id: 'franklin-reiter-related-message',
+  name: 'Franklin-Reiter Related Message Attack',
   category: 'Message / Protocol',
   description: 'Recovers m from linearly related ciphertexts. Use when c1 = m^e and c2 = (a·m + b)^e mod n.',
   inputs: [
@@ -29,7 +29,7 @@ export const attack: Attack = {
             b = Integer(b_val) if b_val else Integer(0)
             if n < 2 or e < 2 or c1 < 0 or c2 < 0:
                 print("Invalid input")
-                print("RELATED_MESSAGE=FAILED")
+                print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
                 return
             print(f"Related Message Attack")
             print(f"n = {n}, e = {e}")
@@ -67,7 +67,7 @@ export const attack: Attack = {
                         break
                 if m_int is None:
                     print("Could not extract root from degree-1 GCD.")
-                    print("RELATED_MESSAGE=FAILED")
+                    print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
                     return
                 print(f"Recovered m = {m_int}")
                 v1 = power_mod(m_int, e, n)
@@ -75,13 +75,13 @@ export const attack: Attack = {
                 print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
                 print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
                 if v1 == c1 and v2 == c2:
-                    print("RELATED_MESSAGE=SUCCESS")
+                    print("FRANKLIN_REITER_RELATED_MESSAGE=SUCCESS")
                 else:
-                    print("RELATED_MESSAGE=FAILED")
+                    print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
             elif g.degree() == 0:
                 print("GCD is constant - no common root found.")
                 print("Check that c1, c2 are related by the given a, b.")
-                print("RELATED_MESSAGE=FAILED")
+                print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
             else:
                 roots = g.roots()
                 if roots:
@@ -92,25 +92,25 @@ export const attack: Attack = {
                     print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
                     print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
                     if v1 == c1 and v2 == c2:
-                        print("RELATED_MESSAGE=SUCCESS")
+                        print("FRANKLIN_REITER_RELATED_MESSAGE=SUCCESS")
                     else:
-                        print("RELATED_MESSAGE=FAILED")
+                        print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
                 else:
                     print("GCD found but no roots extractable.")
-                    print("RELATED_MESSAGE=FAILED")
+                    print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
         except Exception as ex:
             print(f"ERROR: {ex}")
-            print("RELATED_MESSAGE=FAILED")
+            print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
         #
     except BaseException as ex:
         print(f"ERROR: {ex}")
-        print("RELATED_MESSAGE=FAILED")
+        print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} Given $c_1 = m^e$ and $c_2 = (am+b)^e \\bmod n$, recover $m$ via $\\gcd(x^e - c_1, (ax+b)^e - c_2)$.
+  proof: `\\textbf{Theorem:} Given $c_1 \\equiv m^e \\pmod{n}$ and $c_2 \\equiv (am + b)^e \\pmod{n}$, recover $m$ via polynomial GCD.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $f_1(m) \\equiv 0$, $f_2(m) \\equiv 0 \\pmod{n}$
+\\item $c_1 \\equiv m^e \\pmod{n}$, $c_2 \\equiv (am+b)^e \\pmod{n}$
 \\item $\\gcd(a,n) = 1$
 \\end{itemize}
 
@@ -119,10 +119,10 @@ _attack()`,
 f_1(x) &= x^e - c_1, \\quad f_2(x) = (ax+b)^e - c_2 \\\\
 f_1(m) &\\equiv 0 \\pmod{n}, \\quad f_2(m) \\equiv 0 \\pmod{n} \\\\
 \\gcd(f_1,f_2) &= (x - m) \\quad \\text{(with high probability)} \\\\
-m &= -\\text{const} / \\text{lc} \\pmod{n} \\qed
+m &= -g[0] \\cdot g[1]^{-1} \\qed
 \\end{align*}
 
-\\textbf{References:} Coppersmith et al., 1996`,
+\\textbf{References:} Franklin \\& Reiter, 1996; Boneh, 1999`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.c1 && !!p.c2,
 };

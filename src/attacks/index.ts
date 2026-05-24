@@ -4,10 +4,7 @@ import { modInverse, modPow } from '../utils/bigint';
 import { bigIntToBytes } from '../utils/converters';
 
 // Import all attacks (single import per file)
-import { attack as fermat, generateTestcase as genFermat } from './fermat';
-import { attack as wiener, generateTestcase as genWiener } from './wiener';
 import { attack as bonehDurfee, generateTestcase as genBonehDurfee } from './boneh-durfee';
-import { attack as ecm, generateTestcase as genEcm } from './ecm';
 import { attack as ecm2, generateTestcase as genEcm2 } from './ecm2';
 import { attack as pollardP1, generateTestcase as genPollardP1 } from './pollard-p1';
 import { attack as pollardRho, generateTestcase as genPollardRho } from './pollard-rho';
@@ -21,6 +18,7 @@ import { attack as multiPrime, generateTestcase as genMultiPrime } from './multi
 import { attack as gimmickyPrimes, generateTestcase as genGimmickyPrimes } from './gimmicky-primes';
 import { attack as closePrime, generateTestcase as genClosePrime } from './close-prime';
 import { attack as noveltyPrimes, generateTestcase as genNoveltyPrimes } from './novelty-primes';
+import { attack as franklinReiterRelatedMessage, generateTestcase as genFranklinReiterRelatedMessage } from './related-message';
 
 import { attack as simpleLattice, generateTestcase as genSimpleLattice } from './simple-lattice';
 import { attack as partialD, generateTestcase as genPartialD } from './partial-d';
@@ -32,7 +30,6 @@ import { attack as dependentPrime, generateTestcase as genDependentPrime } from 
 
 import { attack as commonModulus, generateTestcase as genCommonModulus } from './common-modulus';
 
-import { attack as franklinReiter, generateTestcase as genFranklinReiter } from './franklin-reiter';
 import { attack as coppersmithShortPad, generateTestcase as genCoppersmithShortPad } from './coppersmith-short-pad';
 import { attack as hastadLinearPad, generateTestcase as genHastadLinearPad } from './hastad-linear-pad';
 import { attack as lsbOracle, generateTestcase as genLsbOracle } from './lsb-oracle';
@@ -58,7 +55,7 @@ import { attack as phiLeak, generateTestcase as genPhiLeak } from './phi-leak';
 
 import { attack as partialKeyExposure, generateTestcase as genPartialKeyExposure } from './partial-key-exposure';
 import { attack as implicitKeyExposure, generateTestcase as genImplicitKeyExposure } from './implicit-key-exposure';
-import { attack as relatedMessage, generateTestcase as genRelatedMessage } from './related-message';
+
 import { attack as commonPrimeRsa, generateTestcase as genCommonPrimeRsa } from './common-prime-rsa';
 import { attack as hastadBroadcast, generateTestcase as genHastadBroadcast } from './hastad-broadcast';
 import { attack as euler, generateTestcase as genEuler } from './euler';
@@ -67,26 +64,23 @@ import { attack as pisanoPeriod, generateTestcase as genPisanoPeriod } from './p
 
 // Public exports
 export const attacks: Attack[] = [
-  fermat, wiener, bonehDurfee, ecm, ecm2, pollardP1, pollardRho, williamsP1,
+  bonehDurfee, ecm2, pollardP1, pollardRho, williamsP1,
   quadraticSieve, squfof, binaryPolyFactor, smallFraction, batchGcd, multiPrime,
   gimmickyPrimes, closePrime, noveltyPrimes, euler, pollardStrassen, pisanoPeriod,
   simpleLattice, partialD, partialPqBits, smallCrtExp, dpDqLeak,
   linearlyRelatedPrimes, dependentPrime,
-  commonModulus, franklinReiter, coppersmithShortPad, hastadLinearPad,
+  commonModulus, coppersmithShortPad, hastadLinearPad,
   lsbOracle, rsaCrtFault, nonCoprimeExp, cubeRootCrt, commonFactor,
   homomorphicForgery, bleichenbacherSig,
   bleichenbacher, manger, biasedLsb,
   roca, nitros, factordbLookup, knownPlaintext, smallPublicExp,
   multiPrimeGcd, phiLeak,
-  partialKeyExposure, implicitKeyExposure, relatedMessage,
+  partialKeyExposure,   implicitKeyExposure, franklinReiterRelatedMessage,
   commonPrimeRsa, hastadBroadcast,
 ];
 
 export const testcaseGenerators: Record<string, () => Record<string, string>> = {
-  fermat: genFermat,
-  wiener: genWiener,
   'boneh-durfee': genBonehDurfee,
-  ecm: genEcm,
   ecm2: genEcm2,
   'pollard-p1': genPollardP1,
   'pollard-rho': genPollardRho,
@@ -108,8 +102,6 @@ export const testcaseGenerators: Record<string, () => Record<string, string>> = 
   'linearly-related-primes': genLinearlyRelatedPrimes,
   'dependent-prime': genDependentPrime,
   'common-modulus': genCommonModulus,
-
-  'franklin-reiter': genFranklinReiter,
   'coppersmith-short-pad': genCoppersmithShortPad,
   'hastad-linear-pad': genHastadLinearPad,
   'lsb-oracle': genLsbOracle,
@@ -117,6 +109,7 @@ export const testcaseGenerators: Record<string, () => Record<string, string>> = 
   'non-coprime-exp': genNonCoprimeExp,
   'cube-root-crt': genCubeRootCrt,
   'common-factor': genCommonFactor,
+  'franklin-reiter-related-message': genFranklinReiterRelatedMessage,
   'homomorphic-forgery': genHomomorphicForgery,
   'bleichenbacher-sig': genBleichenbacherSig,
   bleichenbacher: genBleichenbacher,
@@ -131,7 +124,7 @@ export const testcaseGenerators: Record<string, () => Record<string, string>> = 
   'phi-leak': genPhiLeak,
   'partial-key-exposure': genPartialKeyExposure,
   'implicit-key-exposure': genImplicitKeyExposure,
-  'related-message': genRelatedMessage,
+
   'common-prime-rsa': genCommonPrimeRsa,
   'hastad-broadcast': genHastadBroadcast,
   euler: genEuler,

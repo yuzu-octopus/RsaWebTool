@@ -6,7 +6,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 
 ## Features
 
-- **53 attack implementations** across 5 categories (L5 Playwright test suite: **149/151 passed**, 98.7%)
+- **49 attack implementations** across 5 categories (L5 Playwright test suite: **145/147 passed**, 98.7%)
 - **Real-time SageMath execution** via embedded SageMathCell (offscreen DOM + MutationObserver pipeline)
 - **Browser-side pre-checks** — 8 attacks run entirely in the browser via BigInt GCD, FactorDB API, or lattice GCD (no SageCell needed)
 - **FactorDB integration** — CORS-proxied API via Cloudflare Worker for instant factor lookups, with **auto-submit** of factorized results from all 18 Factorization-category attacks
@@ -26,9 +26,9 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 
 | Category | Count | Highlights |
 |----------|-------|------------|
-| **Factorization** | 22 | Fermat, Wiener, Boneh-Durfee, ECM (×2), Pollard p-1, Pollard rho, Williams p+1, SQUFOF, Quadratic Sieve, Binary Poly Factor, Small Fraction, Batch GCD, Multi-Prime, Gimmicky Primes, Close Prime, Novelty Primes, Common Prime RSA, Euler, Pollard-Strassen, Pisano Period, Common Factor |
+| **Factorization** | 19 | Boneh-Durfee, ECM (Full), Pollard p-1, Pollard rho, Williams p+1, SQUFOF, Quadratic Sieve, Binary Poly Factor, Small Fraction, Batch GCD, Multi-Prime, Gimmicky Primes, Close Prime, Novelty Primes, Common Prime RSA, Euler, Pollard-Strassen, Pisano Period, Common Factor |
 | **Partial Key / Lattice** | 9 | Simple Lattice, Partial d, Partial p/q Bits, Small CRT Exp, dp/dq Leak, Linearly Related Primes, Dependent Prime, Partial Key Exposure, Implicit Key Exposure |
-| **Message / Protocol** | 11 | Common Modulus, Franklin-Reiter, Coppersmith Short Pad, Hastad Linear Pad, RSA-CRT Fault, Non-Coprime Exp, Cube Root CRT, Homomorphic Forgery, Bleichenbacher Sig, Related Message, Hastad Broadcast |
+| **Message / Protocol** | 10 | Common Modulus, Franklin-Reiter Related Message, Coppersmith Short Pad, Hastad Linear Pad, RSA-CRT Fault, Non-Coprime Exp, Cube Root CRT, Homomorphic Forgery, Bleichenbacher Sig, Hastad Broadcast |
 | **Oracle** | 4 | Bleichenbacher PKCS#1 v1.5 (million message attack), Manger OAEP, Biased LSB, LSB Oracle |
 | **Advanced** | 7 | ROCA (Infineon RSALib), Nitros, FactorDB Lookup, Known Plaintext, Small Public Exp, Multi-Prime GCD, Phi(n) Leak |
 
@@ -44,7 +44,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 | `MagicPanel` | `MagicPanel.tsx` | Paste-all mode: auto-detect params via regex (key=value, PEM, hex, decimal), show applicable attacks preview, priority-ordered parallel execution (concurrency=6), early-stop on first `=SUCCESS`, per-attack status list. Shows success toast; auto-submits p,q to FactorDB for Factorization-category attacks |
 | `RsaCalculator` | `RsaCalculator.tsx` | Pure BigInt calculator: Key Gen / Encrypt / Decrypt tabs, auto-format detection (hex/decimal/base64/ASCII), printable ASCII detection |
 | `FormatConverter` | `FormatConverter.tsx` | Standalone Hex / Decimal / Base64 / Text converter with dropdown format selectors and live auto-conversion |
-| `ProofIndex` | `ProofIndex.tsx` | Searchable index of all 53 attacks with category tags and descriptions, click to navigate |
+| `ProofIndex` | `ProofIndex.tsx` | Searchable index of all 49 attacks with category tags and descriptions, click to navigate |
 | `ProofRenderer` | `ProofRenderer.tsx` | Full KaTeX parser: display math (align\*/equation\*/gather\*/aligned), inline math via $...$ (with auto-wrap heuristics for unadorned math tokens), itemize lists, heading detection, References section stripper |
 | `ErrorBoundary` | `ErrorBoundary.tsx` | Class component catching render crashes in content panels, Dracula-themed fallback UI, prevents sidebar/output/snackbar from going down |
 
@@ -57,7 +57,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 
 ### Attack System
 
-All 53 attacks live in `src/attacks/` as individual self-contained files in a flat directory. Each file exports:
+All 49 attacks live in `src/attacks/` as individual self-contained files in a flat directory. Each file exports:
 - `attack: Attack` — full attack metadata (id, name, inputs, sageTemplate, proof, priority, applicableCheck, frontendCheck?, generateTestcase?)
 - `generateTestcase: () => Record<string, string>` — attack-specific testcase generator
 
@@ -110,7 +110,7 @@ These run fully in the browser when sufficient parameters are provided, returnin
 - **frontendCheck pattern** — attacks can define an optional async pre-check that runs in the browser before falling back to SageCell. This enables instant results for FactorDB lookups, phi(n) recovery, and BigInt GCD operations.
 - **Pure math templates** — SageMathCell has no internet access (firewall since 2021). All attack templates must be self-contained pure math code with no external dependencies.
 - **512-bit testcases** — `TESTCASE_BITS = { p: 256, q: 256 }` produces n ≈ 512-bit. Factorization attacks generate n with at least one small factor to avoid SageCell 120s timeout.
-- **L5 Playwright test suite** in `scripts/test-playwright.ts` — runs all 52 SageCell-enabled attacks × 3 runs each (156 total). 10-page concurrency, 120s timeout per run. Only 2 probabilistic partials remain (williams-p1, partial-pq-bits).
+- **L5 Playwright test suite** in `scripts/test-playwright.ts` — runs all 48 SageCell-enabled attacks × 3 runs each (144 total). 10-page concurrency, 120s timeout per run. Only 2 probabilistic partials remain (williams-p1, partial-pq-bits).
 - **No unit tests** — functional verification is `typecheck → lint → build → L5 Playwright suite`.
 - **DRY conventions** — shared MUI TextField styles in `src/styles/inputSx.ts`, reusable drag-to-resize hook in `src/hooks/useDragResize.ts`.
 
@@ -141,7 +141,7 @@ src/
     factordb.ts             — queryFactorDB, formatFactorDBResult, FactorDBError, setFactorDBProxy, reportFactor, extractPQ
     testcases/core.ts       — randomPrime, isPrimeMR, generateKeyPair, encrypt, TESTCASE_BITS
   attacks/
-    index.ts                — Barrel: imports all 53 attacks + testcase generators, CATEGORIES, attacksByCategory
+    index.ts                — Barrel: imports all 49 attacks + testcase generators, CATEGORIES, attacksByCategory
     fermat.ts               — Example: Fermat Factorization (one of 52 flat files)
     wiener.ts               — Wiener's Continued Fraction attack
     ... (50 more)
@@ -152,7 +152,7 @@ src/
     OutputPanel.tsx         — Results (SyntaxHighlighter) + copy + clickable history + Notepad
     MagicPanel.tsx          — Parameter auto-detect, applicable preview, parallel execution, per-attack status
     RsaCalculator.tsx       — Key Gen / Encrypt / Decrypt tabs with auto-format detection
-    ProofIndex.tsx          — Searchable filtered list of all 53 attacks with category tags
+    ProofIndex.tsx          — Searchable filtered list of all 49 attacks with category tags
     ProofRenderer.tsx       — KaTeX renderer: parseProof → segments (displayMath, text, list) → render
     ErrorBoundary.tsx       — Class-based error boundary with Dracula fallback UI for content panels
 workers/
