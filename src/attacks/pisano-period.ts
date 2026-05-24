@@ -1,5 +1,44 @@
 import type { Attack } from '../types';
+import { modPow, gcd } from '../utils/bigint';
 import { randomPrime } from '../utils/testcases/core';
+
+function multiplicativeOrder2(p: bigint): bigint {
+  const trialPrimes = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n];
+  const pm1 = p - 1n;
+  let m = pm1;
+  const factors: bigint[] = [];
+  for (const q of trialPrimes) {
+    while (m % q === 0n) {
+      factors.push(q);
+      m /= q;
+    }
+    if (m === 1n) break;
+  }
+  if (m > 1n) {
+    let f = trialPrimes[trialPrimes.length - 1] + 2n;
+    while (f * f <= m) {
+      while (m % f === 0n) {
+        factors.push(f);
+        m /= f;
+      }
+      f += 2n;
+    }
+    if (m > 1n) {
+      factors.push(m);
+    }
+  }
+  let ord = pm1;
+  for (const f of factors) {
+    while (ord % f === 0n && modPow(2n, ord / f, p) === 1n) {
+      ord /= f;
+    }
+  }
+  return ord;
+}
+
+function lcm(a: bigint, b: bigint): bigint {
+  return a / gcd(a, b) * b;
+}
 
 export const attack: Attack = {
   id: 'pisano-period',
@@ -10,29 +49,34 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
   sageTemplate: (vals: Record<string, string>) => `def _attack():
+    out = []
     try:
         try:
             n = Integer(${vals.n})
-            print(f"Pisano Period Factorization on n = {n}")
-            print()
+            out.append("Pisano Period Factorization on n = " + str(n))
+            out.append("")
             if n < 2:
-                print(f"n = {n} is too small to factor")
-                print("PISANO=FAILED")
+                out.append("n = " + str(n) + " is too small to factor")
+                out.append("PISANO=FAILED")
+                print("\\n".join(out))
                 return
             if n % 2 == 0:
-                print(f"n is even: {n}")
-                print(f"p = 2, q = {n // 2}")
-                print("PISANO=SUCCESS")
+                out.append("n is even: " + str(n))
+                out.append("p = 2, q = " + str(n // 2))
+                out.append("PISANO=SUCCESS")
+                print("\\n".join(out))
                 return
             if n.is_prime():
-                print(f"n is prime: {n}")
-                print("PISANO=FAILED")
+                out.append("n is prime: " + str(n))
+                out.append("PISANO=FAILED")
+                print("\\n".join(out))
                 return
             if n.is_square():
                 p = isqrt(n)
-                print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
-                print("PISANO=SUCCESS")
+                out.append("n is a perfect square: " + str(p) + "^2 = " + str(n))
+                out.append("p = q = " + str(p))
+                out.append("PISANO=SUCCESS")
+                print("\\n".join(out))
                 return
             limit = 200000
             lookup = {}
@@ -47,14 +91,15 @@ export const attack: Attack = {
                         if disc > 0:
                             t = isqrt(disc)
                             if t*t == disc:
-                                p = (s - t) // 2
-                                q = (s + t) // 2
-                                if p > 1 and p*q == n:
-                                    print(f"p = {p}")
-                                    print(f"q = {q}")
-                                    print(f"Verification: p * q = {p * q}")
-                                    print("PISANO=SUCCESS")
+                                p_factor = (s - t) // 2
+                                q_factor = (s + t) // 2
+                                if p_factor > 1 and p_factor * q_factor == n:
+                                    out.append("p = " + str(p_factor))
+                                    out.append("q = " + str(q_factor))
+                                    out.append("Verification: p * q = " + str(p_factor * q_factor))
+                                    out.append("PISANO=SUCCESS")
                                     found = True
+                                    print("\\n".join(out))
                                     return
                 if val in lookup:
                     period = i - lookup[val]
@@ -68,26 +113,28 @@ export const attack: Attack = {
                             if disc > 0:
                                 t = isqrt(disc)
                                 if t*t == disc:
-                                    p = (s - t) // 2
-                                    q = (s + t) // 2
-                                    if p > 1 and p*q == n:
-                                        print(f"p = {p}")
-                                        print(f"q = {q}")
-                                        print(f"Verification: p * q = {p * q}")
-                                        print("PISANO=SUCCESS")
+                                    p_factor = (s - t) // 2
+                                    q_factor = (s + t) // 2
+                                    if p_factor > 1 and p_factor * q_factor == n:
+                                        out.append("p = " + str(p_factor))
+                                        out.append("q = " + str(q_factor))
+                                        out.append("Verification: p * q = " + str(p_factor * q_factor))
+                                        out.append("PISANO=SUCCESS")
                                         found = True
+                                        print("\\n".join(out))
                                         return
                 lookup[val] = i
             if not found:
-                print("Pisano period attack failed: no collision found")
-                print("PISANO=FAILED")
+                out.append("Pisano period attack failed: no collision found")
+                out.append("PISANO=FAILED")
         except Exception as e:
-            print(f"ERROR: {e}")
-            print("PISANO=FAILED")
+            out.append("ERROR: " + str(e))
+            out.append("PISANO=FAILED")
         #
     except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("PISANO=FAILED")
+        out.append("ERROR: " + str(ex))
+        out.append("PISANO=FAILED")
+    print("\\n".join(out))
 _attack()`,
   proof: `\\textbf{Theorem:} Factor n = pq via birthday collision on the multiplicative order of 2 modulo n.
 
@@ -112,9 +159,17 @@ p, q &= \\frac{n - \\phi + 1 \\pm \\sqrt{(n - \\phi + 1)^2 - 4n}}{2} \\qed
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Pisano period attack needs small n for SageCell
-  // Birthday collision in O(sqrt(ord_n(2))) — sqrt(2^20) ≈ 1024 steps for 20-bit primes
-  const p = randomPrime(20);
-  const q = randomPrime(24);
-  return { n: (p * q).toString() };
+  for (let attempt = 0; attempt < 10000; attempt++) {
+    const p = randomPrime(8);
+    const q = randomPrime(8);
+    const ord_p = multiplicativeOrder2(p);
+    const ord_q = multiplicativeOrder2(q);
+    const ord_n = lcm(ord_p, ord_q);
+    const phi = (p - 1n) * (q - 1n);
+    const ratio = Number(phi / ord_n);
+    if (ord_n <= 200000n && ratio <= 199) {
+      return { n: (p * q).toString() };
+    }
+  }
+  return { n: (131n * 251n).toString() };
 };

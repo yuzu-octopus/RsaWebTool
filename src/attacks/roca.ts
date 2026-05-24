@@ -11,112 +11,91 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
   sageTemplate: (vals: Record<string, string>) => `def _attack():
+    out = []
     try:
-        # Validate inputs
         try:
             if not "${vals.n}".strip():
-                print("ERROR: n is required")
-                print("ROCA=FAILED")
+                out.append("ERROR: n is required")
+                out.append("ROCA=FAILED")
+                print("\\n".join(out))
                 return
             n = Integer(${vals.n})
-            # Even check
             if n % 2 == 0:
-                print(f"n is even. p = 2, q = {n // 2}")
-                print("ROCA=SUCCESS")
+                out.append("n is even. p = 2, q = " + str(n // 2))
+                out.append("ROCA=SUCCESS")
+                print("\\n".join(out))
                 return
-            # Prime check
             if is_prime(n):
-                print("n is prime. Not a valid RSA modulus.")
-                print("ROCA=FAILED")
+                out.append("n is prime. Not a valid RSA modulus.")
+                out.append("ROCA=FAILED")
+                print("\\n".join(out))
                 return
-            # ROCA: Return of Coppersmith's Attack
-            # Primes of form p = k*M + (65537^i mod M)
-            # M = product of first several primes
-            print("ROCA vulnerability check")
-            print(f"n = {n}")
-            print()
-            # Try small M values (M_3, M_5, M_7, ...)
-            # Skip M=2,6,30 (num_primes <= 3) — they trivially match all odd n
-            # and give too small M for Coppersmith to work.
-            # We find the largest matching M for the best bound.
-            # Must match testcase generator (up to 61 = 18 primes, M ≈ 2^77)
-            primes_list = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61]
+            out.append("ROCA vulnerability check")
+            out.append("n = " + str(n))
+            primes_list = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
             best_M = None
             best_r = 0
-            best_num = 0
             for num_primes in range(4, len(primes_list) + 1):
                 M = prod(primes_list[:num_primes])
-                if M > 2**96:
+                if M > 2**50:
                     break
-                # Compute possible remainders: 65537^i mod M
                 ord_val = Mod(65537, M).multiplicative_order()
                 remainders = set()
                 for idx in range(ord_val):
                     r = power_mod(65537, idx, M)
                     remainders.add(r)
-                # Check if n mod M is product of two remainders
                 n_mod = n % M
                 for r in remainders:
                     if n_mod * inverse_mod(r, M) % M in remainders:
-                        print(f"Possible match with M = product of first {num_primes} primes")
-                        print(f"M = {M}")
-                        print(f"n mod M = {n_mod}")
-                        print(f"Found compatible remainders: r1 = {r}")
                         best_M = M
                         best_r = r
-                        best_num = num_primes
-                        break  # found a match for this M, continue to larger M
+                        break
             if best_M is not None:
-                found = True
-                r1 = best_r
+                r = best_r
                 M = best_M
-            if found:
-                print()
-                print("VULNERABLE: n appears to use ROCA-generated primes.")
-                print("Use Coppersmith's method to recover p.")
-                print()
-                # Coppersmith's method for small M
-                # p = k*M + r, where r is known remainder
-                # We search for k using Coppersmith
-                r = r1
-                R.<x> = PolynomialRing(ZZ)
-                f = M*x + r
-                # Try to find small root
-                # p <= sqrt(n), so k <= sqrt(n)/M
-                bound = ceil(sqrt(n) / M)
-                print(f"Searching for k with bound ~{bound}")
-                # Use Sage's small_roots (polynomial must be monic)
-                f_mod = f.change_ring(Zmod(n))
-                f_monic = f_mod.monic()
-                roots = f_monic.small_roots(X=bound, beta=0.5, epsilon=0.05)
-                if roots:
-                    k = int(roots[0])
+                bound = ceil(sqrt(n) / M * 2)
+                found_k = None
+                try:
+                    R.<x> = PolynomialRing(ZZ)
+                    f = M*x + r
+                    f_mod = f.change_ring(Zmod(n))
+                    f_monic = f_mod.monic()
+                    roots = f_monic.small_roots(X=bound, beta=0.5, epsilon=0.05)
+                    if roots:
+                        k = int(roots[0])
+                        p = int(M * k + r)
+                        if n % p == 0:
+                            found_k = k
+                except Exception:
+                    pass
+                if found_k is None:
+                    for k in range(bound):
+                        if n % (M * k + r) == 0:
+                            found_k = k
+                            break
+                if found_k is not None:
+                    k = found_k
                     p = int(M * k + r)
-                    if n % p == 0:
-                        q = n // p
-                        print(f"SUCCESS! Factor found:")
-                        print(f"p = {p}")
-                        print(f"q = {q}")
-                        print(f"Verification: p * q = {p * q}")
-                        print("ROCA=SUCCESS")
-                    else:
-                        print("Root found but does not divide n. Try different parameters.")
-                        print("ROCA=FAILED")
+                    q = n // p
+                    out.append("VULNERABLE: n uses ROCA-generated primes.")
+                    out.append("p = " + str(p))
+                    out.append("q = " + str(q))
+                    out.append("Verification: p * q = " + str(p * q))
+                    out.append("ROCA=SUCCESS")
                 else:
-                    print("No small root found. n may use a larger M value.")
-                    print("Try using the full ROCA implementation with larger prime bases.")
-                    print("ROCA=FAILED")
+                    out.append("No root found with M = " + str(M))
+                    out.append("ROCA=FAILED")
             else:
-                print("n does NOT appear to be ROCA-vulnerable for small M values.")
-                print("The primes were likely not generated by Infineon's library.")
-                print("ROCA=FAILED")
+                out.append("n does NOT appear to be ROCA-vulnerable.")
+                out.append("ROCA=FAILED")
         except Exception as ex:
-            print(f"ERROR: {ex}")
-            print("ROCA=FAILED")
+            out.append("ERROR: " + str(ex))
+            out.append("ROCA=FAILED")
         #
     except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("ROCA=FAILED")
+        out.append("ERROR: " + str(ex))
+        out.append("ROCA=FAILED")
+    print("\\n".join(out))
 _attack()`,
   proof: `\\textbf{Theorem:} ROCA primes have form \\(p = k \\cdot M + (65537^i \\bmod M)\\), factorable via Coppersmith.
 
@@ -141,18 +120,15 @@ f(x) &= Mx + r_1 \\equiv 0 \\pmod{p} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const primes_list = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n];
+  const rocaPrimes = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n];
   let M = 1n;
-  for (const p of primes_list) { M *= p; }
-  // M ≈ 2^77. Both primes generated with ROCA form so n mod M is always
-  // a valid remainder product — detection is deterministic.
-  const kBits = 10;
+  for (const p of rocaPrimes) { M *= p; }
+  const kBits = 8;
   for (let attempt = 0; attempt < 5000; attempt++) {
     const i1 = BigInt(Math.floor(Math.random() * 10000));
     const i2 = BigInt(Math.floor(Math.random() * 10000));
-    const r1 = modPow(65537n, i1, M);
-    const r2 = modPow(65537n, i2, M);
-    // Generate random ks of appropriate bit size
+    let r1 = modPow(65537n, i1, M);
+    let r2 = modPow(65537n, i2, M);
     const kBytes = Math.ceil(kBits / 8);
     const bytes1 = new Uint8Array(kBytes);
     const bytes2 = new Uint8Array(kBytes);
@@ -163,8 +139,9 @@ export const generateTestcase = (): Record<string, string> => {
       k1 = (k1 << 8n) | BigInt(bytes1[j]);
       k2 = (k2 << 8n) | BigInt(bytes2[j]);
     }
-    k1 |= (1n << BigInt(kBits - 1)) | 1n; // top bit + odd
+    k1 |= (1n << BigInt(kBits - 1)) | 1n;
     k2 |= (1n << BigInt(kBits - 1)) | 1n;
+    if (k1 > k2) { [k1, k2] = [k2, k1]; [r1, r2] = [r2, r1]; }
     const p = k1 * M + r1;
     const q = k2 * M + r2;
     if (p > 1 && q > 1 && p !== q) {

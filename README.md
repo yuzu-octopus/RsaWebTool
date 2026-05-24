@@ -6,7 +6,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 
 ## Features
 
-- **49 attack implementations** across 5 categories (L5 Playwright test suite: **145/147 passed**, 98.7%)
+- **49 attack implementations** across 5 categories (L5 Playwright test suite: **147/147 passed**, 100%)
 - **Real-time SageMath execution** via embedded SageMathCell (offscreen DOM + MutationObserver pipeline)
 - **Browser-side pre-checks** — 8 attacks run entirely in the browser via BigInt GCD, FactorDB API, or lattice GCD (no SageCell needed)
 - **FactorDB integration** — CORS-proxied API via Cloudflare Worker for instant factor lookups, with **auto-submit** of factorized results from all 18 Factorization-category attacks
@@ -26,10 +26,10 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 
 | Category | Count | Highlights |
 |----------|-------|------------|
-| **Factorization** | 19 | Boneh-Durfee, ECM (Full), Pollard p-1, Pollard rho, Williams p+1, SQUFOF, Quadratic Sieve, Binary Poly Factor, Small Fraction, Batch GCD, Multi-Prime, Gimmicky Primes, Close Prime, Novelty Primes, Common Prime RSA, Euler, Pollard-Strassen, Pisano Period, Common Factor |
-| **Partial Key / Lattice** | 9 | Simple Lattice, Partial d, Partial p/q Bits, Small CRT Exp, dp/dq Leak, Linearly Related Primes, Dependent Prime, Partial Key Exposure, Implicit Key Exposure |
-| **Message / Protocol** | 10 | Common Modulus, Franklin-Reiter Related Message, Coppersmith Short Pad, Hastad Linear Pad, RSA-CRT Fault, Non-Coprime Exp, Cube Root CRT, Homomorphic Forgery, Bleichenbacher Sig, Hastad Broadcast |
-| **Oracle** | 4 | Bleichenbacher PKCS#1 v1.5 (million message attack), Manger OAEP, Biased LSB, LSB Oracle |
+| **Factorization** | 19 | Boneh-Durfee, ECM (Full), Pollard p-1, Pollard rho, Williams p+1, SQUFOF, Quadratic Sieve, Binary Poly Factor, Small Fraction, Batch GCD, Multi-Prime, Gimmicky Primes, Close Prime, Novelty Primes, Common Prime RSA, Common Factor, Euler, Pollard-Strassen, Pisano Period |
+| **Partial Key / Lattice** | 9 | Simple Lattice, Partial d Key Exposure, Partial p/q Bits, Small CRT Exp, dp/dq Leak, Linearly Related Primes, Dependent Prime, Partial Key Exposure, Implicit Key Exposure |
+| **Message / Protocol** | 10 | Common Modulus, Franklin-Reiter Related Message, Coppersmith Short Pad, Hastad Linear Pad, Hastad Broadcast, RSA-CRT Fault, Non-Coprime Exp, Cube Root CRT, Homomorphic Forgery, Bleichenbacher Sig |
+| **Oracle** | 4 | Bleichenbacher PKCS#1 v1.5, Manger OAEP, Biased LSB, LSB Oracle |
 | **Advanced** | 7 | ROCA (Infineon RSALib), Nitros, FactorDB Lookup, Known Plaintext, Small Public Exp, Multi-Prime GCD, Phi(n) Leak |
 
 ## Architecture
@@ -110,7 +110,7 @@ These run fully in the browser when sufficient parameters are provided, returnin
 - **frontendCheck pattern** — attacks can define an optional async pre-check that runs in the browser before falling back to SageCell. This enables instant results for FactorDB lookups, phi(n) recovery, and BigInt GCD operations.
 - **Pure math templates** — SageMathCell has no internet access (firewall since 2021). All attack templates must be self-contained pure math code with no external dependencies.
 - **512-bit testcases** — `TESTCASE_BITS = { p: 256, q: 256 }` produces n ≈ 512-bit. Factorization attacks generate n with at least one small factor to avoid SageCell 120s timeout.
-- **L5 Playwright test suite** in `scripts/test-playwright.ts` — runs all 48 SageCell-enabled attacks × 3 runs each (144 total). 10-page concurrency, 120s timeout per run. Only 2 probabilistic partials remain (williams-p1, partial-pq-bits).
+- **L5 Playwright test suite** in `scripts/test-playwright.ts` — runs all 49 attacks × 3 runs each (147 total). 10-page concurrency, 120s timeout per run.
 - **No unit tests** — functional verification is `typecheck → lint → build → L5 Playwright suite`.
 - **DRY conventions** — shared MUI TextField styles in `src/styles/inputSx.ts`, reusable drag-to-resize hook in `src/hooks/useDragResize.ts`.
 
@@ -142,9 +142,6 @@ src/
     testcases/core.ts       — randomPrime, isPrimeMR, generateKeyPair, encrypt, TESTCASE_BITS
   attacks/
     index.ts                — Barrel: imports all 49 attacks + testcase generators, CATEGORIES, attacksByCategory
-    fermat.ts               — Example: Fermat Factorization (one of 52 flat files)
-    wiener.ts               — Wiener's Continued Fraction attack
-    ... (50 more)
   components/
     FormatConverter.tsx     — Standalone Hex/Decimal/Base64/Text format converter (dropdowns + live auto-conversion)
     Sidebar.tsx             — 220px Drawer, collapsible category tree, Magic/Proofs/Calculator/Converter nav, service status
