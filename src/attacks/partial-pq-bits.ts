@@ -138,9 +138,9 @@ p &= f(x_0), \\quad q = n/p \\qed
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { p, n } = generateKeyPair(192, 192);
+  const { p, n } = generateKeyPair(256, 256);
   const bitLen = p.toString(2).length;
-  // Keep ≥ 86% of bits for degree-2 lattice (needs unknown < n^0.075 ≈ 2^28)
+  // Keep ≥ 86% of bits for degree-2 lattice (needs unknown < n^0.075 ≈ 2^38)
   const keepBits = Math.ceil(bitLen * 0.9);
   const knownBits = p >> BigInt(bitLen - keepBits);
   return { n: n.toString(), knownBits: knownBits.toString(), bitPosition: 'msb' };

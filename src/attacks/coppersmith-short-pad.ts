@@ -113,8 +113,8 @@ m &= \\text{root} - \\delta_1 \\qed
 
 export const generateTestcase = (): Record<string, string> => {
   const e = 3n;
-  const p = randomPrime(64);
-  const q = randomPrime(64);
+  const p = randomPrime(256);
+  const q = randomPrime(256);
   const n = p * q;
   const m = BigInt(Math.floor(Math.random() * 10000) + 42);
   // Use 6-bit padding for fast brute-force delta search (max delta = 125)

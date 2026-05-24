@@ -137,9 +137,9 @@ p, q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Use 128-bit close primes — Fermat converges in < 5000 iterations
-  // for |p - q| < 10000, keeping SageCell execution well under 35s
-  const p = randomPrime(128);
+  // Use 512-bit close primes — Fermat converges in < 5000 iterations
+  // for |p - q| < 10000, regardless of absolute bit size
+  const p = randomPrime(512);
   const delta = Math.floor(Math.random() * 5000) * 2 + 2;
   let q = p + BigInt(delta);
   while (!isPrimeMR(q)) q += 2n;

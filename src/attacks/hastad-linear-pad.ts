@@ -188,7 +188,7 @@ export const generateTestcase = (): Record<string, string> => {
   const m = BigInt(Math.floor(Math.random() * 1000000) + 42);
   const triples: string[] = [];
   for (let i = 0; i < 3; i++) {
-    const { n } = generateKeyPair(64, 64);
+    const { n } = generateKeyPair(256, 256);
     const a = BigInt(Math.floor(Math.random() * 100) + 1);
     const b = BigInt(Math.floor(Math.random() * 1000));
     triples.push(`${n},${encrypt((a * m + b) % n, n, e)},${a},${b}`);

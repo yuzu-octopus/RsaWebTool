@@ -489,7 +489,7 @@ n &= p_1^{e_1} p_2^{e_2} \\cdots p_k^{e_k} \\\\
 \\text{Total time dominated by } &\\text{largest prime factor} \\qed
 \\end{align*}
 
-\\textbf{References:} Lenstra, "Factoring Integers with Elliptic Curves", 1987`,priority:`medium`,applicableCheck:e=>!!e.n},Ig=()=>{let e=kg(32),t=kg(40),n=kg(40);return{n:(e*t*n).toString()}},Lg={id:`pollard-p1`,name:`Pollard's p-1 Method`,category:`Factorization`,description:`Factors n when p-1 is smooth. Stage 1 handles p-1 with all prime factors ≤ B1. Stage 2 (B2) extends to catch p-1 with one larger factor.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B1 (stage 1 bound, optional)`,placeholder:`10000`,multiline:!1},{name:`B2`,label:`B2 (stage 2 bound, optional)`,placeholder:`0 (disabled)`,multiline:!1}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Lenstra, "Factoring Integers with Elliptic Curves", 1987`,priority:`medium`,applicableCheck:e=>!!e.n},Ig=()=>{let e=kg(48),t=kg(56),n=kg(56);return{n:(e*t*n).toString()}},Lg={id:`pollard-p1`,name:`Pollard's p-1 Method`,category:`Factorization`,description:`Factors n when p-1 is smooth. Stage 1 handles p-1 with all prime factors ≤ B1. Stage 2 (B2) extends to catch p-1 with one larger factor.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B1 (stage 1 bound, optional)`,placeholder:`10000`,multiline:!1},{name:`B2`,label:`B2 (stage 2 bound, optional)`,placeholder:`0 (disabled)`,multiline:!1}],sageTemplate:e=>`def _attack():
     try:
         n = Integer(${e.n})
         B1 = int(Integer(${e.B||`10000`}))
@@ -1812,7 +1812,7 @@ p, q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
 
 \\textbf{Explanation:} Londahl's BSGS attack recovers $\\phi(n)$ by solving $2^\\delta \\equiv 2^{-\\phi_{\\text{approx}}} \\pmod{n}$, then factors $n$ via the quadratic.
 
-\\textbf{References:} Carl L\\"ondahl, "Finding close-prime factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,priority:`medium`,applicableCheck:e=>!!e.n},a_=()=>{let e=kg(128),t=Math.floor(Math.random()*5e3)*2+2,n=e+BigInt(t);for(;!Og(n);)n+=2n;return{n:(e*n).toString()}},o_={id:`novelty-primes`,name:`Novelty Primes`,category:`Factorization`,description:`Detects primes near powers of 2 or math constants. Use when p ≈ 2^k or similar.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Carl L\\"ondahl, "Finding close-prime factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,priority:`medium`,applicableCheck:e=>!!e.n},a_=()=>{let e=kg(512),t=Math.floor(Math.random()*5e3)*2+2,n=e+BigInt(t);for(;!Og(n);)n+=2n;return{n:(e*n).toString()}},o_={id:`novelty-primes`,name:`Novelty Primes`,category:`Factorization`,description:`Detects primes near powers of 2 or math constants. Use when p ≈ 2^k or similar.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -1841,7 +1841,7 @@ p, q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
             print(f"Checking n = {n} against known CTF primes...")
             found = False
             print("Checking primes near powers of 2...")
-            for bits in [64, 128, 256]:
+            for bits in [64, 128, 256, 512]:
                 target = 2**bits
                 for delta in range(-1000, 1000):
                     candidate = target + delta
@@ -1897,7 +1897,7 @@ p &\\approx C + \\delta,\\; C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
 \\text{isPrime}(C + \\delta) \\land (n \\bmod (C + \\delta) = 0) &\\implies \\text{factor} \\qed
 \\end{align*}
 
-\\textbf{References:} Various CTF writeups; cryptohack.org`,priority:`low`,applicableCheck:e=>!!e.n},s_=()=>{let e=1n<<BigInt(128),t=0n;for(let n=0n;n<1000n;n+=1n){let r=e+n;if(Og(r)){t=r;break}let i=e-n;if(i>1n&&Og(i)){t=i;break}}let n=kg(Mg.q);return{n:(t*n).toString()}},c_={id:`franklin-reiter-related-message`,name:`Franklin-Reiter Related Message Attack`,category:`Message / Protocol`,description:`Recovers m from linearly related ciphertexts. Use when c1 = m^e and c2 = (a·m + b)^e mod n.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c1`,label:`c1 (ciphertext of m)`,placeholder:`Enter c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (ciphertext of a·m + b)`,placeholder:`Enter c2...`,multiline:!0,rows:3},{name:`a`,label:`a (linear coefficient)`,placeholder:`2`,multiline:!1},{name:`b`,label:`b (linear offset)`,placeholder:`0`,multiline:!1}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Various CTF writeups; cryptohack.org`,priority:`low`,applicableCheck:e=>!!e.n},s_=()=>{let e=1n<<BigInt(512),t=0n;for(let n=0n;n<1000n;n+=1n){let r=e+n;if(Og(r)){t=r;break}let i=e-n;if(i>1n&&Og(i)){t=i;break}}let n=kg(Mg.q);return{n:(t*n).toString()}},c_={id:`franklin-reiter-related-message`,name:`Franklin-Reiter Related Message Attack`,category:`Message / Protocol`,description:`Recovers m from linearly related ciphertexts. Use when c1 = m^e and c2 = (a·m + b)^e mod n.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c1`,label:`c1 (ciphertext of m)`,placeholder:`Enter c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (ciphertext of a·m + b)`,placeholder:`Enter c2...`,multiline:!0,rows:3},{name:`a`,label:`a (linear coefficient)`,placeholder:`2`,multiline:!1},{name:`b`,label:`b (linear offset)`,placeholder:`0`,multiline:!1}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -2266,7 +2266,7 @@ _attack()`,proof:`\\textbf{Theorem:} If $\\ge$ half the bits of $p$ are known (M
 p &= f(x_0), \\quad q = n/p \\qed
 \\end{align*}
 
-\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996; N. Howgrave-Graham, "Approximate Integer Common Divisors", 1997`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},h_=()=>{let{p:e,n:t}=Ag(192,192),n=e.toString(2).length,r=Math.ceil(n*.9),i=e>>BigInt(n-r);return{n:t.toString(),knownBits:i.toString(),bitPosition:`msb`}},g_={id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via brute-force search over k and d_p. Use when the CRT exponent d_p = d mod (p-1) is small (< bound). Each (k, d_p) pair gives a candidate p = (d_p * e - 1) / k + 1.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 1000000`,multiline:!1}],sageTemplate:e=>`def _attack():
+\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996; N. Howgrave-Graham, "Approximate Integer Common Divisors", 1997`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},h_=()=>{let{p:e,n:t}=Ag(256,256),n=e.toString(2).length,r=Math.ceil(n*.9),i=e>>BigInt(n-r);return{n:t.toString(),knownBits:i.toString(),bitPosition:`msb`}},g_={id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via brute-force search over k and d_p. Use when the CRT exponent d_p = d mod (p-1) is small (< bound). Each (k, d_p) pair gives a candidate p = (d_p * e - 1) / k + 1.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 1000000`,multiline:!1}],sageTemplate:e=>`def _attack():
     try:
         n = Integer(${e.n})
         e = Integer(${e.e})
@@ -2657,7 +2657,7 @@ r(\\Delta) &= \\text{Res}_x(f_1,f_2) \\equiv 0 \\pmod{n} \\\\
 m &= \\text{root} - \\delta_1 \\qed
 \\end{align*}
 
-\\textbf{References:} D. Coppersmith, J. Cryptology, 1997; Boneh, 1999`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c1&&!!e.c2},D_=()=>{let e=3n,t=kg(64)*kg(64),n=BigInt(Math.floor(Math.random()*1e4)+42),r=BigInt(Math.floor(Math.random()*64)),i=BigInt(Math.floor(Math.random()*64)),a=n<<20n|r,o=n<<20n|i,s=ug(a,e,t),c=ug(o,e,t);return{n:t.toString(),e:`3`,c1:s.toString(),c2:c.toString()}},O_={id:`hastad-linear-pad`,name:`Hastad's Attack with Linear Padding`,category:`Message / Protocol`,description:`Recovers m from linearly padded encryptions. Use when c_i = (a_i·m + b_i)^e mod n_i.`,inputs:[{name:`triples`,label:`Triples (n,c,a,b per line)`,placeholder:`n1,c1,a1,b1\\nn2,c2,a2,b2...`,multiline:!0,rows:5},{name:`e`,label:`e (public exponent)`,placeholder:`Enter exponent e (e.g., 3)...`,multiline:!1}],sageTemplate:e=>!e.triples||!e.e?`print("ERROR: Missing required inputs (triples, e)")
+\\textbf{References:} D. Coppersmith, J. Cryptology, 1997; Boneh, 1999`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c1&&!!e.c2},D_=()=>{let e=3n,t=kg(256)*kg(256),n=BigInt(Math.floor(Math.random()*1e4)+42),r=BigInt(Math.floor(Math.random()*64)),i=BigInt(Math.floor(Math.random()*64)),a=n<<20n|r,o=n<<20n|i,s=ug(a,e,t),c=ug(o,e,t);return{n:t.toString(),e:`3`,c1:s.toString(),c2:c.toString()}},O_={id:`hastad-linear-pad`,name:`Hastad's Attack with Linear Padding`,category:`Message / Protocol`,description:`Recovers m from linearly padded encryptions. Use when c_i = (a_i·m + b_i)^e mod n_i.`,inputs:[{name:`triples`,label:`Triples (n,c,a,b per line)`,placeholder:`n1,c1,a1,b1\\nn2,c2,a2,b2...`,multiline:!0,rows:5},{name:`e`,label:`e (public exponent)`,placeholder:`Enter exponent e (e.g., 3)...`,multiline:!1}],sageTemplate:e=>!e.triples||!e.e?`print("ERROR: Missing required inputs (triples, e)")
 print("HASTAD_LINEAR_PAD=FAILED")`:`def _attack():
     try:
         e = Integer(${e.e})
@@ -2819,7 +2819,7 @@ F(m) &\\equiv 0 \\pmod{N} \\\\
 m &= small\\_roots(F) \\qed
 \\end{align*}
 
-\\textbf{References:} J. Hastad, Eurocrypt 1988; Coppersmith et al., 1996`,priority:`medium`,applicableCheck:e=>!!e.triples&&!!e.e},k_=()=>{let e=BigInt(Math.floor(Math.random()*1e6)+42),t=[];for(let n=0;n<3;n++){let{n}=Ag(64,64),r=BigInt(Math.floor(Math.random()*100)+1),i=BigInt(Math.floor(Math.random()*1e3));t.push(`${n},${jg((r*e+i)%n,n,3n)},${r},${i}`)}return{triples:t.join(`
+\\textbf{References:} J. Hastad, Eurocrypt 1988; Coppersmith et al., 1996`,priority:`medium`,applicableCheck:e=>!!e.triples&&!!e.e},k_=()=>{let e=BigInt(Math.floor(Math.random()*1e6)+42),t=[];for(let n=0;n<3;n++){let{n}=Ag(256,256),r=BigInt(Math.floor(Math.random()*100)+1),i=BigInt(Math.floor(Math.random()*1e3));t.push(`${n},${jg((r*e+i)%n,n,3n)},${r},${i}`)}return{triples:t.join(`
 `),e:`3`}},A_={id:`lsb-oracle`,name:`LSB Oracle Attack`,category:`Oracle`,description:`Recovers m via LSB oracle. Use when an oracle reveals LSB(decrypt(c·2^e mod n)).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated LSB bits)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         # LSB Oracle Attack — binary search via 2^e blinding
@@ -4210,7 +4210,7 @@ f(x) &= (m_0 \\cdot 2^k + x)^e - c \\equiv 0 \\pmod{n} \\\\
 m &= m_0 \\cdot 2^k + x \\qed
 \\end{align*}
 
-\\textbf{References:} D. Coppersmith, 1997; May, 2003`,priority:`medium`,applicableCheck:e=>!!(e.n&&e.c)},rv=()=>{let e=3n,{n:t}=Ag(64,64,e),n=new TextEncoder().encode(`flag{`),r=BigInt(`0x`+Array.from(n).map(e=>e.toString(16).padStart(2,`0`)).join(``)),i=BigInt(Math.floor(Math.random()*2**16)),a=r<<BigInt(16)|i;return{n:t.toString(),e:`3`,c:jg(a,t,e).toString(),known_prefix:`flag{`,unknown_bits:`16`}},iv={id:`small-public-exp`,name:`Small Public Exponent Analysis`,category:`Advanced`,description:`Recovers m when m^e < n. Use when e is small and message is short.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`3`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.c?`print("ERROR: Missing required inputs (n, c)")
+\\textbf{References:} D. Coppersmith, 1997; May, 2003`,priority:`medium`,applicableCheck:e=>!!(e.n&&e.c)},rv=()=>{let e=3n,{n:t}=Ag(256,256,e),n=new TextEncoder().encode(`flag{`),r=BigInt(`0x`+Array.from(n).map(e=>e.toString(16).padStart(2,`0`)).join(``)),i=BigInt(Math.floor(Math.random()*2**16)),a=r<<BigInt(16)|i;return{n:t.toString(),e:`3`,c:jg(a,t,e).toString(),known_prefix:`flag{`,unknown_bits:`16`}},iv={id:`small-public-exp`,name:`Small Public Exponent Analysis`,category:`Advanced`,description:`Recovers m when m^e < n. Use when e is small and message is short.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`3`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.c?`print("ERROR: Missing required inputs (n, c)")
 print("SMALL_PUBLIC_EXP=FAILED")`:`def _attack():
     try:
         n = Integer(${e.n})
@@ -4509,7 +4509,7 @@ p &= p_{\\text{msb}} + x_0 \\qed
 
 \\textbf{Explanation:} Coppersmith's method constructs a lattice embedding $f(x) = p_{\\text{msb}} + x$; LLL finds the small root $x_0$ when $|x_0| < n^{\\beta^2}$, recovering $p$.
 
-\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", Eurocrypt 1996; A. May, "Using Coppersmith's Method to Attack RSA", 2009`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.p_msb},dv=()=>{let{p:e,n:t}=Ag(192,192),n=e.toString(2).length,r=Math.floor(n*.9),i=BigInt(n-r),a=e>>i<<i;return{n:t.toString(),p_msb:a.toString()}},fv={id:`implicit-key-exposure`,name:`Implicit Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from a^p mod n leak. Use when a^p mod n is accidentally exposed.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`a`,label:`a (base)`,placeholder:`Enter base a...`,multiline:!1},{name:`leak`,label:`leak (a^p mod n)`,placeholder:`Enter leaked value...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", Eurocrypt 1996; A. May, "Using Coppersmith's Method to Attack RSA", 2009`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.p_msb},dv=()=>{let{p:e,n:t}=Ag(512,512),n=e.toString(2).length,r=Math.floor(n*.9),i=BigInt(n-r),a=e>>i<<i;return{n:t.toString(),p_msb:a.toString()}},fv={id:`implicit-key-exposure`,name:`Implicit Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from a^p mod n leak. Use when a^p mod n is accidentally exposed.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`a`,label:`a (base)`,placeholder:`Enter base a...`,multiline:!1},{name:`leak`,label:`leak (a^p mod n)`,placeholder:`Enter leaked value...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -4868,7 +4868,7 @@ P_i &= \\prod_{j \\in I_i} j \\mod n \\\\
 \\gcd(P_i, n) &> 1 \\iff I_i \\text{ contains a factor of } n \\qed
 \\end{align*}
 
-\\textbf{References:} Strassen, 1977; Pollard, 1974`,priority:`medium`,applicableCheck:e=>!!e.n},xv=()=>({n:(kg(18)*kg(42)).toString()});function Sv(e){let t=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n],n=e-1n,r=n,i=[];for(let e of t){for(;r%e===0n;)i.push(e),r/=e;if(r===1n)break}if(r>1n){let e=t[t.length-1]+2n;for(;e*e<=r;){for(;r%e===0n;)i.push(e),r/=e;e+=2n}r>1n&&i.push(r)}let a=n;for(let t of i)for(;a%t===0n&&ug(2n,a/t,e)===1n;)a/=t;return a}function Cv(e,t){return e/og(e,t)*t}var wv={id:`pisano-period`,name:`Pisano Period Factorization`,category:`Factorization`,description:`Factors n via birthday collision on 2^x mod n (Pisano/Mersenne period). Fast for small n (< 64 bits).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Strassen, 1977; Pollard, 1974`,priority:`medium`,applicableCheck:e=>!!e.n},xv=()=>{let e,t,n;do e=kg(16),t=kg(46),n=e*t;while(Number(n)>=0&&Number(n)**.25>49900);return{n:(e*t).toString()}};function Sv(e){let t=[2n,3n,5n,7n,11n,13n,17n,19n,23n,29n,31n,37n,41n,43n,47n,53n,59n,61n],n=e-1n,r=n,i=[];for(let e of t){for(;r%e===0n;)i.push(e),r/=e;if(r===1n)break}if(r>1n){let e=t[t.length-1]+2n;for(;e*e<=r;){for(;r%e===0n;)i.push(e),r/=e;e+=2n}r>1n&&i.push(r)}let a=n;for(let t of i)for(;a%t===0n&&ug(2n,a/t,e)===1n;)a/=t;return a}function Cv(e,t){return e/og(e,t)*t}var wv={id:`pisano-period`,name:`Pisano Period Factorization`,category:`Factorization`,description:`Factors n via birthday collision on 2^x mod n (Pisano/Mersenne period). Fast for small n (< 64 bits).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     out = []
     try:
         try:

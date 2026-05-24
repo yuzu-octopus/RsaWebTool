@@ -114,7 +114,7 @@ m &= m_0 \\cdot 2^k + x \\qed
 
 export const generateTestcase = (): Record<string, string> => {
   const e = 3n;
-  const { n } = generateKeyPair(64, 64, e);
+  const { n } = generateKeyPair(256, 256, e);
   const prefix = new TextEncoder().encode('flag{');
   const prefixInt = BigInt('0x' + Array.from(prefix).map(b => b.toString(16).padStart(2, '0')).join(''));
   const unknownBits = 16;

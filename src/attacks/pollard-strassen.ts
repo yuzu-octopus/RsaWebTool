@@ -86,9 +86,13 @@ P_i &= \\prod_{j \\in I_i} j \\mod n \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Strassen finds factors <= n^(1/4)
-  // Use small p (~18 bits) so c = n^(1/4) ~ 2^15, quick in SageCell
-  const p = randomPrime(18);
-  const q = randomPrime(42);
+  // Strassen's Sage template caps c = n^(1/4) at 50000 (n <= 62 bit)
+  // Use p=16, q=46 so n ≈ 62-bit, c ≈ 46000, safe under the 50000 cap
+  let p: bigint, q: bigint, n: bigint;
+  do {
+    p = randomPrime(16);
+    q = randomPrime(46);
+    n = p * q;
+  } while (Number(n) >= 0 && Math.pow(Number(n), 0.25) > 49900);
   return { n: (p * q).toString() };
 };

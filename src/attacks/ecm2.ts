@@ -122,9 +122,9 @@ n &= p_1^{e_1} p_2^{e_2} \\cdots p_k^{e_k} \\\\
 
 export const generateTestcase = (): Record<string, string> => {
   // Generate n with 3 prime factors for multi-round ECM demonstration
-  // Factors use smaller sizes so ECM converges within SageMathCell 35s
-  const p1 = randomPrime(32);
-  const p2 = randomPrime(40);
-  const p3 = randomPrime(40);
+  // 48-bit smallest factor (~15 digits) — ECM with B1 up to 50000 finds it quickly
+  const p1 = randomPrime(48);
+  const p2 = randomPrime(56);
+  const p3 = randomPrime(56);
   return { n: (p1 * p2 * p3).toString() };
 };

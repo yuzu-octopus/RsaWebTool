@@ -105,9 +105,9 @@ p &= p_{\\text{msb}} + x_0 \\qed
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { p, n } = generateKeyPair(192, 192);
+  const { p, n } = generateKeyPair(512, 512);
   const pBits = p.toString(2).length;
-  // Must keep ≥ 86% of bits (degree-2 bound: unknown < n^0.075 ≈ 2^28 for 384-bit n)
+  // Must keep ≥ 86% of bits (degree-2 bound: unknown < n^0.075 ≈ 2^77 for 1024-bit n)
   const keepBits = Math.floor(pBits * 0.9);
   const shift = BigInt(pBits - keepBits);
   const pMsb = (p >> shift) << shift;

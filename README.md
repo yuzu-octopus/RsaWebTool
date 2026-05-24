@@ -20,7 +20,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 - **Service status** — live FactorDB proxy and SageMathCell availability indicators (colored icons in sidebar)
 - **History** — last 50 executions, success/failure status with timestamps
 - **Dracula theme** — full dark mode with JetBrains Mono typography, Material Icons (no emojis), no box-shadows
-- **512-bit modulus support** — most testcase generators produce 256-bit primes (n ≈ 512-bit); some attacks use custom overrides (pisano-period: 8-bit, roca: 8-bit) for fast SageCell execution
+- **Variable modulus sizes** — testcases range from 64-bit (LSB oracle) to 1024-bit (close-prime), with most factorization attacks at 512-bit default; some attacks use custom overrides (pisano-period: 8-bit, roca: 8-bit) for fast SageCell execution
 
 ## Attack Categories
 
@@ -109,7 +109,7 @@ These run fully in the browser when sufficient parameters are provided, returnin
 - **Notification toasts** — Dracula-themed Snackbar (`slotProps.content.sx` with Dracula background/foreground colors) rendered in `App.tsx`. InputPanel and MagicPanel call `showNotification(msg, severity)` on attack completion.
 - **frontendCheck pattern** — attacks can define an optional async pre-check that runs in the browser before falling back to SageCell. This enables instant results for FactorDB lookups, phi(n) recovery, and BigInt GCD operations.
 - **Pure math templates** — SageMathCell has no internet access (firewall since 2021). All attack templates must be self-contained pure math code with no external dependencies.
-- **512-bit testcases** — `TESTCASE_BITS = { p: 256, q: 256 }` produces n ≈ 512-bit. Factorization attacks generate n with at least one small factor to avoid SageCell 120s timeout.
+- **Variable-size testcases** — `TESTCASE_BITS = { p: 256, q: 256 }` (n ≈ 512-bit) is the default; 10 attacks use custom generators with sizes from 64-bit to 1024-bit, typically producing n ≥ 512-bit while respecting algorithmic constraints (Coppersmith bounds, SageCell caps, timeout limits).
 - **L5 Playwright test suite** in `scripts/test-playwright.ts` — runs all 49 attacks × 3 runs each (147 total, factordb-lookup skipped in CI = 144 runnable). 10-page concurrency, 120s timeout per run. Current: 141/144 passing, 3 expected probabilistic failures (williams-p1 1/3, partial-pq-bits 2/3).
 - **No unit tests** — functional verification is `typecheck → lint → build → L5 Playwright suite`.
 - **DRY conventions** — shared MUI TextField styles in `src/styles/inputSx.ts`, reusable drag-to-resize hook in `src/hooks/useDragResize.ts`.

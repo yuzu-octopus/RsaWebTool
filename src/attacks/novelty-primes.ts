@@ -38,7 +38,7 @@ export const attack: Attack = {
             print(f"Checking n = {n} against known CTF primes...")
             found = False
             print("Checking primes near powers of 2...")
-            for bits in [64, 128, 256]:
+            for bits in [64, 128, 256, 512]:
                 target = 2**bits
                 for delta in range(-1000, 1000):
                     candidate = target + delta
@@ -101,8 +101,8 @@ p &\\approx C + \\delta,\\; C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Generate a prime near a power of 2 (128-bit — fast primality check)
-  const bits = 128;
+  // Generate a prime near a power of 2 (512-bit — fast primality check)
+  const bits = 512;
   const target = 1n << BigInt(bits);
   let p = 0n;
   for (let delta = 0n; delta < 1000n; delta += 1n) {
