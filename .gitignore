@@ -34,12 +34,17 @@ pnpm-debug.log*
 
 # Test artifacts
 test-results/
+scripts/
 scripts/test-results/*.json
 scripts/test-results/templates/
 
-# Workers (Node.js deps)
-workers/node_modules/
-workers/.wrangler/
-workers/bun.lock
-workers/package-lock.json
+# Workers (Cloudflare, Node.js deps)
+workers/
+
+# Agent config (local)
+.opencode/
+.superpowers/
+.playwright-mcp/
+AGENTS.md
+GEMINI.md
 public/test-api-suite.html
