@@ -12,7 +12,6 @@ docs
 page-verify.md
 *.png
 test-*.ts
-HANDOFF.md
 scratch/
 AGENTS.md
 GEMINI.md

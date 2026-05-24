@@ -25,8 +25,8 @@ declare global {
   }
 }
 
-// Default timeout: 10s for SageCell script load + 25s for execution
-export const DEFAULT_SAGE_TIMEOUT = 35000;
+// Default timeout: 10s for SageCell script load + 110s for execution
+export const DEFAULT_SAGE_TIMEOUT = 120000;
 
 // Feature-detect AbortSignal.any() — available in Chrome 93+, Firefox 97+, Safari 15.4+
 const supportsAbortSignalAny = typeof AbortSignal !== 'undefined' && typeof AbortSignal.any === 'function';

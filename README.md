@@ -10,7 +10,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 - **Real-time SageMath execution** via embedded SageMathCell (offscreen DOM + MutationObserver pipeline)
 - **Browser-side pre-checks** — 8 attacks run entirely in the browser via BigInt GCD, FactorDB API, or lattice GCD (no SageCell needed)
 - **FactorDB integration** — CORS-proxied API via Cloudflare Worker for instant factor lookups, with **auto-submit** of factorized results from all 18 Factorization-category attacks
-- **Magic Cracker** — paste any RSA parameters, auto-detect format, and run all applicable attacks with priority ordering, concurrent parallel execution (cap 3), and early-stop on first success
+- **Magic Cracker** — paste any RSA parameters, auto-detect format, and run all applicable attacks with priority ordering, concurrent parallel execution (cap 6), and early-stop on first success
 - **RSA Calculator** — pure BigInt Key Gen / Encrypt / Decrypt (no SageCell needed), with automatic hex/decimal/ASCII detection
 - **Notification toasts** — Dracula-themed Snackbar at top-center (3s auto-dismiss) on attack completion, with auto-submit status for Factorization results
 - **Mathematical proofs** — every attack includes a formal LaTeX proof rendered with KaTeX (display math, inline math heuristics, itemize, References section stripper)
@@ -41,7 +41,7 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 | `Sidebar` | `Sidebar.tsx` | Collapsible category tree (5 categories) + Magic/Proofs/Calculator nav buttons + FactorDB/SageCell service status indicators (ok/error/checking) |
 | `InputPanel` | `InputPanel.tsx` | Shows when an attack is selected: Explanation tab (KaTeX proof rendering) / Input tab (form fields + Generate Testcase + Run/Stop with AbortController). Shows completion toast; auto-submits p,q to FactorDB for Factorization-category attacks |
 | `OutputPanel` | `OutputPanel.tsx` | Results display (react-syntax-highlighter Dracula) + 5 format converters + copy button + history (collapsible, cap 50) + Notepad (drag-resize via `useDragResize`) |
-| `MagicPanel` | `MagicPanel.tsx` | Paste-all mode: auto-detect params via regex (key=value, PEM, hex, decimal), show applicable attacks preview, priority-ordered parallel execution (concurrency=3), early-stop on first `=SUCCESS`, per-attack status list. Shows success toast; auto-submits p,q to FactorDB for Factorization-category attacks |
+| `MagicPanel` | `MagicPanel.tsx` | Paste-all mode: auto-detect params via regex (key=value, PEM, hex, decimal), show applicable attacks preview, priority-ordered parallel execution (concurrency=6), early-stop on first `=SUCCESS`, per-attack status list. Shows success toast; auto-submits p,q to FactorDB for Factorization-category attacks |
 | `RsaCalculator` | `RsaCalculator.tsx` | Pure BigInt calculator: Key Gen / Encrypt / Decrypt tabs, auto-format detection (hex/decimal/base64/ASCII), printable ASCII detection |
 | `ProofIndex` | `ProofIndex.tsx` | Searchable index of all 52 attacks with category tags and descriptions, click to navigate |
 | `ProofRenderer` | `ProofRenderer.tsx` | Full KaTeX parser: display math (align\*/equation\*/gather\*/aligned), inline math via $...$ (with auto-wrap heuristics for unadorned math tokens), itemize lists, heading detection, References section stripper |
@@ -89,12 +89,12 @@ These run fully in the browser when sufficient parameters are provided, returnin
 2. **Script injection**: `<script type="text/x-sage">` with generated template code appended as textContent
 3. **Execution**: `window.sagecell.makeSagecell()` targets container by ID with `template: sagecell.templates.minimal`, `autoeval: true`
 4. **Polling**: `MutationObserver` on container waits for `.sagecell_stdout` to appear, then settles for 500ms before extracting text
-5. **Timeout**: 35s default (10s for SageCell script load + 25s execution), returns error on timeout
+5. **Timeout**: 120s default (10s for SageCell script load + 110s execution), returns error on timeout
 6. **Cleanup**: container removed from DOM, observer disconnected, event listeners cleaned
 
 ### Parallel Execution (Magic Mode)
 
-- `useSageMathParallel()` with concurrency cap of 3
+- `useSageMathParallel()` with concurrency cap of 6
 - Queue-based dispatch: next execution starts as soon as a slot opens
 - `AbortController` stops all remaining jobs when first `=SUCCESS` detected
 - `onResult` callback enables early-stop logic
@@ -108,7 +108,7 @@ These run fully in the browser when sufficient parameters are provided, returnin
 - **Notification toasts** — Dracula-themed Snackbar (`slotProps.content.sx` with Dracula background/foreground colors) rendered in `App.tsx`. InputPanel and MagicPanel call `showNotification(msg, severity)` on attack completion.
 - **frontendCheck pattern** — attacks can define an optional async pre-check that runs in the browser before falling back to SageCell. This enables instant results for FactorDB lookups, phi(n) recovery, and BigInt GCD operations.
 - **Pure math templates** — SageMathCell has no internet access (firewall since 2021). All attack templates must be self-contained pure math code with no external dependencies.
-- **512-bit testcases** — `TESTCASE_BITS = { p: 256, q: 256 }` produces n ≈ 512-bit. Factorization attacks generate n with at least one small factor to avoid SageCell 35s timeout.
+- **512-bit testcases** — `TESTCASE_BITS = { p: 256, q: 256 }` produces n ≈ 512-bit. Factorization attacks generate n with at least one small factor to avoid SageCell 120s timeout.
 - **L5 Playwright test suite** in `scripts/test-playwright.ts` — runs all 51 SageCell-enabled attacks × 3 runs each (153 total). 10-page concurrency, 120s timeout per run. 151/153 passed (98.7%). Only 2 probabilistic partials remain (williams-p1, partial-pq-bits).
 - **No unit tests** — functional verification is `typecheck → lint → build → L5 Playwright suite`.
 - **DRY conventions** — shared MUI TextField styles in `src/styles/inputSx.ts`, reusable drag-to-resize hook in `src/hooks/useDragResize.ts`.
@@ -211,7 +211,7 @@ After deploy, copy the worker URL into `src/config.ts` or set `VITE_FACTORDB_PRO
 - Coppersmith `small_roots(X=..., beta=...)` — beta=0.5 for sqrt(n) factor search
 - `range(int(e) + 1)` to avoid Sage Integer → Python range error with small exponents
 - `prime_range(start, end)` is faster than `range()` + `is_prime()`
-- 35s timeout in useSageMath.ts — factorization testcases must remain feasible within this limit
+- 120s timeout in useSageMath.ts — factorization testcases must remain feasible within this limit
 
 ### Debugging Patterns (Hard-Earned)
 
