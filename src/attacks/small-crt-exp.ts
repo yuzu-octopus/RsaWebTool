@@ -11,7 +11,8 @@ export const attack: Attack = {
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
     { name: 'bound', label: 'bound (max d_p, optional)', placeholder: 'Default 1000000', multiline: false },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => `import math
+def _attack():
     try:
         n = Integer(${vals.n})
         e = Integer(${vals.e})
@@ -19,26 +20,24 @@ export const attack: Attack = {
         if n <= 0 or e <= 0 or bound <= 0:
             print("SMALL_CRT_EXP=FAILED: invalid input values")
         else:
-            # RSA-CRT: d_p * e ≡ 1 (mod p-1), so d_p * e - 1 = k(p-1)
-            # Rearranged: p = (d_p * e - 1) / k + 1
-            # We brute-force k ∈ [1, e) and step through d_p candidates.
-            # For each k, d_p0 = e^(-1) mod k, then step d_p by k.
-            # Total iterations ≈ bound * H_e ≈ bound * 11 for e=65537,
-            # so bound=50000 gives ~550k iterations (< 5s in SageCell).
+            # Use Python ints for fast iteration (avoids Sage Integer overhead)
+            n_int = int(n)
+            e_int = int(e)
+            bound_int = int(bound)
             found = False
-            for k in range(1, e):
-                if gcd(e, k) != 1:
+            for k in range(1, e_int):
+                if math.gcd(e_int, k) != 1:
                     continue
-                dp0 = inverse_mod(e, k)
-                for dp in range(dp0, bound + 1, k):
-                    num = dp * e - 1
-                    p_candidate = num // k + 1
-                    if p_candidate > 1 and n % p_candidate == 0:
-                        q = n // p_candidate
-                        print(f"Verification: p * q = {p_candidate * q}")
+                dp0 = pow(e_int, -1, k)
+                for dp in range(dp0, bound_int + 1, k):
+                    p_candidate = (dp * e_int - 1) // k + 1
+                    if p_candidate > 1 and n_int % p_candidate == 0:
+                        p_sage = Integer(p_candidate)
+                        q_sage = n // p_sage
+                        print(f"Verification: p * q = {p_sage * q_sage}")
                         print(f"dp = {dp}")
-                        print(f"p = {p_candidate}")
-                        print(f"q = {q}")
+                        print(f"p = {p_sage}")
+                        print(f"q = {q_sage}")
                         print()
                         print("SMALL_CRT_EXP=SUCCESS")
                         found = True

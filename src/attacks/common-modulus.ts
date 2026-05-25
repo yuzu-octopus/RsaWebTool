@@ -1,5 +1,6 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
+import { gcd, extendedGcd, modPow, modInverse } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'common-modulus',
@@ -56,6 +57,44 @@ print("COMMON_MODULUS=FAILED")`;
         print("COMMON_MODULUS=FAILED")
     #
 _attack()`;
+  },
+  frontendCheck: (vals) => {
+    if (!vals.n || !vals.e1 || !vals.e2 || !vals.c1 || !vals.c2) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const e1 = BigInt(vals.e1);
+      const e2 = BigInt(vals.e2);
+      const c1 = BigInt(vals.c1);
+      const c2 = BigInt(vals.c2);
+      const g = gcd(e1, e2);
+      if (g !== 1n) return Promise.resolve(null);
+      const { x, y } = extendedGcd(e1, e2);
+      let part1: bigint;
+      if (x < 0n) {
+        const inv = modInverse(c1, n);
+        if (!inv) return Promise.resolve(null);
+        part1 = modPow(inv, -x, n);
+      } else {
+        part1 = modPow(c1, x, n);
+      }
+      let part2: bigint;
+      if (y < 0n) {
+        const inv = modInverse(c2, n);
+        if (!inv) return Promise.resolve(null);
+        part2 = modPow(inv, -y, n);
+      } else {
+        part2 = modPow(c2, y, n);
+      }
+      const m = (part1 * part2) % n;
+      const v1 = modPow(m, e1, n);
+      const v2 = modPow(m, e2, n);
+      if (v1 === c1 && v2 === c2) {
+        return Promise.resolve(`Recovered message: m = ${m}`);
+      }
+      return Promise.resolve(null);
+    } catch {
+      return Promise.resolve(null);
+    }
   },
   proof: `\\textbf{Theorem:} Given c\\_1 \\equiv m^{e\\_1} \\pmod{n} and c\\_2 \\equiv m^{e\\_2} \\pmod{n} with \\gcd(e\\_1, e\\_2) = 1, recover m via Bezout coefficients.
 

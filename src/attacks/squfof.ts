@@ -13,6 +13,7 @@ export const attack: Attack = {
     try:
         try:
             n = Integer(${vals.n})
+            import math
             print(f"SQUFOF on n = {n}")
             print()
             if n < 2:
@@ -42,10 +43,12 @@ export const attack: Attack = {
                 return
             # SQUFOF works best for small factors; extract small factor first
             # Use prime_range for ~3x faster traversal vs trial division by odds
+            n_int = int(n)
             found_small = False
             for trial in prime_range(3, 200000):
-                if n % trial == 0:
-                    p = Integer(trial)
+                t_int = int(trial)
+                if n_int % t_int == 0:
+                    p = Integer(t_int)
                     q = n // p
                     print(f"Small factor found: p = {p}")
                     print(f"Verification: p * q = {p * q}")
@@ -58,16 +61,17 @@ export const attack: Attack = {
             if found_small:
                 return
             # Shanks' Square Forms Factorization (SQUFOF)
-            def squfof(n):
+            def squfof(n_val):
+                n_int = int(n_val)
                 # Find non-residue
                 D = 0
                 for k in [1, 3, 5, 7, -1, -3, -5, -7]:
-                    if kronecker(k, n) == -1:
-                        D = k * n
+                    if kronecker(k, n_val) == -1:
+                        D = k * n_int
                         break
                 if D == 0:
-                    D = n
-                sqrtD = isqrt(D)
+                    D = n_int
+                sqrtD = math.isqrt(D)
                 Po = sqrtD
                 P = Po
                 Q = D - Po**2
@@ -75,7 +79,7 @@ export const attack: Attack = {
                     return None
                 Qprev = 1
                 # Step 1: forward cycle — find a square form
-                limit = 2 * isqrt(isqrt(n)) + 10
+                limit = 2 * math.isqrt(math.isqrt(n_int)) + 10
                 for i in range(limit):
                     if Q == 0:
                         break
@@ -85,9 +89,9 @@ export const attack: Attack = {
                     if Qnew <= 0:
                         break
                     Qnew //= Q
-                    if i % 2 == 0 and Qnew.is_square() and Qnew > 0:
-                        r = isqrt(Qnew)
-                        if (sqrtD - Pnew) % r == 0:
+                    if i % 2 == 0 and Qnew > 0:
+                        r = math.isqrt(Qnew)
+                        if r * r == Qnew and (sqrtD - Pnew) % r == 0:
                             # Step 2: inverse square root → start reverse cycle
                             b = (sqrtD - Pnew) // r
                             P = b * r + Pnew
@@ -103,9 +107,9 @@ export const attack: Attack = {
                                 Q_old = Q
                                 Q = (D - P**2) // Q_old
                                 if P == P_old:
-                                    g = gcd(Q_old, n)
-                                    if 1 < g < n:
-                                        return g, n // g
+                                    g = math.gcd(Q_old, n_int)
+                                    if 1 < g < n_int:
+                                        return Integer(g), Integer(n_int // g)
                                     break
                             break
                     Qprev = Q

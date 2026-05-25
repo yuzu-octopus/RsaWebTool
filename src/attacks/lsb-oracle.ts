@@ -30,21 +30,23 @@ export const attack: Attack = {
             print("LSB_ORACLE=FAILED")
             return
         try:
+            out = []
             n = Integer(${vals.n})
             e_val = "${vals.e}".strip()
             e = Integer(e_val) if e_val else Integer(65537)
             c = Integer(${vals.c})
             orig_c = c
             oracle_bits = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
-            print("LSB Oracle Attack on RSA")
-            print(f"n = {n} ({n.nbits()} bits)")
-            print(f"e = {e}")
-            print(f"Oracle responses: {len(oracle_bits)} bits")
-            print()
+            two_e = pow(2, int(e), int(n))
+            out.append("LSB Oracle Attack on RSA")
+            out.append(f"n = {n} ({n.nbits()} bits)")
+            out.append(f"e = {e}")
+            out.append(f"Oracle responses: {len(oracle_bits)} bits")
+            out.append("")
             if len(oracle_bits) < n.nbits():
-                print(f"WARNING: Need {n.nbits()} responses for full recovery, got {len(oracle_bits)}.")
-                print("Result may be approximate.")
-                print()
+                out.append(f"WARNING: Need {n.nbits()} responses for full recovery, got {len(oracle_bits)}.")
+                out.append("Result may be approximate.")
+                out.append("")
             # Binary search using LSB oracle with 2^e blinding
             # Use QQ (rational) arithmetic to avoid integer-division convergence errors.
             # LSB(m * 2^(i+1) mod n) = 1 iff m >= n / 2^(i+1) (since n is odd)
@@ -52,29 +54,31 @@ export const attack: Attack = {
             upper = QQ(n)
             for i, bit in enumerate(oracle_bits):
                 mid = (lower + upper) / 2
-                c = (c * power_mod(Integer(2), e, n)) % n
+                c = Integer((int(c) * two_e) % int(n))
                 if bit == 0:
                     upper = mid
                 else:
                     lower = mid
                 if i < 5 or i % 50 == 0:
                     remaining = n.nbits() - i - 1
-                    print(f"  Step {i+1}: LSB={bit}, interval ~ [{lower.numerator()}/{lower.denominator()}, {upper.numerator()}/{upper.denominator()}], remaining ~ {max(0, remaining)} bits")
-            print()
+                    out.append(f"  Step {i+1}: LSB={bit}, interval ~ [{lower.numerator()}/{lower.denominator()}, {upper.numerator()}/{upper.denominator()}], remaining ~ {max(0, remaining)} bits")
+            out.append("")
             # Scan exact candidates from integer hull of rational interval
             lo_int = floor(lower)
             hi_int = ceil(upper)
             for m_candidate in range(lo_int, hi_int + 1):
                 m = Integer(m_candidate)
-                if power_mod(m, e, n) == orig_c:
-                    print(f"Recovered message: m = {m}")
-                    print("LSB_ORACLE=SUCCESS")
+                if pow(int(m), int(e), int(n)) == int(orig_c):
+                    out.append(f"Recovered message: m = {m}")
+                    out.append("LSB_ORACLE=SUCCESS")
                     break
             else:
-                print(f"LSB_ORACLE=FAILED (scanned {lo_int}..{hi_int})")
+                out.append(f"LSB_ORACLE=FAILED (scanned {lo_int}..{hi_int})")
+            print("\\n".join(out))
         except Exception as ex:
-            print(f"ERROR: {ex}")
-            print("LSB_ORACLE=FAILED")
+            out.append(f"ERROR: {ex}")
+            out.append("LSB_ORACLE=FAILED")
+            print("\\n".join(out))
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("LSB_ORACLE=FAILED")

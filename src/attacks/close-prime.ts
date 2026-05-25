@@ -13,6 +13,8 @@ export const attack: Attack = {
     try:
         try:
             n = Integer(${vals.n})
+            import math
+            n_int = int(n)
             if n < 2:
                 print(f"n = {n} is too small to factor")
                 print("CLOSE_PRIME=FAILED")
@@ -69,31 +71,31 @@ export const attack: Attack = {
             # Step 2: Londahl BSGS fallback (for larger prime gaps)
             print(f"Fermat did not converge in {max_iter} iterations, trying Londahl BSGS...")
             b = 50000
-            phi_approx = n - 2*isqrt(n) + 1
+            phi_approx = n_int - 2*math.isqrt(n_int) + 1
             print(f"Building baby-step table (b={b})...")
             look_up = {}
-            z = Integer(1)
+            z = 1
             parity = int(phi_approx & 1)
             for j in range(b + 1):
                 if (j & 1) == parity:
                     look_up[z] = j
-                z = (z * 2) % n
+                z = (z * 2) % n_int
             print(f"Searching ({b + 1} giant steps)...")
-            mu = inverse_mod(power_mod(2, phi_approx, n), n)
-            step = power_mod(2, b, n)
+            mu = int(inverse_mod(power_mod(2, Integer(phi_approx), n), n))
+            step = int(power_mod(2, b, n))
             found = False
             for i in range(b + 1):
                 if mu in look_up:
                     j = look_up[mu]
                     phi = phi_approx + j - i*b
-                    m = n - phi + 1
-                    disc = m*m - 4*n
+                    m = n_int - phi + 1
+                    disc = m*m - 4*n_int
                     if disc > 0:
-                        sqrt_disc = isqrt(disc)
+                        sqrt_disc = math.isqrt(disc)
                         if sqrt_disc*sqrt_disc == disc:
                             p_candidate = (m - sqrt_disc) // 2
                             q_candidate = (m + sqrt_disc) // 2
-                            if p_candidate * q_candidate == n and p_candidate > 1 and q_candidate > 1:
+                            if p_candidate * q_candidate == n_int and p_candidate > 1 and q_candidate > 1:
                                 print(f"Londahl BSGS factor found!")
                                 print(f"Verification: p * q = {p_candidate * q_candidate}")
                                 print(f"p = {p_candidate}")
@@ -102,7 +104,7 @@ export const attack: Attack = {
                                 print(f"Baby steps: {b+1}, Giant steps: {i+1}")
                                 found = True
                                 break
-                mu = (mu * step) % n
+                mu = (mu * step) % n_int
             if found:
                 print()
                 print("CLOSE_PRIME=SUCCESS")

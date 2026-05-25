@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { isqrt, gcd } from '../utils/bigint';
 import { randomPrime } from '../utils/testcases/core';
 
 export const attack: Attack = {
@@ -15,6 +16,8 @@ export const attack: Attack = {
             n = Integer(${vals.n})
             print(f"Euler Factorization on n = {n}")
             print()
+            import math
+            n_int = int(n)
             if n < 2:
                 print(f"n = {n} is too small to factor")
                 print("EULER=FAILED")
@@ -41,25 +44,26 @@ export const attack: Attack = {
                 print()
                 print("EULER=SUCCESS")
                 return
-            end = isqrt(n)
+            end = math.isqrt(n_int)
             solutions = []
             a = 0
-            max_iter = 10**6
+            max_iter = 1000000
             while a < end and len(solutions) < 2:
                 if a > max_iter:
                     print(f"Euler factorization failed: exceeded {max_iter} iterations")
                     print("EULER=FAILED")
                     return
-                rem = n - a*a
-                if rem >= 0 and rem.is_square():
-                    b = isqrt(rem)
-                    distinct = True
-                    for sol in solutions:
-                        if sol[0] == b and sol[1] == a:
-                            distinct = False
-                            break
-                    if distinct:
-                        solutions.append([b, a])
+                rem = n_int - a*a
+                if rem >= 0:
+                    b = math.isqrt(rem)
+                    if b*b == rem:
+                        distinct = True
+                        for sol in solutions:
+                            if sol[0] == b and sol[1] == a:
+                                distinct = False
+                                break
+                        if distinct:
+                            solutions.append([b, a])
                 a += 1
             if len(solutions) < 2:
                 print(f"Euler factorization failed: could not find two distinct sum-of-squares representations")
@@ -96,6 +100,47 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("EULER=FAILED")
 _attack()`,
+  frontendCheck: (vals) => {
+    if (!vals.n) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      if (n < 2n) return Promise.resolve(null);
+      if (n % 2n === 0n) return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n / 2n}`);
+      const end = isqrt(n);
+      const solutions: bigint[][] = [];
+      const maxIter = 1000000n;
+      for (let a = 0n; a < end && solutions.length < 2; a++) {
+        if (a > maxIter) return Promise.resolve(null);
+        const rem = n - a * a;
+        if (rem >= 0n) {
+          const b = isqrt(rem);
+          if (b * b === rem) {
+            let distinct = true;
+            for (const sol of solutions) {
+              if (sol[0] === b && sol[1] === a) {
+                distinct = false;
+                break;
+              }
+            }
+            if (distinct) solutions.push([b, a]);
+          }
+        }
+      }
+      if (solutions.length < 2) return Promise.resolve(null);
+      const [s0, s1] = [solutions[0], solutions[1]];
+      const k = gcd(s0[0] - s1[0], s1[1] - s0[1]) ** 2n;
+      const h = gcd(s0[0] + s1[0], s1[1] + s0[1]) ** 2n;
+      const m_ = gcd(s0[0] + s1[0], s1[1] - s0[1]) ** 2n;
+      const lev = gcd(s0[0] - s1[0], s1[1] + s0[1]) ** 2n;
+      const p = gcd(k + h, n);
+      let q = gcd(lev + m_, n);
+      if (p <= 1n || q >= n) return Promise.resolve(null);
+      if (p * q !== n) q = n / p;
+      return Promise.resolve(`Factor found!\nVerification: p * q = ${p * q}\np = ${p}\nq = ${q}`);
+    } catch {
+      return Promise.resolve(null);
+    }
+  },
   proof: `\\textbf{Theorem:} Factor n = pq using two distinct representations as a sum of squares. Requires p, q \\equiv 1 \\pmod{4}.
 
 \\textbf{Setup:}

@@ -12,7 +12,8 @@ export const attack: Attack = {
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
     { name: 'dLow', label: 'dLow (low bits of d)', placeholder: 'Enter known low bits of d...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => `import math
+def _attack():
     try:
         try:
             n = Integer(${vals.n})
@@ -21,25 +22,29 @@ export const attack: Attack = {
             if n <= 0 or e <= 0 or dLow < 0:
                 print("PARTIAL_D=FAILED: invalid input values")
             else:
-                m = dLow.nbits()
+                # Use Python ints for fast iteration
+                n_int = int(n)
+                e_int = int(e)
+                dLow_int = int(dLow)
+                m = dLow_int.bit_length()
                 found = False
-                for k in range(1, e + 1):
-                    d_approx = (k * n + 1) // e
-                    if d_approx % (2**m) == dLow:
-                        d = d_approx
-                        phi = (e * d - 1) // k
-                        s = n - phi + 1
-                        disc = s*s - 4*n
+                for k in range(1, e_int + 1):
+                    d_approx = (k * n_int + 1) // e_int
+                    if (d_approx & ((1 << m) - 1)) == dLow_int:
+                        d_phi = (e_int * d_approx - 1) // k
+                        s = n_int - d_phi + 1
+                        disc = s * s - 4 * n_int
                         if disc >= 0:
-                            sqrt_disc = ZZ(disc).isqrt()
+                            sqrt_disc = math.isqrt(disc)
                             if sqrt_disc * sqrt_disc == disc:
-                                p = (s + sqrt_disc) // 2
-                                q = (s - sqrt_disc) // 2
-                                if p * q == n:
-                                    print(f"Verification: p * q = {p * q}")
-                                    print(f"d = {d}")
-                                    print(f"p = {p}")
-                                    print(f"q = {q}")
+                                p_candidate = (s + sqrt_disc) // 2
+                                if p_candidate > 1 and n_int % p_candidate == 0:
+                                    p_sage = Integer(p_candidate)
+                                    q_sage = n // p_sage
+                                    print(f"Verification: p * q = {p_sage * q_sage}")
+                                    print(f"d = {d_approx}")
+                                    print(f"p = {p_sage}")
+                                    print(f"q = {q_sage}")
                                     print()
                                     print("PARTIAL_D=SUCCESS")
                                     found = True

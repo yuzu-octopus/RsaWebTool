@@ -9,7 +9,8 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => `import math
+def _attack():
     try:
         try:
             n = Integer(${vals.n})
@@ -40,24 +41,25 @@ export const attack: Attack = {
                 print()
                 print("POLLARD_STRASSEN=SUCCESS")
                 return
-            c = Integer(floor(RR(n) ** (1/4))) + 1
+            c = int(floor(RR(n) ** (1/4))) + 1
             if c > 50000:
                 print(f"n is too large for Strassen (n^(1/4) = {c} > 50000)")
                 print("POLLARD_STRASSEN=FAILED")
                 return
+            n_int = int(n)
             for i in range(c):
                 prod = 1
                 jmin = i * c + 1
                 jmax = jmin + c - 1
                 for j in range(jmin, jmax + 1):
-                    prod = (prod * j) % n
-                g = gcd(prod, n)
-                if g > 1 and g < n:
-                    p = g
-                    q = n // g
-                    print(f"Verification: p * q = {p * q}")
-                    print(f"p = {p}")
-                    print(f"q = {q}")
+                    prod = (prod * j) % n_int
+                g = math.gcd(prod, n_int)
+                if g > 1 and g < n_int:
+                    p_sage = Integer(g)
+                    q_sage = n // p_sage
+                    print(f"Verification: p * q = {p_sage * q_sage}")
+                    print(f"p = {p_sage}")
+                    print(f"q = {q_sage}")
                     print()
                     print("POLLARD_STRASSEN=SUCCESS")
                     return

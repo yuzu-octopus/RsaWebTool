@@ -58,17 +58,18 @@ export const attack: Attack = {
   },
   sageTemplate: (vals: Record<string, string>) => {
     const dpBlock = vals.dp ? `
-        dp = Integer(${vals.dp})
-        if dp > 0:
-            num = dp * e - 1
-            for k in range(1, e):
+        dp_val = int(Integer(${vals.dp}))
+        if dp_val > 0:
+            num = dp_val * e_int - 1
+            for k in range(1, e_int):
                 if num % k == 0:
                     p_candidate = num // k + 1
-                    if n % p_candidate == 0:
-                        q_val = n // p_candidate
-                        print(f"Verification: p * q = {p_candidate * q_val}")
-                        print(f"dp = {dp}")
-                        print(f"p = {p_candidate}")
+                    if p_candidate > 1 and n_int % p_candidate == 0:
+                        p_sage = Integer(p_candidate)
+                        q_val = n // p_sage
+                        print(f"Verification: p * q = {p_sage * q_val}")
+                        print(f"dp = {dp_val}")
+                        print(f"p = {p_sage}")
                         print(f"q = {q_val}")
                         print()
                         print("DP_DQ_LEAK=SUCCESS")
@@ -77,30 +78,34 @@ export const attack: Attack = {
 
     const dqBlock = vals.dq ? `
         if not found:
-            dq = Integer(${vals.dq})
-            if dq > 0:
-                num = dq * e - 1
-                for k in range(1, e):
+            dq_val = int(Integer(${vals.dq}))
+            if dq_val > 0:
+                num = dq_val * e_int - 1
+                for k in range(1, e_int):
                     if num % k == 0:
                         q_candidate = num // k + 1
-                        if n % q_candidate == 0:
-                            p_val = n // q_candidate
-                            print(f"Verification: p * q = {p_val * q_candidate}")
-                            print(f"dq = {dq}")
+                        if q_candidate > 1 and n_int % q_candidate == 0:
+                            p_val = n // Integer(q_candidate)
+                            q_sage = Integer(q_candidate)
+                            print(f"Verification: p * q = {p_val * q_sage}")
+                            print(f"dq = {dq_val}")
                             print(f"p = {p_val}")
-                            print(f"q = {q_candidate}")
+                            print(f"q = {q_sage}")
                             print()
                             print("DP_DQ_LEAK=SUCCESS")
                             found = True
                             break` : '';
 
-    return `def _attack():
+    return `import math
+def _attack():
     try:
         n = Integer(${vals.n})
         e = Integer(${vals.e})
         if n <= 0 or e <= 0:
             print("DP_DQ_LEAK=FAILED: invalid input values")
         else:
+            n_int = int(n)
+            e_int = int(e)
             found = False${dpBlock}${dqBlock}
             if not found:
                 print("DP_DQ_LEAK=FAILED: no valid factor found")

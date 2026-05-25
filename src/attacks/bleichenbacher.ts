@@ -33,33 +33,35 @@ export const attack: Attack = {
             print("BLEICHENBACHER=FAILED")
             return
         try:
+            out = []
             n = Integer(${vals.n})
             e = Integer(${vals.e})
             c = Integer(${vals.c})
             orig_c = Integer(${vals.c})
             oracle_bits = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
-            print(f"Bleichenbacher PKCS#1 v1.5 Attack")
-            print(f"n = {n} ({n.nbits()} bits)")
-            print(f"e = {e}")
-            print(f"c = {c}")
-            print(f"Oracle responses: {len(oracle_bits)}")
-            print()
+            out.append(f"Bleichenbacher PKCS#1 v1.5 Attack")
+            out.append(f"n = {n} ({n.nbits()} bits)")
+            out.append(f"e = {e}")
+            out.append(f"c = {c}")
+            out.append(f"Oracle responses: {len(oracle_bits)}")
+            out.append("")
             # PKCS#1 v1.5: EM = 0x00 || 0x02 || PS || 0x00 || M
             # Valid padding: 2B <= m < 3B where B = 2^(8*(k-2)), k = byte length
             k = (n.nbits() + 7) // 8
             B = Integer(2)**(8 * (k - 2))
-            print(f"Block size: {k} bytes, B = 2^(8*{k-2})")
-            print(f"Valid padding range: [2B, 3B) = [{2*B}, {3*B})")
-            print()
+            out.append(f"Block size: {k} bytes, B = 2^(8*{k-2})")
+            out.append(f"Valid padding range: [2B, 3B) = [{2*B}, {3*B})")
+            out.append("")
             # Collect valid s values from oracle responses
             valid_s = [Integer(i + 1) for i, r in enumerate(oracle_bits) if r == 1]
-            print(f"Valid padding responses: {len(valid_s)}")
+            out.append(f"Valid padding responses: {len(valid_s)}")
             if len(valid_s) < 2:
-                print("Need at least 2 valid responses for interval narrowing")
-                print("BLEICHENBACHER=FAILED")
+                out.append("Need at least 2 valid responses for interval narrowing")
+                out.append("BLEICHENBACHER=FAILED")
+                print("\\n".join(out))
                 return
             s1 = valid_s[0]
-            print(f"s1 = {s1}")
+            out.append(f"s1 = {s1}")
             # Initial interval from s1
             if s1 == 1:
                 a = 2 * B
@@ -76,8 +78,8 @@ export const attack: Attack = {
                         a = inter_a
                         b = inter_b
                         break
-            print(f"Initial interval: [{a}, {b}], size={(b-a+1).nbits()} bits")
-            print()
+            out.append(f"Initial interval: [{a}, {b}], size={(b-a+1).nbits()} bits")
+            out.append("")
             # Narrow using remaining valid s values
             for idx in range(1, min(len(valid_s), 50)):
                 s = valid_s[idx]
@@ -101,31 +103,33 @@ export const attack: Attack = {
                     a = new_a
                     b = new_b
                     if idx < 5 or b - a < (B) // 10:
-                        print(f"Step {idx}: s={s}, interval=[{a}, {b}], size={(b-a+1).nbits()} bits")
+                        out.append(f"Step {idx}: s={s}, interval=[{a}, {b}], size={(b-a+1).nbits()} bits")
                 else:
-                    print(f"Step {idx}: s={s}, no valid interval intersection")
-            print()
+                    out.append(f"Step {idx}: s={s}, no valid interval intersection")
+            out.append("")
             if a == b:
                 m = a
-                print(f"Exact message recovered: m = {m}")
+                out.append(f"Exact message recovered: m = {m}")
             else:
                 m = (a + b) // 2
-                print(f"Estimated message: m = {m}")
-                print(f"Final interval: [{a}, {b}]")
-                print(f"Uncertainty: {(b-a+1).nbits()} bits")
+                out.append(f"Estimated message: m = {m}")
+                out.append(f"Final interval: [{a}, {b}]")
+                out.append(f"Uncertainty: {(b-a+1).nbits()} bits")
             # Verify
-            v = power_mod(m, e, n)
-            print(f"Verification: m^e mod n = {v}")
-            print(f"Original c = {orig_c}")
+            v = Integer(pow(int(m), int(e), int(n)))
+            out.append(f"Verification: m^e mod n = {v}")
+            out.append(f"Original c = {orig_c}")
             if v == orig_c:
-                print("VERIFICATION PASSED!")
-                print("BLEICHENBACHER=SUCCESS")
+                out.append("VERIFICATION PASSED!")
+                out.append("BLEICHENBACHER=SUCCESS")
             else:
-                print("Verification failed - may need more oracle responses")
-                print("BLEICHENBACHER=FAILED")
+                out.append("Verification failed - may need more oracle responses")
+                out.append("BLEICHENBACHER=FAILED")
+            print("\\n".join(out))
         except Exception as ex:
-            print(f"ERROR: {ex}")
-            print("BLEICHENBACHER=FAILED")
+            out.append(f"ERROR: {ex}")
+            out.append("BLEICHENBACHER=FAILED")
+            print("\\n".join(out))
         #
     except BaseException as ex:
         print(f"ERROR: {ex}")

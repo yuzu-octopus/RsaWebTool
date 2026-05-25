@@ -35,6 +35,7 @@ export const attack: Attack = {
             print("MANGER=FAILED")
             return
         try:
+            out = []
             n = Integer(${vals.n})
             e = Integer(${vals.e})
             c = Integer(${vals.c})
@@ -47,7 +48,7 @@ export const attack: Attack = {
                 """Simulate oracle using pre-computed responses.
                 Returns True (1) if decrypted value >= B, False (0) if < B."""
                 if oracle_idx[0] >= len(oracle_list):
-                    print(f"WARNING: ran out of oracle responses at index {oracle_idx[0]}")
+                    out.append(f"WARNING: ran out of oracle responses at index {oracle_idx[0]}")
                     return False
                 result = oracle_list[oracle_idx[0]] == 1
                 oracle_idx[0] += 1
@@ -56,51 +57,51 @@ export const attack: Attack = {
                 return (a + b - 1) // b
             def floor_div(a, b):
                 return a // b
-            print(f"Manger's OAEP Attack (3-step algorithm)")
-            print(f"n = {n} ({n.nbits()} bits)")
-            print(f"e = {e}")
-            print(f"c = {c}")
+            out.append(f"Manger's OAEP Attack (3-step algorithm)")
+            out.append(f"n = {n} ({n.nbits()} bits)")
+            out.append(f"e = {e}")
+            out.append(f"c = {c}")
             #
             # k = byte length of n, B = 2^(8*(k-1))
             k = ceil_div(n.nbits(), 8)
             B = Integer(2) ** (8 * (k - 1))
-            print(f"k = {k}, B = 2^(8*{k-1}) = {B}")
-            print(f"2*B = {2*B}, 2*B < n: {2*B < n}")
-            print()
+            out.append(f"k = {k}, B = 2^(8*{k-1}) = {B}")
+            out.append(f"2*B = {2*B}, 2*B < n: {2*B < n}")
+            out.append("")
             #
             queries_used = [0]
             #
             # Step 1: Find f1 such that f1*m mod n >= B
             # Start with f1=2, double until oracle returns True (>= B)
-            print("=== Step 1: Finding f1 ===")
+            out.append("=== Step 1: Finding f1 ===")
             f1 = Integer(2)
-            while not oracle((power_mod(f1, e, n) * c) % n):
+            while not oracle((pow(int(f1), int(e), int(n)) * c) % n):
                 queries_used[0] += 1
                 f1 *= 2
             queries_used[0] += 1
-            print(f"f1 = {f1} (f1*m mod n >= B confirmed)")
-            print()
+            out.append(f"f1 = {f1} (f1*m mod n >= B confirmed)")
+            out.append("")
             #
             # Step 2: Find f2 such that f2*m mod n < B (wrapped around)
             # Start: f2 = floor((n+B)/B) * f1/2
             # Increment by f1/2 until oracle returns False (< B)
-            print("=== Step 2: Finding f2 ===")
+            out.append("=== Step 2: Finding f2 ===")
             f1_half = f1 // 2
             f2 = floor_div(n + B, B) * f1_half
-            while oracle((power_mod(f2, e, n) * c) % n):
+            while oracle((pow(int(f2), int(e), int(n)) * c) % n):
                 queries_used[0] += 1
                 f2 += f1_half
             queries_used[0] += 1
-            print(f"f2 = {f2} (f2*m mod n < B, wrapped to [n, n+B))")
-            print()
+            out.append(f"f2 = {f2} (f2*m mod n < B, wrapped to [n, n+B))")
+            out.append("")
             #
             # Step 3: Binary search to narrow [mmin, mmax] to single value
-            print("=== Step 3: Binary search ===")
+            out.append("=== Step 3: Binary search ===")
             mmin = ceil_div(n, f2)
             mmax = floor_div(n + B, f2)
-            print(f"Initial: mmin={mmin}, mmax={mmax}")
-            print(f"Range size: {(mmax - mmin).nbits()} bits")
-            print()
+            out.append(f"Initial: mmin={mmin}, mmax={mmax}")
+            out.append(f"Range size: {(mmax - mmin).nbits()} bits")
+            out.append("")
             #
             step_count = 0
             twoB = Integer(2) * B
@@ -112,7 +113,7 @@ export const attack: Attack = {
                 if f3 == 0:
                     f3 = Integer(1)
                 # Query oracle with f3
-                oracle_result = oracle((power_mod(f3, e, n) * c) % n)
+                oracle_result = oracle((pow(int(f3), int(e), int(n)) * c) % n)
                 queries_used[0] += 1
                 iNB = i_val * n + B
                 if oracle_result:
@@ -122,32 +123,34 @@ export const attack: Attack = {
                     # f3*m mod n < B => mmax = floor((i*n + B) / f3)
                     mmax = floor_div(iNB, f3)
                 if step_count <= 5 or (mmax - mmin) <= Integer(2):
-                    print(f"Step {step_count}: f3={f3}, oracle={oracle_result}, mmin={mmin}, mmax={mmax}, range={(mmax-mmin).nbits()} bits")
+                    out.append(f"Step {step_count}: f3={f3}, oracle={oracle_result}, mmin={mmin}, mmax={mmax}, range={(mmax-mmin).nbits()} bits")
         #
             #
             m = mmin
-            print(f"Recovered message: m = {m}")
-            print(f"Total oracle queries: {queries_used[0]}")
-            print(f"Total binary search steps: {step_count}")
+            out.append(f"Recovered message: m = {m}")
+            out.append(f"Total oracle queries: {queries_used[0]}")
+            out.append(f"Total binary search steps: {step_count}")
             #
             # Verify
-            v = power_mod(m, e, n)
-            print(f"Verification: m^e mod n = {v}")
-            print(f"Original c = {orig_c}")
+            v = Integer(pow(int(m), int(e), int(n)))
+            out.append(f"Verification: m^e mod n = {v}")
+            out.append(f"Original c = {orig_c}")
             if v == orig_c:
-                print("VERIFICATION PASSED!")
-                print()
-                print("MANGER=SUCCESS")
+                out.append("VERIFICATION PASSED!")
+                out.append("")
+                out.append("MANGER=SUCCESS")
             else:
-                print("Verification failed - may need more oracle responses")
-                print(f"m^e mod n = {v}")
-                print(f"c = {orig_c}")
-                print()
-                print("MANGER=FAILED")
+                out.append("Verification failed - may need more oracle responses")
+                out.append(f"m^e mod n = {v}")
+                out.append(f"c = {orig_c}")
+                out.append("")
+                out.append("MANGER=FAILED")
+            print("\\n".join(out))
         #
         except Exception as ex:
-            print(f"ERROR: {ex}")
-            print("MANGER=FAILED")
+            out.append(f"ERROR: {ex}")
+            out.append("MANGER=FAILED")
+            print("\\n".join(out))
         #
     except BaseException as ex:
         print(f"ERROR: {ex}")

@@ -101,10 +101,13 @@ export const attack: Attack = {
             if B2 > B1:
                 V_curr = VM
                 V_prev = 2
+                # Precompute primes once — is_prime(k) for every k is too slow
+                check_primes = prime_range(max(3, B1+1), B2 + 1)
+                prime_set = set(check_primes)  # O(1) lookup
                 for k in range(2, B2 + 1):
                     V_next = (V_curr * VM - V_prev) % n
                     V_prev, V_curr = V_curr, V_next
-                    if k > B1 and is_prime(k):
+                    if k > B1 and k in prime_set:
                         g = gcd(V_curr - 2, n)
                         if 1 < g < n:
                             return Integer(g)

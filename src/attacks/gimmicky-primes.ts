@@ -13,6 +13,8 @@ export const attack: Attack = {
     try:
         try:
             n = Integer(${vals.n})
+            import math
+            n_int = int(n)
             if n < 2:
                 print(f"n = {n} is too small to factor")
                 print("GIMMICKY_PRIMES=FAILED")
@@ -43,7 +45,7 @@ export const attack: Attack = {
             print("Checking Mersenne primes (2^p - 1)...")
             for p in [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127, 521, 607, 1279, 2203, 2281, 3217, 4253, 4423]:
                 mersenne = 2**p - 1
-                if n % mersenne == 0:
+                if n_int % mersenne == 0:
                     print(f"  Found Mersenne prime factor: 2^{p} - 1 = {mersenne}")
                     print(f"  Cofactor: {n // mersenne}")
                     print(f"  Verification: {mersenne} * {n // mersenne} = {n}")
@@ -57,7 +59,7 @@ export const attack: Attack = {
                 primorial *= p
                 for sign in [1, -1]:
                     candidate = primorial + sign
-                    if candidate > 1 and n % candidate == 0:
+                    if candidate > 1 and n_int % int(candidate) == 0:
                         print(f"  Found primorial prime factor: {candidate} = {p}# {'+' if sign == 1 else '-'} 1")
                         print(f"  Cofactor: {n // candidate}")
                         print(f"  Verification: {candidate} * {n // candidate} = {n}")
@@ -67,7 +69,7 @@ export const attack: Attack = {
             print("Checking Fermat primes (2^(2^k) + 1)...")
             for k in range(0, 5):
                 fermat = 2**(2**k) + 1
-                if n % fermat == 0:
+                if n_int % fermat == 0:
                     print(f"  Found Fermat prime factor: 2^(2^{k}) + 1 = {fermat}")
                     print(f"  Cofactor: {n // fermat}")
                     print(f"  Verification: {fermat} * {n // fermat} = {n}")
@@ -77,7 +79,7 @@ export const attack: Attack = {
             print("Checking Fibonacci primes...")
             fib_primes = [2, 3, 5, 13, 89, 233, 1597, 28657, 514229, 433494437, 2971215073]
             for fib in fib_primes:
-                if n % fib == 0:
+                if n_int % fib == 0:
                     print(f"  Found Fibonacci prime factor: {fib}")
                     print(f"  Cofactor: {n // fib}")
                     print(f"  Verification: {fib} * {n // fib} = {n}")
@@ -88,7 +90,7 @@ export const attack: Attack = {
             for p in [2, 19, 23, 317, 1031]:
                 try:
                     repunit = (10**p - 1) // 9
-                    if n % repunit == 0:
+                    if n_int % repunit == 0:
                         print(f"  Found repunit prime factor: R({p}) = {repunit}")
                         print(f"  Cofactor: {n // repunit}")
                         print(f"  Verification: {repunit} * {n // repunit} = {n}")
@@ -103,7 +105,7 @@ export const attack: Attack = {
                 factorial *= k
                 for sign in [1, -1]:
                     candidate = factorial + sign
-                    if candidate > 1 and n % candidate == 0:
+                    if candidate > 1 and n_int % candidate == 0:
                         print(f"  Found factorial prime factor: {k}! {'+' if sign == 1 else '-'} 1")
                         print(f"  Cofactor: {n // candidate}")
                         print(f"  Verification: {candidate} * {n // candidate} = {n}")
@@ -115,7 +117,7 @@ export const attack: Attack = {
             for k in range(1, 101):
                 for sign in [-1, 1]:
                     candidate = (2**k + sign)**2 - 2
-                    if candidate > 1 and n % candidate == 0:
+                    if candidate > 1 and n_int % candidate == 0:
                         name = "Carol" if sign == -1 else "Kynea"
                         print(f"  Found {name} prime factor: (2^{k} {'-' if sign == -1 else '+' } 1)^2 - 2")
                         print(f"  Cofactor: {n // candidate}")
@@ -128,7 +130,7 @@ export const attack: Attack = {
             for k in range(1, 101):
                 for sign in [1, -1]:
                     candidate = k * 2**k + sign
-                    if candidate > 1 and n % candidate == 0:
+                    if candidate > 1 and n_int % candidate == 0:
                         name = "Cullen" if sign == 1 else "Woodall"
                         print(f"  Found {name} prime factor: {k} * 2^{k} {'+' if sign == 1 else '-'} 1")
                         print(f"  Cofactor: {n // candidate}")
@@ -150,6 +152,81 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("GIMMICKY_PRIMES=FAILED")
 _attack()`,
+  frontendCheck: (vals) => {
+    if (!vals.n) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      if (n < 2n) return Promise.resolve(null);
+      if (n % 2n === 0n) return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n / 2n}`);
+      const nInt = n;
+      const checkDiv = (candidate: bigint): bigint | null => {
+        if (candidate > 1n && nInt % candidate === 0n) return candidate;
+        return null;
+      };
+      const report = (factor: bigint): string => `Factor found!\nCofactor: ${nInt / factor}\nVerification: ${factor} * ${nInt / factor} = ${nInt}`;
+      // 1. Mersenne primes: 2^p - 1
+      for (const exp of [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127, 521, 607, 1279, 2203, 2281, 3217, 4253, 4423]) {
+        const mersenne = (1n << BigInt(exp)) - 1n;
+        const f = checkDiv(mersenne);
+        if (f) return Promise.resolve(report(f));
+      }
+      // 2. Primorial primes
+      const smallPrimes = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199];
+      let primorial = 1n;
+      for (const p of smallPrimes) {
+        primorial *= BigInt(p);
+        for (const sign of [1n, -1n]) {
+          const candidate = primorial + sign;
+          if (candidate > 1n && nInt % candidate === 0n) return Promise.resolve(report(candidate));
+        }
+      }
+      // 3. Fermat primes: 2^(2^k) + 1
+      for (let k = 0; k < 5; k++) {
+        const fermat = (1n << (1n << BigInt(k))) + 1n;
+        const f = checkDiv(fermat);
+        if (f) return Promise.resolve(report(f));
+      }
+      // 4. Fibonacci primes
+      const fibPrimes = [2n,3n,5n,13n,89n,233n,1597n,28657n,514229n,433494437n,2971215073n];
+      for (const fib of fibPrimes) {
+        if (fib < nInt && nInt % fib === 0n) return Promise.resolve(report(fib));
+      }
+      // 5. Repunit primes: (10^p - 1) / 9
+      for (const p of [2, 19, 23, 317, 1031]) {
+        try {
+          const repunit = (10n ** BigInt(p) - 1n) / 9n;
+          if (repunit < nInt && nInt % repunit === 0n) return Promise.resolve(report(repunit));
+        } catch { continue; }
+      }
+      // 6. Factorial primes: k! +/- 1
+      let factorial = 1n;
+      for (let k = 1; k <= 100; k++) {
+        factorial *= BigInt(k);
+        for (const sign of [1n, -1n]) {
+          const candidate = factorial + sign;
+          if (candidate > 1n && nInt % candidate === 0n) return Promise.resolve(report(candidate));
+        }
+      }
+      // 7. Carol/Kynea: (2^k +/- 1)^2 - 2
+      for (let k = 1; k <= 100; k++) {
+        const twoK = 1n << BigInt(k);
+        for (const sign of [-1n, 1n]) {
+          const candidate = (twoK + sign) ** 2n - 2n;
+          if (candidate > 1n && nInt % candidate === 0n) return Promise.resolve(report(candidate));
+        }
+      }
+      // 8. Cullen/Woodall: k * 2^k +/- 1
+      for (let k = 1; k <= 100; k++) {
+        const twoK = 1n << BigInt(k);
+        const kBig = BigInt(k);
+        for (const sign of [1n, -1n]) {
+          const candidate = kBig * twoK + sign;
+          if (candidate > 1n && nInt % candidate === 0n) return Promise.resolve(report(candidate));
+        }
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
+  },
   proof: `\\textbf{Theorem:} If p is a special-form prime (Mersenne, primorial, Fermat, etc.), test divisibility against a precomputed set.
 
 \\textbf{Setup:}

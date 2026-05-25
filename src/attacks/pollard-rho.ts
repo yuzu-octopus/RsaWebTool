@@ -10,6 +10,7 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
   sageTemplate: (vals: Record<string, string>) => `def _attack():
+    import math
     try:
         try:
             n = Integer(${vals.n})
@@ -43,7 +44,9 @@ export const attack: Attack = {
             # Brent's cycle detection with batched GCD (primefac-style, BIT 1980)
             # Batched GCD reduces overhead: accumulate |x-y| products, one gcd per batch
             # Backtracking handles g == n case (when accumulated product contains all factors)
-            def brent_rho_batch(n, c):
+            def brent_rho_batch(n_val, c_val):
+                n_i = int(n_val)
+                c_i = int(c_val)
                 y = 2
                 r = 1
                 q = 1
@@ -52,25 +55,25 @@ export const attack: Attack = {
                 while g == 1:
                     x = y
                     for _ in range(r):
-                        y = (y * y + c) % n
+                        y = (y * y + c_i) % n_i
                     k = 0
                     while k < r and g == 1:
                         ys = y
                         batch = min(m, r - k)
                         for _ in range(batch):
-                            y = (y * y + c) % n
-                            q = (q * abs(x - y)) % n
-                        g = gcd(q, n)
+                            y = (y * y + c_i) % n_i
+                            q = (q * abs(x - y)) % n_i
+                        g = math.gcd(q, n_i)
                         q = 1
                         k += m
                     r *= 2
-                if g == n:
+                if g == n_i:
                     while True:
-                        ys = (ys * ys + c) % n
-                        g = gcd(abs(x - ys), n)
+                        ys = (ys * ys + c_i) % n_i
+                        g = math.gcd(abs(x - ys), n_i)
                         if g > 1:
                             break
-                return g if 1 < g < n else None
+                return Integer(g) if 1 < g < n_i else None
             found = False
             for c_val in range(1, 10):
                 d = brent_rho_batch(n, c_val)

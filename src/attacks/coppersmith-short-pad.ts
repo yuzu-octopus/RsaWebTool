@@ -21,6 +21,7 @@ export const attack: Attack = {
     try:
         n = Integer(${vals.n})
         e = Integer(${vals.e})
+        e_int = int(e)
         c1 = Integer(${vals.c1})
         c2 = Integer(${vals.c2})
         # Pure Python integer e-th root via binary search
@@ -45,8 +46,8 @@ export const attack: Attack = {
         m2_val = None
         # Method 1: Sage's built-in nth_root
         try:
-            m1_t, exact1 = c1.nth_root(int(e), truncate_mode=True)
-            m2_t, exact2 = c2.nth_root(int(e), truncate_mode=True)
+            m1_t, exact1 = c1.nth_root(e_int, truncate_mode=True)
+            m2_t, exact2 = c2.nth_root(e_int, truncate_mode=True)
             if exact1 and exact2:
                 m1_val = Integer(m1_t)
                 m2_val = Integer(m2_t)
@@ -54,26 +55,26 @@ export const attack: Attack = {
             pass
         # Method 2: Pure Python binary search (avoids Sage nth_root bugs)
         if m1_val is None:
-            cand = integer_root(c1, int(e))
-            if cand**int(e) == c1:
+            cand = integer_root(c1, e_int)
+            if cand**e_int == c1:
                 m1_val = cand
         if m2_val is None:
-            cand = integer_root(c2, int(e))
-            if cand**int(e) == c2:
+            cand = integer_root(c2, e_int)
+            if cand**e_int == c2:
                 m2_val = cand
         # Method 3: If only one found, brute-force delta (range covers testcase)
         if m1_val is None and m2_val is not None:
             for d in range(1, 256):
-                if (m2_val - d)**int(e) == c1:
+                if (m2_val - d)**e_int == c1:
                     m1_val = m2_val - d
                     break
         if m2_val is None and m1_val is not None:
             for d in range(1, 256):
-                if (m1_val + d)**int(e) == c2:
+                if (m1_val + d)**e_int == c2:
                     m2_val = m1_val + d
                     break
         if m1_val is not None and m2_val is not None:
-            if power_mod(m1_val, e, n) == c1 and power_mod(m2_val, e, n) == c2:
+            if pow(int(m1_val), e_int, int(n)) == c1 and pow(int(m2_val), e_int, int(n)) == c2:
                 delta_val = m2_val - m1_val
                 print(f"Found messages: m1 = {m1_val}, m2 = {m2_val}, delta = {delta_val}")
                 print()

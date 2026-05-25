@@ -10,7 +10,8 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'k', label: 'k (known multiplier)', placeholder: 'Enter k value...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => `import math
+def _attack():
     try:
         try:
             n = Integer(${vals.n})
@@ -37,19 +38,23 @@ export const attack: Attack = {
                 print(f"p = q = {p}")
                 print("LINEARLY_RELATED_PRIMES=SUCCESS")
                 return
+            # Use Python ints for fast iteration
+            n_int = int(n)
+            k_int = int(k)
             found = False
             for delta in range(-10000, 10001):
-                disc = delta*delta + 4*k*n
-                sqrt_disc = ZZ(disc).isqrt()
+                disc = delta * delta + 4 * k_int * n_int
+                sqrt_disc = math.isqrt(disc)
                 if sqrt_disc * sqrt_disc == disc:
                     num = -delta + sqrt_disc
-                    if num > 0 and num % (2*k) == 0:
-                        p = num // (2*k)
-                        if n % p == 0:
-                            q = n // p
-                            print(f"Verification: p * q = {p * q}")
-                            print(f"p = {p}")
-                            print(f"q = {q}")
+                    if num > 0 and num % (2 * k_int) == 0:
+                        p_candidate = num // (2 * k_int)
+                        if p_candidate > 1 and n_int % p_candidate == 0:
+                            p_sage = Integer(p_candidate)
+                            q_sage = n // p_sage
+                            print(f"Verification: p * q = {p_sage * q_sage}")
+                            print(f"p = {p_sage}")
+                            print(f"q = {q_sage}")
                             print(f"delta = {delta}")
                             print()
                             print("LINEARLY_RELATED_PRIMES=SUCCESS")

@@ -11,7 +11,8 @@ export const attack: Attack = {
     { name: 'B', label: 'B1 (stage 1 bound, optional)', placeholder: '10000', multiline: false },
     { name: 'B2', label: 'B2 (stage 2 bound, optional)', placeholder: '0 (disabled)', multiline: false },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => `import math
+def _attack():
     try:
         n = Integer(${vals.n})
         B1 = int(Integer(${vals.B || '10000'}))
@@ -51,6 +52,8 @@ export const attack: Attack = {
             print()
             print("POLLARD_P1=SUCCESS")
             return
+        # Use Python int for fast modular exponentiation
+        n_int = int(n)
         # Sieve primes up to B1 (pure Python, no prime_range)
         limit = B1
         sieve = [True] * (limit + 1)
@@ -71,13 +74,14 @@ export const attack: Attack = {
         for p in primes:
             q = p
             while q <= limit:
-                a = pow(a, p, n)
+                a = pow(a, p, n_int)
                 q *= p
-        g = gcd(a - 1, n)
-        if 1 < g < n:
-            q_val = n // g
-            print(f"Verification: p * q = {g * q_val}")
-            print(f"p = {g}")
+        g = math.gcd(a - 1, n_int)
+        if 1 < g < n_int:
+            g_sage = Integer(g)
+            q_val = n // g_sage
+            print(f"Verification: p * q = {g_sage * q_val}")
+            print(f"p = {g_sage}")
             print(f"q = {q_val}")
             print()
             print("POLLARD_P1=SUCCESS")
@@ -100,28 +104,28 @@ export const attack: Attack = {
             big_primes = [i for i in range(limit + 1, limit2 + 1) if sieve2[i]]
             if big_primes:
                 Q = 1
-                Hq = pow(a, big_primes[0], n)
-                Q = (Q * (Hq - 1)) % n
+                Hq = pow(a, big_primes[0], n_int)
+                Q = (Q * (Hq - 1)) % n_int
                 for j in range(1, len(big_primes)):
                     d = big_primes[j] - big_primes[j - 1]
-                    Hq = (Hq * pow(a, d, n)) % n
-                    Q = (Q * (Hq - 1)) % n
-                g = gcd(Q, n)
-                if 1 < g < n:
-                    q_val = n // g
-                    print(f"Verification: p * q = {g * q_val}")
-                    print(f"p = {g}")
+                    Hq = (Hq * pow(a, d, n_int)) % n_int
+                    Q = (Q * (Hq - 1)) % n_int
+                g = math.gcd(Q, n_int)
+                if 1 < g < n_int:
+                    g_sage = Integer(g)
+                    q_val = n // g_sage
+                    print(f"Verified: p * q = {g_sage * q_val}")
+                    print(f"p = {g_sage}")
                     print(f"q = {q_val}")
                     print()
                     print("POLLARD_P1=SUCCESS")
                     return
-        print("Pollard p-1 failed: p-1 is not smooth enough for these bounds")
+        print(f"Pollard p-1 failed: p-1 is not {B1}-smooth")
+        if B2 > B1:
+            print(f"(also not {B2}-smooth with one large factor)")
         print("POLLARD_P1=FAILED")
     except Exception as e:
         print(f"ERROR: {e}")
-        print("POLLARD_P1=FAILED")
-    except BaseException as ex:
-        print(f"FATAL: {ex}")
         print("POLLARD_P1=FAILED")
 _attack()`,
   proof: `\\textbf{Theorem:} If p-1 is B\\_1-smooth, find p via a^M mod n. Stage 2: one factor up to B\\_2.

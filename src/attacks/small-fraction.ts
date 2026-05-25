@@ -9,7 +9,8 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => `import math
+def _attack():
     try:
         n = Integer(${vals.n})
         #
@@ -40,8 +41,7 @@ export const attack: Attack = {
             return
         #
         # Small fraction attack: p/q ≈ a/b for small a, b
-        # For each coprime (a,b), approximate q ≈ sqrt(n*b/a), then trial-divide near q0
-        # Trial division is orders of magnitude faster than Coppersmith small_roots per pair
+        # Use Python ints for fast trial division
         try:
             print(f"Searching for small fraction approximation of p/q...")
             print(f"n = {n}")
@@ -51,25 +51,26 @@ export const attack: Attack = {
             trial_window = 500
             pairs_tried = 0
             divs_tried = 0
+            n_int = int(n)
             for b in range(1, max_den + 1):
                 for a in range(1, b + 1):
-                    if gcd(a, b) != 1:
+                    if math.gcd(a, b) != 1:
                         continue
                     pairs_tried += 1
                     # q approx sqrt(n*b/a): p/q ≈ a/b => n = p*q ≈ a*q²/b
-                    q0 = isqrt(n * b // a)
+                    q0 = math.isqrt(n_int * b // a)
                     if q0 <= 1:
                         continue
                     # Exact rational match: q0 divides n
-                    if n % q0 == 0:
-                        q = Integer(q0)
-                        p = n // q
-                        if p > 1 and p * q == n:
+                    if n_int % q0 == 0:
+                        q_sage = Integer(q0)
+                        p_sage = n // q_sage
+                        if p_sage > 1 and p_sage * q_sage == n:
                             print(f"Found! a/b = {a}/{b}")
-                            print(f"Verification: p * q = {p * q}")
-                            print(f"p = {p}")
-                            print(f"q = {q}")
-                            print(f"p/q = {float(p)/float(q):.10f}")
+                            print(f"Verification: p * q = {p_sage * q_sage}")
+                            print(f"p = {p_sage}")
+                            print(f"q = {q_sage}")
+                            print(f"p/q = {float(p_sage)/float(q_sage):.10f}")
                             print(f"a/b = {float(a)/float(b):.10f}")
                             found = True
                             break
@@ -77,28 +78,28 @@ export const attack: Attack = {
                     for delta in range(1, trial_window + 1):
                         divs_tried += 1
                         q_candidate = q0 + delta
-                        if q_candidate > 1 and n % q_candidate == 0:
-                            q = Integer(q_candidate)
-                            p = n // q
-                            if p > 1 and p * q == n:
+                        if q_candidate > 1 and n_int % q_candidate == 0:
+                            q_sage = Integer(q_candidate)
+                            p_sage = n // q_sage
+                            if p_sage > 1 and p_sage * q_sage == n:
                                 print(f"Found! a/b = {a}/{b} (delta = +{delta})")
-                                print(f"Verification: p * q = {p * q}")
-                                print(f"p = {p}")
-                                print(f"q = {q}")
-                                print(f"p/q = {float(p)/float(q):.10f}")
+                                print(f"Verification: p * q = {p_sage * q_sage}")
+                                print(f"p = {p_sage}")
+                                print(f"q = {q_sage}")
+                                print(f"p/q = {float(p_sage)/float(q_sage):.10f}")
                                 print(f"a/b = {float(a)/float(b):.10f}")
                                 found = True
                                 break
                         q_candidate = q0 - delta
-                        if q_candidate > 1 and n % q_candidate == 0:
-                            q = Integer(q_candidate)
-                            p = n // q
-                            if p > 1 and p * q == n:
+                        if q_candidate > 1 and n_int % q_candidate == 0:
+                            q_sage = Integer(q_candidate)
+                            p_sage = n // q_sage
+                            if p_sage > 1 and p_sage * q_sage == n:
                                 print(f"Found! a/b = {a}/{b} (delta = -{delta})")
-                                print(f"Verification: p * q = {p * q}")
-                                print(f"p = {p}")
-                                print(f"q = {q}")
-                                print(f"p/q = {float(p)/float(q):.10f}")
+                                print(f"Verification: p * q = {p_sage * q_sage}")
+                                print(f"p = {p_sage}")
+                                print(f"q = {q_sage}")
+                                print(f"p/q = {float(p_sage)/float(q_sage):.10f}")
                                 print(f"a/b = {float(a)/float(b):.10f}")
                                 found = True
                                 break

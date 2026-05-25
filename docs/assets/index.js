@@ -507,7 +507,8 @@ n &= p_1^{e_1} p_2^{e_2} \\cdots p_k^{e_k} \\\\
 \\text{Total time dominated by } &\\text{largest prime factor} \\qed
 \\end{align*}
 
-\\textbf{References:} Lenstra, "Factoring Integers with Elliptic Curves", 1987`,priority:`medium`,applicableCheck:e=>!!e.n},Ig=()=>{let e=kg(48),t=kg(56),n=kg(56);return{n:(e*t*n).toString()}},Lg={id:`pollard-p1`,name:`Pollard's p-1 Method`,category:`Factorization`,description:`Factors n when p-1 is smooth. Stage 1 handles p-1 with all prime factors ≤ B1. Stage 2 (B2) extends to catch p-1 with one larger factor.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B1 (stage 1 bound, optional)`,placeholder:`10000`,multiline:!1},{name:`B2`,label:`B2 (stage 2 bound, optional)`,placeholder:`0 (disabled)`,multiline:!1}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Lenstra, "Factoring Integers with Elliptic Curves", 1987`,priority:`medium`,applicableCheck:e=>!!e.n},Ig=()=>{let e=kg(48),t=kg(56),n=kg(56);return{n:(e*t*n).toString()}},Lg={id:`pollard-p1`,name:`Pollard's p-1 Method`,category:`Factorization`,description:`Factors n when p-1 is smooth. Stage 1 handles p-1 with all prime factors ≤ B1. Stage 2 (B2) extends to catch p-1 with one larger factor.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B1 (stage 1 bound, optional)`,placeholder:`10000`,multiline:!1},{name:`B2`,label:`B2 (stage 2 bound, optional)`,placeholder:`0 (disabled)`,multiline:!1}],sageTemplate:e=>`import math
+def _attack():
     try:
         n = Integer(${e.n})
         B1 = int(Integer(${e.B||`10000`}))
@@ -547,6 +548,8 @@ n &= p_1^{e_1} p_2^{e_2} \\cdots p_k^{e_k} \\\\
             print()
             print("POLLARD_P1=SUCCESS")
             return
+        # Use Python int for fast modular exponentiation
+        n_int = int(n)
         # Sieve primes up to B1 (pure Python, no prime_range)
         limit = B1
         sieve = [True] * (limit + 1)
@@ -567,13 +570,14 @@ n &= p_1^{e_1} p_2^{e_2} \\cdots p_k^{e_k} \\\\
         for p in primes:
             q = p
             while q <= limit:
-                a = pow(a, p, n)
+                a = pow(a, p, n_int)
                 q *= p
-        g = gcd(a - 1, n)
-        if 1 < g < n:
-            q_val = n // g
-            print(f"Verification: p * q = {g * q_val}")
-            print(f"p = {g}")
+        g = math.gcd(a - 1, n_int)
+        if 1 < g < n_int:
+            g_sage = Integer(g)
+            q_val = n // g_sage
+            print(f"Verification: p * q = {g_sage * q_val}")
+            print(f"p = {g_sage}")
             print(f"q = {q_val}")
             print()
             print("POLLARD_P1=SUCCESS")
@@ -596,28 +600,28 @@ n &= p_1^{e_1} p_2^{e_2} \\cdots p_k^{e_k} \\\\
             big_primes = [i for i in range(limit + 1, limit2 + 1) if sieve2[i]]
             if big_primes:
                 Q = 1
-                Hq = pow(a, big_primes[0], n)
-                Q = (Q * (Hq - 1)) % n
+                Hq = pow(a, big_primes[0], n_int)
+                Q = (Q * (Hq - 1)) % n_int
                 for j in range(1, len(big_primes)):
                     d = big_primes[j] - big_primes[j - 1]
-                    Hq = (Hq * pow(a, d, n)) % n
-                    Q = (Q * (Hq - 1)) % n
-                g = gcd(Q, n)
-                if 1 < g < n:
-                    q_val = n // g
-                    print(f"Verification: p * q = {g * q_val}")
-                    print(f"p = {g}")
+                    Hq = (Hq * pow(a, d, n_int)) % n_int
+                    Q = (Q * (Hq - 1)) % n_int
+                g = math.gcd(Q, n_int)
+                if 1 < g < n_int:
+                    g_sage = Integer(g)
+                    q_val = n // g_sage
+                    print(f"Verified: p * q = {g_sage * q_val}")
+                    print(f"p = {g_sage}")
                     print(f"q = {q_val}")
                     print()
                     print("POLLARD_P1=SUCCESS")
                     return
-        print("Pollard p-1 failed: p-1 is not smooth enough for these bounds")
+        print(f"Pollard p-1 failed: p-1 is not {B1}-smooth")
+        if B2 > B1:
+            print(f"(also not {B2}-smooth with one large factor)")
         print("POLLARD_P1=FAILED")
     except Exception as e:
         print(f"ERROR: {e}")
-        print("POLLARD_P1=FAILED")
-    except BaseException as ex:
-        print(f"FATAL: {ex}")
         print("POLLARD_P1=FAILED")
 _attack()`,proof:`\\textbf{Theorem:} If p-1 is B\\_1-smooth, find p via a^M mod n. Stage 2: one factor up to B\\_2.
 
@@ -638,6 +642,7 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
 \\end{align*}
 
 \\textbf{References:} J. M. Pollard, "Theorems on Factorization and Primality Testing", Proc. Cambridge Philos. Soc., 1974`,priority:`medium`,applicableCheck:e=>!!e.n},Rg=()=>{let e;for(;;){let t=2n,n=[];for(let e=2;e<=2e3;e++)Og(BigInt(e))&&n.push(BigInt(e));for(let e=n.length-1;e>0;e--){let t=Math.floor(Math.random()*(e+1));[n[e],n[t]]=[n[t],n[e]]}let r=0n,i=0;for(;r<128n&&i<n.length;)t*=n[i],r+=BigInt(n[i].toString(2).length),i++;if(e=t+1n,Og(e))break}let t=kg(Mg.q);return{n:(e*t).toString(),B:`10000`,B2:`0`}},zg={id:`pollard-rho`,name:`Pollard's Rho (Brent variant)`,category:`Factorization`,description:`Factors n via birthday paradox with Brent's cycle detection and batched GCD (primefac-style). Batched GCD reduces gcd overhead from O(sqrt(p)) to O(sqrt(p)/m). Backtracking recovers when accumulated product contains all factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    import math
     try:
         try:
             n = Integer(${e.n})
@@ -671,7 +676,9 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
             # Brent's cycle detection with batched GCD (primefac-style, BIT 1980)
             # Batched GCD reduces overhead: accumulate |x-y| products, one gcd per batch
             # Backtracking handles g == n case (when accumulated product contains all factors)
-            def brent_rho_batch(n, c):
+            def brent_rho_batch(n_val, c_val):
+                n_i = int(n_val)
+                c_i = int(c_val)
                 y = 2
                 r = 1
                 q = 1
@@ -680,25 +687,25 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
                 while g == 1:
                     x = y
                     for _ in range(r):
-                        y = (y * y + c) % n
+                        y = (y * y + c_i) % n_i
                     k = 0
                     while k < r and g == 1:
                         ys = y
                         batch = min(m, r - k)
                         for _ in range(batch):
-                            y = (y * y + c) % n
-                            q = (q * abs(x - y)) % n
-                        g = gcd(q, n)
+                            y = (y * y + c_i) % n_i
+                            q = (q * abs(x - y)) % n_i
+                        g = math.gcd(q, n_i)
                         q = 1
                         k += m
                     r *= 2
-                if g == n:
+                if g == n_i:
                     while True:
-                        ys = (ys * ys + c) % n
-                        g = gcd(abs(x - ys), n)
+                        ys = (ys * ys + c_i) % n_i
+                        g = math.gcd(abs(x - ys), n_i)
                         if g > 1:
                             break
-                return g if 1 < g < n else None
+                return Integer(g) if 1 < g < n_i else None
             found = False
             for c_val in range(1, 10):
                 d = brent_rho_batch(n, c_val)
@@ -833,10 +840,13 @@ p &\\mid (x_i - x_j) \\\\
             if B2 > B1:
                 V_curr = VM
                 V_prev = 2
+                # Precompute primes once — is_prime(k) for every k is too slow
+                check_primes = prime_range(max(3, B1+1), B2 + 1)
+                prime_set = set(check_primes)  # O(1) lookup
                 for k in range(2, B2 + 1):
                     V_next = (V_curr * VM - V_prev) % n
                     V_prev, V_curr = V_curr, V_next
-                    if k > B1 and is_prime(k):
+                    if k > B1 and k in prime_set:
                         g = gcd(V_curr - 2, n)
                         if 1 < g < n:
                             return Integer(g)
@@ -1065,6 +1075,7 @@ X &= \\prod_{i \\in S} (x_i + m), \\quad X^2 \\equiv \\prod Q(x_i) = y^2 \\pmod{
     try:
         try:
             n = Integer(${e.n})
+            import math
             print(f"SQUFOF on n = {n}")
             print()
             if n < 2:
@@ -1094,10 +1105,12 @@ X &= \\prod_{i \\in S} (x_i + m), \\quad X^2 \\equiv \\prod Q(x_i) = y^2 \\pmod{
                 return
             # SQUFOF works best for small factors; extract small factor first
             # Use prime_range for ~3x faster traversal vs trial division by odds
+            n_int = int(n)
             found_small = False
             for trial in prime_range(3, 200000):
-                if n % trial == 0:
-                    p = Integer(trial)
+                t_int = int(trial)
+                if n_int % t_int == 0:
+                    p = Integer(t_int)
                     q = n // p
                     print(f"Small factor found: p = {p}")
                     print(f"Verification: p * q = {p * q}")
@@ -1110,16 +1123,17 @@ X &= \\prod_{i \\in S} (x_i + m), \\quad X^2 \\equiv \\prod Q(x_i) = y^2 \\pmod{
             if found_small:
                 return
             # Shanks' Square Forms Factorization (SQUFOF)
-            def squfof(n):
+            def squfof(n_val):
+                n_int = int(n_val)
                 # Find non-residue
                 D = 0
                 for k in [1, 3, 5, 7, -1, -3, -5, -7]:
-                    if kronecker(k, n) == -1:
-                        D = k * n
+                    if kronecker(k, n_val) == -1:
+                        D = k * n_int
                         break
                 if D == 0:
-                    D = n
-                sqrtD = isqrt(D)
+                    D = n_int
+                sqrtD = math.isqrt(D)
                 Po = sqrtD
                 P = Po
                 Q = D - Po**2
@@ -1127,7 +1141,7 @@ X &= \\prod_{i \\in S} (x_i + m), \\quad X^2 \\equiv \\prod Q(x_i) = y^2 \\pmod{
                     return None
                 Qprev = 1
                 # Step 1: forward cycle — find a square form
-                limit = 2 * isqrt(isqrt(n)) + 10
+                limit = 2 * math.isqrt(math.isqrt(n_int)) + 10
                 for i in range(limit):
                     if Q == 0:
                         break
@@ -1137,9 +1151,9 @@ X &= \\prod_{i \\in S} (x_i + m), \\quad X^2 \\equiv \\prod Q(x_i) = y^2 \\pmod{
                     if Qnew <= 0:
                         break
                     Qnew //= Q
-                    if i % 2 == 0 and Qnew.is_square() and Qnew > 0:
-                        r = isqrt(Qnew)
-                        if (sqrtD - Pnew) % r == 0:
+                    if i % 2 == 0 and Qnew > 0:
+                        r = math.isqrt(Qnew)
+                        if r * r == Qnew and (sqrtD - Pnew) % r == 0:
                             # Step 2: inverse square root → start reverse cycle
                             b = (sqrtD - Pnew) // r
                             P = b * r + Pnew
@@ -1155,9 +1169,9 @@ X &= \\prod_{i \\in S} (x_i + m), \\quad X^2 \\equiv \\prod Q(x_i) = y^2 \\pmod{
                                 Q_old = Q
                                 Q = (D - P**2) // Q_old
                                 if P == P_old:
-                                    g = gcd(Q_old, n)
-                                    if 1 < g < n:
-                                        return g, n // g
+                                    g = math.gcd(Q_old, n_int)
+                                    if 1 < g < n_int:
+                                        return Integer(g), Integer(n_int // g)
                                     break
                             break
                     Qprev = Q
@@ -1300,7 +1314,8 @@ n = f(2) &= \\prod g_i(2)^{e_i} \\\\
 \\exists i: g_i(2) &= p \\text{ or } q \\qed
 \\end{align*}
 
-\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen & Gerhard, "Modern Computer Algebra", Chapter 5`,priority:`low`,applicableCheck:e=>!!e.n},Jg=4234267n,Yg=()=>({n:Jg.toString()}),Xg={id:`small-fraction`,name:`Small Fraction Attack`,category:`Factorization`,description:`Factors n when p/q ≈ a/b for small a,b. Uses trial division around isqrt(nb/a) for each candidate fraction.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen & Gerhard, "Modern Computer Algebra", Chapter 5`,priority:`low`,applicableCheck:e=>!!e.n},Jg=4234267n,Yg=()=>({n:Jg.toString()}),Xg={id:`small-fraction`,name:`Small Fraction Attack`,category:`Factorization`,description:`Factors n when p/q ≈ a/b for small a,b. Uses trial division around isqrt(nb/a) for each candidate fraction.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+def _attack():
     try:
         n = Integer(${e.n})
         #
@@ -1331,8 +1346,7 @@ n = f(2) &= \\prod g_i(2)^{e_i} \\\\
             return
         #
         # Small fraction attack: p/q ≈ a/b for small a, b
-        # For each coprime (a,b), approximate q ≈ sqrt(n*b/a), then trial-divide near q0
-        # Trial division is orders of magnitude faster than Coppersmith small_roots per pair
+        # Use Python ints for fast trial division
         try:
             print(f"Searching for small fraction approximation of p/q...")
             print(f"n = {n}")
@@ -1342,25 +1356,26 @@ n = f(2) &= \\prod g_i(2)^{e_i} \\\\
             trial_window = 500
             pairs_tried = 0
             divs_tried = 0
+            n_int = int(n)
             for b in range(1, max_den + 1):
                 for a in range(1, b + 1):
-                    if gcd(a, b) != 1:
+                    if math.gcd(a, b) != 1:
                         continue
                     pairs_tried += 1
                     # q approx sqrt(n*b/a): p/q ≈ a/b => n = p*q ≈ a*q²/b
-                    q0 = isqrt(n * b // a)
+                    q0 = math.isqrt(n_int * b // a)
                     if q0 <= 1:
                         continue
                     # Exact rational match: q0 divides n
-                    if n % q0 == 0:
-                        q = Integer(q0)
-                        p = n // q
-                        if p > 1 and p * q == n:
+                    if n_int % q0 == 0:
+                        q_sage = Integer(q0)
+                        p_sage = n // q_sage
+                        if p_sage > 1 and p_sage * q_sage == n:
                             print(f"Found! a/b = {a}/{b}")
-                            print(f"Verification: p * q = {p * q}")
-                            print(f"p = {p}")
-                            print(f"q = {q}")
-                            print(f"p/q = {float(p)/float(q):.10f}")
+                            print(f"Verification: p * q = {p_sage * q_sage}")
+                            print(f"p = {p_sage}")
+                            print(f"q = {q_sage}")
+                            print(f"p/q = {float(p_sage)/float(q_sage):.10f}")
                             print(f"a/b = {float(a)/float(b):.10f}")
                             found = True
                             break
@@ -1368,28 +1383,28 @@ n = f(2) &= \\prod g_i(2)^{e_i} \\\\
                     for delta in range(1, trial_window + 1):
                         divs_tried += 1
                         q_candidate = q0 + delta
-                        if q_candidate > 1 and n % q_candidate == 0:
-                            q = Integer(q_candidate)
-                            p = n // q
-                            if p > 1 and p * q == n:
+                        if q_candidate > 1 and n_int % q_candidate == 0:
+                            q_sage = Integer(q_candidate)
+                            p_sage = n // q_sage
+                            if p_sage > 1 and p_sage * q_sage == n:
                                 print(f"Found! a/b = {a}/{b} (delta = +{delta})")
-                                print(f"Verification: p * q = {p * q}")
-                                print(f"p = {p}")
-                                print(f"q = {q}")
-                                print(f"p/q = {float(p)/float(q):.10f}")
+                                print(f"Verification: p * q = {p_sage * q_sage}")
+                                print(f"p = {p_sage}")
+                                print(f"q = {q_sage}")
+                                print(f"p/q = {float(p_sage)/float(q_sage):.10f}")
                                 print(f"a/b = {float(a)/float(b):.10f}")
                                 found = True
                                 break
                         q_candidate = q0 - delta
-                        if q_candidate > 1 and n % q_candidate == 0:
-                            q = Integer(q_candidate)
-                            p = n // q
-                            if p > 1 and p * q == n:
+                        if q_candidate > 1 and n_int % q_candidate == 0:
+                            q_sage = Integer(q_candidate)
+                            p_sage = n // q_sage
+                            if p_sage > 1 and p_sage * q_sage == n:
                                 print(f"Found! a/b = {a}/{b} (delta = -{delta})")
-                                print(f"Verification: p * q = {p * q}")
-                                print(f"p = {p}")
-                                print(f"q = {q}")
-                                print(f"p/q = {float(p)/float(q):.10f}")
+                                print(f"Verification: p * q = {p_sage * q_sage}")
+                                print(f"p = {p_sage}")
+                                print(f"q = {q_sage}")
+                                print(f"p/q = {float(p_sage)/float(q_sage):.10f}")
                                 print(f"a/b = {float(a)/float(b):.10f}")
                                 found = True
                                 break
@@ -1432,55 +1447,7 @@ q_0 &= \\left\\lfloor\\sqrt{\\frac{nb}{a}}\\right\\rfloor \\\\
 \\text{Complexity: } O(B^2 \\cdot \\Delta) &\\text{ divisions} \\qed
 \\end{align*}
 
-\\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,priority:`medium`,applicableCheck:e=>!!e.n},Zg=()=>{let e=BigInt(3),t=BigInt(5),n=kg(Mg.q),r=n*e/t,i=r;for(let e=0n;e<500n;e+=1n){let t=r+e;if(t>1n&&Og(t)){i=t;break}let n=r-e;if(n>1n&&Og(n)){i=n;break}}return{n:(i*n).toString()}},Qg={id:`batch-gcd`,name:`Batch GCD`,category:`Factorization`,description:`Finds shared factors across multiple moduli. Use when given a list of RSA moduli.`,inputs:[{name:`n_values`,label:`Moduli (one per line or comma-separated)`,placeholder:`n1\\nn2\\nn3...`,multiline:!0,rows:5}],sageTemplate:e=>`def _attack():
-    try:
-        try:
-            n_list_str = """${e.n_values}"""
-            import re
-            n_list = [Integer(x.strip()) for x in re.split(r'[\\s,]+', n_list_str.strip()) if x.strip()]
-            if len(n_list) < 2:
-                print("Error: Need at least 2 moduli for Batch GCD attack.")
-                print("BATCH_GCD=FAILED")
-            else:
-                print(f"Processing {len(n_list)} moduli...")
-                print()
-                product = prod(n_list)
-                found_any = False
-                for i, n in enumerate(n_list):
-                    if n <= 1:
-                        print(f"n[{i}] = {n}: invalid")
-                        continue
-                    others_product = product // n
-                    g = gcd(n, others_product)
-                    if g > 1 and g < n:
-                        found_any = True
-                        p = g
-                        q = n // g
-                        print(f"n[{i}] = {n}")
-                        print(f"  Shared factor found: p = {p}")
-                        print(f"  q = {q}")
-                        print(f"  Verification: p * q = {p * q}")
-                        print()
-                    elif g == n:
-                        print(f"n[{i}] = {n}")
-                        print(f"  WARNING: n divides product of others (duplicate or fully shared)")
-                        print()
-                if not found_any:
-                    print("No shared factors found among the provided moduli.")
-                    print()
-                print("Batch GCD complete.")
-                if found_any:
-                    print("BATCH_GCD=SUCCESS")
-                else:
-                    print("BATCH_GCD=FAILED")
-        except Exception as e:
-            print(f"Error in Batch GCD: {e}")
-            print("BATCH_GCD=FAILED")
-        #
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("BATCH_GCD=FAILED")
-_attack()`,frontendCheck:async e=>{try{let t=(e.n_values||``).trim();if(!t)return null;let n=t.split(/[\n,]+/).map(e=>e.trim()).filter(e=>e.length>0).map(e=>BigInt(e));if(n.length<2)return null;let r=1n;for(let e of n)r*=e;let i=[`Batch GCD Attack (browser-side, BigInt)`,`Processing ${n.length} moduli...`,``],a=!1;for(let e=0;e<n.length;e++){let t=n[e];if(t<=1n)continue;let o=og(t,r/t);if(o>1n&&o<t){a=!0;let n=o,r=t/o;i.push(`n[${e}] = ${t}`),i.push(`  Shared factor found: p = ${n}`),i.push(`  q = ${r}`),i.push(`  Verification: p * q = ${n*r}`),i.push(``)}else o===t&&(i.push(`n[${e}] = ${t}`),i.push(`  WARNING: n divides product of others (duplicate or fully shared)`),i.push(``))}return a?(i.push(`Batch GCD complete.`),i.push(`BATCH_GCD=SUCCESS`),i.join(`
+\\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,priority:`medium`,applicableCheck:e=>!!e.n},Zg=()=>{let e=BigInt(3),t=BigInt(5),n=kg(Mg.q),r=n*e/t,i=r;for(let e=0n;e<500n;e+=1n){let t=r+e;if(t>1n&&Og(t)){i=t;break}let n=r-e;if(n>1n&&Og(n)){i=n;break}}return{n:(i*n).toString()}},Qg={id:`batch-gcd`,name:`Batch GCD`,category:`Factorization`,description:`Finds shared factors across multiple moduli. Use when given a list of RSA moduli.`,inputs:[{name:`n_values`,label:`Moduli (one per line or comma-separated)`,placeholder:`n1\\nn2\\nn3...`,multiline:!0,rows:5}],sageTemplate:()=>`print("BATCH_GCD=FAILED")`,frontendCheck:async e=>{try{let t=(e.n_values||``).trim();if(!t)return null;let n=t.split(/[\n,]+/).map(e=>e.trim()).filter(e=>e.length>0).map(e=>BigInt(e));if(n.length<2)return null;let r=1n;for(let e of n)r*=e;let i=[`Batch GCD Attack (browser-side, BigInt)`,`Processing ${n.length} moduli...`,``],a=!1;for(let e=0;e<n.length;e++){let t=n[e];if(t<=1n)continue;let o=og(t,r/t);if(o>1n&&o<t){a=!0;let n=o,r=t/o;i.push(`n[${e}] = ${t}`),i.push(`  Shared factor found: p = ${n}`),i.push(`  q = ${r}`),i.push(`  Verification: p * q = ${n*r}`),i.push(``)}else o===t&&(i.push(`n[${e}] = ${t}`),i.push(`  WARNING: n divides product of others (duplicate or fully shared)`),i.push(``))}return a?(i.push(`Batch GCD complete.`),i.push(`BATCH_GCD=SUCCESS`),i.join(`
 `)):null}catch{return null}},proof:`\\textbf{Theorem:} Given moduli $\\{n_1, \\ldots, n_k\\}$, if any two share a prime, $\\gcd(n_i, \\prod_{j \\neq i} n_j)$ reveals it.
 
 \\textbf{Setup:}
@@ -1501,6 +1468,8 @@ g_i > 1 &\\implies g_i \\text{ is a shared prime} \\\\
     try:
         try:
             n = Integer(${e.n})
+            import math
+            n_int = int(n)
             if n < 2:
                 print(f"n = {n} is too small to factor")
                 print("MULTI_PRIME=FAILED")
@@ -1521,17 +1490,19 @@ g_i > 1 &\\implies g_i \\text{ is a shared prime} \\\\
             def factor_all(m):
                 """Complete factorization using trial division + Sage's factor()"""
                 fac = []
-                rem = Integer(m)
+                rem = int(m)
                 for p in prime_range(2, 10000):
-                    while rem % p == 0:
-                        fac.append(Integer(p))
-                        rem //= p
+                    p_int = int(p)
+                    while rem % p_int == 0:
+                        fac.append(Integer(p_int))
+                        rem //= p_int
                 if rem == 1:
                     return sorted(fac)
-                if rem.is_prime():
-                    fac.append(rem)
+                rem_sage = Integer(rem)
+                if rem_sage.is_prime():
+                    fac.append(rem_sage)
                     return sorted(fac)
-                for p, e in factor(rem):
+                for p, e in factor(rem_sage):
                     fac.extend([p] * e)
                 return sorted(fac)
             print(f"Attempting multi-prime factorization of n = {n}")
@@ -1607,6 +1578,8 @@ p_i &\\approx n^{1/r} \\implies \\text{smaller primes, easier factoring} \\qed
     try:
         try:
             n = Integer(${e.n})
+            import math
+            n_int = int(n)
             if n < 2:
                 print(f"n = {n} is too small to factor")
                 print("GIMMICKY_PRIMES=FAILED")
@@ -1637,7 +1610,7 @@ p_i &\\approx n^{1/r} \\implies \\text{smaller primes, easier factoring} \\qed
             print("Checking Mersenne primes (2^p - 1)...")
             for p in [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127, 521, 607, 1279, 2203, 2281, 3217, 4253, 4423]:
                 mersenne = 2**p - 1
-                if n % mersenne == 0:
+                if n_int % mersenne == 0:
                     print(f"  Found Mersenne prime factor: 2^{p} - 1 = {mersenne}")
                     print(f"  Cofactor: {n // mersenne}")
                     print(f"  Verification: {mersenne} * {n // mersenne} = {n}")
@@ -1651,7 +1624,7 @@ p_i &\\approx n^{1/r} \\implies \\text{smaller primes, easier factoring} \\qed
                 primorial *= p
                 for sign in [1, -1]:
                     candidate = primorial + sign
-                    if candidate > 1 and n % candidate == 0:
+                    if candidate > 1 and n_int % int(candidate) == 0:
                         print(f"  Found primorial prime factor: {candidate} = {p}# {'+' if sign == 1 else '-'} 1")
                         print(f"  Cofactor: {n // candidate}")
                         print(f"  Verification: {candidate} * {n // candidate} = {n}")
@@ -1661,7 +1634,7 @@ p_i &\\approx n^{1/r} \\implies \\text{smaller primes, easier factoring} \\qed
             print("Checking Fermat primes (2^(2^k) + 1)...")
             for k in range(0, 5):
                 fermat = 2**(2**k) + 1
-                if n % fermat == 0:
+                if n_int % fermat == 0:
                     print(f"  Found Fermat prime factor: 2^(2^{k}) + 1 = {fermat}")
                     print(f"  Cofactor: {n // fermat}")
                     print(f"  Verification: {fermat} * {n // fermat} = {n}")
@@ -1671,7 +1644,7 @@ p_i &\\approx n^{1/r} \\implies \\text{smaller primes, easier factoring} \\qed
             print("Checking Fibonacci primes...")
             fib_primes = [2, 3, 5, 13, 89, 233, 1597, 28657, 514229, 433494437, 2971215073]
             for fib in fib_primes:
-                if n % fib == 0:
+                if n_int % fib == 0:
                     print(f"  Found Fibonacci prime factor: {fib}")
                     print(f"  Cofactor: {n // fib}")
                     print(f"  Verification: {fib} * {n // fib} = {n}")
@@ -1682,7 +1655,7 @@ p_i &\\approx n^{1/r} \\implies \\text{smaller primes, easier factoring} \\qed
             for p in [2, 19, 23, 317, 1031]:
                 try:
                     repunit = (10**p - 1) // 9
-                    if n % repunit == 0:
+                    if n_int % repunit == 0:
                         print(f"  Found repunit prime factor: R({p}) = {repunit}")
                         print(f"  Cofactor: {n // repunit}")
                         print(f"  Verification: {repunit} * {n // repunit} = {n}")
@@ -1697,7 +1670,7 @@ p_i &\\approx n^{1/r} \\implies \\text{smaller primes, easier factoring} \\qed
                 factorial *= k
                 for sign in [1, -1]:
                     candidate = factorial + sign
-                    if candidate > 1 and n % candidate == 0:
+                    if candidate > 1 and n_int % candidate == 0:
                         print(f"  Found factorial prime factor: {k}! {'+' if sign == 1 else '-'} 1")
                         print(f"  Cofactor: {n // candidate}")
                         print(f"  Verification: {candidate} * {n // candidate} = {n}")
@@ -1709,7 +1682,7 @@ p_i &\\approx n^{1/r} \\implies \\text{smaller primes, easier factoring} \\qed
             for k in range(1, 101):
                 for sign in [-1, 1]:
                     candidate = (2**k + sign)**2 - 2
-                    if candidate > 1 and n % candidate == 0:
+                    if candidate > 1 and n_int % candidate == 0:
                         name = "Carol" if sign == -1 else "Kynea"
                         print(f"  Found {name} prime factor: (2^{k} {'-' if sign == -1 else '+' } 1)^2 - 2")
                         print(f"  Cofactor: {n // candidate}")
@@ -1722,7 +1695,7 @@ p_i &\\approx n^{1/r} \\implies \\text{smaller primes, easier factoring} \\qed
             for k in range(1, 101):
                 for sign in [1, -1]:
                     candidate = k * 2**k + sign
-                    if candidate > 1 and n % candidate == 0:
+                    if candidate > 1 and n_int % candidate == 0:
                         name = "Cullen" if sign == 1 else "Woodall"
                         print(f"  Found {name} prime factor: {k} * 2^{k} {'+' if sign == 1 else '-'} 1")
                         print(f"  Cofactor: {n // candidate}")
@@ -1743,7 +1716,7 @@ p_i &\\approx n^{1/r} \\implies \\text{smaller primes, easier factoring} \\qed
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("GIMMICKY_PRIMES=FAILED")
-_attack()`,proof:`\\textbf{Theorem:} If p is a special-form prime (Mersenne, primorial, Fermat, etc.), test divisibility against a precomputed set.
+_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t<2n)return Promise.resolve(null);if(t%2n==0n)return Promise.resolve(`n is even: ${t}\np = 2\nq = ${t/2n}`);let n=t,r=e=>e>1n&&n%e===0n?e:null,i=e=>`Factor found!\nCofactor: ${n/e}\nVerification: ${e} * ${n/e} = ${n}`;for(let e of[2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281,3217,4253,4423]){let t=r((1n<<BigInt(e))-1n);if(t)return Promise.resolve(i(t))}let a=[2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199],o=1n;for(let e of a){o*=BigInt(e);for(let e of[1n,-1n]){let t=o+e;if(t>1n&&n%t===0n)return Promise.resolve(i(t))}}for(let e=0;e<5;e++){let t=r((1n<<(1n<<BigInt(e)))+1n);if(t)return Promise.resolve(i(t))}for(let e of[2n,3n,5n,13n,89n,233n,1597n,28657n,514229n,433494437n,2971215073n])if(e<n&&n%e===0n)return Promise.resolve(i(e));for(let e of[2,19,23,317,1031])try{let t=(10n**BigInt(e)-1n)/9n;if(t<n&&n%t===0n)return Promise.resolve(i(t))}catch{continue}let s=1n;for(let e=1;e<=100;e++){s*=BigInt(e);for(let e of[1n,-1n]){let t=s+e;if(t>1n&&n%t===0n)return Promise.resolve(i(t))}}for(let e=1;e<=100;e++){let t=1n<<BigInt(e);for(let e of[-1n,1n]){let r=(t+e)**2n-2n;if(r>1n&&n%r===0n)return Promise.resolve(i(r))}}for(let e=1;e<=100;e++){let t=1n<<BigInt(e),r=BigInt(e);for(let e of[1n,-1n]){let a=r*t+e;if(a>1n&&n%a===0n)return Promise.resolve(i(a))}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If p is a special-form prime (Mersenne, primorial, Fermat, etc.), test divisibility against a precomputed set.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -1763,6 +1736,8 @@ s &\\mid n \\implies q = n/s \\\\
     try:
         try:
             n = Integer(${e.n})
+            import math
+            n_int = int(n)
             if n < 2:
                 print(f"n = {n} is too small to factor")
                 print("CLOSE_PRIME=FAILED")
@@ -1819,31 +1794,31 @@ s &\\mid n \\implies q = n/s \\\\
             # Step 2: Londahl BSGS fallback (for larger prime gaps)
             print(f"Fermat did not converge in {max_iter} iterations, trying Londahl BSGS...")
             b = 50000
-            phi_approx = n - 2*isqrt(n) + 1
+            phi_approx = n_int - 2*math.isqrt(n_int) + 1
             print(f"Building baby-step table (b={b})...")
             look_up = {}
-            z = Integer(1)
+            z = 1
             parity = int(phi_approx & 1)
             for j in range(b + 1):
                 if (j & 1) == parity:
                     look_up[z] = j
-                z = (z * 2) % n
+                z = (z * 2) % n_int
             print(f"Searching ({b + 1} giant steps)...")
-            mu = inverse_mod(power_mod(2, phi_approx, n), n)
-            step = power_mod(2, b, n)
+            mu = int(inverse_mod(power_mod(2, Integer(phi_approx), n), n))
+            step = int(power_mod(2, b, n))
             found = False
             for i in range(b + 1):
                 if mu in look_up:
                     j = look_up[mu]
                     phi = phi_approx + j - i*b
-                    m = n - phi + 1
-                    disc = m*m - 4*n
+                    m = n_int - phi + 1
+                    disc = m*m - 4*n_int
                     if disc > 0:
-                        sqrt_disc = isqrt(disc)
+                        sqrt_disc = math.isqrt(disc)
                         if sqrt_disc*sqrt_disc == disc:
                             p_candidate = (m - sqrt_disc) // 2
                             q_candidate = (m + sqrt_disc) // 2
-                            if p_candidate * q_candidate == n and p_candidate > 1 and q_candidate > 1:
+                            if p_candidate * q_candidate == n_int and p_candidate > 1 and q_candidate > 1:
                                 print(f"Londahl BSGS factor found!")
                                 print(f"Verification: p * q = {p_candidate * q_candidate}")
                                 print(f"p = {p_candidate}")
@@ -1852,7 +1827,7 @@ s &\\mid n \\implies q = n/s \\\\
                                 print(f"Baby steps: {b+1}, Giant steps: {i+1}")
                                 found = True
                                 break
-                mu = (mu * step) % n
+                mu = (mu * step) % n_int
             if found:
                 print()
                 print("CLOSE_PRIME=SUCCESS")
@@ -1885,7 +1860,8 @@ p, q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
 
 \\textbf{Explanation:} Londahl's BSGS attack recovers $\\phi(n)$ by solving $2^\\delta \\equiv 2^{-\\phi_{\\text{approx}}} \\pmod{n}$, then factors $n$ via the quadratic.
 
-\\textbf{References:} Carl L\\"ondahl, "Finding close-prime factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,priority:`medium`,applicableCheck:e=>!!e.n},a_=()=>{let e=kg(512),t=Math.floor(Math.random()*5e3)*2+2,n=e+BigInt(t);for(;!Og(n);)n+=2n;return{n:(e*n).toString()}},o_={id:`novelty-primes`,name:`Novelty Primes`,category:`Factorization`,description:`Detects primes near powers of 2 or math constants. Use when p ≈ 2^k or similar.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Carl L\\"ondahl, "Finding close-prime factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,priority:`medium`,applicableCheck:e=>!!e.n},a_=()=>{let e=kg(512),t=Math.floor(Math.random()*5e3)*2+2,n=e+BigInt(t);for(;!Og(n);)n+=2n;return{n:(e*n).toString()}},o_={id:`novelty-primes`,name:`Novelty Primes`,category:`Factorization`,description:`Detects primes near powers of 2 or math constants. Use when p ≈ 2^k or similar.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -1914,15 +1890,17 @@ p, q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
             print(f"Checking n = {n} against known CTF primes...")
             found = False
             print("Checking primes near powers of 2...")
+            n_int = int(n)
             for bits in [64, 128, 256, 512]:
-                target = 2**bits
+                target = 1 << bits
                 for delta in range(-1000, 1000):
                     candidate = target + delta
-                    if candidate > 1 and candidate.is_prime():
-                        if n % candidate == 0:
-                            print(f"  Found prime near 2^{bits}: {candidate}")
-                            print(f"  Cofactor: {n // candidate}")
-                            print(f"  Verification: {candidate} * {n // candidate} = {n}")
+                    if candidate > 1 and n_int % candidate == 0:
+                        if is_prime(candidate):
+                            p_sage = Integer(candidate)
+                            print(f"  Found prime near 2^{bits}: {p_sage}")
+                            print(f"  Cofactor: {n // p_sage}")
+                            print(f"  Verification: {p_sage} * {n // p_sage} = {n}")
                             found = True
             print("\\nChecking primes near common constants...")
             RF = RealField(300)
@@ -1932,12 +1910,14 @@ p, q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
                 ("sqrt(2)", Integer(str(RF(2).sqrt().n(digits=60).str()).replace('.', '')[:55])),
             ]
             for name, const in constants:
+                const_int = int(const)
                 for delta in range(-100, 100):
-                    candidate = const + delta
-                    if candidate > 1 and candidate.is_prime():
-                        if n % candidate == 0:
-                            print(f"  Found prime near {name}: {candidate}")
-                            print(f"  Cofactor: {n // candidate}")
+                    candidate = const_int + delta
+                    if candidate > 1 and n_int % candidate == 0:
+                        if is_prime(candidate):
+                            p_sage = Integer(candidate)
+                            print(f"  Found prime near {name}: {p_sage}")
+                            print(f"  Cofactor: {n // p_sage}")
                             found = True
             if found:
                 print("NOVELTY_PRIMES=SUCCESS")
@@ -1951,7 +1931,7 @@ p, q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("NOVELTY_PRIMES=FAILED")
-_attack()`,proof:`\\textbf{Theorem:} CTF primes may be reused or near structured values; check via database lookup and window search.
+_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t<2n)return Promise.resolve(null);if(t%2n==0n)return Promise.resolve(`n is even: ${t}\np = 2\nq = ${t/2n}`);for(let e of[64,128,256,512]){let n=1n<<BigInt(e);for(let r=-1000n;r<=1000n;r++){let i=n+r;if(i>1n&&t%i===0n)return Promise.resolve(`Found prime near 2^${e}: ${i}\nCofactor: ${t/i}\nVerification: ${i} * ${t/i} = ${t}`)}}for(let[e,n]of[[`pi`,3141592653589793238462643383279502884197169399375105820974n],[`e`,2718281828459045235360287471352662497757247093699959574966n],[`sqrt(2)`,1414213562373095048801688724209698078569671875376948073176n]])for(let r=-100n;r<=100n;r++){let i=n+r;if(i>1n&&t%i===0n)return Promise.resolve(`Found prime near ${e}: ${i}\nCofactor: ${t/i}`)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} CTF primes may be reused or near structured values; check via database lookup and window search.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2211,7 +2191,8 @@ f(x) &= p_0 + x \\equiv 0 \\pmod{p} \\\\
 p &= p_0 + x_0, \\quad q = n/p \\qed
 \\end{align*}
 
-\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.nearp},d_=()=>{let{p:e,n:t}=Ag(Mg.p,Mg.q),n=(1n<<BigInt(30))-1n,r=new Uint8Array(8);crypto.getRandomValues(r);let i=0n;for(let e=0;e<8;e++)i=i<<8n|BigInt(r[e]);i&=n;let a=new Uint8Array(1);crypto.getRandomValues(a),a[0]&1&&(i=-i);let o=e+i;return o<=0n&&(o=e-i),{n:t.toString(),nearp:o.toString()}},f_={id:`partial-d`,name:`Partial d Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from low bits of d. Use when LSBs of private exponent d are leaked.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dLow`,label:`dLow (low bits of d)`,placeholder:`Enter known low bits of d...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.nearp},d_=()=>{let{p:e,n:t}=Ag(Mg.p,Mg.q),n=(1n<<BigInt(30))-1n,r=new Uint8Array(8);crypto.getRandomValues(r);let i=0n;for(let e=0;e<8;e++)i=i<<8n|BigInt(r[e]);i&=n;let a=new Uint8Array(1);crypto.getRandomValues(a),a[0]&1&&(i=-i);let o=e+i;return o<=0n&&(o=e-i),{n:t.toString(),nearp:o.toString()}},f_={id:`partial-d`,name:`Partial d Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from low bits of d. Use when LSBs of private exponent d are leaked.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dLow`,label:`dLow (low bits of d)`,placeholder:`Enter known low bits of d...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -2220,25 +2201,29 @@ p &= p_0 + x_0, \\quad q = n/p \\qed
             if n <= 0 or e <= 0 or dLow < 0:
                 print("PARTIAL_D=FAILED: invalid input values")
             else:
-                m = dLow.nbits()
+                # Use Python ints for fast iteration
+                n_int = int(n)
+                e_int = int(e)
+                dLow_int = int(dLow)
+                m = dLow_int.bit_length()
                 found = False
-                for k in range(1, e + 1):
-                    d_approx = (k * n + 1) // e
-                    if d_approx % (2**m) == dLow:
-                        d = d_approx
-                        phi = (e * d - 1) // k
-                        s = n - phi + 1
-                        disc = s*s - 4*n
+                for k in range(1, e_int + 1):
+                    d_approx = (k * n_int + 1) // e_int
+                    if (d_approx & ((1 << m) - 1)) == dLow_int:
+                        d_phi = (e_int * d_approx - 1) // k
+                        s = n_int - d_phi + 1
+                        disc = s * s - 4 * n_int
                         if disc >= 0:
-                            sqrt_disc = ZZ(disc).isqrt()
+                            sqrt_disc = math.isqrt(disc)
                             if sqrt_disc * sqrt_disc == disc:
-                                p = (s + sqrt_disc) // 2
-                                q = (s - sqrt_disc) // 2
-                                if p * q == n:
-                                    print(f"Verification: p * q = {p * q}")
-                                    print(f"d = {d}")
-                                    print(f"p = {p}")
-                                    print(f"q = {q}")
+                                p_candidate = (s + sqrt_disc) // 2
+                                if p_candidate > 1 and n_int % p_candidate == 0:
+                                    p_sage = Integer(p_candidate)
+                                    q_sage = n // p_sage
+                                    print(f"Verification: p * q = {p_sage * q_sage}")
+                                    print(f"d = {d_approx}")
+                                    print(f"p = {p_sage}")
+                                    print(f"q = {q_sage}")
                                     print()
                                     print("PARTIAL_D=SUCCESS")
                                     found = True
@@ -2394,7 +2379,8 @@ _attack()`,proof:`\\textbf{Theorem:} If $\\ge$ half the bits of $p$ are known (M
 p &= f(x_0), \\quad q = n/p \\qed
 \\end{align*}
 
-\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996; N. Howgrave-Graham, "Approximate Integer Common Divisors", 1997`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},h_=()=>{let{p:e,n:t}=Ag(256,256),n=e.toString(2).length,r=Math.ceil(n*.9),i=e>>BigInt(n-r);return{n:t.toString(),knownBits:i.toString(),bitPosition:`msb`}},g_={id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via brute-force search over k and d_p. Use when the CRT exponent d_p = d mod (p-1) is small (< bound). Each (k, d_p) pair gives a candidate p = (d_p * e - 1) / k + 1.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 1000000`,multiline:!1}],sageTemplate:e=>`def _attack():
+\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996; N. Howgrave-Graham, "Approximate Integer Common Divisors", 1997`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},h_=()=>{let{p:e,n:t}=Ag(256,256),n=e.toString(2).length,r=Math.ceil(n*.9),i=e>>BigInt(n-r);return{n:t.toString(),knownBits:i.toString(),bitPosition:`msb`}},g_={id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via brute-force search over k and d_p. Use when the CRT exponent d_p = d mod (p-1) is small (< bound). Each (k, d_p) pair gives a candidate p = (d_p * e - 1) / k + 1.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 1000000`,multiline:!1}],sageTemplate:e=>`import math
+def _attack():
     try:
         n = Integer(${e.n})
         e = Integer(${e.e})
@@ -2402,26 +2388,24 @@ p &= f(x_0), \\quad q = n/p \\qed
         if n <= 0 or e <= 0 or bound <= 0:
             print("SMALL_CRT_EXP=FAILED: invalid input values")
         else:
-            # RSA-CRT: d_p * e ≡ 1 (mod p-1), so d_p * e - 1 = k(p-1)
-            # Rearranged: p = (d_p * e - 1) / k + 1
-            # We brute-force k ∈ [1, e) and step through d_p candidates.
-            # For each k, d_p0 = e^(-1) mod k, then step d_p by k.
-            # Total iterations ≈ bound * H_e ≈ bound * 11 for e=65537,
-            # so bound=50000 gives ~550k iterations (< 5s in SageCell).
+            # Use Python ints for fast iteration (avoids Sage Integer overhead)
+            n_int = int(n)
+            e_int = int(e)
+            bound_int = int(bound)
             found = False
-            for k in range(1, e):
-                if gcd(e, k) != 1:
+            for k in range(1, e_int):
+                if math.gcd(e_int, k) != 1:
                     continue
-                dp0 = inverse_mod(e, k)
-                for dp in range(dp0, bound + 1, k):
-                    num = dp * e - 1
-                    p_candidate = num // k + 1
-                    if p_candidate > 1 and n % p_candidate == 0:
-                        q = n // p_candidate
-                        print(f"Verification: p * q = {p_candidate * q}")
+                dp0 = pow(e_int, -1, k)
+                for dp in range(dp0, bound_int + 1, k):
+                    p_candidate = (dp * e_int - 1) // k + 1
+                    if p_candidate > 1 and n_int % p_candidate == 0:
+                        p_sage = Integer(p_candidate)
+                        q_sage = n // p_sage
+                        print(f"Verification: p * q = {p_sage * q_sage}")
                         print(f"dp = {dp}")
-                        print(f"p = {p_candidate}")
-                        print(f"q = {q}")
+                        print(f"p = {p_sage}")
+                        print(f"q = {q_sage}")
                         print()
                         print("SMALL_CRT_EXP=SUCCESS")
                         found = True
@@ -2451,45 +2435,50 @@ p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
 \\end{align*}
 
 \\textbf{References:} Standard RSA-CRT analysis; see also Jochemsz-May attack on small CRT exponents`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},__=()=>{let e=65537n;for(let t=3n;t<10000n;t++){let n=t*e-1n;for(let t=1n;t<=e;t++){if(n%t!==0n)continue;let e=n/t+1n;if(e>2n&&Og(e))return{n:(e*kg(Mg.q)).toString(),e:`65537`,bound:`50000`}}}throw Error(`small-crt-exp: failed to generate testcase`)},v_={id:`dp-dq-leak`,name:`dp/dq Leak`,category:`Partial Key / Lattice`,description:`Recovers p from leaked d_p = d mod (p-1) or q from leaked d_q = d mod (q-1). Use when CRT exponents are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dp`,label:`dp (d mod p-1)`,placeholder:`Enter dp value...`,multiline:!0,rows:3},{name:`dq`,label:`dq (d mod q-1, optional)`,placeholder:`Enter dq value...`,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.e);if(t<=0n||n<=0n)return null;let r=2n;if(e.dp){let i=BigInt(e.dp);if(i>0n){let e=n*i-1n;if(e>0n){let n=og(ug(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(n*e).toString()}\ndp = ${i.toString()}\np = ${n.toString()}\nq = ${e.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}if(e.dq){let i=BigInt(e.dq);if(i>0n){let e=n*i-1n;if(e>0n){let n=og(ug(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(e*n).toString()}\ndq = ${i.toString()}\np = ${e.toString()}\nq = ${n.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}return null}catch{return null}},sageTemplate:e=>{let t=e.dp?`
-        dp = Integer(${e.dp})
-        if dp > 0:
-            num = dp * e - 1
-            for k in range(1, e):
+        dp_val = int(Integer(${e.dp}))
+        if dp_val > 0:
+            num = dp_val * e_int - 1
+            for k in range(1, e_int):
                 if num % k == 0:
                     p_candidate = num // k + 1
-                    if n % p_candidate == 0:
-                        q_val = n // p_candidate
-                        print(f"Verification: p * q = {p_candidate * q_val}")
-                        print(f"dp = {dp}")
-                        print(f"p = {p_candidate}")
+                    if p_candidate > 1 and n_int % p_candidate == 0:
+                        p_sage = Integer(p_candidate)
+                        q_val = n // p_sage
+                        print(f"Verification: p * q = {p_sage * q_val}")
+                        print(f"dp = {dp_val}")
+                        print(f"p = {p_sage}")
                         print(f"q = {q_val}")
                         print()
                         print("DP_DQ_LEAK=SUCCESS")
                         found = True
                         break`:``,n=e.dq?`
         if not found:
-            dq = Integer(${e.dq})
-            if dq > 0:
-                num = dq * e - 1
-                for k in range(1, e):
+            dq_val = int(Integer(${e.dq}))
+            if dq_val > 0:
+                num = dq_val * e_int - 1
+                for k in range(1, e_int):
                     if num % k == 0:
                         q_candidate = num // k + 1
-                        if n % q_candidate == 0:
-                            p_val = n // q_candidate
-                            print(f"Verification: p * q = {p_val * q_candidate}")
-                            print(f"dq = {dq}")
+                        if q_candidate > 1 and n_int % q_candidate == 0:
+                            p_val = n // Integer(q_candidate)
+                            q_sage = Integer(q_candidate)
+                            print(f"Verification: p * q = {p_val * q_sage}")
+                            print(f"dq = {dq_val}")
                             print(f"p = {p_val}")
-                            print(f"q = {q_candidate}")
+                            print(f"q = {q_sage}")
                             print()
                             print("DP_DQ_LEAK=SUCCESS")
                             found = True
-                            break`:``;return`def _attack():
+                            break`:``;return`import math
+def _attack():
     try:
         n = Integer(${e.n})
         e = Integer(${e.e})
         if n <= 0 or e <= 0:
             print("DP_DQ_LEAK=FAILED: invalid input values")
         else:
+            n_int = int(n)
+            e_int = int(e)
             found = False${t}${n}
             if not found:
                 print("DP_DQ_LEAK=FAILED: no valid factor found")
@@ -2511,7 +2500,8 @@ p &= (d_p \\cdot e - 1)/k + 1, \\quad \\text{verify } p \\mid n \\\\
 \\text{Symmetric for } d_q:\\quad q &= (d_q \\cdot e - 1)/k + 1 \\qed
 \\end{align*}
 
-\\textbf{References:} Standard RSA-CRT analysis; M. Campagna, A. Sethi, "Key Recovery Method for CRT Implementation of RSA"`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&(!!e.dp||!!e.dq)},y_=()=>{let{p:e,q:t,n,e:r,d:i}=Ag(Mg.p,Mg.q),a=i%(e-1n),o=i%(t-1n);return{n:n.toString(),e:r.toString(),dp:a.toString(),dq:o.toString()}},b_={id:`linearly-related-primes`,name:`Linearly Related Primes`,category:`Partial Key / Lattice`,description:`Factors n when q = k·p + δ. Use when primes have a linear relationship.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`k`,label:`k (known multiplier)`,placeholder:`Enter k value...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Standard RSA-CRT analysis; M. Campagna, A. Sethi, "Key Recovery Method for CRT Implementation of RSA"`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&(!!e.dp||!!e.dq)},y_=()=>{let{p:e,q:t,n,e:r,d:i}=Ag(Mg.p,Mg.q),a=i%(e-1n),o=i%(t-1n);return{n:n.toString(),e:r.toString(),dp:a.toString(),dq:o.toString()}},b_={id:`linearly-related-primes`,name:`Linearly Related Primes`,category:`Partial Key / Lattice`,description:`Factors n when q = k·p + δ. Use when primes have a linear relationship.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`k`,label:`k (known multiplier)`,placeholder:`Enter k value...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -2538,19 +2528,23 @@ p &= (d_p \\cdot e - 1)/k + 1, \\quad \\text{verify } p \\mid n \\\\
                 print(f"p = q = {p}")
                 print("LINEARLY_RELATED_PRIMES=SUCCESS")
                 return
+            # Use Python ints for fast iteration
+            n_int = int(n)
+            k_int = int(k)
             found = False
             for delta in range(-10000, 10001):
-                disc = delta*delta + 4*k*n
-                sqrt_disc = ZZ(disc).isqrt()
+                disc = delta * delta + 4 * k_int * n_int
+                sqrt_disc = math.isqrt(disc)
                 if sqrt_disc * sqrt_disc == disc:
                     num = -delta + sqrt_disc
-                    if num > 0 and num % (2*k) == 0:
-                        p = num // (2*k)
-                        if n % p == 0:
-                            q = n // p
-                            print(f"Verification: p * q = {p * q}")
-                            print(f"p = {p}")
-                            print(f"q = {q}")
+                    if num > 0 and num % (2 * k_int) == 0:
+                        p_candidate = num // (2 * k_int)
+                        if p_candidate > 1 and n_int % p_candidate == 0:
+                            p_sage = Integer(p_candidate)
+                            q_sage = n // p_sage
+                            print(f"Verification: p * q = {p_sage * q_sage}")
+                            print(f"p = {p_sage}")
+                            print(f"q = {q_sage}")
                             print(f"delta = {delta}")
                             print()
                             print("LINEARLY_RELATED_PRIMES=SUCCESS")
@@ -2580,7 +2574,8 @@ p &= \\frac{-\\delta + \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
 \\text{If so, } p &\\mid n \\implies \\text{found} \\qed
 \\end{align*}
 
-\\textbf{References:} A. Nitaj, "Cryptanalysis of RSA with Constrained Primes", 1999`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.k},x_=()=>{let e=kg(Mg.p),t=Math.random(),n=t<.4?1n:t<.7?2n:3n,r=BigInt(Math.floor(Math.random()*100)+1);Math.random()<.5&&(r=-r);let i=n*e+r;for(i<2n&&(i=n*e+BigInt(Math.abs(Number(r)))+2n),i%2n==0n&&(i+=1n);!Og(i)||i===e;)i+=2n;return{n:(e*i).toString(),k:n.toString()}},S_={id:`dependent-prime`,name:`Dependent-Prime RSA`,category:`Partial Key / Lattice`,description:`Factors n when q·e ≡ 1 (mod p). Use when q is derived from e and p via modular inverse.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} A. Nitaj, "Cryptanalysis of RSA with Constrained Primes", 1999`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.k},x_=()=>{let e=kg(Mg.p),t=Math.random(),n=t<.4?1n:t<.7?2n:3n,r=BigInt(Math.floor(Math.random()*100)+1);Math.random()<.5&&(r=-r);let i=n*e+r;for(i<2n&&(i=n*e+BigInt(Math.abs(Number(r)))+2n),i%2n==0n&&(i+=1n);!Og(i)||i===e;)i+=2n;return{n:(e*i).toString(),k:n.toString()}},S_={id:`dependent-prime`,name:`Dependent-Prime RSA`,category:`Partial Key / Lattice`,description:`Factors n when q·e ≡ 1 (mod p). Use when q is derived from e and p via modular inverse.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -2607,20 +2602,24 @@ p &= \\frac{-\\delta + \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
                 print(f"p = q = {p}")
                 print("DEPENDENT_PRIME=SUCCESS")
                 return
-            ne = n * e
+            # Use Python ints for fast iteration
+            n_int = int(n)
+            e_int = int(e)
+            ne_int = n_int * e_int
             found = False
             for k in range(1, 100001):
-                disc = 1 + 4*k*ne
-                sqrt_disc = ZZ(disc).isqrt()
+                disc = 1 + 4 * k * ne_int
+                sqrt_disc = math.isqrt(disc)
                 if sqrt_disc * sqrt_disc == disc:
                     num = -1 + sqrt_disc
-                    if num > 0 and num % (2*k) == 0:
-                        p = num // (2*k)
-                        if n % p == 0:
-                            q = n // p
-                            print(f"Verification: p * q = {p * q}")
-                            print(f"p = {p}")
-                            print(f"q = {q}")
+                    if num > 0 and num % (2 * k) == 0:
+                        p_candidate = num // (2 * k)
+                        if p_candidate > 1 and n_int % p_candidate == 0:
+                            p_sage = Integer(p_candidate)
+                            q_sage = n // p_sage
+                            print(f"Verification: p * q = {p_sage * q_sage}")
+                            print(f"p = {p_sage}")
+                            print(f"q = {q_sage}")
                             print(f"k = {k}")
                             print()
                             print("DEPENDENT_PRIME=SUCCESS")
@@ -2688,7 +2687,7 @@ print("COMMON_MODULUS=FAILED")`:`def _attack():
         print(f"ERROR: {e}")
         print("COMMON_MODULUS=FAILED")
     #
-_attack()`,proof:`\\textbf{Theorem:} Given c\\_1 \\equiv m^{e\\_1} \\pmod{n} and c\\_2 \\equiv m^{e\\_2} \\pmod{n} with \\gcd(e\\_1, e\\_2) = 1, recover m via Bezout coefficients.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.e1||!e.e2||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e1),r=BigInt(e.e2),i=BigInt(e.c1),a=BigInt(e.c2);if(og(n,r)!==1n)return Promise.resolve(null);let{x:o,y:s}=cg(n,r),c;if(o<0n){let e=lg(i,t);if(!e)return Promise.resolve(null);c=ug(e,-o,t)}else c=ug(i,o,t);let l;if(s<0n){let e=lg(a,t);if(!e)return Promise.resolve(null);l=ug(e,-s,t)}else l=ug(a,s,t);let u=c*l%t,d=ug(u,n,t),f=ug(u,r,t);return d===i&&f===a?Promise.resolve(`Recovered message: m = ${u}`):Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given c\\_1 \\equiv m^{e\\_1} \\pmod{n} and c\\_2 \\equiv m^{e\\_2} \\pmod{n} with \\gcd(e\\_1, e\\_2) = 1, recover m via Bezout coefficients.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2709,6 +2708,7 @@ print("COPPERSMITH_SHORT_PAD=FAILED")`:`def _attack():
     try:
         n = Integer(${e.n})
         e = Integer(${e.e})
+        e_int = int(e)
         c1 = Integer(${e.c1})
         c2 = Integer(${e.c2})
         # Pure Python integer e-th root via binary search
@@ -2733,8 +2733,8 @@ print("COPPERSMITH_SHORT_PAD=FAILED")`:`def _attack():
         m2_val = None
         # Method 1: Sage's built-in nth_root
         try:
-            m1_t, exact1 = c1.nth_root(int(e), truncate_mode=True)
-            m2_t, exact2 = c2.nth_root(int(e), truncate_mode=True)
+            m1_t, exact1 = c1.nth_root(e_int, truncate_mode=True)
+            m2_t, exact2 = c2.nth_root(e_int, truncate_mode=True)
             if exact1 and exact2:
                 m1_val = Integer(m1_t)
                 m2_val = Integer(m2_t)
@@ -2742,26 +2742,26 @@ print("COPPERSMITH_SHORT_PAD=FAILED")`:`def _attack():
             pass
         # Method 2: Pure Python binary search (avoids Sage nth_root bugs)
         if m1_val is None:
-            cand = integer_root(c1, int(e))
-            if cand**int(e) == c1:
+            cand = integer_root(c1, e_int)
+            if cand**e_int == c1:
                 m1_val = cand
         if m2_val is None:
-            cand = integer_root(c2, int(e))
-            if cand**int(e) == c2:
+            cand = integer_root(c2, e_int)
+            if cand**e_int == c2:
                 m2_val = cand
         # Method 3: If only one found, brute-force delta (range covers testcase)
         if m1_val is None and m2_val is not None:
             for d in range(1, 256):
-                if (m2_val - d)**int(e) == c1:
+                if (m2_val - d)**e_int == c1:
                     m1_val = m2_val - d
                     break
         if m2_val is None and m1_val is not None:
             for d in range(1, 256):
-                if (m1_val + d)**int(e) == c2:
+                if (m1_val + d)**e_int == c2:
                     m2_val = m1_val + d
                     break
         if m1_val is not None and m2_val is not None:
-            if power_mod(m1_val, e, n) == c1 and power_mod(m2_val, e, n) == c2:
+            if pow(int(m1_val), e_int, int(n)) == c1 and pow(int(m2_val), e_int, int(n)) == c2:
                 delta_val = m2_val - m1_val
                 print(f"Found messages: m1 = {m1_val}, m2 = {m2_val}, delta = {delta_val}")
                 print()
@@ -2882,22 +2882,23 @@ print("HASTAD_LINEAR_PAD=FAILED")`:`def _attack():
                 # Uses Horner evaluation for fast modular arithmetic
                 # (avoid power_mod which is slow in SageCell loops).
                 if found_m is None:
-                    print("Attempting brute-force search for small m...")
-                    a_arr = [t[2] for t in triples]
-                    b_arr = [t[3] for t in triples]
-                    n_arr = [t[0] for t in triples]
-                    c_arr = [t[1] for t in triples]
+                    out = []
+                    out.append("Attempting brute-force search for small m...")
+                    a_int = [int(t[2]) for t in triples]
+                    b_int = [int(t[3]) for t in triples]
+                    n_int = [int(t[0]) for t in triples]
+                    c_int = [int(t[1]) for t in triples]
                     # Precompute Horner coefficients for (a*m+b)^3 - c:
                     # ai^3*m^3 + 3*ai^2*bi*m^2 + 3*ai*bi^2*m + (bi^3-ci)
                     coeffs = []
                     for i in range(len(triples)):
-                        ai = a_arr[i]; bi = b_arr[i]; ni = n_arr[i]
-                        A = (ai**3) % ni
-                        B = (3 * ai**2 * bi) % ni
-                        C = (3 * ai * bi**2) % ni
-                        D = (bi**3 - c_arr[i]) % ni
+                        ai = a_int[i]; bi = b_int[i]; ni = n_int[i]
+                        A = pow(ai, 3, ni)
+                        B = (3 * ai * ai * bi) % ni
+                        C = (3 * ai * bi * bi) % ni
+                        D = (bi * bi * bi - c_int[i]) % ni
                         coeffs.append((ni, A, B, C, D))
-                    limit = 2 * 10**6
+                    limit = 5 * 10**5
                     for m_candidate in range(limit):
                         ok = True
                         for ni, A, B, C, D in coeffs:
@@ -2910,16 +2911,17 @@ print("HASTAD_LINEAR_PAD=FAILED")`:`def _attack():
                                 break
                         if ok:
                             found_m = m_candidate
-                            print(f"Brute-force recovered message: m = {found_m}")
+                            out.append(f"Brute-force recovered message: m = {found_m}")
                             break
-                        if m_candidate % 500000 == 0 and m_candidate > 0:
-                            print(f"  Searched up to m = {m_candidate}...")
+                        if m_candidate % 200000 == 0 and m_candidate > 0:
+                            out.append(f"  Searched up to m = {m_candidate}...")
+                    print("\\n".join(out))
             if found_m is not None:
                 m = Integer(found_m)
                 print("Verifying recovered message...")
                 all_ok = True
                 for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
-                    v = power_mod(a_i * m + b_i, e, n_i)
+                    v = pow(int(a_i) * int(m) + int(b_i), int(e), int(n_i))
                     ok = v == c_i
                     if not ok:
                         all_ok = False
@@ -2956,7 +2958,7 @@ F(m) &\\equiv 0 \\pmod{N} \\\\
 m &= small\\_roots(F) \\qed
 \\end{align*}
 
-\\textbf{References:} J. Hastad, Eurocrypt 1988; Coppersmith et al., 1996`,priority:`medium`,applicableCheck:e=>!!e.triples&&!!e.e},k_=()=>{let e=BigInt(Math.floor(Math.random()*1e6)+42),t=[];for(let n=0;n<3;n++){let{n}=Ag(256,256),r=BigInt(Math.floor(Math.random()*100)+1),i=BigInt(Math.floor(Math.random()*1e3));t.push(`${n},${jg((r*e+i)%n,n,3n)},${r},${i}`)}return{triples:t.join(`
+\\textbf{References:} J. Hastad, Eurocrypt 1988; Coppersmith et al., 1996`,priority:`medium`,applicableCheck:e=>!!e.triples&&!!e.e},k_=()=>{let e=BigInt(Math.floor(Math.random()*1e4)+42),t=[];for(let n=0;n<3;n++){let{n}=Ag(256,256),r=BigInt(Math.floor(Math.random()*100)+1),i=BigInt(Math.floor(Math.random()*1e3));t.push(`${n},${jg((r*e+i)%n,n,3n)},${r},${i}`)}return{triples:t.join(`
 `),e:`3`}},A_={id:`lsb-oracle`,name:`LSB Oracle Attack`,category:`Oracle`,description:`Recovers m via LSB oracle. Use when an oracle reveals LSB(decrypt(c·2^e mod n)).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated LSB bits)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         # LSB Oracle Attack — binary search via 2^e blinding
@@ -2974,21 +2976,23 @@ m &= small\\_roots(F) \\qed
             print("LSB_ORACLE=FAILED")
             return
         try:
+            out = []
             n = Integer(${e.n})
             e_val = "${e.e}".strip()
             e = Integer(e_val) if e_val else Integer(65537)
             c = Integer(${e.c})
             orig_c = c
             oracle_bits = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
-            print("LSB Oracle Attack on RSA")
-            print(f"n = {n} ({n.nbits()} bits)")
-            print(f"e = {e}")
-            print(f"Oracle responses: {len(oracle_bits)} bits")
-            print()
+            two_e = pow(2, int(e), int(n))
+            out.append("LSB Oracle Attack on RSA")
+            out.append(f"n = {n} ({n.nbits()} bits)")
+            out.append(f"e = {e}")
+            out.append(f"Oracle responses: {len(oracle_bits)} bits")
+            out.append("")
             if len(oracle_bits) < n.nbits():
-                print(f"WARNING: Need {n.nbits()} responses for full recovery, got {len(oracle_bits)}.")
-                print("Result may be approximate.")
-                print()
+                out.append(f"WARNING: Need {n.nbits()} responses for full recovery, got {len(oracle_bits)}.")
+                out.append("Result may be approximate.")
+                out.append("")
             # Binary search using LSB oracle with 2^e blinding
             # Use QQ (rational) arithmetic to avoid integer-division convergence errors.
             # LSB(m * 2^(i+1) mod n) = 1 iff m >= n / 2^(i+1) (since n is odd)
@@ -2996,29 +3000,31 @@ m &= small\\_roots(F) \\qed
             upper = QQ(n)
             for i, bit in enumerate(oracle_bits):
                 mid = (lower + upper) / 2
-                c = (c * power_mod(Integer(2), e, n)) % n
+                c = Integer((int(c) * two_e) % int(n))
                 if bit == 0:
                     upper = mid
                 else:
                     lower = mid
                 if i < 5 or i % 50 == 0:
                     remaining = n.nbits() - i - 1
-                    print(f"  Step {i+1}: LSB={bit}, interval ~ [{lower.numerator()}/{lower.denominator()}, {upper.numerator()}/{upper.denominator()}], remaining ~ {max(0, remaining)} bits")
-            print()
+                    out.append(f"  Step {i+1}: LSB={bit}, interval ~ [{lower.numerator()}/{lower.denominator()}, {upper.numerator()}/{upper.denominator()}], remaining ~ {max(0, remaining)} bits")
+            out.append("")
             # Scan exact candidates from integer hull of rational interval
             lo_int = floor(lower)
             hi_int = ceil(upper)
             for m_candidate in range(lo_int, hi_int + 1):
                 m = Integer(m_candidate)
-                if power_mod(m, e, n) == orig_c:
-                    print(f"Recovered message: m = {m}")
-                    print("LSB_ORACLE=SUCCESS")
+                if pow(int(m), int(e), int(n)) == int(orig_c):
+                    out.append(f"Recovered message: m = {m}")
+                    out.append("LSB_ORACLE=SUCCESS")
                     break
             else:
-                print(f"LSB_ORACLE=FAILED (scanned {lo_int}..{hi_int})")
+                out.append(f"LSB_ORACLE=FAILED (scanned {lo_int}..{hi_int})")
+            print("\\n".join(out))
         except Exception as ex:
-            print(f"ERROR: {ex}")
-            print("LSB_ORACLE=FAILED")
+            out.append(f"ERROR: {ex}")
+            out.append("LSB_ORACLE=FAILED")
+            print("\\n".join(out))
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("LSB_ORACLE=FAILED")
@@ -3094,7 +3100,7 @@ print("RSA_CRT_FAULT=FAILED")`:`def _attack():
         print(f"ERROR: {e}")
         print("RSA_CRT_FAULT=FAILED")
     #
-_attack()`,proof:`\\textbf{Theorem:} A single faulty CRT signature s' on known m factors n via \\gcd(s'^e - m, n).
+_attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.m||!e.sig_faulty)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.m),i=og(ug(BigInt(e.sig_faulty),n,t)-r,t);if(i>1n&&i<t){let e=t/i,r=lg(n,(i-1n)*(e-1n)),a=r?`\nPrivate exponent d = ${r}`:``;return Promise.resolve(`Factor found!\np = ${i}\nq = ${e}${a}`)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} A single faulty CRT signature s' on known m factors n via \\gcd(s'^e - m, n).
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -3304,46 +3310,7 @@ m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\\\
 \\#\\text{solutions} &= 3 \\times 3 = 9 \\qed
 \\end{align*}
 
-\\textbf{References:} Williams, 1980; Rabin, 1979`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.c&&!!e.p&&!!e.q},L_=()=>{function e(e){for(;;){let t=kg(e);if(t%3n==1n)return t}}let t=e(Mg.p),n=e(Mg.q),r=t*n,i=ug(BigInt(Math.floor(Math.random()*1e4)+42),3n,r);return{n:r.toString(),c:i.toString(),p:t.toString(),q:n.toString()}},R_={id:`common-factor`,name:`Common Factor Attack`,category:`Factorization`,description:`Recovers p when p divides m. Use when gcd(c, n) > 1.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.c?`print("ERROR: Missing required inputs (n, c)")
-print("COMMON_FACTOR=FAILED")`:`def _attack():
-    try:
-        n = Integer(${e.n})
-        c = Integer(${e.c})
-        print(f"Common Factor Attack")
-        print(f"n = {n}")
-        print(f"c = {c}")
-        print()
-        g = gcd(c, n)
-        print(f"gcd(c, n) = {g}")
-        if g == 1:
-            print("gcd(c, n) = 1. No common factor. Message is not a multiple of p or q.")
-            print("This attack does not apply.")
-            print("COMMON_FACTOR=FAILED")
-        elif g == n:
-            print("gcd(c, n) = n. c is a multiple of n (c = 0 mod n).")
-            print("The message m was 0 or a multiple of n.")
-            print("COMMON_FACTOR=FAILED")
-        else:
-            p = g
-            q = n // g
-            print(f"\\nCommon factor found!")
-            print(f"Verification: p * q = {p * q}")
-            print(f"p is prime: {p.is_prime()}")
-            print(f"q is prime: {q.is_prime()}")
-            print(f"p = {p}")
-            print(f"q = {q}")
-            if p.is_prime() and q.is_prime():
-                print(f"\\nThe message m is a multiple of p = {p}")
-                print(f"m = k * {p} for some integer k")
-                print()
-                print("COMMON_FACTOR=SUCCESS")
-            else:
-                print("gcd(c, n) did not yield valid prime factors.")
-                print("COMMON_FACTOR=FAILED")
-    except Exception as e:
-        print(f"ERROR: {e}")
-        print("COMMON_FACTOR=FAILED")
-_attack()`,frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.c),r=og(n,t);if(r===1n||r===t)return null;let i=r,a=t/r;return[`Common Factor Attack (browser-side, BigInt)`,`n = ${t}`,`c = ${n}`,`gcd(c, n) = ${r}`,``,`Common factor found!`,`p = ${i}`,`q = ${a}`,`Verification: p * q = ${i*a}`,`COMMON_FACTOR=SUCCESS`].join(`
+\\textbf{References:} Williams, 1980; Rabin, 1979`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.c&&!!e.p&&!!e.q},L_=()=>{function e(e){for(;;){let t=kg(e);if(t%3n==1n)return t}}let t=e(Mg.p),n=e(Mg.q),r=t*n,i=ug(BigInt(Math.floor(Math.random()*1e4)+42),3n,r);return{n:r.toString(),c:i.toString(),p:t.toString(),q:n.toString()}},R_={id:`common-factor`,name:`Common Factor Attack`,category:`Factorization`,description:`Recovers p when p divides m. Use when gcd(c, n) > 1.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3}],sageTemplate:()=>`print("COMMON_FACTOR=FAILED")`,frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.c),r=og(n,t);if(r===1n||r===t)return null;let i=r,a=t/r;return[`Common Factor Attack (browser-side, BigInt)`,`n = ${t}`,`c = ${n}`,`gcd(c, n) = ${r}`,``,`Common factor found!`,`p = ${i}`,`q = ${a}`,`Verification: p * q = ${i*a}`,`COMMON_FACTOR=SUCCESS`].join(`
 `)}catch{return null}},proof:`\\textbf{Theorem:} If \\gcd(m,n) > 1, then \\gcd(c,n) reveals a factor of n.
 
 \\textbf{Setup:}
@@ -3362,6 +3329,7 @@ q &= n/p \\qed
 
 \\textbf{References:} Menezes et al., "HAC"; Boneh, 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.c},z_=()=>{let{p:e,n:t,e:n}=Ag(Mg.p,Mg.q),r=jg(e*BigInt(Math.floor(Math.random()*1e3)+2),t,n);return{n:t.toString(),c:r.toString()}},B_={id:`homomorphic-forgery`,name:`Homomorphic Forgery Attack`,category:`Message / Protocol`,description:`Forges signature via multiplicative property. Use when oracle signs chosen messages.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`target_m`,label:`Target message to forge`,placeholder:`Enter target message...`,multiline:!0,rows:3},{name:`oracle_pairs`,label:`Oracle pairs (m,s semicolon-separated)`,placeholder:`m1,s1;m2,s2;m3,s3...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.target_m||!e.oracle_pairs?`print("ERROR: Missing required inputs (n, e, target_m, oracle_pairs)")
 print("HOMOMORPHIC_FORGERY=FAILED")`:`def _attack():
+    from itertools import combinations
     try:
         n = Integer(${e.n})
         e = Integer(${e.e})
@@ -3396,13 +3364,12 @@ print("HOMOMORPHIC_FORGERY=FAILED")`:`def _attack():
         print(f"Oracle pairs: {len(oracle_pairs)}")
         # Verify oracle pairs
         for i, (m_i, s_i) in enumerate(oracle_pairs):
-            v = power_mod(s_i, e, n)
+            v = Integer(pow(int(s_i), int(e), int(n)))
             valid = "OK" if v == m_i else "FAIL"
             print(f"Pair {i+1}: s_i^e mod n = {v}, m_i = {m_i} [{valid}]")
         # Multiplicative forgery: compute product of all oracle signatures
         # If target_m = product of oracle messages (mod n), then
         # forged_sig = product of oracle signatures (mod n)
-        from itertools import combinations
         found = False
         for r in range(1, len(oracle_pairs) + 1):
             for combo in combinations(range(len(oracle_pairs)), r):
@@ -3413,7 +3380,7 @@ print("HOMOMORPHIC_FORGERY=FAILED")`:`def _attack():
                     prod_m = (prod_m * m_i) % n
                     prod_s = (prod_s * s_i) % n
                 if prod_m == target_m % n:
-                    v = power_mod(prod_s, e, n)
+                    v = Integer(pow(int(prod_s), int(e), int(n)))
                     if v == target_m % n:
                         print(f"Forged signature from pairs {[i+1 for i in combo]}: {prod_s}")
                         print(f"Verification: sig^e mod n = {v}")
@@ -3546,33 +3513,35 @@ S^3 &= \\text{target} + \\varepsilon, \\quad 0 \\leq \\varepsilon < 3S^2
             print("BLEICHENBACHER=FAILED")
             return
         try:
+            out = []
             n = Integer(${e.n})
             e = Integer(${e.e})
             c = Integer(${e.c})
             orig_c = Integer(${e.c})
             oracle_bits = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
-            print(f"Bleichenbacher PKCS#1 v1.5 Attack")
-            print(f"n = {n} ({n.nbits()} bits)")
-            print(f"e = {e}")
-            print(f"c = {c}")
-            print(f"Oracle responses: {len(oracle_bits)}")
-            print()
+            out.append(f"Bleichenbacher PKCS#1 v1.5 Attack")
+            out.append(f"n = {n} ({n.nbits()} bits)")
+            out.append(f"e = {e}")
+            out.append(f"c = {c}")
+            out.append(f"Oracle responses: {len(oracle_bits)}")
+            out.append("")
             # PKCS#1 v1.5: EM = 0x00 || 0x02 || PS || 0x00 || M
             # Valid padding: 2B <= m < 3B where B = 2^(8*(k-2)), k = byte length
             k = (n.nbits() + 7) // 8
             B = Integer(2)**(8 * (k - 2))
-            print(f"Block size: {k} bytes, B = 2^(8*{k-2})")
-            print(f"Valid padding range: [2B, 3B) = [{2*B}, {3*B})")
-            print()
+            out.append(f"Block size: {k} bytes, B = 2^(8*{k-2})")
+            out.append(f"Valid padding range: [2B, 3B) = [{2*B}, {3*B})")
+            out.append("")
             # Collect valid s values from oracle responses
             valid_s = [Integer(i + 1) for i, r in enumerate(oracle_bits) if r == 1]
-            print(f"Valid padding responses: {len(valid_s)}")
+            out.append(f"Valid padding responses: {len(valid_s)}")
             if len(valid_s) < 2:
-                print("Need at least 2 valid responses for interval narrowing")
-                print("BLEICHENBACHER=FAILED")
+                out.append("Need at least 2 valid responses for interval narrowing")
+                out.append("BLEICHENBACHER=FAILED")
+                print("\\n".join(out))
                 return
             s1 = valid_s[0]
-            print(f"s1 = {s1}")
+            out.append(f"s1 = {s1}")
             # Initial interval from s1
             if s1 == 1:
                 a = 2 * B
@@ -3589,8 +3558,8 @@ S^3 &= \\text{target} + \\varepsilon, \\quad 0 \\leq \\varepsilon < 3S^2
                         a = inter_a
                         b = inter_b
                         break
-            print(f"Initial interval: [{a}, {b}], size={(b-a+1).nbits()} bits")
-            print()
+            out.append(f"Initial interval: [{a}, {b}], size={(b-a+1).nbits()} bits")
+            out.append("")
             # Narrow using remaining valid s values
             for idx in range(1, min(len(valid_s), 50)):
                 s = valid_s[idx]
@@ -3614,31 +3583,33 @@ S^3 &= \\text{target} + \\varepsilon, \\quad 0 \\leq \\varepsilon < 3S^2
                     a = new_a
                     b = new_b
                     if idx < 5 or b - a < (B) // 10:
-                        print(f"Step {idx}: s={s}, interval=[{a}, {b}], size={(b-a+1).nbits()} bits")
+                        out.append(f"Step {idx}: s={s}, interval=[{a}, {b}], size={(b-a+1).nbits()} bits")
                 else:
-                    print(f"Step {idx}: s={s}, no valid interval intersection")
-            print()
+                    out.append(f"Step {idx}: s={s}, no valid interval intersection")
+            out.append("")
             if a == b:
                 m = a
-                print(f"Exact message recovered: m = {m}")
+                out.append(f"Exact message recovered: m = {m}")
             else:
                 m = (a + b) // 2
-                print(f"Estimated message: m = {m}")
-                print(f"Final interval: [{a}, {b}]")
-                print(f"Uncertainty: {(b-a+1).nbits()} bits")
+                out.append(f"Estimated message: m = {m}")
+                out.append(f"Final interval: [{a}, {b}]")
+                out.append(f"Uncertainty: {(b-a+1).nbits()} bits")
             # Verify
-            v = power_mod(m, e, n)
-            print(f"Verification: m^e mod n = {v}")
-            print(f"Original c = {orig_c}")
+            v = Integer(pow(int(m), int(e), int(n)))
+            out.append(f"Verification: m^e mod n = {v}")
+            out.append(f"Original c = {orig_c}")
             if v == orig_c:
-                print("VERIFICATION PASSED!")
-                print("BLEICHENBACHER=SUCCESS")
+                out.append("VERIFICATION PASSED!")
+                out.append("BLEICHENBACHER=SUCCESS")
             else:
-                print("Verification failed - may need more oracle responses")
-                print("BLEICHENBACHER=FAILED")
+                out.append("Verification failed - may need more oracle responses")
+                out.append("BLEICHENBACHER=FAILED")
+            print("\\n".join(out))
         except Exception as ex:
-            print(f"ERROR: {ex}")
-            print("BLEICHENBACHER=FAILED")
+            out.append(f"ERROR: {ex}")
+            out.append("BLEICHENBACHER=FAILED")
+            print("\\n".join(out))
         #
     except BaseException as ex:
         print(f"ERROR: {ex}")
@@ -3686,6 +3657,7 @@ b - a = 0 &\\implies m = a \\qed
             print("MANGER=FAILED")
             return
         try:
+            out = []
             n = Integer(${e.n})
             e = Integer(${e.e})
             c = Integer(${e.c})
@@ -3698,7 +3670,7 @@ b - a = 0 &\\implies m = a \\qed
                 """Simulate oracle using pre-computed responses.
                 Returns True (1) if decrypted value >= B, False (0) if < B."""
                 if oracle_idx[0] >= len(oracle_list):
-                    print(f"WARNING: ran out of oracle responses at index {oracle_idx[0]}")
+                    out.append(f"WARNING: ran out of oracle responses at index {oracle_idx[0]}")
                     return False
                 result = oracle_list[oracle_idx[0]] == 1
                 oracle_idx[0] += 1
@@ -3707,51 +3679,51 @@ b - a = 0 &\\implies m = a \\qed
                 return (a + b - 1) // b
             def floor_div(a, b):
                 return a // b
-            print(f"Manger's OAEP Attack (3-step algorithm)")
-            print(f"n = {n} ({n.nbits()} bits)")
-            print(f"e = {e}")
-            print(f"c = {c}")
+            out.append(f"Manger's OAEP Attack (3-step algorithm)")
+            out.append(f"n = {n} ({n.nbits()} bits)")
+            out.append(f"e = {e}")
+            out.append(f"c = {c}")
             #
             # k = byte length of n, B = 2^(8*(k-1))
             k = ceil_div(n.nbits(), 8)
             B = Integer(2) ** (8 * (k - 1))
-            print(f"k = {k}, B = 2^(8*{k-1}) = {B}")
-            print(f"2*B = {2*B}, 2*B < n: {2*B < n}")
-            print()
+            out.append(f"k = {k}, B = 2^(8*{k-1}) = {B}")
+            out.append(f"2*B = {2*B}, 2*B < n: {2*B < n}")
+            out.append("")
             #
             queries_used = [0]
             #
             # Step 1: Find f1 such that f1*m mod n >= B
             # Start with f1=2, double until oracle returns True (>= B)
-            print("=== Step 1: Finding f1 ===")
+            out.append("=== Step 1: Finding f1 ===")
             f1 = Integer(2)
-            while not oracle((power_mod(f1, e, n) * c) % n):
+            while not oracle((pow(int(f1), int(e), int(n)) * c) % n):
                 queries_used[0] += 1
                 f1 *= 2
             queries_used[0] += 1
-            print(f"f1 = {f1} (f1*m mod n >= B confirmed)")
-            print()
+            out.append(f"f1 = {f1} (f1*m mod n >= B confirmed)")
+            out.append("")
             #
             # Step 2: Find f2 such that f2*m mod n < B (wrapped around)
             # Start: f2 = floor((n+B)/B) * f1/2
             # Increment by f1/2 until oracle returns False (< B)
-            print("=== Step 2: Finding f2 ===")
+            out.append("=== Step 2: Finding f2 ===")
             f1_half = f1 // 2
             f2 = floor_div(n + B, B) * f1_half
-            while oracle((power_mod(f2, e, n) * c) % n):
+            while oracle((pow(int(f2), int(e), int(n)) * c) % n):
                 queries_used[0] += 1
                 f2 += f1_half
             queries_used[0] += 1
-            print(f"f2 = {f2} (f2*m mod n < B, wrapped to [n, n+B))")
-            print()
+            out.append(f"f2 = {f2} (f2*m mod n < B, wrapped to [n, n+B))")
+            out.append("")
             #
             # Step 3: Binary search to narrow [mmin, mmax] to single value
-            print("=== Step 3: Binary search ===")
+            out.append("=== Step 3: Binary search ===")
             mmin = ceil_div(n, f2)
             mmax = floor_div(n + B, f2)
-            print(f"Initial: mmin={mmin}, mmax={mmax}")
-            print(f"Range size: {(mmax - mmin).nbits()} bits")
-            print()
+            out.append(f"Initial: mmin={mmin}, mmax={mmax}")
+            out.append(f"Range size: {(mmax - mmin).nbits()} bits")
+            out.append("")
             #
             step_count = 0
             twoB = Integer(2) * B
@@ -3763,7 +3735,7 @@ b - a = 0 &\\implies m = a \\qed
                 if f3 == 0:
                     f3 = Integer(1)
                 # Query oracle with f3
-                oracle_result = oracle((power_mod(f3, e, n) * c) % n)
+                oracle_result = oracle((pow(int(f3), int(e), int(n)) * c) % n)
                 queries_used[0] += 1
                 iNB = i_val * n + B
                 if oracle_result:
@@ -3773,32 +3745,34 @@ b - a = 0 &\\implies m = a \\qed
                     # f3*m mod n < B => mmax = floor((i*n + B) / f3)
                     mmax = floor_div(iNB, f3)
                 if step_count <= 5 or (mmax - mmin) <= Integer(2):
-                    print(f"Step {step_count}: f3={f3}, oracle={oracle_result}, mmin={mmin}, mmax={mmax}, range={(mmax-mmin).nbits()} bits")
+                    out.append(f"Step {step_count}: f3={f3}, oracle={oracle_result}, mmin={mmin}, mmax={mmax}, range={(mmax-mmin).nbits()} bits")
         #
             #
             m = mmin
-            print(f"Recovered message: m = {m}")
-            print(f"Total oracle queries: {queries_used[0]}")
-            print(f"Total binary search steps: {step_count}")
+            out.append(f"Recovered message: m = {m}")
+            out.append(f"Total oracle queries: {queries_used[0]}")
+            out.append(f"Total binary search steps: {step_count}")
             #
             # Verify
-            v = power_mod(m, e, n)
-            print(f"Verification: m^e mod n = {v}")
-            print(f"Original c = {orig_c}")
+            v = Integer(pow(int(m), int(e), int(n)))
+            out.append(f"Verification: m^e mod n = {v}")
+            out.append(f"Original c = {orig_c}")
             if v == orig_c:
-                print("VERIFICATION PASSED!")
-                print()
-                print("MANGER=SUCCESS")
+                out.append("VERIFICATION PASSED!")
+                out.append("")
+                out.append("MANGER=SUCCESS")
             else:
-                print("Verification failed - may need more oracle responses")
-                print(f"m^e mod n = {v}")
-                print(f"c = {orig_c}")
-                print()
-                print("MANGER=FAILED")
+                out.append("Verification failed - may need more oracle responses")
+                out.append(f"m^e mod n = {v}")
+                out.append(f"c = {orig_c}")
+                out.append("")
+                out.append("MANGER=FAILED")
+            print("\\n".join(out))
         #
         except Exception as ex:
-            print(f"ERROR: {ex}")
-            print("MANGER=FAILED")
+            out.append(f"ERROR: {ex}")
+            out.append("MANGER=FAILED")
+            print("\\n".join(out))
         #
     except BaseException as ex:
         print(f"ERROR: {ex}")
@@ -3840,11 +3814,13 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r+1)}{256s} \\ri
             print("BIASED_LSB=FAILED")
             return
         try:
+            out = []
             n = Integer(${e.n})
             e_val = "${e.e}".strip()
             e = Integer(e_val) if e_val else Integer(65537)
             orig_c = Integer(${e.c})
-            c = (Integer(${e.c}) * power_mod(Integer(2), e, n)) % n
+            two_e = pow(2, int(e), int(n))
+            c = (Integer(${e.c}) * Integer(two_e)) % n
             # Parse oracle runs (multiple response strings, newline-separated)
             runs_str = """${e.oracle_runs}""".strip()
             runs = []
@@ -3858,24 +3834,24 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r+1)}{256s} \\ri
                 print("ERROR: No valid oracle runs parsed")
                 print("BIASED_LSB=FAILED")
                 return
-            print(f"Biased LSB Oracle Attack")
-            print(f"n = {n}")
-            print(f"e = {e}")
-            print(f"c = {c}")
-            print(f"Number of oracle runs: {len(runs)}")
-            print()
+            out.append(f"Biased LSB Oracle Attack")
+            out.append(f"n = {n}")
+            out.append(f"e = {e}")
+            out.append(f"c = {c}")
+            out.append(f"Number of oracle runs: {len(runs)}")
+            out.append("")
             # Per-bit majority voting, then binary search
             num_bits = min(len(r) for r in runs)
             n_bits = n.nbits()
-            print(f"Using {num_bits} bit positions (n has {n_bits} bits)")
+            out.append(f"Using {num_bits} bit positions (n has {n_bits} bits)")
             # Majority voting
             voted_bits = []
             for i in range(num_bits):
                 votes = sum(runs[j][i] for j in range(len(runs)))
                 majority = 1 if votes > len(runs) / 2 else 0
                 voted_bits.append(majority)
-            print(f"Majority-voted bits: {voted_bits[:20]}{'...' if num_bits > 20 else ''}")
-            print()
+            out.append(f"Majority-voted bits: {voted_bits[:20]}{'...' if num_bits > 20 else ''}")
+            out.append("")
             # Binary search with voted bits using exact rational division
             # NOTE: Must use /2 (Rational) not //2 (floor division) to avoid
             # accumulated truncation errors that exclude m from the interval.
@@ -3887,9 +3863,9 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r+1)}{256s} \\ri
                     upper = mid
                 else:
                     lower = mid
-                c = (c * power_mod(Integer(2), e, n)) % n
+                c = Integer((int(c) * two_e) % int(n))
                 if i < 5 or i >= len(voted_bits) - 3:
-                    print(f"Step {i+1}: bit={bit}, lower={lower}, upper={upper}")
+                    out.append(f"Step {i+1}: bit={bit}, lower={lower}, upper={upper}")
             # Scan candidates near the rational interval [lower, upper)
             # After log2(n) steps, interval should contain exactly one integer
             from math import ceil, floor
@@ -3898,7 +3874,7 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r+1)}{256s} \\ri
             found_m = None
             for m_candidate in range(candidate_start, candidate_end + 1):
                 m_test = Integer(m_candidate)
-                if power_mod(m_test, e, n) == orig_c:
+                if pow(int(m_test), int(e), int(n)) == int(orig_c):
                     found_m = m_test
                     break
             if found_m is None:
@@ -3906,25 +3882,27 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r+1)}{256s} \\ri
                 mid_est = Integer(floor((lower + upper) / 2))
                 for m_candidate in range(max(0, mid_est - 500), mid_est + 501):
                     m_test = Integer(m_candidate)
-                    if power_mod(m_test, e, n) == orig_c:
+                    if pow(int(m_test), int(e), int(n)) == int(orig_c):
                         found_m = m_test
                         break
             if found_m is not None:
-                print(f"\\nRecovered message: m = {found_m}")
-                v = power_mod(found_m, e, n)
-                print(f"Verification: m^e mod n = {v}")
-                print(f"Original c = {orig_c}")
-                print("VERIFICATION PASSED!")
-                print()
-                print("BIASED_LSB=SUCCESS")
+                out.append(f"\\nRecovered message: m = {found_m}")
+                v = Integer(pow(int(found_m), int(e), int(n)))
+                out.append(f"Verification: m^e mod n = {v}")
+                out.append(f"Original c = {orig_c}")
+                out.append("VERIFICATION PASSED!")
+                out.append("")
+                out.append("BIASED_LSB=SUCCESS")
             else:
-                print(f"\\nCandidate scan failed to find m in range [{candidate_start}, {candidate_end}]")
-                print("Verification failed - may need more oracle runs or higher bias")
-                print()
-                print("BIASED_LSB=FAILED")
+                out.append(f"\\nCandidate scan failed to find m in range [{candidate_start}, {candidate_end}]")
+                out.append("Verification failed - may need more oracle runs or higher bias")
+                out.append("")
+                out.append("BIASED_LSB=FAILED")
+            print("\\n".join(out))
         except Exception as ex:
-            print(f"ERROR: {ex}")
-            print("BIASED_LSB=FAILED")
+            out.append(f"ERROR: {ex}")
+            out.append("BIASED_LSB=FAILED")
+            print("\\n".join(out))
         #
     except BaseException as ex:
         print(f"ERROR: {ex}")
@@ -4101,28 +4079,52 @@ f(x) &= Mx + r_1 \\equiv 0 \\pmod{p} \\\\
             r1_val = Integer(1)
             r2_val = n_mod % M
             print(f"M = {M} (product of first {len(primes_subset)} primes, ~{M.nbits()} bits)")
-            # Direct search: try every k in [0, bound] for each remainder.
+            # Coppersmith path (fast lattice reduction)
             bound = min(int(ceil(sqrt(n) / M)), 500000)  # cap to avoid timeout
             print(f"Direct search bound = {bound} (k has ~{Integer(bound).nbits()} bits)")
             factored = False
-            for r_candidate in [r1_val, r2_val]:
-                for k in range(int(bound) + 1):
-                    p_candidate = int(M * k + r_candidate)
-                    if p_candidate > 1 and n % p_candidate == 0:
-                        q = n // p_candidate
-                        print(f"Factor found! r={r_candidate}, k={k}")
-                        print(f"Verification: p * q = {p_candidate * q}")
-                        print(f"p = {p_candidate}")
-                        print(f"q = {q}")
-                        print()
-                        print("NITROS=SUCCESS")
-                        factored = True
-                        break
-                if factored:
-                    break
+            try:
+                R.<x> = PolynomialRing(ZZ)
+                for r_candidate in [r1_val, r2_val]:
+                    f = M*x + r_candidate
+                    f_mod = f.change_ring(Zmod(n))
+                    f_monic = f_mod.monic()
+                    roots = f_monic.small_roots(X=bound, beta=0.5, epsilon=0.05)
+                    if roots:
+                        k = int(roots[0])
+                        p_candidate = int(M * k + r_candidate)
+                        if p_candidate > 1 and n % p_candidate == 0:
+                            q = n // p_candidate
+                            print(f"Factor found via Coppersmith! r={r_candidate}, k={k}")
+                            print(f"Verification: p * q = {p_candidate * q}")
+                            print(f"p = {p_candidate}")
+                            print(f"q = {q}")
+                            print()
+                            print("NITROS=SUCCESS")
+                            factored = True
+                            break
+            except Exception:
+                pass
             if not factored:
-                print("No ROCA/Nitros pattern detected. Searched up to bound =", bound)
-                print("NITROS=FAILED")
+                print("Coppersmith did not find root. Falling back to direct search...")
+                for r_candidate in [r1_val, r2_val]:
+                    for k in range(int(bound) + 1):
+                        if factored:
+                            break
+                        p_candidate = int(M * k + r_candidate)
+                        if p_candidate > 1 and n % p_candidate == 0:
+                            q = n // p_candidate
+                            print(f"Factor found via direct search! r={r_candidate}, k={k}")
+                            print(f"Verification: p * q = {p_candidate * q}")
+                            print(f"p = {p_candidate}")
+                            print(f"q = {q}")
+                            print()
+                            print("NITROS=SUCCESS")
+                            factored = True
+                            break
+                if not factored:
+                    print("No ROCA/Nitros pattern detected. Searched up to bound =", bound)
+                    print("NITROS=FAILED")
         except Exception as ex:
             print(f"ERROR: {ex}")
             print("NITROS=FAILED")
@@ -4289,7 +4291,7 @@ print("KNOWN_PLAINTEXT=FAILED")`:`def _attack():
         # Works when m^e < n (no modular wrap-around), which is common for e=3
         try:
             m_int_root, is_exact = c.nth_root(int(e), truncate_mode=True)
-            if is_exact and power_mod(Integer(m_int_root), e, n) == c:
+            if is_exact and pow(int(m_int_root), int(e), int(n)) == c:
                 print(f"RECOVERED via integer e-th root! m = {m_int_root}")
                 try:
                     m_hex = hex(Integer(m_int_root))[2:]
@@ -4310,13 +4312,13 @@ print("KNOWN_PLAINTEXT=FAILED")`:`def _attack():
             prefix_int = Integer(int.from_bytes(prefix_bytes, 'big'))
             print(f"Prefix as integer: {prefix_int}")
             print(f"Prefix byte length: {len(prefix_bytes)}")
-            shift = Integer(2)**unknown_bits
+            shift = 1 << int(unknown_bits)
             if unknown_bits <= 20:
                 print(f"Brute forcing 2^{unknown_bits} possibilities...")
                 found = False
                 for k in range(shift):
                     m_try = prefix_int * shift + k
-                    if power_mod(m_try, e, n) == c:
+                    if pow(int(m_try), int(e), int(n)) == c:
                         print(f"FOUND! m = {m_try}")
                         try:
                             m_hex = hex(m_try)[2:]
@@ -4344,7 +4346,7 @@ print("KNOWN_PLAINTEXT=FAILED")`:`def _attack():
     except Exception as ex:
         print(f"Error: {ex}")
         print("KNOWN_PLAINTEXT=FAILED")
-_attack()`,proof:`\\textbf{Theorem:} Partial plaintext knowledge + Coppersmith recovers m when unknown portion < n^{1/e}.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.c)return Promise.resolve(null);try{let t=BigInt(e.n),n=e.e?.trim()||`65537`,r=BigInt(n),i=BigInt(e.c),a=((e,t)=>{let n=0n,r=1n;for(;r**t<e;)r*=2n;for(;n<=r;){let i=(n+r)/2n,a=i**t;if(a===e)return i;a<e?n=i+1n:r=i-1n}return null})(i,r);if(a!==null&&ug(a,r,t)===i)try{let e=a.toString(16),t=e.length%2?`0`+e:e,n=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),r=new TextDecoder().decode(n);return Promise.resolve(`RECOVERED via integer e-th root! m = ${a}\nm as bytes: ${r}`)}catch{return Promise.resolve(`RECOVERED via integer e-th root! m = ${a}`)}let o=e.known_prefix||``,s=(e.unknown_bits||`32`).trim(),c=parseInt(s,10);if(o&&c<=20){let e=new TextEncoder().encode(o),n=0n;for(let t of e)n=(n<<8n)+BigInt(t);let a=1n<<BigInt(c),s=Number(a);for(let e=0;e<s;e++){let a=(n<<BigInt(c))+BigInt(e);if(ug(a,r,t)===i)try{let e=a.toString(16),t=e.length%2?`0`+e:e,n=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),r=new TextDecoder().decode(n);return Promise.resolve(`FOUND! m = ${a}\nm as bytes: ${r}`)}catch{return Promise.resolve(`FOUND! m = ${a}`)}}return Promise.resolve(null)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Partial plaintext knowledge + Coppersmith recovers m when unknown portion < n^{1/e}.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -4436,62 +4438,7 @@ _attack()`,proof:`\\textbf{Theorem:} Small e (3,5,17) enables e-th root, Hastad 
 \\text{Franklin-Reiter:} &\\quad \\gcd(x^e - c_1, (ax+b)^e - c_2) = x - m \\qed
 \\end{align*}
 
-\\textbf{References:} Hastad, 1988; Franklin \\& Reiter, 1996`,priority:`high`,applicableCheck:e=>!!(e.n&&e.e&&e.c)},av=()=>{let{n:e}=Ag(Mg.p,Mg.q,3n),t=BigInt(Math.floor(Math.random()*1e6)+42);return{n:e.toString(),e:`3`,c:jg(t,e,3n).toString()}},ov={id:`multi-prime-gcd`,name:`Multi-Prime GCD`,category:`Advanced`,description:`Finds shared primes across multiple moduli via pairwise GCD. Use when given 2+ RSA moduli. Unlike Batch GCD (Factorization category), this attack reports exact moduli pairs that share each factor.`,inputs:[{name:`moduli_list`,label:`Moduli (one per line)`,placeholder:`Enter multiple moduli, one per line...`,multiline:!0,rows:6}],sageTemplate:e=>`def _attack():
-    try:
-        try:
-            moduli_str = """${e.moduli_list}""".strip()
-            if not moduli_str:
-                print("ERROR: moduli_list is required")
-                print("MULTI_PRIME_GCD=FAILED")
-                return
-            moduli = [Integer(x.strip()) for x in moduli_str.split('\\n') if x.strip()]
-            print(f"Multi-Prime GCD attack on {len(moduli)} moduli")
-            print()
-            if len(moduli) < 2:
-                print("Need at least 2 moduli for this attack.")
-                print("MULTI_PRIME_GCD=FAILED")
-            else:
-                print("Running pairwise GCD across all moduli...")
-                print()
-                found_any = False
-                for i in range(len(moduli)):
-                    ni = moduli[i]
-                    for j in range(i + 1, len(moduli)):
-                        nj = moduli[j]
-                        g = gcd(ni, nj)
-                        if g > 1 and g < ni:
-                            found_any = True
-                            print(f"SHARED FACTOR FOUND between moduli {i+1} and {j+1}!")
-                            print(f"gcd(n{i+1}, n{j+1}) = {g}")
-                            print(f"n{i+1} = {ni}")
-                            print(f"  p = {g}")
-                            print(f"  q = {ni // g}")
-                            print(f"n{j+1} = {nj}")
-                            print(f"  p' = {g}")
-                            print(f"  q' = {nj // g}")
-                            print()
-                if found_any:
-                    print("MULTI_PRIME_GCD=SUCCESS")
-                else:
-                    print("No shared factors found among the provided moduli.")
-                    print()
-                    print("This could mean:")
-                    print("  1. All moduli use independently generated primes (good practice)")
-                    print("  2. The shared factors are not between the provided pairs")
-                    print("  3. More moduli are needed to find common factors")
-                    print()
-                    print("Note: In real-world scans, ~0.2% of RSA certificates share factors")
-                    print("due to poor entropy during key generation.")
-                    print()
-                    print("MULTI_PRIME_GCD=FAILED")
-        except Exception as ex:
-            print(f"ERROR: {ex}")
-            print("MULTI_PRIME_GCD=FAILED")
-        #
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("MULTI_PRIME_GCD=FAILED")
-_attack()`,proof:`\\textbf{Theorem:} Pairwise GCD of moduli reveals shared factors and their pairs.
+\\textbf{References:} Hastad, 1988; Franklin \\& Reiter, 1996`,priority:`high`,applicableCheck:e=>!!(e.n&&e.e&&e.c)},av=()=>{let{n:e}=Ag(Mg.p,Mg.q,3n),t=BigInt(Math.floor(Math.random()*1e6)+42);return{n:e.toString(),e:`3`,c:jg(t,e,3n).toString()}},ov={id:`multi-prime-gcd`,name:`Multi-Prime GCD`,category:`Advanced`,description:`Finds shared primes across multiple moduli via pairwise GCD. Use when given 2+ RSA moduli. Unlike Batch GCD (Factorization category), this attack reports exact moduli pairs that share each factor.`,inputs:[{name:`moduli_list`,label:`Moduli (one per line)`,placeholder:`Enter multiple moduli, one per line...`,multiline:!0,rows:6}],sageTemplate:()=>`print("MULTI_PRIME_GCD=FAILED")`,proof:`\\textbf{Theorem:} Pairwise GCD of moduli reveals shared factors and their pairs.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -4668,47 +4615,7 @@ p &= p_{\\text{msb}} + x_0 \\qed
 
 \\textbf{Explanation:} Coppersmith's method constructs a lattice embedding $f(x) = p_{\\text{msb}} + x$; LLL finds the small root $x_0$ when $|x_0| < n^{\\beta^2}$, recovering $p$.
 
-\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", Eurocrypt 1996; A. May, "Using Coppersmith's Method to Attack RSA", 2009`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.p_msb},dv=()=>{let{p:e,n:t}=Ag(512,512),n=e.toString(2).length,r=Math.floor(n*.9),i=BigInt(n-r),a=e>>i<<i;return{n:t.toString(),p_msb:a.toString()}},fv={id:`implicit-key-exposure`,name:`Implicit Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from a^p mod n leak. Use when a^p mod n is accidentally exposed.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`a`,label:`a (base)`,placeholder:`Enter base a...`,multiline:!1},{name:`leak`,label:`leak (a^p mod n)`,placeholder:`Enter leaked value...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
-    try:
-        try:
-            n = Integer(${e.n})
-            a = Integer(${e.a})
-            leak = Integer(${e.leak})
-            if n < 2 or a < 2 or leak < 0:
-                print("Invalid input")
-                print("IMPLICIT_KEY_EXPOSURE=FAILED")
-                return
-            print(f"Implicit Key Exposure Attack")
-            print(f"n = {n}")
-            print(f"a = {a}")
-            print(f"leak = a^p mod n = {leak}")
-            print()
-            # By Fermat's little theorem: a^p = a (mod p)
-            # leak = a^p (mod n) => leak = a^p (mod p) => leak = a (mod p)
-            # Therefore: p | (leak - a) => p = gcd(leak - a, n)
-            g = gcd(leak - a, n)
-            print(f"gcd(leak - a, n) = {g}")
-            print()
-            if g > 1 and g < n:
-                p = g
-                q = n // p
-                print(f"Verification: p * q = {p * q}")
-                print(f"Verification: a^p mod n = {power_mod(a, p, n)} == leak? {power_mod(a, p, n) == leak}")
-                print(f"p = {p}")
-                print(f"q = {q}")
-                print()
-                print("IMPLICIT_KEY_EXPOSURE=SUCCESS")
-            else:
-                print("gcd(leak - a, n) = 1 or n. Fermat trick failed.")
-                print("Possible causes: p divides a, or leak is not a^p mod n.")
-                print("IMPLICIT_KEY_EXPOSURE=FAILED")
-        except Exception as ex:
-            print(f"IMPLICIT_KEY_EXPOSURE=FAILED: {ex}")
-        #
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("IMPLICIT_KEY_EXPOSURE=FAILED")
-_attack()`,proof:`\\textbf{Theorem:} If $a^p \\bmod n$ is leaked, $p$ is recovered via $\\gcd(a - \\text{leak}, n)$.
+\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", Eurocrypt 1996; A. May, "Using Coppersmith's Method to Attack RSA", 2009`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.p_msb},dv=()=>{let{p:e,n:t}=Ag(512,512),n=e.toString(2).length,r=Math.floor(n*.9),i=BigInt(n-r),a=e>>i<<i;return{n:t.toString(),p_msb:a.toString()}},fv={id:`implicit-key-exposure`,name:`Implicit Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from a^p mod n leak. Use when a^p mod n is accidentally exposed.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`a`,label:`a (base)`,placeholder:`Enter base a...`,multiline:!1},{name:`leak`,label:`leak (a^p mod n)`,placeholder:`Enter leaked value...`,multiline:!0,rows:3}],sageTemplate:()=>`print("IMPLICIT_KEY_EXPOSURE=FAILED")`,proof:`\\textbf{Theorem:} If $a^p \\bmod n$ is leaked, $p$ is recovered via $\\gcd(a - \\text{leak}, n)$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -4726,54 +4633,7 @@ p &= \\gcd(\\text{leak} - a, n) \\qed
 \\end{align*}
 
 \\textbf{References:} Common CTF pattern; based on Fermat's Little Theorem`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.a&&!!e.leak,frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.a),r=BigInt(e.leak),i=og(r-n,t);if(i>1n&&i<t){let e=i,a=t/e;return[`Implicit Key Exposure Attack (browser-side, BigInt)`,`n = ${t}`,`a = ${n}`,`leak = ${r}`,``,`Factors recovered:`,`p = ${e}`,`q = ${a}`,`Verification: p * q = ${e*a}`,`Verification: a^p mod n = ${ug(n,e,t)} == leak? ${ug(n,e,t)===r}`,``,`IMPLICIT_KEY_EXPOSURE=SUCCESS`].join(`
-`)}return null}catch{return null}}},pv=()=>{let{p:e,n:t}=Ag(Mg.p,Mg.q),n=ug(3n,e,t);return{n:t.toString(),a:`3`,leak:n.toString()}},mv={id:`common-prime-rsa`,name:`Common Prime RSA`,category:`Factorization`,description:`Factors two moduli sharing a prime. Use when n1 and n2 share a factor p.`,inputs:[{name:`n1`,label:`n1 (first modulus)`,placeholder:`Enter n1...`,multiline:!0,rows:3},{name:`n2`,label:`n2 (second modulus)`,placeholder:`Enter n2...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
-    try:
-        try:
-            n1 = Integer(${e.n1})
-            n2 = Integer(${e.n2})
-            print(f"Common Prime RSA Attack")
-            print(f"n1 = {n1}")
-            print(f"n2 = {n2}")
-            print()
-            if n1 < 2 or n2 < 2:
-                print("Invalid input: moduli must be >= 2")
-                print("COMMON_PRIME_RSA=FAILED")
-                return
-            if n1 == n2:
-                print("n1 == n2. No shared factor beyond the number itself.")
-                print("COMMON_PRIME_RSA=FAILED")
-                return
-            p = gcd(n1, n2)
-            print(f"gcd(n1, n2) = {p}")
-            print()
-            if p > 1 and p < n1 and p < n2:
-                q1 = n1 // p
-                q2 = n2 // p
-                print(f"Verification: p * q1 = {p * q1} == n1? {p * q1 == n1}")
-                print(f"Verification: p * q2 = {p * q2} == n2? {p * q2 == n2}")
-                print(f"Shared prime: p = {p}")
-                print(f"n1 = {p} x {q1}")
-                print(f"n2 = {p} x {q2}")
-                print(f"p is prime: {p.is_prime()}")
-                print(f"q1 is prime: {q1.is_prime()}")
-                print(f"q2 is prime: {q2.is_prime()}")
-                print()
-                print("COMMON_PRIME_RSA=SUCCESS")
-            elif p == 1:
-                print("gcd(n1, n2) = 1. No shared prime factor.")
-                print("These moduli are coprime. Try other factorization methods.")
-                print("COMMON_PRIME_RSA=FAILED")
-            else:
-                print("Unexpected result. One modulus may divide the other.")
-                print("COMMON_PRIME_RSA=FAILED")
-        except Exception as e:
-            print(f"ERROR: {e}")
-            print("COMMON_PRIME_RSA=FAILED")
-        #
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("COMMON_PRIME_RSA=FAILED")
-_attack()`,proof:`\\textbf{Theorem:} If $n_1 = p \\cdot q_1$ and $n_2 = p \\cdot q_2$ share a prime $p$, then $\\gcd(n_1, n_2) = p$.
+`)}return null}catch{return null}}},pv=()=>{let{p:e,n:t}=Ag(Mg.p,Mg.q),n=ug(3n,e,t);return{n:t.toString(),a:`3`,leak:n.toString()}},mv={id:`common-prime-rsa`,name:`Common Prime RSA`,category:`Factorization`,description:`Factors two moduli sharing a prime. Use when n1 and n2 share a factor p.`,inputs:[{name:`n1`,label:`n1 (first modulus)`,placeholder:`Enter n1...`,multiline:!0,rows:3},{name:`n2`,label:`n2 (second modulus)`,placeholder:`Enter n2...`,multiline:!0,rows:3}],sageTemplate:()=>`print("COMMON_PRIME_RSA=FAILED")`,proof:`\\textbf{Theorem:} If $n_1 = p \\cdot q_1$ and $n_2 = p \\cdot q_2$ share a prime $p$, then $\\gcd(n_1, n_2) = p$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -4868,6 +4728,8 @@ m &= \\sqrt[e]{M} \\qed
             n = Integer(${e.n})
             print(f"Euler Factorization on n = {n}")
             print()
+            import math
+            n_int = int(n)
             if n < 2:
                 print(f"n = {n} is too small to factor")
                 print("EULER=FAILED")
@@ -4894,25 +4756,26 @@ m &= \\sqrt[e]{M} \\qed
                 print()
                 print("EULER=SUCCESS")
                 return
-            end = isqrt(n)
+            end = math.isqrt(n_int)
             solutions = []
             a = 0
-            max_iter = 10**6
+            max_iter = 1000000
             while a < end and len(solutions) < 2:
                 if a > max_iter:
                     print(f"Euler factorization failed: exceeded {max_iter} iterations")
                     print("EULER=FAILED")
                     return
-                rem = n - a*a
-                if rem >= 0 and rem.is_square():
-                    b = isqrt(rem)
-                    distinct = True
-                    for sol in solutions:
-                        if sol[0] == b and sol[1] == a:
-                            distinct = False
-                            break
-                    if distinct:
-                        solutions.append([b, a])
+                rem = n_int - a*a
+                if rem >= 0:
+                    b = math.isqrt(rem)
+                    if b*b == rem:
+                        distinct = True
+                        for sol in solutions:
+                            if sol[0] == b and sol[1] == a:
+                                distinct = False
+                                break
+                        if distinct:
+                            solutions.append([b, a])
                 a += 1
             if len(solutions) < 2:
                 print(f"Euler factorization failed: could not find two distinct sum-of-squares representations")
@@ -4948,7 +4811,7 @@ m &= \\sqrt[e]{M} \\qed
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("EULER=FAILED")
-_attack()`,proof:`\\textbf{Theorem:} Factor n = pq using two distinct representations as a sum of squares. Requires p, q \\equiv 1 \\pmod{4}.
+_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t<2n)return Promise.resolve(null);if(t%2n==0n)return Promise.resolve(`n is even: ${t}\np = 2\nq = ${t/2n}`);let n=sg(t),r=[];for(let e=0n;e<n&&r.length<2;e++){if(e>1000000n)return Promise.resolve(null);let n=t-e*e;if(n>=0n){let t=sg(n);if(t*t===n){let n=!0;for(let i of r)if(i[0]===t&&i[1]===e){n=!1;break}n&&r.push([t,e])}}}if(r.length<2)return Promise.resolve(null);let[i,a]=[r[0],r[1]],o=og(i[0]-a[0],a[1]-i[1])**2n,s=og(i[0]+a[0],a[1]+i[1])**2n,c=og(i[0]+a[0],a[1]-i[1])**2n,l=og(i[0]-a[0],a[1]+i[1])**2n,u=og(o+s,t),d=og(l+c,t);return u<=1n||d>=t?Promise.resolve(null):(u*d!==t&&(d=t/u),Promise.resolve(`Factor found!\nVerification: p * q = ${u*d}\np = ${u}\nq = ${d}`))}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Factor n = pq using two distinct representations as a sum of squares. Requires p, q \\equiv 1 \\pmod{4}.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -4964,7 +4827,8 @@ m &= \\gcd(a + c, d - b)^2,\\; \\ell = \\gcd(a - c, d + b)^2 \\\\
 p &= \\gcd(k + h, n),\\; q = \\gcd(\\ell + m, n) \\qed
 \\end{align*}
 
-\\textbf{References:} Euler, 1749`,priority:`medium`,applicableCheck:e=>!!e.n},yv=()=>{function e(e){for(;;){let t=kg(e);if(t%4n==1n)return t}}return{n:(e(18)*e(18)).toString()}},bv={id:`pollard-strassen`,name:`Pollard-Strassen's Algorithm`,category:`Factorization`,description:`Factors n in O(n^(1/4)) by partitioning [1, n^(1/4)] into interval products and GCD. Fast when n has a factor <= n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Euler, 1749`,priority:`medium`,applicableCheck:e=>!!e.n},yv=()=>{function e(e){for(;;){let t=kg(e);if(t%4n==1n)return t}}return{n:(e(18)*e(18)).toString()}},bv={id:`pollard-strassen`,name:`Pollard-Strassen's Algorithm`,category:`Factorization`,description:`Factors n in O(n^(1/4)) by partitioning [1, n^(1/4)] into interval products and GCD. Fast when n has a factor <= n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -4995,24 +4859,25 @@ p &= \\gcd(k + h, n),\\; q = \\gcd(\\ell + m, n) \\qed
                 print()
                 print("POLLARD_STRASSEN=SUCCESS")
                 return
-            c = Integer(floor(RR(n) ** (1/4))) + 1
+            c = int(floor(RR(n) ** (1/4))) + 1
             if c > 50000:
                 print(f"n is too large for Strassen (n^(1/4) = {c} > 50000)")
                 print("POLLARD_STRASSEN=FAILED")
                 return
+            n_int = int(n)
             for i in range(c):
                 prod = 1
                 jmin = i * c + 1
                 jmax = jmin + c - 1
                 for j in range(jmin, jmax + 1):
-                    prod = (prod * j) % n
-                g = gcd(prod, n)
-                if g > 1 and g < n:
-                    p = g
-                    q = n // g
-                    print(f"Verification: p * q = {p * q}")
-                    print(f"p = {p}")
-                    print(f"q = {q}")
+                    prod = (prod * j) % n_int
+                g = math.gcd(prod, n_int)
+                if g > 1 and g < n_int:
+                    p_sage = Integer(g)
+                    q_sage = n // p_sage
+                    print(f"Verification: p * q = {p_sage * q_sage}")
+                    print(f"p = {p_sage}")
+                    print(f"q = {q_sage}")
                     print()
                     print("POLLARD_STRASSEN=SUCCESS")
                     return
@@ -5080,8 +4945,11 @@ P_i &= \\prod_{j \\in I_i} j \\mod n \\\\
             limit = 200000
             lookup = {}
             found = False
+            n_int = int(n)
+            pow_val = 1  # 2^0 mod n
             for i in range(limit):
-                val = (pow(2, i, n) - 1) % n
+                pow_val = (pow_val * 2) % n_int  # recurrence instead of pow(2, i, n)
+                val = (pow_val - 1) % n_int
                 if val == 0:
                     phi_guess = i
                     if phi_guess % 2 == 0:

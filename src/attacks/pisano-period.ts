@@ -87,8 +87,11 @@ export const attack: Attack = {
             limit = 200000
             lookup = {}
             found = False
+            n_int = int(n)
+            pow_val = 1  # 2^0 mod n
             for i in range(limit):
-                val = (pow(2, i, n) - 1) % n
+                pow_val = (pow_val * 2) % n_int  # recurrence instead of pow(2, i, n)
+                val = (pow_val - 1) % n_int
                 if val == 0:
                     phi_guess = i
                     if phi_guess % 2 == 0:

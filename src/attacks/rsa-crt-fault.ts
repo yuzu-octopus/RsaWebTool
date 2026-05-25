@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
-import { modPow, modInverse } from '../utils/bigint';
+import { modPow, modInverse, gcd } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'rsa-crt-fault',
@@ -68,6 +68,27 @@ print("RSA_CRT_FAULT=FAILED")`;
         print("RSA_CRT_FAULT=FAILED")
     #
 _attack()`;
+  },
+  frontendCheck: (vals) => {
+    if (!vals.n || !vals.e || !vals.m || !vals.sig_faulty) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const e = BigInt(vals.e);
+      const m = BigInt(vals.m);
+      const sig_faulty = BigInt(vals.sig_faulty);
+      const v = modPow(sig_faulty, e, n);
+      const g_ = gcd(v - m, n);
+      if (g_ > 1n && g_ < n) {
+        const qq = n / g_;
+        const phi = (g_ - 1n) * (qq - 1n);
+        const d = modInverse(e, phi);
+        const dLine = d ? `\nPrivate exponent d = ${d}` : '';
+        return Promise.resolve(`Factor found!\np = ${g_}\nq = ${qq}${dLine}`);
+      }
+      return Promise.resolve(null);
+    } catch {
+      return Promise.resolve(null);
+    }
   },
   proof: `\\textbf{Theorem:} A single faulty CRT signature s' on known m factors n via \\gcd(s'^e - m, n).
 

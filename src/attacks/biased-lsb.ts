@@ -33,11 +33,13 @@ export const attack: Attack = {
             print("BIASED_LSB=FAILED")
             return
         try:
+            out = []
             n = Integer(${vals.n})
             e_val = "${vals.e}".strip()
             e = Integer(e_val) if e_val else Integer(65537)
             orig_c = Integer(${vals.c})
-            c = (Integer(${vals.c}) * power_mod(Integer(2), e, n)) % n
+            two_e = pow(2, int(e), int(n))
+            c = (Integer(${vals.c}) * Integer(two_e)) % n
             # Parse oracle runs (multiple response strings, newline-separated)
             runs_str = """${vals.oracle_runs}""".strip()
             runs = []
@@ -51,24 +53,24 @@ export const attack: Attack = {
                 print("ERROR: No valid oracle runs parsed")
                 print("BIASED_LSB=FAILED")
                 return
-            print(f"Biased LSB Oracle Attack")
-            print(f"n = {n}")
-            print(f"e = {e}")
-            print(f"c = {c}")
-            print(f"Number of oracle runs: {len(runs)}")
-            print()
+            out.append(f"Biased LSB Oracle Attack")
+            out.append(f"n = {n}")
+            out.append(f"e = {e}")
+            out.append(f"c = {c}")
+            out.append(f"Number of oracle runs: {len(runs)}")
+            out.append("")
             # Per-bit majority voting, then binary search
             num_bits = min(len(r) for r in runs)
             n_bits = n.nbits()
-            print(f"Using {num_bits} bit positions (n has {n_bits} bits)")
+            out.append(f"Using {num_bits} bit positions (n has {n_bits} bits)")
             # Majority voting
             voted_bits = []
             for i in range(num_bits):
                 votes = sum(runs[j][i] for j in range(len(runs)))
                 majority = 1 if votes > len(runs) / 2 else 0
                 voted_bits.append(majority)
-            print(f"Majority-voted bits: {voted_bits[:20]}{'...' if num_bits > 20 else ''}")
-            print()
+            out.append(f"Majority-voted bits: {voted_bits[:20]}{'...' if num_bits > 20 else ''}")
+            out.append("")
             # Binary search with voted bits using exact rational division
             # NOTE: Must use /2 (Rational) not //2 (floor division) to avoid
             # accumulated truncation errors that exclude m from the interval.
@@ -80,9 +82,9 @@ export const attack: Attack = {
                     upper = mid
                 else:
                     lower = mid
-                c = (c * power_mod(Integer(2), e, n)) % n
+                c = Integer((int(c) * two_e) % int(n))
                 if i < 5 or i >= len(voted_bits) - 3:
-                    print(f"Step {i+1}: bit={bit}, lower={lower}, upper={upper}")
+                    out.append(f"Step {i+1}: bit={bit}, lower={lower}, upper={upper}")
             # Scan candidates near the rational interval [lower, upper)
             # After log2(n) steps, interval should contain exactly one integer
             from math import ceil, floor
@@ -91,7 +93,7 @@ export const attack: Attack = {
             found_m = None
             for m_candidate in range(candidate_start, candidate_end + 1):
                 m_test = Integer(m_candidate)
-                if power_mod(m_test, e, n) == orig_c:
+                if pow(int(m_test), int(e), int(n)) == int(orig_c):
                     found_m = m_test
                     break
             if found_m is None:
@@ -99,25 +101,27 @@ export const attack: Attack = {
                 mid_est = Integer(floor((lower + upper) / 2))
                 for m_candidate in range(max(0, mid_est - 500), mid_est + 501):
                     m_test = Integer(m_candidate)
-                    if power_mod(m_test, e, n) == orig_c:
+                    if pow(int(m_test), int(e), int(n)) == int(orig_c):
                         found_m = m_test
                         break
             if found_m is not None:
-                print(f"\\nRecovered message: m = {found_m}")
-                v = power_mod(found_m, e, n)
-                print(f"Verification: m^e mod n = {v}")
-                print(f"Original c = {orig_c}")
-                print("VERIFICATION PASSED!")
-                print()
-                print("BIASED_LSB=SUCCESS")
+                out.append(f"\\nRecovered message: m = {found_m}")
+                v = Integer(pow(int(found_m), int(e), int(n)))
+                out.append(f"Verification: m^e mod n = {v}")
+                out.append(f"Original c = {orig_c}")
+                out.append("VERIFICATION PASSED!")
+                out.append("")
+                out.append("BIASED_LSB=SUCCESS")
             else:
-                print(f"\\nCandidate scan failed to find m in range [{candidate_start}, {candidate_end}]")
-                print("Verification failed - may need more oracle runs or higher bias")
-                print()
-                print("BIASED_LSB=FAILED")
+                out.append(f"\\nCandidate scan failed to find m in range [{candidate_start}, {candidate_end}]")
+                out.append("Verification failed - may need more oracle runs or higher bias")
+                out.append("")
+                out.append("BIASED_LSB=FAILED")
+            print("\\n".join(out))
         except Exception as ex:
-            print(f"ERROR: {ex}")
-            print("BIASED_LSB=FAILED")
+            out.append(f"ERROR: {ex}")
+            out.append("BIASED_LSB=FAILED")
+            print("\\n".join(out))
         #
     except BaseException as ex:
         print(f"ERROR: {ex}")

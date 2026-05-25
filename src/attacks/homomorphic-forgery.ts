@@ -19,6 +19,7 @@ export const attack: Attack = {
 print("HOMOMORPHIC_FORGERY=FAILED")`;
     }
     return `def _attack():
+    from itertools import combinations
     try:
         n = Integer(${vals.n})
         e = Integer(${vals.e})
@@ -53,13 +54,12 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
         print(f"Oracle pairs: {len(oracle_pairs)}")
         # Verify oracle pairs
         for i, (m_i, s_i) in enumerate(oracle_pairs):
-            v = power_mod(s_i, e, n)
+            v = Integer(pow(int(s_i), int(e), int(n)))
             valid = "OK" if v == m_i else "FAIL"
             print(f"Pair {i+1}: s_i^e mod n = {v}, m_i = {m_i} [{valid}]")
         # Multiplicative forgery: compute product of all oracle signatures
         # If target_m = product of oracle messages (mod n), then
         # forged_sig = product of oracle signatures (mod n)
-        from itertools import combinations
         found = False
         for r in range(1, len(oracle_pairs) + 1):
             for combo in combinations(range(len(oracle_pairs)), r):
@@ -70,7 +70,7 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
                     prod_m = (prod_m * m_i) % n
                     prod_s = (prod_s * s_i) % n
                 if prod_m == target_m % n:
-                    v = power_mod(prod_s, e, n)
+                    v = Integer(pow(int(prod_s), int(e), int(n)))
                     if v == target_m % n:
                         print(f"Forged signature from pairs {[i+1 for i in combo]}: {prod_s}")
                         print(f"Verification: sig^e mod n = {v}")

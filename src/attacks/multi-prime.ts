@@ -13,6 +13,8 @@ export const attack: Attack = {
     try:
         try:
             n = Integer(${vals.n})
+            import math
+            n_int = int(n)
             if n < 2:
                 print(f"n = {n} is too small to factor")
                 print("MULTI_PRIME=FAILED")
@@ -33,17 +35,19 @@ export const attack: Attack = {
             def factor_all(m):
                 """Complete factorization using trial division + Sage's factor()"""
                 fac = []
-                rem = Integer(m)
+                rem = int(m)
                 for p in prime_range(2, 10000):
-                    while rem % p == 0:
-                        fac.append(Integer(p))
-                        rem //= p
+                    p_int = int(p)
+                    while rem % p_int == 0:
+                        fac.append(Integer(p_int))
+                        rem //= p_int
                 if rem == 1:
                     return sorted(fac)
-                if rem.is_prime():
-                    fac.append(rem)
+                rem_sage = Integer(rem)
+                if rem_sage.is_prime():
+                    fac.append(rem_sage)
                     return sorted(fac)
-                for p, e in factor(rem):
+                for p, e in factor(rem_sage):
                     fac.extend([p] * e)
                 return sorted(fac)
             print(f"Attempting multi-prime factorization of n = {n}")

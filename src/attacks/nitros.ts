@@ -60,28 +60,52 @@ export const attack: Attack = {
             r1_val = Integer(1)
             r2_val = n_mod % M
             print(f"M = {M} (product of first {len(primes_subset)} primes, ~{M.nbits()} bits)")
-            # Direct search: try every k in [0, bound] for each remainder.
+            # Coppersmith path (fast lattice reduction)
             bound = min(int(ceil(sqrt(n) / M)), 500000)  # cap to avoid timeout
             print(f"Direct search bound = {bound} (k has ~{Integer(bound).nbits()} bits)")
             factored = False
-            for r_candidate in [r1_val, r2_val]:
-                for k in range(int(bound) + 1):
-                    p_candidate = int(M * k + r_candidate)
-                    if p_candidate > 1 and n % p_candidate == 0:
-                        q = n // p_candidate
-                        print(f"Factor found! r={r_candidate}, k={k}")
-                        print(f"Verification: p * q = {p_candidate * q}")
-                        print(f"p = {p_candidate}")
-                        print(f"q = {q}")
-                        print()
-                        print("NITROS=SUCCESS")
-                        factored = True
-                        break
-                if factored:
-                    break
+            try:
+                R.<x> = PolynomialRing(ZZ)
+                for r_candidate in [r1_val, r2_val]:
+                    f = M*x + r_candidate
+                    f_mod = f.change_ring(Zmod(n))
+                    f_monic = f_mod.monic()
+                    roots = f_monic.small_roots(X=bound, beta=0.5, epsilon=0.05)
+                    if roots:
+                        k = int(roots[0])
+                        p_candidate = int(M * k + r_candidate)
+                        if p_candidate > 1 and n % p_candidate == 0:
+                            q = n // p_candidate
+                            print(f"Factor found via Coppersmith! r={r_candidate}, k={k}")
+                            print(f"Verification: p * q = {p_candidate * q}")
+                            print(f"p = {p_candidate}")
+                            print(f"q = {q}")
+                            print()
+                            print("NITROS=SUCCESS")
+                            factored = True
+                            break
+            except Exception:
+                pass
             if not factored:
-                print("No ROCA/Nitros pattern detected. Searched up to bound =", bound)
-                print("NITROS=FAILED")
+                print("Coppersmith did not find root. Falling back to direct search...")
+                for r_candidate in [r1_val, r2_val]:
+                    for k in range(int(bound) + 1):
+                        if factored:
+                            break
+                        p_candidate = int(M * k + r_candidate)
+                        if p_candidate > 1 and n % p_candidate == 0:
+                            q = n // p_candidate
+                            print(f"Factor found via direct search! r={r_candidate}, k={k}")
+                            print(f"Verification: p * q = {p_candidate * q}")
+                            print(f"p = {p_candidate}")
+                            print(f"q = {q}")
+                            print()
+                            print("NITROS=SUCCESS")
+                            factored = True
+                            break
+                if not factored:
+                    print("No ROCA/Nitros pattern detected. Searched up to bound =", bound)
+                    print("NITROS=FAILED")
         except Exception as ex:
             print(f"ERROR: {ex}")
             print("NITROS=FAILED")

@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { modPow } from '../utils/bigint';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 
 export const attack: Attack = {
@@ -34,7 +35,7 @@ print("KNOWN_PLAINTEXT=FAILED")`;
         # Works when m^e < n (no modular wrap-around), which is common for e=3
         try:
             m_int_root, is_exact = c.nth_root(int(e), truncate_mode=True)
-            if is_exact and power_mod(Integer(m_int_root), e, n) == c:
+            if is_exact and pow(int(m_int_root), int(e), int(n)) == c:
                 print(f"RECOVERED via integer e-th root! m = {m_int_root}")
                 try:
                     m_hex = hex(Integer(m_int_root))[2:]
@@ -55,13 +56,13 @@ print("KNOWN_PLAINTEXT=FAILED")`;
             prefix_int = Integer(int.from_bytes(prefix_bytes, 'big'))
             print(f"Prefix as integer: {prefix_int}")
             print(f"Prefix byte length: {len(prefix_bytes)}")
-            shift = Integer(2)**unknown_bits
+            shift = 1 << int(unknown_bits)
             if unknown_bits <= 20:
                 print(f"Brute forcing 2^{unknown_bits} possibilities...")
                 found = False
                 for k in range(shift):
                     m_try = prefix_int * shift + k
-                    if power_mod(m_try, e, n) == c:
+                    if pow(int(m_try), int(e), int(n)) == c:
                         print(f"FOUND! m = {m_try}")
                         try:
                             m_hex = hex(m_try)[2:]
@@ -90,6 +91,72 @@ print("KNOWN_PLAINTEXT=FAILED")`;
         print(f"Error: {ex}")
         print("KNOWN_PLAINTEXT=FAILED")
 _attack()`;
+  },
+  frontendCheck: (vals) => {
+    if (!vals.n || !vals.c) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const eVal = vals.e?.trim() || '65537';
+      const e = BigInt(eVal);
+      const c = BigInt(vals.c);
+      // Strategy 1: Integer e-th root (works when m^e < n, e.g. e=3 with small m)
+      const integerRoot = (target: bigint, exp: bigint): bigint | null => {
+        let lo = 0n, hi = 1n;
+        while (hi ** exp < target) hi *= 2n;
+        while (lo <= hi) {
+          const mid = (lo + hi) / 2n;
+          const pow = mid ** exp;
+          if (pow === target) return mid;
+          if (pow < target) lo = mid + 1n;
+          else hi = mid - 1n;
+        }
+        return null;
+      };
+      const root = integerRoot(c, e);
+      if (root !== null && modPow(root, e, n) === c) {
+        try {
+          const hexStr = root.toString(16);
+          const padded = hexStr.length % 2 ? '0' + hexStr : hexStr;
+          const bytes = new Uint8Array(padded.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
+          const text = new TextDecoder().decode(bytes);
+          return Promise.resolve(`RECOVERED via integer e-th root! m = ${root}\nm as bytes: ${text}`);
+        } catch {
+          return Promise.resolve(`RECOVERED via integer e-th root! m = ${root}`);
+        }
+      }
+      // Strategy 2: Known prefix + brute-force
+      const knownPrefix = vals.known_prefix || '';
+      const unknownBitsStr = (vals.unknown_bits || '32').trim();
+      const unknownBits = parseInt(unknownBitsStr, 10);
+      if (knownPrefix && unknownBits <= 20) {
+        const prefixBytes = new TextEncoder().encode(knownPrefix);
+        let prefixInt = 0n;
+        for (const b of prefixBytes) prefixInt = (prefixInt << 8n) + BigInt(b);
+        const shift = 1n << BigInt(unknownBits);
+        const limit = Number(shift);
+        for (let k = 0; k < limit; k++) {
+          const mTry = (prefixInt << BigInt(unknownBits)) + BigInt(k);
+          if (modPow(mTry, e, n) === c) {
+            try {
+              const hexStr = mTry.toString(16);
+              const padded = hexStr.length % 2 ? '0' + hexStr : hexStr;
+              const bytes = new Uint8Array(padded.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
+              const text = new TextDecoder().decode(bytes);
+              return Promise.resolve(`FOUND! m = ${mTry}\nm as bytes: ${text}`);
+            } catch {
+              return Promise.resolve(`FOUND! m = ${mTry}`);
+            }
+          }
+        }
+        return Promise.resolve(null);
+      }
+      if (knownPrefix && unknownBits > 20) {
+        return Promise.resolve(null); // too large for brute-force, fall through to SageCell
+      }
+      return Promise.resolve(null);
+    } catch {
+      return Promise.resolve(null);
+    }
   },
   proof: `\\textbf{Theorem:} Partial plaintext knowledge + Coppersmith recovers m when unknown portion < n^{1/e}.
 

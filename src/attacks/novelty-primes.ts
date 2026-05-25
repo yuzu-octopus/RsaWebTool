@@ -9,7 +9,8 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => `import math
+def _attack():
     try:
         try:
             n = Integer(${vals.n})
@@ -38,15 +39,17 @@ export const attack: Attack = {
             print(f"Checking n = {n} against known CTF primes...")
             found = False
             print("Checking primes near powers of 2...")
+            n_int = int(n)
             for bits in [64, 128, 256, 512]:
-                target = 2**bits
+                target = 1 << bits
                 for delta in range(-1000, 1000):
                     candidate = target + delta
-                    if candidate > 1 and candidate.is_prime():
-                        if n % candidate == 0:
-                            print(f"  Found prime near 2^{bits}: {candidate}")
-                            print(f"  Cofactor: {n // candidate}")
-                            print(f"  Verification: {candidate} * {n // candidate} = {n}")
+                    if candidate > 1 and n_int % candidate == 0:
+                        if is_prime(candidate):
+                            p_sage = Integer(candidate)
+                            print(f"  Found prime near 2^{bits}: {p_sage}")
+                            print(f"  Cofactor: {n // p_sage}")
+                            print(f"  Verification: {p_sage} * {n // p_sage} = {n}")
                             found = True
             print("\\nChecking primes near common constants...")
             RF = RealField(300)
@@ -56,12 +59,14 @@ export const attack: Attack = {
                 ("sqrt(2)", Integer(str(RF(2).sqrt().n(digits=60).str()).replace('.', '')[:55])),
             ]
             for name, const in constants:
+                const_int = int(const)
                 for delta in range(-100, 100):
-                    candidate = const + delta
-                    if candidate > 1 and candidate.is_prime():
-                        if n % candidate == 0:
-                            print(f"  Found prime near {name}: {candidate}")
-                            print(f"  Cofactor: {n // candidate}")
+                    candidate = const_int + delta
+                    if candidate > 1 and n_int % candidate == 0:
+                        if is_prime(candidate):
+                            p_sage = Integer(candidate)
+                            print(f"  Found prime near {name}: {p_sage}")
+                            print(f"  Cofactor: {n // p_sage}")
                             found = True
             if found:
                 print("NOVELTY_PRIMES=SUCCESS")
@@ -76,6 +81,39 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("NOVELTY_PRIMES=FAILED")
 _attack()`,
+  frontendCheck: (vals) => {
+    if (!vals.n) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      if (n < 2n) return Promise.resolve(null);
+      if (n % 2n === 0n) return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n / 2n}`);
+      // Check primes near powers of 2
+      for (const bits of [64, 128, 256, 512]) {
+        const target = 1n << BigInt(bits);
+        for (let delta = -1000n; delta <= 1000n; delta++) {
+          const candidate = target + delta;
+          if (candidate > 1n && n % candidate === 0n) {
+            return Promise.resolve(`Found prime near 2^${bits}: ${candidate}\nCofactor: ${n / candidate}\nVerification: ${candidate} * ${n / candidate} = ${n}`);
+          }
+        }
+      }
+      // Check primes near math constants (first 55 decimal digits)
+      const constants: [string, bigint][] = [
+        ['pi', 3141592653589793238462643383279502884197169399375105820974n],
+        ['e', 2718281828459045235360287471352662497757247093699959574966n],
+        ['sqrt(2)', 1414213562373095048801688724209698078569671875376948073176n],
+      ];
+      for (const [name, digits] of constants) {
+        for (let delta = -100n; delta <= 100n; delta++) {
+          const candidate = digits + delta;
+          if (candidate > 1n && n % candidate === 0n) {
+            return Promise.resolve(`Found prime near ${name}: ${candidate}\nCofactor: ${n / candidate}`);
+          }
+        }
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
+  },
   proof: `\\textbf{Theorem:} CTF primes may be reused or near structured values; check via database lookup and window search.
 
 \\textbf{Setup:}

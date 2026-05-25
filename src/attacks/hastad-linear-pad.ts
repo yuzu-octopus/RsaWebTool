@@ -103,22 +103,23 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                 # Uses Horner evaluation for fast modular arithmetic
                 # (avoid power_mod which is slow in SageCell loops).
                 if found_m is None:
-                    print("Attempting brute-force search for small m...")
-                    a_arr = [t[2] for t in triples]
-                    b_arr = [t[3] for t in triples]
-                    n_arr = [t[0] for t in triples]
-                    c_arr = [t[1] for t in triples]
+                    out = []
+                    out.append("Attempting brute-force search for small m...")
+                    a_int = [int(t[2]) for t in triples]
+                    b_int = [int(t[3]) for t in triples]
+                    n_int = [int(t[0]) for t in triples]
+                    c_int = [int(t[1]) for t in triples]
                     # Precompute Horner coefficients for (a*m+b)^3 - c:
                     # ai^3*m^3 + 3*ai^2*bi*m^2 + 3*ai*bi^2*m + (bi^3-ci)
                     coeffs = []
                     for i in range(len(triples)):
-                        ai = a_arr[i]; bi = b_arr[i]; ni = n_arr[i]
-                        A = (ai**3) % ni
-                        B = (3 * ai**2 * bi) % ni
-                        C = (3 * ai * bi**2) % ni
-                        D = (bi**3 - c_arr[i]) % ni
+                        ai = a_int[i]; bi = b_int[i]; ni = n_int[i]
+                        A = pow(ai, 3, ni)
+                        B = (3 * ai * ai * bi) % ni
+                        C = (3 * ai * bi * bi) % ni
+                        D = (bi * bi * bi - c_int[i]) % ni
                         coeffs.append((ni, A, B, C, D))
-                    limit = 2 * 10**6
+                    limit = 5 * 10**5
                     for m_candidate in range(limit):
                         ok = True
                         for ni, A, B, C, D in coeffs:
@@ -131,16 +132,17 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                                 break
                         if ok:
                             found_m = m_candidate
-                            print(f"Brute-force recovered message: m = {found_m}")
+                            out.append(f"Brute-force recovered message: m = {found_m}")
                             break
-                        if m_candidate % 500000 == 0 and m_candidate > 0:
-                            print(f"  Searched up to m = {m_candidate}...")
+                        if m_candidate % 200000 == 0 and m_candidate > 0:
+                            out.append(f"  Searched up to m = {m_candidate}...")
+                    print("\\n".join(out))
             if found_m is not None:
                 m = Integer(found_m)
                 print("Verifying recovered message...")
                 all_ok = True
                 for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
-                    v = power_mod(a_i * m + b_i, e, n_i)
+                    v = pow(int(a_i) * int(m) + int(b_i), int(e), int(n_i))
                     ok = v == c_i
                     if not ok:
                         all_ok = False
@@ -186,7 +188,7 @@ m &= small\\_roots(F) \\qed
 
 export const generateTestcase = (): Record<string, string> => {
   const e = 3n;
-  const m = BigInt(Math.floor(Math.random() * 1000000) + 42);
+  const m = BigInt(Math.floor(Math.random() * 10000) + 42);
   const triples: string[] = [];
   for (let i = 0; i < 3; i++) {
     const { n } = generateKeyPair(256, 256);
