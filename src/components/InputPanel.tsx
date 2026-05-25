@@ -11,7 +11,7 @@ import {
 import { Stop, Casino } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
-import { useSageMath } from '../hooks/useSageMath';
+import { useSageMath, DEFAULT_SAGE_TIMEOUT } from '../hooks/useSageMath';
 import { ProofRenderer } from './ProofRenderer';
 import { testcaseGenerators, submitToFactorDB, autoDecrypt } from '../attacks';
 import { isActualSuccess } from '../utils/sage-output';
@@ -100,7 +100,7 @@ export function InputPanel() {
       }
 
       const code = selectedAttack.sageTemplate(inputValues);
-      const result = await execute(code, 35000, controller.signal);
+      const result = await execute(code, DEFAULT_SAGE_TIMEOUT, controller.signal);
       if (attackIdRef.current !== currentAttackId) return;
       if (result.success) {
         let displayStdout = result.stdout;
