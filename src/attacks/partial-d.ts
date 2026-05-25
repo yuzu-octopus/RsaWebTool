@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
-import { modInverse } from '../utils/bigint';
+import { modInverse, isqrt } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'partial-d',
@@ -57,6 +57,40 @@ def _attack():
         print(f"ERROR: {ex}")
         print("PARTIAL_D=FAILED")
 _attack()`,
+  frontendCheck: (vals: Record<string, string>) => {
+    if (!vals.n || !vals.e || !vals.dLow) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const e = BigInt(vals.e);
+      const dLow = BigInt(vals.dLow);
+
+      // Only work for small e (testcase e is large, but this handles small-e scenarios)
+      if (e > 100000n) return Promise.resolve(null);
+
+      // Infer mask from bit length of dLow
+      const mask = (1n << BigInt(dLow.toString(2).length)) - 1n;
+
+      for (let k = 1n; k <= e; k++) {
+        const dApprox = (k * n + 1n) / e;
+        if ((dApprox & mask) !== dLow) continue;
+
+        // Found candidate — verify
+        const phi = (e * dApprox - 1n) / k;
+        const s = n - phi + 1n;
+        const disc = s * s - 4n * n;
+        if (disc < 0n) continue;
+        const sqrtDisc = isqrt(disc);
+        if (sqrtDisc * sqrtDisc !== disc) continue;
+
+        const p = (s - sqrtDisc) / 2n;
+        if (p > 0n && n % p === 0n) {
+          const q = n / p;
+          return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nPrivate key d = ${dApprox}`);
+        }
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
+  },
   proof: `\\textbf{Theorem:} If low $m$ bits of $d$ are known and $d < n$, recover $d$ by iterating $k$ in the key equation.
 
 \\textbf{Setup:}

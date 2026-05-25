@@ -127,6 +127,36 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("BIASED_LSB=FAILED")
 _attack()`,
+  frontendCheck: (vals) => {
+    if (!vals.n || !vals.e || !vals.c || !vals.oracle_runs) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const e = BigInt(vals.e);
+      const c = BigInt(vals.c);
+      const runs = vals.oracle_runs.split('\n').filter(l => l.trim()).map(l =>
+        l.split(',').map(x => x.trim() === '1')
+      );
+      if (runs.length === 0) return Promise.resolve(null);
+      const numBits = runs[0].length;
+      const votes: boolean[] = [];
+      for (let i = 0; i < numBits; i++) {
+        let sum = 0;
+        for (const run of runs) { if (i < run.length) sum += run[i] ? 1 : -1; }
+        votes.push(sum >= 0);
+      }
+      const twoE = modPow(2n, e, n);
+      let curC = c, lo = 0n, hi = n;
+      for (const bit of votes) {
+        const mid = (lo + hi) / 2n;
+        if (bit) lo = mid; else hi = mid;
+        curC = (curC * twoE) % n;
+      }
+      for (let m = lo; m <= hi && m < lo + 1000n; m++) {
+        if (modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}`);
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
+  },
   proof: `\\textbf{Theorem:} A noisy LSB oracle with bias p > 1/2 recovers m via majority voting + binary search.
 
 \\textbf{Setup:}

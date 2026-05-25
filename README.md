@@ -6,9 +6,9 @@ A browser-only RSA cryptography analysis tool powered by SageMathCell, designed 
 
 ## Features
 
-- **49 attack implementations** across 5 categories (L5 Playwright test suite: **141/144 passing**, 98%; 3 expected probabilistic failures)
+- **49 attack implementations** across 5 categories (L5 Playwright test suite: **143/144 passing**, 99.3%; 1 expected probabilistic failure)
 - **Real-time SageMath execution** via embedded SageMathCell (offscreen DOM + MutationObserver pipeline)
-- **Browser-side pre-checks** — 14 attacks run entirely in the browser via BigInt GCD, FactorDB API, lattice GCD, extended GCD (Bezout), Euler sum-of-squares, special-prime trial division, and e-th root brute-force (no SageCell needed)
+- **Browser-side pre-checks** — 20 attacks run entirely in the browser via BigInt GCD, FactorDB API, lattice GCD, extended GCD (Bezout), Euler sum-of-squares, special-prime trial division, Fermat factorization, Brent cycle detection, oracle binary search, interval arithmetic, and e-th root brute-force (no SageCell needed)
 - **FactorDB integration** — CORS-proxied API via Cloudflare Worker for instant factor lookups, with **auto-submit** of factorized results from all 18 Factorization-category attacks
 - **Magic Cracker** — paste any RSA parameters, auto-detect format, and run all applicable attacks with priority ordering, concurrent parallel execution (cap 6), and early-stop on first success
 - **RSA Calculator** — pure BigInt Key Gen / Encrypt / Decrypt (no SageCell needed), with automatic hex/decimal/ASCII detection
@@ -69,13 +69,16 @@ All 49 attacks live in `src/attacks/` as individual self-contained files in a fl
 
 **Adding a new attack** = 1 file + 1 import line + 2 array entries in `index.ts`. Zero UI changes needed.
 
-### 14 Attacks with frontendCheck (Browser-Only)
+### 20 Attacks with frontendCheck (Browser-Only)
 
 These run fully in the browser when sufficient parameters are provided, returning instantly without SageCell:
 
 | Attack | What It Does |
 |--------|-------------|
 | `batch-gcd` | BigInt GCD computation across a comma-separated modulus list |
+| `biased-lsb` | Majority-vote LSB oracle + binary search to recover m |
+| `bleichenbacher` | Interval arithmetic for PKCS#1 v1.5 padding oracle |
+| `close-prime` | Fermat factorization with isqrt (|p-q| small) |
 | `common-factor` | GCD of two moduli to detect shared prime factors |
 | `common-modulus` | Extended GCD + Bezout recovery of m from two encryptions under same n |
 | `common-prime-rsa` | GCD chain across multiple moduli |
@@ -85,9 +88,12 @@ These run fully in the browser when sufficient parameters are provided, returnin
 | `gimmicky-primes` | Trial division against 8 families of special primes (Mersenne, primorial, Fermat, etc.) |
 | `implicit-key-exposure` | Lattice GCD across related keys |
 | `known-plaintext` | Integer e-th root + known-prefix brute-force |
+| `lsb-oracle` | Binary search with LSB oracle responses |
 | `multi-prime-gcd` | GCD across multi-prime setups |
 | `novelty-primes` | Window search near powers of 2 and math constants (π, e, √2) |
 | `phi-leak` | Decrypt directly from leaked φ(n) |
+| `pisano-period` | Period detection via Map on 2<sup>i</sup> mod n |
+| `pollard-rho` | Brent's cycle detection with batched GCD |
 | `rsa-crt-fault` | Recover p via gcd(sig^e - m, n) from faulty CRT signature |
 
 ### SageMath Execution Pipeline
@@ -113,10 +119,10 @@ These run fully in the browser when sufficient parameters are provided, returnin
 - **FactorDB CORS proxy** — FactorDB API has no CORS headers. A Cloudflare Worker at `factordb-proxy.octopusyuzu.workers.dev` adds `Access-Control-Allow-Origin: *` and caches responses (max-age=3600). Worker also supports POST `/report` for submitting factorized results back to FactorDB.
 - **FactorDB auto-submit** — when an attack in the Factorization category succeeds, extracted p,q factors are submitted to FactorDB via `reportFactor()` (fire-and-forget, never blocks result display). Status shown in notification toasts.
 - **Notification toasts** — Dracula-themed Snackbar (`slotProps.content.sx` with Dracula background/foreground colors) rendered in `App.tsx`. InputPanel and MagicPanel call `showNotification(msg, severity)` on attack completion.
-- **frontendCheck pattern** — 14 attacks define an optional async pre-check that runs in the browser before falling back to SageCell. This enables instant results for FactorDB lookups, phi(n) recovery, GCD operations, e-th root brute-force, and special-prime trial division. The suite grew from 8 to 14 in a 2026-05-25 optimization pass that also added a Coppersmith path to nitros and reduced brute-force limits in hastad-linear-pad.
+- **frontendCheck pattern** — 20 attacks define an optional async pre-check that runs in the browser before falling back to SageCell. This enables instant results for FactorDB lookups, phi(n) recovery, GCD operations, e-th root brute-force, Fermat factorization, Brent cycle detection, oracle binary search, interval arithmetic, and special-prime trial division. The suite grew from 14 to 20 in a 2026-05-25 optimization pass that added Brent GCD, Fermat, pisano period, oracle binary search, and Bleichenbacher interval arithmetic as browser-side checks.
 - **Pure math templates** — SageMathCell has no internet access (firewall since 2021). All attack templates must be self-contained pure math code with no external dependencies.
 - **Variable-size testcases** — `TESTCASE_BITS = { p: 256, q: 256 }` (n ≈ 512-bit) is the default; 10 attacks use custom generators with sizes from 64-bit to 1024-bit, typically producing n ≥ 512-bit while respecting algorithmic constraints (Coppersmith bounds, SageCell caps, timeout limits).
-- **L5 Playwright test suite** in `scripts/test-playwright.ts` — runs all 49 attacks × 3 runs each (147 total, factordb-lookup skipped in CI = 144 runnable). 10-page concurrency, 120s timeout per run. Current: 141/144 passing, 3 expected probabilistic failures (williams-p1 1/3, partial-pq-bits 2/3).
+- **L5 Playwright test suite** in `scripts/test-playwright.ts` — runs all 49 attacks × 3 runs each (147 total, factordb-lookup skipped in CI = 144 runnable). 10-page concurrency, 120s timeout per run. Current: **143/144 passing** (~60s), 1 expected probabilistic failure (partial-pq-bits 2/3).
 - **No unit tests** — functional verification is `typecheck → lint → build → L5 Playwright suite`.
 - **DRY conventions** — shared MUI TextField styles in `src/styles/inputSx.ts`, reusable drag-to-resize hook in `src/hooks/useDragResize.ts`.
 

@@ -11,6 +11,7 @@ export const attack: Attack = {
   ],
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
+        out = []
         try:
             n = Integer(${vals.n})
             from sage.libs.libecm import ecmfactor
@@ -19,9 +20,9 @@ export const attack: Attack = {
                 if m == 1:
                     return []
                 if m.is_prime():
-                    print(f"{indent}Prime: {m}")
+                    out.append(f"{indent}Prime: {m}")
                     return [m]
-                print(f"{indent}Composite: {m} ({m.nbits()} bits)")
+                out.append(f"{indent}Composite: {m} ({m.nbits()} bits)")
                 B1_vals = [2000, 10000, 50000]    # capped at 50k to avoid SageMathCell timeout
                 found_p = None
                 for B1_cur in B1_vals:
@@ -38,73 +39,81 @@ export const attack: Attack = {
                     if found_p is not None:
                         break
                 if found_p is not None:
-                    print(f"{indent}ECM factor: {found_p}")
+                    out.append(f"{indent}ECM factor: {found_p}")
                     return ecm_factor_all(found_p, depth + 1) + ecm_factor_all(m // found_p, depth + 1)
-                print(f"{indent}ECM found no factor, using factor()")
+                out.append(f"{indent}ECM found no factor, using factor()")
                 fac = factor(m)
                 result = []
                 for prime, exp in fac:
                     for _ in range(exp):
                         result.append(prime)
                 return result
-            print(f"ECM Full Factorization on n = {n}")
-            print()
+            out.append(f"ECM Full Factorization on n = {n}")
+            out.append("")
             if n < 2:
-                print(f"n = {n} is too small to factor")
+                out.append(f"n = {n} is too small to factor")
+                print("\\n".join(out))
                 print("ECM2=FAILED")
                 return
             if n % 2 == 0:
-                print(f"n is even: {n}")
-                print(f"Verification: 2 * {n // 2} = {n}")
-                print(f"p = 2")
-                print(f"q = {n // 2}")
-                print()
+                out.append(f"n is even: {n}")
+                out.append(f"Verification: 2 * {n // 2} = {n}")
+                out.append(f"p = 2")
+                out.append(f"q = {n // 2}")
+                out.append("")
+                print("\\n".join(out))
                 print("ECM2=SUCCESS")
                 return
             if n.is_prime():
-                print(f"n is prime: {n}")
+                out.append(f"n is prime: {n}")
+                print("\\n".join(out))
                 print("ECM2=FAILED")
                 return
             if n.is_square():
                 p = isqrt(n)
-                print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"Verification: p * q = {p * p}")
-                print(f"p = {p}")
-                print(f"q = {p}")
-                print()
+                out.append(f"n is a perfect square: {p}^2 = {n}")
+                out.append(f"Verification: p * q = {p * p}")
+                out.append(f"p = {p}")
+                out.append(f"q = {p}")
+                out.append("")
+                print("\\n".join(out))
                 print("ECM2=SUCCESS")
                 return
             factors = ecm_factor_all(n, 0)
             factors.sort()
-            print()
-            print(f"All {len(factors)} prime factors: {factors}")
-            print()
+            out.append("")
+            out.append(f"All {len(factors)} prime factors: {factors}")
+            out.append("")
             counts = {}
             for f in factors:
                 counts[f] = counts.get(f, 0) + 1
-            print(f"Factorization:")
+            out.append(f"Factorization:")
             product = 1
             for prime, exp in sorted(counts.items()):
                 if exp == 1:
-                    print(f"  p = {prime}")
+                    out.append(f"  p = {prime}")
                 else:
-                    print(f"  {prime}^{exp}")
+                    out.append(f"  {prime}^{exp}")
                 product *= prime ** exp
-            print()
-            print(f"Verification: product = {product}")
-            print(f"Matches n: {product == n}")
+            out.append("")
+            out.append(f"Verification: product = {product}")
+            out.append(f"Matches n: {product == n}")
             if product == n:
-                print()
+                out.append("")
+                print("\\n".join(out))
                 print("ECM2=SUCCESS")
             else:
-                print()
+                out.append("")
+                print("\\n".join(out))
                 print("ECM2=FAILED")
         except Exception as e:
-            print(f"Error: {e}")
+            out.append(f"Error: {e}")
+            print("\\n".join(out))
             print("ECM2=FAILED")
         #
     except BaseException as ex:
-        print(f"ERROR: {ex}")
+        out.append(f"ERROR: {ex}")
+        print("\\n".join(out))
         print("ECM2=FAILED")
 _attack()`,
   proof: `\\textbf{Theorem:} Repeated ECM with factor removal yields complete factorization.

@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { gcd } from '../utils/bigint';
 import { randomPrime } from '../utils/testcases/core';
 
 export const attack: Attack = {
@@ -100,6 +101,28 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("POLLARD_RHO=FAILED")
 _attack()`,
+  frontendCheck: (vals) => {
+    if (!vals.n) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}`);
+      for (let c = 1n; c < 10n; c++) {
+        let x = 2n, y = 2n, d = 1n;
+        let power = 1n, lam = 0n;
+        while (d === 1n) {
+          if (power === lam) { x = y; power *= 2n; lam = 0n; }
+          y = (y * y + c) % n;
+          lam++;
+          d = gcd(y - x > 0n ? y - x : x - y, n);
+          if (d > 1n && d < n) {
+            const q = n / d;
+            return Promise.resolve(`Factor found!\np = ${d}\nq = ${q}`);
+          }
+        }
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
+  },
   proof: `\\textbf{Theorem:} Pollard rho (Brent + batched GCD) finds a factor in expected O(n^{1/4}).
 
 \\textbf{Setup:}

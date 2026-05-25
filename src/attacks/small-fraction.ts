@@ -1,5 +1,11 @@
 import type { Attack } from '../types';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
+import { isqrt } from '../utils/bigint';
+
+const numGcd = (a: number, b: number): number => {
+  while (b) { [a, b] = [b, a % b]; }
+  return a;
+};
 
 export const attack: Attack = {
   id: 'small-fraction',
@@ -125,6 +131,30 @@ def _attack():
         print(f"ERROR: {ex}")
         print("SMALL_FRACTION=FAILED")
 _attack()`,
+  frontendCheck: (vals) => {
+    if (!vals.n) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}`);
+
+      for (let b = 1; b <= 50; b++) {
+        for (let a = 1; a <= b; a++) {
+          if (numGcd(a, b) !== 1) continue;
+          const q0 = isqrt(n * BigInt(b) / BigInt(a));
+          for (let delta = -500; delta <= 500; delta++) {
+            const q = q0 + BigInt(delta);
+            if (q > 1n && n % q === 0n) {
+              const p = n / q;
+              if (p > 1n) {
+                return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nUsing a=${a}, b=${b}`);
+              }
+            }
+          }
+        }
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
+  },
   proof: `\\textbf{Theorem:} If $p/q \\approx a/b$ for small coprime $a, b$, then $q \\approx \\sqrt{nb/a}$ and trial division near $q_0$ recovers the factor.
 
 \\textbf{Setup:}

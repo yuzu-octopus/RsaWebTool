@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
-import { modPow } from '../utils/bigint';
+import { modPow, modInverse } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'hastad-broadcast',
@@ -71,6 +71,41 @@ print("HASTAD_BROADCAST=FAILED")`;
         print(f"ERROR: {ex}")
         print("HASTAD_BROADCAST=FAILED")
 _attack()`;
+  },
+  frontendCheck: (vals: Record<string, string>) => {
+    if (!vals.e || !vals.ciphertexts) return Promise.resolve(null);
+    try {
+      const e = BigInt(vals.e);
+      const lines = vals.ciphertexts.split('\n').filter(l => l.trim());
+      if (lines.length < Number(e)) return Promise.resolve(null);
+      const pairs = lines.slice(0, Number(e)).map(l => {
+        const [c, n] = l.split(',').map(x => BigInt(x.trim()));
+        return { c, n };
+      });
+      const N = pairs.reduce((acc, {n}) => acc * n, 1n);
+      let M = 0n;
+      for (const {c, n} of pairs) {
+        const Ni = N / n;
+        const inv = modInverse(Ni % n, n);
+        if (inv === null) return Promise.resolve(null);
+        M = (M + c * Ni * inv) % N;
+      }
+      if (M < 2n) return Promise.resolve(null);
+      let lo = 2n, hi = 2n;
+      while (hi ** e < M) hi *= 2n;
+      while (lo < hi) {
+        const mid = (lo + hi + 1n) / 2n;
+        if (mid ** e <= M) lo = mid;
+        else hi = mid - 1n;
+      }
+      if (lo ** e === M) {
+        for (const {c, n} of pairs) {
+          if (modPow(lo, e, n) !== c) return Promise.resolve(null);
+        }
+        return Promise.resolve(`Message recovered: m = ${lo}`);
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} If $m$ is encrypted with the same $e$ to $e$ moduli, CRT recovers $m^e$ over $\\mathbb{Z}$, then $m = \\sqrt[e]{m^e}$.
 

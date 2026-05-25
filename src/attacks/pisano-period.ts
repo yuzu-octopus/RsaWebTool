@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { modPow, gcd } from '../utils/bigint';
+import { modPow, gcd, isqrt } from '../utils/bigint';
 import { randomPrime } from '../utils/testcases/core';
 
 function multiplicativeOrder2(p: bigint): bigint {
@@ -147,6 +147,57 @@ export const attack: Attack = {
         out.append("PISANO=FAILED")
     print("\\n".join(out))
 _attack()`,
+  frontendCheck: (vals) => {
+    if (!vals.n) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}`);
+      const seen = new Map<string, bigint>();
+      let pow_val = 1n;
+      const limit = 200000n;
+      for (let i = 0n; i < limit; i++) {
+        const val = (pow_val - 1n + n) % n;
+        const key = val.toString();
+        if (val === 0n && i > 0n) {
+          const s = n - i + 1n;
+          const disc = s * s - 4n * n;
+          if (disc >= 0n) {
+            const t = isqrt(disc);
+            if (t * t === disc) {
+              const p = (s - t) / 2n;
+              const q = (s + t) / 2n;
+              if (p > 1n && q > 1n && p * q === n) {
+                return Promise.resolve(`Factor found!\nPeriod length: ${i}\np = ${p}\nq = ${q}`);
+              }
+            }
+          }
+        }
+        if (seen.has(key)) {
+          const prev_i = seen.get(key)!;
+          const period = i - prev_i;
+          for (let mult = 1n; mult < 200n; mult++) {
+            const phi_guess = period * mult;
+            if (phi_guess >= n) break;
+            if (phi_guess % 2n !== 0n) continue;
+            const s = n - phi_guess + 1n;
+            const disc = s * s - 4n * n;
+            if (disc < 0n) continue;
+            const t = isqrt(disc);
+            if (t * t === disc) {
+              const p = (s - t) / 2n;
+              const q = (s + t) / 2n;
+              if (p > 1n && q > 1n && p * q === n) {
+                return Promise.resolve(`Factor found!\nPeriod length: ${period}\np = ${p}\nq = ${q}`);
+              }
+            }
+          }
+        }
+        seen.set(key, i);
+        pow_val = (pow_val * 2n) % n;
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
+  },
   proof: `\\textbf{Theorem:} Factor n = pq via birthday collision on the multiplicative order of 2 modulo n.
 
 \\textbf{Setup:}

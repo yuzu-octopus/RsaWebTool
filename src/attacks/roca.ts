@@ -41,9 +41,10 @@ export const attack: Attack = {
                     break
                 ord_val = Mod(65537, M).multiplicative_order()
                 remainders = set()
+                r = 1  # 65537^0 mod M
                 for idx in range(ord_val):
-                    r = power_mod(65537, idx, M)
                     remainders.add(r)
+                    r = (r * 65537) % M
                 n_mod = n % M
                 for r in remainders:
                     if n_mod * inverse_mod(r, M) % M in remainders:

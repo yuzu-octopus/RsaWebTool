@@ -1,5 +1,6 @@
 import type { Attack } from '../types';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
+import { modPow, modInverse, gcd } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'small-crt-exp',
@@ -50,6 +51,40 @@ def _attack():
     except Exception as ex:
         print(f"SMALL_CRT_EXP=FAILED: {ex}")
 _attack()`,
+  frontendCheck: (vals) => {
+    if (!vals.n || !vals.e) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const e = BigInt(vals.e);
+      const bound = vals.bound ? BigInt(vals.bound) : 50000n;
+
+      // FLT-based: find dp such that m^(e*dp) ≡ m (mod p)
+      // Precompute m^e mod n ONCE, then incrementally multiply
+      const m = 2n; // arbitrary message coprime to n
+      const me = modPow(m, e, n); // O(log e) — done once
+
+      let current = 1n; // m^(e*0) mod n = 1
+      for (let dp = 0n; dp <= bound; dp++) {
+        // gcd(m - m^(e*dp), n) reveals p if dp ≡ d (mod p-1)
+        const diff = m - current;
+        const g_ = gcd(diff, n);
+        if (g_ > 1n && g_ < n) {
+          const qq = n / g_;
+          const phi = (g_ - 1n) * (qq - 1n);
+          const d = modInverse(e, phi);
+          const dLine = d ? `\nPrivate exponent d = ${d}` : '';
+          return Promise.resolve(`Factor found at dp = ${dp}!\np = ${g_}\nq = ${qq}${dLine}`);
+        }
+
+        // Incremental: one mul per step, no pow/modPow
+        current = (current * me) % n;
+      }
+
+      return Promise.resolve(null);
+    } catch {
+      return Promise.resolve(null);
+    }
+  },
   proof: `\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small ($< 10^6$), exhaustive search over $k$ recovers $p$.
 
 \\textbf{Setup:}

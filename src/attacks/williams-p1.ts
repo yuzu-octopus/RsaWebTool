@@ -31,36 +31,41 @@ export const attack: Attack = {
         except:
             B2 = 0
         #
-        print(f"Williams' p+1 method on n = {n}")
-        print(f"Initial B1 = {B1}")
-        print(f"Initial B2 = {B2}")
-        print()
+        out = []
+        out.append(f"Williams' p+1 method on n = {n}")
+        out.append(f"Initial B1 = {B1}")
+        out.append(f"Initial B2 = {B2}")
+        out.append("")
         #
         # Check for trivial cases
         if n < 2:
-            print(f"n = {n} is too small to factor")
-            print("WILLIAMS_P1=FAILED")
+            out.append(f"n = {n} is too small to factor")
+            out.append("WILLIAMS_P1=FAILED")
+            print("\\n".join(out))
             return
         if n % 2 == 0:
-            print(f"n is even: {n}")
-            print(f"p = 2")
-            print(f"q = {n // 2}")
-            print(f"Verification: 2 * {n // 2} = {n}")
-            print("WILLIAMS_P1=SUCCESS")
+            out.append(f"n is even: {n}")
+            out.append(f"p = 2")
+            out.append(f"q = {n // 2}")
+            out.append(f"Verification: 2 * {n // 2} = {n}")
+            out.append("WILLIAMS_P1=SUCCESS")
+            print("\\n".join(out))
             return
         if n.is_prime():
-            print(f"n is prime: {n}")
-            print("No factorization possible")
-            print("WILLIAMS_P1=FAILED")
+            out.append(f"n is prime: {n}")
+            out.append("No factorization possible")
+            out.append("WILLIAMS_P1=FAILED")
+            print("\\n".join(out))
             return
         if n.is_square():
             p = isqrt(n)
-            print(f"n is a perfect square: {p}^2 = {n}")
-            print(f"Verification: p * q = {p * p}")
-            print(f"p = {p}")
-            print(f"q = {p}")
-            print()
-            print("WILLIAMS_P1=SUCCESS")
+            out.append(f"n is a perfect square: {p}^2 = {n}")
+            out.append(f"Verification: p * q = {p * p}")
+            out.append(f"p = {p}")
+            out.append(f"q = {p}")
+            out.append("")
+            out.append("WILLIAMS_P1=SUCCESS")
+            print("\\n".join(out))
             return
         #
         # Williams' p+1 using Lucas sequences with two-stage
@@ -134,39 +139,41 @@ export const attack: Attack = {
             found = False
             for attempt, (B1_cur, B2_cur) in enumerate(configs):
                 if attempt > 0:
-                    print(f"Retry #{attempt}: B1 = {B1_cur}", end="")
+                    retry_msg = f"Retry #{attempt}: B1 = {B1_cur}"
                     if B2_cur > 0:
-                        print(f", B2 = {B2_cur}")
-                    else:
-                        print()
+                        retry_msg += f", B2 = {B2_cur}"
+                    out.append(retry_msg)
                 for P in range(3, 8):
                     g = williams_p1_stage(n, B1_cur, B2_cur, P)
                     if g is not None:
                         p = Integer(g)
                         q = n // g
-                        print(f"Factor found with P = {P}!")
-                        print(f"Verification: p * q = {p * q}")
-                        print(f"p = {p}")
-                        print(f"q = {q}")
+                        out.append(f"Factor found with P = {P}!")
+                        out.append(f"Verification: p * q = {p * q}")
+                        out.append(f"p = {p}")
+                        out.append(f"q = {q}")
                         found = True
                         break
                 if found:
                     break
             if not found:
-                print("Williams' p+1 failed. p+1 may not be B1-smooth for tested P values.")
-                print("Try increasing B1, enabling stage 2 with B2 > B1, or using a different method.")
-                print()
-                print("WILLIAMS_P1=FAILED")
+                out.append("Williams' p+1 failed. p+1 may not be B1-smooth for tested P values.")
+                out.append("Try increasing B1, enabling stage 2 with B2 > B1, or using a different method.")
+                out.append("")
+                out.append("WILLIAMS_P1=FAILED")
             else:
-                print()
-                print("WILLIAMS_P1=SUCCESS")
+                out.append("")
+                out.append("WILLIAMS_P1=SUCCESS")
+            print("\\n".join(out))
         except Exception as ex:
-            print(f"Williams' p+1 error: {ex}")
-            print("WILLIAMS_P1=FAILED")
+            out.append(f"Williams' p+1 error: {ex}")
+            out.append("WILLIAMS_P1=FAILED")
+            print("\\n".join(out))
         #
     except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("WILLIAMS_P1=FAILED")
+        out.append(f"ERROR: {ex}")
+        out.append("WILLIAMS_P1=FAILED")
+        print("\\n".join(out))
 _attack()`,
   proof: `\\textbf{Theorem:} If p+1 is B1-smooth, find p via Lucas sequences V\\_M(P,1). Stage 2 extends to B2.
 

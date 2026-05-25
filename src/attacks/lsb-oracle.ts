@@ -83,6 +83,26 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("LSB_ORACLE=FAILED")
 _attack()`,
+  frontendCheck: (vals) => {
+    if (!vals.n || !vals.e || !vals.c || !vals.oracle_responses) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const e = BigInt(vals.e);
+      const c = BigInt(vals.c);
+      const bits = vals.oracle_responses.split(',').map(x => x.trim() === '1');
+      const twoE = modPow(2n, e, n);
+      let curC = c, lo = 0n, hi = n;
+      for (const bit of bits) {
+        const mid = (lo + hi) / 2n;
+        if (bit) lo = mid; else hi = mid;
+        curC = (curC * twoE) % n;
+      }
+      for (let m = lo; m <= hi && m < lo + 10n; m++) {
+        if (modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}`);
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
+  },
   proof: `\\textbf{Theorem:} An oracle \\mathcal{O}(c) = (c^d \\bmod n) \\bmod 2 recovers m in O(\\log n) queries via binary search.
 
 \\textbf{Setup:}

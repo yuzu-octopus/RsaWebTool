@@ -75,9 +75,12 @@ export const attack: Attack = {
             # Start with f1=2, double until oracle returns True (>= B)
             out.append("=== Step 1: Finding f1 ===")
             f1 = Integer(2)
-            while not oracle((pow(int(f1), int(e), int(n)) * c) % n):
+            two_e = Integer(pow(2, int(e), int(n)))  # precompute 2^e mod n once
+            cur = two_e  # 2^e mod n = (2^e)^1 mod n
+            while not oracle((cur * c) % n):
                 queries_used[0] += 1
                 f1 *= 2
+                cur = (cur * two_e) % n  # incremental: one mul per step
             queries_used[0] += 1
             out.append(f"f1 = {f1} (f1*m mod n >= B confirmed)")
             out.append("")

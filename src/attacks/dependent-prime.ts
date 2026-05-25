@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
-import { modInverse } from '../utils/bigint';
+import { modInverse, isqrt } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'dependent-prime',
@@ -70,6 +70,28 @@ def _attack():
         print(f"ERROR: {ex}")
         print("DEPENDENT_PRIME=FAILED")
 _attack()`,
+  frontendCheck: (vals) => {
+    if (!vals.n || !vals.e) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const e = BigInt(vals.e);
+      const fourNE = 4n * n * e;
+      for (let k = 1n; k <= 100000n; k++) {
+        const disc = 1n + k * fourNE;
+        const sqrt_disc = isqrt(disc);
+        if (sqrt_disc * sqrt_disc !== disc) continue;
+        const num = -1n + sqrt_disc;
+        if (num > 0n && num % (2n * k) === 0n) {
+          const p = num / (2n * k);
+          if (p > 1n && n % p === 0n) {
+            const q = n / p;
+            return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}`);
+          }
+        }
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
+  },
   proof: `\\textbf{Theorem:} If $q \\cdot e \\equiv 1 \\pmod{p}$, solve $kp^2 + p - ne = 0$ for $p$.
 
 \\textbf{Setup:}

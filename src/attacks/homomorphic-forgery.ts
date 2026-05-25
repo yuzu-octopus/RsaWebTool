@@ -89,6 +89,47 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
     #
 _attack()`;
   },
+  frontendCheck: (vals: Record<string, string>) => {
+    if (!vals.n || !vals.e || !vals.target_m || !vals.oracle_pairs) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const e = BigInt(vals.e);
+      const targetM = BigInt(vals.target_m);
+
+      // Parse oracle pairs: "m1,s1;m2,s2;..."
+      const pairs: Array<[bigint, bigint]> = vals.oracle_pairs.split(';')
+        .map(p => p.trim())
+        .filter(p => p.length > 0)
+        .map(p => {
+          const [m, s] = p.split(',').map(x => BigInt(x.trim()));
+          return [m, s] as [bigint, bigint];
+        });
+
+      if (pairs.length === 0) return Promise.resolve(null);
+
+      // Verify each pair
+      for (const [m_i, s_i] of pairs) {
+        if (modPow(s_i, e, n) !== m_i) return Promise.resolve(null);
+      }
+
+      // Powerset search (limited to 15 pairs — 2^15 = 32768 subsets)
+      if (pairs.length > 15) return Promise.resolve(null);
+      const count = 1 << pairs.length;
+      for (let mask = 1; mask < count; mask++) {
+        let prodM = 1n, prodS = 1n;
+        for (let i = 0; i < pairs.length; i++) {
+          if (mask & (1 << i)) {
+            prodM = (prodM * pairs[i][0]) % n;
+            prodS = (prodS * pairs[i][1]) % n;
+          }
+        }
+        if (prodM === targetM) {
+          return Promise.resolve(`Factor found!\nForged signature: s = ${prodS}\nVerification: s^e mod n = ${modPow(prodS, e, n)}`);
+        }
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
+  },
   proof: `\\textbf{Theorem:} Textbook RSA is multiplicatively homomorphic: \\(s_1 s_2 \\bmod n\\) signs \\(m_1 m_2 \\bmod n\\).
 
 \\textbf{Setup:}

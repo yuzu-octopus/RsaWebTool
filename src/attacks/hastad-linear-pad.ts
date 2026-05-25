@@ -158,10 +158,6 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
     except Exception as ex:
         print(f"ERROR: {ex}")
         print("HASTAD_LINEAR_PAD=FAILED")
-        #
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("HASTAD_LINEAR_PAD=FAILED")
 _attack()`;
   },
   proof: `\\textbf{Theorem:} Given c\\_i \\equiv (a\\_i m + b\\_i)^e \\pmod{n\\_i} with k \\geq e, recover m via CRT + Coppersmith.

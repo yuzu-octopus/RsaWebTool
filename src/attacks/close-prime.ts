@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { isqrt } from '../utils/bigint';
 import { randomPrime, isPrimeMR } from '../utils/testcases/core';
 
 export const attack: Attack = {
@@ -118,6 +119,29 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("CLOSE_PRIME=FAILED")
 _attack()`,
+  frontendCheck: (vals) => {
+    if (!vals.n) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}`);
+      let a = isqrt(n);
+      if (a * a < n) a++;
+      const limit = a + 1000000n;
+      while (a < limit) {
+        const b2 = a * a - n;
+        const b = isqrt(b2);
+        if (b * b === b2) {
+          const p = a - b;
+          const q = a + b;
+          if (p > 1n && q > 1n && p * q === n) {
+            return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}`);
+          }
+        }
+        a++;
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
+  },
   proof: `\\textbf{Theorem:} If $p \\approx q$, then $\\phi(n)$ can be recovered via a BSGS discrete log attack, factoring $n$.
 
 \\textbf{Setup:}

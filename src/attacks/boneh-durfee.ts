@@ -19,30 +19,35 @@ export const attack: Attack = {
             try:
                 n = Integer(${vals.n})
                 e = Integer(${vals.e})
-                print(f"Boneh-Durfee Attack on n = {n}")
+                out = []
+                out.append(f"Boneh-Durfee Attack on n = {n}")
                 if n < 2 or e < 2:
-                    print("Invalid input: n and e must be >= 2")
+                    out.append("Invalid input: n and e must be >= 2")
+                    print("\\n".join(out))
                     print("BONEH_DURFEE=FAILED")
                     return
                 if n % 2 == 0:
-                    print(f"n is even: {n}")
-                    print(f"Verification: 2 * {n // 2} = {n}")
-                    print(f"p = 2")
-                    print(f"q = {n // 2}")
-                    print()
+                    out.append(f"n is even: {n}")
+                    out.append(f"Verification: 2 * {n // 2} = {n}")
+                    out.append(f"p = 2")
+                    out.append(f"q = {n // 2}")
+                    out.append("")
+                    print("\\n".join(out))
                     print("BONEH_DURFEE=SUCCESS")
                     return
                 if n.is_prime():
-                    print(f"n is prime: {n}")
+                    out.append(f"n is prime: {n}")
+                    print("\\n".join(out))
                     print("BONEH_DURFEE=FAILED")
                     return
                 if n.is_square():
                     p = isqrt(n)
-                    print(f"n is a perfect square: {p}^2 = {n}")
-                    print(f"Verification: p * q = {p * p}")
-                    print(f"p = {p}")
-                    print(f"q = {p}")
-                    print()
+                    out.append(f"n is a perfect square: {p}^2 = {n}")
+                    out.append(f"Verification: p * q = {p * p}")
+                    out.append(f"p = {p}")
+                    out.append(f"q = {p}")
+                    out.append("")
+                    print("\\n".join(out))
                     print("BONEH_DURFEE=SUCCESS")
                     return
                 # Phase 1: Wiener's attack via continued fraction convergents of e/n
@@ -62,21 +67,22 @@ export const attack: Attack = {
                                 p = (s - t) // 2
                                 q = (s + t) // 2
                                 if p * q == n and p > 1:
-                                    print(f"Wiener's attack succeeded:")
-                                    print(f"Verification: p * q = {p * q}")
-                                    print(f"d = {d}")
-                                    print(f"p = {p}")
-                                    print(f"q = {q}")
-                                    print()
-                                    print("BONEH_DURFEE=SUCCESS")
+                                    out.append(f"Wiener's attack succeeded:")
+                                    out.append(f"Verification: p * q = {p * q}")
+                                    out.append(f"d = {d}")
+                                    out.append(f"p = {p}")
+                                    out.append(f"q = {q}")
+                                    out.append("")
                                     found = True
                                     break
                 if found:
+                    print("\\n".join(out))
+                    print("BONEH_DURFEE=SUCCESS")
                     return
                 # Phase 2: Boneh-Durfee lattice attack (Herrmann-May simplification)
                 # f(x,y) = 1 + x*(A + y) with root (2k, -(p+q)/2) where ed = 1 + k*phi(n)
                 # Theoretical bound: d < n^delta with delta < 1 - 1/sqrt(2) ≈ 0.292
-                print("Wiener failed (d >= n^0.25). Attempting Boneh-Durfee lattice attack...")
+                out.append("Wiener failed (d >= n^0.25). Attempting Boneh-Durfee lattice attack...")
                 A = (n + 1) // 2
                 delta = 0.260
                 m = 3
@@ -166,22 +172,25 @@ export const attack: Attack = {
                                             p_val = ZZ((p_plus_q + sqrt_disc2) // 2)
                                             q_val = ZZ((p_plus_q - sqrt_disc2) // 2)
                                             if p_val * q_val == n and p_val > 1:
-                                                print("Boneh-Durfee lattice attack succeeded!")
-                                                print(f"Verification: p * q = {p_val * q_val}")
-                                                print(f"d = {d_val}")
-                                                print(f"p = {p_val}")
-                                                print(f"q = {q_val}")
-                                                print()
+                                                out.append("Boneh-Durfee lattice attack succeeded!")
+                                                out.append(f"Verification: p * q = {p_val * q_val}")
+                                                out.append(f"d = {d_val}")
+                                                out.append(f"p = {p_val}")
+                                                out.append(f"q = {q_val}")
+                                                out.append("")
+                                                print("\\n".join(out))
                                                 print("BONEH_DURFEE=SUCCESS")
                                                 found2 = True
                                                 break
                             if found2:
                                 break
                 if not found2:
-                    print("Boneh-Durfee lattice attack failed: d >= n^0.292 or parameters insufficient.")
+                    out.append("Boneh-Durfee lattice attack failed: d >= n^0.292 or parameters insufficient.")
+                    print("\\n".join(out))
                     print("BONEH_DURFEE=FAILED")
             except BaseException as ex:
-                print(f"ERROR: Boneh-Durfee computation failed: {ex}")
+                out.append(f"ERROR: Boneh-Durfee computation failed: {ex}")
+                print("\\n".join(out))
                 print("BONEH_DURFEE=FAILED")
         #
         _bd_attack()

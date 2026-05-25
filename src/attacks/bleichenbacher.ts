@@ -1,5 +1,6 @@
 import type { Attack } from '../types';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
+import { modPow } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'bleichenbacher',
@@ -135,6 +136,47 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("BLEICHENBACHER=FAILED")
 _attack()`,
+  frontendCheck: (vals) => {
+    if (!vals.n || !vals.e || !vals.c || !vals.oracle_responses) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const e = BigInt(vals.e);
+      const c = BigInt(vals.c);
+      const responses = vals.oracle_responses.split(',').map(x => x.trim() === '1');
+      const nextResponse = () => idx < responses.length ? responses[idx++] : false;
+      const nBits = n.toString(2).length;
+      const k = Math.ceil(nBits / 8);
+      const B = 1n << BigInt(8 * (k - 1));
+      const twoB = 2n * B;
+      let idx = 0;
+
+      // Step 1
+      let s = 1n;
+      while (!nextResponse()) s++;
+
+      // Step 2-3: Initial interval
+      let mmin = (n + s - 1n) / s;
+      let mmax = (n + B) / s;
+
+      // Step 4: Narrow interval
+      const step4Limit = Math.min(responses.length - idx, 100);
+      for (let i = 0; i < step4Limit; i++) {
+        const fTmp = twoB / (mmax - mmin);
+        const iVal = (fTmp * mmin) / n;
+        let sNew = (iVal * n + mmin - 1n) / mmin;
+        if (sNew === 0n) sNew = 1n;
+        const oracleResult = nextResponse();
+        const iNB = iVal * n + B;
+        if (oracleResult) mmin = (iNB + sNew - 1n) / sNew;
+        else mmax = iNB / sNew;
+      }
+
+      for (let m = mmin; m <= mmax && m < mmin + 100n; m++) {
+        if (modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}`);
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
+  },
   proof: `\\textbf{Theorem:} A PKCS#1 v1.5 padding oracle decrypts any ciphertext in \\(\\approx 2^{17}\\) queries.
 
 \\textbf{Setup:}

@@ -86,10 +86,52 @@ export const attack: Attack = {
     except Exception as e:
         print("ERROR:", e)
         print("COPPERSMITH_SHORT_PAD=FAILED")
-    except BaseException as e:
-        print("ERROR:", e)
-        print("COPPERSMITH_SHORT_PAD=FAILED")
 _attack()`;
+  },
+  frontendCheck: (vals: Record<string, string>) => {
+    if (!vals.n || !vals.e || !vals.c1 || !vals.c2) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const e = BigInt(vals.e);
+      const c1 = BigInt(vals.c1);
+      const c2 = BigInt(vals.c2);
+      const iroot = (val: bigint, exp: bigint): bigint | null => {
+        if (val < 0n) return null;
+        if (val < 2n) return val;
+        let lo = 2n, hi = 2n;
+        while (hi ** exp < val) hi *= 2n;
+        while (lo < hi) {
+          const mid = (lo + hi + 1n) / 2n;
+          if (mid ** exp <= val) lo = mid;
+          else hi = mid - 1n;
+        }
+        return lo ** exp === val ? lo : null;
+      };
+      let m1: bigint | null = iroot(c1, e);
+      let m2: bigint | null = iroot(c2, e);
+      if (m1 === null && m2 !== null) {
+        for (let d = 1n; d < 256n; d++) {
+          if ((m2 - d) ** e === c1) {
+            m1 = m2 - d;
+            break;
+          }
+        }
+      }
+      if (m2 === null && m1 !== null) {
+        for (let d = 1n; d < 256n; d++) {
+          if ((m1 + d) ** e === c2) {
+            m2 = m1 + d;
+            break;
+          }
+        }
+      }
+      if (m1 !== null && m2 !== null) {
+        if (modPow(m1, e, n) === c1 && modPow(m2, e, n) === c2) {
+          return Promise.resolve(`Messages recovered!\nm1 = ${m1}\nm2 = ${m2}\ndelta = ${m2 - m1}`);
+        }
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} Given $c_1 \\equiv (m + \\delta_1)^e \\pmod{n}$ and $c_2 \\equiv (m + \\delta_2)^e \\pmod{n}$ with $|\\Delta| < n^{1/e^2}$, recover $m$ via resultant + Coppersmith.
 
