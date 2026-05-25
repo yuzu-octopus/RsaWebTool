@@ -176,7 +176,7 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r+1)}{256s} \\ri
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Use small primes (12-bit → n ≈ 24 bits) so the attack completes in SageMathCell's 35s timeout.
+  // Use small primes (12-bit → n ≈ 24 bits) so the attack completes in SageMathCell's 120s timeout.
   const { n, e, d } = generateKeyPair(12, 12);
   // k = byte length, B = 2^(8*(k-1))
   const k = Math.ceil(Number(n.toString(2).length) / 8);

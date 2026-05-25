@@ -122,7 +122,7 @@ p &\\mid (x_i - x_j) \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Generate n with one SMALL factor (≤28 bits) so rho succeeds within SageCell 35s
+  // Generate n with one SMALL factor (≤28 bits) so rho succeeds within SageCell 120s
   // Rho runs in O(sqrt(p)) — with p=28 bits, ~2^14 = 16384 iterations, very fast
   // n = 28 + 64 = 92 bits total — fast modular arithmetic
   const p = randomPrime(28);

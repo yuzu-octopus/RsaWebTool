@@ -202,7 +202,7 @@ export function useSageMath() {
 
   const execute = async (
     code: string,
-    timeoutMs = 35000,
+    timeoutMs = DEFAULT_SAGE_TIMEOUT,
     signal?: AbortSignal,
   ): Promise<SageResult> => {
     const lifecycleSignal = controllerRef.current?.signal;

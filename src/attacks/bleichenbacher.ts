@@ -159,7 +159,7 @@ b - a = 0 &\\implies m = a \\qed
 
 export const generateTestcase = (): Record<string, string> => {
   // Use small primes (10-bit → n ≈ 20 bits) so the oracle response array stays small
-  // and the template converges within SageMathCell's 35s timeout.
+  // and the template converges within SageMathCell's 120s timeout.
   // B = 2^(8*(k-2)) where k = ceil(nbits/8). For n≈20 bits: k=3, B=256.
   const { n, e } = generateKeyPair(10, 10);
   const k = Math.ceil(n.toString(2).length / 8);

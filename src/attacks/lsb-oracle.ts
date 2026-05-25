@@ -108,7 +108,7 @@ b_i = 0 &\\iff m < n/2^{i} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Use small primes (12-bit) so the attack completes in SageMathCell's 35s timeout.
+  // Use small primes (12-bit) so the attack completes in SageMathCell's 120s timeout.
   // 12+12=24 bits → 24 oracle iterations with integer arithmetic, sub-second execution.
   const { n, e, d } = generateKeyPair(12, 12);
   const m = BigInt(Math.floor(Math.random() * 1000) + 42);
