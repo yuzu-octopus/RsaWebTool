@@ -25,9 +25,11 @@ export const attack: Attack = {
             if n % nearp == 0:
                 p = nearp
                 q = n // p
-                print("SIMPLE_LATTICE=SUCCESS: nearp exactly divides n")
-                print(f"p={p}")
-                print(f"q={q}")
+                print(f"Verification: p * q = {p * q}")
+                print(f"p = {p}")
+                print(f"q = {q}")
+                print()
+                print("SIMPLE_LATTICE=SUCCESS")
                 return
             if n % 2 == 0:
                 print("n is even — cannot apply lattice attack")
@@ -70,9 +72,11 @@ export const attack: Attack = {
                     break
             if found_p:
                 q = n // found_p
+                print(f"Verification: p * q = {found_p * q}")
+                print(f"p = {found_p}")
+                print(f"q = {q}")
+                print()
                 print("SIMPLE_LATTICE=SUCCESS")
-                print(f"p={found_p}")
-                print(f"q={q}")
             else:
                 print("SIMPLE_LATTICE=FAILED: no roots found in any LLL row")
         except Exception as ex:

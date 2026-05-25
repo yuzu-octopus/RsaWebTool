@@ -48,10 +48,11 @@ export const attack: Attack = {
                         if n % p == 0:
                             q = n // p
                             print(f"Verification: p * q = {p * q}")
-                            print(f"LINEARLY_RELATED_PRIMES=SUCCESS")
-                            print(f"p={p}")
-                            print(f"q={q}")
-                            print(f"delta={delta}")
+                            print(f"p = {p}")
+                            print(f"q = {q}")
+                            print(f"delta = {delta}")
+                            print()
+                            print("LINEARLY_RELATED_PRIMES=SUCCESS")
                             found = True
                             break
             if not found:

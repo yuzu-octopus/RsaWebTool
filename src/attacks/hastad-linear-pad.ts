@@ -146,6 +146,7 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                         all_ok = False
                     print(f"  Verify {i+1}: (a*m+b)^e mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
                 if all_ok:
+                    print()
                     print("HASTAD_LINEAR_PAD=SUCCESS")
                 else:
                     print("HASTAD_LINEAR_PAD=FAILED")

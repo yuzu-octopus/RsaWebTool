@@ -38,14 +38,15 @@ print("COMMON_FACTOR=FAILED")`;
             p = g
             q = n // g
             print(f"\\nCommon factor found!")
-            print(f"p = {p}")
-            print(f"q = {q}")
             print(f"Verification: p * q = {p * q}")
             print(f"p is prime: {p.is_prime()}")
             print(f"q is prime: {q.is_prime()}")
+            print(f"p = {p}")
+            print(f"q = {q}")
             if p.is_prime() and q.is_prime():
                 print(f"\\nThe message m is a multiple of p = {p}")
                 print(f"m = k * {p} for some integer k")
+                print()
                 print("COMMON_FACTOR=SUCCESS")
             else:
                 print("gcd(c, n) did not yield valid prime factors.")

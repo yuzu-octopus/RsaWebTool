@@ -108,10 +108,12 @@ export const attack: Attack = {
                 print(f"Verification: m^e mod n = {v}")
                 print(f"Original c = {orig_c}")
                 print("VERIFICATION PASSED!")
+                print()
                 print("BIASED_LSB=SUCCESS")
             else:
                 print(f"\\nCandidate scan failed to find m in range [{candidate_start}, {candidate_end}]")
                 print("Verification failed - may need more oracle runs or higher bias")
+                print()
                 print("BIASED_LSB=FAILED")
         except Exception as ex:
             print(f"ERROR: {ex}")

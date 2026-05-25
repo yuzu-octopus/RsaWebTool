@@ -38,7 +38,8 @@ export const attack: Attack = {
                     high = mid - 1
             return low
         print("Coppersmith Short Pad Attack")
-        print("n =", n, "e =", e)
+        print(f"n = {n}")
+        print(f"e = {e}")
         print("Recovering messages via integer e-th root...")
         m1_val = None
         m2_val = None
@@ -74,7 +75,8 @@ export const attack: Attack = {
         if m1_val is not None and m2_val is not None:
             if power_mod(m1_val, e, n) == c1 and power_mod(m2_val, e, n) == c2:
                 delta_val = m2_val - m1_val
-                print(f"Found messages: m1={m1_val}, m2={m2_val}, delta={delta_val}")
+                print(f"Found messages: m1 = {m1_val}, m2 = {m2_val}, delta = {delta_val}")
+                print()
                 print("COPPERSMITH_SHORT_PAD=SUCCESS")
                 return
         print("Could not recover messages.")

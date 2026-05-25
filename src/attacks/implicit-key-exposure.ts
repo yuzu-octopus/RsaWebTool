@@ -36,10 +36,11 @@ export const attack: Attack = {
             if g > 1 and g < n:
                 p = g
                 q = n // p
-                print(f"p = {p}")
-                print(f"q = {q}")
                 print(f"Verification: p * q = {p * q}")
                 print(f"Verification: a^p mod n = {power_mod(a, p, n)} == leak? {power_mod(a, p, n) == leak}")
+                print(f"p = {p}")
+                print(f"q = {q}")
+                print()
                 print("IMPLICIT_KEY_EXPOSURE=SUCCESS")
             else:
                 print("gcd(leak - a, n) = 1 or n. Fermat trick failed.")
@@ -93,6 +94,7 @@ p &= \\gcd(\\text{leak} - a, n) \\qed
           `q = ${q}`,
           `Verification: p * q = ${p * q}`,
           `Verification: a^p mod n = ${modPow(a, p, n)} == leak? ${modPow(a, p, n) === leak}`,
+          ``,
           `IMPLICIT_KEY_EXPOSURE=SUCCESS`,
         ].join('\n');
       }

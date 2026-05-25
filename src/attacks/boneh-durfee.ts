@@ -26,8 +26,10 @@ export const attack: Attack = {
                     return
                 if n % 2 == 0:
                     print(f"n is even: {n}")
+                    print(f"Verification: 2 * {n // 2} = {n}")
                     print(f"p = 2")
                     print(f"q = {n // 2}")
+                    print()
                     print("BONEH_DURFEE=SUCCESS")
                     return
                 if n.is_prime():
@@ -37,6 +39,10 @@ export const attack: Attack = {
                 if n.is_square():
                     p = isqrt(n)
                     print(f"n is a perfect square: {p}^2 = {n}")
+                    print(f"Verification: p * q = {p * p}")
+                    print(f"p = {p}")
+                    print(f"q = {p}")
+                    print()
                     print("BONEH_DURFEE=SUCCESS")
                     return
                 # Phase 1: Wiener's attack via continued fraction convergents of e/n
@@ -57,8 +63,11 @@ export const attack: Attack = {
                                 q = (s + t) // 2
                                 if p * q == n and p > 1:
                                     print(f"Wiener's attack succeeded:")
-                                    print(f"d = {d}, p = {p}, q = {q}")
                                     print(f"Verification: p * q = {p * q}")
+                                    print(f"d = {d}")
+                                    print(f"p = {p}")
+                                    print(f"q = {q}")
+                                    print()
                                     print("BONEH_DURFEE=SUCCESS")
                                     found = True
                                     break
@@ -158,10 +167,11 @@ export const attack: Attack = {
                                             q_val = ZZ((p_plus_q - sqrt_disc2) // 2)
                                             if p_val * q_val == n and p_val > 1:
                                                 print("Boneh-Durfee lattice attack succeeded!")
+                                                print(f"Verification: p * q = {p_val * q_val}")
                                                 print(f"d = {d_val}")
                                                 print(f"p = {p_val}")
                                                 print(f"q = {q_val}")
-                                                print(f"Verification: p * q = {p_val * q_val}")
+                                                print()
                                                 print("BONEH_DURFEE=SUCCESS")
                                                 found2 = True
                                                 break

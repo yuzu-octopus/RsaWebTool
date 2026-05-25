@@ -56,8 +56,10 @@ export const attack: Attack = {
         if n.is_square():
             p = isqrt(n)
             print(f"n is a perfect square: {p}^2 = {n}")
-            print(f"p = q = {p}")
             print(f"Verification: p * q = {p * p}")
+            print(f"p = {p}")
+            print(f"q = {p}")
+            print()
             print("WILLIAMS_P1=SUCCESS")
             return
         #
@@ -140,9 +142,9 @@ export const attack: Attack = {
                         p = Integer(g)
                         q = n // g
                         print(f"Factor found with P = {P}!")
+                        print(f"Verification: p * q = {p * q}")
                         print(f"p = {p}")
                         print(f"q = {q}")
-                        print(f"Verification: p * q = {p * q}")
                         found = True
                         break
                 if found:
@@ -150,8 +152,10 @@ export const attack: Attack = {
             if not found:
                 print("Williams' p+1 failed. p+1 may not be B1-smooth for tested P values.")
                 print("Try increasing B1, enabling stage 2 with B2 > B1, or using a different method.")
+                print()
                 print("WILLIAMS_P1=FAILED")
             else:
+                print()
                 print("WILLIAMS_P1=SUCCESS")
         except Exception as ex:
             print(f"Williams' p+1 error: {ex}")

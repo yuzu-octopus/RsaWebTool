@@ -24,9 +24,11 @@ export const attack: Attack = {
             if n % p_msb == 0:
                 p = p_msb
                 q = n // p
-                print("PARTIAL_KEY_EXPOSURE=SUCCESS: p_msb exactly divides n")
-                print(f"p={p}")
-                print(f"q={q}")
+                print(f"Verification: p * q = {p * q}")
+                print(f"p = {p}")
+                print(f"q = {q}")
+                print()
+                print("PARTIAL_KEY_EXPOSURE=SUCCESS")
                 return
             # p = p_msb + x, where x is unknown low bits (trailing zeros = bit count of x)
             k = p_msb.trailing_zero_bits()
@@ -68,8 +70,10 @@ export const attack: Attack = {
                     break
             if found_p:
                 q = n // found_p
+                print(f"Verification: p * q = {found_p * q}")
                 print(f"p = {found_p}")
                 print(f"q = {q}")
+                print()
                 print("PARTIAL_KEY_EXPOSURE=SUCCESS")
             else:
                 print("Need approximately half the bits of p for Coppersmith to work.")

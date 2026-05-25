@@ -32,7 +32,10 @@ export const attack: Attack = {
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("GIMMICKY_PRIMES=SUCCESS")
                 return
             found = False
@@ -132,10 +135,12 @@ export const attack: Attack = {
                         print(f"  Verification: {candidate} * {n // candidate} = {n}")
                         found = True
             if found:
+                print()
                 print("GIMMICKY_PRIMES=SUCCESS")
             else:
                 print("No gimmicky prime factors found.")
                 print("The factors are likely standard randomly-generated primes.")
+                print()
                 print("GIMMICKY_PRIMES=FAILED")
         except Exception as e:
             print(f"Error in gimmicky primes check: {e}")

@@ -56,6 +56,7 @@ export const attack: Attack = {
                     print()
                     print("Note: In real-world scans, ~0.2% of RSA certificates share factors")
                     print("due to poor entropy during key generation.")
+                    print()
                     print("MULTI_PRIME_GCD=FAILED")
         except Exception as ex:
             print(f"ERROR: {ex}")

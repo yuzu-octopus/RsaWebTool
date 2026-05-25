@@ -50,10 +50,11 @@ export const attack: Attack = {
                         if n % p == 0:
                             q = n // p
                             print(f"Verification: p * q = {p * q}")
+                            print(f"p = {p}")
+                            print(f"q = {q}")
+                            print(f"k = {k}")
+                            print()
                             print("DEPENDENT_PRIME=SUCCESS")
-                            print(f"p={p}")
-                            print(f"q={q}")
-                            print(f"k={k}")
                             found = True
                             break
             if not found:

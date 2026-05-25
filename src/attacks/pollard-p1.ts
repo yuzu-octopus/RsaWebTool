@@ -31,7 +31,11 @@ export const attack: Attack = {
             print("POLLARD_P1=FAILED")
             return
         if n % 2 == 0:
-            print(f"n is even: p = 2, q = {n // 2}")
+            print(f"n is even: {n}")
+            print(f"Verification: 2 * {n // 2} = {n}")
+            print(f"p = 2")
+            print(f"q = {n // 2}")
+            print()
             print("POLLARD_P1=SUCCESS")
             return
         if n.is_prime():
@@ -40,7 +44,11 @@ export const attack: Attack = {
             return
         if n.is_square():
             p = isqrt(n)
-            print(f"n is a perfect square: p = q = {p}")
+            print(f"n is a perfect square: {p}^2 = {n}")
+            print(f"Verification: p * q = {p * p}")
+            print(f"p = {p}")
+            print(f"q = {p}")
+            print()
             print("POLLARD_P1=SUCCESS")
             return
         # Sieve primes up to B1 (pure Python, no prime_range)
@@ -68,9 +76,10 @@ export const attack: Attack = {
         g = gcd(a - 1, n)
         if 1 < g < n:
             q_val = n // g
+            print(f"Verification: p * q = {g * q_val}")
             print(f"p = {g}")
             print(f"q = {q_val}")
-            print(f"Verification: p * q = {g * q_val}")
+            print()
             print("POLLARD_P1=SUCCESS")
             return
         # Stage 2 (optional, only if B2 > B1 and Stage 1 failed)
@@ -100,9 +109,10 @@ export const attack: Attack = {
                 g = gcd(Q, n)
                 if 1 < g < n:
                     q_val = n // g
+                    print(f"Verification: p * q = {g * q_val}")
                     print(f"p = {g}")
                     print(f"q = {q_val}")
-                    print(f"Verification: p * q = {g * q_val}")
+                    print()
                     print("POLLARD_P1=SUCCESS")
                     return
         print("Pollard p-1 failed: p-1 is not smooth enough for these bounds")

@@ -31,7 +31,10 @@ export const attack: Attack = {
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("BINARY_POLY_FACTOR=SUCCESS")
                 return
             if n > 0 and (n & (n - 1)) == 0:
@@ -75,6 +78,7 @@ export const attack: Attack = {
                         val = factor(2)
                         if val > 1:
                             print(f"  {val} (is prime: {val.is_prime()})")
+                    print()
                     print("BINARY_POLY_FACTOR=SUCCESS")
                 else:
                     print("No proper factors: polynomial factorization is trivial (irreducible f(x)).")

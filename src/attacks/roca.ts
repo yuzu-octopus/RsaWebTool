@@ -78,9 +78,10 @@ export const attack: Attack = {
                     p = int(M * k + r)
                     q = n // p
                     out.append("VULNERABLE: n uses ROCA-generated primes.")
+                    out.append("Verification: p * q = " + str(p * q))
                     out.append("p = " + str(p))
                     out.append("q = " + str(q))
-                    out.append("Verification: p * q = " + str(p * q))
+                    out.append("")
                     out.append("ROCA=SUCCESS")
                 else:
                     out.append("No root found with M = " + str(M))

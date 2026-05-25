@@ -60,9 +60,11 @@ export const attack: Attack = {
                             break
                     if found_p:
                         q = n // found_p
-                        print(f"PARTIAL_PQ_BITS=SUCCESS")
-                        print(f"p={found_p}")
-                        print(f"q={q}")
+                        print(f"Verification: p * q = {found_p * q}")
+                        print(f"p = {found_p}")
+                        print(f"q = {q}")
+                        print()
+                        print("PARTIAL_PQ_BITS=SUCCESS")
                     else:
                         print("PARTIAL_PQ_BITS=FAILED: no roots found")
             elif bitPosition == "lsb":
@@ -104,9 +106,11 @@ export const attack: Attack = {
                             break
                     if found_p:
                         q = n // found_p
-                        print(f"PARTIAL_PQ_BITS=SUCCESS")
-                        print(f"p={found_p}")
-                        print(f"q={q}")
+                        print(f"Verification: p * q = {found_p * q}")
+                        print(f"p = {found_p}")
+                        print(f"q = {q}")
+                        print()
+                        print("PARTIAL_PQ_BITS=SUCCESS")
                     else:
                         print("PARTIAL_PQ_BITS=FAILED: no roots found")
         except Exception as ex:

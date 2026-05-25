@@ -75,6 +75,7 @@ export const attack: Attack = {
                 print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
                 print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
                 if v1 == c1 and v2 == c2:
+                    print()
                     print("FRANKLIN_REITER_RELATED_MESSAGE=SUCCESS")
                 else:
                     print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
@@ -92,6 +93,7 @@ export const attack: Attack = {
                     print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
                     print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
                     if v1 == c1 and v2 == c2:
+                        print()
                         print("FRANKLIN_REITER_RELATED_MESSAGE=SUCCESS")
                     else:
                         print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")

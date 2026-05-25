@@ -68,7 +68,6 @@ export const attack: Attack = {
             else:
                 print("\\nNo novelty primes found.")
                 print("NOVELTY_PRIMES=FAILED")
-            print("\\nNovelty prime check complete.")
         except Exception as e:
             print(f"Error in Novelty Primes check: {e}")
             print("NOVELTY_PRIMES=FAILED")

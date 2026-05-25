@@ -45,11 +45,11 @@ print("RSA_CRT_FAULT=FAILED")`;
             p = g
             q = n // g
             print(f"\\nFactorization found!")
-            print(f"p = {p}")
-            print(f"q = {q}")
-            print(f"p * q = {p * q}")
+            print(f"Verification: p * q = {p * q}")
             print(f"p is prime: {p.is_prime()}")
             print(f"q is prime: {q.is_prime()}")
+            print(f"p = {p}")
+            print(f"q = {q}")
             # Compute private key
             phi = (p - 1) * (q - 1)
             d = inverse_mod(e, phi)
@@ -58,6 +58,7 @@ print("RSA_CRT_FAULT=FAILED")`;
             sig_recovered = power_mod(m, d, n)
             print(f"Recovered sig: {sig_recovered}")
             print(f"Matches valid sig: {sig_recovered == sig_valid}")
+            print()
             print("RSA_CRT_FAULT=SUCCESS")
         else:
             print("GCD did not reveal a factor. The fault may not be a CRT fault.")

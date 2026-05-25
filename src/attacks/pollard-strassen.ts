@@ -21,7 +21,10 @@ export const attack: Attack = {
                 return
             if n % 2 == 0:
                 print(f"n is even: {n}")
-                print(f"p = 2, q = {n // 2}")
+                print(f"Verification: p * q = {2 * (n // 2)}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print()
                 print("POLLARD_STRASSEN=SUCCESS")
                 return
             if n.is_prime():
@@ -31,7 +34,10 @@ export const attack: Attack = {
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("POLLARD_STRASSEN=SUCCESS")
                 return
             c = Integer(floor(RR(n) ** (1/4))) + 1
@@ -49,9 +55,10 @@ export const attack: Attack = {
                 if g > 1 and g < n:
                     p = g
                     q = n // g
+                    print(f"Verification: p * q = {p * q}")
                     print(f"p = {p}")
                     print(f"q = {q}")
-                    print(f"Verification: p * q = {p * q}")
+                    print()
                     print("POLLARD_STRASSEN=SUCCESS")
                     return
             print("Pollard-Strassen failed: no factor found in intervals")

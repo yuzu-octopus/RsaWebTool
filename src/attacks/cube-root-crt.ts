@@ -63,6 +63,7 @@ print("CUBE_ROOT_CRT=FAILED")`;
         elif len(roots_p) * len(roots_q) == 9:
             print("\\n9 solutions (3 mod p × 3 mod q). Additional context needed to identify correct m.")
         if found_valid:
+            print()
             print("CUBE_ROOT_CRT=SUCCESS")
         else:
             print("CUBE_ROOT_CRT=FAILED")

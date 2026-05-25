@@ -36,10 +36,11 @@ export const attack: Attack = {
                     if p_candidate > 1 and n % p_candidate == 0:
                         q = n // p_candidate
                         print(f"Verification: p * q = {p_candidate * q}")
+                        print(f"dp = {dp}")
+                        print(f"p = {p_candidate}")
+                        print(f"q = {q}")
+                        print()
                         print("SMALL_CRT_EXP=SUCCESS")
-                        print(f"dp={dp}")
-                        print(f"p={p_candidate}")
-                        print(f"q={q}")
                         found = True
                         break
                 if found:

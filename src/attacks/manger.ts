@@ -136,11 +136,13 @@ export const attack: Attack = {
             print(f"Original c = {orig_c}")
             if v == orig_c:
                 print("VERIFICATION PASSED!")
+                print()
                 print("MANGER=SUCCESS")
             else:
                 print("Verification failed - may need more oracle responses")
                 print(f"m^e mod n = {v}")
                 print(f"c = {orig_c}")
+                print()
                 print("MANGER=FAILED")
         #
         except Exception as ex:

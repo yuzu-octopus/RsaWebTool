@@ -34,7 +34,10 @@ export const attack: Attack = {
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("SQUFOF=SUCCESS")
                 return
             # SQUFOF works best for small factors; extract small factor first
@@ -45,8 +48,10 @@ export const attack: Attack = {
                     p = Integer(trial)
                     q = n // p
                     print(f"Small factor found: p = {p}")
-                    print(f"q = {q}")
                     print(f"Verification: p * q = {p * q}")
+                    print(f"p = {p}")
+                    print(f"q = {q}")
+                    print()
                     print("SQUFOF=SUCCESS")
                     found_small = True
                     break
@@ -110,9 +115,10 @@ export const attack: Attack = {
             result = squfof(n)
             if result:
                 p, q = result
+                print(f"Verification: p * q = {p * q}")
                 print(f"p = {p}")
                 print(f"q = {q}")
-                print(f"Verification: p * q = {p * q}")
+                print()
                 print("SQUFOF=SUCCESS")
             else:
                 print("SQUFOF did not find a factor. Try a different method.")

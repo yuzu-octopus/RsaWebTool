@@ -32,7 +32,10 @@ export const attack: Attack = {
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("CLOSE_PRIME=SUCCESS")
                 return
             # Step 1: Fermat factorization (fast for close primes)
@@ -55,11 +58,12 @@ export const attack: Attack = {
                 q = a_final + b
                 if p > 1 and q < n and p*q == n:
                     print(f"Fermat factorization succeeded!")
+                    print(f"Verification: p * q = {p * q}")
                     print(f"p = {p}")
                     print(f"q = {q}")
                     print(f"|p - q| = {q - p}")
-                    print(f"Verification: p * q = {p * q}")
                     print(f"Iterations: {iterations}")
+                    print()
                     print("CLOSE_PRIME=SUCCESS")
                     return
             # Step 2: Londahl BSGS fallback (for larger prime gaps)
@@ -91,15 +95,16 @@ export const attack: Attack = {
                             q_candidate = (m + sqrt_disc) // 2
                             if p_candidate * q_candidate == n and p_candidate > 1 and q_candidate > 1:
                                 print(f"Londahl BSGS factor found!")
+                                print(f"Verification: p * q = {p_candidate * q_candidate}")
                                 print(f"p = {p_candidate}")
                                 print(f"q = {q_candidate}")
                                 print(f"|p - q| = {abs(q_candidate - p_candidate)}")
-                                print(f"Verification: p * q = {p_candidate * q_candidate}")
                                 print(f"Baby steps: {b+1}, Giant steps: {i+1}")
                                 found = True
                                 break
                 mu = (mu * step) % n
             if found:
+                print()
                 print("CLOSE_PRIME=SUCCESS")
             else:
                 print("Both Fermat and Londahl BSGS failed to factor n.")

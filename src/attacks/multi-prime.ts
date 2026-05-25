@@ -75,6 +75,7 @@ export const attack: Attack = {
                 for p, k in factor_counts.items():
                     phi *= p**(k-1) * (p - 1)
                 print(f"phi(n) = {phi}")
+                print()
                 print("MULTI_PRIME=SUCCESS")
             elif len(prime_factors) == 2 and all_prime:
                 print("Standard 2-prime RSA (not multi-prime).")

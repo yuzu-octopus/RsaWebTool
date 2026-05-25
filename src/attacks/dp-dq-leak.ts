@@ -30,7 +30,7 @@ export const attack: Attack = {
             const p = gcd(x - 1n, n);
             if (p > 1n && p < n) {
               const q = n / p;
-              return `Verification: p * q = ${(p * q).toString()}\nDP_DQ_LEAK=SUCCESS\ndp=${dp.toString()}\np=${p.toString()}\nq=${q.toString()}`;
+              return `Verification: p * q = ${(p * q).toString()}\ndp = ${dp.toString()}\np = ${p.toString()}\nq = ${q.toString()}\n\nDP_DQ_LEAK=SUCCESS`;
             }
           }
         }
@@ -45,7 +45,7 @@ export const attack: Attack = {
             const q = gcd(x - 1n, n);
             if (q > 1n && q < n) {
               const p = n / q;
-              return `Verification: p * q = ${(p * q).toString()}\nDP_DQ_LEAK=SUCCESS\ndq=${dq.toString()}\np=${p.toString()}\nq=${q.toString()}`;
+              return `Verification: p * q = ${(p * q).toString()}\ndq = ${dq.toString()}\np = ${p.toString()}\nq = ${q.toString()}\n\nDP_DQ_LEAK=SUCCESS`;
             }
           }
         }
@@ -67,10 +67,11 @@ export const attack: Attack = {
                     if n % p_candidate == 0:
                         q_val = n // p_candidate
                         print(f"Verification: p * q = {p_candidate * q_val}")
+                        print(f"dp = {dp}")
+                        print(f"p = {p_candidate}")
+                        print(f"q = {q_val}")
+                        print()
                         print("DP_DQ_LEAK=SUCCESS")
-                        print(f"dp={dp}")
-                        print(f"p={p_candidate}")
-                        print(f"q={q_val}")
                         found = True
                         break` : '';
 
@@ -85,10 +86,11 @@ export const attack: Attack = {
                         if n % q_candidate == 0:
                             p_val = n // q_candidate
                             print(f"Verification: p * q = {p_val * q_candidate}")
+                            print(f"dq = {dq}")
+                            print(f"p = {p_val}")
+                            print(f"q = {q_candidate}")
+                            print()
                             print("DP_DQ_LEAK=SUCCESS")
-                            print(f"dq={dq}")
-                            print(f"p={p_val}")
-                            print(f"q={q_candidate}")
                             found = True
                             break` : '';
 

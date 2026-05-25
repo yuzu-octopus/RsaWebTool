@@ -47,6 +47,7 @@ print("COMMON_MODULUS=FAILED")`;
             print(f"Verification: m^e1 mod n = {v1} (should equal c1 = {c1})")
             print(f"Verification: m^e2 mod n = {v2} (should equal c2 = {c2})")
             if v1 == c1 and v2 == c2:
+                print()
                 print("COMMON_MODULUS=SUCCESS")
             else:
                 print("COMMON_MODULUS=FAILED")

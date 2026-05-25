@@ -87,7 +87,8 @@ print("KNOWN_PLAINTEXT=FAILED")`;
             print("Provide the known portion of the plaintext to attempt recovery.")
             print("KNOWN_PLAINTEXT=FAILED")
     except Exception as ex:
-        print(f"KNOWN_PLAINTEXT=FAILED: {ex}")
+        print(f"Error: {ex}")
+        print("KNOWN_PLAINTEXT=FAILED")
 _attack()`;
   },
   proof: `\\textbf{Theorem:} Partial plaintext knowledge + Coppersmith recovers m when unknown portion < n^{1/e}.

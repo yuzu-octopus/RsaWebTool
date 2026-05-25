@@ -21,7 +21,10 @@ export const attack: Attack = {
                 return
             if n % 2 == 0:
                 print(f"n is even: {n}")
-                print(f"p = 2, q = {n // 2}")
+                print(f"Verification: 2 * {n // 2} = {n}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print()
                 print("POLLARD_RHO=SUCCESS")
                 return
             if n.is_prime():
@@ -31,7 +34,10 @@ export const attack: Attack = {
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("POLLARD_RHO=SUCCESS")
                 return
             # Brent's cycle detection with batched GCD (primefac-style, BIT 1980)
@@ -71,10 +77,11 @@ export const attack: Attack = {
                 if d is not None:
                     p = d
                     q = n // p
+                    print(f"Verification: p * q = {p * q}")
                     print(f"p = {p}")
                     print(f"q = {q}")
-                    print(f"Verification: p * q = {p * q}")
                     print(f"c value: {c_val}")
+                    print()
                     print("POLLARD_RHO=SUCCESS")
                     found = True
                     break

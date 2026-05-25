@@ -74,12 +74,14 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
                     if v == target_m % n:
                         print(f"Forged signature from pairs {[i+1 for i in combo]}: {prod_s}")
                         print(f"Verification: sig^e mod n = {v}")
+                        print()
                         print("HOMOMORPHIC_FORGERY=SUCCESS")
                         found = True
                         return
         if not found:
             print("Could not factor target_m from oracle pairs using multiplication.")
             print("Try more oracle queries or different combination patterns.")
+            print()
             print("HOMOMORPHIC_FORGERY=FAILED")
     except Exception as ex:
         print(f"ERROR: {ex}")

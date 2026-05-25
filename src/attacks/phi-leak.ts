@@ -44,10 +44,11 @@ export const attack: Attack = {
                     p = (sum_pq - sqrt_disc) // 2
                     q = (sum_pq + sqrt_disc) // 2
                     print(f"SUCCESS! Factors recovered:")
-                    print(f"p = {p}")
-                    print(f"q = {q}")
                     print(f"Verification: p * q = {p * q}")
                     print(f"Verification: (p-1)*(q-1) = {(p-1)*(q-1)}")
+                    print(f"p = {p}")
+                    print(f"q = {q}")
+                    print()
                     print("PHI_LEAK=SUCCESS")
                 else:
                     print(f"Discriminant is not a perfect square: {discriminant}")
@@ -96,11 +97,12 @@ _attack()`,
         `Discriminant = ${discriminant}`,
         ``,
         `Factors recovered:`,
-        `p = ${p}`,
-        `q = ${q}`,
         `Verification: p * q = ${p * q}`,
         `Verification: (p-1)*(q-1) = ${phi_check}`,
+        `p = ${p}`,
+        `q = ${q}`,
         `phi(n) matches: ${phi_check === phi ? 'YES' : 'NO'}`,
+        ``,
         `PHI_LEAK=SUCCESS`,
       ].join('\n');
     } catch {

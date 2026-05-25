@@ -62,7 +62,10 @@ export const attack: Attack = {
                 return
             if n % 2 == 0:
                 out.append("n is even: " + str(n))
-                out.append("p = 2, q = " + str(n // 2))
+                out.append("Verification: p * q = " + str(2 * (n // 2)))
+                out.append("p = 2")
+                out.append("q = " + str(n // 2))
+                out.append("")
                 out.append("PISANO=SUCCESS")
                 print("\\n".join(out))
                 return
@@ -74,7 +77,10 @@ export const attack: Attack = {
             if n.is_square():
                 p = isqrt(n)
                 out.append("n is a perfect square: " + str(p) + "^2 = " + str(n))
-                out.append("p = q = " + str(p))
+                out.append("Verification: p * q = " + str(p * p))
+                out.append("p = " + str(p))
+                out.append("q = " + str(p))
+                out.append("")
                 out.append("PISANO=SUCCESS")
                 print("\\n".join(out))
                 return
@@ -94,9 +100,10 @@ export const attack: Attack = {
                                 p_factor = (s - t) // 2
                                 q_factor = (s + t) // 2
                                 if p_factor > 1 and p_factor * q_factor == n:
+                                    out.append("Verification: p * q = " + str(p_factor * q_factor))
                                     out.append("p = " + str(p_factor))
                                     out.append("q = " + str(q_factor))
-                                    out.append("Verification: p * q = " + str(p_factor * q_factor))
+                                    out.append("")
                                     out.append("PISANO=SUCCESS")
                                     found = True
                                     print("\\n".join(out))
@@ -116,9 +123,10 @@ export const attack: Attack = {
                                     p_factor = (s - t) // 2
                                     q_factor = (s + t) // 2
                                     if p_factor > 1 and p_factor * q_factor == n:
+                                        out.append("Verification: p * q = " + str(p_factor * q_factor))
                                         out.append("p = " + str(p_factor))
                                         out.append("q = " + str(q_factor))
-                                        out.append("Verification: p * q = " + str(p_factor * q_factor))
+                                        out.append("")
                                         out.append("PISANO=SUCCESS")
                                         found = True
                                         print("\\n".join(out))

@@ -37,10 +37,11 @@ export const attack: Attack = {
                                 q = (s - sqrt_disc) // 2
                                 if p * q == n:
                                     print(f"Verification: p * q = {p * q}")
-                                    print(f"PARTIAL_D=SUCCESS")
-                                    print(f"d={d}")
-                                    print(f"p={p}")
-                                    print(f"q={q}")
+                                    print(f"d = {d}")
+                                    print(f"p = {p}")
+                                    print(f"q = {q}")
+                                    print()
+                                    print("PARTIAL_D=SUCCESS")
                                     found = True
                                     break
                 if not found:

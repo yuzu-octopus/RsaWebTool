@@ -32,7 +32,10 @@ export const attack: Attack = {
         if n.is_square():
             p = isqrt(n)
             print(f"n is a perfect square: {p}^2 = {n}")
-            print(f"p = q = {p}")
+            print(f"Verification: p * q = {p * p}")
+            print(f"p = {p}")
+            print(f"q = {p}")
+            print()
             print("SMALL_FRACTION=SUCCESS")
             return
         #
@@ -63,11 +66,11 @@ export const attack: Attack = {
                         p = n // q
                         if p > 1 and p * q == n:
                             print(f"Found! a/b = {a}/{b}")
+                            print(f"Verification: p * q = {p * q}")
                             print(f"p = {p}")
                             print(f"q = {q}")
                             print(f"p/q = {float(p)/float(q):.10f}")
                             print(f"a/b = {float(a)/float(b):.10f}")
-                            print(f"Verification: p * q = {p * q}")
                             found = True
                             break
                     # Near-exact: try q0 ± delta
@@ -79,11 +82,11 @@ export const attack: Attack = {
                             p = n // q
                             if p > 1 and p * q == n:
                                 print(f"Found! a/b = {a}/{b} (delta = +{delta})")
+                                print(f"Verification: p * q = {p * q}")
                                 print(f"p = {p}")
                                 print(f"q = {q}")
                                 print(f"p/q = {float(p)/float(q):.10f}")
                                 print(f"a/b = {float(a)/float(b):.10f}")
-                                print(f"Verification: p * q = {p * q}")
                                 found = True
                                 break
                         q_candidate = q0 - delta
@@ -92,11 +95,11 @@ export const attack: Attack = {
                             p = n // q
                             if p > 1 and p * q == n:
                                 print(f"Found! a/b = {a}/{b} (delta = -{delta})")
+                                print(f"Verification: p * q = {p * q}")
                                 print(f"p = {p}")
                                 print(f"q = {q}")
                                 print(f"p/q = {float(p)/float(q):.10f}")
                                 print(f"a/b = {float(a)/float(b):.10f}")
-                                print(f"Verification: p * q = {p * q}")
                                 found = True
                                 break
                     if found:
@@ -106,10 +109,12 @@ export const attack: Attack = {
             print()
             print(f"Pairs tested: {pairs_tried}, trial divisions: {divs_tried}")
             if found:
+                print()
                 print("SMALL_FRACTION=SUCCESS")
             else:
                 print(f"No small fraction found with denominator up to {max_den}.")
                 print("p/q may not be close to a small rational.")
+                print()
                 print("SMALL_FRACTION=FAILED")
         except Exception as e:
             print(f"Error in Small Fraction Attack: {e}")

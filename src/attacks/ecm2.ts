@@ -55,7 +55,10 @@ export const attack: Attack = {
                 return
             if n % 2 == 0:
                 print(f"n is even: {n}")
-                print(f"p = 2, q = {n // 2}")
+                print(f"Verification: 2 * {n // 2} = {n}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print()
                 print("ECM2=SUCCESS")
                 return
             if n.is_prime():
@@ -65,7 +68,10 @@ export const attack: Attack = {
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("ECM2=SUCCESS")
                 return
             factors = ecm_factor_all(n, 0)
@@ -88,8 +94,10 @@ export const attack: Attack = {
             print(f"Verification: product = {product}")
             print(f"Matches n: {product == n}")
             if product == n:
+                print()
                 print("ECM2=SUCCESS")
             else:
+                print()
                 print("ECM2=FAILED")
         except Exception as e:
             print(f"Error: {e}")

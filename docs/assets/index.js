@@ -210,8 +210,10 @@ To suppress this warning, you need to explicitly provide the \`palette.${t}Chann
                     return
                 if n % 2 == 0:
                     print(f"n is even: {n}")
+                    print(f"Verification: 2 * {n // 2} = {n}")
                     print(f"p = 2")
                     print(f"q = {n // 2}")
+                    print()
                     print("BONEH_DURFEE=SUCCESS")
                     return
                 if n.is_prime():
@@ -221,6 +223,10 @@ To suppress this warning, you need to explicitly provide the \`palette.${t}Chann
                 if n.is_square():
                     p = isqrt(n)
                     print(f"n is a perfect square: {p}^2 = {n}")
+                    print(f"Verification: p * q = {p * p}")
+                    print(f"p = {p}")
+                    print(f"q = {p}")
+                    print()
                     print("BONEH_DURFEE=SUCCESS")
                     return
                 # Phase 1: Wiener's attack via continued fraction convergents of e/n
@@ -241,8 +247,11 @@ To suppress this warning, you need to explicitly provide the \`palette.${t}Chann
                                 q = (s + t) // 2
                                 if p * q == n and p > 1:
                                     print(f"Wiener's attack succeeded:")
-                                    print(f"d = {d}, p = {p}, q = {q}")
                                     print(f"Verification: p * q = {p * q}")
+                                    print(f"d = {d}")
+                                    print(f"p = {p}")
+                                    print(f"q = {q}")
+                                    print()
                                     print("BONEH_DURFEE=SUCCESS")
                                     found = True
                                     break
@@ -342,10 +351,11 @@ To suppress this warning, you need to explicitly provide the \`palette.${t}Chann
                                             q_val = ZZ((p_plus_q - sqrt_disc2) // 2)
                                             if p_val * q_val == n and p_val > 1:
                                                 print("Boneh-Durfee lattice attack succeeded!")
+                                                print(f"Verification: p * q = {p_val * q_val}")
                                                 print(f"d = {d_val}")
                                                 print(f"p = {p_val}")
                                                 print(f"q = {q_val}")
-                                                print(f"Verification: p * q = {p_val * q_val}")
+                                                print()
                                                 print("BONEH_DURFEE=SUCCESS")
                                                 found2 = True
                                                 break
@@ -430,7 +440,10 @@ x^2 - (p+q)x + n &= 0 \\implies p, q \\qed
                 return
             if n % 2 == 0:
                 print(f"n is even: {n}")
-                print(f"p = 2, q = {n // 2}")
+                print(f"Verification: 2 * {n // 2} = {n}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print()
                 print("ECM2=SUCCESS")
                 return
             if n.is_prime():
@@ -440,7 +453,10 @@ x^2 - (p+q)x + n &= 0 \\implies p, q \\qed
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("ECM2=SUCCESS")
                 return
             factors = ecm_factor_all(n, 0)
@@ -463,8 +479,10 @@ x^2 - (p+q)x + n &= 0 \\implies p, q \\qed
             print(f"Verification: product = {product}")
             print(f"Matches n: {product == n}")
             if product == n:
+                print()
                 print("ECM2=SUCCESS")
             else:
+                print()
                 print("ECM2=FAILED")
         except Exception as e:
             print(f"Error: {e}")
@@ -509,7 +527,11 @@ n &= p_1^{e_1} p_2^{e_2} \\cdots p_k^{e_k} \\\\
             print("POLLARD_P1=FAILED")
             return
         if n % 2 == 0:
-            print(f"n is even: p = 2, q = {n // 2}")
+            print(f"n is even: {n}")
+            print(f"Verification: 2 * {n // 2} = {n}")
+            print(f"p = 2")
+            print(f"q = {n // 2}")
+            print()
             print("POLLARD_P1=SUCCESS")
             return
         if n.is_prime():
@@ -518,7 +540,11 @@ n &= p_1^{e_1} p_2^{e_2} \\cdots p_k^{e_k} \\\\
             return
         if n.is_square():
             p = isqrt(n)
-            print(f"n is a perfect square: p = q = {p}")
+            print(f"n is a perfect square: {p}^2 = {n}")
+            print(f"Verification: p * q = {p * p}")
+            print(f"p = {p}")
+            print(f"q = {p}")
+            print()
             print("POLLARD_P1=SUCCESS")
             return
         # Sieve primes up to B1 (pure Python, no prime_range)
@@ -546,9 +572,10 @@ n &= p_1^{e_1} p_2^{e_2} \\cdots p_k^{e_k} \\\\
         g = gcd(a - 1, n)
         if 1 < g < n:
             q_val = n // g
+            print(f"Verification: p * q = {g * q_val}")
             print(f"p = {g}")
             print(f"q = {q_val}")
-            print(f"Verification: p * q = {g * q_val}")
+            print()
             print("POLLARD_P1=SUCCESS")
             return
         # Stage 2 (optional, only if B2 > B1 and Stage 1 failed)
@@ -578,9 +605,10 @@ n &= p_1^{e_1} p_2^{e_2} \\cdots p_k^{e_k} \\\\
                 g = gcd(Q, n)
                 if 1 < g < n:
                     q_val = n // g
+                    print(f"Verification: p * q = {g * q_val}")
                     print(f"p = {g}")
                     print(f"q = {q_val}")
-                    print(f"Verification: p * q = {g * q_val}")
+                    print()
                     print("POLLARD_P1=SUCCESS")
                     return
         print("Pollard p-1 failed: p-1 is not smooth enough for these bounds")
@@ -621,7 +649,10 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
                 return
             if n % 2 == 0:
                 print(f"n is even: {n}")
-                print(f"p = 2, q = {n // 2}")
+                print(f"Verification: 2 * {n // 2} = {n}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print()
                 print("POLLARD_RHO=SUCCESS")
                 return
             if n.is_prime():
@@ -631,7 +662,10 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("POLLARD_RHO=SUCCESS")
                 return
             # Brent's cycle detection with batched GCD (primefac-style, BIT 1980)
@@ -671,10 +705,11 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
                 if d is not None:
                     p = d
                     q = n // p
+                    print(f"Verification: p * q = {p * q}")
                     print(f"p = {p}")
                     print(f"q = {q}")
-                    print(f"Verification: p * q = {p * q}")
                     print(f"c value: {c_val}")
+                    print()
                     print("POLLARD_RHO=SUCCESS")
                     found = True
                     break
@@ -753,8 +788,10 @@ p &\\mid (x_i - x_j) \\\\
         if n.is_square():
             p = isqrt(n)
             print(f"n is a perfect square: {p}^2 = {n}")
-            print(f"p = q = {p}")
             print(f"Verification: p * q = {p * p}")
+            print(f"p = {p}")
+            print(f"q = {p}")
+            print()
             print("WILLIAMS_P1=SUCCESS")
             return
         #
@@ -837,9 +874,9 @@ p &\\mid (x_i - x_j) \\\\
                         p = Integer(g)
                         q = n // g
                         print(f"Factor found with P = {P}!")
+                        print(f"Verification: p * q = {p * q}")
                         print(f"p = {p}")
                         print(f"q = {q}")
-                        print(f"Verification: p * q = {p * q}")
                         found = True
                         break
                 if found:
@@ -847,8 +884,10 @@ p &\\mid (x_i - x_j) \\\\
             if not found:
                 print("Williams' p+1 failed. p+1 may not be B1-smooth for tested P values.")
                 print("Try increasing B1, enabling stage 2 with B2 > B1, or using a different method.")
+                print()
                 print("WILLIAMS_P1=FAILED")
             else:
+                print()
                 print("WILLIAMS_P1=SUCCESS")
         except Exception as ex:
             print(f"Williams' p+1 error: {ex}")
@@ -892,9 +931,10 @@ V_M &= \\alpha^M + \\alpha^{-M} = 2 \\pmod{p} \\\\
             return
         if n % 2 == 0:
             print(f"n is even: {n}")
+            print(f"Verification: 2 * {n // 2} = {n}")
             print(f"p = 2")
             print(f"q = {n // 2}")
-            print(f"Verification: 2 * {n // 2} = {n}")
+            print()
             print("QUADRATIC_SIEVE=SUCCESS")
             return
         if n.is_prime():
@@ -905,8 +945,10 @@ V_M &= \\alpha^M + \\alpha^{-M} = 2 \\pmod{p} \\\\
         if n.is_square():
             p = isqrt(n)
             print(f"n is a perfect square: {p}^2 = {n}")
-            print(f"p = q = {p}")
             print(f"Verification: p * q = {p * p}")
+            print(f"p = {p}")
+            print(f"q = {p}")
+            print()
             print("QUADRATIC_SIEVE=SUCCESS")
             return
         #
@@ -922,10 +964,12 @@ V_M &= \\alpha^M + \\alpha^{-M} = 2 \\pmod{p} \\\\
             tdiv_limit = 1000000
             tdiv = trial_division(n, tdiv_limit)
             if tdiv and 1 < tdiv < n:
-                print(f"Small factor found via trial division: {tdiv}")
                 q = n // tdiv
-                print(f"q = {q}")
+                print(f"Small factor found via trial division: {tdiv}")
                 print(f"Verification: {tdiv} * {q} = {tdiv * q}")
+                print(f"p = {tdiv}")
+                print(f"q = {q}")
+                print()
                 print("QUADRATIC_SIEVE=SUCCESS")
                 return
             print("No small factor via trial division, trying qsieve...")
@@ -965,11 +1009,12 @@ V_M &= \\alpha^M + \\alpha^{-M} = 2 \\pmod{p} \\\\
             elif len(factors) == 2 and all(exp == 1 for _, exp in factors):
                 p = Integer(factors[0][0])
                 q = Integer(factors[1][0])
+                print(f"Verification: p * q = {p * q}")
                 print(f"p = {p}")
                 print(f"q = {q}")
-                print(f"Verification: p * q = {p * q}")
                 print(f"p is prime: {p.is_prime()}")
                 print(f"q is prime: {q.is_prime()}")
+                print()
                 print("QUADRATIC_SIEVE=SUCCESS")
             # Multiple factors or powers
             else:
@@ -985,11 +1030,13 @@ V_M &= \\alpha^M + \\alpha^{-M} = 2 \\pmod{p} \\\\
                     product *= Integer(prime) ** exp
                 print(f"Verification: product = {product}")
                 print(f"Matches n: {product == n}")
+                print()
                 print("QUADRATIC_SIEVE=SUCCESS")
         except Exception as ex:
             print(f"Factorization failed: {ex}")
             print("n may be too large for the quadratic sieve.")
             print("For numbers > 100 digits, try ECM or specialized attacks.")
+            print()
             print("QUADRATIC_SIEVE=FAILED")
         #
     except BaseException as ex:
@@ -1039,7 +1086,10 @@ X &= \\prod_{i \\in S} (x_i + m), \\quad X^2 \\equiv \\prod Q(x_i) = y^2 \\pmod{
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("SQUFOF=SUCCESS")
                 return
             # SQUFOF works best for small factors; extract small factor first
@@ -1050,8 +1100,10 @@ X &= \\prod_{i \\in S} (x_i + m), \\quad X^2 \\equiv \\prod Q(x_i) = y^2 \\pmod{
                     p = Integer(trial)
                     q = n // p
                     print(f"Small factor found: p = {p}")
-                    print(f"q = {q}")
                     print(f"Verification: p * q = {p * q}")
+                    print(f"p = {p}")
+                    print(f"q = {q}")
+                    print()
                     print("SQUFOF=SUCCESS")
                     found_small = True
                     break
@@ -1115,9 +1167,10 @@ X &= \\prod_{i \\in S} (x_i + m), \\quad X^2 \\equiv \\prod Q(x_i) = y^2 \\pmod{
             result = squfof(n)
             if result:
                 p, q = result
+                print(f"Verification: p * q = {p * q}")
                 print(f"p = {p}")
                 print(f"q = {q}")
-                print(f"Verification: p * q = {p * q}")
+                print()
                 print("SQUFOF=SUCCESS")
             else:
                 print("SQUFOF did not find a factor. Try a different method.")
@@ -1169,7 +1222,10 @@ s &= \\sqrt{c_i}, \\quad \\text{reverse } \\rho \\text{ to find } (s, b^*, s) \\
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("BINARY_POLY_FACTOR=SUCCESS")
                 return
             if n > 0 and (n & (n - 1)) == 0:
@@ -1213,6 +1269,7 @@ s &= \\sqrt{c_i}, \\quad \\text{reverse } \\rho \\text{ to find } (s, b^*, s) \\
                         val = factor(2)
                         if val > 1:
                             print(f"  {val} (is prime: {val.is_prime()})")
+                    print()
                     print("BINARY_POLY_FACTOR=SUCCESS")
                 else:
                     print("No proper factors: polynomial factorization is trivial (irreducible f(x)).")
@@ -1266,7 +1323,10 @@ n = f(2) &= \\prod g_i(2)^{e_i} \\\\
         if n.is_square():
             p = isqrt(n)
             print(f"n is a perfect square: {p}^2 = {n}")
-            print(f"p = q = {p}")
+            print(f"Verification: p * q = {p * p}")
+            print(f"p = {p}")
+            print(f"q = {p}")
+            print()
             print("SMALL_FRACTION=SUCCESS")
             return
         #
@@ -1297,11 +1357,11 @@ n = f(2) &= \\prod g_i(2)^{e_i} \\\\
                         p = n // q
                         if p > 1 and p * q == n:
                             print(f"Found! a/b = {a}/{b}")
+                            print(f"Verification: p * q = {p * q}")
                             print(f"p = {p}")
                             print(f"q = {q}")
                             print(f"p/q = {float(p)/float(q):.10f}")
                             print(f"a/b = {float(a)/float(b):.10f}")
-                            print(f"Verification: p * q = {p * q}")
                             found = True
                             break
                     # Near-exact: try q0 ± delta
@@ -1313,11 +1373,11 @@ n = f(2) &= \\prod g_i(2)^{e_i} \\\\
                             p = n // q
                             if p > 1 and p * q == n:
                                 print(f"Found! a/b = {a}/{b} (delta = +{delta})")
+                                print(f"Verification: p * q = {p * q}")
                                 print(f"p = {p}")
                                 print(f"q = {q}")
                                 print(f"p/q = {float(p)/float(q):.10f}")
                                 print(f"a/b = {float(a)/float(b):.10f}")
-                                print(f"Verification: p * q = {p * q}")
                                 found = True
                                 break
                         q_candidate = q0 - delta
@@ -1326,11 +1386,11 @@ n = f(2) &= \\prod g_i(2)^{e_i} \\\\
                             p = n // q
                             if p > 1 and p * q == n:
                                 print(f"Found! a/b = {a}/{b} (delta = -{delta})")
+                                print(f"Verification: p * q = {p * q}")
                                 print(f"p = {p}")
                                 print(f"q = {q}")
                                 print(f"p/q = {float(p)/float(q):.10f}")
                                 print(f"a/b = {float(a)/float(b):.10f}")
-                                print(f"Verification: p * q = {p * q}")
                                 found = True
                                 break
                     if found:
@@ -1340,10 +1400,12 @@ n = f(2) &= \\prod g_i(2)^{e_i} \\\\
             print()
             print(f"Pairs tested: {pairs_tried}, trial divisions: {divs_tried}")
             if found:
+                print()
                 print("SMALL_FRACTION=SUCCESS")
             else:
                 print(f"No small fraction found with denominator up to {max_den}.")
                 print("p/q may not be close to a small rational.")
+                print()
                 print("SMALL_FRACTION=FAILED")
         except Exception as e:
             print(f"Error in Small Fraction Attack: {e}")
@@ -1501,6 +1563,7 @@ g_i > 1 &\\implies g_i \\text{ is a shared prime} \\\\
                 for p, k in factor_counts.items():
                     phi *= p**(k-1) * (p - 1)
                 print(f"phi(n) = {phi}")
+                print()
                 print("MULTI_PRIME=SUCCESS")
             elif len(prime_factors) == 2 and all_prime:
                 print("Standard 2-prime RSA (not multi-prime).")
@@ -1563,7 +1626,10 @@ p_i &\\approx n^{1/r} \\implies \\text{smaller primes, easier factoring} \\qed
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("GIMMICKY_PRIMES=SUCCESS")
                 return
             found = False
@@ -1663,10 +1729,12 @@ p_i &\\approx n^{1/r} \\implies \\text{smaller primes, easier factoring} \\qed
                         print(f"  Verification: {candidate} * {n // candidate} = {n}")
                         found = True
             if found:
+                print()
                 print("GIMMICKY_PRIMES=SUCCESS")
             else:
                 print("No gimmicky prime factors found.")
                 print("The factors are likely standard randomly-generated primes.")
+                print()
                 print("GIMMICKY_PRIMES=FAILED")
         except Exception as e:
             print(f"Error in gimmicky primes check: {e}")
@@ -1714,7 +1782,10 @@ s &\\mid n \\implies q = n/s \\\\
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("CLOSE_PRIME=SUCCESS")
                 return
             # Step 1: Fermat factorization (fast for close primes)
@@ -1737,11 +1808,12 @@ s &\\mid n \\implies q = n/s \\\\
                 q = a_final + b
                 if p > 1 and q < n and p*q == n:
                     print(f"Fermat factorization succeeded!")
+                    print(f"Verification: p * q = {p * q}")
                     print(f"p = {p}")
                     print(f"q = {q}")
                     print(f"|p - q| = {q - p}")
-                    print(f"Verification: p * q = {p * q}")
                     print(f"Iterations: {iterations}")
+                    print()
                     print("CLOSE_PRIME=SUCCESS")
                     return
             # Step 2: Londahl BSGS fallback (for larger prime gaps)
@@ -1773,15 +1845,16 @@ s &\\mid n \\implies q = n/s \\\\
                             q_candidate = (m + sqrt_disc) // 2
                             if p_candidate * q_candidate == n and p_candidate > 1 and q_candidate > 1:
                                 print(f"Londahl BSGS factor found!")
+                                print(f"Verification: p * q = {p_candidate * q_candidate}")
                                 print(f"p = {p_candidate}")
                                 print(f"q = {q_candidate}")
                                 print(f"|p - q| = {abs(q_candidate - p_candidate)}")
-                                print(f"Verification: p * q = {p_candidate * q_candidate}")
                                 print(f"Baby steps: {b+1}, Giant steps: {i+1}")
                                 found = True
                                 break
                 mu = (mu * step) % n
             if found:
+                print()
                 print("CLOSE_PRIME=SUCCESS")
             else:
                 print("Both Fermat and Londahl BSGS failed to factor n.")
@@ -1871,7 +1944,6 @@ p, q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
             else:
                 print("\\nNo novelty primes found.")
                 print("NOVELTY_PRIMES=FAILED")
-            print("\\nNovelty prime check complete.")
         except Exception as e:
             print(f"Error in Novelty Primes check: {e}")
             print("NOVELTY_PRIMES=FAILED")
@@ -1957,6 +2029,7 @@ p &\\approx C + \\delta,\\; C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
                 print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
                 print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
                 if v1 == c1 and v2 == c2:
+                    print()
                     print("FRANKLIN_REITER_RELATED_MESSAGE=SUCCESS")
                 else:
                     print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
@@ -1974,6 +2047,7 @@ p &\\approx C + \\delta,\\; C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
                     print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
                     print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
                     if v1 == c1 and v2 == c2:
+                        print()
                         print("FRANKLIN_REITER_RELATED_MESSAGE=SUCCESS")
                     else:
                         print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
@@ -2018,9 +2092,11 @@ m &= -g[0] \\cdot g[1]^{-1} \\qed
             if n % nearp == 0:
                 p = nearp
                 q = n // p
-                print("SIMPLE_LATTICE=SUCCESS: nearp exactly divides n")
-                print(f"p={p}")
-                print(f"q={q}")
+                print(f"Verification: p * q = {p * q}")
+                print(f"p = {p}")
+                print(f"q = {q}")
+                print()
+                print("SIMPLE_LATTICE=SUCCESS")
                 return
             if n % 2 == 0:
                 print("n is even — cannot apply lattice attack")
@@ -2063,9 +2139,11 @@ m &= -g[0] \\cdot g[1]^{-1} \\qed
                     break
             if found_p:
                 q = n // found_p
+                print(f"Verification: p * q = {found_p * q}")
+                print(f"p = {found_p}")
+                print(f"q = {q}")
+                print()
                 print("SIMPLE_LATTICE=SUCCESS")
-                print(f"p={found_p}")
-                print(f"q={q}")
             else:
                 print("SIMPLE_LATTICE=FAILED: no roots found in any LLL row")
         except Exception as ex:
@@ -2113,10 +2191,11 @@ p &= p_0 + x_0, \\quad q = n/p \\qed
                                 q = (s - sqrt_disc) // 2
                                 if p * q == n:
                                     print(f"Verification: p * q = {p * q}")
-                                    print(f"PARTIAL_D=SUCCESS")
-                                    print(f"d={d}")
-                                    print(f"p={p}")
-                                    print(f"q={q}")
+                                    print(f"d = {d}")
+                                    print(f"p = {p}")
+                                    print(f"q = {q}")
+                                    print()
+                                    print("PARTIAL_D=SUCCESS")
                                     found = True
                                     break
                 if not found:
@@ -2195,9 +2274,11 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\implies p, q \\qed
                             break
                     if found_p:
                         q = n // found_p
-                        print(f"PARTIAL_PQ_BITS=SUCCESS")
-                        print(f"p={found_p}")
-                        print(f"q={q}")
+                        print(f"Verification: p * q = {found_p * q}")
+                        print(f"p = {found_p}")
+                        print(f"q = {q}")
+                        print()
+                        print("PARTIAL_PQ_BITS=SUCCESS")
                     else:
                         print("PARTIAL_PQ_BITS=FAILED: no roots found")
             elif bitPosition == "lsb":
@@ -2239,9 +2320,11 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\implies p, q \\qed
                             break
                     if found_p:
                         q = n // found_p
-                        print(f"PARTIAL_PQ_BITS=SUCCESS")
-                        print(f"p={found_p}")
-                        print(f"q={q}")
+                        print(f"Verification: p * q = {found_p * q}")
+                        print(f"p = {found_p}")
+                        print(f"q = {q}")
+                        print()
+                        print("PARTIAL_PQ_BITS=SUCCESS")
                     else:
                         print("PARTIAL_PQ_BITS=FAILED: no roots found")
         except Exception as ex:
@@ -2291,10 +2374,11 @@ p &= f(x_0), \\quad q = n/p \\qed
                     if p_candidate > 1 and n % p_candidate == 0:
                         q = n // p_candidate
                         print(f"Verification: p * q = {p_candidate * q}")
+                        print(f"dp = {dp}")
+                        print(f"p = {p_candidate}")
+                        print(f"q = {q}")
+                        print()
                         print("SMALL_CRT_EXP=SUCCESS")
-                        print(f"dp={dp}")
-                        print(f"p={p_candidate}")
-                        print(f"q={q}")
                         found = True
                         break
                 if found:
@@ -2321,7 +2405,7 @@ p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
 \\text{Check } p \\mid n &\\implies \\text{factorization found} \\qed
 \\end{align*}
 
-\\textbf{References:} Standard RSA-CRT analysis; see also Jochemsz-May attack on small CRT exponents`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},__=()=>{let e=65537n;for(let t=3n;t<10000n;t++){let n=t*e-1n;for(let t=1n;t<=e;t++){if(n%t!==0n)continue;let e=n/t+1n;if(e>2n&&Og(e))return{n:(e*kg(Mg.q)).toString(),e:`65537`,bound:`50000`}}}throw Error(`small-crt-exp: failed to generate testcase`)},v_={id:`dp-dq-leak`,name:`dp/dq Leak`,category:`Partial Key / Lattice`,description:`Recovers p from leaked d_p = d mod (p-1) or q from leaked d_q = d mod (q-1). Use when CRT exponents are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dp`,label:`dp (d mod p-1)`,placeholder:`Enter dp value...`,multiline:!0,rows:3},{name:`dq`,label:`dq (d mod q-1, optional)`,placeholder:`Enter dq value...`,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.e);if(t<=0n||n<=0n)return null;let r=2n;if(e.dp){let i=BigInt(e.dp);if(i>0n){let e=n*i-1n;if(e>0n){let n=og(ug(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(n*e).toString()}\nDP_DQ_LEAK=SUCCESS\ndp=${i.toString()}\np=${n.toString()}\nq=${e.toString()}`}}}}if(e.dq){let i=BigInt(e.dq);if(i>0n){let e=n*i-1n;if(e>0n){let n=og(ug(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(e*n).toString()}\nDP_DQ_LEAK=SUCCESS\ndq=${i.toString()}\np=${e.toString()}\nq=${n.toString()}`}}}}return null}catch{return null}},sageTemplate:e=>{let t=e.dp?`
+\\textbf{References:} Standard RSA-CRT analysis; see also Jochemsz-May attack on small CRT exponents`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},__=()=>{let e=65537n;for(let t=3n;t<10000n;t++){let n=t*e-1n;for(let t=1n;t<=e;t++){if(n%t!==0n)continue;let e=n/t+1n;if(e>2n&&Og(e))return{n:(e*kg(Mg.q)).toString(),e:`65537`,bound:`50000`}}}throw Error(`small-crt-exp: failed to generate testcase`)},v_={id:`dp-dq-leak`,name:`dp/dq Leak`,category:`Partial Key / Lattice`,description:`Recovers p from leaked d_p = d mod (p-1) or q from leaked d_q = d mod (q-1). Use when CRT exponents are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dp`,label:`dp (d mod p-1)`,placeholder:`Enter dp value...`,multiline:!0,rows:3},{name:`dq`,label:`dq (d mod q-1, optional)`,placeholder:`Enter dq value...`,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.e);if(t<=0n||n<=0n)return null;let r=2n;if(e.dp){let i=BigInt(e.dp);if(i>0n){let e=n*i-1n;if(e>0n){let n=og(ug(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(n*e).toString()}\ndp = ${i.toString()}\np = ${n.toString()}\nq = ${e.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}if(e.dq){let i=BigInt(e.dq);if(i>0n){let e=n*i-1n;if(e>0n){let n=og(ug(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(e*n).toString()}\ndq = ${i.toString()}\np = ${e.toString()}\nq = ${n.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}return null}catch{return null}},sageTemplate:e=>{let t=e.dp?`
         dp = Integer(${e.dp})
         if dp > 0:
             num = dp * e - 1
@@ -2331,10 +2415,11 @@ p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
                     if n % p_candidate == 0:
                         q_val = n // p_candidate
                         print(f"Verification: p * q = {p_candidate * q_val}")
+                        print(f"dp = {dp}")
+                        print(f"p = {p_candidate}")
+                        print(f"q = {q_val}")
+                        print()
                         print("DP_DQ_LEAK=SUCCESS")
-                        print(f"dp={dp}")
-                        print(f"p={p_candidate}")
-                        print(f"q={q_val}")
                         found = True
                         break`:``,n=e.dq?`
         if not found:
@@ -2347,10 +2432,11 @@ p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
                         if n % q_candidate == 0:
                             p_val = n // q_candidate
                             print(f"Verification: p * q = {p_val * q_candidate}")
+                            print(f"dq = {dq}")
+                            print(f"p = {p_val}")
+                            print(f"q = {q_candidate}")
+                            print()
                             print("DP_DQ_LEAK=SUCCESS")
-                            print(f"dq={dq}")
-                            print(f"p={p_val}")
-                            print(f"q={q_candidate}")
                             found = True
                             break`:``;return`def _attack():
     try:
@@ -2418,10 +2504,11 @@ p &= (d_p \\cdot e - 1)/k + 1, \\quad \\text{verify } p \\mid n \\\\
                         if n % p == 0:
                             q = n // p
                             print(f"Verification: p * q = {p * q}")
-                            print(f"LINEARLY_RELATED_PRIMES=SUCCESS")
-                            print(f"p={p}")
-                            print(f"q={q}")
-                            print(f"delta={delta}")
+                            print(f"p = {p}")
+                            print(f"q = {q}")
+                            print(f"delta = {delta}")
+                            print()
+                            print("LINEARLY_RELATED_PRIMES=SUCCESS")
                             found = True
                             break
             if not found:
@@ -2487,10 +2574,11 @@ p &= \\frac{-\\delta + \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
                         if n % p == 0:
                             q = n // p
                             print(f"Verification: p * q = {p * q}")
+                            print(f"p = {p}")
+                            print(f"q = {q}")
+                            print(f"k = {k}")
+                            print()
                             print("DEPENDENT_PRIME=SUCCESS")
-                            print(f"p={p}")
-                            print(f"q={q}")
-                            print(f"k={k}")
                             found = True
                             break
             if not found:
@@ -2547,6 +2635,7 @@ print("COMMON_MODULUS=FAILED")`:`def _attack():
             print(f"Verification: m^e1 mod n = {v1} (should equal c1 = {c1})")
             print(f"Verification: m^e2 mod n = {v2} (should equal c2 = {c2})")
             if v1 == c1 and v2 == c2:
+                print()
                 print("COMMON_MODULUS=SUCCESS")
             else:
                 print("COMMON_MODULUS=FAILED")
@@ -2592,7 +2681,8 @@ print("COPPERSMITH_SHORT_PAD=FAILED")`:`def _attack():
                     high = mid - 1
             return low
         print("Coppersmith Short Pad Attack")
-        print("n =", n, "e =", e)
+        print(f"n = {n}")
+        print(f"e = {e}")
         print("Recovering messages via integer e-th root...")
         m1_val = None
         m2_val = None
@@ -2628,7 +2718,8 @@ print("COPPERSMITH_SHORT_PAD=FAILED")`:`def _attack():
         if m1_val is not None and m2_val is not None:
             if power_mod(m1_val, e, n) == c1 and power_mod(m2_val, e, n) == c2:
                 delta_val = m2_val - m1_val
-                print(f"Found messages: m1={m1_val}, m2={m2_val}, delta={delta_val}")
+                print(f"Found messages: m1 = {m1_val}, m2 = {m2_val}, delta = {delta_val}")
+                print()
                 print("COPPERSMITH_SHORT_PAD=SUCCESS")
                 return
         print("Could not recover messages.")
@@ -2789,6 +2880,7 @@ print("HASTAD_LINEAR_PAD=FAILED")`:`def _attack():
                         all_ok = False
                     print(f"  Verify {i+1}: (a*m+b)^e mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
                 if all_ok:
+                    print()
                     print("HASTAD_LINEAR_PAD=SUCCESS")
                 else:
                     print("HASTAD_LINEAR_PAD=FAILED")
@@ -2935,11 +3027,11 @@ print("RSA_CRT_FAULT=FAILED")`:`def _attack():
             p = g
             q = n // g
             print(f"\\nFactorization found!")
-            print(f"p = {p}")
-            print(f"q = {q}")
-            print(f"p * q = {p * q}")
+            print(f"Verification: p * q = {p * q}")
             print(f"p is prime: {p.is_prime()}")
             print(f"q is prime: {q.is_prime()}")
+            print(f"p = {p}")
+            print(f"q = {q}")
             # Compute private key
             phi = (p - 1) * (q - 1)
             d = inverse_mod(e, phi)
@@ -2948,6 +3040,7 @@ print("RSA_CRT_FAULT=FAILED")`:`def _attack():
             sig_recovered = power_mod(m, d, n)
             print(f"Recovered sig: {sig_recovered}")
             print(f"Matches valid sig: {sig_recovered == sig_valid}")
+            print()
             print("RSA_CRT_FAULT=SUCCESS")
         else:
             print("GCD did not reveal a factor. The fault may not be a CRT fault.")
@@ -3071,6 +3164,7 @@ print("NON_COPRIME_EXP=FAILED")`:`def _attack():
                         found_valid = True
                     print(f"    m^e mod n = {v} (c = {c}) {'OK' if ok else 'FAIL'}")
             if found_valid:
+                print()
                 print("NON_COPRIME_EXP=SUCCESS")
             else:
                 print("NON_COPRIME_EXP=FAILED")
@@ -3141,6 +3235,7 @@ print("CUBE_ROOT_CRT=FAILED")`:`def _attack():
         elif len(roots_p) * len(roots_q) == 9:
             print("\\n9 solutions (3 mod p × 3 mod q). Additional context needed to identify correct m.")
         if found_valid:
+            print()
             print("CUBE_ROOT_CRT=SUCCESS")
         else:
             print("CUBE_ROOT_CRT=FAILED")
@@ -3187,14 +3282,15 @@ print("COMMON_FACTOR=FAILED")`:`def _attack():
             p = g
             q = n // g
             print(f"\\nCommon factor found!")
-            print(f"p = {p}")
-            print(f"q = {q}")
             print(f"Verification: p * q = {p * q}")
             print(f"p is prime: {p.is_prime()}")
             print(f"q is prime: {q.is_prime()}")
+            print(f"p = {p}")
+            print(f"q = {q}")
             if p.is_prime() and q.is_prime():
                 print(f"\\nThe message m is a multiple of p = {p}")
                 print(f"m = k * {p} for some integer k")
+                print()
                 print("COMMON_FACTOR=SUCCESS")
             else:
                 print("gcd(c, n) did not yield valid prime factors.")
@@ -3276,12 +3372,14 @@ print("HOMOMORPHIC_FORGERY=FAILED")`:`def _attack():
                     if v == target_m % n:
                         print(f"Forged signature from pairs {[i+1 for i in combo]}: {prod_s}")
                         print(f"Verification: sig^e mod n = {v}")
+                        print()
                         print("HOMOMORPHIC_FORGERY=SUCCESS")
                         found = True
                         return
         if not found:
             print("Could not factor target_m from oracle pairs using multiplication.")
             print("Try more oracle queries or different combination patterns.")
+            print()
             print("HOMOMORPHIC_FORGERY=FAILED")
     except Exception as ex:
         print(f"ERROR: {ex}")
@@ -3351,6 +3449,7 @@ print("BLEICHENBACHER_SIG=FAILED")`:`def _attack():
         top_two = cube >> (8 * (n_bytes - 2))
         if top_two == Integer(0x0001):
             print("PKCS#1 structure preserved — forged signature valid against lax verifier")
+            print()
             print("BLEICHENBACHER_SIG=SUCCESS")
         else:
             print("Signature forgery failed — garbage area too small for this hash and modulus")
@@ -3643,11 +3742,13 @@ b - a = 0 &\\implies m = a \\qed
             print(f"Original c = {orig_c}")
             if v == orig_c:
                 print("VERIFICATION PASSED!")
+                print()
                 print("MANGER=SUCCESS")
             else:
                 print("Verification failed - may need more oracle responses")
                 print(f"m^e mod n = {v}")
                 print(f"c = {orig_c}")
+                print()
                 print("MANGER=FAILED")
         #
         except Exception as ex:
@@ -3769,10 +3870,12 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r+1)}{256s} \\ri
                 print(f"Verification: m^e mod n = {v}")
                 print(f"Original c = {orig_c}")
                 print("VERIFICATION PASSED!")
+                print()
                 print("BIASED_LSB=SUCCESS")
             else:
                 print(f"\\nCandidate scan failed to find m in range [{candidate_start}, {candidate_end}]")
                 print("Verification failed - may need more oracle runs or higher bias")
+                print()
                 print("BIASED_LSB=FAILED")
         except Exception as ex:
             print(f"ERROR: {ex}")
@@ -3868,9 +3971,10 @@ b_i = 0 &\\implies \\text{lower half}, \\quad b_i = 1 \\implies \\text{upper hal
                     p = int(M * k + r)
                     q = n // p
                     out.append("VULNERABLE: n uses ROCA-generated primes.")
+                    out.append("Verification: p * q = " + str(p * q))
                     out.append("p = " + str(p))
                     out.append("q = " + str(q))
-                    out.append("Verification: p * q = " + str(p * q))
+                    out.append("")
                     out.append("ROCA=SUCCESS")
                 else:
                     out.append("No root found with M = " + str(M))
@@ -3962,9 +4066,10 @@ f(x) &= Mx + r_1 \\equiv 0 \\pmod{p} \\\\
                     if p_candidate > 1 and n % p_candidate == 0:
                         q = n // p_candidate
                         print(f"Factor found! r={r_candidate}, k={k}")
+                        print(f"Verification: p * q = {p_candidate * q}")
                         print(f"p = {p_candidate}")
                         print(f"q = {q}")
-                        print(f"Verification: p * q = {p_candidate * q}")
+                        print()
                         print("NITROS=SUCCESS")
                         factored = True
                         break
@@ -4192,7 +4297,8 @@ print("KNOWN_PLAINTEXT=FAILED")`:`def _attack():
             print("Provide the known portion of the plaintext to attempt recovery.")
             print("KNOWN_PLAINTEXT=FAILED")
     except Exception as ex:
-        print(f"KNOWN_PLAINTEXT=FAILED: {ex}")
+        print(f"Error: {ex}")
+        print("KNOWN_PLAINTEXT=FAILED")
 _attack()`,proof:`\\textbf{Theorem:} Partial plaintext knowledge + Coppersmith recovers m when unknown portion < n^{1/e}.
 
 \\textbf{Setup:}
@@ -4245,6 +4351,7 @@ print("SMALL_PUBLIC_EXP=FAILED")`:`def _attack():
                     print(f"m as text: {m_bytes.decode('utf-8', errors='replace')}")
                 except Exception:
                     print(f"m as hex: {hex(m_root)}")
+                print()
                 print("SMALL_PUBLIC_EXP=SUCCESS")
             else:
                 print(f"c is not a perfect {e}-th power over integers.")
@@ -4262,6 +4369,7 @@ print("SMALL_PUBLIC_EXP=FAILED")`:`def _attack():
                 print("If two ciphertexts c1 = m^e and c2 = (m + delta)^e")
                 print("are known with the same (n, e), then m can be recovered.")
                 print("Provide a second ciphertext to attempt this attack.")
+                print()
                 print("SMALL_PUBLIC_EXP=FAILED")
     except Exception as ex:
         print(f"ERROR: {ex}")
@@ -4329,6 +4437,7 @@ _attack()`,proof:`\\textbf{Theorem:} Small e (3,5,17) enables e-th root, Hastad 
                     print()
                     print("Note: In real-world scans, ~0.2% of RSA certificates share factors")
                     print("due to poor entropy during key generation.")
+                    print()
                     print("MULTI_PRIME_GCD=FAILED")
         except Exception as ex:
             print(f"ERROR: {ex}")
@@ -4388,10 +4497,11 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}}, \\quad n_j = g_{ij} \\cdot \\frac{n_j}
                     p = (sum_pq - sqrt_disc) // 2
                     q = (sum_pq + sqrt_disc) // 2
                     print(f"SUCCESS! Factors recovered:")
-                    print(f"p = {p}")
-                    print(f"q = {q}")
                     print(f"Verification: p * q = {p * q}")
                     print(f"Verification: (p-1)*(q-1) = {(p-1)*(q-1)}")
+                    print(f"p = {p}")
+                    print(f"q = {q}")
+                    print()
                     print("PHI_LEAK=SUCCESS")
                 else:
                     print(f"Discriminant is not a perfect square: {discriminant}")
@@ -4404,7 +4514,7 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}}, \\quad n_j = g_{ij} \\cdot \\frac{n_j}
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("PHI_LEAK=FAILED")
-_attack()`,frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.phi),r=t-n+1n,i=r*r-4n*t;if(i<0n)return`phi(n) is inconsistent with n.\nDiscriminant is negative: ${i}`;let a=sg(i);if(a*a!==i)return null;let o=(r-a)/2n,s=(r+a)/2n;if(o*s!==t)return null;let c=(o-1n)*(s-1n);return[`Phi(n) Leak Attack (browser-side, BigInt)`,`n = ${t}`,`phi(n) = ${n}`,`p + q = ${r}`,`Discriminant = ${i}`,``,`Factors recovered:`,`p = ${o}`,`q = ${s}`,`Verification: p * q = ${o*s}`,`Verification: (p-1)*(q-1) = ${c}`,`phi(n) matches: ${c===n?`YES`:`NO`}`,`PHI_LEAK=SUCCESS`].join(`
+_attack()`,frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.phi),r=t-n+1n,i=r*r-4n*t;if(i<0n)return`phi(n) is inconsistent with n.\nDiscriminant is negative: ${i}`;let a=sg(i);if(a*a!==i)return null;let o=(r-a)/2n,s=(r+a)/2n;if(o*s!==t)return null;let c=(o-1n)*(s-1n);return[`Phi(n) Leak Attack (browser-side, BigInt)`,`n = ${t}`,`phi(n) = ${n}`,`p + q = ${r}`,`Discriminant = ${i}`,``,`Factors recovered:`,`Verification: p * q = ${o*s}`,`Verification: (p-1)*(q-1) = ${c}`,`p = ${o}`,`q = ${s}`,`phi(n) matches: ${c===n?`YES`:`NO`}`,``,`PHI_LEAK=SUCCESS`].join(`
 `)}catch{return null}},proof:`\\textbf{Theorem:} Knowing $\\phi(n)$ factors $n = pq$ in polynomial time by solving a quadratic.
 
 \\textbf{Setup:}
@@ -4435,9 +4545,11 @@ p, q &= \\frac{s \\pm \\sqrt{\\Delta}}{2} \\qed
             if n % p_msb == 0:
                 p = p_msb
                 q = n // p
-                print("PARTIAL_KEY_EXPOSURE=SUCCESS: p_msb exactly divides n")
-                print(f"p={p}")
-                print(f"q={q}")
+                print(f"Verification: p * q = {p * q}")
+                print(f"p = {p}")
+                print(f"q = {q}")
+                print()
+                print("PARTIAL_KEY_EXPOSURE=SUCCESS")
                 return
             # p = p_msb + x, where x is unknown low bits (trailing zeros = bit count of x)
             k = p_msb.trailing_zero_bits()
@@ -4479,8 +4591,10 @@ p, q &= \\frac{s \\pm \\sqrt{\\Delta}}{2} \\qed
                     break
             if found_p:
                 q = n // found_p
+                print(f"Verification: p * q = {found_p * q}")
                 print(f"p = {found_p}")
                 print(f"q = {q}")
+                print()
                 print("PARTIAL_KEY_EXPOSURE=SUCCESS")
             else:
                 print("Need approximately half the bits of p for Coppersmith to work.")
@@ -4533,10 +4647,11 @@ p &= p_{\\text{msb}} + x_0 \\qed
             if g > 1 and g < n:
                 p = g
                 q = n // p
-                print(f"p = {p}")
-                print(f"q = {q}")
                 print(f"Verification: p * q = {p * q}")
                 print(f"Verification: a^p mod n = {power_mod(a, p, n)} == leak? {power_mod(a, p, n) == leak}")
+                print(f"p = {p}")
+                print(f"q = {q}")
+                print()
                 print("IMPLICIT_KEY_EXPOSURE=SUCCESS")
             else:
                 print("gcd(leak - a, n) = 1 or n. Fermat trick failed.")
@@ -4565,7 +4680,7 @@ p &\\mid (\\text{leak} - a) \\\\
 p &= \\gcd(\\text{leak} - a, n) \\qed
 \\end{align*}
 
-\\textbf{References:} Common CTF pattern; based on Fermat's Little Theorem`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.a&&!!e.leak,frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.a),r=BigInt(e.leak),i=og(r-n,t);if(i>1n&&i<t){let e=i,a=t/e;return[`Implicit Key Exposure Attack (browser-side, BigInt)`,`n = ${t}`,`a = ${n}`,`leak = ${r}`,``,`Factors recovered:`,`p = ${e}`,`q = ${a}`,`Verification: p * q = ${e*a}`,`Verification: a^p mod n = ${ug(n,e,t)} == leak? ${ug(n,e,t)===r}`,`IMPLICIT_KEY_EXPOSURE=SUCCESS`].join(`
+\\textbf{References:} Common CTF pattern; based on Fermat's Little Theorem`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.a&&!!e.leak,frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.a),r=BigInt(e.leak),i=og(r-n,t);if(i>1n&&i<t){let e=i,a=t/e;return[`Implicit Key Exposure Attack (browser-side, BigInt)`,`n = ${t}`,`a = ${n}`,`leak = ${r}`,``,`Factors recovered:`,`p = ${e}`,`q = ${a}`,`Verification: p * q = ${e*a}`,`Verification: a^p mod n = ${ug(n,e,t)} == leak? ${ug(n,e,t)===r}`,``,`IMPLICIT_KEY_EXPOSURE=SUCCESS`].join(`
 `)}return null}catch{return null}}},pv=()=>{let{p:e,n:t}=Ag(Mg.p,Mg.q),n=ug(3n,e,t);return{n:t.toString(),a:`3`,leak:n.toString()}},mv={id:`common-prime-rsa`,name:`Common Prime RSA`,category:`Factorization`,description:`Factors two moduli sharing a prime. Use when n1 and n2 share a factor p.`,inputs:[{name:`n1`,label:`n1 (first modulus)`,placeholder:`Enter n1...`,multiline:!0,rows:3},{name:`n2`,label:`n2 (second modulus)`,placeholder:`Enter n2...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
@@ -4589,14 +4704,15 @@ p &= \\gcd(\\text{leak} - a, n) \\qed
             if p > 1 and p < n1 and p < n2:
                 q1 = n1 // p
                 q2 = n2 // p
+                print(f"Verification: p * q1 = {p * q1} == n1? {p * q1 == n1}")
+                print(f"Verification: p * q2 = {p * q2} == n2? {p * q2 == n2}")
                 print(f"Shared prime: p = {p}")
                 print(f"n1 = {p} x {q1}")
                 print(f"n2 = {p} x {q2}")
-                print(f"Verification: p * q1 = {p * q1} == n1? {p * q1 == n1}")
-                print(f"Verification: p * q2 = {p * q2} == n2? {p * q2 == n2}")
                 print(f"p is prime: {p.is_prime()}")
                 print(f"q1 is prime: {q1.is_prime()}")
                 print(f"q2 is prime: {q2.is_prime()}")
+                print()
                 print("COMMON_PRIME_RSA=SUCCESS")
             elif p == 1:
                 print("gcd(n1, n2) = 1. No shared prime factor.")
@@ -4673,6 +4789,7 @@ print("HASTAD_BROADCAST=FAILED")`:`def _attack():
                             all_ok = False
                         print(f"  Verify {i+1}: m^{e} mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
                     if all_ok:
+                        print()
                         print("HASTAD_BROADCAST=SUCCESS")
                     else:
                         print("HASTAD_BROADCAST=FAILED")
@@ -4712,9 +4829,10 @@ m &= \\sqrt[e]{M} \\qed
                 return
             if n % 2 == 0:
                 print(f"n is even: {n}")
+                print(f"Verification: 2 * {n // 2} = {n}")
                 print(f"p = 2")
                 print(f"q = {n // 2}")
-                print(f"Verification: 2 * {n // 2} = {n}")
+                print()
                 print("EULER=SUCCESS")
                 return
             if n.is_prime():
@@ -4725,8 +4843,10 @@ m &= \\sqrt[e]{M} \\qed
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
                 print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("EULER=SUCCESS")
                 return
             end = isqrt(n)
@@ -4769,11 +4889,12 @@ m &= \\sqrt[e]{M} \\qed
             else:
                 if p * q != n:
                     q = n // p
-                print(f"p = {p}")
-                print(f"q = {q}")
                 print(f"Verification: p * q = {p * q}")
                 print(f"p is prime: {p.is_prime()}")
                 print(f"q is prime: {q.is_prime()}")
+                print(f"p = {p}")
+                print(f"q = {q}")
+                print()
                 print("EULER=SUCCESS")
         except Exception as e:
             print(f"ERROR: {e}")
@@ -4810,7 +4931,10 @@ p &= \\gcd(k + h, n),\\; q = \\gcd(\\ell + m, n) \\qed
                 return
             if n % 2 == 0:
                 print(f"n is even: {n}")
-                print(f"p = 2, q = {n // 2}")
+                print(f"Verification: p * q = {2 * (n // 2)}")
+                print(f"p = 2")
+                print(f"q = {n // 2}")
+                print()
                 print("POLLARD_STRASSEN=SUCCESS")
                 return
             if n.is_prime():
@@ -4820,7 +4944,10 @@ p &= \\gcd(k + h, n),\\; q = \\gcd(\\ell + m, n) \\qed
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("POLLARD_STRASSEN=SUCCESS")
                 return
             c = Integer(floor(RR(n) ** (1/4))) + 1
@@ -4838,9 +4965,10 @@ p &= \\gcd(k + h, n),\\; q = \\gcd(\\ell + m, n) \\qed
                 if g > 1 and g < n:
                     p = g
                     q = n // g
+                    print(f"Verification: p * q = {p * q}")
                     print(f"p = {p}")
                     print(f"q = {q}")
-                    print(f"Verification: p * q = {p * q}")
+                    print()
                     print("POLLARD_STRASSEN=SUCCESS")
                     return
             print("Pollard-Strassen failed: no factor found in intervals")
@@ -4882,7 +5010,10 @@ P_i &= \\prod_{j \\in I_i} j \\mod n \\\\
                 return
             if n % 2 == 0:
                 out.append("n is even: " + str(n))
-                out.append("p = 2, q = " + str(n // 2))
+                out.append("Verification: p * q = " + str(2 * (n // 2)))
+                out.append("p = 2")
+                out.append("q = " + str(n // 2))
+                out.append("")
                 out.append("PISANO=SUCCESS")
                 print("\\n".join(out))
                 return
@@ -4894,7 +5025,10 @@ P_i &= \\prod_{j \\in I_i} j \\mod n \\\\
             if n.is_square():
                 p = isqrt(n)
                 out.append("n is a perfect square: " + str(p) + "^2 = " + str(n))
-                out.append("p = q = " + str(p))
+                out.append("Verification: p * q = " + str(p * p))
+                out.append("p = " + str(p))
+                out.append("q = " + str(p))
+                out.append("")
                 out.append("PISANO=SUCCESS")
                 print("\\n".join(out))
                 return
@@ -4914,9 +5048,10 @@ P_i &= \\prod_{j \\in I_i} j \\mod n \\\\
                                 p_factor = (s - t) // 2
                                 q_factor = (s + t) // 2
                                 if p_factor > 1 and p_factor * q_factor == n:
+                                    out.append("Verification: p * q = " + str(p_factor * q_factor))
                                     out.append("p = " + str(p_factor))
                                     out.append("q = " + str(q_factor))
-                                    out.append("Verification: p * q = " + str(p_factor * q_factor))
+                                    out.append("")
                                     out.append("PISANO=SUCCESS")
                                     found = True
                                     print("\\n".join(out))
@@ -4936,9 +5071,10 @@ P_i &= \\prod_{j \\in I_i} j \\mod n \\\\
                                     p_factor = (s - t) // 2
                                     q_factor = (s + t) // 2
                                     if p_factor > 1 and p_factor * q_factor == n:
+                                        out.append("Verification: p * q = " + str(p_factor * q_factor))
                                         out.append("p = " + str(p_factor))
                                         out.append("q = " + str(q_factor))
-                                        out.append("Verification: p * q = " + str(p_factor * q_factor))
+                                        out.append("")
                                         out.append("PISANO=SUCCESS")
                                         found = True
                                         print("\\n".join(out))

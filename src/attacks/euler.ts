@@ -21,9 +21,10 @@ export const attack: Attack = {
                 return
             if n % 2 == 0:
                 print(f"n is even: {n}")
+                print(f"Verification: 2 * {n // 2} = {n}")
                 print(f"p = 2")
                 print(f"q = {n // 2}")
-                print(f"Verification: 2 * {n // 2} = {n}")
+                print()
                 print("EULER=SUCCESS")
                 return
             if n.is_prime():
@@ -34,8 +35,10 @@ export const attack: Attack = {
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
                 print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("EULER=SUCCESS")
                 return
             end = isqrt(n)
@@ -78,11 +81,12 @@ export const attack: Attack = {
             else:
                 if p * q != n:
                     q = n // p
-                print(f"p = {p}")
-                print(f"q = {q}")
                 print(f"Verification: p * q = {p * q}")
                 print(f"p is prime: {p.is_prime()}")
                 print(f"q is prime: {q.is_prime()}")
+                print(f"p = {p}")
+                print(f"q = {q}")
+                print()
                 print("EULER=SUCCESS")
         except Exception as e:
             print(f"ERROR: {e}")

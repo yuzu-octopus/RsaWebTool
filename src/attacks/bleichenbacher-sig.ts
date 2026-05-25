@@ -63,6 +63,7 @@ print("BLEICHENBACHER_SIG=FAILED")`;
         top_two = cube >> (8 * (n_bytes - 2))
         if top_two == Integer(0x0001):
             print("PKCS#1 structure preserved — forged signature valid against lax verifier")
+            print()
             print("BLEICHENBACHER_SIG=SUCCESS")
         else:
             print("Signature forgery failed — garbage area too small for this hash and modulus")

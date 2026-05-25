@@ -25,9 +25,10 @@ export const attack: Attack = {
             return
         if n % 2 == 0:
             print(f"n is even: {n}")
+            print(f"Verification: 2 * {n // 2} = {n}")
             print(f"p = 2")
             print(f"q = {n // 2}")
-            print(f"Verification: 2 * {n // 2} = {n}")
+            print()
             print("QUADRATIC_SIEVE=SUCCESS")
             return
         if n.is_prime():
@@ -38,8 +39,10 @@ export const attack: Attack = {
         if n.is_square():
             p = isqrt(n)
             print(f"n is a perfect square: {p}^2 = {n}")
-            print(f"p = q = {p}")
             print(f"Verification: p * q = {p * p}")
+            print(f"p = {p}")
+            print(f"q = {p}")
+            print()
             print("QUADRATIC_SIEVE=SUCCESS")
             return
         #
@@ -55,10 +58,12 @@ export const attack: Attack = {
             tdiv_limit = 1000000
             tdiv = trial_division(n, tdiv_limit)
             if tdiv and 1 < tdiv < n:
-                print(f"Small factor found via trial division: {tdiv}")
                 q = n // tdiv
-                print(f"q = {q}")
+                print(f"Small factor found via trial division: {tdiv}")
                 print(f"Verification: {tdiv} * {q} = {tdiv * q}")
+                print(f"p = {tdiv}")
+                print(f"q = {q}")
+                print()
                 print("QUADRATIC_SIEVE=SUCCESS")
                 return
             print("No small factor via trial division, trying qsieve...")
@@ -98,11 +103,12 @@ export const attack: Attack = {
             elif len(factors) == 2 and all(exp == 1 for _, exp in factors):
                 p = Integer(factors[0][0])
                 q = Integer(factors[1][0])
+                print(f"Verification: p * q = {p * q}")
                 print(f"p = {p}")
                 print(f"q = {q}")
-                print(f"Verification: p * q = {p * q}")
                 print(f"p is prime: {p.is_prime()}")
                 print(f"q is prime: {q.is_prime()}")
+                print()
                 print("QUADRATIC_SIEVE=SUCCESS")
             # Multiple factors or powers
             else:
@@ -118,11 +124,13 @@ export const attack: Attack = {
                     product *= Integer(prime) ** exp
                 print(f"Verification: product = {product}")
                 print(f"Matches n: {product == n}")
+                print()
                 print("QUADRATIC_SIEVE=SUCCESS")
         except Exception as ex:
             print(f"Factorization failed: {ex}")
             print("n may be too large for the quadratic sieve.")
             print("For numbers > 100 digits, try ECM or specialized attacks.")
+            print()
             print("QUADRATIC_SIEVE=FAILED")
         #
     except BaseException as ex:

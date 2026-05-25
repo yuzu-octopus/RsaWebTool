@@ -34,14 +34,15 @@ export const attack: Attack = {
             if p > 1 and p < n1 and p < n2:
                 q1 = n1 // p
                 q2 = n2 // p
+                print(f"Verification: p * q1 = {p * q1} == n1? {p * q1 == n1}")
+                print(f"Verification: p * q2 = {p * q2} == n2? {p * q2 == n2}")
                 print(f"Shared prime: p = {p}")
                 print(f"n1 = {p} x {q1}")
                 print(f"n2 = {p} x {q2}")
-                print(f"Verification: p * q1 = {p * q1} == n1? {p * q1 == n1}")
-                print(f"Verification: p * q2 = {p * q2} == n2? {p * q2 == n2}")
                 print(f"p is prime: {p.is_prime()}")
                 print(f"q1 is prime: {q1.is_prime()}")
                 print(f"q2 is prime: {q2.is_prime()}")
+                print()
                 print("COMMON_PRIME_RSA=SUCCESS")
             elif p == 1:
                 print("gcd(n1, n2) = 1. No shared prime factor.")

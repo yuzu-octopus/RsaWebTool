@@ -116,6 +116,7 @@ print("NON_COPRIME_EXP=FAILED")`;
                         found_valid = True
                     print(f"    m^e mod n = {v} (c = {c}) {'OK' if ok else 'FAIL'}")
             if found_valid:
+                print()
                 print("NON_COPRIME_EXP=SUCCESS")
             else:
                 print("NON_COPRIME_EXP=FAILED")

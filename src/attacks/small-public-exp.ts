@@ -50,6 +50,7 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
                     print(f"m as text: {m_bytes.decode('utf-8', errors='replace')}")
                 except Exception:
                     print(f"m as hex: {hex(m_root)}")
+                print()
                 print("SMALL_PUBLIC_EXP=SUCCESS")
             else:
                 print(f"c is not a perfect {e}-th power over integers.")
@@ -67,6 +68,7 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
                 print("If two ciphertexts c1 = m^e and c2 = (m + delta)^e")
                 print("are known with the same (n, e), then m can be recovered.")
                 print("Provide a second ciphertext to attempt this attack.")
+                print()
                 print("SMALL_PUBLIC_EXP=FAILED")
     except Exception as ex:
         print(f"ERROR: {ex}")

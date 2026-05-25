@@ -70,9 +70,10 @@ export const attack: Attack = {
                     if p_candidate > 1 and n % p_candidate == 0:
                         q = n // p_candidate
                         print(f"Factor found! r={r_candidate}, k={k}")
+                        print(f"Verification: p * q = {p_candidate * q}")
                         print(f"p = {p_candidate}")
                         print(f"q = {q}")
-                        print(f"Verification: p * q = {p_candidate * q}")
+                        print()
                         print("NITROS=SUCCESS")
                         factored = True
                         break
