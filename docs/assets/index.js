@@ -1991,69 +1991,114 @@ p &\\approx C + \\delta,\\; C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
             print(f"c2 = (a*m + b)^e mod n = {c2}")
             print(f"a = {a}, b = {b}")
             print()
-            # Custom GCD for polynomials over Zmod(n) with composite n
-            # Sage's built-in gcd() fails for non-prime modulus.
-            # Avoid monic() since leading coeff may not be invertible
-            # in Zmod(n) for composite n — just return the raw gcd.
-            def poly_gcd(p, q):
-                while q != 0:
-                    p, q = q, p % q
-                return p
+            # Diagnostic: if b = 0, check degenerate case c2 == a^e * c1
+            if b == 0:
+                ratio_check = power_mod(a, e, n) * c1 % n
+                print(f"Diagnostic: a^e * c1 mod n = {ratio_check}")
+                print(f"Diagnostic: c2 = {c2}")
+                print(f"Diagnostic: match? {ratio_check == c2}")
+                if ratio_check == c2:
+                    print("WARNING: b=0 and c2 == a^e*c1. Any m satisfies c2 = (am)^e mod n.")
+                    print("Cannot recover m uniquely. Try using b != 0.")
+                    print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
+                    return
+                print()
             # f1(x) = x^e - c1, f2(x) = (a*x + b)^e - c2
             # Both share root x = m over Zmod(n)
-            # gcd(f1, f2) = (x - m) -> m = -constant / leading_coeff
             R.<x> = PolynomialRing(Zmod(n))
             f1 = x**e - c1
             f2 = (a * x + b)**e - c2
+            # Custom GCD for polynomials over Zmod(n) with composite n.
+            # Use try/except around p %% q since pseudo-remainder can fail
+            # when leading coefficient shares a factor with n.
+            def poly_gcd(p, q):
+                while q != 0:
+                    try:
+                        p, q = q, p % q
+                    except (ZeroDivisionError, ValueError, TypeError):
+                        lc = q.leading_coefficient()
+                        g = gcd(Integer(lc), Integer(n))
+                        if 1 < g < n:
+                            print(f"GCD found factor of n: {g}")
+                        break
+                return p
             g = poly_gcd(f1, f2)
             print(f"GCD degree: {g.degree()}")
+            m_int = None
             if g.degree() == 1:
-                # g(x) = a*x + b over Zmod(n); root m = -b * a^(-1) mod n
                 a_coeff = Integer(g[1])
                 b_coeff = Integer(g[0])
                 try:
                     m_int = Integer((-b_coeff) * inverse_mod(a_coeff, n) % n)
                 except (ZeroDivisionError, ValueError):
-                    # Leading coeff not invertible — try all candidates
-                    m_int = None
                     for r, _ in g.roots():
                         m_int = Integer(r)
                         break
-                if m_int is None:
-                    print("Could not extract root from degree-1 GCD.")
-                    print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
-                    return
-                print(f"Recovered m = {m_int}")
-                v1 = power_mod(m_int, e, n)
-                v2 = power_mod(Integer(a * m_int + b), e, n)
-                print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
-                print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
-                if v1 == c1 and v2 == c2:
-                    print()
-                    print("FRANKLIN_REITER_RELATED_MESSAGE=SUCCESS")
+            elif g.degree() > 1:
+                for r, _ in g.roots():
+                    m_int = Integer(r)
+                    break
+            # Fallback: if GCD failed and e == 3, use closed-form elimination.
+            # Derivation:
+            #   (am+b)^3 = a^3*m^3 + 3a^2*b*m^2 + 3a*b^2*m + b^3 = c2
+            #   m^3 = c1
+            #   Substitute: 3a^2*b*m^2 + 3a*b^2*m + (b^3 - c2 + a^3*c1) = 0
+            #   Multiply by (A*m - B) and use m^3 = c1 to eliminate m^2:
+            #   (A*C - B^2)*m = B*C - A^2*c1
+            if m_int is None and e == 3:
+                print("Trying e=3 closed-form fallback...")
+                A = (3 * a^2 * b) % n
+                B = (3 * a * b^2) % n
+                C = (b^3 - c2 + a^3 * c1) % n
+                print(f"Algebraic elimination: {A}*m^2 + {B}*m + {C} = 0 (mod n)")
+                if A == 0 and B == 0 and C == 0:
+                    print("Degenerate: any m satisfies both equations (b=0 case).")
+                elif A == 0 and B == 0:
+                    print(f"Contradiction: {C} != 0. a/b values are wrong.")
+                elif A == 0:
+                    # Linear case: B*m + C = 0
+                    try:
+                        m_int = Integer((-C) * inverse_mod(B, n) % n)
+                        print(f"Linear fallback recovered m = {m_int}")
+                    except (ZeroDivisionError, ValueError):
+                        print("Linear fallback failed (B not invertible).")
                 else:
-                    print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
-            elif g.degree() == 0:
-                print("GCD is constant - no common root found.")
-                print("Check that c1, c2 are related by the given a, b.")
-                print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
-            else:
-                roots = g.roots()
-                if roots:
-                    m_int = Integer(roots[0][0])
-                    print(f"Recovered m = {m_int}")
-                    v1 = power_mod(m_int, e, n)
-                    v2 = power_mod(Integer(a * m_int + b), e, n)
-                    print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
-                    print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
-                    if v1 == c1 and v2 == c2:
-                        print()
-                        print("FRANKLIN_REITER_RELATED_MESSAGE=SUCCESS")
+                    # Quadratic case: use derived formula
+                    denom = (A * C - B^2) % n
+                    numer = (B * C - A^2 * c1) % n
+                    print(f"Denominator (A*C - B^2): {denom}")
+                    gd = gcd(Integer(denom), Integer(n))
+                    if 1 < gd < n:
+                        print(f"Denominator shares factor {gd} with n - trying CRT...")
+                        try:
+                            p1 = gd
+                            q1 = n // p1
+                            m_p = Integer(numer % p1 * inverse_mod(denom % p1, p1) % p1)
+                            m_q = Integer(numer % q1 * inverse_mod(denom % q1, q1) % q1)
+                            m_int = Integer(crt([m_p, m_q], [p1, q1]))
+                            print(f"CRT fallback recovered m = {m_int}")
+                        except Exception as ex2:
+                            print(f"CRT fallback failed: {ex2}")
                     else:
-                        print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
-                else:
-                    print("GCD found but no roots extractable.")
-                    print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
+                        try:
+                            m_int = Integer(numer * inverse_mod(denom, n) % n)
+                            print(f"Quadratic fallback recovered m = {m_int}")
+                        except (ZeroDivisionError, ValueError):
+                            print("Quadratic fallback failed (denominator not invertible).")
+            if m_int is None:
+                print("Could not recover message m.")
+                print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
+                return
+            print(f"Recovered m = {m_int}")
+            v1 = power_mod(m_int, e, n)
+            v2 = power_mod(Integer(a * m_int + b), e, n)
+            print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
+            print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
+            if v1 == c1 and v2 == c2:
+                print()
+                print("FRANKLIN_REITER_RELATED_MESSAGE=SUCCESS")
+            else:
+                print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
         except Exception as ex:
             print(f"ERROR: {ex}")
             print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
