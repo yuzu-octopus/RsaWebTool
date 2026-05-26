@@ -93,7 +93,7 @@ export function ProofIndex() {
                     </Box>
                   }
                   secondary={
-                    <Typography sx={{ color: draculaColors.comment, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", fontSize: '0.75rem' }}>
+                    <Typography sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.75rem' }}>
                       [{attack.category}] {attack.description}
                     </Typography>
                   }
