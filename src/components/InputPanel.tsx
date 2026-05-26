@@ -7,6 +7,7 @@ import {
   Tabs,
   Tab,
   CircularProgress,
+  Divider,
 } from '@mui/material';
 import { Stop, Casino } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
@@ -171,6 +172,23 @@ export function InputPanel() {
             <Typography variant="body2" sx={{ color: draculaColors.comment, fontStyle: 'italic' }}>
               No proof available.
             </Typography>
+          )}
+
+          {selectedAttack.usageGuide && (
+            <>
+              <Divider sx={{ borderColor: draculaColors.comment, my: 2 }} />
+              <Typography
+                variant="h5"
+                sx={{ color: draculaColors.cyan, mb: 1, fontFamily: "'JetBrains Mono', monospace" }}
+              >
+                How to Use
+              </Typography>
+              <Typography
+                sx={{ color: draculaColors.foreground, fontSize: '0.85rem', whiteSpace: 'pre-wrap', fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.6 }}
+              >
+                {selectedAttack.usageGuide}
+              </Typography>
+            </>
           )}
         </Box>
       )}

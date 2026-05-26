@@ -19,6 +19,7 @@ export interface Attack {
   inputs: InputField[];
   sageTemplate: (vals: Record<string, string>) => string;
   proof: string;
+  usageGuide?: string;
   priority: 'high' | 'medium' | 'low';
   applicableCheck: (params: Record<string, string>) => boolean;
   frontendCheck?: (vals: Record<string, string>) => Promise<string | null>;
