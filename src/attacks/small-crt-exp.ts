@@ -103,6 +103,7 @@ p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
 \\end{align*}
 
 \\textbf{References:} Standard RSA-CRT analysis; see also Jochemsz-May attack on small CRT exponents`,
+  usageGuide: 'This attack recovers the private key when either dp or dq (the CRT exponents) is small.\n\nHow to use:\n1. You have n, e, and know that dp (d mod p-1) or dq (d mod q-1) is small (< bound)\n2. The attack iterates over k and d_p candidates to find the factorization\n3. Provide n, e, and optionally bound (max d_p value to try, default 50000)\n4. The attack recovers p = (d_p * e - 1) / k + 1 and checks if it divides n\n\nTip: This is a variant of Boneh-Durfee adapted for CRT exponents. Higher bound = more exhaustive search. Start with 50000 and increase if needed.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e,
 };

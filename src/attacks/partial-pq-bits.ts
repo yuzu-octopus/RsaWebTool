@@ -137,6 +137,7 @@ p &= f(x_0), \\quad q = n/p \\qed
 \\end{align*}
 
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996; N. Howgrave-Graham, "Approximate Integer Common Divisors", 1997`,
+  usageGuide: 'This attack recovers a prime factor when a fraction of its bits are known (e.g., from side-channel leakage).\n\nHow to use:\n1. You know some bits of p (or q) and need to recover the full prime\n2. Provide n, knownBits, and bitPosition (\\"msb\\" or \\"lsb\\")\n3. The attack uses Coppersmith\\\'s method to find the missing bits\n\nTip: This is inherently probabilistic — the lattice may fail even with the right inputs. Try with more known bits if it fails. bitPosition=msb = known high bits, lsb = known low bits.',
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.knownBits && !!p.bitPosition,
 };
