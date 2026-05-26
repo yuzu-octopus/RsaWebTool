@@ -56,7 +56,7 @@ export function extendedGcd(a: bigint, b: bigint): { gcd: bigint; x: bigint; y: 
  * Modular inverse of a mod m, or null if no inverse exists.
  */
 export function modInverse(a: bigint, m: bigint): bigint | null {
-  const { gcd, x } = extendedGcd(a < 0n ? a + m : a, m);
+  const { gcd, x } = extendedGcd(((a % m) + m) % m, m);
   if (gcd !== 1n) return null;
   return ((x % m) + m) % m;
 }

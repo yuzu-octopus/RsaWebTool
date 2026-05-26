@@ -59,9 +59,6 @@ export const attack: Attack = {
           'COMMON_PRIME_RSA=SUCCESS',
         ].join('\n');
       }
-      if (p === 1n) {
-        return null;
-      }
       return null;
     } catch {
       return null;

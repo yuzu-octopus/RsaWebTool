@@ -217,7 +217,7 @@ export const generateTestcase = (): Record<string, string> => {
       currentBits += primes[idx].toString(2).length;
       idx++;
     }
-    
+
     // Check if Stage 1 or 2
     if (Math.random() < 0.7) {
       p = pPlus1 - 1n;

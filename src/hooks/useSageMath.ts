@@ -148,7 +148,7 @@ export function createSageMathExecutor() {
 
           // Detect completion markers
           if (text.includes('=SUCCESS') || text.includes('=FAILED')) {
-            finish({ success: true, stdout: text.trim() });
+            finish({ success: text.includes('=SUCCESS'), stdout: text.trim() });
             return;
           }
         }, 200);
