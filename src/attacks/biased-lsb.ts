@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'biased-lsb',
   name: 'Biased LSB Oracle',
   category: 'Oracle',
-  description: 'Recovers m via noisy LSB oracle. Use when LSB oracle is correct with probability > 50%.',
+  description: 'Recovers plaintext m using a noisy LSB oracle with bias > 50% via majority voting and binary fraction accumulation. Use for error-prone side-channel LSB leaks.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -162,25 +162,28 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} A noisy LSB oracle with bias p > 1/2 recovers m via majority voting + binary fraction accumulation.
+  proof: `\\textbf{Theorem:} A noisy LSB oracle with bias $p > 1/2$ recovers $m$ via majority voting and binary fraction accumulation.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item Oracle correct with prob $p > 1/2$
-\\item k runs per query for majority voting
+\\item Oracle $\\mathcal{O}(c) = \\text{LSB}(\\text{decrypt}(c))$ but correct only with probability $p > 1/2$
+\\item $k$ independent oracle runs per query position for majority voting
+\\item Each blinding step: $c_i = c \\cdot 2^{i \\cdot e} \\bmod n$ decrypts to $2^i m \\bmod n$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-b_i &= \\text{LSB}(2^i m \\bmod n) \\\\
-\\hat{b}_i &= \\text{majority}(b_{i,1}, \\ldots, b_{i,k}) \\\\
-\\Pr[\\hat{b}_i \\neq b_i] &\\leq \\exp(-2k(p-\\tfrac12)^2) \\\\
+b_i &= \\text{LSB}(2^i m \\bmod n) \\quad \\text{(true bit)} \\\\
+\\hat{b}_i &= \\text{majority}(b_{i,1}, \\ldots, b_{i,k}) \\quad \\text{(voted estimate)} \\\\
+\\Pr[\\hat{b}_i \\neq b_i] &\\leq \\exp(-2k(p-\\tfrac12)^2) \\quad \\text{(Hoeffding bound)} \\\\
 k = O\\!\\left(\\frac{\\log n}{(p-1/2)^2}\\right) &\\implies \\Pr[\\hat{b}_i \\neq b_i] = O(1/n) \\\\
-q &= \\sum_{i=0}^{k-1} \\hat{b}_i \\cdot 2^{k-1-i} \\\\
+q &= \\sum_{i=0}^{k-1} \\hat{b}_i \\cdot 2^{k-1-i} \\quad \\text{(binary fraction)} \\\\
 m &= \\left\\lceil \\frac{q \\cdot n}{2^k} \\right\\rceil \\quad \\text{(verify via } m^e \\equiv c \\pmod{n}) \\qed
 \\end{align*}
 
-\\textbf{References:} Goldwasser, Micali, 1982; Håstad et al., 1989`,
+\\textbf{Explanation:} The LSB of $2^i m \\bmod n$ equals the $i$-th bit of the binary fraction $m/n$. Each oracle call is noisy (correct with probability $p$), but by taking $k$ repeated queries per position and majority-voting, we amplify the effective accuracy. The Hoeffding bound shows that error decays exponentially in $k(p-1/2)^2$. Once we have $k > \\log_2 n$ reliable bits, the binary fraction $q/2^k$ approximates $m/n$ within $1/2^k$, so $m = \\lceil q \\cdot n / 2^k \\rceil$ uniquely.
+
+\\textbf{References:} S. Goldwasser, S. Micali, "Probabilistic Encryption", JCSS 1984; J. Håstad et al., "A Pseudorandom Generator from any One-Way Function", SIAM J. Comp. 1999`,
   usageGuide: 'This attack is for when your LSB oracle is noisy \u2014 instead of a single correct bit per query, you have multiple responses and use majority voting.\n\nHow to use:\n1. Query the oracle multiple times per blinding value to get multiple response strings\n2. Provide n, e, c, and oracle_runs \u2014 one response per line, each line being comma-separated 0/1 bits\n3. The attack uses majority voting per bit position, then accumulates voted bits into binary fraction m/n\n4. The final m is computed as ceil(q * n / 2^k) where q is the accumulated voted bits\n\nTip: More runs per position increases accuracy. With 31 runs and 90% accuracy per bit, majority voting gives >99.9% confidence per bit position after 31 runs.',
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_runs,

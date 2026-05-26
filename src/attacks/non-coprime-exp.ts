@@ -5,7 +5,7 @@ export const attack: Attack = {
   id: 'non-coprime-exp',
   name: 'Non-Coprime Exponent Attack',
   category: 'Message / Protocol',
-  description: 'Decrypts when gcd(e, φ(n)) > 1. Use when public exponent shares factor with φ(n).',
+  description: 'Decrypts by finding all e-th roots modulo each prime when gcd(e, phi(n)) > 1. Use when public exponent shares a factor with phi(n).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -126,24 +126,26 @@ print("NON_COPRIME_EXP=FAILED")`;
     #
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} When $\\gcd(e,\\varphi(n)) > 1$, ciphertext has multiple preimages recovered via Hensel lifting the CRT components.
+  proof: `\\textbf{Theorem:} When $\\gcd(e, \\varphi(n)) > 1$, the ciphertext $c = m^e \\bmod n$ has multiple preimages. All are recovered by finding e-th roots modulo $p$ and $q$ separately, then CRT-combining.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $g_p = \\gcd(e,p-1)$, $g_q = \\gcd(e,q-1)$
-\\item $g_p = \\gcd(e, p-1)$, $g_q = \\gcd(e, q-1)$, product $g = g_p \\cdot g_q > 1$
+\\item $n = pq$, $e$ shares a factor with $\\varphi(n) = (p-1)(q-1)$
+\\item $g_p = \\gcd(e, p-1) > 1$ or $g_q = \\gcd(e, q-1) > 1$ (or both)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-g_p &= \\gcd(e,p-1), \\quad g_q = \\gcd(e,q-1) \\\\
-\\{r_{p,1}, \\ldots, r_{p,g_p}\\} &= \\{x \\in \\mathbb{F}_p : x^e = c\\} \\\\
-\\{r_{q,1}, \\ldots, r_{q,g_q}\\} &= \\{x \\in \\mathbb{F}_q : x^e = c\\} \\\\
-m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\\\
-\\#\\text{solutions} &= g_p \\cdot g_q \\qed
+g_p &= \\gcd(e, p-1), \\quad g_q = \\gcd(e, q-1) \\\\
+R_p &= \\{r \\in \\mathbb{F}_p : r^e \\equiv c \\pmod{p}\\}, \\quad |R_p| = g_p \\\\
+R_q &= \\{r \\in \\mathbb{F}_q : r^e \\equiv c \\pmod{q}\\}, \\quad |R_q| = g_q \\\\
+m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\quad \\text{for each pair} \\\\
+\\#\\text{valid plaintexts} &= g_p \\cdot g_q
 \\end{align*}
 
-\\textbf{References:} Williams, 1980; May, 2003`,
+\\textbf{Explanation:} RSA requires $\\gcd(e, \\varphi(n)) = 1$ for a unique decryption exponent $d$. When this fails, the encryption map $m \\mapsto m^e \\bmod n$ is many-to-one: multiple plaintexts produce the same ciphertext. The attack finds all e-th roots in $\\mathbb{F}_p$ and $\\mathbb{F}_q$ using finite field algebra, then combines them via CRT. Each combination is a valid preimage of $c$.
+
+\\textbf{References:} Williams, 1980; May, "Attacks on RSA with Small Parameters," 2003`,
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.p && !!p.q,
 };

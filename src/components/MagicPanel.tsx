@@ -24,6 +24,7 @@ import { detectFormat, parsePEM } from '../utils/converters';
 import { generateKeyPair, encrypt, TESTCASE_BITS } from '../utils/testcases/core';
 import { isActualSuccess } from '../utils/sage-output';
 import { inputSx } from '../styles/inputSx';
+import { colFlexSx, centeredPanelSx, colorGhostBtn } from '../styles/shared';
 import type { Attack } from '../types';
 
 const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
@@ -373,8 +374,8 @@ export function MagicPanel() {
   if (viewMode !== 'magic') return null;
 
   return (
-    <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <Box sx={{ p: 2, overflow: 'auto', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Box sx={colFlexSx}>
+      <Box sx={{ ...centeredPanelSx, p: 2 }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
           <Typography variant="h2" sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
             <AutoFixHigh sx={{ fontSize: 'inherit' }} /> Magic Cracker
@@ -477,13 +478,7 @@ export function MagicPanel() {
               fullWidth
               variant="outlined"
               onClick={handleGenerateTestcase}
-              sx={{
-                borderColor: draculaColors.cyan,
-                color: draculaColors.cyan,
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '0.8rem',
-                '&:hover': { backgroundColor: draculaColors.cyan, color: draculaColors.background },
-              }}
+              sx={colorGhostBtn(draculaColors.cyan)}
               startIcon={<Casino sx={{ fontSize: '1rem' }} />}
             >
               Generate Testcase
@@ -502,13 +497,7 @@ export function MagicPanel() {
               fullWidth
               variant="outlined"
               onClick={handleStop}
-              sx={{
-                mt: 2,
-                borderColor: draculaColors.red,
-                color: draculaColors.red,
-                fontFamily: "'JetBrains Mono', monospace",
-                '&:hover': { backgroundColor: draculaColors.red, color: draculaColors.background },
-              }}
+              sx={colorGhostBtn(draculaColors.red)}
             >
               <Stop sx={{ mr: 1 }} /> Stop
             </Button>
@@ -518,14 +507,7 @@ export function MagicPanel() {
               variant="outlined"
               onClick={() => { void handleCrack(); }}
               disabled={!rawInput.trim()}
-              sx={{
-                mt: 2,
-                borderColor: draculaColors.purple,
-                color: draculaColors.purple,
-                fontFamily: "'JetBrains Mono', monospace",
-                '&:hover': { backgroundColor: draculaColors.purple, color: draculaColors.background },
-                '&:disabled': { borderColor: draculaColors.comment, color: draculaColors.comment },
-              }}
+              sx={{ ...colorGhostBtn(draculaColors.purple), '&:disabled': { borderColor: draculaColors.comment, color: draculaColors.comment } }}
             >
               <Science sx={{ mr: 1 }} /> Crack It
             </Button>

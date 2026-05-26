@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'manger',
   name: "Manger's OAEP Attack",
   category: 'Oracle',
-  description: 'Decrypts OAEP via first-byte oracle. Use when oracle reveals if decrypted OAEP starts with 0x00.',
+  description: 'Decrypts OAEP-encrypted messages using a first-byte oracle in O(log n) queries. Use when an oracle reveals whether the plaintext starts with 0x00.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -159,24 +159,29 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("MANGER=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} An OAEP first-byte oracle allows decryption in O(\\log n) queries.
+  proof: `\\textbf{Theorem:} An OAEP first-byte oracle recovers the full plaintext in O(\\log n) oracle queries.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item Oracle O(c) = 1 iff first byte is 0x00
-\\item First byte 0 $\\iff m < n/256$
+\\item $c = m^e \\bmod n$ with OAEP padding; first byte must be $0x00$
+\\item Oracle $\\mathcal{O}(c') = 1$ iff plaintext's first byte is $0x00$ (i.e., $m < n/256$)
+\\item $B = 2^{8(k-1)} \\approx n/256$, where $k = \\lceil n/8 \\rceil$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\mathcal{O}(c) = 1 &\\iff m < n/256 \\\\
-\\mathcal{O}(c \\cdot s^e) = 1 &\\implies m \\cdot s - rn < n/256 \\\\
-m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r+1)}{256s} \\right) \\\\
-[a_{i+1}, b_{i+1}] &= [a_i, b_i] \\cap \\{m : \\mathcal{O}(c \\cdot s_i^e) = 1\\} \\\\
+\\mathcal{O}(c) = 1 &\\iff m < B = n/256 \\\\
+\\mathcal{O}(c \\cdot s^e) = 1 &\\implies m \\cdot s - rn < B \\quad \\text{for some } r \\\\
+m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{rn+B}{s} \\right) \\\\
+\\text{Step 1: } &\\text{Find } f_1 = 2^t \\text{ with } \\mathcal{O}(c \\cdot f_1^e) = 1 \\\\
+\\text{Step 2: } &\\text{Find } f_2 \\text{ where } \\mathcal{O}(c \\cdot f_2^e) = 0 \\text{ (wrapped past } n) \\\\
+\\text{Step 3: } &\\text{Binary search: } [a_{i+1}, b_{i+1}] \\subset [a_i, b_i] \\\\
 \\lceil \\log_2 n \\rceil + 8 \\text{ queries} &\\implies b - a = 0 \\implies m = a \\qed
 \\end{align*}
 
-\\textbf{References:} J. Manger, CRYPTO 2001`,
+\\textbf{Explanation:} Manger's attack has three phases. Step 1 doubles a multiplier $f$ until the blinded message $f \\cdot m \\bmod n$ exceeds $B$ (first byte nonzero). Step 2 adds $f/2$ increments until the value wraps past $n$ and falls below $B$ again. Step 3 performs a binary search, narrowing the interval by checking whether $f \\cdot m \\bmod n \\geq B$. The key insight is that the boundary $B$ partitions $[0, n)$ into exactly two contiguous segments, making this a textbook binary search problem. Unlike Bleichenbacher's attack which requires ~$2^{17}$ queries, Manger needs only O(\\log n) queries.
+
+\\textbf{References:} J. Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP) as Standardized in PKCS#1 v2.0", CRYPTO 2001`,
   usageGuide: 'This requires oracle_responses \u2014 a comma-separated list from an oracle that reveals whether the decrypted plaintext\'s first byte is 0x00 (i.e., plaintext < B where B = 2^(8*(k-1)), k = ceil(n.nbits()/8)).\n\nHow to use:\n1. Set up an oracle that returns 1 if decrypt(c\') has first byte 0x00 (plaintext < B), 0 otherwise\n2. Query the oracle for successive blinding values\n3. Provide n, e, c, and oracle_responses as comma-separated bits\n4. The attack narrows the message interval with each query\n\nTip: Manger\'s attack requires O(log n) oracle queries \u2014 significantly fewer than Bleichenbacher. The oracle boundary is B = 2^(8*(k-1)) \u2248 n/256, NOT n/2.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_responses,

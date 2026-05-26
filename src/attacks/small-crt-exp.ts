@@ -8,7 +8,7 @@ export const attack: Attack = {
   id: 'small-crt-exp',
   name: 'Small CRT Exponent',
   category: 'Partial Key / Lattice',
-  description: 'Factors n via FLT-based linear search over d_p. Use when the CRT exponent d_p = d mod (p-1) is small (< bound). For each d_p candidate, checks if gcd(2^{e·d_p} - 2, n) > 1 via batched product tree GCD.',
+  description: 'Factors n via FLT-based batch GCD search over small CRT exponent d_p. Use when d_p = d mod (p-1) is small (< bound, default 1,000,000).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -121,26 +121,27 @@ _attack()`,
       return Promise.resolve(null);
     }
   },
-  proof: `\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small ($< \\text{bound}$), Fermat's Little Theorem with batched GCD recovers $p$.
+  proof: `\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small ($< \\text{bound}$), Fermat's Little Theorem with batched GCD recovers $p$ in $O(\\text{bound})$ time.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $e \\cdot d_p \\equiv 1 \\pmod{p-1}$, so $e \\cdot d_p = 1 + k(p-1)$ for some $k$
+\\item $ed_p \\equiv 1 \\pmod{p-1}$, so $ed_p = 1 + k(p-1)$ for some $k$
 \\item By FLT: $2^{e \\cdot d_p} \\equiv 2 \\pmod{p}$, so $p \\mid (2^{e \\cdot d_p} - 2)$
-\\item $d_p$ small ($< \\text{bound}$)
+\\item $d_p$ is small ($< \\text{bound}$, default $10^6$)
 \\end{itemize}
 
-\\textbf{Algorithm:}
-\\begin{enumerate}
-\\item Precompute $\\texttt{step} = 2^e \\bmod n$
-\\item For $d_p = 0 \\ldots \\text{bound}$: $\\texttt{current} = \\texttt{step}^{d_p} \\bmod n = 2^{e \\cdot d_p} \\bmod n$
-\\item Accumulate $\\Pi = \\Pi \\cdot (\\texttt{current} - 2) \\bmod n$
-\\item Every $1000$ steps: $g = \\gcd(\\Pi, n)$. If $1 < g < n$, scan the batch for exact $d_p$
-\\end{enumerate}
+\\textbf{Proof:}
+\\begin{align*}
+\\texttt{step} &= 2^e \\bmod n \\\\
+\\text{For } d_p = 0\\ldots\\text{bound}:\\quad &\\texttt{current} = \\texttt{step}^{d_p} \\bmod n = 2^{e d_p} \\bmod n \\\\
+\\text{Accumulate } \\Pi &= \\Pi \\cdot (\\texttt{current} - 2) \\bmod n \\\\
+\\text{Every } 1000 \\text{ steps:}\\quad &g = \\gcd(\\Pi, n) \\\\
+1 < g < n &\\implies \\text{scan batch for exact } d_p \\qed
+\\end{align*}
 
-\\textbf{Complexity:} $O(\\text{bound})$ BigInt operations, independent of $e$. Batched GCD reduces gcd calls by $1000\\times$.
+\\textbf{Explanation:} Fermat's Little Theorem guarantees $2^{ed_p} \\equiv 2 \\pmod{p}$ when $d_p$ is the correct CRT exponent. The attack linearly scans candidate $d_p$ values, accumulating a product of $(2^{ed_p} - 2)$ values in batches of 1000. A single GCD per batch detects whether any candidate in the batch is correct, reducing GCD calls by $1000\\times$. Once a hit is found, a linear scan of just that batch identifies the exact $d_p$. This works for any $e$ (no $e$-size limit) since the iteration count depends only on the bound.
 
-\\textbf{References:} Boneh \\textit{et al.} (CRYPTO 1998); Cohn \\& Heninger (ePrint 2011/436)`,
+\\textbf{References:} Boneh \\textit{et al.}, "Cryptanalysis of RSA with Small CRT Exponents", CRYPTO 1998; Cohn \\& Heninger, ePrint 2011/436`,
    usageGuide: 'This attack recovers the private key when either dp or dq (the CRT exponents) is small.\n\nHow to use:\n1. You have n, e, and know that dp (d mod p-1) is small (< bound)\n2. The attack uses Fermat\'s Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p\n3. A batched GCD approach (product tree) accelerates the linear scan ~1000x by reducing gcd calls via product accumulation\n4. Provide n, e, and optionally bound (max dp to try, default 1000000)\n\nTip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 1000000 runs in ~900ms for 1024-bit n.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e,

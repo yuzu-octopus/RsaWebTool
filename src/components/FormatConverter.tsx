@@ -14,6 +14,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { convertFormat } from '../utils/converters';
 import type { Format } from '../utils/converters';
 import { inputSx } from '../styles/inputSx';
+import { colFlexSx, centeredPanelSx } from '../styles/shared';
 
 const FORMATS: { value: Format; label: string }[] = [
   { value: 'hex', label: 'Hex' },
@@ -70,8 +71,8 @@ export function FormatConverter() {
   if (viewMode !== 'format-converter') return null;
 
   return (
-    <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <Box sx={{ p: 2, overflow: 'auto', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Box sx={colFlexSx}>
+      <Box sx={{ ...centeredPanelSx, p: 2 }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
           <Typography
             variant="h2"

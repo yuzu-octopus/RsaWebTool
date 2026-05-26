@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'known-plaintext',
   name: 'Known Plaintext Attack',
   category: 'Message / Protocol',
-  description: 'Recovers m via integer e-th root (when m^e < n) or known-prefix brute-force (≤20 unknown bits). Use when e is small or high-order bytes of m are known.',
+  description: 'Recovers m via integer e-th root when m^e < n, or via known-prefix brute-force for up to 20 unknown bits. Use when plaintext is small or partially known.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: '65537', multiline: false },
@@ -146,27 +146,27 @@ _attack()`;
       return Promise.resolve(null);
     }
   },
-  proof: `\\textbf{Theorem:} When $m^e < n$, $m$ is recovered via integer e-th root. With known prefix, brute-force recovers $m$ for gaps $\\leq 20$ bits.
+  proof: `\\textbf{Theorem:} When $m^e < n$, the plaintext is recovered by taking the integer e-th root of $c$. When high-order bytes of $m$ are known, brute-force over the unknown low bits recovers the full plaintext.
 
 \\textbf{Strategy 1: Integer e-th Root}
 \\begin{align*}
-c &= m^e \\quad (\\text{no modular wrap when } m^e < n) \\\\
-m &= \\sqrt[e]{c} \\quad \\text{(exact integer root)}
+c &= m^e \\quad \\text{(no modular reduction when } m^e < n\\text{)} \\\\
+m &= \\sqrt[e]{c} \\quad \\text{(exact integer root over $\\mathbb{Z}$)}
 \\end{align*}
-Works when $m$ is small relative to $n$ (e.g., $e=3$ with small plaintext).
+Works when $m$ is small relative to $n$ (common with $e = 3$ and short plaintexts).
 
 \\textbf{Strategy 2: Known Prefix + Brute Force}
 \\begin{align*}
-m &= m_0 \\cdot 2^k + x, \\quad |x| < 2^k \\\\
+m &= m_0 \\cdot 2^k + x, \\quad 0 \\leq x < 2^k \\\\
 c &\\equiv (m_0 \\cdot 2^k + x)^e \\pmod{n} \\\\
 \\text{Iterate } x &= 0, 1, \\ldots, 2^k - 1 \\\\
-\\text{Check: } &(m_0 \\cdot 2^k + x)^e \\equiv c \\pmod{n} \\qed
+\\text{Check: } &(m_0 \\cdot 2^k + x)^e \\equiv c \\pmod{n}
 \\end{align*}
-Works for $k \\leq 20$ ($\\approx 1$ million iterations).
+Feasible for $k \\leq 20$ (approx. 1 million modular exponentiations in the browser).
 
-\\textbf{Limitations:} For larger unknown portions ($>20$ bits), Coppersmith's method or other lattice techniques would be needed but are not implemented here due to SageCell timeout constraints.
+\\textbf{Explanation:} Two complementary strategies. Strategy 1 works when the plaintext is so small that $m^e$ never wraps around modulo $n$ — the ciphertext literally equals $m^e$ as an integer, so taking the e-th root recovers $m$. Strategy 2 works when part of the plaintext is known (e.g., a flag format like "flag\\{...\\}") — the unknown suffix is brute-forced by testing each candidate against the ciphertext.
 
-\\textbf{References:} D. Coppersmith, 1997; May, 2003`,
+\\textbf{References:} D. Coppersmith, 1997; May, "Attacks on RSA with Small Parameters," 2003`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!(p.n && p.c),
 };

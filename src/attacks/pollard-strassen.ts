@@ -5,7 +5,7 @@ export const attack: Attack = {
   id: 'pollard-strassen',
   name: "Pollard-Strassen's Algorithm",
   category: 'Factorization',
-  description: "Factors n in O(n^(1/4)) by partitioning [1, n^(1/4)] into interval products and GCD. Fast when n has a factor <= n^(1/4).",
+  description: "Factors n in O(n^(1/4)) by computing GCD of interval products over [1, n^(1/4)] to find a small factor. Use when n has a factor ≤ n^(1/4).",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -82,21 +82,24 @@ def _attack():
         print(f"ERROR: {ex}")
         print("POLLARD_STRASSEN=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} Pollard-Strassen factors n in O(n^{1/4} \\log n) using interval product GCD.
+  proof: `\\textbf{Theorem:} Pollard-Strassen factors n in $O(n^{1/4} \\log n)$ time by partitioning $[1, n^{1/4}]$ into intervals and testing each via GCD.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item n has a prime factor p \\leq n^{1/4}
+\\item $n$ has a prime factor $p \\leq n^{1/4}$
 \\item Partition $[1, n^{1/4}]$ into $c = \\lceil n^{1/4} \\rceil$ intervals
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 \\text{Let } c &= \\lceil n^{1/4} \\rceil \\\\
-\\text{Interval } I_i &= \\{ic + 1, \\dots, (i+1)c\\} \\\\
+\\text{Interval } I_i &= \\{i c + 1, \\dots, (i+1) c\\} \\\\
 P_i &= \\prod_{j \\in I_i} j \\mod n \\\\
-\\gcd(P_i, n) &> 1 \\iff I_i \\text{ contains a factor of } n \\qed
+\\gcd(P_i, n) &> 1 \\iff I_i \\text{ contains a factor of } n
 \\end{align*}
+Compute each $P_i$ incrementally and take $\\gcd(P_i, n)$. When a match is found, back-track within the interval to isolate the exact factor. The cost is $O(c) = O(n^{1/4})$ multiplications and GCDs.
+
+\\textbf{Explanation:} If $p \\mid n$ and $p \\leq n^{1/4}$, then $p$ lies in some interval $I_i$. Since every element of $I_i$ divides $P_i$, we have $p \\mid P_i$ and hence $\\gcd(P_i, n) \\geq p > 1$. The backtrack step finds $p$ within the winning interval by rebuilding the product one term at a time until the GCD becomes non-trivial.
 
 \\textbf{References:} Strassen, 1977; Pollard, 1974`,
   priority: 'medium',

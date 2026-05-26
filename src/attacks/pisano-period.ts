@@ -44,7 +44,7 @@ export const attack: Attack = {
   id: 'pisano-period',
   name: 'Pisano Period Factorization',
   category: 'Factorization',
-  description: 'Factors n via birthday collision on 2^x mod n (multiplicative order period). Fast for small n (< 64 bits).',
+  description: 'Factors n via birthday collision on 2^x mod n using multiplicative period search. Use for small moduli under 64 bits.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -198,24 +198,26 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} Factor n = pq via birthday collision on the multiplicative order of 2 modulo n.
+  proof: `\\textbf{Theorem:} Factor $n = pq$ via birthday collision on the sequence $f(i) = 2^i - 1 \\pmod{n}$, revealing $\\lambda(n)$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $f(x) = 2^x - 1 \\pmod{n}$
-\\item Birthday paradox: collision $f(i) = f(j)$ in $O(\\sqrt{\\operatorname{ord}_n(2)})$ steps
+\\item Let $f(x) = 2^x - 1 \\pmod{n}$ for $x = 0, 1, 2, \\ldots$
+\\item Birthday paradox: collision $f(i) = f(j)$ expected in $O(\\sqrt{\\operatorname{ord}_n(2)})$ steps
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-f(i) &= f(j) \\implies 2^i \\equiv 2^j \\pmod{n} \\\\
+f(i) = f(j) &\\implies 2^i \\equiv 2^j \\pmod{n} \\\\
 &\\implies 2^{|j-i|} \\equiv 1 \\pmod{n} \\\\
-|j-i| &\\text{ is a multiple of }\\operatorname{ord}_n(2) \\mid \\lambda(n) \\\\
-\\text{Try } \\phi &= k \\cdot |j-i| \\text{ as candidate for } \\varphi(n) \\\\
-p, q &= \\frac{n - \\phi + 1 \\pm \\sqrt{(n - \\phi + 1)^2 - 4n}}{2} \\qed
+|j-i| &\\text{ is a multiple of } \\operatorname{ord}_n(2) \\mid \\lambda(n) \\\\
+\\phi &= k \\cdot |j-i| \\text{ as candidate for } \\phi(n) \\\\
+p,q &= \\frac{n - \\phi + 1 \\pm \\sqrt{(n - \\phi + 1)^2 - 4n}}{2} \\qed
 \\end{align*}
 
-\\textbf{References:} Wuliangshun, Integer Factorization With Pisano Period, IEEE 2019`,
+\\textbf{Explanation:} The Pisano period attack tracks $2^i \\bmod n$ via recurrence ($v_{i+1} = 2 \\cdot v_i \\bmod n$). When a value repeats, the index difference is a multiple of the multiplicative order of 2 modulo $n$, which divides $\\lambda(n)$. Each candidate $\\phi$ is tested by checking whether the quadratic discriminant is a perfect square.
+
+\\textbf{References:} Wuliangshun, "Integer Factorization With Pisano Period", IEEE Access, 2019`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

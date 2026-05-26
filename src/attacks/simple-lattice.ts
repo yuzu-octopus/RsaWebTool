@@ -5,7 +5,7 @@ export const attack: Attack = {
   id: 'simple-lattice',
   name: 'Simple Lattice',
   category: 'Partial Key / Lattice',
-  description: 'Recovers p from an approximation. Use when nearp ≈ p with |nearp - p| < n^(1/4).',
+  description: 'Recovers p from an approximate value nearp using Coppersmith\'s lattice when |nearp - p| < n^(1/4). Use when a close approximation of p is known.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'nearp', label: 'nearp (approximate p)', placeholder: 'Enter approximate p value...', multiline: true, rows: 3 },
@@ -85,20 +85,24 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("SIMPLE_LATTICE=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If $|p-p_0| < n^{1/4}$, Coppersmith recovers $p$ from approximation $p_0$.
+  proof: `\\textbf{Theorem:} If $|p-p_0| < n^{1/4}$, Coppersmith's method recovers $p$ from approximation $p_0$ via lattice reduction.
 
 \\textbf{Setup:}
 \\begin{itemize}
 \\item $n = p \\cdot q$ with balanced primes
-\\item $p = p_0 + x$, $|x| < n^{1/4}$
+\\item $p_0 \\approx p$, $|p - p_0| < X = n^{1/4}$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 f(x) &= p_0 + x \\equiv 0 \\pmod{p} \\\\
-\\text{Coppersmith finds } x_0 \\text{ when } |x_0| &< n^{1/4} \\quad (\\beta = 0.5) \\\\
-p &= p_0 + x_0, \\quad q = n/p \\qed
+\\text{Construct lattice from shifts: } &x^i f(x)^j n^{m-j} \\\\
+\\text{LLL finds short vector } g(x) &= a_0 + a_1 x \\text{ with root } x_0 \\\\
+r &\\approx -\\frac{a_0 \\cdot X}{a_1},\\quad x_0 = \\text{round}(r) \\\\
+p &= p_0 + x_0,\\quad q = n/p \\qed
 \\end{align*}
+
+\\textbf{Explanation:} The attack embeds $f(x) = p_0 + x$ into a lattice with $m=5$ shifts of decreasing $n$ powers and $t=5$ shifts of $f^m x^k$. After LLL reduction, each row of the reduced basis is a candidate polynomial; the attack checks all rows (not just row 0, because Sage's $\\texttt{small\\_roots}$ has a degree-1 bug) for two-term polynomials whose root rounds to the correct offset.
 
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996`,
   usageGuide: 'This recovers a factor p from an approximate value nearp using Coppersmith\\\'s lattice method.\n\nHow to use:\n1. You have a modulus n and an approximation nearp ≈ p (one of the prime factors)\n2. The approximation must be within n^(1/4) of the actual p\n3. Provide n and nearp\n4. The attack constructs a lattice and uses LLL to find the exact p\n\nTip: nearp can come from side-channel leaks, known bits of p, or approximations from other attacks. If |nearp - p| > n^(1/4) the attack may fail.',

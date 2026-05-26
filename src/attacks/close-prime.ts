@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'close-prime',
   name: 'Close-Prime',
   category: 'Factorization',
-  description: 'Factor n when p and q are close using Fermat factorization with Londahl BSGS fallback. Fermat handles |p - q| < 2·n^(1/4); BSGS extends to ~sqrt(n).',
+  description: 'Factors n when p and q are close via Fermat iteration and Londahl BSGS fallback. Use when primes are suspected close together.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -150,29 +150,27 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} When $|p - q|$ is small, Fermat's factorization finds $p,q$ in $O(|p-q|)$ steps; the Londahl BSGS extends this to $O(\\sqrt{|p-q|})$.
+  proof: `\\textbf{Theorem:} Factor $n = pq$ when $|p-q|$ is small via Fermat's difference-of-squares iteration, extended by Londahl's BSGS to larger gaps.
 
-\\textbf{Fermat's Factorization:}
+\\textbf{Setup:}
+\\begin{itemize}
+\\item $n = pq$ with $p \\approx q$
+\\item Let $a = \\frac{p+q}{2}$, $b = \\frac{p-q}{2}$, so $n = a^2 - b^2$
+\\end{itemize}
+
+\\textbf{Proof:}
 \\begin{align*}
-n &= pq = a^2 - b^2 \\\\
-a &= \\frac{p+q}{2}, \\quad b = \\frac{p-q}{2} \\\\
-a &= \\lceil\\sqrt{n}\\rceil, \\quad b = \\sqrt{a^2 - n} \\\\
-\\text{Iterate: } a_{i+1} &= a_i + 1, \\quad b_i = \\sqrt{a_i^2 - n} \\\\
-a_i^2 - n \\text{ is a perfect square} &\\implies p = a_i - b_i, \\; q = a_i + b_i
+a &= \\lceil\\sqrt{n}\\rceil,\\; b = \\sqrt{a^2 - n} \\\\
+\\text{Fermat: } a_{i+1} &= a_i + 1,\\; b_i^2 = a_i^2 - n \\\\
+a_i^2 - n \\text{ is square} &\\implies p = a_i - b_i,\\; q = a_i + b_i \\\\
+\\text{BSGS: } \\phi_{\\text{approx}} &= n - 2\\lfloor\\sqrt{n}\\rfloor + 1 \\\\
+2^{\\delta} &\\equiv 2^{-\\phi_{\\text{approx}}} \\pmod{n},\\; \\delta = \\phi(n) - \\phi_{\\text{approx}} \\\\
+\\phi(n) &= \\phi_{\\text{approx}} + j - i \\cdot b,\\; p+q = n - \\phi(n) + 1
 \\end{align*}
 
-\\textbf{Fallback (Londahl BSGS):}
-\\begin{align*}
-\\phi_{\\text{approx}} &= n - 2\\lfloor\\sqrt{n}\\rfloor + 1 \\approx \\phi(n) \\\\
-2^{\\delta} &\\equiv 2^{-\\phi_{\\text{approx}}} \\pmod{n}, \\quad \\delta = \\phi(n) - \\phi_{\\text{approx}} \\\\
-\\text{Baby-step: } 2^j \\bmod n, \\quad \\text{Giant-step: } &2^{-\\phi_{\\text{approx}}}(2^b)^i \\\\
-\\phi(n) &= \\phi_{\\text{approx}} + j - i \\cdot b, \\quad p+q = n - \\phi(n) + 1 \\\\
-p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
-\\end{align*}
+\\textbf{Explanation:} Fermat represents $n$ as $a^2 - b^2$ and searches for $a$ such that $a^2 - n$ is a perfect square. Each step increments $a$ by 1 and updates $b^2$ additively, avoiding multiplication. When $|p-q| < 10^6$, Fermat converges quickly. Londahl's BSGS recovers $\\phi(n)$ via a discrete-log collision for larger gaps.
 
-\\textbf{Explanation:} Fermat's method iterates $a$ starting from $\\lceil\\sqrt{n}\\rceil$, checking if $a^2 - n$ is a perfect square. When $|p-q| < 10^6$, it converges in under $10^6$ iterations. For larger gaps, Londahl's BSGS fallback recovers $\\phi(n)$ via a discrete log in $O(\\sqrt{\\delta})$ steps.
-
-\\textbf{References:} Fermat (1643); Carl L\\"ondahl, "Finding close-prime factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,
+\\textbf{References:} Fermat (1643); C. L\\"ondahl, "Finding Close-Prime Factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

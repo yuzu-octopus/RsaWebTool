@@ -4,7 +4,7 @@ export const attack: Attack = {
   id: 'binary-poly-factor',
   name: 'Binary Polynomial Factoring',
   category: 'Factorization',
-  description: 'Factors n via binary polynomial factorization. Use when n\'s binary form yields factorable polynomial.',
+  description: "Factors n by factoring its binary representation as a polynomial over Z[x] and evaluating at x=2. Use when the binary convolution of p and q has no carries.",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -100,23 +100,26 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("BINARY_POLY_FACTOR=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If $n$'s binary polynomial $f(x) = \\sum b_i x^i$ factors over $\\mathbb{Z}[x]$, then evaluating at $x=2$ reveals factors of $n$.
+  proof: `\\textbf{Theorem:} If $n$'s binary polynomial $f(x) = \\sum b_i x^i$ factors over $\\mathbb{Z}[x]$, then evaluating the factors at $x = 2$ recovers the integer factors of $n$.
 
 \\textbf{Setup:}
 \\begin{itemize}
 \\item $n = \\sum b_i 2^i$, binary digits $b_i \\in \\{0,1\\}$
-\\item $f(x) = \\sum b_i x^i \\in \\mathbb{Z}[x]$, $f(2) = n$
+\\item $f(x) = \\sum b_i x^i \\in \\mathbb{Z}[x]$, so $f(2) = n$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 f(x) &= \\sum b_i x^i \\\\
-f(x) &= \\prod g_i(x)^{e_i} \\quad\\text{(factor over } \\mathbb{Z}[x]\\text{)} \\\\
+f(x) &= \\prod g_i(x)^{e_i} \\quad \\text{(irreducible factorization over } \\mathbb{Z}[x]\\text{)} \\\\
 n = f(2) &= \\prod g_i(2)^{e_i} \\\\
-\\exists i: g_i(2) &= p \\text{ or } q \\qed
+\\exists i: g_i(2) &= p \\text{ or } q
 \\end{align*}
+If the binary convolution of $p$ and $q$ produces no carries, then $f_{pq}(x) = f_p(x) \\cdot f_q(x)$ and the polynomial factorization separates them.
 
-\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen & Gerhard, "Modern Computer Algebra", Chapter 5`,
+\\textbf{Explanation:} When multiplying two integers whose binary representations trigger no carries (i.e., every bit position gets at most one 1 from each factor), the binary polynomial of the product equals the product of the binary polynomials. Factoring this polynomial over $\\mathbb{Z}[x]$ and evaluating at $x = 2$ recovers the original integers. This is a rare special case but works instantly when applicable.
+
+\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen \\& Gerhard, "Modern Computer Algebra", Chapter 5`,
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

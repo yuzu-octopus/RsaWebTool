@@ -5,7 +5,7 @@ export const attack: Attack = {
   id: 'partial-key-exposure',
   name: 'Partial Key Exposure',
   category: 'Partial Key / Lattice',
-  description: 'Recovers p from known MSBs. Use when ≥ half the bits of p are known.',
+  description: 'Recovers p from known high bits (MSBs) using Coppersmith\'s lattice. Use when at least half of p\'s bits are known via side-channel leakage.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'p_msb', label: 'p_msb (known MSBs of p)', placeholder: 'Enter known high bits of p...', multiline: true, rows: 3 },
@@ -84,24 +84,25 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("PARTIAL_KEY_EXPOSURE=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If MSBs of $p$ are known with $|x| < n^{\\beta^2}$, Coppersmith recovers $p$.
+  proof: `\\textbf{Theorem:} If MSBs of $p$ are known with $|x| < n^{\\beta^2}$ where $\\beta = 0.5$, Coppersmith's lattice recovers $p$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $n = pq$
-\\item $p = p_{\\text{msb}} + x$, $|x| < X$
+\\item $n = pq$ with balanced primes
+\\item $p = p_{\\text{msb}} + x$, $|x| < X = n^{1/4}$
+\\item $p_{\\text{msb}}$ has trailing zeros indicating the unknown bit positions
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 f(x) &= p_{\\text{msb}} + x \\equiv 0 \\pmod{p} \\\\
-\\text{Construct lattice from } x^i f(x)^j &\\cdot n^{m-j} \\\\
-\\text{LLL} \\implies \\text{short vector } g(x) &\\in \\mathbb{Z}[x] \\\\
-g(x_0) = 0 &\\implies \\text{recover } x_0 \\\\
-p &= p_{\\text{msb}} + x_0 \\qed
+\\text{Construct lattice from shifts: } &x^i f(x)^j n^{m-j},\\quad m = 5,\\; t = 5 \\\\
+\\text{LLL} &\\implies \\text{short vector with coefficients } a_0, a_1 \\\\
+r &\\approx -\\frac{a_0 X}{a_1},\\quad x_0 = \\text{round}(r) \\\\
+p &= p_{\\text{msb}} + x_0,\\quad q = n/p \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Coppersmith's method constructs a lattice embedding $f(x) = p_{\\text{msb}} + x$; LLL finds the small root $x_0$ when $|x_0| < n^{\\beta^2}$, recovering $p$.
+\\textbf{Explanation:} Coppersmith's method constructs a lattice embedding $f(x) = p_{\\text{msb}} + x$ with $m=5$ polynomial shifts scaled by powers of $n$ and $t=5$ shifts of $f^m x^k$. After LLL reduction, each basis row is a candidate polynomial $g(x) = a_0 + a_1 x + \\ldots$. The attack checks all rows (not just row 0) for two-term polynomials whose root $x_0 \\approx -a_0 X / a_1$ recovers $p$ when substituted back.
 
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", Eurocrypt 1996; A. May, "Using Coppersmith's Method to Attack RSA", 2009`,
   priority: 'high',

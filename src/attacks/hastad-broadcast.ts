@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'hastad-broadcast',
   name: "Hastad's Broadcast Attack",
   category: 'Message / Protocol',
-  description: 'Recovers m from e ciphertexts with small e using CRT. Use when same m sent to e recipients with exponent e.',
+  description: 'Recovers m from e ciphertexts under distinct moduli with small e via CRT and integer e-th root. Use when same m encrypted with exponent e to e recipients.',
   inputs: [
     { name: 'e', label: 'e (public exponent / number of ciphertexts)', placeholder: '3', multiline: false },
     { name: 'ciphertexts', label: 'ciphertexts (one per line: c, n)', placeholder: 'c1, n1\nc2, n2\nc3, n3', multiline: true, rows: 6 },
@@ -101,23 +101,26 @@ _attack()`;
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} If $m$ is encrypted with the same $e$ to $e$ moduli, CRT recovers $m^e$ over $\\mathbb{Z}$, then $m = \\sqrt[e]{m^e}$.
+  proof: `\\textbf{Theorem:} If the same plaintext $m$ is encrypted under $e$ distinct moduli with the same exponent $e$, CRT recovers $m^e$ over $\\mathbb{Z}$ and $m = \\sqrt[e]{m^e}$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $m$ encrypted with same $e$ to $e$ distinct moduli
-\\item $m^e < \\prod n_i$
+\\item $c_i \\equiv m^e \\pmod{n_i}$ for $i = 1, \\ldots, e$
+\\item $\\gcd(n_i, n_j) = 1$ for $i \\neq j$ (moduli are pairwise coprime)
+\\item $m^e < \\prod_{i=1}^e n_i$ (message is smaller than the combined modulus)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 c_i &\\equiv m^e \\pmod{n_i} \\\\
-M &\\equiv m^e \\pmod{\\prod n_i} \\quad \\text{(CRT)} \\\\
-m^e < \\prod n_i &\\implies M = m^e \\quad \\text{(over } \\mathbb{Z}\\text{)} \\\\
-m &= \\sqrt[e]{M} \\qed
+M &\\equiv m^e \\pmod{\\prod n_i} \\quad \\text{(by CRT)} \\\\
+m^e < \\prod n_i &\\implies M = m^e \\quad \\text{(equality over $\\mathbb{Z}$, not just modulo)} \\\\
+m &= \\sqrt[e]{M} \\quad \\text{(exact integer e-th root)}
 \\end{align*}
 
-\\textbf{References:} J. Hastad, "Solving Low-Exponent RSA", 1988`,
+\\textbf{Explanation:} CRT reconstructs $m^e$ as an integer $M$. Since $m^e$ is smaller than the product of all moduli, the reconstruction is exact — there is no modular wrap-around. The e-th root then recovers $m$ directly. This is why small exponents like $e = 3$ are dangerous when broadcasting: only 3 ciphertexts suffice for recovery.
+
+\\textbf{References:} J. Hastad, "Solving Low-Exponent RSA," Eurocrypt 1988`,
   usageGuide: 'This attack recovers m when the same plaintext is encrypted with the same small exponent e to e different moduli.\n\nHow to use:\n1. Collect e ciphertext/modulus pairs: (c1, n1), (c2, n2), ..., (ce, ne)\n2. Paste them into the ciphertexts field, one per line: c, n\n3. Set e to the public exponent (usually 3)\n4. The attack uses CRT to combine the ciphertexts and takes the integer e-th root\n\nInput format:\nc1, n1\nc2, n2\nc3, n3\n\nTip: For convenience, paste this into Magic Mode which auto-detects the format. Works when m^e < n1*n2*...*ne.',
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.e && !!p.ciphertexts,

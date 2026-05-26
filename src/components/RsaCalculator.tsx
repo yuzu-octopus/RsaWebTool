@@ -13,31 +13,9 @@ import { useAppContext } from '../hooks/useAppContext';
 import { modPow, modInverse } from '../utils/bigint';
 import { detectFormat } from '../utils/converters';
 import { inputSx } from '../styles/inputSx';
+import { colFlexSx, centeredPanelSx, outputBoxSx, tabSx } from '../styles/shared';
 
-const outputBoxSx = {
-  mt: 2,
-  p: 1,
-  borderRadius: 1,
-  backgroundColor: draculaColors.currentLine,
-  border: `1px solid ${draculaColors.purple}`,
-  fontFamily: "'JetBrains Mono', monospace",
-  fontSize: '0.8rem',
-  color: draculaColors.foreground,
-  whiteSpace: 'pre-wrap',
-  wordBreak: 'break-all',
-  maxHeight: '150px',
-  overflow: 'auto',
-};
 
-const tabSx = {
-  color: draculaColors.comment,
-  fontFamily: "'JetBrains Mono', monospace",
-  fontSize: '0.85rem',
-  minHeight: 40,
-  '&.Mui-selected': {
-    color: draculaColors.foreground,
-  },
-};
 
 function parseBigInt(input: string): bigint | null {
   const trimmed = input.trim();
@@ -241,8 +219,8 @@ export function RsaCalculator() {
   };
 
   return (
-    <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <Box sx={{ p: 2, overflow: 'auto', flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Box sx={colFlexSx}>
+      <Box sx={{ ...centeredPanelSx, p: 2 }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
           <Typography variant="h2" sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
             <Calculate sx={{ fontSize: 'inherit' }} /> RSA Calculator

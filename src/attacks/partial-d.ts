@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'partial-d',
   name: 'Partial d Key Exposure',
   category: 'Partial Key / Lattice',
-  description: 'Recovers p from low bits of d. Use when LSBs of private exponent d are leaked.',
+  description: 'Recovers d from leaked low-order bits by iterating k in ed = k·φ(n)+1. Use when low-order bits of d are exposed via side-channel.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -91,25 +91,24 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} If low $m$ bits of $d$ are known and $d < n$, recover $d$ by iterating $k$ in the key equation.
+  proof: `\\textbf{Theorem:} If low $m$ bits of $d$ are known, recover $d$ by iterating $k$ in the key equation $ed = k\\varphi(n)+1$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $ed \\equiv 1 \\pmod{\\varphi(n)}$
-\\item $d_{\\text{low}} = d \\bmod 2^m$ known
-\\item $k \\in [1, e]$ where $ed-1 = k\\varphi(n)$
+\\item $ed \\equiv 1 \\pmod{\\varphi(n)}$, so $ed - 1 = k\\varphi(n)$ for some $k \\in [1, e]$
+\\item $d_{\\text{low}} = d \\bmod 2^m$ known, $m = \\text{bit-length of } d_{\\text{low}}$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-d &\\approx \\frac{kn + 1}{e} \\\\
+\\text{Since } \\varphi(n) &\\approx n,\\quad d \\approx \\frac{kn + 1}{e} \\\\
 d_{\\text{approx}} &= \\left\\lfloor \\frac{kn + 1}{e} \\right\\rfloor \\\\
 d_{\\text{approx}} \\bmod 2^m &\\stackrel{?}{=} d_{\\text{low}} \\\\
-\\varphi &= (ed - 1)/k \\\\
-x^2 - (n - \\varphi + 1)x + n &= 0 \\implies p, q \\qed
+\\varphi &= (ed_{\\text{approx}} - 1)/k \\\\
+x^2 - (n - \\varphi + 1)x + n &= 0 \\\\implies p,q \\qed
 \\end{align*}
 
-\\textbf{Explanation:} For each $k \\in [1,e]$, compute $d_{\\text{approx}} = \\lfloor(kn+1)/e\\rfloor$; if low $m$ bits match $d_{\\text{low}}$, recover $\\varphi(n) = (ed-1)/k$ and solve $x^2 - (n-\\varphi+1)x + n = 0$ for $p,q$.
+\\textbf{Explanation:} For each $k \\in [1,e]$, compute $d_{\\text{approx}} = \\lfloor(kn+1)/e\\rfloor$. If the low $m$ bits match $d_{\\text{low}}$, recover $\\varphi(n) = (ed-1)/k$ and solve the quadratic $x^2 - (n-\\varphi+1)x + n = 0$ for $p$ and $q$. The search bound is limited to $k < 2^{m+2}$ (cap at $\\sim 4\\times 10^6$) for efficiency.
 
 \\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,
   usageGuide: 'This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.\n\nHow to use:\n1. You have modulus n, public exponent e, and dLow (the low-order bits of d)\n2. Provide n, e, and dLow\n3. The attack iterates k in ed = k\\phi(n) + 1, checking if d_approx has matching low bits\n4. For each matching candidate, it computes \\phi(n) and solves the quadratic for p,q\n\nTip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~4M iterations); the frontendCheck always attempts the search regardless of e size.',

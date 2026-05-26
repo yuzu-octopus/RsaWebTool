@@ -6,27 +6,30 @@ export const attack: Attack = {
   id: 'multi-prime-gcd',
   name: 'Multi-Prime GCD',
   category: 'Factorization',
-  description: 'Finds shared primes across multiple moduli via pairwise GCD. Use when given 2+ RSA moduli. Unlike Batch GCD (Factorization category), this attack reports exact moduli pairs that share each factor.',
+  description: 'Finds shared prime factors across multiple RSA moduli using pairwise GCD with pair reporting. Use when two or more moduli may share a common factor.',
   inputs: [
     { name: 'moduli_list', label: 'Moduli (one per line)', placeholder: 'Enter multiple moduli, one per line...', multiline: true, rows: 6 },
   ],
   sageTemplate: () => `print("Multi-prime GCD requires multiple moduli — run in browser mode")`,
-  proof: `\\textbf{Theorem:} Pairwise GCD of moduli reveals shared factors and their pairs.
+  proof: `\\textbf{Theorem:} Pairwise GCD among a set of RSA moduli reveals shared prime factors and identifies which moduli share them.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item Moduli $\\{n_i\\}$
-\\item Some pair shares a factor
+\\item Set of moduli $\\{n_1, n_2, \\ldots, n_k\\}$
+\\item Some pair $(n_i, n_j)$ shares a prime factor $p$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 g_{ij} &= \\gcd(n_i, n_j) \\quad (1 \\leq i < j \\leq k) \\\\
 g_{ij} > 1 &\\implies p \\mid n_i \\land p \\mid n_j \\\\
-n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}}, \\quad n_j = g_{ij} \\cdot \\frac{n_j}{g_{ij}} \\qed
+n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{ij}} \\\\
+\\text{Cost: } &O(k^2 \\cdot \\log^2 n) \\qed
 \\end{align*}
 
-\\textbf{References:} Heninger et al., USENIX Security 2012`,
+\\textbf{Explanation:} When multiple RSA moduli are generated with insufficient entropy, two moduli may coincidentally share a prime factor. Pairwise GCD detects this — if $\\gcd(n_i, n_j) > 1$, the shared factor divides both moduli. Each unordered pair $(i,j)$ is checked once for $k$ moduli, yielding $O(k^2)$ GCD operations.
+
+\\textbf{References:} N. Heninger, Z. Durumeric, E. Wustrow, J. A. Halderman, "Mining Your Ps and Qs", USENIX Security Symposium, 2012`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => {
     const vals = (p.moduli_list || '').trim();

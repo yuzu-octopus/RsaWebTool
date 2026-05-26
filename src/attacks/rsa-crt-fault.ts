@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'rsa-crt-fault',
   name: 'RSA-CRT Fault Attack (Bellcore)',
   category: 'Message / Protocol',
-  description: 'Recovers p from faulty CRT signature. Use when a signature was computed with CRT fault.',
+  description: "Factors n from a single faulty CRT signature via gcd. Use when a transient fault corrupts one of two CRT exponentiations during signing.",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -90,23 +90,27 @@ _attack()`;
       return Promise.resolve(null);
     }
   },
-  proof: `\\textbf{Theorem:} A single faulty CRT signature s' on known m factors n via \\gcd(s'^e - m, n).
+  proof: `\\textbf{Theorem:} A single faulty CRT signature $s'$ on a known message $m$ reveals the factorization of $n = pq$ via $\\gcd(s'^e - m, n)$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item s' \\equiv s \\pmod{p}, s' \\not\\equiv s \\pmod{q} (single-fault)
-\\item n = pq
+\\item $s' \\equiv s \\pmod{p}$, $s' \\not\\equiv s \\pmod{q}$ (fault in one CRT branch only)
+\\item $n = pq$, message $m$ known, faulty signature $s'$ observed
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-s'^e &\\equiv m \\pmod{p} \\\\
-s'^e &\\not\\equiv m \\pmod{q} \\\\
-p \\mid (s'^e - m), \\quad q &\\nmid (s'^e - m) \\\\
-\\gcd(s'^e - m, n) &= p, \\quad q = n/p \\qed
+s &\\equiv m^d \\pmod{n} \\quad \\text{(correct signature)} \\\\
+s'^e &\\equiv m \\pmod{p} \\quad \\text{(fault-free branch)} \\\\
+s'^e &\\not\\equiv m \\pmod{q} \\quad \\text{(corrupted branch)} \\\\
+p &\\mid (s'^e - m), \\quad q \\nmid (s'^e - m) \\\\
+\\gcd(s'^e - m, n) &= p \\\\[4pt]
+q &= n / p \\qed
 \\end{align*}
 
-\\textbf{References:} Boneh, DeMillo, Lipton, Eurocrypt 1997`,
+\\textbf{Explanation:} CRT signing computes $s_p = m^{d_p} \\bmod p$ and $s_q = m^{d_q} \\bmod q$ separately, then combines. If a transient fault corrupts $s_q$ but leaves $s_p$ correct, the faulty signature $s'$ is valid modulo $p$ but invalid modulo $q$. The GCD of $(s'^e - m)$ with $n$ reveals $p$ directly.
+
+\\textbf{References:} Boneh, DeMillo, Lipton, "On the Importance of Checking Cryptographic Protocols for Faults," Eurocrypt 1997`,
   usageGuide: 'This attack exploits a faulty RSA-CRT signature. When a transient fault corrupts the CRT computation, the faulty signature leaks one prime factor.\n\nHow to use:\n1. Obtain a valid signature sig_valid for a message m\n2. Obtain a faulty signature sig_faulty for the same message m from a fault-injected device\n3. The attack computes gcd(sig_faulty^e - m, n) to recover p\n\nRequired: n, e, m (the signed message as an integer), sig_valid, sig_faulty\n\nTip: The two signatures must be from the SAME message using the SAME key. The fault must affect only one of the two CRT exponentiations.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.m && !!p.sig_valid && !!p.sig_faulty,

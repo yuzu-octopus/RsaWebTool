@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'coppersmith-short-pad',
   name: 'Coppersmith Short Pad Attack',
   category: 'Partial Key / Lattice',
-  description: 'Recovers padded messages m1,m2 from short random pads. Use when same base message is padded with short random values before encryption.',
+  description: 'Recovers messages m1, m2 from two ciphertexts with small padding differences via integer e-th root. Use when same message is encrypted twice with small random pads (e=3, no modular wrap-around).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -123,25 +123,27 @@ _attack()`;
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} Given $c_1 \\equiv m_1^e \\pmod{n}$ and $c_2 \\equiv m_2^e \\pmod{n}$ where $m_1 = m + r_1$ and $m_2 = m + r_2$ with small random pads $r_1, r_2$, recover $m$ when $m^e < n$ (no modular wrap-around).
+  proof: `\\textbf{Theorem:} Given $c_1 \\equiv m_1^e \\pmod{n}$ and $c_2 \\equiv m_2^e \\pmod{n}$ where $m_1 = m + r_1$, $m_2 = m + r_2$ with small random pads, recover $m$ when $m^e < n$.
 
 \\textbf{Setup:}
 \\begin{itemize}
 \\item $c_1 \\equiv m_1^e \\pmod{n}$, $c_2 \\equiv m_2^e \\pmod{n}$
-\\item $m_1, m_2 < n^{1/e}$ (message with small padding fits below $n$)
+\\item $m_1, m_2 < n^{1/e}$ (padded messages are small enough that $m_i^e < n$; no modular reduction)
+\\item $r_1, r_2$ are short random pads
 \\end{itemize}
 
-\\textbf{Method:}
-\\begin{enumerate}
-\\item Compute $m_1 = \\sqrt[e]{c_1}$ and $m_2 = \\sqrt[e]{c_2}$ via integer e-th root
-\\item Verify $m_1^e = c_1$ and $m_2^e = c_2$ to confirm exact roots
-\\item If only one root found, brute-force the small pad difference $\\Delta = r_2 - r_1$
-\\item Output: $m_1, m_2, \\Delta \\quad \\text{(extract base } m \\text{ if } r_1 \\text{ known)}
-\\end{enumerate}
+\\textbf{Proof:}
+\\begin{align*}
+m_1 &= \\lfloor\\sqrt[e]{c_1}\\rfloor,\\quad m_2 = \\lfloor\\sqrt[e]{c_2}\\rfloor \\\\
+\\text{Verify } m_1^e &= c_1,\\; m_2^e = c_2 \\quad\\text{(exact integer e-th root)} \\\\
+\\Delta &= m_2 - m_1 = r_2 - r_1 \\\\
+\\text{If only one root found, brute-force } \\Delta &\\in [1, 255] \\\\
+m &= m_1 - r_1 = m_2 - r_2 \\qed
+\\end{align*}
 
-\\textbf{Caveat:} This approach requires $m_1^e, m_2^e < n$ (no modular reduction). For $e = 3$ and small messages (common in CTF challenges), this holds. The full Coppersmith method using polynomial resultants and lattice reduction handles the general case with $|\\Delta| < n^{1/e^2}$ but is not implemented in the SageCell template due to timeout constraints.
+\\textbf{Explanation:} When $m^e < n$, the ciphertext is an exact $e$-th power in the integers (no modular wrap-around). Integer $e$-th root directly recovers $m_1$ and $m_2$. If only one root is found, brute-force the small pad difference $\\Delta$ (at most 255). The full Coppersmith short-pad attack using polynomial resultants handles the general case where $m^e \\ge n$ and $|\\Delta| < n^{1/e^2}$, but requires lattice reduction not shown here.
 
-\\textbf{References:} D. Coppersmith, J. Cryptology, 1997; Boneh, 1999`,
+\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Bivariate Integer Equation", J. Cryptology, 1997; D. Boneh, "Twenty Years of Attacks on RSA", 1999`,
   usageGuide: 'This attack recovers m when the same message is encrypted twice with the same public key but with a small random padding added.\n\nHow to use:\n1. You have two ciphertexts c1, c2 of the same plaintext m with small pads r1, r2\n2. The pads are small (|r1|, |r2| < n^(1/e)) so m^e < n (no modular wrap-around)\n3. Provide n, e, c1, c2\n4. The attack uses integer e-th root to recover the messages and pads\n\nTip: Works best with e=3 and small messages. For convenience, paste into Magic Mode which auto-detects.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c1 && !!p.c2,

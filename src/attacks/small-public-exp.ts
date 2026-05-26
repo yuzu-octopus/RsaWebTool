@@ -5,7 +5,7 @@ export const attack: Attack = {
   id: 'small-public-exp',
   name: 'Small Public Exponent Analysis',
   category: 'Advanced',
-  description: 'Recovers m when m^e < n. Use when e is small and message is short.',
+  description: 'Recovers plaintext m via e-th root (m^e < n), Hastad broadcast (e ciphertexts), or Franklin-Reiter related-message attack. Use when e is small (e.g., 3, 5, 17).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: '3', multiline: false },
@@ -76,23 +76,31 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
     #
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} Small e (3,5,17) enables e-th root, Hastad broadcast, and Franklin-Reiter attacks.
+  proof: `\\textbf{Theorem:} Small public exponent $e \\in \\{3, 5, 17\\}$ enables three distinct attacks: e-th root (direct), Hastad broadcast (multiple recipients), and Franklin-Reiter (related messages).
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $e \\in \\{3,5,17\\}$
-\\item Known attacks become viable
+\\item $n$ is an RSA modulus, $e$ is small, $c = m^e \\bmod n$
+\\item Attack 1: $m^e < n$ (no modular reduction occurred)
+\\item Attack 2: Same $m$ encrypted to $e$ different recipients with same $e$
+\\item Attack 3: Two ciphertexts $c_1 = m^e$, $c_2 = (m+\\delta)^e$ under same $(n, e)$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{e-th root:} &\\quad m^e < n \\implies m = \\sqrt[e]{c} \\\\
-\\text{Hastad:} &\\quad C \\equiv m^e \\pmod{N}, \\; N = \\prod n_i \\\\
-&\\quad m^e < N \\implies m = \\sqrt[e]{C} \\\\
-\\text{Franklin-Reiter:} &\\quad \\gcd(x^e - c_1, (ax+b)^e - c_2) = x - m \\qed
+\\text{Attack 1 -- e-th root:} &\\quad m^e < n \\implies c = m^e \\;\\text{(over integers)} \\\\
+&\\quad \\therefore m = \\sqrt[e]{c} \\quad\\text{(exact integer root)} \\\\
+\\text{Attack 2 -- Hastad broadcast:} &\\quad c_i = m^e \\bmod n_i, \\; i = 1,\\ldots,e \\\\
+&\\quad C \\equiv m^e \\pmod{N}, \\; N = \\prod n_i \\\\
+&\\quad m^e < N \\implies m = \\sqrt[e]{C} \\quad\\text{(CRT + integer root)} \\\\
+\\text{Attack 3 -- Franklin-Reiter:} &\\quad f_1(x) = x^e - c_1 \\\\
+&\\quad f_2(x) = (x+\\delta)^e - c_2 \\\\
+&\\quad \\gcd(f_1(x), f_2(x)) = x - m \\;\\text{over } \\mathbb{Z}_n[x] \\qed
 \\end{align*}
 
-\\textbf{References:} Hastad, 1988; Franklin \\& Reiter, 1996`,
+\\textbf{Explanation:} Small exponents make RSA vulnerable because the modular reduction $m^e \\bmod n$ only occurs when $m^e \\geq n$. If the message is short enough that $m^e < n$, we can simply compute $m = \\sqrt[e]{c}$ over the integers -- no factoring needed. Hastad extends this: if the same message is encrypted to $e$ different recipients (different moduli $n_i$), the Chinese Remainder Theorem lets us reconstruct $m^e$ over $\\mathbb{Z}_{\\prod n_i}$, then take the $e$-th root. Franklin-Reiter handles the case where two plaintexts are related by a known affine relationship $m_2 = a \\cdot m_1 + b$: the GCD of the two polynomials $x^e - c_1$ and $(ax+b)^e - c_2$ reveals $x - m_1$.
+
+\\textbf{References:} J. H\\aa{}stad, "Solving Simultaneous Modular Equations of Low Degree", SIAM J. Comp. 1988; M. Franklin, M. Reiter, "A Linear-Time Attack on RSA with Related Messages", CRYPTO 1996`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!(p.n && p.e && p.c),
 };

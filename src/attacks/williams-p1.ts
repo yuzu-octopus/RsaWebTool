@@ -5,7 +5,7 @@ export const attack: Attack = {
   id: 'williams-p1',
   name: "Williams' p+1 Method",
   category: 'Factorization',
-  description: 'Factors n when p+1 is smooth. Use when p+1 has only small prime factors. Stage 2 catches p+1 with one larger prime factor.',
+  description: "Factors n when p+1 is B1-smooth using Lucas sequences V_k(P,1). Stage 2 extends to handle one larger prime factor beyond B1. Use when Pollard p-1 fails.",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'B', label: 'B1 (stage 1 bound, optional)', placeholder: '10000', multiline: false },
@@ -176,24 +176,26 @@ export const attack: Attack = {
         out.append("WILLIAMS_P1=FAILED")
         print("\\n".join(out))
 _attack()`,
-  proof: `\\textbf{Theorem:} If p+1 is B1-smooth, find p via Lucas sequences V\\_M(P,1). Stage 2 extends to B2.
+  proof: `\\textbf{Theorem:} If $p+1$ is $B1$-smooth, then $p$ can be found via Lucas sequences $V_k(P,1)$. Stage 2 extends the smoothness bound to $B2$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item Lucas sequences V\\_k(P,1) = \\alpha^k + \\alpha^{-k}
-\\item (D/p) = -1 \\implies \\alpha^{p+1} = 1 in \\mathbb{F}\\_{p^2}
-\\item M = \\operatorname{lcm}(1, 2, \\ldots, B1)
+\\item Lucas sequences $V_k(P,1) = \\alpha^k + \\alpha^{-k}$ where $\\alpha + \\alpha^{-1} = P$
+\\item $(D/p) = -1$ where $D = P^2 - 4$, implying $\\alpha^{p+1} \\equiv 1 \\pmod{p}$
+\\item $M = \\operatorname{lcm}(1, 2, \\ldots, B1)$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 \\text{Choose } P: \\; D &= P^2 - 4, \\quad (D/p) = -1 \\\\
-p+1 &\\mid M \\implies \\alpha^M = 1 \\\\
-V_M &= \\alpha^M + \\alpha^{-M} = 2 \\pmod{p} \\\\
+p+1 &\\mid M \\implies \\alpha^M \\equiv 1 \\pmod{p} \\\\
+V_M &= \\alpha^M + \\alpha^{-M} \\equiv 2 \\pmod{p} \\\\
 \\gcd(V_M - 2, n) &= p \\\\
 \\text{Stage 2: } p+1 &= q \\cdot s,\\; s \\mid M,\\; q \\in (B1, B2] \\\\
-\\text{Check } \\gcd(V_{qM} - 2, n) &\\text{ via recurrence } V_{(k+1)M} = V_{kM}V_M - V_{(k-1)M} \\qed
+\\text{Check } \\gcd(V_{qM} - 2, n) &\\text{ via recurrence } V_{(k+1)M} = V_{kM}V_M - V_{(k-1)M}
 \\end{align*}
+
+\\textbf{Explanation:} Like Pollard's p-1 but for factors where $p+1$ is smooth. The Lucas sequence $V_k$ lives in the quadratic extension $\\mathbb{F}_{p^2}$, where the multiplicative order divides $p+1$. When $(D/p) = -1$, the element $\\alpha$ has norm 1 and satisfies $\\alpha^{p+1} = 1$, so if $p+1 \\mid M$ then $V_M \\equiv 2 \\pmod{p}$. Stage 2 catches the case where $p+1$ has one large prime factor beyond $B1$ by checking multiples of $M$.
 
 \\textbf{References:} H. C. Williams, "A p+1 Method of Factoring", Mathematics of Computation, 1982`,
   priority: 'medium',

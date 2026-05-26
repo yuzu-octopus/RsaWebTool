@@ -14,16 +14,7 @@ export function isActualSuccess(output: string): boolean {
     return successIdx > failedIdx;
   }
 
-  // Heuristic fallback for legacy templates without markers.
-  // NOTE: This is inherently fuzzy — `p =` or `found` can match intermediate output
-  // like "Trying p = 2..." or "No factor found". Only triggers when explicit
-  // =SUCCESS/=FAILED markers are absent; all current attack templates include markers.
-  const text = trimmed.toLowerCase();
-  if (/failed|error|impossible|no factor found|could not|unable to/.test(text)) {
-    return false;
-  }
-  if (/=success|p =|q =|factors:|recovered|found|decrypted/.test(text)) {
-    return true;
-  }
+  // All current attack templates include =SUCCESS/=FAILED markers.
+  // No heuristic fallback needed.
   return false;
 }

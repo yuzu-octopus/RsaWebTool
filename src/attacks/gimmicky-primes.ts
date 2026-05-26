@@ -5,7 +5,7 @@ export const attack: Attack = {
   id: 'gimmicky-primes',
   name: 'Gimmicky Primes',
   category: 'Factorization',
-  description: 'Detects special-form primes (Mersenne, Fermat, etc.). Use when p may be a known special prime.',
+  description: 'Detects special-form primes (Mersenne, primorial, Fermat, Fibonacci, repunit, and others) by trial division. Use for CTF moduli with crafted prime factors.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -243,23 +243,25 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} If p is a special-form prime (Mersenne, primorial, Fermat, etc.), test divisibility against a precomputed set.
+  proof: `\\textbf{Theorem:} If $p$ is a special-form prime from a known set $\\mathcal{S}$, trial division against $\\mathcal{S}$ finds $p$ in $O(|\\mathcal{S}| \\cdot \\log^2 n)$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item n = pq
-\\item p \\in \\mathcal{S} (known special-form set, |\\mathcal{S}| \\ll 5000)
+\\item $n = p \\cdot q$ where $p$ belongs to a known special-form set $\\mathcal{S}$
+\\item $\\mathcal{S}$ includes Mersenne, primorial, Fermat, Fibonacci, repunit, factorial, Carol/Kynea, and Cullen/Woodall primes
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-n &= p \\cdot q, \\quad p \\in \\mathcal{S} \\\\
-n \\bmod s &= 0 \\quad \\text{for some } s \\in \\mathcal{S} \\\\
-s &\\mid n \\implies q = n/s \\\\
-\\text{Cost: } O(|\\mathcal{S}| \\cdot \\log^2 n) & \\qed
+n &= p \\cdot q,\\quad p \\in \\mathcal{S} \\\\
+n \\bmod s &= 0 \\text{ for some } s \\in \\mathcal{S} \\\\
+s \\mid n &\\implies p = s,\\; q = n/s \\\\
+\\text{Cost: } &O(|\\mathcal{S}| \\cdot \\log^2 n) \\qed
 \\end{align*}
 
-\\textbf{References:} Caldwell, "The Prime Pages"; Ribenboim, "The New Book of Prime Number Records", 1996`,
+\\textbf{Explanation:} In CTF challenges, primes are sometimes constructed from known sequences (Mersenne $2^p-1$, primorial $p\\#\\pm1$, Fermat $2^{2^k}+1$, etc.). This attack checks all small candidates from each family by trial division. The set size is a few hundred candidates, so the check completes nearly instantly.
+
+\\textbf{References:} C. Caldwell, "The Prime Pages" (https://t5k.org); P. Ribenboim, "The New Book of Prime Number Records", Springer 1996`,
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

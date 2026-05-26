@@ -5,7 +5,7 @@ export const attack: Attack = {
   id: 'squfof',
   name: 'SQUFOF',
   category: 'Factorization',
-  description: 'Factors n via continued fractions of sqrt(n). Use for n < 10^14.',
+  description: "Factors n by finding a square form in the cycle of reduced binary quadratic forms. Use for n < 10^14 (faster than trial division for medium-sized factors).",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -135,22 +135,25 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("SQUFOF=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} SQUFOF factors n by finding a square form in the cycle of reduced forms of discriminant D = kn.
+  proof: `\\textbf{Theorem:} SQUFOF factors $n$ by finding a square form in the cycle of reduced binary quadratic forms of discriminant $D = kn$ where $(k/n) = -1$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item Binary quadratic forms ax^2 + bxy + cy^2, discriminant D = b^2 - 4ac
-\\item D = kn where \\left(\\frac{k}{n}\\right) = -1
+\\item Binary quadratic forms $ax^2 + bxy + cy^2$, discriminant $D = b^2 - 4ac$
+\\item $D = kn$ where $\\left(\\frac{k}{n}\\right) = -1$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 n = pq, \\quad \\left(\\frac{k}{n}\\right) &= -1, \\quad D = kn \\\\
 (a_0, b_0, c_0) &\\xrightarrow{\\rho} (a_1, b_1, c_1) \\xrightarrow{\\rho} \\cdots \\xrightarrow{\\rho} (a_L, b_L, c_L) = (a_0, b_0, c_0) \\\\
-\\exists i: c_i &= q^2 \\;\\text{(perfect square)} \\\\
-s &= \\sqrt{c_i}, \\quad \\text{reverse } \\rho \\text{ to find } (s, b^*, s) \\\\
-\\gcd(s, n) &= p \\text{ or } q \\qed
+\\exists i: c_i &= q^2 \\;\\text{(a perfect square)} \\\\
+s &= \\sqrt{c_i}, \\quad \\text{reverse the reduction } \\rho \\text{ from the square root} \\\\
+\\gcd(s, n) &= p \\text{ or } q
 \\end{align*}
+The algorithm searches the forward cycle for a square $c_i$, then starts a reverse cycle from $s = \\sqrt{c_i}$ until the reduced form repeats. At the symmetry point, GCD recovers the factor.
+
+\\textbf{Explanation:} SQUFOF (SQUare FOrm Factorization) exploits the structure of the class group of binary quadratic forms. The key insight is that when discriminant $D$ corresponds to a composite $n = pq$, the cycle of reduced forms contains a square form whose square root reveals one prime factor. It works well for $n < 10^{14}$ and requires no large-integer arithmetic beyond GCD.
 
 \\textbf{References:} Shanks, 1975; Gower \\& Wagstaff, Math. Comp., 2008`,
   priority: 'medium',

@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'bleichenbacher',
   name: "Bleichenbacher PKCS#1 v1.5",
   category: 'Oracle',
-  description: 'Decrypts via PKCS#1 v1.5 padding oracle. Use when server reveals padding validity.',
+  description: 'Decrypts a PKCS#1 v1.5 ciphertext using a padding oracle in ~2^17 queries. Use when a server reveals whether padding is valid.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -203,28 +203,28 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} A PKCS#1 v1.5 padding oracle decrypts any ciphertext in \\(\\approx 2^{17}\\) queries.
+  proof: `\\textbf{Theorem:} A PKCS#1 v1.5 padding oracle decrypts any RSA ciphertext in approximately $2^{17}$ adaptive queries.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item Oracle O(c) = 1 iff valid PKCS#1 v1.5 padding
-\\item $B = 2^{8(k-2)}$, $k = \\lceil \\log_{256} n \\rceil$
-\\item $(c \\cdot s^e)^d \\equiv m \\cdot s \\pmod{n}$
+\\item $c = m^e \\bmod n$, with $m$ having valid PKCS#1 v1.5 padding: $m = 0x00\\,0x02\\,PS\\,0x00\\,M$
+\\item Oracle $\\mathcal{O}(c') = 1$ iff $\\text{decrypt}(c')$ has valid PKCS#1 v1.5 padding
+\\item $B = 2^{8(k-2)}$ where $k = \\lceil n/8 \\rceil$ is the byte length; valid messages lie in $[2B, 3B)$
+\\item Multiplying ciphertext: $(c \\cdot s^e)^d \\equiv m \\cdot s \\pmod{n}$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-c &= m^e \\bmod n, \\quad 2B \\leq m < 3B \\\\
-\\mathcal{O}(c \\cdot s^e) = 1 &\\implies 2B \\leq m \\cdot s - rn < 3B \\\\
-\\frac{2B + rn}{s} &\\leq m < \\frac{3B + rn}{s} \\\\
-M_i &= \\bigcup_r \\left[\\left\\lceil \\frac{2B+rn}{s_i}\\right\\rceil, \\left\\lfloor \\frac{3B-1+rn}{s_i}\\right\\rfloor\\right] \\\\
+\\mathcal{O}(c \\cdot s^e) = 1 &\\implies 2B \\leq m \\cdot s - rn < 3B \\quad \\text{for some } r \\\\
+&\\implies \\frac{2B + rn}{s} \\leq m < \\frac{3B + rn}{s} \\\\
+M_i &= \\bigcup_{r=0}^{s_i-1} \\left[\\left\\lceil \\frac{2B+rn}{s_i}\\right\\rceil, \\left\\lfloor \\frac{3B-1+rn}{s_i}\\right\\rfloor\\right] \\\\
 [a_{i+1}, b_{i+1}] &= [a_i, b_i] \\cap M_i \\\\
-b - a = 0 &\\implies m = a \\qed
+b - a \\to 0 &\\implies m = a \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Each valid response constrains m to intervals. Intersecting across s values shrinks until m is isolated.
+\\textbf{Explanation:} Bleichenbacher's attack works by blinding the ciphertext: $c' = c \\cdot s^e \\bmod n$ decrypts to $m \\cdot s \\bmod n$. When the oracle says the decryption has valid PKCS#1 v1.5 padding, we know $m \\cdot s \\bmod n \\in [2B, 3B)$. For each valid $s$, this constrains $m$ to a set of intervals (one per wrap-around $r$). Intersecting intervals across multiple $s$ values progressively narrows the candidate range. With roughly 20 valid $s$ values, the interval collapses to a single integer -- the original message $m$.
 
-\\textbf{References:} D. Bleichenbacher, CRYPTO 1998`,
+\\textbf{References:} D. Bleichenbacher, "Chosen Ciphertext Attacks Against Protocols Based on the RSA Encryption Standard PKCS#1", CRYPTO 1998`,
   usageGuide: 'This requires oracle_responses \u2014 a comma-separated list of 1s (valid padding) and 0s (invalid) from a PKCS#1 v1.5 padding oracle.\n\nHow to use:\n1. Set up an oracle that returns 1 if decrypt(c\') has valid PKCS#1 v1.5 padding, 0 otherwise\n2. For s = 1, 2, 3, ... query the oracle with c\' = c * s^e mod n\n3. Record the responses as comma-separated bits: 1,0,0,1,0,0,... (1 = valid padding)\n4. Provide n, e, c, and the full oracle_responses string\n\nTip: s=1 always returns 1 (the original ciphertext has valid padding). You need roughly 20 valid responses to narrow the interval.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_responses,

@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'dependent-prime',
   name: 'Dependent-Prime RSA',
   category: 'Partial Key / Lattice',
-  description: 'Factors n when q·e ≡ 1 (mod p). Use when q is derived from e and p via modular inverse.',
+  description: 'Factors n when q is derived from e (q·e ≡ 1 mod p) via quadratic discriminant. Use when q = e^{-1} mod p as in some embedded RSA implementations.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -96,22 +96,24 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} If $q \\cdot e \\equiv 1 \\pmod{p}$, solve $kp^2 + p - ne = 0$ for $p$.
+  proof: `\\textbf{Theorem:} If $qe \\equiv 1 \\pmod{p}$, solve $kp^2 + p - ne = 0$ for $p$ by iterating $k$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $q \\cdot e = 1 + kp$ for some integer $k$
-\\item $n = p \\cdot q$
+\\item $qe = 1 + kp$ for some integer $k$
+\\item $n = pq$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-ne &= p + kp^2 \\\\
+ne &= p(qe) = p(1 + kp) = p + kp^2 \\\\
 kp^2 + p - ne &= 0 \\\\
 p &= \\frac{-1 + \\sqrt{1 + 4kne}}{2k} \\\\
-\\text{Iterate } k = 1, \\ldots, 10^5: \\quad &\\text{check if } 1 + 4kne \\text{ is square} \\\\
-\\text{If so, } p &\\mid n \\implies \\text{found} \\qed
+\\text{Iterate } k &= 1, \\ldots, 10^5:\\quad \\text{check if } 1 + 4kne \\text{ is a perfect square} \\\\
+\\text{If so, } p &\\mid n \\implies \\text{factorization found} \\qed
 \\end{align*}
+
+\\textbf{Explanation:} Multiplying $n = pq$ by $e$ and substituting $qe = 1 + kp$ yields a quadratic in $p$. The discriminant $\\Delta = 1 + 4kne$ must be a perfect square. The attack iterates $k$ up to $10^5$, using a mod-16 perfect-square pre-filter (only residues 1 and 9 are valid squares mod 16) to reject $\\sim 50\\%$ of candidates without computing an integer square root. This key generation pattern occurs in some embedded RSA implementations that derive $q$ from $p$ to speed up CRT parameter computation.
 
 \\textbf{References:} Custom CTF construction; related to Nitaj's constrained prime analysis`,
   usageGuide: 'This attack factors n when q is derived from p through a modular relationship: q·e ≡ 1 (mod p).\n\nHow to use:\n1. You have n and e, and know that q is computed as q = e^(-1) mod p\n2. Provide n and e\n3. The attack solves the equation k*p^2 + p - n*e = 0 to recover p\n\nTip: This key generation pattern occurs in some embedded RSA implementations where q is derived from p to speed up CRT operations.',

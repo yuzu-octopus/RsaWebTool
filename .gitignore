@@ -1,7 +1,7 @@
 # Dependencies
 node_modules
 
-# Build output
+# Build output (GitHub Pages from docs/)
 dist
 dist-ssr
 docs
@@ -27,25 +27,20 @@ pnpm-debug.log*
 # TypeScript
 *.tsbuildinfo
 
-# Agent config (local)
+# Agent config (local — not part of the web app)
 .opencode/
 .superpowers/
 .playwright-mcp/
-
-# Test artifacts
-test-results/
-scripts/
-scripts/test-results/*.json
-scripts/test-results/templates/
-
-# Workers (Cloudflare, Node.js deps)
-workers/
-
-# Agent config (local)
 opencode.json
-.opencode/
-.superpowers/
-.playwright-mcp/
 AGENTS.md
 GEMINI.md
+
+# Test infrastructure (scripts + artifacts, tracked separately)
+scripts/
+test-results/
+
+# Cloudflare Worker (deployed separately)
+workers/
+
+# Internal test page (not deployed)
 public/test-api-suite.html

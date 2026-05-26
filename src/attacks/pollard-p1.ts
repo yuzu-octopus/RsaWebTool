@@ -5,7 +5,7 @@ export const attack: Attack = {
   id: 'pollard-p1',
   name: "Pollard's p-1 Method",
   category: 'Factorization',
-  description: 'Factors n when p-1 is smooth. Stage 1 handles p-1 with all prime factors ≤ B1. Stage 2 (B2) extends to catch p-1 with one larger factor.',
+  description: 'Factors n when a prime factor p has p-1 that is B1-smooth, with Stage 2 extending to one larger factor. Use when small prime factors may be smooth.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'B', label: 'B1 (stage 1 bound, optional)', placeholder: '10000', multiline: false },
@@ -128,23 +128,25 @@ def _attack():
         print(f"ERROR: {e}")
         print("POLLARD_P1=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} If p-1 is B\\_1-smooth, find p via a^M mod n. Stage 2: one factor up to B\\_2.
+  proof: `\\textbf{Theorem:} If $p-1$ is $B_1$-smooth, compute $a^M \\bmod n$ with $M = \\operatorname{lcm}(1,\\ldots,B_1)$ to reveal $p$ via $\\gcd(a^M-1, n)$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item Fermat's Little Theorem: a^{p-1} \\equiv 1 \\pmod{p}
-\\item p-1 is B\\_1-smooth
-\\item M = \\operatorname{lcm}(1, 2, \\ldots, B\\_1)
+\\item Fermat's Little Theorem: $a^{p-1} \\equiv 1 \\pmod{p}$ for $\\gcd(a,p)=1$
+\\item $p-1$ is $B_1$-smooth: all prime factors of $p-1$ are $\\leq B_1$
+\\item $M = \\operatorname{lcm}(1, 2, \\ldots, B_1)$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-p-1 &\\mid M \\implies a^M \\equiv 1 \\pmod{p} \\\\
+p-1 \\mid M &\\implies a^M \\equiv 1 \\pmod{p} \\\\
 p &\\mid (a^M - 1) \\implies \\gcd(a^M - 1, n) = p \\\\
 \\text{Stage 2: } p-1 &= q_0 \\cdot s,\\; s \\mid M,\\; q_0 \\in (B_1, B_2] \\\\
 H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
 \\gcd\\left(\\prod_{q \\in (B_1, B_2]} (H^q - 1), n\\right) &= p \\qed
 \\end{align*}
+
+\\textbf{Explanation:} Pollard's $p-1$ method exploits Fermat's Little Theorem: if $p-1$ divides $M = \\operatorname{lcm}(1,\\ldots,B_1)$, then $a^M \\equiv 1 \\pmod{p}$, so $\\gcd(a^M-1, n)$ reveals $p$. Stage 1 computes $a^M$ by raising $a$ to each prime power $\\leq B_1$. Stage 2 handles the case where $p-1$ has one prime factor between $B_1$ and $B_2$.
 
 \\textbf{References:} J. M. Pollard, "Theorems on Factorization and Primality Testing", Proc. Cambridge Philos. Soc., 1974`,
   priority: 'medium',

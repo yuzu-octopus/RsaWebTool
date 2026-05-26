@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'euler',
   name: 'Euler Factorization',
   category: 'Factorization',
-  description: 'Factors n via two distinct sum-of-squares representations. Requires p ≡ q ≡ 1 (mod 4).',
+  description: "Factors n by finding two distinct representations as a sum of squares a^2+b^2 = c^2+d^2 = n. Use when both primes are ≡ 1 (mod 4).",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -141,21 +141,24 @@ _attack()`,
       return Promise.resolve(null);
     }
   },
-  proof: `\\textbf{Theorem:} Factor n = pq using two distinct representations as a sum of squares. Requires p, q \\equiv 1 \\pmod{4}.
+  proof: `\\textbf{Theorem:} Factor $n = pq$ using two distinct representations as a sum of squares. Requires $p \\equiv q \\equiv 1 \\pmod{4}$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $n = pq$, $p \\equiv q \\equiv 1 \\pmod{4}$
-\\item $n = a^2 + b^2 = c^2 + d^2$ (two representations)
+\\item $n = pq$, with $p \\equiv q \\equiv 1 \\pmod{4}$
+\\item $n = a^2 + b^2 = c^2 + d^2$ (two distinct representations)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-(a - c)(a + c) &= (d - b)(d + b) \\equiv 0 \\pmod{p \\text{ or } q} \\\\
+(a - c)(a + c) &= (d - b)(d + b) \\\\
 k &= \\gcd(a - c, d - b)^2,\\; h = \\gcd(a + c, d + b)^2 \\\\
 m &= \\gcd(a + c, d - b)^2,\\; \\ell = \\gcd(a - c, d + b)^2 \\\\
-p &= \\gcd(k + h, n),\\; q = \\gcd(\\ell + m, n) \\qed
+p &= \\gcd(k + h, n),\\; q = \\gcd(\\ell + m, n)
 \\end{align*}
+From the identity $(a-c)(a+c) = (d-b)(d+b)$, the GCD combinations recover the prime factors.
+
+\\textbf{Explanation:} A theorem of Euler states that any prime $p \\equiv 1 \\pmod{4}$ has a unique representation as a sum of two squares (up to order and sign). A composite $n = pq$ where both primes are $\\equiv 1 \\pmod{4}$ therefore has two distinct representations, and these can be algebraically combined to recover $p$ and $q$. The method searches for the representations by iterating $a$ from $0$ to $\\sqrt{n}$.
 
 \\textbf{References:} Euler, 1749`,
   priority: 'medium',

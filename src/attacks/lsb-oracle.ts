@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'lsb-oracle',
   name: 'LSB Oracle Attack',
   category: 'Oracle',
-  description: 'Recovers m via LSB oracle. Use when an oracle reveals LSB(decrypt(c·2^e mod n)).',
+  description: 'Recovers plaintext m using an exact LSB oracle in log2(n) queries via binary fraction accumulation. Use when a side channel reveals the LSB of the decrypted ciphertext.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: '65537', multiline: false },
@@ -114,31 +114,34 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} An LSB oracle recovers $m$ in $O(\\log n)$ queries via binary fraction accumulation.
+  proof: `\\textbf{Theorem:} An exact LSB oracle recovers $m$ in exactly $\\log_2 n$ queries via binary fraction accumulation.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $\\mathcal{O}(c) = \\text{LSB}(m^d \\bmod n)$
-\\item $\\mathcal{O}(c \\cdot 2^{e} \\bmod n) = \\text{LSB}(2m \\bmod n)$
+\\item Oracle $\\mathcal{O}(c) = \\text{LSB}(m^d \\bmod n)$ -- the least significant bit
+\\item Blinding: $\\mathcal{O}(c \\cdot 2^{e} \\bmod n) = \\text{LSB}(2m \\bmod n)$, hence $\\mathcal{O}(c \\cdot 2^{i e} \\bmod n) = \\text{LSB}(2^i m \\bmod n)$
 \\end{itemize}
 
 \\textbf{Proof (Binary Fraction):}
 \\begin{align*}
-\\text{LSB}(2^i m \\bmod n) &= \\text{bit } i \\text{ of binary fraction } \\frac{m}{n} \\\\
-q &= \\sum_{i=0}^{k-1} b_i \\cdot 2^{k-1-i}, \\quad b_i = \\text{LSB}(2^{i+1} m \\bmod n) \\\\
-m &= \\left\\lceil \\frac{q \\cdot n}{2^k} \\right\\rceil \\quad (k \\geq \\log_2 n \\text{ unique solution}) \\qed
+\\text{LSB}(2^i m \\bmod n) &= \\text{bit } i \\text{ of the binary fraction } \\frac{m}{n} \\\\
+b_i &= \\text{LSB}(2^{i+1} m \\bmod n) \\\\
+q &= \\sum_{i=0}^{k-1} b_i \\cdot 2^{k-1-i} \\quad \\text{(accumulate bits MSB-first)} \\\\
+m &= \\left\\lceil \\frac{q \\cdot n}{2^k} \\right\\rceil \\quad (k \\geq \\log_2 n \\implies \\text{unique}) \\qed
 \\end{align*}
 
-\\textbf{Alternative (Interval Halving):}
+\\textbf{Proof (Interval Halving) -- Equivalent View:}
 \\begin{align*}
 [L_0, U_0] &= [0, n] \\\\
-\\text{mid} &= \\frac{L_i + U_i}{2} \\quad \\text{(QQ rational)} \\\\
-\\text{LSB}(2^{i+1}m \\bmod n) = 0 &\\implies m \\in [L_i, \\text{mid}) \\\\
-\\text{LSB}(2^{i+1}m \\bmod n) = 1 &\\implies m \\in [\\text{mid}, U_i) \\\\
-\\log_2 n \\text{ steps} &\\implies U_i - L_i = 0 \\implies m = L_i \\qed
+\\text{mid} &= \\frac{L_i + U_i}{2} \\quad \\text{(exact rational midpoint)} \\\\
+\\mathcal{O}(c \\cdot 2^{i e}) = 0 &\\implies m \\in [L_i, \\text{mid}) \\\\
+\\mathcal{O}(c \\cdot 2^{i e}) = 1 &\\implies m \\in [\\text{mid}, U_i) \\\\
+\\log_2 n \\text{ steps} &\\implies U_i - L_i \\to 0 \\implies m = L_i \\qed
 \\end{align*}
 
-\\textbf{References:} Goldwasser, Micali, 1984; Ben-Or et al., 1988`,
+\\textbf{Explanation:} The key insight is that multiplying $m$ by 2 modulo $n$ either doubles it (if $2m < n$) or wraps around ($2m - n$). The LSB tells us which happened: LSB=1 means $2m \\geq n$ (wrapped), LSB=0 means $2m < n$ (didn't wrap). This is exactly a binary search: each LSB response halves the interval containing $m$. After $\\log_2 n$ queries, the interval width is less than 1, pinpointing $m$. The binary fraction formulation is more efficient for batch computation.
+
+\\textbf{References:} S. Goldwasser, S. Micali, "Probabilistic Encryption", JCSS 1984; M. Ben-Or et al., "A Hard-Core Predicate for all One-Way Functions", STOC 1988`,
   usageGuide: 'This attack requires oracle_responses \u2014 a comma-separated list of LSB bits obtained by querying an oracle that reveals the least significant bit of the decrypted ciphertext.\n\nHow to use:\n1. Set up an LSB oracle function that returns LSB(decrypt(c)) for any ciphertext c\n2. For each query i: compute c\' = c * 2^(i*e) mod n, call the oracle, record the bit\n3. Provide n, e, c, and the full list of oracle bits (from query 0 to query log2(n))\n4. The attack accumulates bits into a binary fraction to recover the message\n\nTip: You need roughly n.bit_length() oracle responses for full recovery. Each bit halves the uncertainty.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!(p.n && p.e && p.c && p.oracle_responses),

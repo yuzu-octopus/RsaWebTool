@@ -18,6 +18,7 @@ import { ProofRenderer } from './ProofRenderer';
 import { testcaseGenerators, submitToFactorDB, autoDecrypt } from '../attacks';
 import { isActualSuccess } from '../utils/sage-output';
 import { inputSx } from '../styles/inputSx';
+import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn } from '../styles/shared';
 import { useTimer } from '../hooks/useTimer';
 
 export function InputPanel() {
@@ -137,7 +138,7 @@ export function InputPanel() {
   };
 
   return (
-    <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+    <Box sx={colFlexSx}>
       {/* Tabs at top-left */}
       <Tabs
         value={tab}
@@ -146,17 +147,8 @@ export function InputPanel() {
           minHeight: 40,
           px: 2,
           pt: 2,
-          '& .MuiTabs-flexContainer': {
-            justifyContent: 'flex-start',
-          },
-          '& .MuiTab-root': {
-            color: draculaColors.comment,
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '0.85rem',
-            textTransform: 'none',
-            minHeight: 40,
-            px: 3,
-          },
+          '& .MuiTabs-flexContainer': { justifyContent: 'flex-start' },
+          '& .MuiTab-root': { ...tabSx, px: 3 },
           '& .Mui-selected': { color: draculaColors.purple },
           '& .MuiTabs-indicator': { backgroundColor: draculaColors.purple },
         }}
@@ -197,7 +189,7 @@ export function InputPanel() {
 
       {/* Input tab - center aligned */}
       {tab === 1 && (
-        <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }}>
+        <Box sx={{ ...centeredPanelSx, p: 2 }}>
           <Box sx={{ width: '100%', maxWidth: 500 }}>
             <Typography variant="h4" sx={{ color: draculaColors.cyan, mb: 0.5 }}>
               {selectedAttack.name}
@@ -232,13 +224,7 @@ export function InputPanel() {
                 variant="outlined"
                 onClick={handleGenerateTestcase}
                 data-testid="generate-testcase"
-                sx={{
-                  borderColor: draculaColors.cyan,
-                  color: draculaColors.cyan,
-                  fontFamily: "'JetBrains Mono', monospace",
-                  fontSize: '0.8rem',
-                  '&:hover': { backgroundColor: draculaColors.cyan, color: draculaColors.background },
-                }}
+                sx={colorGhostBtn(draculaColors.cyan)}
                 startIcon={<Casino sx={{ fontSize: '1rem' }} />}
               >
                 Generate Testcase
@@ -257,13 +243,7 @@ export function InputPanel() {
                   fullWidth
                   variant="outlined"
                   onClick={handleStop}
-                  sx={{
-                    mt: 2,
-                    borderColor: draculaColors.red,
-                    color: draculaColors.red,
-                    fontFamily: "'JetBrains Mono', monospace",
-                    '&:hover': { backgroundColor: draculaColors.red, color: draculaColors.background },
-                  }}
+                  sx={colorGhostBtn(draculaColors.red)}
                 >
                   <Stop sx={{ mr: 1 }} /> Stop
                 </Button>
@@ -278,13 +258,7 @@ export function InputPanel() {
                 variant="outlined"
                 onClick={() => { void handleRun(); }}
                 data-testid="run-attack"
-                sx={{
-                  mt: 2,
-                  borderColor: draculaColors.purple,
-                  color: draculaColors.purple,
-                  fontFamily: "'JetBrains Mono', monospace",
-                  '&:hover': { backgroundColor: draculaColors.purple, color: draculaColors.background },
-                }}
+                sx={colorGhostBtn(draculaColors.purple)}
               >
                 Run
               </Button>

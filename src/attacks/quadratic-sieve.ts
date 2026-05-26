@@ -5,7 +5,7 @@ export const attack: Attack = {
   id: 'quadratic-sieve',
   name: 'Quadratic Sieve',
   category: 'Factorization',
-  description: 'Factors n via the quadratic sieve (qsieve). Best for medium-sized semiprimes (< 100 digits / ~330 bits) with similar-sized factors.',
+  description: "Factors n by finding congruent squares via smoothness over a factor base. Use for medium-sized semiprimes (< 100 digits) with similar-sized factors.",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -137,24 +137,27 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("QUADRATIC_SIEVE=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} QS factors n in expected exp(\\sqrt{\\ln n \\ln \\ln n}).
+  proof: `\\textbf{Theorem:} The Quadratic Sieve factors $n$ in expected sub-exponential time $\\exp(\\sqrt{\\ln n \\ln \\ln n})$ by finding $x^2 \\equiv y^2 \\pmod{n}$ with $x \\not\\equiv \\pm y \\pmod{n}$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item Congruent squares: x^2 \\equiv y^2 \\pmod{n} \\implies \\gcd(x - y, n) factor
-\\item Factor base \\mathcal{F}
-\\item Q(x) = (x + \\lfloor\\sqrt{n}\\rfloor)^2 - n
+\\item $n = pq$, a semiprime with no small factors
+\\item Choose a factor base $\\mathcal{F} = \\{p_1, \\ldots, p_k\\}$ of small primes
+\\item $Q(x) = (x + \\lfloor\\sqrt{n}\\rfloor)^2 - n$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 m &= \\lfloor\\sqrt{n}\\rfloor, \\quad Q(x) = (x + m)^2 - n \\\\
-\\text{Sieve } Q(x) &\\text{ for B-smooth values over } \\mathcal{F} \\\\
+\\text{Sieve } Q(x) &\\text{ for } B\\text{-smooth values over } \\mathcal{F} \\\\
 \\vec{v}_x &= (e_p \\bmod 2)_{p \\in \\mathcal{F}} \\in \\mathbb{F}_2^{|\\mathcal{F}|} \\\\
-\\sum_{i \\in S} \\vec{v}_{x_i} &= \\vec{0} \\pmod{2} \\quad \\text{(linear dependency)} \\\\
-X &= \\prod_{i \\in S} (x_i + m), \\quad X^2 \\equiv \\prod Q(x_i) = y^2 \\pmod{n} \\\\
-\\gcd(X - y, n) &= \\text{factor} \\quad \\text{(prob } \\geq 1/2\\text{)} \\qed
+\\text{Find } S: \\; \\sum_{i \\in S} \\vec{v}_{x_i} &= \\vec{0} \\pmod{2} \\quad \\text{(linear dependency)} \\\\
+X &= \\prod_{i \\in S} (x_i + m), \\quad Y = \\sqrt{\\prod Q(x_i)} \\\\
+X^2 &\\equiv Y^2 \\pmod{n} \\\\
+\\gcd(X - Y, n) &= p \\text{ or } q \\quad \\text{(prob } \\geq 1/2\\text{)}
 \\end{align*}
+
+\\textbf{Explanation:} The QS finds many integers $x$ where $Q(x)$ factors completely over the factor base (a "smooth" number). Each smooth $Q(x)$ gives an exponent vector modulo 2. A linear dependency among these vectors means the product of the corresponding $Q(x_i)$ values is a perfect square. Since $Q(x) \\equiv (x+m)^2 \\pmod{n}$, we get $X^2 \\equiv Y^2 \\pmod{n}$ with $X \\not\\equiv \\pm Y \\pmod{n}$ about half the time, yielding a factor via GCD.
 
 \\textbf{References:} C. Pomerance, "The Quadratic Sieve Factoring Algorithm", Eurocrypt 1984`,
   priority: 'high',

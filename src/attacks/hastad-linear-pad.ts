@@ -5,7 +5,7 @@ export const attack: Attack = {
   id: 'hastad-linear-pad',
   name: "Hastad's Attack with Linear Padding",
   category: 'Message / Protocol',
-  description: 'Recovers m from linearly padded encryptions. Use when c_i = (a_i·m + b_i)^e mod n_i.',
+  description: 'Recovers m from k >= e ciphertexts with affine padding under same exponent via CRT and Coppersmith. Use when c_i = (a_i·m + b_i)^e mod n_i.',
   inputs: [
     { name: 'triples', label: 'Triples (n,c,a,b per line)', placeholder: 'n1,c1,a1,b1\\nn2,c2,a2,b2...', multiline: true, rows: 5 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter exponent e (e.g., 3)...', multiline: false },
@@ -160,24 +160,27 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
         print("HASTAD_LINEAR_PAD=FAILED")
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} Given c\\_i \\equiv (a\\_i m + b\\_i)^e \\pmod{n\\_i} with k \\geq e, recover m via CRT + Coppersmith.
+  proof: `\\textbf{Theorem:} Given $k \\geq e$ ciphertexts $c_i \\equiv (a_i m + b_i)^e \\pmod{n_i}$ with pairwise coprime moduli, recover $m$ by CRT-combining the polynomials and applying Coppersmith small roots.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item c_i \\equiv (a_i m + b_i)^e \\pmod{n_i}, $\\gcd(n_i,n_j) = 1$
-\\item $k \\geq e$, affine transforms known
+\\item $c_i \\equiv (a_i m + b_i)^e \\pmod{n_i}$ with $\\gcd(n_i, n_j) = 1$ for $i \\neq j$
+\\item $k \\geq e$, affine transforms $(a_i, b_i)$ known for each modulus
+\\item $m < \\min_i(n_i^{1/e})$ (message is small enough for Coppersmith)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 f_i(x) &= (a_i x + b_i)^e - c_i \\in (\\mathbb{Z}/n_i\\mathbb{Z})[x] \\\\
-N &= \\prod_{i=1}^{k} n_i, \\quad t_i = N_i \\cdot N_i^{-1} \\bmod n_i \\\\
+N &= \\prod_{i=1}^{k} n_i, \\quad N_i = N / n_i, \\quad t_i = N_i \\cdot N_i^{-1} \\bmod n_i \\\\
 F(x) &= \\sum_{i=1}^{k} t_i \\cdot f_i(x) \\pmod{N} \\\\
-F(m) &\\equiv 0 \\pmod{N} \\\\
-m &= small\\_roots(F) \\qed
+F(m) &\\equiv 0 \\pmod{N} \\quad \\text{(by CRT, each $f_i(m) \\equiv 0$)} \\\\
+m &= \\text{small\\_roots}(F) \\quad \\text{(since $|m| < N^{1/e}$)}
 \\end{align*}
 
-\\textbf{References:} J. Hastad, Eurocrypt 1988; Coppersmith et al., 1996`,
+\\textbf{Explanation:} This generalizes Hastad's Broadcast Attack to affine-padded messages. CRT combines the polynomials into one modulo $N = \\prod n_i$, then Coppersmith's method finds the small root $m$. The requirement $k \\geq e$ ensures enough information to overcome the linear padding. Each $(a_i, b_i)$ must be known.
+
+\\textbf{References:} J. Hastad, "Solving Low-Exponent RSA," Eurocrypt 1988; Coppersmith et al., 1996`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.triples && !!p.e,
 };

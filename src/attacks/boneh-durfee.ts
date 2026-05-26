@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'boneh-durfee',
   name: 'Boneh-Durfee Attack',
   category: 'Factorization',
-  description: 'Recovers d via Wiener continued fractions (d < n^0.25) with Boneh-Durfee lattice fallback (d < n^0.292).',
+  description: 'Recovers d when d < n^0.292 via Wiener continued fractions (d < n^0.25) or Boneh-Durfee lattice (d < n^0.292). Use for unbalanced private exponents.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -199,24 +199,22 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("BONEH_DURFEE=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} Recover $d$ when $d < n^{0.292}$ via Wiener continued fractions (fast path) or Boneh-Durfee lattice (fallback).
+  proof: `\\textbf{Theorem:} Find $d$ when $d < n^{0.292}$ using Wiener's continued fractions ($d < n^{0.25}$) or Boneh-Durfee's lattice ($d < n^{0.292}$).
 
-\\textbf{Phase 1: Wiener's Attack (d < n^{0.25})}
+\\textbf{Setup:}
+\\begin{itemize}
+\\item $ed \\equiv 1 \\pmod{\\phi(n)}$ with unknown $d$, $k$, $\\phi(n)$
+\\item $e \\approx n$ and $d < n^{\\delta}$ with $\\delta < 0.5$
+\\end{itemize}
+
+\\textbf{Proof:}
 \\begin{align*}
-ed - k\\phi(n) &= 1 \\\\
-\\left|\\frac{e}{n} - \\frac{k}{d}\\right| &< \\frac{1}{2d^2} \\quad \\text{(Continued fraction expansion)} \\\\
-\\frac{k}{d} \\text{ is a convergent of } \\frac{e}{n} &\\implies \\phi(n) = \\frac{ed - 1}{k} \\\\
-p,q &= \\frac{n - \\phi(n) + 1 \\pm \\sqrt{(n - \\phi(n) + 1)^2 - 4n}}{2} \\qed
+\\left|\\frac{e}{n} - \\frac{k}{d}\\right| &= \\frac{|ed - kn|}{dn} = \\frac{|1 - k(p+q-1)|}{dn} < \\frac{1}{2d^2} \\quad \\text{(for $d < n^{0.25}$)}\\\\
+\\frac{k}{d} \\text{ a convergent of } \\frac{e}{n} &\\implies \\phi(n) = \\frac{ed-1}{k},\\; p+q = n - \\phi(n) + 1 \\\\
+p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2}
 \\end{align*}
 
-\\textbf{Phase 2: Boneh-Durfee Lattice (d < n^{0.292})}
-\\begin{align*}
-f(x,y) &= x(A + y) - 1, \\quad A = \\lfloor n^{1/2} \\rfloor \\\\
-\\text{Herrmann-May linearization:} \\quad f(x,y) &\\to \\text{shift polynomials + x-shifts} \\\\
-\\text{LLL on } m \\text{ shifts, } d_x = d_y &= m \\text{ with } t = (1-2\\beta)m \\\\
-\\|v_1\\| &< 2^{\\Theta(m^2)} \\cdot n^{m \\cdot (\\beta - 1/2 + \\epsilon)} \\\\
-d < n^{0.292} &\\implies \\text{shortest vector reveals } (k, d) \\qed
-\\end{align*}
+\\textbf{Explanation:} Wiener's attack exploits the fact that when $d$ is small, $e/n$ approximates $k/d$ so closely that $k/d$ appears as a convergent in the continued fraction expansion of $e/n$. The Boneh-Durfee lattice uses Coppersmith's method with a bivariate polynomial $f(x,y) = x(A+y)-1$ to extend the bound to $d < n^{0.292}$ by finding short vectors via LLL.
 
 \\textbf{References:} M. Wiener, CRYPTO 1990; D. Boneh, G. Durfee, CRYPTO 1999`,
   priority: 'high',

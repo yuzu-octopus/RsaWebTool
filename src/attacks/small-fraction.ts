@@ -11,7 +11,7 @@ export const attack: Attack = {
   id: 'small-fraction',
   name: 'Small Fraction Attack',
   category: 'Factorization',
-  description: 'Factors n when p/q ≈ a/b for small a,b. Uses trial division around isqrt(nb/a) for each candidate fraction.',
+  description: "Factors n when p/q approximates a small rational a/b by solving for q and testing candidates via trial division. Use when p/q is close to a simple fraction.",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -160,7 +160,7 @@ _attack()`,
 \\textbf{Setup:}
 \\begin{itemize}
 \\item $n = pq$
-\\item $p/q \\approx a/b$, $\\gcd(a,b) = 1$, small $a,b$
+\\item $p/q \\approx a/b$, with $\\gcd(a,b) = 1$ and $a,b$ small
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -169,9 +169,11 @@ _attack()`,
 n = pq &\\approx \\frac{a}{b} q^2 \\\\
 q_0 &= \\left\\lfloor\\sqrt{\\frac{nb}{a}}\\right\\rfloor \\\\
 \\text{Trial divide } q_0 \\pm k &\\text{ for small } k \\\\
-\\text{Search: } 1 \\leq b &\\leq B, \\; 1 \\leq a \\leq b, \\; \\gcd(a,b) = 1 \\\\
-\\text{Complexity: } O(B^2 \\cdot \\Delta) &\\text{ divisions} \\qed
+\\text{Search space: } 1 \\leq b &\\leq B, \\; 1 \\leq a \\leq b, \\; \\gcd(a,b) = 1 \\\\
+\\text{Complexity: } O(B^2 \\cdot \\Delta) &\\text{ divisions}
 \\end{align*}
+
+\\textbf{Explanation:} When $p \\approx (a/b) \\cdot q$, substituting into $n = pq$ gives $q^2 \\approx nb/a$. We compute $q_0 = \\lfloor\\sqrt{nb/a}\\rfloor$ for each candidate fraction $a/b$ and test the surrounding window for an exact divisor of $n$. Because $a, b$ are constrained to be small (denominator $\\leq 50$), the search is efficient.
 
 \\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,
   priority: 'medium',

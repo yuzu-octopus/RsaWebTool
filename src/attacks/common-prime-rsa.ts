@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'common-prime-rsa',
   name: 'Common Prime RSA',
   category: 'Factorization',
-  description: 'Factors two moduli sharing a prime. Use when n1 and n2 share a factor p.',
+  description: "Factors two RSA moduli n1, n2 that share a common prime by computing gcd(n1, n2). Use when two moduli may share a prime factor.",
   inputs: [
     { name: 'n1', label: 'n1 (first modulus)', placeholder: 'Enter n1...', multiline: true, rows: 3 },
     { name: 'n2', label: 'n2 (second modulus)', placeholder: 'Enter n2...', multiline: true, rows: 3 },
@@ -16,15 +16,19 @@ export const attack: Attack = {
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $n_1 = p \\cdot q_1$, $n_2 = p \\cdot q_2$
-\\item $q_1 \\neq q_2$, $\\gcd(q_1, q_2) = 1$
+\\item Two RSA moduli $n_1 = p \\cdot q_1$ and $n_2 = p \\cdot q_2$
+\\item $q_1 \\neq q_2$ (otherwise the moduli are identical)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 \\gcd(n_1, n_2) &= \\gcd(p \\cdot q_1, p \\cdot q_2) \\\\
-&= p \\cdot \\gcd(q_1, q_2) = p \\qed
+&= p \\cdot \\gcd(q_1, q_2) \\\\
+&= p \\quad \\text{(since } q_1, q_2 \\text{ are distinct primes)}
 \\end{align*}
+The GCD extracts the shared prime directly — no factorization of either modulus is needed.
+
+\\textbf{Explanation:} This is a simpler, two-modulus variant of the Batch GCD attack. When two RSA keys were generated on the same machine or with a shared entropy source, they may share a prime factor. Computing the GCD of the two moduli instantly recovers the shared prime, fully factoring both keys.
 
 \\textbf{References:} A. K. Lenstra et al., "Ron was wrong, Whit is right" (2012) — found 0.2\\% of RSA keys shared factors`,
   priority: 'high',

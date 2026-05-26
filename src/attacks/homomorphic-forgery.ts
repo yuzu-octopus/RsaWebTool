@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'homomorphic-forgery',
   name: 'Homomorphic Forgery Attack',
   category: 'Message / Protocol',
-  description: 'Forges signature via multiplicative property. Use when oracle signs chosen messages.',
+  description: "Forges a valid RSA signature by exploiting textbook RSA's multiplicative homomorphism. Use when an oracle signs chosen messages and target is a product of signed messages.",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -130,23 +130,27 @@ _attack()`;
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} Textbook RSA is multiplicatively homomorphic: \\(s_1 s_2 \\bmod n\\) signs \\(m_1 m_2 \\bmod n\\).
+  proof: `\\textbf{Theorem:} Textbook RSA signatures are multiplicatively homomorphic: the product of signatures signs the product of messages.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item Oracle signs \\(m_i \\to s_i = m_i^d \\bmod n\\)
-\\item Target \\(m^* = \\prod m_i \\pmod{n}\\)
+\\item Oracle signs chosen messages: $s_i = m_i^d \\bmod n$
+\\item Target message $m^*$ factors as $\\prod_{i \\in I} m_i \\pmod{n}$ for some subset $I$ of oracle queries
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-s_1 &= m_1^d, \\quad s_2 = m_2^d \\pmod{n} \\\\
-s^* &= s_1 \\cdot s_2 \\equiv m_1^d \\cdot m_2^d \\pmod{n} \\\\
-&\\equiv (m_1 \\cdot m_2)^d \\pmod{n} \\\\
-(s^*)^e &\\equiv m^* \\pmod{n} \\qed
+s_1 &= m_1^d \\pmod{n} \\\\
+s_2 &= m_2^d \\pmod{n} \\\\
+s^* &= s_1 \\cdot s_2 \\bmod n \\\\
+    &\\equiv m_1^d \\cdot m_2^d \\pmod{n} \\\\
+    &\\equiv (m_1 \\cdot m_2)^d \\pmod{n} \\\\
+(s^*)^e &\\equiv m_1 \\cdot m_2 \\equiv m^* \\pmod{n} \\qed
 \\end{align*}
 
-\\textbf{References:} Rivest, Shamir, Adleman, 1978; Boneh, 1999`,
+\\textbf{Explanation:} Since $(m_1 m_2)^d = m_1^d \\cdot m_2^d \\pmod{n}$, multiplying known signatures yields a valid signature for the product of their messages. The attack searches subsets of oracle pairs whose message-product equals $m^*$, then multiplies the corresponding signatures. Modern padding schemes (OAEP, PSS) destroy this homomorphism by hashing and randomizing before signing.
+
+\\textbf{References:} Rivest, Shamir, Adleman, 1978; Boneh, "Twenty Years of Attacks on RSA," 1999`,
   usageGuide: 'This attack exploits RSA\'s multiplicative homomorphism to forge signatures from known oracle pairs.\n\nHow to use:\n1. Obtain oracle pairs (m_i, s_i) where s_i is a valid signature on m_i under the target public key\n2. Provide n, e, target_m (message to forge), and oracle_pairs formatted as "m1,s1;m2,s2;..."\n3. The attack searches subset products: if target_m = product of some subset of m_i (mod n), then the forged signature = product of the corresponding s_i (mod n)\n\nTip: The more oracle pairs you have, the more likely you can factor target_m into a subset product. Modern RSA with OAEP/PSS padding prevents this attack.',
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.target_m && !!p.oracle_pairs,

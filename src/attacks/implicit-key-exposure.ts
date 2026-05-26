@@ -6,29 +6,31 @@ export const attack: Attack = {
   id: 'implicit-key-exposure',
   name: 'Implicit Key Exposure',
   category: 'Partial Key / Lattice',
-  description: 'Recovers p from a^p mod n leak. Use when a^p mod n is accidentally exposed.',
+  description: 'Recovers p from leaked value a^p mod n using Fermat\'s Little Theorem GCD. Use when a^p mod n is accidentally exposed via side-channel or implementation bug.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'a', label: 'a (base)', placeholder: 'Enter base a...', multiline: false },
     { name: 'leak', label: 'leak (a^p mod n)', placeholder: 'Enter leaked value...', multiline: true, rows: 3 },
   ],
   sageTemplate: () => `print("Implicit Key Exposure requires multiple keys — run in browser mode")`,
-  proof: `\\textbf{Theorem:} If $a^p \\bmod n$ is leaked, $p$ is recovered via $\\gcd(a - \\text{leak}, n)$.
+  proof: `\\textbf{Theorem:} If $a^p \\bmod n$ is leaked, recover $p$ via $\\gcd(a - \\text{leak}, n)$ using Fermat's Little Theorem.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $n = pq$, $p \\nmid a$
-\\item $\\text{leak} = a^p \\bmod n$
-\\item Fermat's little theorem: $a^p \\equiv a \\pmod{p}$
+\\item $n = pq$, assume $p \\nmid a$
+\\item $\\text{leak} = a^p \\bmod n$ is known
+\\item FLT: $a^p \\equiv a \\pmod{p}$ for prime $p$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 \\text{leak} &\\equiv a^p \\pmod{n} \\\\
-\\text{leak} &\\equiv a^p \\equiv a \\pmod{p} \\quad \\text{(FLT)} \\\\
-p &\\mid (\\text{leak} - a) \\\\
+\\text{leak} &\\equiv a^p \\equiv a \\pmod{p} \\quad\\text{(by FLT)} \\\\
+\\text{leak} - a &\\equiv 0 \\pmod{p} \\\\
 p &= \\gcd(\\text{leak} - a, n) \\qed
 \\end{align*}
+
+\\textbf{Explanation:} Fermat's Little Theorem states $a^p \\equiv a \\pmod{p}$. Since the leaked value $\\text{leak} \\equiv a^p \\pmod{n}$, it also satisfies $\\text{leak} \\equiv a^p \\pmod{p}$. Therefore $\\text{leak} \\equiv a \\pmod{p}$, meaning $p$ divides $(\\text{leak} - a)$. Computing $\\gcd(\\text{leak} - a, n)$ extracts $p$ directly. This is a simple single-shot attack requiring no iteration or lattice reduction.
 
 \\textbf{References:} Common CTF pattern; based on Fermat's Little Theorem`,
   priority: 'high',

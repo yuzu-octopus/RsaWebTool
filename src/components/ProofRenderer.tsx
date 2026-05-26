@@ -28,12 +28,16 @@ interface ProofSegment {
   env?: string; // LaTeX environment name for displayMath
 }
 
+// Module-level regex constants (compiled once, not per parseProof call)
+const displayMathRegex = /\\begin\{(align\*|equation\*|gather\*|aligned)\}([\s\S]*?)\\end\{\1\}/g;
+const itemizeRegex = /\\begin\{itemize\}([\s\S]*?)\\end\{itemize\}/g;
+const inlineMathRegex = /\$([^$]+)\$|\\\(([^)]+)\\\)/g;
+
 /**
  * Parses a LaTeX proof string into segments.
  */
 function parseProof(latex: string): ProofSegment[] {
   const segments: ProofSegment[] = [];
-  const displayMathRegex = /\\begin\{(align\*|equation\*|gather\*|aligned)\}([\s\S]*?)\\end\{\1\}/g;
   let lastEnd = 0;
   let m;
 
@@ -68,7 +72,6 @@ function parseProof(latex: string): ProofSegment[] {
  */
 function parseTextBlock(text: string): ProofSegment[] {
   const segments: ProofSegment[] = [];
-  const itemizeRegex = /\\begin\{itemize\}([\s\S]*?)\\end\{itemize\}/g;
   let lastEnd = 0;
   let m;
 
@@ -211,11 +214,12 @@ function InlineMath({ text }: { text: string }) {
 
   const parts = useMemo(() => {
     const result: React.ReactNode[] = [];
-    const inlineRegex = /\$([^$]+)\$|\\\(([^)]+)\\\)/g;
     let lastIdx = 0;
     let match;
 
-    while ((match = inlineRegex.exec(processedText)) !== null) {
+    // Reset lastIndex as regex is stateful (global flag)
+    inlineMathRegex.lastIndex = 0;
+    while ((match = inlineMathRegex.exec(processedText)) !== null) {
       if (match.index > lastIdx) {
         const textContent = processedText.slice(lastIdx, match.index);
         result.push(

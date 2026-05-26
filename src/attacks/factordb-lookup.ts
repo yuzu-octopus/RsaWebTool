@@ -5,7 +5,7 @@ export const attack: Attack = {
   id: 'factordb-lookup',
   name: 'FactorDB Lookup',
   category: 'Advanced',
-  description: 'Looks up factorization in FactorDB. Use as first step for any unknown modulus.',
+  description: 'Looks up factorization of n in the FactorDB database with local fallbacks (trial division, ECM, Pollard\'s rho). Use as the first step for any unknown RSA modulus.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -129,22 +129,31 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("FACTORDB_LOOKUP=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} Pre-factored moduli from public databases plus local fallbacks.
+  proof: `\\textbf{Theorem:} FactorDB provides instant factorization for any previously factored modulus via a public API, with local fallbacks for unknown moduli.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item n to factor
-\\item FactorDB API available
+\\item Input: RSA modulus $n$ to factor
+\\item FactorDB maintains a database of known factorizations
+\\item CORS proxy at \`factordb-proxy\` bridges browser-to-API requests
 \\end{itemize}
 
-\\textbf{Proof:}
+\\textbf{API Mechanism:}
+\\begin{itemize}
+\\item Query: \`GET /query?n=<hex>\` to factordb.com API
+\\item Response contains status (FF = fully factored, CF = composite factors, etc.)
+\\item If FF, factors are returned as a list of prime-power pairs
+\\item Verification: $\\prod p_i^{e_i} = n$
+\\end{itemize}
+
+\\textbf{Fallback Chain (when n is not in FactorDB):}
 \\begin{align*}
-\\text{Query} &\\;\\text{factordb.com/api}?query = n \\\\
-\\text{Verify} &\\; \\prod p_i = n \\\\
-\\text{Fallback 1:} &\\; \\text{trial division up to bound } B \\\\
-\\text{Fallback 2:} &\\; \\text{ECM}(n) \\\\
-\\text{Fallback 3:} &\\; \\text{PollardRho}(n) \\qed
+\\text{Fallback 1: } &\\text{Trial division up to } 10^4 \\\\
+\\text{Fallback 2: } &\\text{ECM factorisation via SageMath: } n.\\text{factor(algorithm='ecm')} \\\\
+\\text{Fallback 3: } &\\text{Pollard's rho: Floyd cycle detection} \\qed
 \\end{align*}
+
+\\textbf{Explanation:} FactorDB is the internet's largest database of integer factorizations, containing billions of entries. The attack first queries FactorDB via a CORS proxy. If the modulus has been factored before (common for CTF challenges), the result is instant. If not, SageMathCell falls back to local factorization methods: trial division for small factors, ECM for medium-sized factors, and Pollard's rho for larger ones. This makes FactorDB Lookup an excellent first diagnostic step for any unknown RSA modulus.
 
 \\textbf{References:} https://factordb.com`,
   priority: 'low',

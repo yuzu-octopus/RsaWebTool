@@ -16,14 +16,7 @@ import { dracula as draculaStyle } from 'react-syntax-highlighter/dist/esm/style
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useDragResize } from '../hooks/useDragResize';
-
-const utilBtnSx = {
-  borderColor: draculaColors.purple,
-  color: draculaColors.purple,
-  fontFamily: "'JetBrains Mono', monospace",
-  fontSize: '0.7rem',
-  '&:hover': { backgroundColor: draculaColors.purple, color: draculaColors.background },
-};
+import { ghostBtnSx } from '../styles/shared';
 
 export function OutputPanel() {
   const { outputResult, outputError, history } = useAppContext();
@@ -162,7 +155,7 @@ export function OutputPanel() {
             </Box>
 
             <Box sx={{ display: 'flex', gap: 1, mt: 2, flexWrap: 'wrap' }}>
-              <Button size="small" variant="outlined" onClick={handleCopy} sx={utilBtnSx} startIcon={<ContentCopy />}>
+              <Button size="small" variant="outlined" onClick={handleCopy} sx={ghostBtnSx} startIcon={<ContentCopy />}>
                 Copy
               </Button>
               {copyMessage && (

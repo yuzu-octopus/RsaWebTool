@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'batch-gcd',
   name: 'Batch GCD',
   category: 'Factorization',
-  description: 'Finds shared factors across multiple moduli. Use when given a list of RSA moduli.',
+  description: "Finds shared prime factors across a list of RSA moduli by computing gcd of each against the product of all others. Use when multiple moduli may share primes.",
   inputs: [
     { name: 'n_values', label: 'Moduli (one per line or comma-separated)', placeholder: 'n1\\nn2\\nn3...', multiline: true, rows: 5 },
   ],
@@ -73,21 +73,24 @@ export const attack: Attack = {
       return null;
     }
   },
-  proof: `\\textbf{Theorem:} Given moduli $\\{n_1, \\ldots, n_k\\}$, if any two share a prime, $\\gcd(n_i, \\prod_{j \\neq i} n_j)$ reveals it.
+  proof: `\\textbf{Theorem:} Given moduli $\\{n_1, \\ldots, n_k\\}$, if any two share a prime, then $\\gcd(n_i, \\prod_{j \\neq i} n_j)$ reveals it.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item RSA moduli $n_i = p_i q_i$
-\\item $p_i = p_j$ for some $i \\neq j$
+\\item RSA moduli $n_i = p_i \\cdot q_i$, $i = 1 \\ldots k$
+\\item $p_i = p_j$ for some $i \\neq j$ (shared prime)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-p \\mid n_i, \\; p \\mid n_j &\\implies p \\mid \\gcd(n_i, n_j) \\\\
-g_i &= \\gcd\\left(n_i, \\prod_{j \\neq i} n_j\\right) \\\\
-g_i > 1 &\\implies g_i \\text{ is a shared prime} \\\\
-\\text{Product tree: } O(k \\log k) &\\text{ vs } O(k^2) \\text{ pairwise} \\qed
+p \\mid n_i,\\; p \\mid n_j &\\implies p \\mid \\gcd(n_i, n_j) \\\\
+\\text{For each } i: \\quad g_i &= \\gcd\\left(n_i, \\prod_{j \\neq i} n_j\\right) \\\\
+g_i > 1 &\\implies g_i \\text{ is a shared prime factor} \\\\
+\\text{Product tree: } O(k \\log k) &\\text{ vs } O(k^2) \\text{ for pairwise GCD}
 \\end{align*}
+The product $\\prod_{j \\neq i} n_j$ can be computed efficiently using a product tree (divide-and-conquer), achieving $O(k \\log k)$ complexity rather than $O(k^2)$ pairwise GCDs.
+
+\\textbf{Explanation:} When RSA keys are generated with insufficient randomness, two moduli may share a common prime factor. Computing the GCD of each modulus against the product of all others efficiently catches this. In practice, this attack found real-world weak keys — the 2012 "Mining Your Ps and Qs" study found 0.2\\% of TLS certificates shared factors.
 
 \\textbf{References:} Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012; Bernstein, "How to Find Small Factors of Products", 2004`,
   priority: 'high',

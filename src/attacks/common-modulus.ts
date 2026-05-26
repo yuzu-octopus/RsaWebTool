@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'common-modulus',
   name: 'Common Modulus Attack',
   category: 'Message / Protocol',
-  description: 'Recovers m from two encryptions under same n. Use when same message encrypted with coprime e1, e2.',
+  description: "Recovers m from two ciphertexts under the same n with coprime exponents via Bezout's identity. Use when same m encrypted with different e values under same modulus.",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e1', label: 'e1 (first exponent)', placeholder: 'Enter first exponent e1...', multiline: true, rows: 3 },
@@ -96,23 +96,26 @@ _attack()`;
       return Promise.resolve(null);
     }
   },
-  proof: `\\textbf{Theorem:} Given c\\_1 \\equiv m^{e\\_1} \\pmod{n} and c\\_2 \\equiv m^{e\\_2} \\pmod{n} with \\gcd(e\\_1, e\\_2) = 1, recover m via Bezout coefficients.
+  proof: `\\textbf{Theorem:} Given two ciphertexts $c_1 \\equiv m^{e_1} \\pmod{n}$ and $c_2 \\equiv m^{e_2} \\pmod{n}$ with $\\gcd(e_1, e_2) = 1$, recover $m$ without factoring $n$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item \\gcd(e\\_1, e\\_2) = 1
-\\item c_i \\equiv m^{e_i} \\pmod{n}
+\\item Same message $m$ encrypted under the same modulus $n$ with two different public exponents $e_1, e_2$
+\\item $\\gcd(e_1, e_2) = 1$, i.e., the exponents are coprime
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\gcd(e_1, e_2) = 1 \\implies \\exists a, b &: a e_1 + b e_2 = 1 \\\\
-c_1^a \\cdot c_2^b &\\equiv m^{a e_1 + b e_2} \\equiv m \\pmod{n} \\\\
-a < 0 \\implies c_1^a &= (c_1^{-1})^{|a|} \\pmod{n} \\\\
-m &= c_1^a \\cdot c_2^b \\pmod{n} \\qed
+\\gcd(e_1, e_2) = 1 &\\implies \\exists\\, a, b \\in \\mathbb{Z} \\text{ with } a e_1 + b e_2 = 1 \\\\
+c_1^a \\cdot c_2^b &\\equiv (m^{e_1})^a \\cdot (m^{e_2})^b \\pmod{n} \\\\
+&\\equiv m^{a e_1 + b e_2} \\pmod{n} \\\\
+&\\equiv m^1 \\equiv m \\pmod{n}
 \\end{align*}
+When $a < 0$, compute $c_1^a = (c_1^{-1})^{|a|} \\pmod{n}$. Same for $b < 0$.
 
-\\textbf{References:} Simmons & Norris, 1977; Boneh, 1999`,
+\\textbf{Explanation:} Bezout's identity guarantees integers $a, b$ satisfying $a e_1 + b e_2 = 1$ because $\\gcd(e_1, e_2) = 1$. Multiplying $c_1^a \\cdot c_2^b$ yields $m^{a e_1 + b e_2} = m$. This is why coprime exponents are essential: if $\\gcd(e_1, e_2) > 1$, the GCD may directly factor $n$.
+
+\\textbf{References:} Simmons \\& Norris, 1977; Boneh, "Twenty Years of Attacks on RSA," 1999`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e1 && !!p.e2 && !!p.c1 && !!p.c2,
 };

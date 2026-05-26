@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'franklin-reiter-related-message',
   name: 'Franklin-Reiter Related Message Attack',
   category: 'Message / Protocol',
-  description: 'Recovers m from linearly related ciphertexts. Use when c1 = m^e and c2 = (a·m + b)^e mod n.',
+  description: 'Recovers m from two ciphertexts with linearly related plaintexts via polynomial GCD. Use when c1 = m^e and c2 = (a·m + b)^e mod n with known a, b.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: '65537', multiline: false },
@@ -213,23 +213,27 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} Given $c_1 \\equiv m^e \\pmod{n}$ and $c_2 \\equiv (am + b)^e \\pmod{n}$, recover $m$ via polynomial GCD.
+  proof: `\\textbf{Theorem:} Given $c_1 \\equiv m^e \\pmod{n}$ and $c_2 \\equiv (am + b)^e \\pmod{n}$ with known $a, b$ and $\\gcd(a, n) = 1$, recover $m$ by computing $\\gcd(x^e - c_1, (ax + b)^e - c_2)$.
 
 \\textbf{Setup:}
 \\begin{itemize}
 \\item $c_1 \\equiv m^e \\pmod{n}$, $c_2 \\equiv (am+b)^e \\pmod{n}$
-\\item $\\gcd(a,n) = 1$
+\\item $a, b$ are known and $\\gcd(a, n) = 1$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-f_1(x) &= x^e - c_1, \\quad f_2(x) = (ax+b)^e - c_2 \\\\
-f_1(m) &\\equiv 0 \\pmod{n}, \\quad f_2(m) \\equiv 0 \\pmod{n} \\\\
-\\gcd(f_1,f_2) &= (x - m) \\quad \\text{(with high probability)} \\\\
-m &= -g[0] \\cdot g[1]^{-1} \\qed
+f_1(x) &= x^e - c_1 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
+f_2(x) &= (ax + b)^e - c_2 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
+f_1(m) &\\equiv m^e - c_1 \\equiv 0 \\pmod{n} \\\\
+f_2(m) &\\equiv (am+b)^e - c_2 \\equiv 0 \\pmod{n} \\\\
+\\gcd(f_1, f_2) &= (x - m) \\quad \\text{(with high probability)} \\\\
+m &= -g[0] \\cdot g[1]^{-1} \\pmod{n}
 \\end{align*}
 
-\\textbf{References:} Franklin \\& Reiter, 1996; Boneh, 1999`,
+\\textbf{Explanation:} Both polynomials $f_1$ and $f_2$ share $m$ as a root modulo $n$. The polynomial GCD extracts their common linear factor $(x - m)$. For $e = 3$, a closed-form algebraic elimination is available without polynomial arithmetic over composite moduli.
+
+\\textbf{References:} Franklin \\& Reiter, 1996; Boneh, "Twenty Years of Attacks on RSA," 1999`,
   usageGuide: 'This attack recovers m when two related messages are encrypted with the same public key.\n\nHow to use:\n1. You have two ciphertexts c1, c2 encrypted under the same (n, e)\n2. The plaintexts are related: m2 = a*m1 + b for known a, b\n3. Provide n, e, c1, c2, a, and b\n4. The attack computes gcd(m1^e - c1, (a*m1 + b)^e - c2) to recover m1\n\nTip: The attack requires e = 3 for reliable algebraic recovery; e = 5 or 7 may work via polynomial GCD but can fail over composite moduli. For convenience, paste into Magic Mode which auto-detects the parameters.',
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.c1 && !!p.c2,

@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'pollard-rho',
   name: "Pollard's Rho (Brent variant)",
   category: 'Factorization',
-  description: "Factors n via birthday paradox with Brent's cycle detection and GCD. GCD reduces gcd overhead from O(sqrt(p)) to O(sqrt(p)/m). Backtracking recovers when accumulated product contains all factors.",
+  description: "Factors n via birthday paradox with Brent's cycle detection and batched GCD reduction. Use for general-purpose factorization of medium-sized factors.",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -143,13 +143,12 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} Pollard rho (Brent + batched GCD) finds a factor in expected O(n^{1/4}).
+  proof: `\\textbf{Theorem:} Pollard's rho algorithm with Brent's cycle detection and batched GCD finds a non-trivial factor in expected $O(n^{1/4})$ time.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item Birthday paradox: collision among \\sqrt{N} random elements
-\\item Brent cycle detection
-\\item Batched GCD
+\\item Birthday paradox: among $\\sqrt{p}$ random elements modulo a prime $p$, a collision is expected
+\\item Pseudo-random walk $x_{i+1} = x_i^2 + c \\pmod{n}$ eventually cycles modulo each prime factor
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -158,11 +157,13 @@ x_{i+1} &= x_i^2 + c \\pmod{n} \\\\
 \\text{Collision after } O(\\sqrt{p}) &\\text{ steps (birthday paradox)} \\\\
 \\exists i \\neq j: \\; x_i &\\equiv x_j \\pmod{p} \\\\
 p &\\mid (x_i - x_j) \\\\
-\\text{Brent: save } x \\text{ at powers of 2} &\\;\\;\\; \\text{1 eval per step} \\\\
-\\text{Batched GCD: 1 gcd per } m \\text{ steps } &\\implies O(n^{1/4}) \\qed
+\\text{Brent: save } x \\text{ only at powers of } 2 &\\;\\;\\; \\text{(1 evaluation per step)} \\\\
+\\text{Batched GCD: accumulate } \\prod |x-y| &\\text{ for } m \\text{ steps, then one gcd} \\qed
 \\end{align*}
 
-\\textbf{References:} Pollard, 1975; Brent, BIT 1980`,
+\\textbf{Explanation:} Pollard's rho uses $f(x) = x^2 + c$ to generate a sequence that eventually cycles modulo $p$. Brent's cycle detection compares each value against a saved snapshot at powers of two, requiring only one evaluation per step instead of Floyd's three. Batched GCD reduces overhead by accumulating $m$ differences into one product before each GCD call. If the accumulated product contains $n$ as a factor, backtracking identifies the exact step.
+
+\\textbf{References:} J. M. Pollard, "A Monte Carlo Method for Factorization", BIT 1975; R. P. Brent, "An Improved Monte Carlo Factorization Algorithm", BIT 1980`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

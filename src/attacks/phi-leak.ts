@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'phi-leak',
   name: 'Phi(n) Leak',
   category: 'Partial Key / Lattice',
-  description: 'Factors n when φ(n) is leaked. Use when Euler\'s totient φ(n) is known.',
+  description: 'Factors n immediately when φ(n) is known via quadratic formula. Use when Euler\'s totient φ(n) has been leaked or computed.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'phi', label: 'phi(n) (Euler totient)', placeholder: 'Enter phi(n)...', multiline: true, rows: 3 },
@@ -109,23 +109,25 @@ _attack()`,
       return null;
     }
   },
-  proof: `\\textbf{Theorem:} Knowing $\\phi(n)$ factors $n = pq$ in polynomial time by solving a quadratic.
+  proof: `\\textbf{Theorem:} Knowing $\\phi(n)$ factors $n = pq$ in polynomial time by solving the quadratic $x^2 - (n - \\phi(n) + 1)x + n = 0$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $n = pq$
-\\item $\\phi(n) = (p-1)(q-1)$ is known
+\\item $n = pq$ with $p, q$ prime
+\\item $\\phi(n) = (p-1)(q-1)$ is known (leaked or computed)
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\phi(n) &= (p-1)(q-1) = n - (p+q) + 1 \\\\
-s &= n - \\phi + 1 = p + q \\\\
-\\Delta &= s^2 - 4n = (p - q)^2 \\\\
+\\phi(n) &= (p-1)(q-1) = pq - p - q + 1 = n - (p+q) + 1 \\\\
+s &= n - \\phi(n) + 1 = p + q \\\\
+\\Delta &= s^2 - 4n = (p+q)^2 - 4pq = (p-q)^2 \\\\
 p, q &= \\frac{s \\pm \\sqrt{\\Delta}}{2} \\qed
 \\end{align*}
 
-\\textbf{References:} Rivest, Shamir, Adleman, 1978; Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2`,
+\\textbf{Explanation:} Given both $n = pq$ and $\\phi(n) = (p-1)(q-1)$, we know both the sum $p+q = n - \\phi(n) + 1$ and the product $pq = n$. By Vieta's formulas, $p$ and $q$ are the roots of $x^2 - (p+q)x + pq = 0$. Computing the discriminant $\\Delta = (p+q)^2 - 4n = (p-q)^2$ and taking its square root yields $p$ and $q$ directly via the quadratic formula. This is a single-shot deterministic attack with no iteration.
+
+\\textbf{References:} Rivest, Shamir, Adleman, "A Method for Obtaining Digital Signatures and Public-Key Cryptosystems", 1978; Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!(p.n && p.phi),
 };

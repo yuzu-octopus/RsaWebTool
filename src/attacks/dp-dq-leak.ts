@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'dp-dq-leak',
   name: 'dp/dq Leak',
   category: 'Partial Key / Lattice',
-  description: 'Recovers p from leaked d_p = d mod (p-1) or q from leaked d_q = d mod (q-1). Use when CRT exponents are known.',
+  description: 'Recovers p from leaked d_p (or q from leaked d_q) via FLT-based GCD. Use when CRT exponents d_p or d_q are known.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -117,17 +117,19 @@ _attack()`;
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $d_p \\cdot e \\equiv 1 \\pmod{p-1}$
-\\item $d_p \\cdot e - 1 = k(p-1)$, $k < e$
+\\item $ed_p \\equiv 1 \\pmod{p-1}$, so $d_p e - 1 = k(p-1)$ for some $k < e$
+\\item Symmetrically, $d_q e - 1 = k'(q-1)$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\\\
-\\text{Iterate } k &= 1, \\ldots, e-1: \\quad \\text{check } k \\mid (d_p \\cdot e - 1) \\\\
-p &= (d_p \\cdot e - 1)/k + 1, \\quad \\text{verify } p \\mid n \\\\
-\\text{Symmetric for } d_q:\\quad q &= (d_q \\cdot e - 1)/k + 1 \\qed
+p &= \\frac{d_p \\cdot e - 1}{k} + 1 \\quad\\text{(if } k \\text{ divides } d_p e - 1\\text{)} \\\\
+\\text{Iterate } k &= 1, \\ldots, e-1:\\quad \\text{check } k \\mid (d_p e - 1) \\\\
+p &= \\frac{d_p e - 1}{k} + 1,\\quad \\text{verify } p \\mid n \\\\
+\\text{Symmetric for } d_q:\\quad q &= \\frac{d_q e - 1}{k} + 1 \\qed
 \\end{align*}
+
+\\textbf{Explanation:} Since $ed_p \\equiv 1 \\pmod{p-1}$, we have $ed_p - 1 = k(p-1)$. Iterating $k$ from 1 to $e-1$, when $k$ divides $ed_p - 1$, compute $p = (ed_p - 1)/k + 1$ and check if $p$ divides $n$. The browser-side frontendCheck uses a faster FLT-based GCD method: compute $g = \\gcd(2^{ed_p - 1} - 1, n)$, which directly yields $p$ without iterating $k$.
 
 \\textbf{References:} Standard RSA-CRT analysis; M. Campagna, A. Sethi, "Key Recovery Method for CRT Implementation of RSA"`,
   usageGuide: 'This attack factors n using leaked CRT parameters dp and dq.\n\nHow to use:\n1. You have modulus n, public exponent e, and the CRT exponent dp (= d mod p-1)\n2. Optionally provide dq (= d mod q-1) as well\n3. The attack computes p from dp via gcd(pow(2, e*dp - 1, n) - 1, n)\n4. q = n / p gives the factorization\n\nTip: dp and dq are often stored alongside the private key. This attack runs entirely in your browser — no server computation needed.',

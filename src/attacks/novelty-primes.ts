@@ -5,7 +5,7 @@ export const attack: Attack = {
   id: 'novelty-primes',
   name: 'Novelty Primes',
   category: 'Factorization',
-  description: 'Detects primes near powers of 2 or math constants. Use when p ≈ 2^k or similar.',
+  description: 'Detects primes near powers of two or mathematical constants via windowed trial division. Use for CTF moduli with novelty-crafted primes.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -117,25 +117,25 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} CTF primes may be reused or near structured values; check via database lookup and window search.
+  proof: `\\textbf{Theorem:} If $p$ is a prime near a power of two or a mathematical constant, a windowed trial division search finds it.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item n = pq
-\\item Known prime database \\mathcal{P}
-\\item Structured windows around 2^k, constants
+\\item $n = p \\cdot q$ where $p$ is near a known structured value
+\\item Search windows around powers of two $2^k$ ($k \\in \\{64, 128, 256, 512\\}$) and constants $\\pi, e, \\sqrt{2}$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\mathcal{P} &= \\{p_1, \\ldots, p_m\\} \\\\
-n \\bmod p_i &= 0 \\implies p_i \\mid n,\\; q = n/p_i \\\\
-p &\\approx 2^k + \\delta,\\; |\\delta| \\leq W \\\\
+p &\\approx 2^k + \\delta,\\; |\\delta| \\leq W \\text{ (window size)} \\\\
 p &\\approx C + \\delta,\\; C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
-\\text{isPrime}(C + \\delta) \\land (n \\bmod (C + \\delta) = 0) &\\implies \\text{factor} \\qed
+n \\bmod (2^k + \\delta) = 0 &\\implies p = 2^k + \\delta,\\; q = n/p \\\\
+\\text{Cost: } &O(W \\cdot \\log^2 n) \\qed
 \\end{align*}
 
-\\textbf{References:} Various CTF writeups; cryptohack.org`,
+\\textbf{Explanation:} CTF challenge authors sometimes construct primes from well-known numbers — $p = 2^k \\pm \\delta$ (near powers of two) or $p = \\lfloor \\pi \\times 10^m \\rfloor \\pm \\delta$ (from mathematical constants). This attack checks candidates in a window around each known value, testing divisibility of $n$.
+
+\\textbf{References:} Cryptopals; Cryptohack.org; various CTF writeups`,
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };
