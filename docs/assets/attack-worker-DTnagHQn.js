@@ -551,7 +551,7 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("POLLARD_RHO=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${t/2n}\nPOLLARD_RHO=SUCCESS`);for(let e=1n;e<10n;e++){let n=2n,r=2n,i=1n,a=1n,o=0n,s=0;for(;i===1n&&s<5e4;)if(s++,a===o&&(n=r,a*=2n,o=0n),r=(r*r+e)%t,o++,i=O(r-n>0n?r-n:n-r,t),i>1n&&i<t){let e=t/i;return Promise.resolve(`Factor found!\np = ${i}\nq = ${e}\nPOLLARD_RHO=SUCCESS`)}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Pollard rho (Brent + batched GCD) finds a factor in expected O(n^{1/4}).
+_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${t/2n}\nPOLLARD_RHO=SUCCESS`);for(let e=1n;e<10n;e++){let n=t,r=BigInt(e),i=2n,a=2n,o=1n,s=1n,c=1n,l=0n,u=5e4,d=0;for(;s===1n&&d<u;){a=i;for(let e=0n;e<c&&d<u;e++)i=(i*i+r)%n,d++;for(l=0n;l<c&&s===1n&&d<u;){let e=Math.min(100,Number(c-l));for(let t=0;t<e;t++){i=(i*i+r)%n;let e=i>a?i-a:a-i;o=o*e%n,d++}s=O(o,n),o=1n,l+=BigInt(100)}c*=2n}if(s>1n&&s<n){let e=n/s;return Promise.resolve(`Factor found!\np = ${s}\nq = ${e}\nPOLLARD_RHO=SUCCESS`)}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Pollard rho (Brent + batched GCD) finds a factor in expected O(n^{1/4}).
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -651,9 +651,9 @@ p &\\mid (x_i - x_j) \\\\
                     result, result1 = result1, V2j2
             return result
         #
-        def williams_p1_stage(n, B1, B2, P):
+        def williams_p1_stage(n, B1, B2, P, stage1_primes, stage2_primes, prime_set):
             M = 1
-            for p in prime_range(B1 + 1):
+            for p in stage1_primes:
                 pp = p
                 while pp * p <= B1:
                     pp *= p
@@ -665,9 +665,6 @@ p &\\mid (x_i - x_j) \\\\
             if B2 > B1:
                 V_curr = VM
                 V_prev = 2
-                # Precompute primes once — is_prime(k) for every k is too slow
-                check_primes = prime_range(max(3, B1+1), B2 + 1)
-                prime_set = set(check_primes)  # O(1) lookup
                 for k in range(2, B2 + 1):
                     V_next = (V_curr * VM - V_prev) % n
                     V_prev, V_curr = V_curr, V_next
@@ -702,8 +699,12 @@ p &\\mid (x_i - x_j) \\\\
                     if B2_cur > 0:
                         retry_msg += f", B2 = {B2_cur}"
                     out.append(retry_msg)
+                # Cache prime lists per config (avoid recomputation per P value)
+                stage1_primes = prime_range(B1_cur + 1)
+                stage2_primes = prime_range(max(3, B1_cur+1), B2_cur + 1) if B2_cur > B1_cur else []
+                prime_set = set(stage2_primes)
                 for P in range(3, 8):
-                    g = williams_p1_stage(n, B1_cur, B2_cur, P)
+                    g = williams_p1_stage(n, B1_cur, B2_cur, P, stage1_primes, stage2_primes, prime_set)
                     if g is not None:
                         p = Integer(g)
                         q = n // g
@@ -1689,7 +1690,7 @@ s &\\mid n \\implies q = n/s \\\\
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("CLOSE_PRIME=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${t/2n}\nCLOSE_PRIME=SUCCESS`);let n=k(t);n*n<t&&n++;let r=n+1000000n;for(;n<r;){let e=n*n-t,r=k(e);if(r*r===e){let e=n-r,i=n+r;if(e>1n&&i>1n&&e*i===t)return Promise.resolve(`Factor found!\np = ${e}\nq = ${i}\nCLOSE_PRIME=SUCCESS`)}n++}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} When $|p - q|$ is small, Fermat's factorization finds $p,q$ in $O(|p-q|)$ steps; the Londahl BSGS extends this to $O(\\sqrt{|p-q|})$.
+_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${t/2n}\nCLOSE_PRIME=SUCCESS`);let n=k(t);n*n<t&&n++;let r=n*n-t,i=n+1000000n;for(;n<i;){let e=Number(r&15n);if(e===0||e===1||e===4||e===9){let e=k(r);if(e*e===r){let r=n-e,i=n+e;if(r>1n&&i>1n&&r*i===t)return Promise.resolve(`Factor found!\np = ${r}\nq = ${i}\nCLOSE_PRIME=SUCCESS`)}}r+=2n*n+1n,n++}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} When $|p - q|$ is small, Fermat's factorization finds $p,q$ in $O(|p-q|)$ steps; the Londahl BSGS extends this to $O(\\sqrt{|p-q|})$.
 
 \\textbf{Fermat's Factorization:}
 \\begin{align*}
@@ -1756,11 +1757,10 @@ def _attack():
                             print(f"q = {n // p_sage}")
                             found = True
             print("\\nChecking primes near common constants...")
-            RF = RealField(300)
             constants = [
-                ("pi", Integer(str(RF(pi()).n(digits=60).str()).replace('.', '')[:55])),
-                ("e", Integer(str(RF(exp(1)).n(digits=60).str()).replace('.', '')[:55])),
-                ("sqrt(2)", Integer(str(RF(2).sqrt().n(digits=60).str()).replace('.', '')[:55])),
+                ("pi", 3141592653589793238462643383279502884197169399375105820974),
+                ("e", 2718281828459045235360287471352662497757247093699959574966),
+                ("sqrt(2)", 1414213562373095048801688724209698078569671875376948073176),
             ]
             for name, const in constants:
                 const_int = int(const)
@@ -1941,7 +1941,7 @@ p &\\approx C + \\delta,\\; C \\in \\{\\pi, e, \\sqrt{2}, \\ldots\\} \\\\
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
-_attack()`,proof:`\\textbf{Theorem:} Given $c_1 \\equiv m^e \\pmod{n}$ and $c_2 \\equiv (am + b)^e \\pmod{n}$, recover $m$ via polynomial GCD.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=(e.e||``).trim(),r=n?BigInt(n):65537n,i=BigInt(e.c1),a=BigInt(e.c2),o=(e.a||``).trim(),s=o?BigInt(o):2n,c=(e.b||``).trim(),l=c?BigInt(c):0n;if(t<2n||r<2n||i<0n||a<0n||r!==3n)return Promise.resolve(null);let u=3n*s*s*l%t,d=3n*s*l*l%t,f=((l*l*l-a+s*s*s%t*i)%t%t+t)%t;if(u===0n&&d===0n)return Promise.resolve(null);if(u===0n){if(d===0n)return Promise.resolve(null);let e=j(d,t);if(e===null)return Promise.resolve(null);let n=(-f%t+t)%t*e%t;return M(n,r,t)===i?Promise.resolve(`Recovered m = ${n}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`):Promise.resolve(null)}let p=((u*f-d*d)%t+t)%t,m=((d*f-u*u%t*i)%t+t)%t;if(p===0n)return Promise.resolve(null);let h=j(p,t);if(h===null)return Promise.resolve(null);let g=m*h%t;return M(g,r,t)===i?Promise.resolve(`Recovered m = ${g}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`):Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given $c_1 \\equiv m^e \\pmod{n}$ and $c_2 \\equiv (am + b)^e \\pmod{n}$, recover $m$ via polynomial GCD.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2077,8 +2077,9 @@ def _attack():
                 e_int = int(e)
                 dLow_int = int(dLow)
                 m = dLow_int.bit_length()
+                kBound = 1 << min(m + 2, 20)
                 found = False
-                for k in range(1, e_int + 1):
+                for k in range(1, kBound + 1):
                     d_approx = (k * n_int + 1) // e_int
                     if (d_approx & ((1 << m) - 1)) == dLow_int:
                         d_phi = (e_int * d_approx - 1) // k
@@ -2408,22 +2409,31 @@ def _attack():
                 print("POLLARD_STRASSEN=FAILED")
                 return
             n_int = int(n)
-            for i in range(c):
-                prod = 1
-                jmin = i * c + 1
-                jmax = jmin + c - 1
-                for j in range(jmin, jmax + 1):
-                    prod = (prod * j) % n_int
-                g = math.gcd(prod, n_int)
-                if g > 1 and g < n_int:
-                    p_sage = Integer(g)
-                    q_sage = n // p_sage
-                    print(f"Verification: p * q = {p_sage * q_sage}")
-                    print(f"p = {p_sage}")
-                    print(f"q = {q_sage}")
-                    print()
-                    print("POLLARD_STRASSEN=SUCCESS")
-                    return
+            # Single-pass Strassen: accumulate product incrementally with batched GCD
+            prod = 1
+            batch_size = 1000
+            for i in range(1, c + 1):
+                prod = (prod * i) % n_int
+                if i % batch_size == 0 or i == c:
+                    g = math.gcd(prod, n_int)
+                    if g > 1 and g < n_int:
+                        # Backtrack to find exact factor in this batch
+                        backtrack_start = max(1, i - batch_size + 1)
+                        backtrack_prod = 1
+                        for j in range(backtrack_start, i + 1):
+                            backtrack_prod = (backtrack_prod * j) % n_int
+                            g2 = math.gcd(backtrack_prod, n_int)
+                            if g2 > 1 and g2 < n_int:
+                                p_sage = Integer(g2)
+                                q_sage = n // p_sage
+                                print(f"Verification: p * q = {p_sage * q_sage}")
+                                print(f"p = {p_sage}")
+                                print(f"q = {q_sage}")
+                                print()
+                                print("POLLARD_STRASSEN=SUCCESS")
+                                return
+                        # If product GCD found but backtrack didn't (shouldn't happen)
+                        break
             print("Pollard-Strassen failed: no factor found in intervals")
             print("POLLARD_STRASSEN=FAILED")
         except Exception as e:
@@ -2852,7 +2862,7 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("DEPENDENT_PRIME=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n||!e.e)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=4n*t*n;for(let e=1n;e<=100000n;e++){let n=1n+e*r,i=k(n);if(i*i!==n)continue;let a=-1n+i;if(a>0n&&a%(2n*e)==0n){let n=a/(2n*e);if(n>1n&&t%n===0n){let e=t/n;return Promise.resolve(`Factor found!\np = ${n}\nq = ${e}\nDEPENDENT_PRIME=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $q \\cdot e \\equiv 1 \\pmod{p}$, solve $kp^2 + p - ne = 0$ for $p$.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.e)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=4n*t*n;for(let e=1n;e<=100000n;e++){let n=1n+e*r,i=Number(n&15n);if(i!==1&&i!==9)continue;let a=k(n);if(a*a!==n)continue;let o=-1n+a;if(o>0n&&o%(2n*e)==0n){let n=o/(2n*e);if(n>1n&&t%n===0n){let e=t/n;return Promise.resolve(`Factor found!\np = ${n}\nq = ${e}\nDEPENDENT_PRIME=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $q \\cdot e \\equiv 1 \\pmod{p}$, solve $kp^2 + p - ne = 0$ for $p$.
 
 \\textbf{Setup:}
 \\begin{itemize}

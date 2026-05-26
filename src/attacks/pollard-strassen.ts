@@ -47,22 +47,31 @@ def _attack():
                 print("POLLARD_STRASSEN=FAILED")
                 return
             n_int = int(n)
-            for i in range(c):
-                prod = 1
-                jmin = i * c + 1
-                jmax = jmin + c - 1
-                for j in range(jmin, jmax + 1):
-                    prod = (prod * j) % n_int
-                g = math.gcd(prod, n_int)
-                if g > 1 and g < n_int:
-                    p_sage = Integer(g)
-                    q_sage = n // p_sage
-                    print(f"Verification: p * q = {p_sage * q_sage}")
-                    print(f"p = {p_sage}")
-                    print(f"q = {q_sage}")
-                    print()
-                    print("POLLARD_STRASSEN=SUCCESS")
-                    return
+            # Single-pass Strassen: accumulate product incrementally with batched GCD
+            prod = 1
+            batch_size = 1000
+            for i in range(1, c + 1):
+                prod = (prod * i) % n_int
+                if i % batch_size == 0 or i == c:
+                    g = math.gcd(prod, n_int)
+                    if g > 1 and g < n_int:
+                        # Backtrack to find exact factor in this batch
+                        backtrack_start = max(1, i - batch_size + 1)
+                        backtrack_prod = 1
+                        for j in range(backtrack_start, i + 1):
+                            backtrack_prod = (backtrack_prod * j) % n_int
+                            g2 = math.gcd(backtrack_prod, n_int)
+                            if g2 > 1 and g2 < n_int:
+                                p_sage = Integer(g2)
+                                q_sage = n // p_sage
+                                print(f"Verification: p * q = {p_sage * q_sage}")
+                                print(f"p = {p_sage}")
+                                print(f"q = {q_sage}")
+                                print()
+                                print("POLLARD_STRASSEN=SUCCESS")
+                                return
+                        # If product GCD found but backtrack didn't (shouldn't happen)
+                        break
             print("Pollard-Strassen failed: no factor found in intervals")
             print("POLLARD_STRASSEN=FAILED")
         except Exception as e:

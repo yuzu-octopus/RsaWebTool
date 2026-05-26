@@ -92,9 +92,9 @@ export const attack: Attack = {
                     result, result1 = result1, V2j2
             return result
         #
-        def williams_p1_stage(n, B1, B2, P):
+        def williams_p1_stage(n, B1, B2, P, stage1_primes, stage2_primes, prime_set):
             M = 1
-            for p in prime_range(B1 + 1):
+            for p in stage1_primes:
                 pp = p
                 while pp * p <= B1:
                     pp *= p
@@ -106,9 +106,6 @@ export const attack: Attack = {
             if B2 > B1:
                 V_curr = VM
                 V_prev = 2
-                # Precompute primes once — is_prime(k) for every k is too slow
-                check_primes = prime_range(max(3, B1+1), B2 + 1)
-                prime_set = set(check_primes)  # O(1) lookup
                 for k in range(2, B2 + 1):
                     V_next = (V_curr * VM - V_prev) % n
                     V_prev, V_curr = V_curr, V_next
@@ -143,8 +140,12 @@ export const attack: Attack = {
                     if B2_cur > 0:
                         retry_msg += f", B2 = {B2_cur}"
                     out.append(retry_msg)
+                # Cache prime lists per config (avoid recomputation per P value)
+                stage1_primes = prime_range(B1_cur + 1)
+                stage2_primes = prime_range(max(3, B1_cur+1), B2_cur + 1) if B2_cur > B1_cur else []
+                prime_set = set(stage2_primes)
                 for P in range(3, 8):
-                    g = williams_p1_stage(n, B1_cur, B2_cur, P)
+                    g = williams_p1_stage(n, B1_cur, B2_cur, P, stage1_primes, stage2_primes, prime_set)
                     if g is not None:
                         p = Integer(g)
                         q = n // g

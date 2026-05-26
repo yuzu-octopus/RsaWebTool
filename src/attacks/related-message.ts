@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
-import { modPow } from '../utils/bigint';
+import { modInverse, modPow } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'franklin-reiter-related-message',
@@ -153,6 +153,66 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
 _attack()`,
+  frontendCheck: (vals) => {
+    if (!vals.n || !vals.c1 || !vals.c2) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const rawE = (vals.e || '').trim();
+      const e = rawE ? BigInt(rawE) : 65537n;
+      const c1 = BigInt(vals.c1);
+      const c2 = BigInt(vals.c2);
+      const rawA = (vals.a || '').trim();
+      const a = rawA ? BigInt(rawA) : 2n;
+      const rawB = (vals.b || '').trim();
+      const b = rawB ? BigInt(rawB) : 0n;
+
+      if (n < 2n || e < 2n || c1 < 0n || c2 < 0n) return Promise.resolve(null);
+      // Only supports e=3 in frontendCheck (polynomial GCD over composite n is not feasible in JS)
+      if (e !== 3n) return Promise.resolve(null);
+
+      // Closed-form solution for e=3 (from sageTemplate):
+      // (am+b)^3 = a^3*m^3 + 3a^2*b*m^2 + 3a*b^2*m + b^3 = c2
+      // m^3 = c1
+      // => A*m^2 + B*m + C = 0 (mod n) where:
+      // A = 3*a^2*b, B = 3*a*b^2, C = b^3 - c2 + a^3*c1
+      const A = (3n * a * a * b) % n;
+      const B = (3n * a * b * b) % n;
+      const C = ((b * b * b) - c2 + (a * a * a % n) * c1) % n;
+      const nMod = ((C % n) + n) % n;
+      const Cnorm = nMod;
+
+      if (A === 0n && B === 0n) {
+        // Degenerate or contradiction
+        return Promise.resolve(null);
+      }
+      if (A === 0n) {
+        // Linear case: B*m + C = 0 => m = -C * B^(-1) mod n
+        if (B === 0n) return Promise.resolve(null);
+        const invB = modInverse(B, n);
+        if (invB === null) return Promise.resolve(null);
+        const m = ((-Cnorm % n) + n) % n * invB % n;
+        if (modPow(m, e, n) === c1) {
+          return Promise.resolve(`Recovered m = ${m}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
+        }
+        return Promise.resolve(null);
+      }
+
+      // Quadratic case: A*m^2 + B*m + C = 0
+      // From the derived formula: (A*C - B^2)*m = B*C - A^2*c1 (mod n)
+      const denom = ((A * Cnorm - B * B) % n + n) % n;
+      const numer = ((B * Cnorm - A * A % n * c1) % n + n) % n;
+
+      if (denom === 0n) return Promise.resolve(null);
+      const invDenom = modInverse(denom, n);
+      if (invDenom === null) return Promise.resolve(null);
+      const m = (numer * invDenom) % n;
+
+      if (modPow(m, e, n) === c1) {
+        return Promise.resolve(`Recovered m = ${m}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
+  },
   proof: `\\textbf{Theorem:} Given $c_1 \\equiv m^e \\pmod{n}$ and $c_2 \\equiv (am + b)^e \\pmod{n}$, recover $m$ via polynomial GCD.
 
 \\textbf{Setup:}

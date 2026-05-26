@@ -107,23 +107,37 @@ _attack()`,
       const n = BigInt(vals.n);
       if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}\nPOLLARD_RHO=SUCCESS`);
       for (let c = 1n; c < 10n; c++) {
-        let x = 2n, y = 2n, d = 1n;
-        let power = 1n, lam = 0n;
-        const maxPollardIter = 50000;
-        let pollardIter = 0;
-        while (d === 1n && pollardIter < maxPollardIter) {
-          pollardIter++;
-          if (power === lam) { x = y; power *= 2n; lam = 0n; }
-          y = (y * y + c) % n;
-          lam++;
-          d = gcd(y - x > 0n ? y - x : x - y, n);
-          if (d > 1n && d < n) {
-            const q = n / d;
-            return Promise.resolve(`Factor found!\np = ${d}\nq = ${q}\nPOLLARD_RHO=SUCCESS`);
+        const n_i = n;
+        const c_i = BigInt(c);
+        let y = 2n, x = 2n, qProd = 1n, g = 1n;
+        let r = 1n, k = 0n;
+        const batchM = 100;
+        const maxIter = 50000;
+        let iter = 0;
+        while (g === 1n && iter < maxIter) {
+          x = y;
+          for (let i = 0n; i < r && iter < maxIter; i++) {
+            y = (y * y + c_i) % n_i;
+            iter++;
           }
+          k = 0n;
+          while (k < r && g === 1n && iter < maxIter) {
+            const batchSize = Math.min(batchM, Number(r - k));
+            for (let i = 0; i < batchSize; i++) {
+              y = (y * y + c_i) % n_i;
+              const diff = y > x ? y - x : x - y;
+              qProd = (qProd * diff) % n_i;
+              iter++;
+            }
+            g = gcd(qProd, n_i);
+            qProd = 1n;
+            k += BigInt(batchM);
+          }
+          r *= 2n;
         }
-        if (d === 1n && pollardIter >= maxPollardIter) {
-          continue; // try next c value
+        if (g > 1n && g < n_i) {
+          const q = n_i / g;
+          return Promise.resolve(`Factor found!\np = ${g}\nq = ${q}\nPOLLARD_RHO=SUCCESS`);
         }
       }
       return Promise.resolve(null);

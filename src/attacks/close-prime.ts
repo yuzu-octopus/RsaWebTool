@@ -124,19 +124,27 @@ _attack()`,
     try {
       const n = BigInt(vals.n);
       if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}\nCLOSE_PRIME=SUCCESS`);
+      // Incremental Fermat: b2 = a^2 - n, updated as b2 += 2*a + 1 each step
+      // This avoids repeated a*a - n (a BigInt multiplication)
       let a = isqrt(n);
       if (a * a < n) a++;
+      let b2 = a * a - n;
       const limit = a + 1000000n;
       while (a < limit) {
-        const b2 = a * a - n;
-        const b = isqrt(b2);
-        if (b * b === b2) {
-          const p = a - b;
-          const q = a + b;
-          if (p > 1n && q > 1n && p * q === n) {
-            return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nCLOSE_PRIME=SUCCESS`);
+        // Mod-16 perfect square pre-filter: valid squares end in 0,1,4,9 hex
+        const lastNybble = Number(b2 & 15n);
+        if (lastNybble === 0 || lastNybble === 1 || lastNybble === 4 || lastNybble === 9) {
+          const b = isqrt(b2);
+          if (b * b === b2) {
+            const p = a - b;
+            const q = a + b;
+            if (p > 1n && q > 1n && p * q === n) {
+              return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nCLOSE_PRIME=SUCCESS`);
+            }
           }
         }
+        // Increment a and b2: (a+1)^2 - n = a^2 - n + 2a + 1 = b2 + 2a + 1
+        b2 += 2n * a + 1n;
         a++;
       }
       return Promise.resolve(null);

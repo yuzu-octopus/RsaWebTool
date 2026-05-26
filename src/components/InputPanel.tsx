@@ -199,8 +199,11 @@ export function InputPanel() {
       {tab === 1 && (
         <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', p: 2 }}>
           <Box sx={{ width: '100%', maxWidth: 500 }}>
-            <Typography variant="h4" sx={{ color: draculaColors.cyan, mb: 1 }}>
+            <Typography variant="h4" sx={{ color: draculaColors.cyan, mb: 0.5 }}>
               {selectedAttack.name}
+            </Typography>
+            <Typography variant="caption" sx={{ color: draculaColors.pink, display: 'block', mb: 1, fontSize: '0.7rem' }}>
+              {selectedAttack.frontendCheck ? 'Runs locally in browser' : 'Executed via SageMathCell'}
             </Typography>
             <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 3 }}>
               {selectedAttack.description}

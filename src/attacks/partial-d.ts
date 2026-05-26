@@ -27,8 +27,9 @@ def _attack():
                 e_int = int(e)
                 dLow_int = int(dLow)
                 m = dLow_int.bit_length()
+                kBound = 1 << min(m + 2, 20)
                 found = False
-                for k in range(1, e_int + 1):
+                for k in range(1, kBound + 1):
                     d_approx = (k * n_int + 1) // e_int
                     if (d_approx & ((1 << m) - 1)) == dLow_int:
                         d_phi = (e_int * d_approx - 1) // k

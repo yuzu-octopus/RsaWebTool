@@ -75,9 +75,22 @@ export function ProofIndex() {
               >
                 <ListItemText
                   primary={
-                    <Typography sx={{ color: draculaColors.cyan, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>
-                      {attack.name}
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                      <Typography sx={{ color: draculaColors.cyan, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>
+                        {attack.name}
+                      </Typography>
+                      <Typography
+                        component="span"
+                        sx={{
+                          color: attack.frontendCheck ? draculaColors.green : draculaColors.orange,
+                          fontSize: '0.65rem',
+                          fontFamily: "'JetBrains Mono', monospace",
+                          opacity: 0.8,
+                        }}
+                      >
+                        ({attack.frontendCheck ? 'Local' : 'SageMath'})
+                      </Typography>
+                    </Box>
                   }
                   secondary={
                     <Typography sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.75rem' }}>

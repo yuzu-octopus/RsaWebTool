@@ -78,6 +78,10 @@ _attack()`,
       const fourNE = 4n * n * e;
       for (let k = 1n; k <= 100000n; k++) {
         const disc = 1n + k * fourNE;
+        // Mod-16 perfect square pre-filter: disc ≡ 1 (mod 4), so valid squares mod 16 are only 1 and 9
+        // This rejects ~50% of candidates without calling isqrt
+        const lastNybble = Number(disc & 15n);
+        if (lastNybble !== 1 && lastNybble !== 9) continue;
         const sqrt_disc = isqrt(disc);
         if (sqrt_disc * sqrt_disc !== disc) continue;
         const num = -1n + sqrt_disc;

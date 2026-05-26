@@ -75,16 +75,7 @@ export function FormatConverter() {
         <Box sx={{ width: '100%', maxWidth: 640 }}>
           <Typography
             variant="h2"
-            sx={{
-              color: draculaColors.orange,
-              fontFamily: "'JetBrains Mono', monospace",
-              fontWeight: 700,
-              fontSize: '1.5rem',
-              mb: 1,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-            }}
+            sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}
           >
             <SwapHoriz sx={{ fontSize: 'inherit' }} /> Format Converter
           </Typography>

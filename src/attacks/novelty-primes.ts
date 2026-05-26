@@ -54,11 +54,10 @@ def _attack():
                             print(f"q = {n // p_sage}")
                             found = True
             print("\\nChecking primes near common constants...")
-            RF = RealField(300)
             constants = [
-                ("pi", Integer(str(RF(pi()).n(digits=60).str()).replace('.', '')[:55])),
-                ("e", Integer(str(RF(exp(1)).n(digits=60).str()).replace('.', '')[:55])),
-                ("sqrt(2)", Integer(str(RF(2).sqrt().n(digits=60).str()).replace('.', '')[:55])),
+                ("pi", 3141592653589793238462643383279502884197169399375105820974),
+                ("e", 2718281828459045235360287471352662497757247093699959574966),
+                ("sqrt(2)", 1414213562373095048801688724209698078569671875376948073176),
             ]
             for name, const in constants:
                 const_int = int(const)
