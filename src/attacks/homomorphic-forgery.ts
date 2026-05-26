@@ -89,7 +89,7 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
     #
 _attack()`;
   },
-  frontendCheck: (vals: Record<string, string>) => {
+  frontendCheck: (vals: Record<string, string>, onProgress?: (pct: number) => void) => {
     if (!vals.n || !vals.e || !vals.target_m || !vals.oracle_pairs) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
@@ -116,6 +116,9 @@ _attack()`;
       if (pairs.length > 15) return Promise.resolve(null);
       const count = 1 << pairs.length;
       for (let mask = 1; mask < count; mask++) {
+        if (onProgress && count > 100 && mask % 1000 === 0) {
+          onProgress(Math.round(mask * 100 / count));
+        }
         let prodM = 1n, prodS = 1n;
         for (let i = 0; i < pairs.length; i++) {
           if (mask & (1 << i)) {
@@ -124,6 +127,7 @@ _attack()`;
           }
         }
         if (prodM === targetM) {
+          onProgress?.(100);
           return Promise.resolve(`Factor found!\nForged signature: s = ${prodS}\nVerification: s^e mod n = ${modPow(prodS, e, n)}\nHOMOMORPHIC_FORGERY=SUCCESS`);
         }
       }

@@ -51,7 +51,7 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
     #
 _attack()`;
   },
-  frontendCheck: (vals: Record<string, string>): Promise<string | null> => {
+  frontendCheck: (vals: Record<string, string>, onProgress?: (pct: number) => void): Promise<string | null> => {
     const n = BigInt(vals.n);
     const e = BigInt(vals.e || '3');
     const c = BigInt(vals.c);
@@ -74,11 +74,14 @@ _attack()`;
     };
 
     for (let k = 0n; k <= kBound; k++) {
+      if (onProgress && kBound > 1000n && k % 1000n === 0n) {
+        onProgress(Number(k * 100n / kBound));
+      }
       const candidate = c + k * n;
       const root = iroot(candidate);
-      if (root ** e === candidate) return Promise.resolve(`m = ${root}\nk = ${k}\nSMALL_PUBLIC_EXP=SUCCESS`);
-      if ((root + 1n) ** e === candidate) return Promise.resolve(`m = ${root + 1n}\nk = ${k}\nSMALL_PUBLIC_EXP=SUCCESS`);
-      if (root > 0n && (root - 1n) ** e === candidate) return Promise.resolve(`m = ${root - 1n}\nk = ${k}\nSMALL_PUBLIC_EXP=SUCCESS`);
+      if (root ** e === candidate) { onProgress?.(100); return Promise.resolve(`m = ${root}\nk = ${k}\nSMALL_PUBLIC_EXP=SUCCESS`); }
+      if ((root + 1n) ** e === candidate) { onProgress?.(100); return Promise.resolve(`m = ${root + 1n}\nk = ${k}\nSMALL_PUBLIC_EXP=SUCCESS`); }
+      if (root > 0n && (root - 1n) ** e === candidate) { onProgress?.(100); return Promise.resolve(`m = ${root - 1n}\nk = ${k}\nSMALL_PUBLIC_EXP=SUCCESS`); }
     }
     return Promise.resolve(null);
   },

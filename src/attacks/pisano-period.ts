@@ -147,7 +147,7 @@ export const attack: Attack = {
         out.append("PISANO_PERIOD=FAILED")
     print("\\n".join(out))
 _attack()`,
-  frontendCheck: (vals) => {
+  frontendCheck: (vals, onProgress) => {
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
@@ -156,6 +156,9 @@ _attack()`,
       let pow_val = 1n;
       const limit = 200000n;
       for (let i = 0n; i < limit; i++) {
+        if (onProgress && i % 10000n === 0n) {
+          onProgress(Number(i * 100n / limit));
+        }
         const val = (pow_val - 1n + n) % n;
         const key = val.toString();
         if (val === 0n && i > 0n) {
@@ -167,6 +170,7 @@ _attack()`,
               const p = (s - t) / 2n;
               const q = (s + t) / 2n;
               if (p > 1n && q > 1n && p * q === n) {
+                onProgress?.(100);
                 return Promise.resolve(`Factor found!\nPeriod length: ${i}\np = ${p}\nq = ${q}\nPISANO_PERIOD=SUCCESS`);
               }
             }
@@ -187,6 +191,7 @@ _attack()`,
               const p = (s - t) / 2n;
               const q = (s + t) / 2n;
               if (p > 1n && q > 1n && p * q === n) {
+                onProgress?.(100);
                 return Promise.resolve(`Factor found!\nPeriod length: ${period}\np = ${p}\nq = ${q}\nPISANO_PERIOD=SUCCESS`);
               }
             }

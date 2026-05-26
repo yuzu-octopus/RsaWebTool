@@ -92,9 +92,10 @@ print("KNOWN_PLAINTEXT=FAILED")`;
         print("KNOWN_PLAINTEXT=FAILED")
 _attack()`;
   },
-  frontendCheck: (vals) => {
+  frontendCheck: (vals, onProgress) => {
     if (!vals.n || !vals.c) return Promise.resolve(null);
     try {
+      let lastProgress = -1;
       const n = BigInt(vals.n);
       const eVal = vals.e?.trim() || '65537';
       const e = BigInt(eVal);
@@ -102,6 +103,7 @@ _attack()`;
       // Strategy 1: Integer e-th root (works when m^e < n, e.g. e=3 with small m)
       const root = iroot(c, e);
       if (root ** e === c && modPow(root, e, n) === c) {
+        onProgress?.(100);
         try {
           const hexStr = root.toString(16);
           const padded = hexStr.length % 2 ? '0' + hexStr : hexStr;
@@ -109,6 +111,7 @@ _attack()`;
           const text = new TextDecoder().decode(bytes);
           return Promise.resolve(`RECOVERED via integer e-th root! m = ${root}\nm as bytes: ${text}\nKNOWN_PLAINTEXT=SUCCESS`);
         } catch {
+          onProgress?.(100);
           return Promise.resolve(`RECOVERED via integer e-th root! m = ${root}\nKNOWN_PLAINTEXT=SUCCESS`);
         }
       }
@@ -123,8 +126,16 @@ _attack()`;
         const shift = 1n << BigInt(unknownBits);
         const limit = Number(shift);
         for (let k = 0; k < limit; k++) {
+          if (onProgress && limit > 1000) {
+            const pct = Math.round(k * 100 / limit);
+            if (pct !== lastProgress) {
+              lastProgress = pct;
+              onProgress(pct);
+            }
+          }
           const mTry = (prefixInt << BigInt(unknownBits)) + BigInt(k);
           if (modPow(mTry, e, n) === c) {
+            onProgress?.(100);
             try {
               const hexStr = mTry.toString(16);
               const padded = hexStr.length % 2 ? '0' + hexStr : hexStr;
@@ -132,6 +143,7 @@ _attack()`;
               const text = new TextDecoder().decode(bytes);
               return Promise.resolve(`FOUND! m = ${mTry}\nm as bytes: ${text}\nKNOWN_PLAINTEXT=SUCCESS`);
             } catch {
+              onProgress?.(100);
               return Promise.resolve(`FOUND! m = ${mTry}\nKNOWN_PLAINTEXT=SUCCESS`);
             }
           }

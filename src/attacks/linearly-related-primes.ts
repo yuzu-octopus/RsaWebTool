@@ -69,7 +69,7 @@ def _attack():
         print(f"ERROR: {ex}")
         print("LINEARLY_RELATED_PRIMES=FAILED")
 _attack()`,
-  frontendCheck: (vals) => {
+  frontendCheck: (vals, onProgress) => {
     if (!vals.n || !vals.k) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
@@ -79,6 +79,9 @@ _attack()`,
         const disc = delta * delta + fourKN;
         const discNybble = Number(disc & 15n);
         if (discNybble !== 0 && discNybble !== 1 && discNybble !== 4 && discNybble !== 9) continue;
+        if (onProgress && delta % 10000n === 0n) {
+          onProgress(Number((delta + 100000n) * 100n / 200001n));
+        }
         const sqrt_disc = isqrt(disc);
         if (sqrt_disc * sqrt_disc !== disc) continue;
         const num = -delta + sqrt_disc;
@@ -86,6 +89,7 @@ _attack()`,
           const p = num / (2n * k);
           if (p > 1n && n % p === 0n) {
             const q = n / p;
+            onProgress?.(100);
             return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nk = ${k}\ndelta = ${delta}\nLINEARLY_RELATED_PRIMES=SUCCESS`);
           }
         }

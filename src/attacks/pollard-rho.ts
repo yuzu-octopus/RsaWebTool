@@ -101,12 +101,20 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("POLLARD_RHO=FAILED")
 _attack()`,
-  frontendCheck: (vals) => {
+  frontendCheck: (vals, onProgress) => {
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
       if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}\nPOLLARD_RHO=SUCCESS`);
+      let totalProgressCalls = 0;
       for (let c = 1n; c < 10n; c++) {
+        if (onProgress) {
+          const progress = Math.round(Number(c - 1n) * 100 / 9);
+          if (progress > totalProgressCalls) {
+            totalProgressCalls = progress;
+            onProgress(progress);
+          }
+        }
         const n_i = n;
         const c_i = BigInt(c);
         let y = 2n, x = 2n, qProd = 1n, g = 1n;
@@ -137,6 +145,7 @@ _attack()`,
         }
         if (g > 1n && g < n_i) {
           const q = n_i / g;
+          onProgress?.(100);
           return Promise.resolve(`Factor found!\np = ${g}\nq = ${q}\nc = ${c}\niterations = ${iter}\nPOLLARD_RHO=SUCCESS`);
         }
       }

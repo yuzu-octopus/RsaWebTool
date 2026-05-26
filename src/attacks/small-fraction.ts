@@ -131,13 +131,16 @@ def _attack():
         print(f"ERROR: {ex}")
         print("SMALL_FRACTION=FAILED")
 _attack()`,
-  frontendCheck: (vals) => {
+  frontendCheck: (vals, onProgress) => {
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
       if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}\nSMALL_FRACTION=SUCCESS`);
 
       for (let b = 1; b <= 100; b++) {
+        if (onProgress) {
+          onProgress(Math.round((b - 1) * 100 / 100));
+        }
         for (let a = 1; a <= b; a++) {
           if (numGcd(a, b) !== 1) continue;
           const q0 = isqrt(n * BigInt(b) / BigInt(a));
@@ -146,6 +149,7 @@ _attack()`,
             if (q > 1n && n % q === 0n) {
               const p = n / q;
               if (p > 1n) {
+                onProgress?.(100);
                 return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nUsing a=${a}, b=${b}\nSMALL_FRACTION=SUCCESS`);
               }
             }
