@@ -254,8 +254,8 @@ export function MagicPanel() {
     // If all attacks resolved by frontendCheck, short-circuit
     if (remaining.length === 0) {
       if (currentRunId !== runIdRef.current) return;
-      setRunning(false);
       timer.stop();
+      setRunning(false);
       abortControllerRef.current = null;
       const firstSuccess = preCheckResults.find(r => r?.isSuccess);
       if (firstSuccess && firstSuccess.result) {
