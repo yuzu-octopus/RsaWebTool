@@ -5,7 +5,7 @@ import { modPow } from '../utils/bigint';
 export const attack: Attack = {
   id: 'coppersmith-short-pad',
   name: 'Coppersmith Short Pad Attack',
-  category: 'Message / Protocol',
+  category: 'Partial Key / Lattice',
   description: 'Recovers m from short random pads. Use when same message padded with short random values.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },

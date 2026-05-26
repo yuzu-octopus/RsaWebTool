@@ -5,7 +5,7 @@ import { gcd } from '../utils/bigint';
 export const attack: Attack = {
   id: 'multi-prime-gcd',
   name: 'Multi-Prime GCD',
-  category: 'Advanced',
+  category: 'Factorization',
   description: 'Finds shared primes across multiple moduli via pairwise GCD. Use when given 2+ RSA moduli. Unlike Batch GCD (Factorization category), this attack reports exact moduli pairs that share each factor.',
   inputs: [
     { name: 'moduli_list', label: 'Moduli (one per line)', placeholder: 'Enter multiple moduli, one per line...', multiline: true, rows: 6 },

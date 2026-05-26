@@ -5,7 +5,7 @@ import { isqrt } from '../utils/bigint';
 export const attack: Attack = {
   id: 'phi-leak',
   name: 'Phi(n) Leak',
-  category: 'Advanced',
+  category: 'Partial Key / Lattice',
   description: 'Factors n when φ(n) is leaked. Use when Euler\'s totient φ(n) is known.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },

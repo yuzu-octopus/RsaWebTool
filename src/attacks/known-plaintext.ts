@@ -5,7 +5,7 @@ import { generateKeyPair, encrypt } from '../utils/testcases/core';
 export const attack: Attack = {
   id: 'known-plaintext',
   name: 'Known Plaintext Attack',
-  category: 'Advanced',
+  category: 'Message / Protocol',
   description: 'Recovers m from known prefix via Coppersmith. Use when high-order bytes of m are known and unknown portion is small.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },

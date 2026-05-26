@@ -35,8 +35,7 @@ import { attack as hastadLinearPad, generateTestcase as genHastadLinearPad } fro
 import { attack as lsbOracle, generateTestcase as genLsbOracle } from './lsb-oracle';
 import { attack as rsaCrtFault, generateTestcase as genRsaCrtFault } from './rsa-crt-fault';
 import { attack as nonCoprimeExp, generateTestcase as genNonCoprimeExp } from './non-coprime-exp';
-import { attack as cubeRootCrt, generateTestcase as genCubeRootCrt } from './cube-root-crt';
-import { attack as commonFactor, generateTestcase as genCommonFactor } from './common-factor';
+
 import { attack as homomorphicForgery, generateTestcase as genHomomorphicForgery } from './homomorphic-forgery';
 import { attack as bleichenbacherSig, generateTestcase as genBleichenbacherSig } from './bleichenbacher-sig';
 
@@ -70,7 +69,7 @@ export const attacks: Attack[] = [
   simpleLattice, partialD, partialPqBits, smallCrtExp, dpDqLeak,
   linearlyRelatedPrimes, dependentPrime,
   commonModulus, coppersmithShortPad, hastadLinearPad,
-  lsbOracle, rsaCrtFault, nonCoprimeExp, cubeRootCrt, commonFactor,
+  lsbOracle, rsaCrtFault, nonCoprimeExp,
   homomorphicForgery, bleichenbacherSig,
   bleichenbacher, manger, biasedLsb,
   roca, nitros, factordbLookup, knownPlaintext, smallPublicExp,
@@ -107,8 +106,6 @@ export const testcaseGenerators: Record<string, () => Record<string, string>> = 
   'lsb-oracle': genLsbOracle,
   'rsa-crt-fault': genRsaCrtFault,
   'non-coprime-exp': genNonCoprimeExp,
-  'cube-root-crt': genCubeRootCrt,
-  'common-factor': genCommonFactor,
   'franklin-reiter-related-message': genFranklinReiterRelatedMessage,
   'homomorphic-forgery': genHomomorphicForgery,
   'bleichenbacher-sig': genBleichenbacherSig,
