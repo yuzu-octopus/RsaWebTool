@@ -247,7 +247,7 @@ export function InputPanel() {
                 >
                   <Stop sx={{ mr: 1 }} /> Stop
                 </Button>
-                <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 2, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
                   <CircularProgress size={16} data-testid="loading-spinner" sx={{ color: draculaColors.orange }} />
                   Running... {timer.formatted}
                 </Typography>
