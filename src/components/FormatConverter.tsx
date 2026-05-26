@@ -75,7 +75,7 @@ export function FormatConverter() {
       <Box sx={{ ...centeredPanelSx, p: 2 }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
           <Typography
-            variant="h2"
+            variant="h3"
             sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}
           >
             <SwapHoriz sx={{ fontSize: 'inherit' }} /> Format Converter

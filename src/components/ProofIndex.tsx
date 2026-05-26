@@ -86,10 +86,9 @@ export function ProofIndex() {
                           color: attack.frontendCheck ? draculaColors.green : draculaColors.orange,
                           fontSize: '0.65rem',
                           fontFamily: "'JetBrains Mono', monospace",
-                          opacity: 0.8,
-                        }}
-                      >
-                        ({attack.frontendCheck ? 'Local' : 'SageMath'})
+          }}
+        >
+          ({attack.frontendCheck ? 'Local' : 'SageMath'})
                       </Typography>
                     </Box>
                   }

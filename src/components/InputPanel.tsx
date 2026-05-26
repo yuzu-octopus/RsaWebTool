@@ -190,7 +190,7 @@ export function InputPanel() {
       {/* Input tab - center aligned */}
       {tab === 1 && (
         <Box sx={{ ...centeredPanelSx, p: 2 }}>
-          <Box sx={{ width: '100%', maxWidth: 500 }}>
+          <Box sx={{ width: '100%', maxWidth: 500, pb: '30vh' }}>
             <Typography variant="h4" sx={{ color: draculaColors.cyan, mb: 0.5 }}>
               {selectedAttack.name}
             </Typography>
@@ -218,7 +218,7 @@ export function InputPanel() {
               </Box>
             ))}
 
-            <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+            <Box sx={{ display: 'flex', gap: 1, mt: 2, mb: 2 }}>
               <Button
                 fullWidth
                 variant="outlined"
