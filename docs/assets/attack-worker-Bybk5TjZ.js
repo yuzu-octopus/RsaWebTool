@@ -1201,7 +1201,7 @@ def _attack():
             print()
             found = False
             max_den = 50
-            trial_window = 500
+            trial_window = 2000
             pairs_tried = 0
             divs_tried = 0
             n_int = int(n)
@@ -1277,7 +1277,7 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("SMALL_FRACTION=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${t/2n}\nSMALL_FRACTION=SUCCESS`);for(let e=1;e<=50;e++)for(let n=1;n<=e;n++){if(V(n,e)!==1)continue;let r=k(t*BigInt(e)/BigInt(n));for(let i=-500;i<=500;i++){let a=r+BigInt(i);if(a>1n&&t%a===0n){let r=t/a;if(r>1n)return Promise.resolve(`Factor found!\np = ${r}\nq = ${a}\nUsing a=${n}, b=${e}\nSMALL_FRACTION=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $p/q \\approx a/b$ for small coprime $a, b$, then $q \\approx \\sqrt{nb/a}$ and trial division near $q_0$ recovers the factor.
+_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${t/2n}\nSMALL_FRACTION=SUCCESS`);for(let e=1;e<=50;e++)for(let n=1;n<=e;n++){if(V(n,e)!==1)continue;let r=k(t*BigInt(e)/BigInt(n));for(let i=-2e3;i<=2e3;i++){let a=r+BigInt(i);if(a>1n&&t%a===0n){let r=t/a;if(r>1n)return Promise.resolve(`Factor found!\np = ${r}\nq = ${a}\nUsing a=${n}, b=${e}\nSMALL_FRACTION=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $p/q \\approx a/b$ for small coprime $a, b$, then $q \\approx \\sqrt{nb/a}$ and trial division near $q_0$ recovers the factor.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -1482,12 +1482,12 @@ p_i &\\approx n^{1/k} \\text{ (each prime is smaller than in 2-prime RSA)} \\\\
                 for sign in [1, -1]:
                     candidate = primorial + sign
                     if candidate > 1 and n_int % int(candidate) == 0:
-                    print(f"  Found primorial prime factor: {candidate} = {p}# {'+' if sign == 1 else '-'} 1")
-                    print(f"  Cofactor: {n // candidate}")
-                    print(f"  Verification: {candidate} * {n // candidate} = {n}")
-                    print(f"p = {candidate}")
-                    print(f"q = {n // candidate}")
-                    found = True
+                        print(f"  Found primorial prime factor: {candidate} = {p}# {'+' if sign == 1 else '-'} 1")
+                        print(f"  Cofactor: {n // candidate}")
+                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
+                        print(f"p = {candidate}")
+                        print(f"q = {n // candidate}")
+                        found = True
             # 3. Fermat primes: 2^(2^k) + 1
             print()
             print("Checking Fermat primes (2^(2^k) + 1)...")
@@ -1519,12 +1519,12 @@ p_i &\\approx n^{1/k} \\text{ (each prime is smaller than in 2-prime RSA)} \\\\
                 try:
                     repunit = (10**p - 1) // 9
                     if n_int % repunit == 0:
-                    print(f"  Found repunit prime factor: R({p}) = {repunit}")
-                    print(f"  Cofactor: {n // repunit}")
-                    print(f"  Verification: {repunit} * {n // repunit} = {n}")
-                    print(f"p = {repunit}")
-                    print(f"q = {n // repunit}")
-                    found = True
+                        print(f"  Found repunit prime factor: R({p}) = {repunit}")
+                        print(f"  Cofactor: {n // repunit}")
+                        print(f"  Verification: {repunit} * {n // repunit} = {n}")
+                        print(f"p = {repunit}")
+                        print(f"q = {n // repunit}")
+                        found = True
                 except Exception:
                     pass
             # 6. Factorial primes: k! +/- 1
@@ -1536,12 +1536,12 @@ p_i &\\approx n^{1/k} \\text{ (each prime is smaller than in 2-prime RSA)} \\\\
                 for sign in [1, -1]:
                     candidate = factorial + sign
                     if candidate > 1 and n_int % candidate == 0:
-                    print(f"  Found factorial prime factor: {k}! {'+' if sign == 1 else '-'} 1")
-                    print(f"  Cofactor: {n // candidate}")
-                    print(f"  Verification: {candidate} * {n // candidate} = {n}")
-                    print(f"p = {candidate}")
-                    print(f"q = {n // candidate}")
-                    found = True
+                        print(f"  Found factorial prime factor: {k}! {'+' if sign == 1 else '-'} 1")
+                        print(f"  Cofactor: {n // candidate}")
+                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
+                        print(f"p = {candidate}")
+                        print(f"q = {n // candidate}")
+                        found = True
             # 7. Carol and Kynea primes: (2^k - 1)^2 - 2, (2^k + 1)^2 - 2
             # Cap k at 100 to keep candidate sizes manageable (≈ 2^200 max)
             print()
@@ -1551,12 +1551,12 @@ p_i &\\approx n^{1/k} \\text{ (each prime is smaller than in 2-prime RSA)} \\\\
                     candidate = (2**k + sign)**2 - 2
                     if candidate > 1 and n_int % candidate == 0:
                         name = "Carol" if sign == -1 else "Kynea"
-                    print(f"  Found {name} prime factor: (2^{k} {'-' if sign == -1 else '+' } 1)^2 - 2")
-                    print(f"  Cofactor: {n // candidate}")
-                    print(f"  Verification: {candidate} * {n // candidate} = {n}")
-                    print(f"p = {candidate}")
-                    print(f"q = {n // candidate}")
-                    found = True
+                        print(f"  Found {name} prime factor: (2^{k} {'-' if sign == -1 else '+' } 1)^2 - 2")
+                        print(f"  Cofactor: {n // candidate}")
+                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
+                        print(f"p = {candidate}")
+                        print(f"q = {n // candidate}")
+                        found = True
             # 8. Cullen and Woodall primes: k * 2^k +/- 1
             # Cap k at 100 to keep candidate sizes manageable (k*2^k ≈ 2^107 max)
             print()
@@ -1566,12 +1566,12 @@ p_i &\\approx n^{1/k} \\text{ (each prime is smaller than in 2-prime RSA)} \\\\
                     candidate = k * 2**k + sign
                     if candidate > 1 and n_int % candidate == 0:
                         name = "Cullen" if sign == 1 else "Woodall"
-                    print(f"  Found {name} prime factor: {k} * 2^{k} {'+' if sign == 1 else '-'} 1")
-                    print(f"  Cofactor: {n // candidate}")
-                    print(f"  Verification: {candidate} * {n // candidate} = {n}")
-                    print(f"p = {candidate}")
-                    print(f"q = {n // candidate}")
-                    found = True
+                        print(f"  Found {name} prime factor: {k} * 2^{k} {'+' if sign == 1 else '-'} 1")
+                        print(f"  Cofactor: {n // candidate}")
+                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
+                        print(f"p = {candidate}")
+                        print(f"q = {n // candidate}")
+                        found = True
             if found:
                 print()
                 print("GIMMICKY_PRIMES=SUCCESS")
@@ -2106,7 +2106,7 @@ def _attack():
                 e_int = int(e)
                 dLow_int = int(dLow)
                 m = dLow_int.bit_length()
-                kBound = 1 << min(m + 2, 20)
+                kBound = 1 << min(m + 2, 24)
                 found = False
                 for k in range(1, kBound + 1):
                     d_approx = (k * n_int + 1) // e_int
@@ -2136,7 +2136,7 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("PARTIAL_D=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.dLow)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.dLow),i=r.toString(2).length,a=1n<<BigInt(Math.min(i+2,20)),o=(1n<<BigInt(i))-1n;for(let e=1n;e<=a;e++){let i=(e*t+1n)/n;if((i&o)!==r)continue;let a=t-(n*i-1n)/e+1n,s=a*a-4n*t;if(s<0n)continue;let c=k(s);if(c*c!==s)continue;let l=(a-c)/2n;if(l>0n&&t%l===0n){let e=t/l;return Promise.resolve(`Factor found!\np = ${l}\nq = ${e}\nPrivate key d = ${i}\nPARTIAL_D=SUCCESS`)}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If low $m$ bits of $d$ are known, recover $d$ by iterating $k$ in the key equation $ed = k\\varphi(n)+1$.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.dLow)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.dLow),i=r.toString(2).length,a=1n<<BigInt(Math.min(i+2,24)),o=(1n<<BigInt(i))-1n,s=t/n,c=t%n,l=(t+1n)/n,u=(t+1n)%n;for(let e=1n;e<=a;e++){if((l&o)===r){let r=t-(n*l-1n)/e+1n,i=r*r-4n*t;if(i>=0n){let e=k(i);if(e*e===i){let n=(r-e)/2n;if(n>0n&&t%n===0n){let e=t/n;return Promise.resolve(`Factor found!\np = ${n}\nq = ${e}\nPrivate key d = ${l}\nPARTIAL_D=SUCCESS`)}}}}l+=s,u+=c,u>=n&&(l+=1n,u-=n)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If low $m$ bits of $d$ are known, recover $d$ by iterating $k$ in the key equation $ed = k\\varphi(n)+1$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2153,7 +2153,7 @@ d_{\\text{approx}} \\bmod 2^m &\\stackrel{?}{=} d_{\\text{low}} \\\\
 x^2 - (n - \\varphi + 1)x + n &= 0 \\\\implies p,q \\qed
 \\end{align*}
 
-\\textbf{Explanation:} For each $k \\in [1,e]$, compute $d_{\\text{approx}} = \\lfloor(kn+1)/e\\rfloor$. If the low $m$ bits match $d_{\\text{low}}$, recover $\\varphi(n) = (ed-1)/k$ and solve the quadratic $x^2 - (n-\\varphi+1)x + n = 0$ for $p$ and $q$. The search bound is limited to $k < 2^{m+2}$ (cap at $\\sim 4\\times 10^6$) for efficiency.
+\\textbf{Explanation:} For each $k \\in [1,e]$, compute $d_{\\text{approx}} = \\lfloor(kn+1)/e\\rfloor$. If the low $m$ bits match $d_{\\text{low}}$, recover $\\varphi(n) = (ed-1)/k$ and solve the quadratic $x^2 - (n-\\varphi+1)x + n = 0$ for $p$ and $q$. The search bound is limited to $k < 2^{m+2}$ (cap at $\\sim 16\\times 10^6$) for efficiency.
 
 \\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,usageGuide:`This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.
 
@@ -2163,7 +2163,7 @@ How to use:
 3. The attack iterates k in ed = k\\phi(n) + 1, checking if d_approx has matching low bits
 4. For each matching candidate, it computes \\phi(n) and solves the quadratic for p,q
 
-Tip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~4M iterations); the frontendCheck always attempts the search regardless of e size.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.dLow},Z={id:`partial-pq-bits`,name:`Partial p/q Bits`,category:`Partial Key / Lattice`,description:`Recovers p from known high (MSB) or low (LSB) bits using Coppersmith's lattice. Use when half or more of p's bits are known via side-channel.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`knownBits`,label:`knownBits (known bits of p)`,placeholder:`Enter known bits as integer...`,multiline:!0,rows:3},{name:`bitPosition`,label:`bitPosition`,placeholder:`msb or lsb`,multiline:!1}],sageTemplate:e=>`def _attack():
+Tip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~16M iterations); the frontendCheck always attempts the search regardless of e size.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.dLow},Z={id:`partial-pq-bits`,name:`Partial p/q Bits`,category:`Partial Key / Lattice`,description:`Recovers p from known high (MSB) or low (LSB) bits using Coppersmith's lattice. Use when half or more of p's bits are known via side-channel.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`knownBits`,label:`knownBits (known bits of p)`,placeholder:`Enter known bits as integer...`,multiline:!0,rows:3},{name:`bitPosition`,label:`bitPosition`,placeholder:`msb or lsb`,multiline:!1}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -2335,7 +2335,7 @@ Tip: This is inherently probabilistic — the lattice may fail even with the rig
             end = math.isqrt(n_int)
             solutions = []
             a = 0
-            max_iter = 1000000
+            max_iter = 5000000
             while a < end and len(solutions) < 2:
                 if a > max_iter:
                     print(f"Euler factorization failed: exceeded {max_iter} iterations")
@@ -2387,7 +2387,7 @@ Tip: This is inherently probabilistic — the lattice may fail even with the rig
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("EULER=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t<2n)return Promise.resolve(null);if(t%2n==0n)return Promise.resolve(`n is even: ${t}\np = 2\nq = ${t/2n}\nEULER=SUCCESS`);let n=k(t),r=[];for(let e=0n;e<n&&r.length<2;e++){if(e>1000000n)return Promise.resolve(null);let n=t-e*e;if(n>=0n){let t=k(n);if(t*t===n){let n=!0;for(let i of r)if(i[0]===t&&i[1]===e){n=!1;break}n&&r.push([t,e])}}}if(r.length<2)return Promise.resolve(null);let[i,a]=[r[0],r[1]],o=O(i[0]-a[0],a[1]-i[1])**2n,s=O(i[0]+a[0],a[1]+i[1])**2n,c=O(i[0]+a[0],a[1]-i[1])**2n,l=O(i[0]-a[0],a[1]+i[1])**2n,u=O(o+s,t),d=O(l+c,t);return u<=1n||d>=t?Promise.resolve(null):(u*d!==t&&(d=t/u),Promise.resolve(`Factor found!\nVerification: p * q = ${u*d}\np = ${u}\nq = ${d}\nEULER=SUCCESS`))}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Factor $n = pq$ using two distinct representations as a sum of squares. Requires $p \\equiv q \\equiv 1 \\pmod{4}$.
+_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t<2n)return Promise.resolve(null);if(t%2n==0n)return Promise.resolve(`n is even: ${t}\np = 2\nq = ${t/2n}\nEULER=SUCCESS`);let n=k(t),r=[];for(let e=0n;e<n&&r.length<2;e++){if(e>5000000n)return Promise.resolve(null);let n=t-e*e;if(n>=0n){let t=k(n);if(t*t===n){let n=!0;for(let i of r)if(i[0]===t&&i[1]===e){n=!1;break}n&&r.push([t,e])}}}if(r.length<2)return Promise.resolve(null);let[i,a]=[r[0],r[1]],o=O(i[0]-a[0],a[1]-i[1])**2n,s=O(i[0]+a[0],a[1]+i[1])**2n,c=O(i[0]+a[0],a[1]-i[1])**2n,l=O(i[0]-a[0],a[1]+i[1])**2n,u=O(o+s,t),d=O(l+c,t);return u<=1n||d>=t?Promise.resolve(null):(u*d!==t&&(d=t/u),Promise.resolve(`Factor found!\nVerification: p * q = ${u*d}\np = ${u}\nq = ${d}\nEULER=SUCCESS`))}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Factor $n = pq$ using two distinct representations as a sum of squares. Requires $p \\equiv q \\equiv 1 \\pmod{4}$.
 
 \\textbf{Setup:}
 \\begin{itemize}

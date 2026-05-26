@@ -47,7 +47,7 @@ export const attack: Attack = {
             end = math.isqrt(n_int)
             solutions = []
             a = 0
-            max_iter = 1000000
+            max_iter = 5000000
             while a < end and len(solutions) < 2:
                 if a > max_iter:
                     print(f"Euler factorization failed: exceeded {max_iter} iterations")
@@ -108,7 +108,7 @@ _attack()`,
       if (n % 2n === 0n) return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n / 2n}\nEULER=SUCCESS`);
       const end = isqrt(n);
       const solutions: bigint[][] = [];
-      const maxIter = 1000000n;
+      const maxIter = 5000000n;
       for (let a = 0n; a < end && solutions.length < 2; a++) {
         if (a > maxIter) return Promise.resolve(null);
         const rem = n - a * a;
@@ -172,7 +172,7 @@ export const generateTestcase = (): Record<string, string> => {
       if (p % 4n === 1n) return p;
     }
   }
-  const nBits = 18;
+  const nBits = 20;
   const p = prime1mod4(nBits);
   const q = prime1mod4(nBits);
   return { n: (p * q).toString() };

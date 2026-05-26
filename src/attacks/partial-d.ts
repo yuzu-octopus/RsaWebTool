@@ -27,7 +27,7 @@ def _attack():
                 e_int = int(e)
                 dLow_int = int(dLow)
                 m = dLow_int.bit_length()
-                kBound = 1 << min(m + 2, 20)
+                kBound = 1 << min(m + 2, 24)
                 found = False
                 for k in range(1, kBound + 1):
                     d_approx = (k * n_int + 1) // e_int
@@ -67,25 +67,41 @@ _attack()`,
 
       // Infer mask from bit length of dLow; bound k by dLow bit-length
       const dLowBits = dLow.toString(2).length;
-      const kBound = 1n << BigInt(Math.min(dLowBits + 2, 20)); // bound at ~4M max
+      const kBound = 1n << BigInt(Math.min(dLowBits + 2, 24)); // bound at ~16M max
       const mask = (1n << BigInt(dLowBits)) - 1n;
 
+      // Precompute once
+      const q = n / e;
+      const r = n % e;
+
+      // Initialize for k = 1
+      let dApprox = (n + 1n) / e;
+      let rem = (n + 1n) % e;
+
       for (let k = 1n; k <= kBound; k++) {
-        const dApprox = (k * n + 1n) / e;
-        if ((dApprox & mask) !== dLow) continue;
+        if ((dApprox & mask) === dLow) {
+          // Found candidate — verify
+          const phi = (e * dApprox - 1n) / k;
+          const s = n - phi + 1n;
+          const disc = s * s - 4n * n;
+          if (disc >= 0n) {
+            const sqrtDisc = isqrt(disc);
+            if (sqrtDisc * sqrtDisc === disc) {
+              const p = (s - sqrtDisc) / 2n;
+              if (p > 0n && n % p === 0n) {
+                const qVal = n / p;
+                return Promise.resolve(`Factor found!\np = ${p}\nq = ${qVal}\nPrivate key d = ${dApprox}\nPARTIAL_D=SUCCESS`);
+              }
+            }
+          }
+        }
 
-        // Found candidate — verify
-        const phi = (e * dApprox - 1n) / k;
-        const s = n - phi + 1n;
-        const disc = s * s - 4n * n;
-        if (disc < 0n) continue;
-        const sqrtDisc = isqrt(disc);
-        if (sqrtDisc * sqrtDisc !== disc) continue;
-
-        const p = (s - sqrtDisc) / 2n;
-        if (p > 0n && n % p === 0n) {
-          const q = n / p;
-          return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nPrivate key d = ${dApprox}\nPARTIAL_D=SUCCESS`);
+        // Update for next iteration (k -> k+1)
+        dApprox += q;
+        rem += r;
+        if (rem >= e) {
+          dApprox += 1n;
+          rem -= e;
         }
       }
       return Promise.resolve(null);
@@ -108,10 +124,10 @@ d_{\\text{approx}} \\bmod 2^m &\\stackrel{?}{=} d_{\\text{low}} \\\\
 x^2 - (n - \\varphi + 1)x + n &= 0 \\\\implies p,q \\qed
 \\end{align*}
 
-\\textbf{Explanation:} For each $k \\in [1,e]$, compute $d_{\\text{approx}} = \\lfloor(kn+1)/e\\rfloor$. If the low $m$ bits match $d_{\\text{low}}$, recover $\\varphi(n) = (ed-1)/k$ and solve the quadratic $x^2 - (n-\\varphi+1)x + n = 0$ for $p$ and $q$. The search bound is limited to $k < 2^{m+2}$ (cap at $\\sim 4\\times 10^6$) for efficiency.
+\\textbf{Explanation:} For each $k \\in [1,e]$, compute $d_{\\text{approx}} = \\lfloor(kn+1)/e\\rfloor$. If the low $m$ bits match $d_{\\text{low}}$, recover $\\varphi(n) = (ed-1)/k$ and solve the quadratic $x^2 - (n-\\varphi+1)x + n = 0$ for $p$ and $q$. The search bound is limited to $k < 2^{m+2}$ (cap at $\\sim 16\\times 10^6$) for efficiency.
 
 \\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,
-  usageGuide: 'This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.\n\nHow to use:\n1. You have modulus n, public exponent e, and dLow (the low-order bits of d)\n2. Provide n, e, and dLow\n3. The attack iterates k in ed = k\\phi(n) + 1, checking if d_approx has matching low bits\n4. For each matching candidate, it computes \\phi(n) and solves the quadratic for p,q\n\nTip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~4M iterations); the frontendCheck always attempts the search regardless of e size.',
+  usageGuide: 'This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.\n\nHow to use:\n1. You have modulus n, public exponent e, and dLow (the low-order bits of d)\n2. Provide n, e, and dLow\n3. The attack iterates k in ed = k\\phi(n) + 1, checking if d_approx has matching low bits\n4. For each matching candidate, it computes \\phi(n) and solves the quadratic for p,q\n\nTip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~16M iterations); the frontendCheck always attempts the search regardless of e size.',
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.dLow,
 };

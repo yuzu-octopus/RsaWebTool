@@ -54,7 +54,7 @@ def _attack():
             print()
             found = False
             max_den = 50
-            trial_window = 500
+            trial_window = 2000
             pairs_tried = 0
             divs_tried = 0
             n_int = int(n)
@@ -141,7 +141,7 @@ _attack()`,
         for (let a = 1; a <= b; a++) {
           if (numGcd(a, b) !== 1) continue;
           const q0 = isqrt(n * BigInt(b) / BigInt(a));
-          for (let delta = -500; delta <= 500; delta++) {
+          for (let delta = -2000; delta <= 2000; delta++) {
             const q = q0 + BigInt(delta);
             if (q > 1n && n % q === 0n) {
               const p = n / q;
