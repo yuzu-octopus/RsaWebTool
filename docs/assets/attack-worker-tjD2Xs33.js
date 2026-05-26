@@ -4673,90 +4673,58 @@ Feasible for $k \\leq 20$ (approx. 1 million modular exponentiations in the brow
 
 \\textbf{Explanation:} Two complementary strategies. Strategy 1 works when the plaintext is so small that $m^e$ never wraps around modulo $n$ — the ciphertext literally equals $m^e$ as an integer, so taking the e-th root recovers $m$. Strategy 2 works when part of the plaintext is known (e.g., a flag format like "flag\\{...\\}") — the unknown suffix is brute-forced by testing each candidate against the ciphertext.
 
-\\textbf{References:} D. Coppersmith, 1997; May, "Attacks on RSA with Small Parameters," 2003`,priority:`medium`,applicableCheck:e=>!!(e.n&&e.c)},{id:`small-public-exp`,name:`Small Public Exponent Analysis`,category:`Advanced`,description:`Recovers plaintext m via e-th root (m^e < n), Hastad broadcast (e ciphertexts), or Franklin-Reiter related-message attack. Use when e is small (e.g., 3, 5, 17).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`3`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.c?`print("ERROR: Missing required inputs (n, c)")
+\\textbf{References:} D. Coppersmith, 1997; May, "Attacks on RSA with Small Parameters," 2003`,priority:`medium`,applicableCheck:e=>!!(e.n&&e.c)},{id:`small-public-exp`,name:`Small Public Exponent`,category:`Advanced`,description:`Recovers plaintext m via integer e-th root (m = (c + k*n)^(1/e)). Use when e is small (e.g., 3, 5, 17).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`3`},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`k_bound`,label:`k bound (c + k*n iterations)`,placeholder:`100000`}],sageTemplate:e=>!e.n||!e.c?`print("ERROR: Missing required inputs (n, c)")
 print("SMALL_PUBLIC_EXP=FAILED")`:`def _attack():
     try:
         n = Integer(${e.n})
         e_val = "${e.e}".strip()
         e = Integer(e_val) if e_val else Integer(3)
         c = Integer(${e.c})
-        print(f"Small public exponent analysis")
-        print(f"n = {n}")
-        print(f"e = {e}")
-        print(f"c = {c}")
-        print()
-        # Check if e is small
-        if e >= 100:
-            print(f"e = {e} is not considered 'small' for this attack.")
-            print("This attack is effective for e in {3, 5, 17}.")
-            print("Try other attack methods.")
-            print("SMALL_PUBLIC_EXP=FAILED")
-        else:
-            print(f"e = {e} is small. Checking for vulnerabilities...")
-            print()
-            # Attack 1: e-th root (m^e < n)
-            print("Attack 1: e-th root attack (m^e < n)")
-            m_root, exact = c.nth_root(e, truncate_mode=True)
+        k_bound_val = "${e.k_bound}".strip() if "${e.k_bound}" else "100000"
+        k_bound = Integer(k_bound_val) if k_bound_val else Integer(100000)
+        out = []
+        for k in range(int(k_bound) + 1):
+            candidate = c + k * n
+            m, exact = candidate.nth_root(e, truncate_mode=True)
             if exact:
-                print(f"SUCCESS! c is a perfect {e}-th power.")
-                print(f"m = {m_root}")
+                out.append(f"SUCCESS! k = {k}")
+                out.append(f"m = {m}")
                 try:
-                    m_hex = hex(m_root)[2:]
+                    m_hex = hex(m)[2:]
                     if len(m_hex) % 2 != 0:
                         m_hex = '0' + m_hex
                     m_bytes = bytes.fromhex(m_hex)
-                    print(f"m as text: {m_bytes.decode('utf-8', errors='replace')}")
+                    out.append(f"m as text: {m_bytes.decode('utf-8', errors='replace')}")
                 except Exception:
-                    print(f"m as hex: {hex(m_root)}")
-                print()
-                print("SMALL_PUBLIC_EXP=SUCCESS")
-            else:
-                print(f"c is not a perfect {e}-th power over integers.")
-                print("m^e >= n, so modular reduction occurred.")
-                print()
-                # Attack 2: Hastad broadcast (need multiple (n, c) pairs)
-                print("Attack 2: Hastad broadcast note")
-                print("If the SAME message m was encrypted with e = 3")
-                print("under 3 DIFFERENT moduli n1, n2, n3, then:")
-                print("  m = CRT(c1, c2, c3)^(1/3) over integers")
-                print("Provide additional (n, c) pairs to attempt this attack.")
-                print()
-                # Attack 3: Franklin-Reiter related message
-                print("Attack 3: Franklin-Reiter related message note")
-                print("If two ciphertexts c1 = m^e and c2 = (m + delta)^e")
-                print("are known with the same (n, e), then m can be recovered.")
-                print("Provide a second ciphertext to attempt this attack.")
-                print()
-                print("SMALL_PUBLIC_EXP=FAILED")
+                    out.append(f"m as hex: {hex(m)}")
+                break
+        if not out:
+            out.append(f"No perfect {e}-th power found for k in 0..{k_bound} with e = {e}")
+        print("\\\\n".join(out))
+        print("SMALL_PUBLIC_EXP=SUCCESS" if out else "SMALL_PUBLIC_EXP=FAILED")
     except Exception as ex:
         print(f"ERROR: {ex}")
         print("SMALL_PUBLIC_EXP=FAILED")
     #
-_attack()`,proof:`\\textbf{Theorem:} Small public exponent $e \\in \\{3, 5, 17\\}$ enables three distinct attacks: e-th root (direct), Hastad broadcast (multiple recipients), and Franklin-Reiter (related messages).
+_attack()`,frontendCheck:e=>{let t=BigInt(e.n),n=BigInt(e.e||`3`),r=BigInt(e.c);if(n>1000n)return Promise.resolve(null);let i=BigInt(e.k_bound||`100000`);if(i<0n)return Promise.resolve(null);let a=e=>{if(e<2n)return e;let t=e.toString(2).length,r=1n<<BigInt(Math.ceil(t/Number(n)));for(;;){let t=r**(n-1n),i=((n-1n)*r*t+e)/(n*t);if(i>=r)break;r=i}return r};for(let e=0n;e<=i;e++){let i=r+e*t,o=a(i);if(o**n===i)return Promise.resolve(`m = ${o.toString()}\nSMALL_PUBLIC_EXP=SUCCESS`);if((o+1n)**n===i)return Promise.resolve(`m = ${(o+1n).toString()}\nSMALL_PUBLIC_EXP=SUCCESS`);if(o>0n&&(o-1n)**n===i)return Promise.resolve(`m = ${(o-1n).toString()}\nSMALL_PUBLIC_EXP=SUCCESS`)}return Promise.resolve(null)},proof:`\\textbf{Theorem:} If $m^e \\geq n$, then $m^e = c + k \\cdot n$ for some $k \\geq 0$, and $m = \\sqrt[e]{c + k \\cdot n}$ when $k = \\lfloor m^e / n \\rfloor$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $n$ is an RSA modulus, $e$ is small, $c = m^e \\bmod n$
-\\item Attack 1: $m^e < n$ (no modular reduction occurred)
-\\item Attack 2: Same $m$ encrypted to $e$ different recipients with same $e$
-\\item Attack 3: Two ciphertexts $c_1 = m^e$, $c_2 = (m+\\delta)^e$ under same $(n, e)$
+\\item $n$ is an RSA modulus, $e$ is a small public exponent
+\\item $c = m^e \\bmod n$ (ciphertext)
+\\item $k$ is the quotient $\\lfloor m^e / n \\rfloor$, small when $m$ is near $n^{1/e}$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-\\text{Attack 1 -- e-th root:} &\\quad m^e < n \\implies c = m^e \\;\\text{(over integers)} \\\\
-&\\quad \\therefore m = \\sqrt[e]{c} \\quad\\text{(exact integer root)} \\\\
-\\text{Attack 2 -- Hastad broadcast:} &\\quad c_i = m^e \\bmod n_i, \\; i = 1,\\ldots,e \\\\
-&\\quad C \\equiv m^e \\pmod{N}, \\; N = \\prod n_i \\\\
-&\\quad m^e < N \\implies m = \\sqrt[e]{C} \\quad\\text{(CRT + integer root)} \\\\
-\\text{Attack 3 -- Franklin-Reiter:} &\\quad f_1(x) = x^e - c_1 \\\\
-&\\quad f_2(x) = (x+\\delta)^e - c_2 \\\\
-&\\quad \\gcd(f_1(x), f_2(x)) = x - m \\;\\text{over } \\mathbb{Z}_n[x] \\qed
+c &\\equiv m^e \\pmod{n} \\\\
+m^e &= c + k \\cdot n \\quad\\text{for some } k \\in \\mathbb{Z}_{\\geq 0} \\\\
+\\therefore m &= \\sqrt[e]{c + k \\cdot n} \\quad\\text{when } k \\text{ is correct} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Small exponents make RSA vulnerable because the modular reduction $m^e \\bmod n$ only occurs when $m^e \\geq n$. If the message is short enough that $m^e < n$, we can simply compute $m = \\sqrt[e]{c}$ over the integers -- no factoring needed. Hastad extends this: if the same message is encrypted to $e$ different recipients (different moduli $n_i$), the Chinese Remainder Theorem lets us reconstruct $m^e$ over $\\mathbb{Z}_{\\prod n_i}$, then take the $e$-th root. Franklin-Reiter handles the case where two plaintexts are related by a known affine relationship $m_2 = a \\cdot m_1 + b$: the GCD of the two polynomials $x^e - c_1$ and $(ax+b)^e - c_2$ reveals $x - m_1$.
+\\textbf{Explanation:} The RSA relation $c \\equiv m^e \\pmod{n}$ is equivalent to $m^e = c + k \\cdot n$ for some integer $k \\geq 0$. When $m^e < n$ (short plaintext), $k = 0$ and $m = \\sqrt[e]{c}$ directly. Otherwise, $k$ is the (unknown) quotient $\\lfloor m^e / n \\rfloor$. For small $e$, this quotient is often small enough to brute-force: we iterate $k = 0, 1, 2, \\ldots$ and check whether $c + k \\cdot n$ is an exact $e$-th power.
 
-\\textbf{References:} J. H\\aa{}stad, "Solving Simultaneous Modular Equations of Low Degree", SIAM J. Comp. 1988; M. Franklin, M. Reiter, "A Linear-Time Attack on RSA with Related Messages", CRYPTO 1996`,priority:`high`,applicableCheck:e=>!!(e.n&&e.e&&e.c)},{id:`multi-prime-gcd`,name:`Multi-Prime GCD`,category:`Factorization`,description:`Finds shared prime factors across multiple RSA moduli using pairwise GCD with pair reporting. Use when two or more moduli may share a common factor.`,inputs:[{name:`moduli_list`,label:`Moduli (one per line)`,placeholder:`Enter multiple moduli, one per line...`,multiline:!0,rows:6}],sageTemplate:()=>`print("Multi-prime GCD requires multiple moduli — run in browser mode")`,proof:`\\textbf{Theorem:} Pairwise GCD among a set of RSA moduli reveals shared prime factors and identifies which moduli share them.
+\\textbf{References:} D. Boneh et al., "Twenty Years of Attacks on the RSA Cryptosystem", Notices AMS 1999`,priority:`high`,applicableCheck:e=>!!(e.n&&e.e&&e.c)},{id:`multi-prime-gcd`,name:`Multi-Prime GCD`,category:`Factorization`,description:`Finds shared prime factors across multiple RSA moduli using pairwise GCD with pair reporting. Use when two or more moduli may share a common factor.`,inputs:[{name:`moduli_list`,label:`Moduli (one per line)`,placeholder:`Enter multiple moduli, one per line...`,multiline:!0,rows:6}],sageTemplate:()=>`print("Multi-prime GCD requires multiple moduli — run in browser mode")`,proof:`\\textbf{Theorem:} Pairwise GCD among a set of RSA moduli reveals shared prime factors and identifies which moduli share them.
 
 \\textbf{Setup:}
 \\begin{itemize}
