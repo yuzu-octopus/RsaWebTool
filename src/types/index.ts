@@ -6,6 +6,7 @@ export interface InputField {
   rows?: number;
   type?: 'text' | 'number' | 'textarea' | 'select';
   required?: boolean;
+  tooltip?: string;
   options?: { label: string; value: string }[];
 }
 

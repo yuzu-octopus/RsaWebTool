@@ -36,6 +36,7 @@ The GCD extracts the shared prime directly — no factorization of either modulu
   // eslint-disable-next-line @typescript-eslint/require-await
   frontendCheck: async (vals: Record<string, string>) => {
     try {
+      if (!vals.n1 || !vals.n2) return 'ERROR: Missing required input: n1 and n2\nCOMMON_PRIME_RSA=FAILED';
       const n1 = BigInt(vals.n1);
       const n2 = BigInt(vals.n2);
       if (n1 < 2n || n2 < 2n) {

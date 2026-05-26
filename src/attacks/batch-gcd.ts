@@ -15,7 +15,7 @@ export const attack: Attack = {
   frontendCheck: async (vals: Record<string, string>) => {
     try {
       const raw = (vals.n_values || '').trim();
-      if (!raw) return null;
+      if (!raw) return 'ERROR: Missing required input: n_values (comma-separated moduli)\nBATCH_GCD=FAILED';
 
       const moduli = raw.split(/[\n,]+/)
         .map(s => s.trim())

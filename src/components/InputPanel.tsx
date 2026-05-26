@@ -88,6 +88,20 @@ export function InputPanel() {
     setOutputError(null);
     const currentAttackId = selectedAttack.id;
     attackIdRef.current = currentAttackId;
+
+    const missingFields = selectedAttack.inputs
+      .filter(f => f.required !== false)
+      .filter(f => !inputValues[f.name]?.trim())
+      .map(f => f.label || f.name);
+    if (missingFields.length > 0) {
+      const msg = `Missing required inputs:\n${missingFields.map(f => `- ${f}`).join('\n')}`;
+      setOutputError(msg);
+      addToHistory(selectedAttack.id, selectedAttack.name, msg, false);
+      setLoading(false);
+      timer.stop();
+      return;
+    }
+
     try {
       if (selectedAttack.frontendCheck) {
         const preResult = await runAttack(selectedAttack.id, inputValues);
@@ -120,8 +134,8 @@ export function InputPanel() {
         showNotification(`${selectedAttack.name}: ${runSuccess ? 'success' : 'failed'}`, runSuccess ? 'success' : 'error');
         if (runSuccess) submitToFactorDB(selectedAttack, result.stdout, inputValues.n, showNotification);
       } else {
-        setOutputError(result.error || 'Unknown error');
-        addToHistory(selectedAttack.id, selectedAttack.name, result.error || 'Unknown error', false);
+        setOutputError(result.error || 'SageCell execution failed with no specific error. Check that all required inputs are filled.');
+        addToHistory(selectedAttack.id, selectedAttack.name, result.error || 'SageCell execution failed with no specific error. Check that all required inputs are filled.', false);
       }
     } catch (err: unknown) {
       if (attackIdRef.current !== currentAttackId) { return; }
@@ -205,14 +219,16 @@ export function InputPanel() {
               <Box key={field.name} sx={{ mb: 2 }}>
                 <TextField
                   fullWidth
-                  label={field.label}
+                  label={field.required === false ? `${field.label} (optional)` : field.label}
                   placeholder={field.placeholder}
                   value={inputValues[field.name] || ''}
                   onChange={e => handleInputChange(field.name, e.target.value)}
                   multiline={field.multiline}
                   rows={field.rows || 1}
+                  required={field.required !== false}
                   variant="outlined"
                   size="small"
+                  helperText={field.tooltip}
                   sx={inputSx}
                 />
               </Box>

@@ -157,7 +157,7 @@ _attack()`,
       const mCeil = divisor > n ? (q * n + divisor - 1n) / divisor : q * n / divisor;
 
       for (let m = mCeil - 2n; m <= mCeil + 2n; m++) {
-        if (m >= 0n && modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}\nbits = ${numBits}\nruns = ${runs.length}\nm (hex) = 0x${m.toString(16)}\nBIASED_LSB=SUCCESS`);
+        if (m >= 0n && modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}\nbits = ${numBits}\nruns = ${runs.length}\nBIASED_LSB=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }

@@ -5,17 +5,21 @@ export const attack: Attack = {
   id: 'non-coprime-exp',
   name: 'Non-Coprime Exponent Attack',
   category: 'Message / Protocol',
-  description: 'Decrypts by finding all e-th roots modulo each prime when gcd(e, phi(n)) > 1. Use when public exponent shares a factor with phi(n).',
+  description: 'Resolves multiple plaintexts when gcd(e, phi(n)) > 1 using known p and q factors. Use after factoring n, when public exponent shares a factor with phi(n).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
-    { name: 'p', label: 'p (prime factor)', placeholder: 'Enter prime factor p...', multiline: true, rows: 3 },
-    { name: 'q', label: 'q (prime factor)', placeholder: 'Enter prime factor q...', multiline: true, rows: 3 },
+    { name: 'p', label: 'p (prime factor)', placeholder: 'Enter prime factor p...', multiline: true, rows: 3, required: false, tooltip: 'Known prime factor of n. Required for e-th root disambiguation.' },
+    { name: 'q', label: 'q (prime factor)', placeholder: 'Enter prime factor q...', multiline: true, rows: 3, required: false, tooltip: 'Known prime factor of n. Required for e-th root disambiguation.' },
   ],
   sageTemplate: (vals: Record<string, string>) => {
-    if (!vals.n || !vals.e || !vals.c || !vals.p || !vals.q) {
-      return `print("ERROR: Missing required inputs (n, e, c, p, q)")
+    if (!vals.n || !vals.e || !vals.c) {
+      return `print("ERROR: Missing required inputs (n, e, c)")
+print("NON_COPRIME_EXP=FAILED")`;
+    }
+    if (!vals.p || !vals.q) {
+      return `print("ERROR: This attack requires p and q to resolve multiple e-th roots. Use factorization attacks first to find p and q.")
 print("NON_COPRIME_EXP=FAILED")`;
     }
     return `def _attack():
@@ -147,7 +151,7 @@ m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\quad \\text{for each pair} \\\\
 
 \\textbf{References:} Williams, 1980; May, "Attacks on RSA with Small Parameters," 2003`,
   priority: 'low',
-  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.p && !!p.q,
+  applicableCheck: (vals: Record<string, string>) => !!vals.n && !!vals.e && !!vals.c,
 };
 
 export const generateTestcase = (): Record<string, string> => {

@@ -40,7 +40,7 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{
   frontendCheck: async (vals: Record<string, string>) => {
     try {
       const raw = (vals.moduli_list || '').trim();
-      if (!raw) return null;
+      if (!raw) return 'ERROR: Missing required input: moduli_list\nMULTI_PRIME_GCD=FAILED';
 
       const moduli = raw.split('\n')
         .map(s => s.trim())

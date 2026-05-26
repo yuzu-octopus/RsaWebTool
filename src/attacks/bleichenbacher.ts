@@ -198,7 +198,7 @@ _attack()`,
 
       // Verify
       for (let m = a; m <= b && m < a + 100n; m++) {
-        if (modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}\nvalid s values = ${validS.length}\ninterval width = ${b - a + 1n}\nm (hex) = 0x${m.toString(16)}\nBLEICHENBACHER=SUCCESS`);
+        if (modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}\nvalid s values = ${validS.length}\ninterval width = ${b - a + 1n}\nBLEICHENBACHER=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }

@@ -38,6 +38,7 @@ p &= \\gcd(\\text{leak} - a, n) \\qed
   // eslint-disable-next-line @typescript-eslint/require-await
   frontendCheck: async (vals: Record<string, string>) => {
     try {
+      if (!vals.n || !vals.a || !vals.leak) return 'ERROR: Missing required input: n, a, or leak\nIMPLICIT_KEY_EXPOSURE=FAILED';
       const n = BigInt(vals.n);
       const a = BigInt(vals.a);
       const leak = BigInt(vals.leak);

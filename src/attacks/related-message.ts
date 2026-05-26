@@ -192,17 +192,7 @@ _attack()`,
         if (invB === null) return Promise.resolve(null);
         const m = ((-Cnorm % n) + n) % n * invB % n;
         if (modPow(m, e, n) === c1) {
-          const fmt = (val: bigint): string => {
-            const hex = val.toString(16);
-            try {
-              const padded = hex.length % 2 ? '0' + hex : hex;
-              const bytes = new Uint8Array(padded.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
-              return `Recovered m = ${val}\nm (hex) = 0x${hex}\nm (text) = ${new TextDecoder().decode(bytes)}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`;
-            } catch {
-              return `Recovered m = ${val}\nm (hex) = 0x${hex}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`;
-            }
-          };
-          return Promise.resolve(fmt(m));
+          return Promise.resolve(`Recovered m = ${m}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
         }
         return Promise.resolve(null);
       }
@@ -218,14 +208,7 @@ _attack()`,
       const m = (numer * invDenom) % n;
 
       if (modPow(m, e, n) === c1) {
-        const hex = m.toString(16);
-        try {
-          const padded = hex.length % 2 ? '0' + hex : hex;
-          const bytes = new Uint8Array(padded.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
-          return Promise.resolve(`Recovered m = ${m}\nm (hex) = 0x${hex}\nm (text) = ${new TextDecoder().decode(bytes)}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
-        } catch {
-          return Promise.resolve(`Recovered m = ${m}\nm (hex) = 0x${hex}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
-        }
+        return Promise.resolve(`Recovered m = ${m}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }

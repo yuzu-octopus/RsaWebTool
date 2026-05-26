@@ -6,12 +6,25 @@ export const attack: Attack = {
   id: 'phi-leak',
   name: 'Phi(n) Leak',
   category: 'Partial Key / Lattice',
-  description: 'Factors n immediately when φ(n) is known via quadratic formula. Use when Euler\'s totient φ(n) has been leaked or computed.',
+  description: 'Factors n immediately when φ(n) has been leaked, via quadratic formula. Use when Euler\'s totient φ(n) is known from side-channel leakage.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
-    { name: 'phi', label: 'phi(n) (Euler totient)', placeholder: 'Enter phi(n)...', multiline: true, rows: 3 },
+    { name: 'phi', label: 'phi(n) (Euler totient)', placeholder: 'Enter phi(n)...', multiline: true, rows: 3, required: false, tooltip: 'Enter the leaked φ(n) value, if known from side-channel or other leakage' },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
+  sageTemplate: (vals: Record<string, string>) => {
+    const nStr = vals.n ?? '';
+    const phiStr = vals.phi ?? '';
+    return `def _attack():
+    if not ${JSON.stringify(nStr)}.strip():
+        print("Missing required input: n")
+        print("PHI_LEAK=FAILED")
+        return
+    if not ${JSON.stringify(phiStr)}.strip():
+        print("This attack requires a leaked φ(n) value.")
+        print("Found n: ${vals.n} but φ(n) is missing.")
+        print("With n alone, the modulus cannot be factored. The φ(n) value must be provided as a second input.")
+        print("PHI_LEAK=FAILED")
+        return
     try:
         try:
             n = Integer(${vals.n})
@@ -61,9 +74,11 @@ export const attack: Attack = {
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("PHI_LEAK=FAILED")
-_attack()`,
+_attack()`;
+  },
   // eslint-disable-next-line @typescript-eslint/require-await
   frontendCheck: async (vals: Record<string, string>) => {
+    if (!vals.n || !vals.phi) return null;
     try {
       const n = BigInt(vals.n);
       const phi = BigInt(vals.phi);
@@ -129,7 +144,7 @@ p, q &= \\frac{s \\pm \\sqrt{\\Delta}}{2} \\qed
 
 \\textbf{References:} Rivest, Shamir, Adleman, "A Method for Obtaining Digital Signatures and Public-Key Cryptosystems", 1978; Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2`,
   priority: 'high',
-  applicableCheck: (p: Record<string, string>) => !!(p.n && p.phi),
+  applicableCheck: (p: Record<string, string>) => !!p.n,
 };
 
 export const generateTestcase = (): Record<string, string> => {

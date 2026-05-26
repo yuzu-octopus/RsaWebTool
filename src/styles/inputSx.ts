@@ -17,4 +17,11 @@ export const inputSx = {
   '& .MuiInputBase-input': {
     fontFamily: "'JetBrains Mono', monospace",
   },
+  '& .MuiFormHelperText-root': {
+    color: draculaColors.comment,
+    fontFamily: "'JetBrains Mono', monospace",
+    fontSize: '0.7rem',
+    marginLeft: 0,
+    marginTop: '2px',
+  },
 };
