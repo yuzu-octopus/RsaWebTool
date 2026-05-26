@@ -123,7 +123,7 @@ _attack()`,
           }
         }
         if (d === 1n && pollardIter >= maxPollardIter) {
-          return Promise.resolve(null);
+          continue; // try next c value
         }
       }
       return Promise.resolve(null);

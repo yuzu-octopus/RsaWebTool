@@ -18,6 +18,7 @@ import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useSageMathParallel, DEFAULT_SAGE_TIMEOUT } from '../hooks/useSageMath';
 import { useTimer } from '../hooks/useTimer';
+import { useWorkerPool } from '../hooks/useWorkerPool';
 import { attacks, submitToFactorDB, autoDecrypt } from '../attacks';
 import { detectFormat, parsePEM } from '../utils/converters';
 import { generateKeyPair, encrypt, TESTCASE_BITS } from '../utils/testcases/core';
@@ -145,6 +146,7 @@ export function MagicPanel() {
   const [errorInsights, setErrorInsights] = useState<string | null>(null);
   const testcaseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timer = useTimer();
+  const { runAttack } = useWorkerPool();
 
   useEffect(() => {
     return () => {
@@ -211,9 +213,8 @@ export function MagicPanel() {
 
     // Run all frontendChecks concurrently, updating job status as each completes
     const preCheckPromises = applicable.map(async (a, i) => {
-      if (!a.frontendCheck) return null;
       try {
-        const result = await a.frontendCheck(params);
+        const result = await runAttack(a.id, params);
         if (result !== null) {
           const isSuccess = isActualSuccess(result);
           setJobs(prev => {

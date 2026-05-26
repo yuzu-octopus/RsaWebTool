@@ -13,6 +13,7 @@ import { Stop, Casino } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useSageMath, DEFAULT_SAGE_TIMEOUT } from '../hooks/useSageMath';
+import { useWorkerPool } from '../hooks/useWorkerPool';
 import { ProofRenderer } from './ProofRenderer';
 import { testcaseGenerators, submitToFactorDB, autoDecrypt } from '../attacks';
 import { isActualSuccess } from '../utils/sage-output';
@@ -31,6 +32,7 @@ export function InputPanel() {
   const mountedRef = useRef(true);
   const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const timer = useTimer();
+  const { runAttack } = useWorkerPool();
   useEffect(() => {
     mountedRef.current = true;
     return () => {
@@ -87,7 +89,7 @@ export function InputPanel() {
     attackIdRef.current = currentAttackId;
     try {
       if (selectedAttack.frontendCheck) {
-        const preResult = await selectedAttack.frontendCheck(inputValues);
+        const preResult = await runAttack(selectedAttack.id, inputValues);
         if (preResult !== null) {
           if (attackIdRef.current !== currentAttackId) return;
           let displayPreResult = preResult;
