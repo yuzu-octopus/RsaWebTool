@@ -12,7 +12,7 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
-    { name: 'bound', label: 'bound (max d_p, optional)', placeholder: 'Default 5000000', multiline: false },
+    { name: 'bound', label: 'bound (max d_p, optional)', placeholder: 'Default 5000000', required: false, multiline: false },
   ],
   sageTemplate: (vals: Record<string, string>) => `import math
 def _attack():

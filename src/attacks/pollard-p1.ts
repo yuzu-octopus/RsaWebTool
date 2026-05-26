@@ -8,8 +8,8 @@ export const attack: Attack = {
   description: 'Factors n when a prime factor p has p-1 that is B1-smooth, with Stage 2 extending to one larger factor. Use when small prime factors may be smooth.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
-    { name: 'B', label: 'B1 (stage 1 bound, optional)', placeholder: '10000', multiline: false },
-    { name: 'B2', label: 'B2 (stage 2 bound, optional)', placeholder: '0 (disabled)', multiline: false },
+    { name: 'B', label: 'B1 (stage 1 bound, optional)', placeholder: '10000', required: false, multiline: false },
+    { name: 'B2', label: 'B2 (stage 2 bound, optional)', placeholder: '0 (disabled)', required: false, multiline: false },
   ],
   sageTemplate: (vals: Record<string, string>) => `import math
 def _attack():

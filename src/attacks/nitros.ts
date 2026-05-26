@@ -9,7 +9,7 @@ export const attack: Attack = {
   description: 'Factors RSA keys with generalized ROCA primes p = k·M + (a^i mod M) for arbitrary generator a. Use when prime generation follows a ROCA-like pattern with non-standard base.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
-    { name: 'base', label: 'Base (default 65537)', placeholder: '65537', multiline: false },
+    { name: 'base', label: 'Base (default 65537)', placeholder: '65537', required: false, multiline: false },
   ],
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:

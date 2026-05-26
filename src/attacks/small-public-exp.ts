@@ -10,7 +10,7 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: '3' },
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
-    { name: 'k_bound', label: 'k bound (c + k*n iterations)', placeholder: '100000' },
+    { name: 'k_bound', label: 'k bound (c + k*n iterations)', placeholder: '100000', required: false },
   ],
   sageTemplate: (vals: Record<string, string>) => {
     if (!vals.n || !vals.c) {
