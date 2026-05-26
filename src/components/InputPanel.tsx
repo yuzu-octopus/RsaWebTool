@@ -16,6 +16,7 @@ import { ProofRenderer } from './ProofRenderer';
 import { testcaseGenerators, submitToFactorDB, autoDecrypt } from '../attacks';
 import { isActualSuccess } from '../utils/sage-output';
 import { inputSx } from '../styles/inputSx';
+import { useTimer } from '../hooks/useTimer';
 
 export function InputPanel() {
   const { selectedAttack, viewMode, setOutputResult, setOutputError, addToHistory, showNotification } = useAppContext();
@@ -28,6 +29,7 @@ export function InputPanel() {
   const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
   const mountedRef = useRef(true);
   const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const timer = useTimer();
   useEffect(() => {
     mountedRef.current = true;
     return () => {
@@ -77,6 +79,7 @@ export function InputPanel() {
     const controller = new AbortController();
     abortControllerRef.current = controller;
     setLoading(true);
+    timer.start();
     setOutputResult(null);
     setOutputError(null);
     const currentAttackId = selectedAttack.id;
@@ -94,6 +97,7 @@ export function InputPanel() {
           const preSuccess = isActualSuccess(preResult);
           showNotification(`${selectedAttack.name}: ${preSuccess ? 'success' : 'failed'}`, preSuccess ? 'success' : 'error');
           if (preSuccess) submitToFactorDB(selectedAttack, preResult, inputValues.n, showNotification);
+          timer.stop();
           setLoading(false);
           return;
         }
@@ -122,6 +126,7 @@ export function InputPanel() {
       addToHistory(selectedAttack.id, selectedAttack.name, message, false);
     } finally {
       if (attackIdRef.current === currentAttackId) {
+        timer.stop();
         setLoading(false);
         abortControllerRef.current = null;
       }
@@ -241,7 +246,7 @@ export function InputPanel() {
                 </Button>
                 <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
                   <CircularProgress size={16} data-testid="loading-spinner" sx={{ color: draculaColors.orange }} />
-                  Running... click Stop to cancel
+                  Running... {timer.formatted}
                 </Typography>
               </>
             ) : (
