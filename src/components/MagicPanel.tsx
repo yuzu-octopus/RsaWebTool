@@ -17,6 +17,7 @@ import { AutoFixHigh, Science, CheckCircle, Cancel, HourglassEmpty, SkipNext, St
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useSageMathParallel, DEFAULT_SAGE_TIMEOUT } from '../hooks/useSageMath';
+import { useTimer } from '../hooks/useTimer';
 import { attacks, submitToFactorDB, autoDecrypt } from '../attacks';
 import { detectFormat, parsePEM } from '../utils/converters';
 import { generateKeyPair, encrypt, TESTCASE_BITS } from '../utils/testcases/core';
@@ -143,6 +144,7 @@ export function MagicPanel() {
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
   const [errorInsights, setErrorInsights] = useState<string | null>(null);
   const testcaseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timer = useTimer();
 
   useEffect(() => {
     return () => {
@@ -190,6 +192,7 @@ export function MagicPanel() {
     const controller = createController();
     abortControllerRef.current = controller;
     setRunning(true);
+    timer.start();
     setJobs([]);
     setEarlyStop(false);
     setOutputResult(null);
@@ -252,6 +255,7 @@ export function MagicPanel() {
     if (remaining.length === 0) {
       if (currentRunId !== runIdRef.current) return;
       setRunning(false);
+      timer.stop();
       abortControllerRef.current = null;
       const firstSuccess = preCheckResults.find(r => r?.isSuccess);
       if (firstSuccess && firstSuccess.result) {
@@ -327,6 +331,7 @@ export function MagicPanel() {
       setOutputError(message);
     } finally {
       if (currentRunId === runIdRef.current) {
+        timer.stop();
         setRunning(false);
         abortControllerRef.current = null;
       }
@@ -540,8 +545,7 @@ export function MagicPanel() {
               />
               <Typography variant="body2" sx={{ color: draculaColors.purple, mt: 1, textAlign: 'center', fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
                 <CircularProgress size={16} sx={{ color: draculaColors.purple }} />
-                {jobs.filter(j => j.status !== 'running').length}/{jobs.length} completed
-                {jobs.filter(j => j.status === 'running').length > 0 && `, ${jobs.filter(j => j.status === 'running').length} running`}
+                Elapsed: {timer.formatted} — {jobs.filter(j => j.status !== 'running').length}/{jobs.length} completed
               </Typography>
             </Box>
           )}
