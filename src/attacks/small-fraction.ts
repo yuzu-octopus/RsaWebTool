@@ -7,11 +7,18 @@ const numGcd = (a: number, b: number): number => {
   return a;
 };
 
+// Precomputed BigInt offsets for the delta window to avoid BigInt(delta) per iteration
+const DELTA_WINDOW = 2000;
+const offsets: bigint[] = [];
+for (let d = -DELTA_WINDOW; d <= DELTA_WINDOW; d++) {
+  offsets.push(BigInt(d));
+}
+
 export const attack: Attack = {
   id: 'small-fraction',
   name: 'Small Fraction Attack',
   category: 'Factorization',
-  description: "Factors n when p/q approximates a small rational a/b by solving for q and testing candidates via trial division. Use when p/q is close to a simple fraction.",
+  description: "Factors n when p/q approximates a small rational a/b using parity-optimized trial division over the search window. Use when p/q is close to a simple fraction with denominator ≤ 100.",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -137,6 +144,9 @@ _attack()`,
       const n = BigInt(vals.n);
       if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}\nSMALL_FRACTION=SUCCESS`);
 
+      // n is odd (product of odd primes) — skip even q candidates
+      const isOdd = (x: bigint): boolean => (x & 1n) !== 0n;
+
       for (let b = 1; b <= 100; b++) {
         if (onProgress) {
           onProgress(Math.round((b - 1) * 100 / 100));
@@ -144,9 +154,11 @@ _attack()`,
         for (let a = 1; a <= b; a++) {
           if (numGcd(a, b) !== 1) continue;
           const q0 = isqrt(n * BigInt(b) / BigInt(a));
-          for (let delta = -2000; delta <= 2000; delta++) {
-            const q = q0 + BigInt(delta);
-            if (q > 1n && n % q === 0n) {
+          if (q0 <= 1n) continue;
+          // Use precomputed offsets + skip even q (n is odd, can't have even divisor)
+          for (const offset of offsets) {
+            const q = q0 + offset;
+            if (isOdd(q) && n % q === 0n) {
               const p = n / q;
               if (p > 1n) {
                 onProgress?.(100);
@@ -159,12 +171,13 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} If $p/q \\approx a/b$ for small coprime $a, b$, then $q \\approx \\sqrt{nb/a}$ and trial division near $q_0$ recovers the factor.
+  usageGuide: 'This attack factors n when the ratio of its two prime factors p/q is close to a simple fraction a/b with small denominator (≤ 100).\n\nHow it works:\n1. For each coprime pair (a,b) with 1 ≤ b ≤ 100 and 1 ≤ a ≤ b, estimate q₀ ≈ √(n·b/a)\n2. Test q₀ ± 2000 for divisibility: if q | n then p = n/q recovers both factors\n3. Since n is odd (product of two odd primes), even q can never divide n — a single-bit (q & 1) check skips ~50% of BigInt divisions\n4. Precomputed offset BigInts avoid per-iteration allocation overhead\n\nTip: Works in-browser (frontendCheck) for any n. Falls back to SageMathCell for larger systematic searches. Testcase generated with a=3, b=5 for immediate verification.',
+  proof: `\\textbf{Theorem:} If $p/q \\approx a/b$ for small coprime $a, b$, then $q \\approx \\sqrt{nb/a}$ and parity-optimized trial division near $q_0$ recovers the factor.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $n = pq$
-\\item $p/q \\approx a/b$, with $\\gcd(a,b) = 1$ and $a,b$ small
+\\item $n = pq$, with $p,q$ odd primes
+\\item $p/q \\approx a/b$, $\\gcd(a,b) = 1$, $1 \\leq b \\leq 100$
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -172,12 +185,14 @@ _attack()`,
 \\frac{p}{q} &\\approx \\frac{a}{b} \\\\
 n = pq &\\approx \\frac{a}{b} q^2 \\\\
 q_0 &= \\left\\lfloor\\sqrt{\\frac{nb}{a}}\\right\\rfloor \\\\
-\\text{Trial divide } q_0 \\pm k &\\text{ for small } k \\\\
-\\text{Search space: } 1 \\leq b &\\leq B, \\; 1 \\leq a \\leq b, \\; \\gcd(a,b) = 1 \\\\
-\\text{Complexity: } O(B^2 \\cdot \\Delta) &\\text{ divisions}
+\\text{Search } q_0 \\pm k\\text{ for } &|k| \\leq 2000,\\; k \\in \\mathbb{Z} \\\\
+\\text{Even } q\\text{ cannot divide odd } n &\\implies \\text{skip } q \\equiv 0 \\pmod{2} \\\\
+\\text{Search space: } 1 \\leq b &\\leq 100,\\; 1 \\leq a \\leq b,\\; \\gcd(a,b) = 1 \\\\
+\\text{Complexity: } O(B^2 \\cdot \\Delta) & \\text{ with }\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!
+\\text{ parity filter: } \\frac{1}{2}\\text{ fewer divisions}
 \\end{align*}
 
-\\textbf{Explanation:} When $p \\approx (a/b) \\cdot q$, substituting into $n = pq$ gives $q^2 \\approx nb/a$. We compute $q_0 = \\lfloor\\sqrt{nb/a}\\rfloor$ for each candidate fraction $a/b$ and test the surrounding window for an exact divisor of $n$. Because $a, b$ are constrained to be small (denominator $\\leq 50$), the search is efficient.
+\\textbf{Explanation:} When $p \\approx (a/b) \\cdot q$, substituting into $n = pq$ gives $q^2 \\approx nb/a$. We compute $q_0 = \\lfloor\\sqrt{nb/a}\\rfloor$ for each coprime $a,b$ and test $q_0 \\pm 2000$ for an exact divisor of $n$. Since $n$ is odd (product of odd primes), even candidates can never divide $n$ and are skipped via a $\\& 1$ bit check — cutting the effective trial division count in half. Precomputed BigInt offsets avoid per-iteration allocation. The search examines $\\approx 5050$ fraction pairs, each with $4001$ delta candidates, halved to $\\approx 10$M BigInt divisions worst-case.
 
 \\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,
   priority: 'medium',

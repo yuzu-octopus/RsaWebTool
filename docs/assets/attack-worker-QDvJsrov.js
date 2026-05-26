@@ -463,7 +463,7 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
 
 \\textbf{Explanation:} Pollard's $p-1$ method exploits Fermat's Little Theorem: if $p-1$ divides $M = \\operatorname{lcm}(1,\\ldots,B_1)$, then $a^M \\equiv 1 \\pmod{p}$, so $\\gcd(a^M-1, n)$ reveals $p$. Stage 1 computes $a^M$ by raising $a$ to each prime power $\\leq B_1$. Stage 2 handles the case where $p-1$ has one prime factor between $B_1$ and $B_2$.
 
-\\textbf{References:} J. M. Pollard, "Theorems on Factorization and Primality Testing", Proc. Cambridge Philos. Soc., 1974`,priority:`medium`,applicableCheck:e=>!!e.n},I={id:`pollard-rho`,name:`Pollard's Rho (Brent variant)`,category:`Factorization`,description:`Factors n via birthday paradox with Brent's cycle detection and batched GCD reduction. Use for general-purpose factorization of medium-sized factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} J. M. Pollard, "Theorems on Factorization and Primality Testing", Proc. Cambridge Philos. Soc., 1974`,priority:`medium`,applicableCheck:e=>!!e.n},te={id:`pollard-rho`,name:`Pollard's Rho (Brent variant)`,category:`Factorization`,description:`Factors n via birthday paradox with Brent's cycle detection and batched GCD reduction. Use for general-purpose factorization of medium-sized factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     import math
     try:
         try:
@@ -573,7 +573,7 @@ p &\\mid (x_i - x_j) \\\\
 
 \\textbf{Explanation:} Pollard's rho uses $f(x) = x^2 + c$ to generate a sequence that eventually cycles modulo $p$. Brent's cycle detection compares each value against a saved snapshot at powers of two, requiring only one evaluation per step instead of Floyd's three. Batched GCD reduces overhead by accumulating $m$ differences into one product before each GCD call. If the accumulated product contains $n$ as a factor, backtracking identifies the exact step.
 
-\\textbf{References:} J. M. Pollard, "A Monte Carlo Method for Factorization", BIT 1975; R. P. Brent, "An Improved Monte Carlo Factorization Algorithm", BIT 1980`,priority:`medium`,applicableCheck:e=>!!e.n},L={id:`williams-p1`,name:`Williams' p+1 Method`,category:`Factorization`,description:`Factors n when p+1 is B1-smooth using Lucas sequences V_k(P,1). Stage 2 extends to handle one larger prime factor beyond B1. Use when Pollard p-1 fails.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B1 (stage 1 bound, optional)`,placeholder:`10000`,required:!1,multiline:!1},{name:`B2`,label:`B2 (stage 2 bound, optional)`,placeholder:`0 (disabled)`,required:!1,multiline:!1}],sageTemplate:e=>`def _attack():
+\\textbf{References:} J. M. Pollard, "A Monte Carlo Method for Factorization", BIT 1975; R. P. Brent, "An Improved Monte Carlo Factorization Algorithm", BIT 1980`,priority:`medium`,applicableCheck:e=>!!e.n},I={id:`williams-p1`,name:`Williams' p+1 Method`,category:`Factorization`,description:`Factors n when p+1 is B1-smooth using Lucas sequences V_k(P,1). Stage 2 extends to handle one larger prime factor beyond B1. Use when Pollard p-1 fails.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B1 (stage 1 bound, optional)`,placeholder:`10000`,required:!1,multiline:!1},{name:`B2`,label:`B2 (stage 2 bound, optional)`,placeholder:`0 (disabled)`,required:!1,multiline:!1}],sageTemplate:e=>`def _attack():
     try:
         n = Integer(${e.n})
         #
@@ -758,7 +758,7 @@ V_M &= \\alpha^M + \\alpha^{-M} \\equiv 2 \\pmod{p} \\\\
 
 \\textbf{Explanation:} Like Pollard's p-1 but for factors where $p+1$ is smooth. The Lucas sequence $V_k$ lives in the quadratic extension $\\mathbb{F}_{p^2}$, where the multiplicative order divides $p+1$. When $(D/p) = -1$, the element $\\alpha$ has norm 1 and satisfies $\\alpha^{p+1} = 1$, so if $p+1 \\mid M$ then $V_M \\equiv 2 \\pmod{p}$. Stage 2 catches the case where $p+1$ has one large prime factor beyond $B1$ by checking multiples of $M$.
 
-\\textbf{References:} H. C. Williams, "A p+1 Method of Factoring", Mathematics of Computation, 1982`,priority:`medium`,applicableCheck:e=>!!e.n},R={id:`quadratic-sieve`,name:`Quadratic Sieve`,category:`Factorization`,description:`Factors n by finding congruent squares via smoothness over a factor base. Use for medium-sized semiprimes (< 100 digits) with similar-sized factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} H. C. Williams, "A p+1 Method of Factoring", Mathematics of Computation, 1982`,priority:`medium`,applicableCheck:e=>!!e.n},L={id:`quadratic-sieve`,name:`Quadratic Sieve`,category:`Factorization`,description:`Factors n by finding congruent squares via smoothness over a factor base. Use for medium-sized semiprimes (< 100 digits) with similar-sized factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         n = Integer(${e.n})
         #
@@ -907,7 +907,7 @@ X^2 &\\equiv Y^2 \\pmod{n} \\\\
 
 \\textbf{Explanation:} The QS finds many integers $x$ where $Q(x)$ factors completely over the factor base (a "smooth" number). Each smooth $Q(x)$ gives an exponent vector modulo 2. A linear dependency among these vectors means the product of the corresponding $Q(x_i)$ values is a perfect square. Since $Q(x) \\equiv (x+m)^2 \\pmod{n}$, we get $X^2 \\equiv Y^2 \\pmod{n}$ with $X \\not\\equiv \\pm Y \\pmod{n}$ about half the time, yielding a factor via GCD.
 
-\\textbf{References:} C. Pomerance, "The Quadratic Sieve Factoring Algorithm", Eurocrypt 1984`,priority:`high`,applicableCheck:e=>!!e.n},z={id:`squfof`,name:`SQUFOF`,category:`Factorization`,description:`Factors n by finding a square form in the cycle of reduced binary quadratic forms. Use for n < 10^14 (faster than trial division for medium-sized factors).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} C. Pomerance, "The Quadratic Sieve Factoring Algorithm", Eurocrypt 1984`,priority:`high`,applicableCheck:e=>!!e.n},R={id:`squfof`,name:`SQUFOF`,category:`Factorization`,description:`Factors n by finding a square form in the cycle of reduced binary quadratic forms. Use for n < 10^14 (faster than trial division for medium-sized factors).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -1052,7 +1052,7 @@ The algorithm searches the forward cycle for a square $c_i$, then starts a rever
 
 \\textbf{Explanation:} SQUFOF (SQUare FOrm Factorization) exploits the structure of the class group of binary quadratic forms. The key insight is that when discriminant $D$ corresponds to a composite $n = pq$, the cycle of reduced forms contains a square form whose square root reveals one prime factor. It works well for $n < 10^{14}$ and requires no large-integer arithmetic beyond GCD.
 
-\\textbf{References:} Shanks, 1975; Gower \\& Wagstaff, Math. Comp., 2008`,priority:`medium`,applicableCheck:e=>!!e.n},B={id:`binary-poly-factor`,name:`Binary Polynomial Factoring`,category:`Factorization`,description:`Factors n by factoring its binary representation as a polynomial over Z[x] and evaluating at x=2. Use when the binary convolution of p and q has no carries.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Shanks, 1975; Gower \\& Wagstaff, Math. Comp., 2008`,priority:`medium`,applicableCheck:e=>!!e.n},z={id:`binary-poly-factor`,name:`Binary Polynomial Factoring`,category:`Factorization`,description:`Factors n by factoring its binary representation as a polynomial over Z[x] and evaluating at x=2. Use when the binary convolution of p and q has no carries.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -1162,7 +1162,7 @@ If the binary convolution of $p$ and $q$ produces no carries, then $f_{pq}(x) = 
 
 \\textbf{Explanation:} When multiplying two integers whose binary representations trigger no carries (i.e., every bit position gets at most one 1 from each factor), the binary polynomial of the product equals the product of the binary polynomials. Factoring this polynomial over $\\mathbb{Z}[x]$ and evaluating at $x = 2$ recovers the original integers. This is a rare special case but works instantly when applicable.
 
-\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen \\& Gerhard, "Modern Computer Algebra", Chapter 5`,priority:`low`,applicableCheck:e=>!!e.n},V=(e,t)=>{for(;t;)[e,t]=[t,e%t];return e},H={id:`small-fraction`,name:`Small Fraction Attack`,category:`Factorization`,description:`Factors n when p/q approximates a small rational a/b by solving for q and testing candidates via trial division. Use when p/q is close to a simple fraction.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen \\& Gerhard, "Modern Computer Algebra", Chapter 5`,priority:`low`,applicableCheck:e=>!!e.n},B=(e,t)=>{for(;t;)[e,t]=[t,e%t];return e},V=[];for(let e=-2e3;e<=2e3;e++)V.push(BigInt(e));let H={id:`small-fraction`,name:`Small Fraction Attack`,category:`Factorization`,description:`Factors n when p/q approximates a small rational a/b using parity-optimized trial division over the search window. Use when p/q is close to a simple fraction with denominator ≤ 100.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
 def _attack():
     try:
         n = Integer(${e.n})
@@ -1277,12 +1277,20 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("SMALL_FRACTION=FAILED")
-_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${n/2n}\nSMALL_FRACTION=SUCCESS`);for(let e=1;e<=100;e++){t&&t(Math.round((e-1)*100/100));for(let r=1;r<=e;r++){if(V(r,e)!==1)continue;let i=k(n*BigInt(e)/BigInt(r));for(let a=-2e3;a<=2e3;a++){let o=i+BigInt(a);if(o>1n&&n%o===0n){let i=n/o;if(i>1n)return t?.(100),Promise.resolve(`Factor found!\np = ${i}\nq = ${o}\nUsing a=${r}, b=${e}\nSMALL_FRACTION=SUCCESS`)}}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $p/q \\approx a/b$ for small coprime $a, b$, then $q \\approx \\sqrt{nb/a}$ and trial division near $q_0$ recovers the factor.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${n/2n}\nSMALL_FRACTION=SUCCESS`);let r=e=>(e&1n)!=0n;for(let e=1;e<=100;e++){t&&t(Math.round((e-1)*100/100));for(let i=1;i<=e;i++){if(B(i,e)!==1)continue;let a=k(n*BigInt(e)/BigInt(i));if(!(a<=1n))for(let o of V){let s=a+o;if(r(s)&&n%s===0n){let r=n/s;if(r>1n)return t?.(100),Promise.resolve(`Factor found!\np = ${r}\nq = ${s}\nUsing a=${i}, b=${e}\nSMALL_FRACTION=SUCCESS`)}}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},usageGuide:`This attack factors n when the ratio of its two prime factors p/q is close to a simple fraction a/b with small denominator (≤ 100).
+
+How it works:
+1. For each coprime pair (a,b) with 1 ≤ b ≤ 100 and 1 ≤ a ≤ b, estimate q₀ ≈ √(n·b/a)
+2. Test q₀ ± 2000 for divisibility: if q | n then p = n/q recovers both factors
+3. Since n is odd (product of two odd primes), even q can never divide n — a single-bit (q & 1) check skips ~50% of BigInt divisions
+4. Precomputed offset BigInts avoid per-iteration allocation overhead
+
+Tip: Works in-browser (frontendCheck) for any n. Falls back to SageMathCell for larger systematic searches. Testcase generated with a=3, b=5 for immediate verification.`,proof:`\\textbf{Theorem:} If $p/q \\approx a/b$ for small coprime $a, b$, then $q \\approx \\sqrt{nb/a}$ and parity-optimized trial division near $q_0$ recovers the factor.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $n = pq$
-\\item $p/q \\approx a/b$, with $\\gcd(a,b) = 1$ and $a,b$ small
+\\item $n = pq$, with $p,q$ odd primes
+\\item $p/q \\approx a/b$, $\\gcd(a,b) = 1$, $1 \\leq b \\leq 100$
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -1290,12 +1298,14 @@ _attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=
 \\frac{p}{q} &\\approx \\frac{a}{b} \\\\
 n = pq &\\approx \\frac{a}{b} q^2 \\\\
 q_0 &= \\left\\lfloor\\sqrt{\\frac{nb}{a}}\\right\\rfloor \\\\
-\\text{Trial divide } q_0 \\pm k &\\text{ for small } k \\\\
-\\text{Search space: } 1 \\leq b &\\leq B, \\; 1 \\leq a \\leq b, \\; \\gcd(a,b) = 1 \\\\
-\\text{Complexity: } O(B^2 \\cdot \\Delta) &\\text{ divisions}
+\\text{Search } q_0 \\pm k\\text{ for } &|k| \\leq 2000,\\; k \\in \\mathbb{Z} \\\\
+\\text{Even } q\\text{ cannot divide odd } n &\\implies \\text{skip } q \\equiv 0 \\pmod{2} \\\\
+\\text{Search space: } 1 \\leq b &\\leq 100,\\; 1 \\leq a \\leq b,\\; \\gcd(a,b) = 1 \\\\
+\\text{Complexity: } O(B^2 \\cdot \\Delta) & \\text{ with }\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!\\!
+\\text{ parity filter: } \\frac{1}{2}\\text{ fewer divisions}
 \\end{align*}
 
-\\textbf{Explanation:} When $p \\approx (a/b) \\cdot q$, substituting into $n = pq$ gives $q^2 \\approx nb/a$. We compute $q_0 = \\lfloor\\sqrt{nb/a}\\rfloor$ for each candidate fraction $a/b$ and test the surrounding window for an exact divisor of $n$. Because $a, b$ are constrained to be small (denominator $\\leq 50$), the search is efficient.
+\\textbf{Explanation:} When $p \\approx (a/b) \\cdot q$, substituting into $n = pq$ gives $q^2 \\approx nb/a$. We compute $q_0 = \\lfloor\\sqrt{nb/a}\\rfloor$ for each coprime $a,b$ and test $q_0 \\pm 2000$ for an exact divisor of $n$. Since $n$ is odd (product of odd primes), even candidates can never divide $n$ and are skipped via a $\\& 1$ bit check — cutting the effective trial division count in half. Precomputed BigInt offsets avoid per-iteration allocation. The search examines $\\approx 5050$ fraction pairs, each with $4001$ delta candidates, halved to $\\approx 10$M BigInt divisions worst-case.
 
 \\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,priority:`medium`,applicableCheck:e=>!!e.n},U={id:`batch-gcd`,name:`Batch GCD`,category:`Factorization`,description:`Finds shared prime factors across a list of RSA moduli by computing gcd of each against the product of all others. Use when multiple moduli may share primes.`,inputs:[{name:`n_values`,label:`Moduli (one per line or comma-separated)`,placeholder:`n1\\nn2\\nn3...`,multiline:!0,rows:5}],sageTemplate:()=>`print("Batch GCD requires multiple moduli — run in browser mode")`,frontendCheck:async e=>{try{let t=(e.n_values||``).trim();if(!t)return`ERROR: Missing required input: n_values (comma-separated moduli)
 BATCH_GCD=FAILED`;let n=t.split(/[\n,]+/).map(e=>e.trim()).filter(e=>e.length>0).map(e=>BigInt(e));if(n.length<2)return null;let r=1n;for(let e of n)r*=e;let i=[`Batch GCD Attack (browser-side, BigInt)`,`Processing ${n.length} moduli...`,``],a=!1;for(let e=0;e<n.length;e++){let t=n[e];if(t<=1n)continue;let o=O(t,r/t);if(o>1n&&o<t){a=!0;let n=o,r=t/o;i.push(`n[${e}] = ${t}`),i.push(`  Shared factor found: p = ${n}`),i.push(`  q = ${r}`),i.push(`  Verification: p * q = ${n*r}`),i.push(``)}else o===t&&(i.push(`n[${e}] = ${t}`),i.push(`  WARNING: n divides product of others (duplicate or fully shared)`),i.push(``))}return a?(i.push(`Batch GCD complete.`),i.push(`BATCH_GCD=SUCCESS`),i.join(`
@@ -2299,7 +2309,7 @@ How to use:
 2. Provide n, knownBits, and bitPosition (\\"msb\\" or \\"lsb\\")
 3. The attack uses Coppersmith\\'s method to find the missing bits
 
-Tip: This is inherently probabilistic — the lattice may fail even with the right inputs. Try with more known bits if it fails. bitPosition=msb = known high bits, lsb = known low bits.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},Q=5000n,$=[P,F,ee,I,L,R,z,B,H,U,W,G,K,q,{id:`euler`,name:`Euler Factorization`,category:`Factorization`,description:`Factors n by finding two distinct representations as a sum of squares a^2+b^2 = c^2+d^2 = n. Use when both primes are ≡ 1 (mod 4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+Tip: This is inherently probabilistic — the lattice may fail even with the right inputs. Try with more known bits if it fails. bitPosition=msb = known high bits, lsb = known low bits.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},Q=5000n,$=[P,F,ee,te,I,L,R,z,H,U,W,G,K,q,{id:`euler`,name:`Euler Factorization`,category:`Factorization`,description:`Factors n by finding two distinct representations as a sum of squares a^2+b^2 = c^2+d^2 = n. Use when both primes are ≡ 1 (mod 4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -5051,4 +5061,4 @@ c1, n1
 c2, n2
 c3, n3
 
-Tip: For convenience, paste this into Magic Mode which auto-detects the format. Works when m^e < n1*n2*...*ne.`,priority:`high`,applicableCheck:e=>!!e.e&&!!e.ciphertexts}],te=[`Factorization`,`Partial Key / Lattice`,`Message / Protocol`,`Oracle`,`Advanced`],ne=new Map;for(let e of te)ne.set(e,$.filter(t=>t.category===e));n(`https://factordb-proxy.octopusyuzu.workers.dev`),self.onmessage=async e=>{let{id:t,attackId:n,params:r}=e.data,i=$.find(e=>e.id===n);if(!i?.frontendCheck){self.postMessage({id:t,result:null});return}try{let e=await i.frontendCheck(r);self.postMessage({id:t,result:e})}catch(e){self.postMessage({id:t,result:null,error:String(e)})}}})();
+Tip: For convenience, paste this into Magic Mode which auto-detects the format. Works when m^e < n1*n2*...*ne.`,priority:`high`,applicableCheck:e=>!!e.e&&!!e.ciphertexts}],ne=[`Factorization`,`Partial Key / Lattice`,`Message / Protocol`,`Oracle`,`Advanced`],re=new Map;for(let e of ne)re.set(e,$.filter(t=>t.category===e));n(`https://factordb-proxy.octopusyuzu.workers.dev`),self.onmessage=async e=>{let{id:t,attackId:n,params:r}=e.data,i=$.find(e=>e.id===n);if(!i?.frontendCheck){self.postMessage({id:t,result:null});return}try{let e=await i.frontendCheck(r);self.postMessage({id:t,result:e})}catch(e){self.postMessage({id:t,result:null,error:String(e)})}}})();
