@@ -197,7 +197,7 @@ export function InputPanel() {
             <Typography variant="caption" sx={{ color: draculaColors.pink, display: 'block', mb: 1, fontSize: '0.7rem' }}>
               {selectedAttack.frontendCheck ? 'Runs locally in browser' : 'Executed via SageMathCell'}
             </Typography>
-            <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 3 }}>
+            <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 3, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" }}>
               {selectedAttack.description}
             </Typography>
 

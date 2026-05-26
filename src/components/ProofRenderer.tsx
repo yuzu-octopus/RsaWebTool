@@ -278,6 +278,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
         <Box
           sx={{
             color: draculaColors.foreground,
+            fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
             lineHeight: 1.8,
             '& .katex-display': {
               margin: '1.2em 0',
