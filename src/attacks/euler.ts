@@ -136,7 +136,7 @@ _attack()`,
       let q = gcd(lev + m_, n);
       if (p <= 1n || q >= n) return Promise.resolve(null);
       if (p * q !== n) q = n / p;
-      return Promise.resolve(`Factor found!\nVerification: p * q = ${p * q}\np = ${p}\nq = ${q}\nEULER=SUCCESS`);
+      return Promise.resolve(`Factor found!\nVerification: p * q = ${p * q}\np = ${p}\nq = ${q}\nn = ${s0[0]}^2 + ${s0[1]}^2 = ${s1[0]}^2 + ${s1[1]}^2\nEULER=SUCCESS`);
     } catch {
       return Promise.resolve(null);
     }

@@ -109,7 +109,7 @@ _attack()`,
 
       // Scan ±2 around candidate for safety (handles edge rounding)
       for (let m = mCeil - 2n; m <= mCeil + 2n; m++) {
-        if (m >= 0n && modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}\nLSB_ORACLE=SUCCESS`);
+        if (m >= 0n && modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}\nbits used = ${k}\nm (hex) = 0x${m.toString(16)}\nLSB_ORACLE=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }

@@ -89,7 +89,17 @@ _attack()`;
       const v1 = modPow(m, e1, n);
       const v2 = modPow(m, e2, n);
       if (v1 === c1 && v2 === c2) {
-        return Promise.resolve(`Recovered message: m = ${m}\nCOMMON_MODULUS=SUCCESS`);
+        const fmt = (val: bigint): string => {
+          const hex = val.toString(16);
+          try {
+            const padded = hex.length % 2 ? '0' + hex : hex;
+            const bytes = new Uint8Array(padded.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
+            return `Recovered message: m = ${val}\nm (hex) = 0x${hex}\nm (text) = ${new TextDecoder().decode(bytes)}\nCOMMON_MODULUS=SUCCESS`;
+          } catch {
+            return `Recovered message: m = ${val}\nm (hex) = 0x${hex}\nCOMMON_MODULUS=SUCCESS`;
+          }
+        };
+        return Promise.resolve(fmt(m));
       }
       return Promise.resolve(null);
     } catch {

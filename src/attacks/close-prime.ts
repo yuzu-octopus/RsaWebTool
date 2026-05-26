@@ -128,6 +128,7 @@ _attack()`,
       // This avoids repeated a*a - n (a BigInt multiplication)
       let a = isqrt(n);
       if (a * a < n) a++;
+      const initialA = a;
       let b2 = a * a - n;
       const limit = a + 1000000n;
       while (a < limit) {
@@ -139,7 +140,7 @@ _attack()`,
             const p = a - b;
             const q = a + b;
             if (p > 1n && q > 1n && p * q === n) {
-              return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nCLOSE_PRIME=SUCCESS`);
+              return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\niterations = ${a - initialA}\nCLOSE_PRIME=SUCCESS`);
             }
           }
         }

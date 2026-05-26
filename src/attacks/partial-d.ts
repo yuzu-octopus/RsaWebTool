@@ -90,7 +90,7 @@ _attack()`,
               const p = (s - sqrtDisc) / 2n;
               if (p > 0n && n % p === 0n) {
                 const qVal = n / p;
-                return Promise.resolve(`Factor found!\np = ${p}\nq = ${qVal}\nPrivate key d = ${dApprox}\nPARTIAL_D=SUCCESS`);
+                return Promise.resolve(`Factor found!\np = ${p}\nq = ${qVal}\nk = ${k}\nPrivate key d = ${dApprox}\nPARTIAL_D=SUCCESS`);
               }
             }
           }

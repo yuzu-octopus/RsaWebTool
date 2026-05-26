@@ -137,7 +137,7 @@ _attack()`,
         }
         if (g > 1n && g < n_i) {
           const q = n_i / g;
-          return Promise.resolve(`Factor found!\np = ${g}\nq = ${q}\nPOLLARD_RHO=SUCCESS`);
+          return Promise.resolve(`Factor found!\np = ${g}\nq = ${q}\nc = ${c}\niterations = ${iter}\nPOLLARD_RHO=SUCCESS`);
         }
       }
       return Promise.resolve(null);

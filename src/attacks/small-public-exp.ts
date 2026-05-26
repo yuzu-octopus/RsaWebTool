@@ -73,13 +73,24 @@ _attack()`;
       return x;
     };
 
+    const fmtResult = (m: bigint, k: bigint): string => {
+      const hex = m.toString(16);
+      try {
+        const padded = hex.length % 2 ? '0' + hex : hex;
+        const bytes = new Uint8Array(padded.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
+        const text = new TextDecoder().decode(bytes);
+        return `m = ${m}\nk = ${k}\nm (hex) = 0x${hex}\nm (text) = ${text}\nSMALL_PUBLIC_EXP=SUCCESS`;
+      } catch {
+        return `m = ${m}\nk = ${k}\nm (hex) = 0x${hex}\nSMALL_PUBLIC_EXP=SUCCESS`;
+      }
+    };
+
     for (let k = 0n; k <= kBound; k++) {
       const candidate = c + k * n;
       const root = iroot(candidate);
-      // Check root and neighbors for safety (Newton can undershoot)
-      if (root ** e === candidate) return Promise.resolve(`m = ${root.toString()}\nSMALL_PUBLIC_EXP=SUCCESS`);
-      if ((root + 1n) ** e === candidate) return Promise.resolve(`m = ${(root + 1n).toString()}\nSMALL_PUBLIC_EXP=SUCCESS`);
-      if (root > 0n && (root - 1n) ** e === candidate) return Promise.resolve(`m = ${(root - 1n).toString()}\nSMALL_PUBLIC_EXP=SUCCESS`);
+      if (root ** e === candidate) return Promise.resolve(fmtResult(root, k));
+      if ((root + 1n) ** e === candidate) return Promise.resolve(fmtResult(root + 1n, k));
+      if (root > 0n && (root - 1n) ** e === candidate) return Promise.resolve(fmtResult(root - 1n, k));
     }
     return Promise.resolve(null);
   },

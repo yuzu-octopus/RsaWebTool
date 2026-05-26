@@ -96,7 +96,17 @@ _attack()`;
         for (const {c, n} of pairs) {
           if (modPow(lo, e, n) !== c) return Promise.resolve(null);
         }
-        return Promise.resolve(`Message recovered: m = ${lo}\nHASTAD_BROADCAST=SUCCESS`);
+        const fmt = (m: bigint): string => {
+          const hex = m.toString(16);
+          try {
+            const padded = hex.length % 2 ? '0' + hex : hex;
+            const bytes = new Uint8Array(padded.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
+            return `Message recovered: m = ${m}\nm (hex) = 0x${hex}\nm (text) = ${new TextDecoder().decode(bytes)}\nHASTAD_BROADCAST=SUCCESS`;
+          } catch {
+            return `Message recovered: m = ${m}\nm (hex) = 0x${hex}\nHASTAD_BROADCAST=SUCCESS`;
+          }
+        };
+        return Promise.resolve(fmt(lo));
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
