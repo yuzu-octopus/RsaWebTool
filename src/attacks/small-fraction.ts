@@ -53,8 +53,8 @@ def _attack():
             print(f"n = {n}")
             print()
             found = False
-            max_den = 50
-            trial_window = 2000
+            max_den = 100
+            trial_window = 10000
             pairs_tried = 0
             divs_tried = 0
             n_int = int(n)
@@ -137,11 +137,11 @@ _attack()`,
       const n = BigInt(vals.n);
       if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}\nSMALL_FRACTION=SUCCESS`);
 
-      for (let b = 1; b <= 50; b++) {
+      for (let b = 1; b <= 100; b++) {
         for (let a = 1; a <= b; a++) {
           if (numGcd(a, b) !== 1) continue;
           const q0 = isqrt(n * BigInt(b) / BigInt(a));
-          for (let delta = -2000; delta <= 2000; delta++) {
+          for (let delta = -10000; delta <= 10000; delta++) {
             const q = q0 + BigInt(delta);
             if (q > 1n && n % q === 0n) {
               const p = n / q;

@@ -12,14 +12,14 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
-    { name: 'bound', label: 'bound (max d_p, optional)', placeholder: 'Default 1000000', multiline: false },
+    { name: 'bound', label: 'bound (max d_p, optional)', placeholder: 'Default 5000000', multiline: false },
   ],
   sageTemplate: (vals: Record<string, string>) => `import math
 def _attack():
     try:
         n = Integer(${vals.n})
         e = Integer(${vals.e})
-        bound = ${vals.bound ? `Integer(${vals.bound})` : 'Integer(1000000)'}
+        bound = ${vals.bound ? `Integer(${vals.bound})` : 'Integer(5000000)'}
         if n <= 0 or e <= 0 or bound <= 0:
             print("SMALL_CRT_EXP=FAILED: invalid input values")
         else:
@@ -69,7 +69,7 @@ _attack()`,
       const n = BigInt(vals.n);
       const e = BigInt(vals.e);
 
-      const bound = vals.bound ? BigInt(vals.bound) : 1000000n;
+      const bound = vals.bound ? BigInt(vals.bound) : 5000000n;
 
       // FLT-based batch GCD: linear scan over d_p = 0..bound.
       // At each step: current = 2^(e*d_p) mod n.
@@ -142,7 +142,7 @@ _attack()`,
 \\textbf{Explanation:} Fermat's Little Theorem guarantees $2^{ed_p} \\equiv 2 \\pmod{p}$ when $d_p$ is the correct CRT exponent. The attack linearly scans candidate $d_p$ values, accumulating a product of $(2^{ed_p} - 2)$ values in batches of 1000. A single GCD per batch detects whether any candidate in the batch is correct, reducing GCD calls by $1000\\times$. Once a hit is found, a linear scan of just that batch identifies the exact $d_p$. This works for any $e$ (no $e$-size limit) since the iteration count depends only on the bound.
 
 \\textbf{References:} Boneh \\textit{et al.}, "Cryptanalysis of RSA with Small CRT Exponents", CRYPTO 1998; Cohn \\& Heninger, ePrint 2011/436`,
-   usageGuide: 'This attack recovers the private key when either dp or dq (the CRT exponents) is small.\n\nHow to use:\n1. You have n, e, and know that dp (d mod p-1) is small (< bound)\n2. The attack uses Fermat\'s Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p\n3. A batched GCD approach (product tree) accelerates the linear scan ~1000x by reducing gcd calls via product accumulation\n4. Provide n, e, and optionally bound (max dp to try, default 1000000)\n\nTip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 1000000 runs in ~900ms for 1024-bit n.',
+   usageGuide: 'This attack recovers the private key when either dp or dq (the CRT exponents) is small.\n\nHow to use:\n1. You have n, e, and know that dp (d mod p-1) is small (< bound)\n2. The attack uses Fermat\'s Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p\n3. A batched GCD approach (product tree) accelerates the linear scan ~1000x by reducing gcd calls via product accumulation\n4. Provide n, e, and optionally bound         (max dp to try, default 5000000)\n\nTip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 5000000 runs in ~900ms for 1024-bit n.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e,
 };
@@ -161,7 +161,7 @@ export const generateTestcase = (): Record<string, string> => {
       const p = num / k + 1n;
       if (p > 2n && isPrimeMR(p)) {
         const q = randomPrime(TESTCASE_BITS.q);
-        return { n: (p * q).toString(), e: e.toString(), bound: '1000000' };
+        return { n: (p * q).toString(), e: e.toString(), bound: '5000000' };
       }
     }
   }

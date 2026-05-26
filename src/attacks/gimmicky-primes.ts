@@ -111,7 +111,7 @@ export const attack: Attack = {
             print()
             print("Checking factorial primes (k! \u00b1 1)...")
             factorial = 1
-            for k in range(1, 101):
+            for k in range(1, 1001):
                 factorial *= k
                 for sign in [1, -1]:
                     candidate = factorial + sign
@@ -126,7 +126,7 @@ export const attack: Attack = {
             # Cap k at 100 to keep candidate sizes manageable (≈ 2^200 max)
             print()
             print("Checking Carol and Kynea primes...")
-            for k in range(1, 101):
+            for k in range(1, 1001):
                 for sign in [-1, 1]:
                     candidate = (2**k + sign)**2 - 2
                     if candidate > 1 and n_int % candidate == 0:
@@ -141,7 +141,7 @@ export const attack: Attack = {
             # Cap k at 100 to keep candidate sizes manageable (k*2^k ≈ 2^107 max)
             print()
             print("Checking Cullen and Woodall primes (k * 2^k \u00b1 1)...")
-            for k in range(1, 101):
+            for k in range(1, 1001):
                 for sign in [1, -1]:
                     candidate = k * 2**k + sign
                     if candidate > 1 and n_int % candidate == 0:
@@ -216,7 +216,7 @@ _attack()`,
       }
       // 6. Factorial primes: k! +/- 1
       let factorial = 1n;
-      for (let k = 1; k <= 100; k++) {
+      for (let k = 1; k <= 1000; k++) {
         factorial *= BigInt(k);
         for (const sign of [1n, -1n]) {
           const candidate = factorial + sign;
@@ -224,7 +224,7 @@ _attack()`,
         }
       }
       // 7. Carol/Kynea: (2^k +/- 1)^2 - 2
-      for (let k = 1; k <= 100; k++) {
+      for (let k = 1; k <= 1000; k++) {
         const twoK = 1n << BigInt(k);
         for (const sign of [-1n, 1n]) {
           const candidate = (twoK + sign) ** 2n - 2n;
@@ -232,7 +232,7 @@ _attack()`,
         }
       }
       // 8. Cullen/Woodall: k * 2^k +/- 1
-      for (let k = 1; k <= 100; k++) {
+      for (let k = 1; k <= 1000; k++) {
         const twoK = 1n << BigInt(k);
         const kBig = BigInt(k);
         for (const sign of [1n, -1n]) {

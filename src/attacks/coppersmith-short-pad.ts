@@ -64,12 +64,12 @@ export const attack: Attack = {
                 m2_val = cand
         # Method 3: If only one found, brute-force delta (range covers testcase)
         if m1_val is None and m2_val is not None:
-            for d in range(1, 256):
+            for d in range(1, 4096):
                 if (m2_val - d)**e_int == c1:
                     m1_val = m2_val - d
                     break
         if m2_val is None and m1_val is not None:
-            for d in range(1, 256):
+            for d in range(1, 4096):
                 if (m1_val + d)**e_int == c2:
                     m2_val = m1_val + d
                     break
@@ -100,7 +100,7 @@ _attack()`;
       let m1: bigint | null = m1Root ** e === c1 ? m1Root : null;
       let m2: bigint | null = m2Root ** e === c2 ? m2Root : null;
       if (m1 === null && m2 !== null) {
-        for (let d = 1n; d < 256n; d++) {
+        for (let d = 1n; d < 4096n; d++) {
           if ((m2 - d) ** e === c1) {
             m1 = m2 - d;
             break;
@@ -108,7 +108,7 @@ _attack()`;
         }
       }
       if (m2 === null && m1 !== null) {
-        for (let d = 1n; d < 256n; d++) {
+        for (let d = 1n; d < 4096n; d++) {
           if ((m1 + d) ** e === c2) {
             m2 = m1 + d;
             break;
@@ -155,8 +155,8 @@ export const generateTestcase = (): Record<string, string> => {
   const q = randomPrime(256);
   const n = p * q;
   const m = BigInt(Math.floor(Math.random() * 10000) + 42);
-  // Use 6-bit padding for fast brute-force delta search (max delta = 125)
-  const maxPad = 2 ** 6;
+  // Use 12-bit padding for fast brute-force delta search (max delta = 125)
+  const maxPad = 2 ** 12;
   const r1 = BigInt(Math.floor(Math.random() * maxPad));
   const r2 = BigInt(Math.floor(Math.random() * maxPad));
   const m1 = (m << 20n) | r1;

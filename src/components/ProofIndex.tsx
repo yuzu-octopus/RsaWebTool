@@ -40,7 +40,7 @@ export function ProofIndex() {
     <Box sx={colFlexSx}>
       <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Typography variant="h2" sx={{ color: draculaColors.purple, mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="h3" sx={{ color: draculaColors.purple, mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
             <MenuBook sx={{ fontSize: 'inherit' }} /> Proofs Index
           </Typography>
 

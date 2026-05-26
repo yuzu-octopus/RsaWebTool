@@ -44,7 +44,7 @@ def _attack():
             e_int = int(e)
             ne_int = n_int * e_int
             found = False
-            for k in range(1, 100001):
+            for k in range(1, 500001):
                 disc = 1 + 4 * k * ne_int
                 sqrt_disc = math.isqrt(disc)
                 if sqrt_disc * sqrt_disc == disc:
@@ -76,7 +76,7 @@ _attack()`,
       const n = BigInt(vals.n);
       const e = BigInt(vals.e);
       const fourNE = 4n * n * e;
-      for (let k = 1n; k <= 100000n; k++) {
+      for (let k = 1n; k <= 500000n; k++) {
         const disc = 1n + k * fourNE;
         // Mod-16 perfect square pre-filter: disc ≡ 1 (mod 4), so valid squares mod 16 are only 1 and 9
         // This rejects ~50% of candidates without calling isqrt
@@ -109,7 +109,7 @@ _attack()`,
 ne &= p(qe) = p(1 + kp) = p + kp^2 \\\\
 kp^2 + p - ne &= 0 \\\\
 p &= \\frac{-1 + \\sqrt{1 + 4kne}}{2k} \\\\
-\\text{Iterate } k &= 1, \\ldots, 10^5:\\quad \\text{check if } 1 + 4kne \\text{ is a perfect square} \\\\
+\\text{Iterate } k &= 1, \\ldots, 5 \\cdot 10^5:\\quad \\text{check if } 1 + 4kne \\text{ is a perfect square} \\\\
 \\text{If so, } p &\\mid n \\implies \\text{factorization found} \\qed
 \\end{align*}
 
@@ -129,7 +129,7 @@ export const generateTestcase = (): Record<string, string> => {
     if (q !== null && q >= 2n && isPrimeMR(q)) {
       const n = p * q;
       const k = (q * e - 1n) / p;
-      if (k > 0n && k < 100001n) {
+      if (k > 0n && k < 500001n) {
         return { n: n.toString(), e: e.toString() };
       }
     }

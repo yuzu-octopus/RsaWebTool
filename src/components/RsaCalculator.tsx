@@ -222,7 +222,7 @@ export function RsaCalculator() {
     <Box sx={colFlexSx}>
       <Box sx={{ ...centeredPanelSx, p: 2 }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Typography variant="h2" sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography variant="h3" sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
             <Calculate sx={{ fontSize: 'inherit' }} /> RSA Calculator
           </Typography>
           <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 2 }}>

@@ -1200,8 +1200,8 @@ def _attack():
             print(f"n = {n}")
             print()
             found = False
-            max_den = 50
-            trial_window = 2000
+            max_den = 100
+            trial_window = 10000
             pairs_tried = 0
             divs_tried = 0
             n_int = int(n)
@@ -1277,7 +1277,7 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("SMALL_FRACTION=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${t/2n}\nSMALL_FRACTION=SUCCESS`);for(let e=1;e<=50;e++)for(let n=1;n<=e;n++){if(V(n,e)!==1)continue;let r=k(t*BigInt(e)/BigInt(n));for(let i=-2e3;i<=2e3;i++){let a=r+BigInt(i);if(a>1n&&t%a===0n){let r=t/a;if(r>1n)return Promise.resolve(`Factor found!\np = ${r}\nq = ${a}\nUsing a=${n}, b=${e}\nSMALL_FRACTION=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $p/q \\approx a/b$ for small coprime $a, b$, then $q \\approx \\sqrt{nb/a}$ and trial division near $q_0$ recovers the factor.
+_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${t/2n}\nSMALL_FRACTION=SUCCESS`);for(let e=1;e<=100;e++)for(let n=1;n<=e;n++){if(V(n,e)!==1)continue;let r=k(t*BigInt(e)/BigInt(n));for(let i=-1e4;i<=1e4;i++){let a=r+BigInt(i);if(a>1n&&t%a===0n){let r=t/a;if(r>1n)return Promise.resolve(`Factor found!\np = ${r}\nq = ${a}\nUsing a=${n}, b=${e}\nSMALL_FRACTION=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $p/q \\approx a/b$ for small coprime $a, b$, then $q \\approx \\sqrt{nb/a}$ and trial division near $q_0$ recovers the factor.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -1531,7 +1531,7 @@ p_i &\\approx n^{1/k} \\text{ (each prime is smaller than in 2-prime RSA)} \\\\
             print()
             print("Checking factorial primes (k! \u00b1 1)...")
             factorial = 1
-            for k in range(1, 101):
+            for k in range(1, 1001):
                 factorial *= k
                 for sign in [1, -1]:
                     candidate = factorial + sign
@@ -1546,7 +1546,7 @@ p_i &\\approx n^{1/k} \\text{ (each prime is smaller than in 2-prime RSA)} \\\\
             # Cap k at 100 to keep candidate sizes manageable (≈ 2^200 max)
             print()
             print("Checking Carol and Kynea primes...")
-            for k in range(1, 101):
+            for k in range(1, 1001):
                 for sign in [-1, 1]:
                     candidate = (2**k + sign)**2 - 2
                     if candidate > 1 and n_int % candidate == 0:
@@ -1561,7 +1561,7 @@ p_i &\\approx n^{1/k} \\text{ (each prime is smaller than in 2-prime RSA)} \\\\
             # Cap k at 100 to keep candidate sizes manageable (k*2^k ≈ 2^107 max)
             print()
             print("Checking Cullen and Woodall primes (k * 2^k \u00b1 1)...")
-            for k in range(1, 101):
+            for k in range(1, 1001):
                 for sign in [1, -1]:
                     candidate = k * 2**k + sign
                     if candidate > 1 and n_int % candidate == 0:
@@ -1587,7 +1587,7 @@ p_i &\\approx n^{1/k} \\text{ (each prime is smaller than in 2-prime RSA)} \\\\
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("GIMMICKY_PRIMES=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t<2n)return Promise.resolve(null);if(t%2n==0n)return Promise.resolve(`n is even: ${t}\np = 2\nq = ${t/2n}\nGIMMICKY_PRIMES=SUCCESS`);let n=t,r=e=>e>1n&&n%e===0n?e:null,i=e=>`Factor found!\nCofactor: ${n/e}\nVerification: ${e} * ${n/e} = ${n}\nGIMMICKY_PRIMES=SUCCESS`;for(let e of[2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281,3217,4253,4423]){let t=r((1n<<BigInt(e))-1n);if(t)return Promise.resolve(i(t))}let a=[2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199],o=1n;for(let e of a){o*=BigInt(e);for(let e of[1n,-1n]){let t=o+e;if(t>1n&&n%t===0n)return Promise.resolve(i(t))}}for(let e=0;e<5;e++){let t=r((1n<<(1n<<BigInt(e)))+1n);if(t)return Promise.resolve(i(t))}for(let e of[2n,3n,5n,13n,89n,233n,1597n,28657n,514229n,433494437n,2971215073n])if(e<n&&n%e===0n)return Promise.resolve(i(e));for(let e of[2,19,23,317,1031])try{let t=(10n**BigInt(e)-1n)/9n;if(t<n&&n%t===0n)return Promise.resolve(i(t))}catch{continue}let s=1n;for(let e=1;e<=100;e++){s*=BigInt(e);for(let e of[1n,-1n]){let t=s+e;if(t>1n&&n%t===0n)return Promise.resolve(i(t))}}for(let e=1;e<=100;e++){let t=1n<<BigInt(e);for(let e of[-1n,1n]){let r=(t+e)**2n-2n;if(r>1n&&n%r===0n)return Promise.resolve(i(r))}}for(let e=1;e<=100;e++){let t=1n<<BigInt(e),r=BigInt(e);for(let e of[1n,-1n]){let a=r*t+e;if(a>1n&&n%a===0n)return Promise.resolve(i(a))}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $p$ is a special-form prime from a known set $\\mathcal{S}$, trial division against $\\mathcal{S}$ finds $p$ in $O(|\\mathcal{S}| \\cdot \\log^2 n)$.
+_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t<2n)return Promise.resolve(null);if(t%2n==0n)return Promise.resolve(`n is even: ${t}\np = 2\nq = ${t/2n}\nGIMMICKY_PRIMES=SUCCESS`);let n=t,r=e=>e>1n&&n%e===0n?e:null,i=e=>`Factor found!\nCofactor: ${n/e}\nVerification: ${e} * ${n/e} = ${n}\nGIMMICKY_PRIMES=SUCCESS`;for(let e of[2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281,3217,4253,4423]){let t=r((1n<<BigInt(e))-1n);if(t)return Promise.resolve(i(t))}let a=[2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199],o=1n;for(let e of a){o*=BigInt(e);for(let e of[1n,-1n]){let t=o+e;if(t>1n&&n%t===0n)return Promise.resolve(i(t))}}for(let e=0;e<5;e++){let t=r((1n<<(1n<<BigInt(e)))+1n);if(t)return Promise.resolve(i(t))}for(let e of[2n,3n,5n,13n,89n,233n,1597n,28657n,514229n,433494437n,2971215073n])if(e<n&&n%e===0n)return Promise.resolve(i(e));for(let e of[2,19,23,317,1031])try{let t=(10n**BigInt(e)-1n)/9n;if(t<n&&n%t===0n)return Promise.resolve(i(t))}catch{continue}let s=1n;for(let e=1;e<=1e3;e++){s*=BigInt(e);for(let e of[1n,-1n]){let t=s+e;if(t>1n&&n%t===0n)return Promise.resolve(i(t))}}for(let e=1;e<=1e3;e++){let t=1n<<BigInt(e);for(let e of[-1n,1n]){let r=(t+e)**2n-2n;if(r>1n&&n%r===0n)return Promise.resolve(i(r))}}for(let e=1;e<=1e3;e++){let t=1n<<BigInt(e),r=BigInt(e);for(let e of[1n,-1n]){let a=r*t+e;if(a>1n&&n%a===0n)return Promise.resolve(i(a))}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $p$ is a special-form prime from a known set $\\mathcal{S}$, trial division against $\\mathcal{S}$ finds $p$ in $O(|\\mathcal{S}| \\cdot \\log^2 n)$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2614,12 +2614,12 @@ p,q &= \\frac{n - \\phi + 1 \\pm \\sqrt{(n - \\phi + 1)^2 - 4n}}{2} \\qed
 
 \\textbf{Explanation:} The Pisano period attack tracks $2^i \\bmod n$ via recurrence ($v_{i+1} = 2 \\cdot v_i \\bmod n$). When a value repeats, the index difference is a multiple of the multiplicative order of 2 modulo $n$, which divides $\\lambda(n)$. Each candidate $\\phi$ is tested by checking whether the quadratic discriminant is a perfect square.
 
-\\textbf{References:} Wuliangshun, "Integer Factorization With Pisano Period", IEEE Access, 2019`,priority:`medium`,applicableCheck:e=>!!e.n},Y,X,Z,{id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via FLT-based batch GCD search over small CRT exponent d_p. Use when d_p = d mod (p-1) is small (< bound, default 1,000,000).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 1000000`,multiline:!1}],sageTemplate:e=>`import math
+\\textbf{References:} Wuliangshun, "Integer Factorization With Pisano Period", IEEE Access, 2019`,priority:`medium`,applicableCheck:e=>!!e.n},Y,X,Z,{id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via FLT-based batch GCD search over small CRT exponent d_p. Use when d_p = d mod (p-1) is small (< bound, default 1,000,000).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 5000000`,multiline:!1}],sageTemplate:e=>`import math
 def _attack():
     try:
         n = Integer(${e.n})
         e = Integer(${e.e})
-        bound = ${e.bound?`Integer(${e.bound})`:`Integer(1000000)`}
+        bound = ${e.bound?`Integer(${e.bound})`:`Integer(5000000)`}
         if n <= 0 or e <= 0 or bound <= 0:
             print("SMALL_CRT_EXP=FAILED: invalid input values")
         else:
@@ -2662,7 +2662,7 @@ def _attack():
                 print("SMALL_CRT_EXP=FAILED")
     except Exception as ex:
         print(f"SMALL_CRT_EXP=FAILED: {ex}")
-_attack()`,frontendCheck:e=>{if(!e.n||!e.e)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=e.bound?BigInt(e.bound):1000000n,i=M(2n,n,t),a=1n,o=1n,s=0n;for(let e=0n;e<=r;e++){let c=((a-2n)%t+t)%t;if(o=o*c%t,e%Q==Q-1n||e===r){let r=O(o,t);if(r>1n&&r<t){let a=e,o=M(i,s,t);for(let e=s;e<=a;e++){if(O(((o-2n)%t+t)%t,t)>1n){let i=r,a=t/r,o=j(n,(i-1n)*(a-1n)),s=o?`\nPrivate exponent d = ${o}`:``;return Promise.resolve(`Factor found at dp = ${e}!\np = ${i}\nq = ${a}${s}\nSMALL_CRT_EXP=SUCCESS`)}o=o*i%t}}o=1n,s=e+1n}a=a*i%t}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small ($< \\text{bound}$), Fermat's Little Theorem with batched GCD recovers $p$ in $O(\\text{bound})$ time.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.e)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=e.bound?BigInt(e.bound):5000000n,i=M(2n,n,t),a=1n,o=1n,s=0n;for(let e=0n;e<=r;e++){let c=((a-2n)%t+t)%t;if(o=o*c%t,e%Q==Q-1n||e===r){let r=O(o,t);if(r>1n&&r<t){let a=e,o=M(i,s,t);for(let e=s;e<=a;e++){if(O(((o-2n)%t+t)%t,t)>1n){let i=r,a=t/r,o=j(n,(i-1n)*(a-1n)),s=o?`\nPrivate exponent d = ${o}`:``;return Promise.resolve(`Factor found at dp = ${e}!\np = ${i}\nq = ${a}${s}\nSMALL_CRT_EXP=SUCCESS`)}o=o*i%t}}o=1n,s=e+1n}a=a*i%t}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small ($< \\text{bound}$), Fermat's Little Theorem with batched GCD recovers $p$ in $O(\\text{bound})$ time.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2688,9 +2688,9 @@ How to use:
 1. You have n, e, and know that dp (d mod p-1) is small (< bound)
 2. The attack uses Fermat's Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p
 3. A batched GCD approach (product tree) accelerates the linear scan ~1000x by reducing gcd calls via product accumulation
-4. Provide n, e, and optionally bound (max dp to try, default 1000000)
+4. Provide n, e, and optionally bound         (max dp to try, default 5000000)
 
-Tip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 1000000 runs in ~900ms for 1024-bit n.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},{id:`dp-dq-leak`,name:`dp/dq Leak`,category:`Partial Key / Lattice`,description:`Recovers p from leaked d_p (or q from leaked d_q) via FLT-based GCD. Use when CRT exponents d_p or d_q are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dp`,label:`dp (d mod p-1)`,placeholder:`Enter dp value...`,multiline:!0,rows:3},{name:`dq`,label:`dq (d mod q-1, optional)`,placeholder:`Enter dq value...`,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.e);if(t<=0n||n<=0n)return null;let r=2n;if(e.dp){let i=BigInt(e.dp);if(i>0n){let e=n*i-1n;if(e>0n){let n=O(M(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(n*e).toString()}\ndp = ${i.toString()}\np = ${n.toString()}\nq = ${e.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}if(e.dq){let i=BigInt(e.dq);if(i>0n){let e=n*i-1n;if(e>0n){let n=O(M(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(e*n).toString()}\ndq = ${i.toString()}\np = ${e.toString()}\nq = ${n.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}return null}catch{return null}},sageTemplate:e=>{let t=e.dp?`
+Tip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 5000000 runs in ~900ms for 1024-bit n.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},{id:`dp-dq-leak`,name:`dp/dq Leak`,category:`Partial Key / Lattice`,description:`Recovers p from leaked d_p (or q from leaked d_q) via FLT-based GCD. Use when CRT exponents d_p or d_q are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dp`,label:`dp (d mod p-1)`,placeholder:`Enter dp value...`,multiline:!0,rows:3},{name:`dq`,label:`dq (d mod q-1, optional)`,placeholder:`Enter dq value...`,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.e);if(t<=0n||n<=0n)return null;let r=2n;if(e.dp){let i=BigInt(e.dp);if(i>0n){let e=n*i-1n;if(e>0n){let n=O(M(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(n*e).toString()}\ndp = ${i.toString()}\np = ${n.toString()}\nq = ${e.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}if(e.dq){let i=BigInt(e.dq);if(i>0n){let e=n*i-1n;if(e>0n){let n=O(M(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(e*n).toString()}\ndq = ${i.toString()}\np = ${e.toString()}\nq = ${n.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}return null}catch{return null}},sageTemplate:e=>{let t=e.dp?`
         dp_val = int(Integer(${e.dp}))
         if dp_val > 0:
             num = dp_val * e_int - 1
@@ -2798,7 +2798,7 @@ def _attack():
             n_int = int(n)
             k_int = int(k)
             found = False
-            for delta in range(-10000, 10001):
+            for delta in range(-100000, 100001):
                 disc = delta * delta + 4 * k_int * n_int
                 sqrt_disc = math.isqrt(disc)
                 if sqrt_disc * sqrt_disc == disc:
@@ -2823,12 +2823,12 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("LINEARLY_RELATED_PRIMES=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n||!e.k)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.k),r=4n*n*t;for(let e=-10000n;e<=10000n;e++){let i=e*e+r,a=k(i);if(a*a!==i)continue;let o=-e+a;if(o>0n&&o%(2n*n)==0n){let e=o/(2n*n);if(e>1n&&t%e===0n){let n=t/e;return Promise.resolve(`Factor found!\np = ${e}\nq = ${n}\nLINEARLY_RELATED_PRIMES=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta| < 10^4$, solve $kp^2 + \\delta p - n = 0$ to recover $p$.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.k)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.k),r=4n*n*t;for(let e=-100000n;e<=100000n;e++){let i=e*e+r,a=k(i);if(a*a!==i)continue;let o=-e+a;if(o>0n&&o%(2n*n)==0n){let e=o/(2n*n);if(e>1n&&t%e===0n){let n=t/e;return Promise.resolve(`Factor found!\np = ${e}\nq = ${n}\nLINEARLY_RELATED_PRIMES=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta| < 10^5$, solve $kp^2 + \\delta p - n = 0$ to recover $p$.
 
 \\textbf{Setup:}
 \\begin{itemize}
 \\item $n = pq$ and $q = kp + \\delta$
-\\item $k$ known, $\\delta$ unknown but small ($|\\delta| < 10^4$)
+\\item $k$ known, $\\delta$ unknown but small ($|\\delta| < 10^5$)
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -2840,7 +2840,7 @@ p &= \\frac{-\\delta + \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
 \\text{If so, } p &\\mid n \\implies \\text{factorization found} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Substituting $q = kp + \\delta$ into $n = pq$ gives a quadratic in $p$. The discriminant $\\Delta = \\delta^2 + 4kn$ must be a perfect square for integer $p$. The attack iterates $\\delta$ over $[-10^4, 10^4]$, which covers the typical range for CTF challenges and poorly generated primes. Setting $k = 1$ gives the classic twin-prime case ($p$ and $q$ close together).
+\\textbf{Explanation:} Substituting $q = kp + \\delta$ into $n = pq$ gives a quadratic in $p$. The discriminant $\\Delta = \\delta^2 + 4kn$ must be a perfect square for integer $p$. The attack iterates $\\delta$ over $[-10^5, 10^5]$, which covers the typical range for CTF challenges and poorly generated primes. Setting $k = 1$ gives the classic twin-prime case ($p$ and $q$ close together).
 
 \\textbf{References:} A. Nitaj, "Cryptanalysis of RSA with Constrained Primes", 1999`,usageGuide:`This attack factors n when the two primes are linearly related: q = k*p + δ for known k.
 
@@ -2882,7 +2882,7 @@ def _attack():
             e_int = int(e)
             ne_int = n_int * e_int
             found = False
-            for k in range(1, 100001):
+            for k in range(1, 500001):
                 disc = 1 + 4 * k * ne_int
                 sqrt_disc = math.isqrt(disc)
                 if sqrt_disc * sqrt_disc == disc:
@@ -2907,7 +2907,7 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("DEPENDENT_PRIME=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n||!e.e)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=4n*t*n;for(let e=1n;e<=100000n;e++){let n=1n+e*r,i=Number(n&15n);if(i!==1&&i!==9)continue;let a=k(n);if(a*a!==n)continue;let o=-1n+a;if(o>0n&&o%(2n*e)==0n){let n=o/(2n*e);if(n>1n&&t%n===0n){let e=t/n;return Promise.resolve(`Factor found!\np = ${n}\nq = ${e}\nDEPENDENT_PRIME=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $qe \\equiv 1 \\pmod{p}$, solve $kp^2 + p - ne = 0$ for $p$ by iterating $k$.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.e)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=4n*t*n;for(let e=1n;e<=500000n;e++){let n=1n+e*r,i=Number(n&15n);if(i!==1&&i!==9)continue;let a=k(n);if(a*a!==n)continue;let o=-1n+a;if(o>0n&&o%(2n*e)==0n){let n=o/(2n*e);if(n>1n&&t%n===0n){let e=t/n;return Promise.resolve(`Factor found!\np = ${n}\nq = ${e}\nDEPENDENT_PRIME=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $qe \\equiv 1 \\pmod{p}$, solve $kp^2 + p - ne = 0$ for $p$ by iterating $k$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2920,7 +2920,7 @@ _attack()`,frontendCheck:e=>{if(!e.n||!e.e)return Promise.resolve(null);try{let 
 ne &= p(qe) = p(1 + kp) = p + kp^2 \\\\
 kp^2 + p - ne &= 0 \\\\
 p &= \\frac{-1 + \\sqrt{1 + 4kne}}{2k} \\\\
-\\text{Iterate } k &= 1, \\ldots, 10^5:\\quad \\text{check if } 1 + 4kne \\text{ is a perfect square} \\\\
+\\text{Iterate } k &= 1, \\ldots, 5 \\cdot 10^5:\\quad \\text{check if } 1 + 4kne \\text{ is a perfect square} \\\\
 \\text{If so, } p &\\mid n \\implies \\text{factorization found} \\qed
 \\end{align*}
 
@@ -3038,12 +3038,12 @@ print("COPPERSMITH_SHORT_PAD=FAILED")`:`def _attack():
                 m2_val = cand
         # Method 3: If only one found, brute-force delta (range covers testcase)
         if m1_val is None and m2_val is not None:
-            for d in range(1, 256):
+            for d in range(1, 4096):
                 if (m2_val - d)**e_int == c1:
                     m1_val = m2_val - d
                     break
         if m2_val is None and m1_val is not None:
-            for d in range(1, 256):
+            for d in range(1, 4096):
                 if (m1_val + d)**e_int == c2:
                     m2_val = m1_val + d
                     break
@@ -3060,7 +3060,7 @@ print("COPPERSMITH_SHORT_PAD=FAILED")`:`def _attack():
     except Exception as e:
         print("ERROR:", e)
         print("COPPERSMITH_SHORT_PAD=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.c1),i=BigInt(e.c2),a=N(r,n),o=N(i,n),s=a**n===r?a:null,c=o**n===i?o:null;if(s===null&&c!==null){for(let e=1n;e<256n;e++)if((c-e)**n===r){s=c-e;break}}if(c===null&&s!==null){for(let e=1n;e<256n;e++)if((s+e)**n===i){c=s+e;break}}return s!==null&&c!==null&&M(s,n,t)===r&&M(c,n,t)===i?Promise.resolve(`Messages recovered!\nm1 = ${s}\nm2 = ${c}\ndelta = ${c-s}\nCOPPERSMITH_SHORT_PAD=SUCCESS`):Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given $c_1 \\equiv m_1^e \\pmod{n}$ and $c_2 \\equiv m_2^e \\pmod{n}$ where $m_1 = m + r_1$, $m_2 = m + r_2$ with small random pads, recover $m$ when $m^e < n$.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.c1),i=BigInt(e.c2),a=N(r,n),o=N(i,n),s=a**n===r?a:null,c=o**n===i?o:null;if(s===null&&c!==null){for(let e=1n;e<4096n;e++)if((c-e)**n===r){s=c-e;break}}if(c===null&&s!==null){for(let e=1n;e<4096n;e++)if((s+e)**n===i){c=s+e;break}}return s!==null&&c!==null&&M(s,n,t)===r&&M(c,n,t)===i?Promise.resolve(`Messages recovered!\nm1 = ${s}\nm2 = ${c}\ndelta = ${c-s}\nCOPPERSMITH_SHORT_PAD=SUCCESS`):Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given $c_1 \\equiv m_1^e \\pmod{n}$ and $c_2 \\equiv m_2^e \\pmod{n}$ where $m_1 = m + r_1$, $m_2 = m + r_2$ with small random pads, recover $m$ when $m^e < n$.
 
 \\textbf{Setup:}
 \\begin{itemize}

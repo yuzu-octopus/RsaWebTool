@@ -43,7 +43,7 @@ def _attack():
             n_int = int(n)
             k_int = int(k)
             found = False
-            for delta in range(-10000, 10001):
+            for delta in range(-100000, 100001):
                 disc = delta * delta + 4 * k_int * n_int
                 sqrt_disc = math.isqrt(disc)
                 if sqrt_disc * sqrt_disc == disc:
@@ -75,7 +75,7 @@ _attack()`,
       const n = BigInt(vals.n);
       const k = BigInt(vals.k);
       const fourKN = 4n * k * n;
-      for (let delta = -10000n; delta <= 10000n; delta++) {
+      for (let delta = -100000n; delta <= 100000n; delta++) {
         const disc = delta * delta + fourKN;
         const sqrt_disc = isqrt(disc);
         if (sqrt_disc * sqrt_disc !== disc) continue;
@@ -91,12 +91,12 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta| < 10^4$, solve $kp^2 + \\delta p - n = 0$ to recover $p$.
+  proof: `\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta| < 10^5$, solve $kp^2 + \\delta p - n = 0$ to recover $p$.
 
 \\textbf{Setup:}
 \\begin{itemize}
 \\item $n = pq$ and $q = kp + \\delta$
-\\item $k$ known, $\\delta$ unknown but small ($|\\delta| < 10^4$)
+\\item $k$ known, $\\delta$ unknown but small ($|\\delta| < 10^5$)
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -108,7 +108,7 @@ p &= \\frac{-\\delta + \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
 \\text{If so, } p &\\mid n \\implies \\text{factorization found} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Substituting $q = kp + \\delta$ into $n = pq$ gives a quadratic in $p$. The discriminant $\\Delta = \\delta^2 + 4kn$ must be a perfect square for integer $p$. The attack iterates $\\delta$ over $[-10^4, 10^4]$, which covers the typical range for CTF challenges and poorly generated primes. Setting $k = 1$ gives the classic twin-prime case ($p$ and $q$ close together).
+\\textbf{Explanation:} Substituting $q = kp + \\delta$ into $n = pq$ gives a quadratic in $p$. The discriminant $\\Delta = \\delta^2 + 4kn$ must be a perfect square for integer $p$. The attack iterates $\\delta$ over $[-10^5, 10^5]$, which covers the typical range for CTF challenges and poorly generated primes. Setting $k = 1$ gives the classic twin-prime case ($p$ and $q$ close together).
 
 \\textbf{References:} A. Nitaj, "Cryptanalysis of RSA with Constrained Primes", 1999`,
   usageGuide: 'This attack factors n when the two primes are linearly related: q = k*p + δ for known k.\n\nHow to use:\n1. You know that n = p*q where q = k*p + δ for some known multiplier k and small unknown δ\n2. Provide n and k\n3. The attack solves the quadratic equation k*p^2 + δ*p - n = 0 to recover p\n\nTip: This is common in CTF challenges or badly generated keys. Setting k=1 gives the classic twin-prime case (p = q + δ). For p = a*q + b form, try inverting the relationship.',
