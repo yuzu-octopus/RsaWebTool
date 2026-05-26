@@ -78,6 +78,12 @@ export const attack: Attack = {
                         val = factor(2)
                         if val > 1:
                             print(f"  {val} (is prime: {val.is_prime()})")
+                    if len(proper_vals) >= 2:
+                        p_factor = Integer(proper_vals[0])
+                        q_factor = Integer(proper_vals[1])
+                        if p_factor > 1 and q_factor > 1 and p_factor * q_factor == n:
+                            print(f"p = {p_factor}")
+                            print(f"q = {q_factor}")
                     print()
                     print("BINARY_POLY_FACTOR=SUCCESS")
                 else:

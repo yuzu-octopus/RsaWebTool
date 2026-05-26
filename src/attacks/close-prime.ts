@@ -142,27 +142,29 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} If $p \\approx q$, then $\\phi(n)$ can be recovered via a BSGS discrete log attack, factoring $n$.
+  proof: `\\textbf{Theorem:} When $|p - q|$ is small, Fermat's factorization finds $p,q$ in $O(|p-q|)$ steps; the Londahl BSGS extends this to $O(\\sqrt{|p-q|})$.
 
-\\textbf{Setup:}
-\\begin{itemize}
-\\item $n = pq$, $p$ and $q$ odd primes
-\\item $\\phi_{\\text{approx}} = n - 2\\lfloor\\sqrt{n}\\rfloor + 1 \\approx \\phi(n)$ when $p \\approx q$
-\\end{itemize}
-
-\\textbf{Proof:}
+\\textbf{Fermat's Factorization:}
 \\begin{align*}
-\\delta &= \\phi(n) - \\phi_{\\text{approx}} \\\\
-2^{\\delta} &\\equiv 2^{-\\phi_{\\text{approx}}} \\pmod{n} \\\\
-\\text{BSGS: store } 2^j \\bmod n, &\\quad \\text{search } 2^{-\\phi_{\\text{approx}}}(2^b)^i \\\\
-\\phi(n) &= \\phi_{\\text{approx}} + j - i \\cdot b \\\\
-p + q &= n - \\phi(n) + 1 \\\\
-p, q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
+n &= pq = a^2 - b^2 \\\\
+a &= \\frac{p+q}{2}, \\quad b = \\frac{p-q}{2} \\\\
+a &= \\lceil\\sqrt{n}\\rceil, \\quad b = \\sqrt{a^2 - n} \\\\
+\\text{Iterate: } a_{i+1} &= a_i + 1, \\quad b_i = \\sqrt{a_i^2 - n} \\\\
+a_i^2 - n \\text{ is a perfect square} &\\implies p = a_i - b_i, \\; q = a_i + b_i
 \\end{align*}
 
-\\textbf{Explanation:} Londahl's BSGS attack recovers $\\phi(n)$ by solving $2^\\delta \\equiv 2^{-\\phi_{\\text{approx}}} \\pmod{n}$, then factors $n$ via the quadratic.
+\\textbf{Fallback (Londahl BSGS):}
+\\begin{align*}
+\\phi_{\\text{approx}} &= n - 2\\lfloor\\sqrt{n}\\rfloor + 1 \\approx \\phi(n) \\\\
+2^{\\delta} &\\equiv 2^{-\\phi_{\\text{approx}}} \\pmod{n}, \\quad \\delta = \\phi(n) - \\phi_{\\text{approx}} \\\\
+\\text{Baby-step: } 2^j \\bmod n, \\quad \\text{Giant-step: } &2^{-\\phi_{\\text{approx}}}(2^b)^i \\\\
+\\phi(n) &= \\phi_{\\text{approx}} + j - i \\cdot b, \\quad p+q = n - \\phi(n) + 1 \\\\
+p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2} \\qed
+\\end{align*}
 
-\\textbf{References:} Carl L\\"ondahl, "Finding close-prime factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,
+\\textbf{Explanation:} Fermat's method iterates $a$ starting from $\\lceil\\sqrt{n}\\rceil$, checking if $a^2 - n$ is a perfect square. When $|p-q| < 10^6$, it converges in under $10^6$ iterations. For larger gaps, Londahl's BSGS fallback recovers $\\phi(n)$ via a discrete log in $O(\\sqrt{\\delta})$ steps.
+
+\\textbf{References:} Fermat (1643); Carl L\\"ondahl, "Finding close-prime factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

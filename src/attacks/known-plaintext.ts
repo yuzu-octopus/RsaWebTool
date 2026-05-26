@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'known-plaintext',
   name: 'Known Plaintext Attack',
   category: 'Message / Protocol',
-  description: 'Recovers m from known prefix via Coppersmith. Use when high-order bytes of m are known and unknown portion is small.',
+  description: 'Recovers m via integer e-th root (when m^e < n) or known-prefix brute-force (≤20 unknown bits). Use when e is small or high-order bytes of m are known.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: '65537', multiline: false },
@@ -146,22 +146,25 @@ _attack()`;
       return Promise.resolve(null);
     }
   },
-  proof: `\\textbf{Theorem:} Partial plaintext knowledge + Coppersmith recovers m when unknown portion < n^{1/e}.
+  proof: `\\textbf{Theorem:} When $m^e < n$, $m$ is recovered via integer e-th root. With known prefix, brute-force recovers $m$ for gaps $\\leq 20$ bits.
 
-\\textbf{Setup:}
-\\begin{itemize}
-\\item $m = m_0 \\cdot 2^k + x$, $|x| < n^{1/e}$
-\\item $n$, $e$, $c$ known
-\\end{itemize}
-
-\\textbf{Proof:}
+\\textbf{Strategy 1: Integer e-th Root}
 \\begin{align*}
-m &= m_0 \\cdot 2^k + x, \\quad |x| < X \\\\
-c &\\equiv (m_0 \\cdot 2^k + x)^e \\pmod{n} \\\\
-f(x) &= (m_0 \\cdot 2^k + x)^e - c \\equiv 0 \\pmod{n} \\\\
-|x| &< n^{1/e} \\implies \\text{Coppersmith recovers } x \\\\
-m &= m_0 \\cdot 2^k + x \\qed
+c &= m^e \\quad (\\text{no modular wrap when } m^e < n) \\\\
+m &= \\sqrt[e]{c} \\quad \\text{(exact integer root)}
 \\end{align*}
+Works when $m$ is small relative to $n$ (e.g., $e=3$ with small plaintext).
+
+\\textbf{Strategy 2: Known Prefix + Brute Force}
+\\begin{align*}
+m &= m_0 \\cdot 2^k + x, \\quad |x| < 2^k \\\\
+c &\\equiv (m_0 \\cdot 2^k + x)^e \\pmod{n} \\\\
+\\text{Iterate } x &= 0, 1, \\ldots, 2^k - 1 \\\\
+\\text{Check: } &(m_0 \\cdot 2^k + x)^e \\equiv c \\pmod{n} \\qed
+\\end{align*}
+Works for $k \\leq 20$ ($\\approx 1$ million iterations).
+
+\\textbf{Limitations:} For larger unknown portions ($>20$ bits), Coppersmith's method or other lattice techniques would be needed but are not implemented here due to SageCell timeout constraints.
 
 \\textbf{References:} D. Coppersmith, 1997; May, 2003`,
   priority: 'medium',

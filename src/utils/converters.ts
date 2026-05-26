@@ -237,10 +237,7 @@ export function parsePEM(input: string): { n: string; e: string } | null {
   return null;
 }
 
-/**
- * Convert a BigInt to a Uint8Array (Python's `long_to_bytes` equivalent).
- * Decodes to UTF-8 if valid, otherwise returns hex representation.
- */
+/** Converts a BigInt to a Uint8Array (big-endian, minimal encoding) */
 export function bigIntToBytes(m: bigint): Uint8Array {
   if (m === 0n) return new Uint8Array([0]);
   const hex = m.toString(16);

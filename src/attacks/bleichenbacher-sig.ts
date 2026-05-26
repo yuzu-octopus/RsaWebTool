@@ -97,7 +97,7 @@ S^3 &= \\text{target} + \\varepsilon, \\quad 0 \\leq \\varepsilon < 3S^2
 \\end{itemize}
 
 \\textbf{References:} D. Bleichenbacher, Crypto 2006 rump session`,
-  usageGuide: 'This attack forges RSA signatures by exploiting that small valid signatures can be found by computing e-th roots over the integers.\n\nHow to use:\n1. You have a public key (n, e) and need a valid signature for a chosen message\n2. The attack finds a value s such that s^e mod n matches the target encoding\n3. Provide n and e\n\nTip: This attack works best with small e (3, 5, 7). The forged signature will be for a message whose hash matches the structure of a small e-th root.',
+  usageGuide: 'This attack forges RSA signatures by exploiting that s^3 < n makes the cube root computable over integers.\n\nHow to use:\n1. You have modulus n and a hash value you want a signature for\n2. Provide n and hash_hex (hash as hex string)\n3. The attack constructs an integer with PKCS#1 v1.5 padding + target hash, then takes its cube root\n4. The rounded cube root S satisfies S^3 = target + epsilon, where epsilon is absorbed by garbage bytes\n\nTip: e must be exactly 3 for this attack. The modulus must be large enough to accommodate the hash plus 8 bytes of padding plus garbage bytes. RSA with OAEP/PSS padding is NOT vulnerable.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.hash_hex,
 };

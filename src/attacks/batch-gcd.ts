@@ -10,7 +10,7 @@ export const attack: Attack = {
   inputs: [
     { name: 'n_values', label: 'Moduli (one per line or comma-separated)', placeholder: 'n1\\nn2\\nn3...', multiline: true, rows: 5 },
   ],
-  sageTemplate: () => `print("BATCH_GCD=FAILED")`,
+  sageTemplate: () => `print("Batch GCD requires multiple moduli — run in browser mode")`,
   // eslint-disable-next-line @typescript-eslint/require-await
   frontendCheck: async (vals: Record<string, string>) => {
     try {

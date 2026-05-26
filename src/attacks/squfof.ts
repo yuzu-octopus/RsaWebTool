@@ -159,7 +159,7 @@ s &= \\sqrt{c_i}, \\quad \\text{reverse } \\rho \\text{ to find } (s, b^*, s) \\
 
 export const generateTestcase = (): Record<string, string> => {
   // Generate n with one small factor (≤16 bits) so trial division succeeds
-  // SQUFOF's trial division goes up to 100000, so 16-bit primes are well within range
+  // SQUFOF's trial division goes up to 200000, so 16-bit primes are well within range
   const p = randomPrime(16);
   const q = randomPrime(TESTCASE_BITS.p + TESTCASE_BITS.q - 16);
   return { n: (p * q).toString() };

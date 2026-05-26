@@ -10,7 +10,7 @@ export const attack: Attack = {
   inputs: [
     { name: 'moduli_list', label: 'Moduli (one per line)', placeholder: 'Enter multiple moduli, one per line...', multiline: true, rows: 6 },
   ],
-  sageTemplate: () => `print("MULTI_PRIME_GCD=FAILED")`,
+  sageTemplate: () => `print("Multi-prime GCD requires multiple moduli — run in browser mode")`,
   proof: `\\textbf{Theorem:} Pairwise GCD of moduli reveals shared factors and their pairs.
 
 \\textbf{Setup:}

@@ -147,7 +147,7 @@ s^* &= s_1 \\cdot s_2 \\equiv m_1^d \\cdot m_2^d \\pmod{n} \\\\
 \\end{align*}
 
 \\textbf{References:} Rivest, Shamir, Adleman, 1978; Boneh, 1999`,
-  usageGuide: 'This attack exploits RSA\'s homomorphic property: E(m1) * E(m2) = E(m1 * m2 mod n).\n\nHow to use:\n1. You have RSA public key (n, e) and a target message m you want to forge\n2. Provide n, e, and target_m (as decimal or hex)\n3. The attack finds a blinding factor and constructs a valid signature\n\nTip: This is a textbook attack on textbook RSA (no padding). Modern RSA with OAEP/PSS padding prevents this attack.',
+  usageGuide: 'This attack exploits RSA\'s multiplicative homomorphism to forge signatures from known oracle pairs.\n\nHow to use:\n1. Obtain oracle pairs (m_i, s_i) where s_i is a valid signature on m_i under the target public key\n2. Provide n, e, target_m (message to forge), and oracle_pairs formatted as "m1,s1;m2,s2;..."\n3. The attack searches subset products: if target_m = product of some subset of m_i (mod n), then the forged signature = product of the corresponding s_i (mod n)\n\nTip: The more oracle pairs you have, the more likely you can factor target_m into a subset product. Modern RSA with OAEP/PSS padding prevents this attack.',
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.target_m && !!p.oracle_pairs,
 };

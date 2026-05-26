@@ -177,7 +177,7 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{n(256r+1)}{256s} \\ri
 \\end{align*}
 
 \\textbf{References:} J. Manger, CRYPTO 2001`,
-  usageGuide: 'This requires oracle_responses \u2014 a comma-separated list from an oracle that reveals whether decrypt(c\') < n/2 (or similar boundary query).\n\nHow to use:\n1. Set up an oracle that returns whether the decrypted plaintext is in a specific range\n2. Query the oracle for successive blinding values\n3. Provide n, e, c, and oracle_responses as comma-separated bits\n4. The attack narrows the message interval with each query\n\nTip: Manger\'s attack requires fewer oracle queries than Bleichenbacher but the oracle boundary condition is different. Ensure your oracle matches the expected predicate.',
+  usageGuide: 'This requires oracle_responses \u2014 a comma-separated list from an oracle that reveals whether the decrypted plaintext\'s first byte is 0x00 (i.e., plaintext < B where B = 2^(8*(k-1)), k = ceil(n.nbits()/8)).\n\nHow to use:\n1. Set up an oracle that returns 1 if decrypt(c\') has first byte 0x00 (plaintext < B), 0 otherwise\n2. Query the oracle for successive blinding values\n3. Provide n, e, c, and oracle_responses as comma-separated bits\n4. The attack narrows the message interval with each query\n\nTip: Manger\'s attack requires O(log n) oracle queries \u2014 significantly fewer than Bleichenbacher. The oracle boundary is B = 2^(8*(k-1)) \u2248 n/256, NOT n/2.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_responses,
 };

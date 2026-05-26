@@ -49,6 +49,8 @@ export const attack: Attack = {
                     print(f"  Found Mersenne prime factor: 2^{p} - 1 = {mersenne}")
                     print(f"  Cofactor: {n // mersenne}")
                     print(f"  Verification: {mersenne} * {n // mersenne} = {n}")
+                    print(f"p = {mersenne}")
+                    print(f"q = {n // mersenne}")
                     found = True
             # 2. Primorial primes: p# +/- 1
             print()
@@ -60,10 +62,12 @@ export const attack: Attack = {
                 for sign in [1, -1]:
                     candidate = primorial + sign
                     if candidate > 1 and n_int % int(candidate) == 0:
-                        print(f"  Found primorial prime factor: {candidate} = {p}# {'+' if sign == 1 else '-'} 1")
-                        print(f"  Cofactor: {n // candidate}")
-                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
-                        found = True
+                    print(f"  Found primorial prime factor: {candidate} = {p}# {'+' if sign == 1 else '-'} 1")
+                    print(f"  Cofactor: {n // candidate}")
+                    print(f"  Verification: {candidate} * {n // candidate} = {n}")
+                    print(f"p = {candidate}")
+                    print(f"q = {n // candidate}")
+                    found = True
             # 3. Fermat primes: 2^(2^k) + 1
             print()
             print("Checking Fermat primes (2^(2^k) + 1)...")
@@ -73,6 +77,8 @@ export const attack: Attack = {
                     print(f"  Found Fermat prime factor: 2^(2^{k}) + 1 = {fermat}")
                     print(f"  Cofactor: {n // fermat}")
                     print(f"  Verification: {fermat} * {n // fermat} = {n}")
+                    print(f"p = {fermat}")
+                    print(f"q = {n // fermat}")
                     found = True
             # 4. Fibonacci primes
             print()
@@ -83,6 +89,8 @@ export const attack: Attack = {
                     print(f"  Found Fibonacci prime factor: {fib}")
                     print(f"  Cofactor: {n // fib}")
                     print(f"  Verification: {fib} * {n // fib} = {n}")
+                    print(f"p = {fib}")
+                    print(f"q = {n // fib}")
                     found = True
             # 5. Repunit primes: (10^p - 1) / 9
             print()
@@ -91,10 +99,12 @@ export const attack: Attack = {
                 try:
                     repunit = (10**p - 1) // 9
                     if n_int % repunit == 0:
-                        print(f"  Found repunit prime factor: R({p}) = {repunit}")
-                        print(f"  Cofactor: {n // repunit}")
-                        print(f"  Verification: {repunit} * {n // repunit} = {n}")
-                        found = True
+                    print(f"  Found repunit prime factor: R({p}) = {repunit}")
+                    print(f"  Cofactor: {n // repunit}")
+                    print(f"  Verification: {repunit} * {n // repunit} = {n}")
+                    print(f"p = {repunit}")
+                    print(f"q = {n // repunit}")
+                    found = True
                 except Exception:
                     pass
             # 6. Factorial primes: k! +/- 1
@@ -106,10 +116,12 @@ export const attack: Attack = {
                 for sign in [1, -1]:
                     candidate = factorial + sign
                     if candidate > 1 and n_int % candidate == 0:
-                        print(f"  Found factorial prime factor: {k}! {'+' if sign == 1 else '-'} 1")
-                        print(f"  Cofactor: {n // candidate}")
-                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
-                        found = True
+                    print(f"  Found factorial prime factor: {k}! {'+' if sign == 1 else '-'} 1")
+                    print(f"  Cofactor: {n // candidate}")
+                    print(f"  Verification: {candidate} * {n // candidate} = {n}")
+                    print(f"p = {candidate}")
+                    print(f"q = {n // candidate}")
+                    found = True
             # 7. Carol and Kynea primes: (2^k - 1)^2 - 2, (2^k + 1)^2 - 2
             # Cap k at 100 to keep candidate sizes manageable (≈ 2^200 max)
             print()
@@ -119,10 +131,12 @@ export const attack: Attack = {
                     candidate = (2**k + sign)**2 - 2
                     if candidate > 1 and n_int % candidate == 0:
                         name = "Carol" if sign == -1 else "Kynea"
-                        print(f"  Found {name} prime factor: (2^{k} {'-' if sign == -1 else '+' } 1)^2 - 2")
-                        print(f"  Cofactor: {n // candidate}")
-                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
-                        found = True
+                    print(f"  Found {name} prime factor: (2^{k} {'-' if sign == -1 else '+' } 1)^2 - 2")
+                    print(f"  Cofactor: {n // candidate}")
+                    print(f"  Verification: {candidate} * {n // candidate} = {n}")
+                    print(f"p = {candidate}")
+                    print(f"q = {n // candidate}")
+                    found = True
             # 8. Cullen and Woodall primes: k * 2^k +/- 1
             # Cap k at 100 to keep candidate sizes manageable (k*2^k ≈ 2^107 max)
             print()
@@ -132,10 +146,12 @@ export const attack: Attack = {
                     candidate = k * 2**k + sign
                     if candidate > 1 and n_int % candidate == 0:
                         name = "Cullen" if sign == 1 else "Woodall"
-                        print(f"  Found {name} prime factor: {k} * 2^{k} {'+' if sign == 1 else '-'} 1")
-                        print(f"  Cofactor: {n // candidate}")
-                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
-                        found = True
+                    print(f"  Found {name} prime factor: {k} * 2^{k} {'+' if sign == 1 else '-'} 1")
+                    print(f"  Cofactor: {n // candidate}")
+                    print(f"  Verification: {candidate} * {n // candidate} = {n}")
+                    print(f"p = {candidate}")
+                    print(f"q = {n // candidate}")
+                    found = True
             if found:
                 print()
                 print("GIMMICKY_PRIMES=SUCCESS")

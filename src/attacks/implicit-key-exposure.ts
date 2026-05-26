@@ -12,7 +12,7 @@ export const attack: Attack = {
     { name: 'a', label: 'a (base)', placeholder: 'Enter base a...', multiline: false },
     { name: 'leak', label: 'leak (a^p mod n)', placeholder: 'Enter leaked value...', multiline: true, rows: 3 },
   ],
-  sageTemplate: () => `print("IMPLICIT_KEY_EXPOSURE=FAILED")`,
+  sageTemplate: () => `print("Implicit Key Exposure requires multiple keys — run in browser mode")`,
   proof: `\\textbf{Theorem:} If $a^p \\bmod n$ is leaked, $p$ is recovered via $\\gcd(a - \\text{leak}, n)$.
 
 \\textbf{Setup:}

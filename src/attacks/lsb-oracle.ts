@@ -49,7 +49,9 @@ export const attack: Attack = {
                 out.append("")
             # Binary search using LSB oracle with 2^e blinding
             # Use QQ (rational) arithmetic to avoid integer-division convergence errors.
-            # LSB(m * 2^(i+1) mod n) = 1 iff m >= n / 2^(i+1) (since n is odd)
+            # LSB(2^(i+1) * m mod n) = 1 iff current m >= midpoint of [lower, upper]
+            # where midpoint = ceil((lower + upper) / 2); then halve interval
+            # Compute midpoint using (lower + upper) / 2 (QQ rational, exact)
             lower = QQ(0)
             upper = QQ(n)
             for i, bit in enumerate(oracle_bits):
@@ -112,31 +114,32 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} An oracle \\mathcal{O}(c) = (c^d \\bmod n) \\bmod 2 recovers m in O(\\log n) queries via binary search.
+  proof: `\\textbf{Theorem:} An LSB oracle recovers $m$ in $O(\\log n)$ queries via binary fraction accumulation.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item Oracle O(c) = (c^d \\bmod n) \\bmod 2
-\\item Blind via c \\cdot 2^{ie} \\bmod n
+\\item $\\mathcal{O}(c) = \\text{LSB}(m^d \\bmod n)$
+\\item $\\mathcal{O}(c \\cdot 2^{e} \\bmod n) = \\text{LSB}(2m \\bmod n)$
 \\end{itemize}
 
-\\textbf{Proof:}
+\\textbf{Proof (Binary Fraction):}
 \\begin{align*}
-c_i &= c \\cdot 2^{ie} \\bmod n \\\\
-b_i &= \\text{LSB}(m \\cdot 2^{i} \\bmod n) \\\\
-b_i = 0 &\\iff m < n/2^{i} \\\\
-[\\ell_0, u_0) &= [0, n) \\\\
-[\\ell_{i+1}, u_{i+1}) &= \\begin{cases}
-[\\ell_i, (\\ell_i+u_i)/2) & b_i = 0 \\\\
-[(\\ell_i+u_i)/2, u_i) & b_i = 1
-\\end{cases} \\\\
-\\lceil \\log_2 n \\rceil \\text{ queries} &\\implies u_k - \\ell_k = 1 \\implies m = \\ell_k \\qed
+\\text{LSB}(2^i m \\bmod n) &= \\text{bit } i \\text{ of binary fraction } \\frac{m}{n} \\\\
+q &= \\sum_{i=0}^{k-1} b_i \\cdot 2^{k-1-i}, \\quad b_i = \\text{LSB}(2^{i+1} m \\bmod n) \\\\
+m &= \\left\\lceil \\frac{q \\cdot n}{2^k} \\right\\rceil \\quad (k \\geq \\log_2 n \\text{ unique solution}) \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Each query halves the search interval. After \\lceil \\log_2 n \\rceil queries the interval contains exactly one integer.
+\\textbf{Alternative (Interval Halving):}
+\\begin{align*}
+[L_0, U_0] &= [0, n] \\\\
+\\text{mid} &= \\frac{L_i + U_i}{2} \\quad \\text{(QQ rational)} \\\\
+\\text{LSB}(2^{i+1}m \\bmod n) = 0 &\\implies m \\in [L_i, \\text{mid}) \\\\
+\\text{LSB}(2^{i+1}m \\bmod n) = 1 &\\implies m \\in [\\text{mid}, U_i) \\\\
+\\log_2 n \\text{ steps} &\\implies U_i - L_i = 0 \\implies m = L_i \\qed
+\\end{align*}
 
-\\textbf{References:} Goldwasser, Micali, 1982; Boneh, 1999`,
-  usageGuide: 'This attack requires oracle_responses \u2014 a comma-separated list of LSB bits obtained by querying an oracle that reveals the least significant bit of the decrypted ciphertext.\n\nHow to use:\n1. Set up an LSB oracle function that returns LSB(decrypt(c)) for any ciphertext c\n2. For each query i: compute c\' = c * 2^(i*e) mod n, call the oracle, record the bit\n3. Provide n, e, c, and the full list of oracle bits (from query 0 to query log2(n))\n4. The attack performs binary search to recover the message\n\nTip: You need roughly n.bit_length() oracle responses for full recovery. Each bit halves the uncertainty.',
+\\textbf{References:} Goldwasser, Micali, 1984; Ben-Or et al., 1988`,
+  usageGuide: 'This attack requires oracle_responses \u2014 a comma-separated list of LSB bits obtained by querying an oracle that reveals the least significant bit of the decrypted ciphertext.\n\nHow to use:\n1. Set up an LSB oracle function that returns LSB(decrypt(c)) for any ciphertext c\n2. For each query i: compute c\' = c * 2^(i*e) mod n, call the oracle, record the bit\n3. Provide n, e, c, and the full list of oracle bits (from query 0 to query log2(n))\n4. The attack accumulates bits into a binary fraction to recover the message\n\nTip: You need roughly n.bit_length() oracle responses for full recovery. Each bit halves the uncertainty.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!(p.n && p.e && p.c && p.oracle_responses),
 };

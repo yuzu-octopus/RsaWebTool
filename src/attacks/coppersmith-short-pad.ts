@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'coppersmith-short-pad',
   name: 'Coppersmith Short Pad Attack',
   category: 'Partial Key / Lattice',
-  description: 'Recovers m from short random pads. Use when same message padded with short random values.',
+  description: 'Recovers padded messages m1,m2 from short random pads. Use when same base message is padded with short random values before encryption.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -136,7 +136,7 @@ _attack()`;
 \\item Compute $m_1 = \\sqrt[e]{c_1}$ and $m_2 = \\sqrt[e]{c_2}$ via integer e-th root
 \\item Verify $m_1^e = c_1$ and $m_2^e = c_2$ to confirm exact roots
 \\item If only one root found, brute-force the small pad difference $\\Delta = r_2 - r_1$
-\\item Recover $m$ by removing the shared padding prefix from $m_1$ or $m_2$
+\\item Output: $m_1, m_2, \\Delta \\quad \\text{(extract base } m \\text{ if } r_1 \\text{ known)}
 \\end{enumerate}
 
 \\textbf{Caveat:} This approach requires $m_1^e, m_2^e < n$ (no modular reduction). For $e = 3$ and small messages (common in CTF challenges), this holds. The full Coppersmith method using polynomial resultants and lattice reduction handles the general case with $|\\Delta| < n^{1/e^2}$ but is not implemented in the SageCell template due to timeout constraints.

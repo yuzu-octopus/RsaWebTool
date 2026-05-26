@@ -50,6 +50,8 @@ def _attack():
                             print(f"  Found prime near 2^{bits}: {p_sage}")
                             print(f"  Cofactor: {n // p_sage}")
                             print(f"  Verification: {p_sage} * {n // p_sage} = {n}")
+                            print(f"p = {p_sage}")
+                            print(f"q = {n // p_sage}")
                             found = True
             print("\\nChecking primes near common constants...")
             RF = RealField(300)
@@ -67,6 +69,8 @@ def _attack():
                             p_sage = Integer(candidate)
                             print(f"  Found prime near {name}: {p_sage}")
                             print(f"  Cofactor: {n // p_sage}")
+                            print(f"p = {p_sage}")
+                            print(f"q = {n // p_sage}")
                             found = True
             if found:
                 print("NOVELTY_PRIMES=SUCCESS")

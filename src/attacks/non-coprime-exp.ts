@@ -126,12 +126,12 @@ print("NON_COPRIME_EXP=FAILED")`;
     #
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} When $\\gcd(e,\\varphi(n)) = g > 1$, ciphertext has $g$ preimages via $e$-th roots mod $p$, mod $q$ + CRT.
+  proof: `\\textbf{Theorem:} When $\\gcd(e,\\varphi(n)) > 1$, ciphertext has multiple preimages recovered via Hensel lifting the CRT components.
 
 \\textbf{Setup:}
 \\begin{itemize}
 \\item $g_p = \\gcd(e,p-1)$, $g_q = \\gcd(e,q-1)$
-\\item $g = g_p \\cdot g_q > 1$
+\\item $g_p = \\gcd(e, p-1)$, $g_q = \\gcd(e, q-1)$, product $g = g_p \\cdot g_q > 1$
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -140,7 +140,7 @@ g_p &= \\gcd(e,p-1), \\quad g_q = \\gcd(e,q-1) \\\\
 \\{r_{p,1}, \\ldots, r_{p,g_p}\\} &= \\{x \\in \\mathbb{F}_p : x^e = c\\} \\\\
 \\{r_{q,1}, \\ldots, r_{q,g_q}\\} &= \\{x \\in \\mathbb{F}_q : x^e = c\\} \\\\
 m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\\\
-\\#\\text{solutions} &= g_p \\cdot g_q = g \\qed
+\\#\\text{solutions} &= g_p \\cdot g_q \\qed
 \\end{align*}
 
 \\textbf{References:} Williams, 1980; May, 2003`,

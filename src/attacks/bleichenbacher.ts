@@ -198,7 +198,7 @@ _attack()`,
 
       // Verify
       for (let m = a; m <= b && m < a + 100n; m++) {
-        if (modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}\nBLECHENBACHER=SUCCESS`);
+        if (modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}\nBLEICHENBACHER=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }

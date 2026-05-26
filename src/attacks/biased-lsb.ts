@@ -59,7 +59,7 @@ export const attack: Attack = {
             out.append(f"c = {c}")
             out.append(f"Number of oracle runs: {len(runs)}")
             out.append("")
-            # Per-bit majority voting, then binary search
+            # Per-bit majority voting, then binary fraction accumulation
             num_bits = min(len(r) for r in runs)
             n_bits = n.nbits()
             out.append(f"Using {num_bits} bit positions (n has {n_bits} bits)")
@@ -162,7 +162,7 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} A noisy LSB oracle with bias p > 1/2 recovers m via majority voting + binary search.
+  proof: `\\textbf{Theorem:} A noisy LSB oracle with bias p > 1/2 recovers m via majority voting + binary fraction accumulation.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -176,12 +176,12 @@ b_i &= \\text{LSB}(2^i m \\bmod n) \\\\
 \\hat{b}_i &= \\text{majority}(b_{i,1}, \\ldots, b_{i,k}) \\\\
 \\Pr[\\hat{b}_i \\neq b_i] &\\leq \\exp(-2k(p-\\tfrac12)^2) \\\\
 k = O\\!\\left(\\frac{\\log n}{(p-1/2)^2}\\right) &\\implies \\Pr[\\hat{b}_i \\neq b_i] = O(1/n) \\\\
-b_i = 0 &\\implies \\text{lower half}, \\quad b_i = 1 \\implies \\text{upper half} \\\\
-\\log_2 n \\text{ steps} &\\implies m = a \\qed
+q &= \\sum_{i=0}^{k-1} \\hat{b}_i \\cdot 2^{k-1-i} \\\\
+m &= \\left\\lceil \\frac{q \\cdot n}{2^k} \\right\\rceil \\quad \\text{(verify via } m^e \\equiv c \\pmod{n}) \\qed
 \\end{align*}
 
 \\textbf{References:} Goldwasser, Micali, 1982; Håstad et al., 1989`,
-  usageGuide: 'This attack is for when your LSB oracle is noisy \u2014 instead of a single correct bit per query, you have multiple responses and use majority voting.\n\nHow to use:\n1. Query the oracle N times per blinding value (oracle_runs defaults to 101)\n2. The attack uses majority voting to determine the correct LSB at each step\n3. Provide n, e, c, and oracle_responses \u2014 one per line, each line being comma-separated 0/1 bits\n4. The attack performs binary search with probabilistic bit recovery\n\nTip: More queries per position (oracle_runs) increases accuracy but takes more time. The default of 101 gives 99%+ confidence for each bit.',
+  usageGuide: 'This attack is for when your LSB oracle is noisy \u2014 instead of a single correct bit per query, you have multiple responses and use majority voting.\n\nHow to use:\n1. Query the oracle multiple times per blinding value to get multiple response strings\n2. Provide n, e, c, and oracle_runs \u2014 one response per line, each line being comma-separated 0/1 bits\n3. The attack uses majority voting per bit position, then accumulates voted bits into binary fraction m/n\n4. The final m is computed as ceil(q * n / 2^k) where q is the accumulated voted bits\n\nTip: More runs per position increases accuracy. With 31 runs and 90% accuracy per bit, majority voting gives >99.9% confidence per bit position after 31 runs.',
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_runs,
 };

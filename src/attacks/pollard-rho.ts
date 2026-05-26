@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'pollard-rho',
   name: "Pollard's Rho (Brent variant)",
   category: 'Factorization',
-  description: "Factors n via birthday paradox with Brent's cycle detection and batched GCD (primefac-style). Batched GCD reduces gcd overhead from O(sqrt(p)) to O(sqrt(p)/m). Backtracking recovers when accumulated product contains all factors.",
+  description: "Factors n via birthday paradox with Brent's cycle detection and GCD. GCD reduces gcd overhead from O(sqrt(p)) to O(sqrt(p)/m). Backtracking recovers when accumulated product contains all factors.",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -109,7 +109,10 @@ _attack()`,
       for (let c = 1n; c < 10n; c++) {
         let x = 2n, y = 2n, d = 1n;
         let power = 1n, lam = 0n;
-        while (d === 1n) {
+        const maxPollardIter = 50000;
+        let pollardIter = 0;
+        while (d === 1n && pollardIter < maxPollardIter) {
+          pollardIter++;
           if (power === lam) { x = y; power *= 2n; lam = 0n; }
           y = (y * y + c) % n;
           lam++;
@@ -118,6 +121,9 @@ _attack()`,
             const q = n / d;
             return Promise.resolve(`Factor found!\np = ${d}\nq = ${q}\nPOLLARD_RHO=SUCCESS`);
           }
+        }
+        if (d === 1n && pollardIter >= maxPollardIter) {
+          return Promise.resolve(null);
         }
       }
       return Promise.resolve(null);

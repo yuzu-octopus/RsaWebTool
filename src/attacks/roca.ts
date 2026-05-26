@@ -99,7 +99,7 @@ export const attack: Attack = {
         out.append("ROCA=FAILED")
     print("\\n".join(out))
 _attack()`,
-  proof: `\\textbf{Theorem:} ROCA primes have form \\(p = k \\cdot M + (65537^i \\bmod M)\\), factorable via Coppersmith.
+  proof: `\\textbf{Theorem:} ROCA primes have form $p = k \\cdot M + (65537^i \\bmod M)$, factorable via Coppersmith.
 
 \\textbf{Setup:}
 \\begin{itemize}

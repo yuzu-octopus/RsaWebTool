@@ -111,7 +111,7 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\implies p, q \\qed
 \\textbf{Explanation:} For each $k \\in [1,e]$, compute $d_{\\text{approx}} = \\lfloor(kn+1)/e\\rfloor$; if low $m$ bits match $d_{\\text{low}}$, recover $\\varphi(n) = (ed-1)/k$ and solve $x^2 - (n-\\varphi+1)x + n = 0$ for $p,q$.
 
 \\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,
-  usageGuide: 'This attack reconstructs the full private key d when a fraction of its bits are known.\n\nHow to use:\n1. You have modulus n, public exponent e, and dLow (the low-order bits of d)\n2. Provide n, e, and dLow\n3. The attack uses lattice techniques to recover the missing high-order bits of d\n\nTip: You need at least n.bit_length()/4 known bits of d for the attack to work. More known bits = faster convergence.',
+  usageGuide: 'This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.\n\nHow to use:\n1. You have modulus n, public exponent e, and dLow (the low-order bits of d)\n2. Provide n, e, and dLow\n3. The attack iterates k in ed = k\\phi(n) + 1, checking if d_approx has matching low bits\n4. For each matching candidate, it computes \\phi(n) and solves the quadratic for p,q\n\nTip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~4M iterations); the frontendCheck always attempts the search regardless of e size.',
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.dLow,
 };

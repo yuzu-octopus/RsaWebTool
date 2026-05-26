@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'boneh-durfee',
   name: 'Boneh-Durfee Attack',
   category: 'Factorization',
-  description: 'Recovers d via lattice reduction. Use when d < n^0.292.',
+  description: 'Recovers d via Wiener continued fractions (d < n^0.25) with Boneh-Durfee lattice fallback (d < n^0.292).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -199,28 +199,26 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("BONEH_DURFEE=FAILED")
 _attack()`,
-  proof: `\\textbf{Theorem:} Recover d when d < n^{0.292} via lattice reduction.
+  proof: `\\textbf{Theorem:} Recover $d$ when $d < n^{0.292}$ via Wiener continued fractions (fast path) or Boneh-Durfee lattice (fallback).
 
-\\textbf{Setup:}
-\\begin{itemize}
-\\item ed \\equiv 1 \\pmod{\\varphi(n)}, so ed - 1 = k\\varphi(n)
-\\item \\varphi(n) \\approx 2(A + y) with A = (n+1)/2, y = -(p+q)/2
-\\item LLL lattice basis reduction
-\\end{itemize}
-
-\\textbf{Proof:}
+\\textbf{Phase 1: Wiener's Attack (d < n^{0.25})}
 \\begin{align*}
-ed - 1 &= k\\varphi(n) = k(2A + 2y) \\\\
-f(x, y) &= 1 + x(A + y) \\equiv 0 \\pmod{e} \\quad \\text{root } (2k, y) \\\\
-u &= xy + 1 \\quad \\text{(Herrmann-May linearization)} \\\\
-\\text{Construct lattice from shifts of } f^k e^{m-k} &\\text{, apply LLL} \\\\
-\\text{Resultant of short vectors } &\\implies y, \\; \\varphi(n), \\; p+q \\\\
-x^2 - (p+q)x + n &= 0 \\implies p, q \\qed
+ed - k\\phi(n) &= 1 \\\\
+\\left|\\frac{e}{n} - \\frac{k}{d}\\right| &< \\frac{1}{2d^2} \\quad \\text{(Continued fraction expansion)} \\\\
+\\frac{k}{d} \\text{ is a convergent of } \\frac{e}{n} &\\implies \\phi(n) = \\frac{ed - 1}{k} \\\\
+p,q &= \\frac{n - \\phi(n) + 1 \\pm \\sqrt{(n - \\phi(n) + 1)^2 - 4n}}{2} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Build bivariate polynomial, apply Herrmann-May linearization, construct lattice, find short vectors via LLL, recover \\varphi(n) via resultant. The bound d < n^{0.292} comes from lattice dimension analysis.
+\\textbf{Phase 2: Boneh-Durfee Lattice (d < n^{0.292})}
+\\begin{align*}
+f(x,y) &= x(A + y) - 1, \\quad A = \\lfloor n^{1/2} \\rfloor \\\\
+\\text{Herrmann-May linearization:} \\quad f(x,y) &\\to \\text{shift polynomials + x-shifts} \\\\
+\\text{LLL on } m \\text{ shifts, } d_x = d_y &= m \\text{ with } t = (1-2\\beta)m \\\\
+\\|v_1\\| &< 2^{\\Theta(m^2)} \\cdot n^{m \\cdot (\\beta - 1/2 + \\epsilon)} \\\\
+d < n^{0.292} &\\implies \\text{shortest vector reveals } (k, d) \\qed
+\\end{align*}
 
-\\textbf{References:} Boneh \\& Durfee, 1999; Herrmann \\& May, PKC 2008`,
+\\textbf{References:} M. Wiener, CRYPTO 1990; D. Boneh, G. Durfee, CRYPTO 1999`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e,
 };

@@ -107,7 +107,7 @@ p \\mid (s'^e - m), \\quad q &\\nmid (s'^e - m) \\\\
 \\end{align*}
 
 \\textbf{References:} Boneh, DeMillo, Lipton, Eurocrypt 1997`,
-  usageGuide: 'This attack exploits a faulty RSA-CRT signature. When a transient fault corrupts the CRT computation, the faulty signature leaks one prime factor.\n\nHow to use:\n1. Obtain a valid signature sig_valid for a message m (or compute hash_hex yourself)\n2. Obtain a faulty signature sig_faulty for the same m from a fault-injected device\n3. The attack computes gcd(sig_faulty^e - m, n) to recover p\n\nRequired: n, e, hash_hex (the signed message as hex), sig_valid, sig_faulty\n\nTip: The two signatures must be from the SAME message using the SAME key. The fault must affect only one of the two CRT exponentiations.',
+  usageGuide: 'This attack exploits a faulty RSA-CRT signature. When a transient fault corrupts the CRT computation, the faulty signature leaks one prime factor.\n\nHow to use:\n1. Obtain a valid signature sig_valid for a message m\n2. Obtain a faulty signature sig_faulty for the same message m from a fault-injected device\n3. The attack computes gcd(sig_faulty^e - m, n) to recover p\n\nRequired: n, e, m (the signed message as an integer), sig_valid, sig_faulty\n\nTip: The two signatures must be from the SAME message using the SAME key. The fault must affect only one of the two CRT exponentiations.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.m && !!p.sig_valid && !!p.sig_faulty,
 };

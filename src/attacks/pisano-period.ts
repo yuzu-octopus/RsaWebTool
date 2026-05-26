@@ -44,7 +44,7 @@ export const attack: Attack = {
   id: 'pisano-period',
   name: 'Pisano Period Factorization',
   category: 'Factorization',
-  description: 'Factors n via birthday collision on 2^x mod n (Pisano/Mersenne period). Fast for small n (< 64 bits).',
+  description: 'Factors n via birthday collision on 2^x mod n (multiplicative order period). Fast for small n (< 64 bits).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -57,7 +57,7 @@ export const attack: Attack = {
             out.append("")
             if n < 2:
                 out.append("n = " + str(n) + " is too small to factor")
-                out.append("PISANO=FAILED")
+                out.append("PISANO_PERIOD=FAILED")
                 print("\\n".join(out))
                 return
             if n % 2 == 0:
@@ -66,12 +66,12 @@ export const attack: Attack = {
                 out.append("p = 2")
                 out.append("q = " + str(n // 2))
                 out.append("")
-                out.append("PISANO=SUCCESS")
+                out.append("PISANO_PERIOD=SUCCESS")
                 print("\\n".join(out))
                 return
             if n.is_prime():
                 out.append("n is prime: " + str(n))
-                out.append("PISANO=FAILED")
+                out.append("PISANO_PERIOD=FAILED")
                 print("\\n".join(out))
                 return
             if n.is_square():
@@ -81,7 +81,7 @@ export const attack: Attack = {
                 out.append("p = " + str(p))
                 out.append("q = " + str(p))
                 out.append("")
-                out.append("PISANO=SUCCESS")
+                out.append("PISANO_PERIOD=SUCCESS")
                 print("\\n".join(out))
                 return
             limit = 200000
@@ -107,7 +107,7 @@ export const attack: Attack = {
                                     out.append("p = " + str(p_factor))
                                     out.append("q = " + str(q_factor))
                                     out.append("")
-                                    out.append("PISANO=SUCCESS")
+                                    out.append("PISANO_PERIOD=SUCCESS")
                                     found = True
                                     print("\\n".join(out))
                                     return
@@ -130,21 +130,21 @@ export const attack: Attack = {
                                         out.append("p = " + str(p_factor))
                                         out.append("q = " + str(q_factor))
                                         out.append("")
-                                        out.append("PISANO=SUCCESS")
+                                        out.append("PISANO_PERIOD=SUCCESS")
                                         found = True
                                         print("\\n".join(out))
                                         return
                 lookup[val] = i
             if not found:
                 out.append("Pisano period attack failed: no collision found")
-                out.append("PISANO=FAILED")
+                out.append("PISANO_PERIOD=FAILED")
         except Exception as e:
             out.append("ERROR: " + str(e))
-            out.append("PISANO=FAILED")
+            out.append("PISANO_PERIOD=FAILED")
         #
     except BaseException as ex:
         out.append("ERROR: " + str(ex))
-        out.append("PISANO=FAILED")
+        out.append("PISANO_PERIOD=FAILED")
     print("\\n".join(out))
 _attack()`,
   frontendCheck: (vals) => {
