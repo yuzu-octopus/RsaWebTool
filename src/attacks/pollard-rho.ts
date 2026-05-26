@@ -105,7 +105,7 @@ _attack()`,
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
-      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}`);
+      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}\nPOLLARD_RHO=SUCCESS`);
       for (let c = 1n; c < 10n; c++) {
         let x = 2n, y = 2n, d = 1n;
         let power = 1n, lam = 0n;
@@ -116,7 +116,7 @@ _attack()`,
           d = gcd(y - x > 0n ? y - x : x - y, n);
           if (d > 1n && d < n) {
             const q = n / d;
-            return Promise.resolve(`Factor found!\np = ${d}\nq = ${q}`);
+            return Promise.resolve(`Factor found!\np = ${d}\nq = ${q}\nPOLLARD_RHO=SUCCESS`);
           }
         }
       }

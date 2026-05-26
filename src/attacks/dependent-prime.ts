@@ -85,7 +85,7 @@ _attack()`,
           const p = num / (2n * k);
           if (p > 1n && n % p === 0n) {
             const q = n / p;
-            return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}`);
+            return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nDEPENDENT_PRIME=SUCCESS`);
           }
         }
       }

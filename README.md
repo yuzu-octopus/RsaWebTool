@@ -76,8 +76,8 @@ These run fully in the browser when sufficient parameters are provided, returnin
 | Attack | What It Does |
 |--------|-------------|
 | `batch-gcd` | BigInt GCD computation across a comma-separated modulus list |
-| `biased-lsb` | Majority-vote LSB oracle + binary search to recover m |
-| `bleichenbacher` | Interval arithmetic for PKCS#1 v1.5 padding oracle |
+| `biased-lsb` | Majority-vote LSB oracle + binary fraction recovery of m |
+| `bleichenbacher` | Full Bleichenbacher interval narrowing via r-range enumeration for PKCS#1 v1.5 padding oracle |
 | `close-prime` | Fermat factorization with isqrt (|p-q| small) |
 | `common-modulus` | Extended GCD + Bezout recovery of m from two encryptions under same n |
 | `common-prime-rsa` | GCD chain across multiple moduli |
@@ -91,10 +91,10 @@ These run fully in the browser when sufficient parameters are provided, returnin
 | `implicit-key-exposure` | Lattice GCD across related keys |
 | `known-plaintext` | Integer e-th root + known-prefix brute-force |
 | `linearly-related-primes` | GCD across primes with known linear relations |
-| `lsb-oracle` | Binary search with LSB oracle responses |
+| `lsb-oracle` | Binary fraction recovery of m from LSB oracle responses |
 | `multi-prime-gcd` | GCD across multi-prime setups |
 | `novelty-primes` | Window search near powers of 2 and math constants (π, e, √2) |
-| `partial-d` | Decrypt directly from leaked private exponent d |
+| `partial-d` | Decrypt directly from leaked private exponent d (k-bound iterations for large e) |
 | `phi-leak` | Decrypt directly from leaked φ(n) |
 | `pisano-period` | Period detection via Map on 2<sup>i</sup> mod n |
 | `pollard-rho` | Brent's cycle detection with batched GCD |

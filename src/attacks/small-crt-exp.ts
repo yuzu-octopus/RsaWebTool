@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
-import { modPow, modInverse, gcd } from '../utils/bigint';
+import { modInverse, gcd } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'small-crt-exp',
@@ -56,28 +56,29 @@ _attack()`,
     try {
       const n = BigInt(vals.n);
       const e = BigInt(vals.e);
+
+      // k-based search: p = (dp * e - 1) / k + 1, check n % p == 0
+      // Only works for small e (3, 17, 65537, up to ~1M). For larger e,
+      // skip frontendCheck and let SageCell handle it (120s timeout).
+      if (e > 1_000_000n) return Promise.resolve(null);
+
       const bound = vals.bound ? BigInt(vals.bound) : 50000n;
 
-      // FLT-based: find dp such that m^(e*dp) ≡ m (mod p)
-      // Precompute m^e mod n ONCE, then incrementally multiply
-      const m = 2n; // arbitrary message coprime to n
-      const me = modPow(m, e, n); // O(log e) — done once
-
-      let current = 1n; // m^(e*0) mod n = 1
-      for (let dp = 0n; dp <= bound; dp++) {
-        // gcd(m - m^(e*dp), n) reveals p if dp ≡ d (mod p-1)
-        const diff = m - current;
-        const g_ = gcd(diff, n);
-        if (g_ > 1n && g_ < n) {
-          const qq = n / g_;
-          const phi = (g_ - 1n) * (qq - 1n);
-          const d = modInverse(e, phi);
-          const dLine = d ? `\nPrivate exponent d = ${d}` : '';
-          return Promise.resolve(`Factor found at dp = ${dp}!\np = ${g_}\nq = ${qq}${dLine}`);
+      for (let k = 1n; k < e; k++) {
+        if (gcd(e, k) !== 1n) continue;
+        const dp0 = modInverse(e % k, k);
+        if (dp0 === null) continue;
+        for (let dp = dp0; dp <= bound; dp += k) {
+          const pCandidate = (dp * e - 1n) / k + 1n;
+          if (pCandidate > 1n && n % pCandidate === 0n) {
+            const p = pCandidate;
+            const q = n / p;
+            const phi = (p - 1n) * (q - 1n);
+            const d = modInverse(e, phi);
+            const dLine = d ? `\nPrivate exponent d = ${d}` : '';
+            return Promise.resolve(`Factor found at dp = ${dp}!\np = ${p}\nq = ${q}${dLine}\nSMALL_CRT_EXP=SUCCESS`);
+          }
         }
-
-        // Incremental: one mul per step, no pow/modPow
-        current = (current * me) % n;
       }
 
       return Promise.resolve(null);

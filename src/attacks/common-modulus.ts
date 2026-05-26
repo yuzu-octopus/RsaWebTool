@@ -89,7 +89,7 @@ _attack()`;
       const v1 = modPow(m, e1, n);
       const v2 = modPow(m, e2, n);
       if (v1 === c1 && v2 === c2) {
-        return Promise.resolve(`Recovered message: m = ${m}`);
+        return Promise.resolve(`Recovered message: m = ${m}\nCOMMON_MODULUS=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch {

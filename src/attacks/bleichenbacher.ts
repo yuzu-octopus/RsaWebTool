@@ -143,36 +143,62 @@ _attack()`,
       const e = BigInt(vals.e);
       const c = BigInt(vals.c);
       const responses = vals.oracle_responses.split(',').map(x => x.trim() === '1');
-      const nextResponse = () => idx < responses.length ? responses[idx++] : false;
       const nBits = n.toString(2).length;
       const k = Math.ceil(nBits / 8);
-      const B = 1n << BigInt(8 * (k - 1));
+      const B = 1n << BigInt(8 * (k - 2));
       const twoB = 2n * B;
-      let idx = 0;
+      const threeB = 3n * B;
 
-      // Step 1
-      let s = 1n;
-      while (!nextResponse()) s++;
+      // Collect valid s values (1-indexed positions where oracle = 1)
+      const validS: bigint[] = [];
+      for (let i = 0; i < responses.length; i++) {
+        if (responses[i]) validS.push(BigInt(i + 1));
+      }
+      // Need at least s=1 (original ciphertext) + one more valid s
+      if (validS.length < 2) return Promise.resolve(null);
 
-      // Step 2-3: Initial interval
-      let mmin = (n + s - 1n) / s;
-      let mmax = (n + B) / s;
+      // Initial interval from s=1: original message m ∈ [2B, 3B-1]
+      let a = twoB;
+      let b = threeB - 1n;
 
-      // Step 4: Narrow interval
-      const step4Limit = Math.min(responses.length - idx, 100);
-      for (let i = 0; i < step4Limit; i++) {
-        const fTmp = twoB / (mmax - mmin);
-        const iVal = (fTmp * mmin) / n;
-        let sNew = (iVal * n + mmin - 1n) / mmin;
-        if (sNew === 0n) sNew = 1n;
-        const oracleResult = nextResponse();
-        const iNB = iVal * n + B;
-        if (oracleResult) mmin = (iNB + sNew - 1n) / sNew;
-        else mmax = iNB / sNew;
+      // Narrow using remaining valid s values (skip s=1, it sets initial interval)
+      for (let idx = 1; idx < validS.length && a < b; idx++) {
+        const s = validS[idx];
+        // r range: r = ceil((a*s - 3B + 1)/n) ... floor((b*s - 2B)/n)
+        const rMinNum = a * s - threeB + 1n;
+        const rMin = rMinNum <= 0n ? 0n : (rMinNum + n - 1n) / n;
+        const rMaxNum = b * s - twoB;
+        const rMax = rMaxNum < 0n ? -1n : rMaxNum / n;
+
+        if (rMin > rMax) continue;
+
+        let newA: bigint | null = null;
+        let newB: bigint | null = null;
+        
+        for (let r = rMin; r <= rMax; r++) {
+          // ceil((2B + r*n) / s)
+          const ca = (twoB + r * n + s - 1n) / s;
+          // floor((3B - 1 + r*n) / s)
+          const cb = (threeB - 1n + r * n) / s;
+          
+          const interA = ca > a ? ca : a; // max(a, ca)
+          const interB = cb < b ? cb : b; // min(b, cb)
+          
+          if (interA <= interB) {
+            if (newA === null || interA > newA) newA = interA;
+            if (newB === null || interB < newB) newB = interB;
+          }
+        }
+
+        if (newA !== null && newB !== null) {
+          a = newA;
+          b = newB;
+        }
       }
 
-      for (let m = mmin; m <= mmax && m < mmin + 100n; m++) {
-        if (modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}`);
+      // Verify
+      for (let m = a; m <= b && m < a + 100n; m++) {
+        if (modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}\nBLECHENBACHER=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }

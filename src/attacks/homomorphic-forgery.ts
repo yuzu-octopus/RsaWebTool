@@ -124,7 +124,7 @@ _attack()`;
           }
         }
         if (prodM === targetM) {
-          return Promise.resolve(`Factor found!\nForged signature: s = ${prodS}\nVerification: s^e mod n = ${modPow(prodS, e, n)}`);
+          return Promise.resolve(`Factor found!\nForged signature: s = ${prodS}\nVerification: s^e mod n = ${modPow(prodS, e, n)}\nHOMOMORPHIC_FORGERY=SUCCESS`);
         }
       }
       return Promise.resolve(null);

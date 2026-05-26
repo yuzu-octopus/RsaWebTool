@@ -123,7 +123,7 @@ _attack()`,
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
-      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}`);
+      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}\nCLOSE_PRIME=SUCCESS`);
       let a = isqrt(n);
       if (a * a < n) a++;
       const limit = a + 1000000n;
@@ -134,7 +134,7 @@ _attack()`,
           const p = a - b;
           const q = a + b;
           if (p > 1n && q > 1n && p * q === n) {
-            return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}`);
+            return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nCLOSE_PRIME=SUCCESS`);
           }
         }
         a++;

@@ -135,7 +135,7 @@ _attack()`,
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
-      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}`);
+      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}\nSMALL_FRACTION=SUCCESS`);
 
       for (let b = 1; b <= 50; b++) {
         for (let a = 1; a <= b; a++) {
@@ -146,7 +146,7 @@ _attack()`,
             if (q > 1n && n % q === 0n) {
               const p = n / q;
               if (p > 1n) {
-                return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nUsing a=${a}, b=${b}`);
+                return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nUsing a=${a}, b=${b}\nSMALL_FRACTION=SUCCESS`);
               }
             }
           }

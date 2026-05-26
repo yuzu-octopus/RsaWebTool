@@ -9,6 +9,7 @@
         "@emotion/styled": "^11.14.1",
         "@mui/icons-material": "^9.0.1",
         "@mui/material": "^9.0.1",
+        "bigint-gcd": "^1.0.46",
         "katex": "^0.17.0",
         "react": "^19.2.6",
         "react-dom": "^19.2.6",
@@ -256,6 +257,8 @@
     "balanced-match": ["balanced-match@4.0.4", "", {}, "sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA=="],
 
     "baseline-browser-mapping": ["baseline-browser-mapping@2.10.30", "", { "bin": { "baseline-browser-mapping": "dist/cli.cjs" } }, "sha512-xjOFN16Ha1+Rz4nFYKqHU/LSB+gx/Vi3yQLX7r7sAW+Wa+8hhF2h4pvqTrTMc8+WcDBEunnUurr46Jvv0jk3Vg=="],
+
+    "bigint-gcd": ["bigint-gcd@1.0.46", "", {}, "sha512-LS+5iwYDi5kHu4antUAYaM0uqVN3dA9bNzZvbZlsRofuB4TclaL93LYxF/dDxFmaVcmw5twkWE9aykMb0IVWsA=="],
 
     "brace-expansion": ["brace-expansion@5.0.6", "", { "dependencies": { "balanced-match": "^4.0.2" } }, "sha512-kLpxurY4Z4r9sgMsyG0Z9uzsBlgiU/EFKhj/h91/8yHu0edo7XuixOIH3VcJ8kkxs6/jPzoI6U9Vj3WqbMQ94g=="],
 

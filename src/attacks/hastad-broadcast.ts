@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
-import { modPow, modInverse } from '../utils/bigint';
+import { modPow, modInverse, iroot } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'hastad-broadcast',
@@ -91,18 +91,12 @@ _attack()`;
         M = (M + c * Ni * inv) % N;
       }
       if (M < 2n) return Promise.resolve(null);
-      let lo = 2n, hi = 2n;
-      while (hi ** e < M) hi *= 2n;
-      while (lo < hi) {
-        const mid = (lo + hi + 1n) / 2n;
-        if (mid ** e <= M) lo = mid;
-        else hi = mid - 1n;
-      }
+      const lo = iroot(M, e);
       if (lo ** e === M) {
         for (const {c, n} of pairs) {
           if (modPow(lo, e, n) !== c) return Promise.resolve(null);
         }
-        return Promise.resolve(`Message recovered: m = ${lo}`);
+        return Promise.resolve(`Message recovered: m = ${lo}\nHASTAD_BROADCAST=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }

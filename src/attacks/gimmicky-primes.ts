@@ -157,13 +157,13 @@ _attack()`,
     try {
       const n = BigInt(vals.n);
       if (n < 2n) return Promise.resolve(null);
-      if (n % 2n === 0n) return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n / 2n}`);
+      if (n % 2n === 0n) return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n / 2n}\nGIMMICKY_PRIMES=SUCCESS`);
       const nInt = n;
       const checkDiv = (candidate: bigint): bigint | null => {
         if (candidate > 1n && nInt % candidate === 0n) return candidate;
         return null;
       };
-      const report = (factor: bigint): string => `Factor found!\nCofactor: ${nInt / factor}\nVerification: ${factor} * ${nInt / factor} = ${nInt}`;
+      const report = (factor: bigint): string => `Factor found!\nCofactor: ${nInt / factor}\nVerification: ${factor} * ${nInt / factor} = ${nInt}\nGIMMICKY_PRIMES=SUCCESS`;
       // 1. Mersenne primes: 2^p - 1
       for (const exp of [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127, 521, 607, 1279, 2203, 2281, 3217, 4253, 4423]) {
         const mersenne = (1n << BigInt(exp)) - 1n;

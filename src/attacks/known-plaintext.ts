@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { modPow } from '../utils/bigint';
+import { modPow, iroot } from '../utils/bigint';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 
 export const attack: Attack = {
@@ -100,28 +100,16 @@ _attack()`;
       const e = BigInt(eVal);
       const c = BigInt(vals.c);
       // Strategy 1: Integer e-th root (works when m^e < n, e.g. e=3 with small m)
-      const integerRoot = (target: bigint, exp: bigint): bigint | null => {
-        let lo = 0n, hi = 1n;
-        while (hi ** exp < target) hi *= 2n;
-        while (lo <= hi) {
-          const mid = (lo + hi) / 2n;
-          const pow = mid ** exp;
-          if (pow === target) return mid;
-          if (pow < target) lo = mid + 1n;
-          else hi = mid - 1n;
-        }
-        return null;
-      };
-      const root = integerRoot(c, e);
-      if (root !== null && modPow(root, e, n) === c) {
+      const root = iroot(c, e);
+      if (root ** e === c && modPow(root, e, n) === c) {
         try {
           const hexStr = root.toString(16);
           const padded = hexStr.length % 2 ? '0' + hexStr : hexStr;
           const bytes = new Uint8Array(padded.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
           const text = new TextDecoder().decode(bytes);
-          return Promise.resolve(`RECOVERED via integer e-th root! m = ${root}\nm as bytes: ${text}`);
+          return Promise.resolve(`RECOVERED via integer e-th root! m = ${root}\nm as bytes: ${text}\nKNOWN_PLAINTEXT=SUCCESS`);
         } catch {
-          return Promise.resolve(`RECOVERED via integer e-th root! m = ${root}`);
+          return Promise.resolve(`RECOVERED via integer e-th root! m = ${root}\nKNOWN_PLAINTEXT=SUCCESS`);
         }
       }
       // Strategy 2: Known prefix + brute-force
@@ -142,9 +130,9 @@ _attack()`;
               const padded = hexStr.length % 2 ? '0' + hexStr : hexStr;
               const bytes = new Uint8Array(padded.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
               const text = new TextDecoder().decode(bytes);
-              return Promise.resolve(`FOUND! m = ${mTry}\nm as bytes: ${text}`);
+              return Promise.resolve(`FOUND! m = ${mTry}\nm as bytes: ${text}\nKNOWN_PLAINTEXT=SUCCESS`);
             } catch {
-              return Promise.resolve(`FOUND! m = ${mTry}`);
+              return Promise.resolve(`FOUND! m = ${mTry}\nKNOWN_PLAINTEXT=SUCCESS`);
             }
           }
         }

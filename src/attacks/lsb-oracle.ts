@@ -90,15 +90,24 @@ _attack()`,
       const e = BigInt(vals.e);
       const c = BigInt(vals.c);
       const bits = vals.oracle_responses.split(',').map(x => x.trim() === '1');
-      const twoE = modPow(2n, e, n);
-      let curC = c, lo = 0n, hi = n;
+      const k = BigInt(bits.length);
+
+      // Each LSB response b_i = floor(2^(i+1)*m/n) mod 2, which is bit i of the
+      // binary fraction m/n. Accumulate all bits into quotient q, MSB first:
+      // q = sum(b_i * 2^(k-1-i)) so that m/n ≈ q / 2^k.
+      let q = 0n;
       for (const bit of bits) {
-        const mid = (lo + hi) / 2n;
-        if (bit) lo = mid; else hi = mid;
-        curC = (curC * twoE) % n;
+        q = (q << 1n) | (bit ? 1n : 0n);
       }
-      for (let m = lo; m <= hi && m < lo + 10n; m++) {
-        if (modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}`);
+
+      // After k bits: m ∈ [q*n/2^k, (q+1)*n/2^k). Width = n/2^k.
+      // When k >= n.bit_length(), width < 1 → m = ceil(q*n/2^k) uniquely.
+      const divisor = 1n << k;
+      const mCeil = divisor > n ? (q * n + divisor - 1n) / divisor : q * n / divisor;
+
+      // Scan ±2 around candidate for safety (handles edge rounding)
+      for (let m = mCeil - 2n; m <= mCeil + 2n; m++) {
+        if (m >= 0n && modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}\nLSB_ORACLE=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
@@ -152,7 +161,7 @@ export const generateTestcase = (): Record<string, string> => {
     const lsb = modPow(curC, d, n) & 1n;
     if (lsb === 1n) {
       responses.push('1');
-      lower = mid;
+      lower = mid + 1n;
     } else {
       responses.push('0');
       upper = mid;

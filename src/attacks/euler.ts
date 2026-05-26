@@ -105,7 +105,7 @@ _attack()`,
     try {
       const n = BigInt(vals.n);
       if (n < 2n) return Promise.resolve(null);
-      if (n % 2n === 0n) return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n / 2n}`);
+      if (n % 2n === 0n) return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n / 2n}\nEULER=SUCCESS`);
       const end = isqrt(n);
       const solutions: bigint[][] = [];
       const maxIter = 1000000n;
@@ -136,7 +136,7 @@ _attack()`,
       let q = gcd(lev + m_, n);
       if (p <= 1n || q >= n) return Promise.resolve(null);
       if (p * q !== n) q = n / p;
-      return Promise.resolve(`Factor found!\nVerification: p * q = ${p * q}\np = ${p}\nq = ${q}`);
+      return Promise.resolve(`Factor found!\nVerification: p * q = ${p * q}\np = ${p}\nq = ${q}\nEULER=SUCCESS`);
     } catch {
       return Promise.resolve(null);
     }

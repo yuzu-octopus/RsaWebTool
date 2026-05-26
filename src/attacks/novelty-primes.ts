@@ -86,14 +86,14 @@ _attack()`,
     try {
       const n = BigInt(vals.n);
       if (n < 2n) return Promise.resolve(null);
-      if (n % 2n === 0n) return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n / 2n}`);
+      if (n % 2n === 0n) return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n / 2n}\nNOVELTY_PRIMES=SUCCESS`);
       // Check primes near powers of 2
       for (const bits of [64, 128, 256, 512]) {
         const target = 1n << BigInt(bits);
         for (let delta = -1000n; delta <= 1000n; delta++) {
           const candidate = target + delta;
           if (candidate > 1n && n % candidate === 0n) {
-            return Promise.resolve(`Found prime near 2^${bits}: ${candidate}\nCofactor: ${n / candidate}\nVerification: ${candidate} * ${n / candidate} = ${n}`);
+            return Promise.resolve(`Found prime near 2^${bits}: ${candidate}\nCofactor: ${n / candidate}\nVerification: ${candidate} * ${n / candidate} = ${n}\nNOVELTY_PRIMES=SUCCESS`);
           }
         }
       }
@@ -107,7 +107,7 @@ _attack()`,
         for (let delta = -100n; delta <= 100n; delta++) {
           const candidate = digits + delta;
           if (candidate > 1n && n % candidate === 0n) {
-            return Promise.resolve(`Found prime near ${name}: ${candidate}\nCofactor: ${n / candidate}`);
+            return Promise.resolve(`Found prime near ${name}: ${candidate}\nCofactor: ${n / candidate}\nNOVELTY_PRIMES=SUCCESS`);
           }
         }
       }

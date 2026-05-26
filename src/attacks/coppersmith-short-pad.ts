@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { randomPrime } from '../utils/testcases/core';
-import { modPow } from '../utils/bigint';
+import { modPow, iroot } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'coppersmith-short-pad',
@@ -95,20 +95,10 @@ _attack()`;
       const e = BigInt(vals.e);
       const c1 = BigInt(vals.c1);
       const c2 = BigInt(vals.c2);
-      const iroot = (val: bigint, exp: bigint): bigint | null => {
-        if (val < 0n) return null;
-        if (val < 2n) return val;
-        let lo = 2n, hi = 2n;
-        while (hi ** exp < val) hi *= 2n;
-        while (lo < hi) {
-          const mid = (lo + hi + 1n) / 2n;
-          if (mid ** exp <= val) lo = mid;
-          else hi = mid - 1n;
-        }
-        return lo ** exp === val ? lo : null;
-      };
-      let m1: bigint | null = iroot(c1, e);
-      let m2: bigint | null = iroot(c2, e);
+      const m1Root = iroot(c1, e);
+      const m2Root = iroot(c2, e);
+      let m1: bigint | null = m1Root ** e === c1 ? m1Root : null;
+      let m2: bigint | null = m2Root ** e === c2 ? m2Root : null;
       if (m1 === null && m2 !== null) {
         for (let d = 1n; d < 256n; d++) {
           if ((m2 - d) ** e === c1) {
@@ -127,7 +117,7 @@ _attack()`;
       }
       if (m1 !== null && m2 !== null) {
         if (modPow(m1, e, n) === c1 && modPow(m2, e, n) === c2) {
-          return Promise.resolve(`Messages recovered!\nm1 = ${m1}\nm2 = ${m2}\ndelta = ${m2 - m1}`);
+          return Promise.resolve(`Messages recovered!\nm1 = ${m1}\nm2 = ${m2}\ndelta = ${m2 - m1}\nCOPPERSMITH_SHORT_PAD=SUCCESS`);
         }
       }
       return Promise.resolve(null);

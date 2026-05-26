@@ -64,13 +64,12 @@ _attack()`,
       const e = BigInt(vals.e);
       const dLow = BigInt(vals.dLow);
 
-      // Only work for small e (testcase e is large, but this handles small-e scenarios)
-      if (e > 100000n) return Promise.resolve(null);
+      // Infer mask from bit length of dLow; bound k by dLow bit-length
+      const dLowBits = dLow.toString(2).length;
+      const kBound = 1n << BigInt(Math.min(dLowBits + 2, 20)); // bound at ~4M max
+      const mask = (1n << BigInt(dLowBits)) - 1n;
 
-      // Infer mask from bit length of dLow
-      const mask = (1n << BigInt(dLow.toString(2).length)) - 1n;
-
-      for (let k = 1n; k <= e; k++) {
+      for (let k = 1n; k <= kBound; k++) {
         const dApprox = (k * n + 1n) / e;
         if ((dApprox & mask) !== dLow) continue;
 
@@ -85,7 +84,7 @@ _attack()`,
         const p = (s - sqrtDisc) / 2n;
         if (p > 0n && n % p === 0n) {
           const q = n / p;
-          return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nPrivate key d = ${dApprox}`);
+          return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nPrivate key d = ${dApprox}\nPARTIAL_D=SUCCESS`);
         }
       }
       return Promise.resolve(null);

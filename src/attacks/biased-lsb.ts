@@ -144,15 +144,20 @@ _attack()`,
         for (const run of runs) { if (i < run.length) sum += run[i] ? 1 : -1; }
         votes.push(sum >= 0);
       }
-      const twoE = modPow(2n, e, n);
-      let curC = c, lo = 0n, hi = n;
+
+      // Accumulate majority-voted bits into quotient q (binary fraction m/n)
+      const k = BigInt(votes.length);
+      let q = 0n;
       for (const bit of votes) {
-        const mid = (lo + hi) / 2n;
-        if (bit) lo = mid; else hi = mid;
-        curC = (curC * twoE) % n;
+        q = (q << 1n) | (bit ? 1n : 0n);
       }
-      for (let m = lo; m <= hi && m < lo + 1000n; m++) {
-        if (modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}`);
+
+      // After k bits: m = ceil(q * n / 2^k). When k >= n.bit_length(), width < 1.
+      const divisor = 1n << k;
+      const mCeil = divisor > n ? (q * n + divisor - 1n) / divisor : q * n / divisor;
+
+      for (let m = mCeil - 2n; m <= mCeil + 2n; m++) {
+        if (m >= 0n && modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}\nBIASED_LSB=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }

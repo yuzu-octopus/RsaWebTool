@@ -83,7 +83,7 @@ _attack()`;
         const phi = (g_ - 1n) * (qq - 1n);
         const d = modInverse(e, phi);
         const dLine = d ? `\nPrivate exponent d = ${d}` : '';
-        return Promise.resolve(`Factor found!\np = ${g_}\nq = ${qq}${dLine}`);
+        return Promise.resolve(`Factor found!\np = ${g_}\nq = ${qq}${dLine}\nRSA_CRT_FAULT=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch {

@@ -151,7 +151,7 @@ _attack()`,
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
-      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}`);
+      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}\nPISANO_PERIOD=SUCCESS`);
       const seen = new Map<string, bigint>();
       let pow_val = 1n;
       const limit = 200000n;
@@ -167,7 +167,7 @@ _attack()`,
               const p = (s - t) / 2n;
               const q = (s + t) / 2n;
               if (p > 1n && q > 1n && p * q === n) {
-                return Promise.resolve(`Factor found!\nPeriod length: ${i}\np = ${p}\nq = ${q}`);
+                return Promise.resolve(`Factor found!\nPeriod length: ${i}\np = ${p}\nq = ${q}\nPISANO_PERIOD=SUCCESS`);
               }
             }
           }
@@ -187,7 +187,7 @@ _attack()`,
               const p = (s - t) / 2n;
               const q = (s + t) / 2n;
               if (p > 1n && q > 1n && p * q === n) {
-                return Promise.resolve(`Factor found!\nPeriod length: ${period}\np = ${p}\nq = ${q}`);
+                return Promise.resolve(`Factor found!\nPeriod length: ${period}\np = ${p}\nq = ${q}\nPISANO_PERIOD=SUCCESS`);
               }
             }
           }
