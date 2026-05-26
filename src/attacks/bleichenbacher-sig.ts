@@ -97,6 +97,7 @@ S^3 &= \\text{target} + \\varepsilon, \\quad 0 \\leq \\varepsilon < 3S^2
 \\end{itemize}
 
 \\textbf{References:} D. Bleichenbacher, Crypto 2006 rump session`,
+  usageGuide: 'This attack forges RSA signatures by exploiting that small valid signatures can be found by computing e-th roots over the integers.\n\nHow to use:\n1. You have a public key (n, e) and need a valid signature for a chosen message\n2. The attack finds a value s such that s^e mod n matches the target encoding\n3. Provide n and e\n\nTip: This attack works best with small e (3, 5, 7). The forged signature will be for a message whose hash matches the structure of a small e-th root.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.hash_hex,
 };

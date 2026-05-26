@@ -124,6 +124,7 @@ m &= \\sqrt[e]{M} \\qed
 \\end{align*}
 
 \\textbf{References:} J. Hastad, "Solving Low-Exponent RSA", 1988`,
+  usageGuide: 'This attack recovers m when the same plaintext is encrypted with the same small exponent e to e different moduli.\n\nHow to use:\n1. Collect e ciphertext/modulus pairs: (c1, n1), (c2, n2), ..., (ce, ne)\n2. Paste them into the ciphertexts field, one per line: c, n\n3. Set e to the public exponent (usually 3)\n4. The attack uses CRT to combine the ciphertexts and takes the integer e-th root\n\nInput format:\nc1, n1\nc2, n2\nc3, n3\n\nTip: For convenience, paste this into Magic Mode which auto-detects the format. Works when m^e < n1*n2*...*ne.',
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.e && !!p.ciphertexts,
 };

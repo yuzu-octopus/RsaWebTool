@@ -151,7 +151,7 @@ m &= \\text{root} - \\delta_1 \\qed
 \\end{align*}
 
 \\textbf{References:} D. Coppersmith, J. Cryptology, 1997; Boneh, 1999`,
-
+  usageGuide: 'This attack recovers m when the same message is encrypted twice with the same public key but with a small random padding added.\n\nHow to use:\n1. You have two ciphertexts c1, c2 of the same plaintext m with small pads r1, r2\n2. The pads are small relative to the modulus (|r1|, |r2| < n^(1/e))\n3. Provide n, e, c1, c2\n4. The attack uses Coppersmith\'s method to recover the pads and message\n\nTip: The pads must be different but both small. If the pad difference is known, set base accordingly. For convenience, paste into Magic Mode which auto-detects.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c1 && !!p.c2,
 };

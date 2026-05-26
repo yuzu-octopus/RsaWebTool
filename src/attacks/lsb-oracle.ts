@@ -127,6 +127,7 @@ b_i = 0 &\\iff m < n/2^{i} \\\\
 \\textbf{Explanation:} Each query halves the search interval. After \\lceil \\log_2 n \\rceil queries the interval contains exactly one integer.
 
 \\textbf{References:} Goldwasser, Micali, 1982; Boneh, 1999`,
+  usageGuide: 'This attack requires oracle_responses \u2014 a comma-separated list of LSB bits obtained by querying an oracle that reveals the least significant bit of the decrypted ciphertext.\n\nHow to use:\n1. Set up an LSB oracle function that returns LSB(decrypt(c)) for any ciphertext c\n2. For each query i: compute c\' = c * 2^(i*e) mod n, call the oracle, record the bit\n3. Provide n, e, c, and the full list of oracle bits (from query 0 to query log2(n))\n4. The attack performs binary search to recover the message\n\nTip: You need roughly n.bit_length() oracle responses for full recovery. Each bit halves the uncertainty.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!(p.n && p.e && p.c && p.oracle_responses),
 };

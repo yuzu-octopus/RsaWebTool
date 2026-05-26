@@ -176,6 +176,7 @@ b_i = 0 &\\implies \\text{lower half}, \\quad b_i = 1 \\implies \\text{upper hal
 \\end{align*}
 
 \\textbf{References:} Goldwasser, Micali, 1982; Håstad et al., 1989`,
+  usageGuide: 'This attack is for when your LSB oracle is noisy \u2014 instead of a single correct bit per query, you have multiple responses and use majority voting.\n\nHow to use:\n1. Query the oracle N times per blinding value (oracle_runs defaults to 101)\n2. The attack uses majority voting to determine the correct LSB at each step\n3. Provide n, e, c, and oracle_responses \u2014 one per line, each line being comma-separated 0/1 bits\n4. The attack performs binary search with probabilistic bit recovery\n\nTip: More queries per position (oracle_runs) increases accuracy but takes more time. The default of 101 gives 99%+ confidence for each bit.',
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_runs,
 };
