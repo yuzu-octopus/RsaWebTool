@@ -100,7 +100,7 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("EULER=FAILED")
 _attack()`,
-  frontendCheck: (vals) => {
+  frontendCheck: (vals, onProgress) => {
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
@@ -109,10 +109,21 @@ _attack()`,
       const end = isqrt(n);
       const solutions: bigint[][] = [];
       const maxIter = 5000000n;
+      let a2 = 0n; // tracks a^2 via recurrence: (a+1)^2 = a^2 + 2a + 1
       for (let a = 0n; a < end && solutions.length < 2; a++) {
-        if (a > maxIter) return Promise.resolve(null);
-        const rem = n - a * a;
-        if (rem >= 0n) {
+        if (onProgress && a % 100000n === 0n) {
+          const pct = a > maxIter ? 100 : Number(a * 100n / (end < maxIter ? end : maxIter));
+          onProgress(pct);
+        }
+        if (a > maxIter) {
+          onProgress?.(100);
+          return Promise.resolve(null);
+        }
+        const rem = n - a2;
+        a2 += 2n * a + 1n; // update for next iteration: (a+1)^2
+        // Mod-16 perfect square pre-filter (~80% rejection)
+        const lastNybble = Number(rem & 15n);
+        if (lastNybble === 0 || lastNybble === 1 || lastNybble === 4 || lastNybble === 9) {
           const b = isqrt(rem);
           if (b * b === rem) {
             let distinct = true;
@@ -136,6 +147,7 @@ _attack()`,
       let q = gcd(lev + m_, n);
       if (p <= 1n || q >= n) return Promise.resolve(null);
       if (p * q !== n) q = n / p;
+      onProgress?.(100);
       return Promise.resolve(`Factor found!\nVerification: p * q = ${p * q}\np = ${p}\nq = ${q}\nn = ${s0[0]}^2 + ${s0[1]}^2 = ${s1[0]}^2 + ${s1[1]}^2\nEULER=SUCCESS`);
     } catch {
       return Promise.resolve(null);

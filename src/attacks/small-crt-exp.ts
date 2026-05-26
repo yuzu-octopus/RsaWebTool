@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { modInverse, gcd, modPow } from '../utils/bigint';
 
-const BATCH_SIZE = 1000n;
+const BATCH_SIZE = 5000n;
 
 export const attack: Attack = {
   id: 'small-crt-exp',
@@ -63,7 +63,7 @@ def _attack():
     except Exception as ex:
         print(f"SMALL_CRT_EXP=FAILED: {ex}")
 _attack()`,
-  frontendCheck: (vals) => {
+  frontendCheck: (vals, onProgress) => {
     if (!vals.n || !vals.e) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
@@ -85,6 +85,9 @@ _attack()`,
       for (let dp = 0n; dp <= bound; dp++) {
         // x = (current - 2) mod n, always non-negative
         const x = ((current - 2n) % n + n) % n;
+        if (onProgress && bound > 10000n && dp % 50000n === 0n) {
+          onProgress(Number(dp * 100n / bound));
+        }
         product = (product * x) % n;
 
         const isLastInBatch = dp % BATCH_SIZE === BATCH_SIZE - 1n || dp === bound;
@@ -102,6 +105,7 @@ _attack()`,
                 const phi = (p0 - 1n) * (q0 - 1n);
                 const privateExp = modInverse(e, phi);
                 const dLine = privateExp ? `\nPrivate exponent d = ${privateExp}` : '';
+                onProgress?.(100);
                 return Promise.resolve(`Factor found at dp = ${dpScan}!\np = ${p0}\nq = ${q0}${dLine}\nSMALL_CRT_EXP=SUCCESS`);
               }
               curScan = (curScan * step) % n;

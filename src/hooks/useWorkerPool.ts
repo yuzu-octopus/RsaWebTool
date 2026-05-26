@@ -93,6 +93,7 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
   const runAttack = useCallback((
     attackId: string,
     vals: Record<string, string>,
+    onProgress?: (pct: number) => void,
   ): Promise<string | null> => {
     return new Promise<string | null>((resolve, reject) => {
       // Fallback: Workers unavailable → run on main thread via dynamic import
@@ -103,7 +104,7 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
             resolve(null);
             return;
           }
-          attack.frontendCheck(vals).then(resolve).catch(reject);
+          attack.frontendCheck(vals, onProgress).then(resolve).catch(reject);
         }).catch(reject);
         return;
       }

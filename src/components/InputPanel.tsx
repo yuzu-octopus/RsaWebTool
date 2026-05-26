@@ -7,6 +7,7 @@ import {
   Tabs,
   Tab,
   CircularProgress,
+  LinearProgress,
   Divider,
 } from '@mui/material';
 import { Stop, Casino } from '@mui/icons-material';
@@ -30,6 +31,7 @@ export function InputPanel() {
   const abortControllerRef = useRef<AbortController | null>(null);
   const attackIdRef = useRef<string | null>(null);
   const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
   const mountedRef = useRef(true);
   const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const timer = useTimer();
@@ -83,6 +85,7 @@ export function InputPanel() {
     const controller = new AbortController();
     abortControllerRef.current = controller;
     setLoading(true);
+    setProgress(0);
     timer.start();
     setOutputResult(null);
     setOutputError(null);
@@ -104,7 +107,7 @@ export function InputPanel() {
 
     try {
       if (selectedAttack.frontendCheck) {
-        const preResult = await runAttack(selectedAttack.id, inputValues);
+        const preResult = await runAttack(selectedAttack.id, inputValues, setProgress);
         if (preResult !== null) {
           if (attackIdRef.current !== currentAttackId) return;
           let displayPreResult = preResult;
@@ -267,6 +270,23 @@ export function InputPanel() {
                   <CircularProgress size={16} data-testid="loading-spinner" sx={{ color: draculaColors.orange }} />
                   Running... {timer.formatted}
                 </Typography>
+                {progress > 0 && (
+                  <Box sx={{ mt: 1.5, width: '100%', maxWidth: 300, mx: 'auto' }}>
+                    <LinearProgress
+                      variant="determinate"
+                      value={progress}
+                      sx={{
+                        height: 6,
+                        borderRadius: 3,
+                        bgcolor: draculaColors.currentLine,
+                        '& .MuiLinearProgress-bar': { bgcolor: draculaColors.cyan, borderRadius: 3 },
+                      }}
+                    />
+                    <Typography variant="caption" sx={{ color: draculaColors.comment, mt: 0.5, textAlign: 'center', display: 'block' }}>
+                      {progress}%
+                    </Typography>
+                  </Box>
+                )}
               </>
             ) : (
               <Button

@@ -77,6 +77,8 @@ _attack()`,
       const fourKN = 4n * k * n;
       for (let delta = -100000n; delta <= 100000n; delta++) {
         const disc = delta * delta + fourKN;
+        const discNybble = Number(disc & 15n);
+        if (discNybble !== 0 && discNybble !== 1 && discNybble !== 4 && discNybble !== 9) continue;
         const sqrt_disc = isqrt(disc);
         if (sqrt_disc * sqrt_disc !== disc) continue;
         const num = -delta + sqrt_disc;

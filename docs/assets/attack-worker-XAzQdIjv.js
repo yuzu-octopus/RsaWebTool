@@ -1277,7 +1277,7 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("SMALL_FRACTION=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${t/2n}\nSMALL_FRACTION=SUCCESS`);for(let e=1;e<=100;e++)for(let n=1;n<=e;n++){if(V(n,e)!==1)continue;let r=k(t*BigInt(e)/BigInt(n));for(let i=-1e4;i<=1e4;i++){let a=r+BigInt(i);if(a>1n&&t%a===0n){let r=t/a;if(r>1n)return Promise.resolve(`Factor found!\np = ${r}\nq = ${a}\nUsing a=${n}, b=${e}\nSMALL_FRACTION=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $p/q \\approx a/b$ for small coprime $a, b$, then $q \\approx \\sqrt{nb/a}$ and trial division near $q_0$ recovers the factor.
+_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${t/2n}\nSMALL_FRACTION=SUCCESS`);for(let e=1;e<=100;e++)for(let n=1;n<=e;n++){if(V(n,e)!==1)continue;let r=k(t*BigInt(e)/BigInt(n));for(let i=-2e3;i<=2e3;i++){let a=r+BigInt(i);if(a>1n&&t%a===0n){let r=t/a;if(r>1n)return Promise.resolve(`Factor found!\np = ${r}\nq = ${a}\nUsing a=${n}, b=${e}\nSMALL_FRACTION=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $p/q \\approx a/b$ for small coprime $a, b$, then $q \\approx \\sqrt{nb/a}$ and trial division near $q_0$ recovers the factor.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -1714,7 +1714,7 @@ s \\mid n &\\implies p = s,\\; q = n/s \\\\
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("CLOSE_PRIME=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${t/2n}\nCLOSE_PRIME=SUCCESS`);let n=k(t);n*n<t&&n++;let r=n,i=n*n-t,a=n+1000000n;for(;n<a;){let e=Number(i&15n);if(e===0||e===1||e===4||e===9){let e=k(i);if(e*e===i){let i=n-e,a=n+e;if(i>1n&&a>1n&&i*a===t)return Promise.resolve(`Factor found!\np = ${i}\nq = ${a}\niterations = ${n-r}\nCLOSE_PRIME=SUCCESS`)}}i+=2n*n+1n,n++}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Factor $n = pq$ when $|p-q|$ is small via Fermat's difference-of-squares iteration, extended by Londahl's BSGS to larger gaps.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${n/2n}\nCLOSE_PRIME=SUCCESS`);let r=k(n);r*r<n&&r++;let i=r,a=r*r-n,o=r+1000000n;for(;r<o;){t&&r%50000n==0n&&t(Number((r-i)*100n/(o-i)));let e=Number(a&15n);if(e===0||e===1||e===4||e===9){let e=k(a);if(e*e===a){let a=r-e,o=r+e;if(a>1n&&o>1n&&a*o===n)return t?.(100),Promise.resolve(`Factor found!\np = ${a}\nq = ${o}\niterations = ${r-i}\nCLOSE_PRIME=SUCCESS`)}}a+=2n*r+1n,r++}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Factor $n = pq$ when $|p-q|$ is small via Fermat's difference-of-squares iteration, extended by Londahl's BSGS to larger gaps.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2137,7 +2137,7 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("PARTIAL_D=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.dLow)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.dLow),i=r.toString(2).length,a=1n<<BigInt(Math.min(i+2,24)),o=(1n<<BigInt(i))-1n,s=t/n,c=t%n,l=(t+1n)/n,u=(t+1n)%n;for(let e=1n;e<=a;e++){if((l&o)===r){let r=t-(n*l-1n)/e+1n,i=r*r-4n*t;if(i>=0n){let n=k(i);if(n*n===i){let i=(r-n)/2n;if(i>0n&&t%i===0n){let n=t/i;return Promise.resolve(`Factor found!\np = ${i}\nq = ${n}\nk = ${e}\nPrivate key d = ${l}\nPARTIAL_D=SUCCESS`)}}}}l+=s,u+=c,u>=n&&(l+=1n,u-=n)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If low $m$ bits of $d$ are known, recover $d$ by iterating $k$ in the key equation $ed = k\\varphi(n)+1$.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e||!e.dLow)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=BigInt(e.dLow),a=i.toString(2).length,o=1n<<BigInt(Math.min(a+2,24)),s=(1n<<BigInt(a))-1n,c=n/r,l=n%r,u=(n+1n)/r,d=(n+1n)%r;for(let e=1n;e<=o;e++){if(t&&o>10000n&&e%100000n==0n&&t(Number(e*100n/o)),(u&s)===i){let i=n-(r*u-1n)/e+1n,a=i*i-4n*n;if(a>=0n){let r=k(a);if(r*r===a){let a=(i-r)/2n;if(a>0n&&n%a===0n){let r=n/a;return t?.(100),Promise.resolve(`Factor found!\np = ${a}\nq = ${r}\nk = ${e}\nPrivate key d = ${u}\nPARTIAL_D=SUCCESS`)}}}}u+=c,d+=l,d>=r&&(u+=1n,d-=r)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If low $m$ bits of $d$ are known, recover $d$ by iterating $k$ in the key equation $ed = k\\varphi(n)+1$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2299,7 +2299,7 @@ How to use:
 2. Provide n, knownBits, and bitPosition (\\"msb\\" or \\"lsb\\")
 3. The attack uses Coppersmith\\'s method to find the missing bits
 
-Tip: This is inherently probabilistic — the lattice may fail even with the right inputs. Try with more known bits if it fails. bitPosition=msb = known high bits, lsb = known low bits.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},Q=1000n,$=[P,F,ee,I,L,R,z,B,H,U,W,G,K,q,{id:`euler`,name:`Euler Factorization`,category:`Factorization`,description:`Factors n by finding two distinct representations as a sum of squares a^2+b^2 = c^2+d^2 = n. Use when both primes are ≡ 1 (mod 4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+Tip: This is inherently probabilistic — the lattice may fail even with the right inputs. Try with more known bits if it fails. bitPosition=msb = known high bits, lsb = known low bits.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},Q=5000n,$=[P,F,ee,I,L,R,z,B,H,U,W,G,K,q,{id:`euler`,name:`Euler Factorization`,category:`Factorization`,description:`Factors n by finding two distinct representations as a sum of squares a^2+b^2 = c^2+d^2 = n. Use when both primes are ≡ 1 (mod 4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -2388,7 +2388,7 @@ Tip: This is inherently probabilistic — the lattice may fail even with the rig
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("EULER=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t<2n)return Promise.resolve(null);if(t%2n==0n)return Promise.resolve(`n is even: ${t}\np = 2\nq = ${t/2n}\nEULER=SUCCESS`);let n=k(t),r=[];for(let e=0n;e<n&&r.length<2;e++){if(e>5000000n)return Promise.resolve(null);let n=t-e*e;if(n>=0n){let t=k(n);if(t*t===n){let n=!0;for(let i of r)if(i[0]===t&&i[1]===e){n=!1;break}n&&r.push([t,e])}}}if(r.length<2)return Promise.resolve(null);let[i,a]=[r[0],r[1]],o=O(i[0]-a[0],a[1]-i[1])**2n,s=O(i[0]+a[0],a[1]+i[1])**2n,c=O(i[0]+a[0],a[1]-i[1])**2n,l=O(i[0]-a[0],a[1]+i[1])**2n,u=O(o+s,t),d=O(l+c,t);return u<=1n||d>=t?Promise.resolve(null):(u*d!==t&&(d=t/u),Promise.resolve(`Factor found!\nVerification: p * q = ${u*d}\np = ${u}\nq = ${d}\nn = ${i[0]}^2 + ${i[1]}^2 = ${a[0]}^2 + ${a[1]}^2\nEULER=SUCCESS`))}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Factor $n = pq$ using two distinct representations as a sum of squares. Requires $p \\equiv q \\equiv 1 \\pmod{4}$.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n<2n)return Promise.resolve(null);if(n%2n==0n)return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n/2n}\nEULER=SUCCESS`);let r=k(n),i=[],a=5000000n,o=0n;for(let e=0n;e<r&&i.length<2;e++){if(t&&e%100000n==0n&&t(e>a?100:Number(e*100n/(r<a?r:a))),e>a)return t?.(100),Promise.resolve(null);let s=n-o;o+=2n*e+1n;let c=Number(s&15n);if(c===0||c===1||c===4||c===9){let t=k(s);if(t*t===s){let n=!0;for(let r of i)if(r[0]===t&&r[1]===e){n=!1;break}n&&i.push([t,e])}}}if(i.length<2)return Promise.resolve(null);let[s,c]=[i[0],i[1]],l=O(s[0]-c[0],c[1]-s[1])**2n,u=O(s[0]+c[0],c[1]+s[1])**2n,d=O(s[0]+c[0],c[1]-s[1])**2n,f=O(s[0]-c[0],c[1]+s[1])**2n,p=O(l+u,n),m=O(f+d,n);return p<=1n||m>=n?Promise.resolve(null):(p*m!==n&&(m=n/p),t?.(100),Promise.resolve(`Factor found!\nVerification: p * q = ${p*m}\np = ${p}\nq = ${m}\nn = ${s[0]}^2 + ${s[1]}^2 = ${c[0]}^2 + ${c[1]}^2\nEULER=SUCCESS`))}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Factor $n = pq$ using two distinct representations as a sum of squares. Requires $p \\equiv q \\equiv 1 \\pmod{4}$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2663,7 +2663,7 @@ def _attack():
                 print("SMALL_CRT_EXP=FAILED")
     except Exception as ex:
         print(f"SMALL_CRT_EXP=FAILED: {ex}")
-_attack()`,frontendCheck:e=>{if(!e.n||!e.e)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=e.bound?BigInt(e.bound):5000000n,i=M(2n,n,t),a=1n,o=1n,s=0n;for(let e=0n;e<=r;e++){let c=((a-2n)%t+t)%t;if(o=o*c%t,e%Q==Q-1n||e===r){let r=O(o,t);if(r>1n&&r<t){let a=e,o=M(i,s,t);for(let e=s;e<=a;e++){if(O(((o-2n)%t+t)%t,t)>1n){let i=r,a=t/r,o=j(n,(i-1n)*(a-1n)),s=o?`\nPrivate exponent d = ${o}`:``;return Promise.resolve(`Factor found at dp = ${e}!\np = ${i}\nq = ${a}${s}\nSMALL_CRT_EXP=SUCCESS`)}o=o*i%t}}o=1n,s=e+1n}a=a*i%t}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small ($< \\text{bound}$), Fermat's Little Theorem with batched GCD recovers $p$ in $O(\\text{bound})$ time.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=e.bound?BigInt(e.bound):5000000n,a=M(2n,r,n),o=1n,s=1n,c=0n;for(let e=0n;e<=i;e++){let l=((o-2n)%n+n)%n;if(t&&i>10000n&&e%50000n==0n&&t(Number(e*100n/i)),s=s*l%n,e%Q==Q-1n||e===i){let i=O(s,n);if(i>1n&&i<n){let o=e,s=M(a,c,n);for(let e=c;e<=o;e++){if(O(((s-2n)%n+n)%n,n)>1n){let a=i,o=n/i,s=j(r,(a-1n)*(o-1n)),c=s?`\nPrivate exponent d = ${s}`:``;return t?.(100),Promise.resolve(`Factor found at dp = ${e}!\np = ${a}\nq = ${o}${c}\nSMALL_CRT_EXP=SUCCESS`)}s=s*a%n}}s=1n,c=e+1n}o=o*a%n}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small ($< \\text{bound}$), Fermat's Little Theorem with batched GCD recovers $p$ in $O(\\text{bound})$ time.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2824,7 +2824,7 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("LINEARLY_RELATED_PRIMES=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n||!e.k)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.k),r=4n*n*t;for(let e=-100000n;e<=100000n;e++){let i=e*e+r,a=k(i);if(a*a!==i)continue;let o=-e+a;if(o>0n&&o%(2n*n)==0n){let r=o/(2n*n);if(r>1n&&t%r===0n){let i=t/r;return Promise.resolve(`Factor found!\np = ${r}\nq = ${i}\nk = ${n}\ndelta = ${e}\nLINEARLY_RELATED_PRIMES=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta| < 10^5$, solve $kp^2 + \\delta p - n = 0$ to recover $p$.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.k)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.k),r=4n*n*t;for(let e=-100000n;e<=100000n;e++){let i=e*e+r,a=Number(i&15n);if(a!==0&&a!==1&&a!==4&&a!==9)continue;let o=k(i);if(o*o!==i)continue;let s=-e+o;if(s>0n&&s%(2n*n)==0n){let r=s/(2n*n);if(r>1n&&t%r===0n){let i=t/r;return Promise.resolve(`Factor found!\np = ${r}\nq = ${i}\nk = ${n}\ndelta = ${e}\nLINEARLY_RELATED_PRIMES=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta| < 10^5$, solve $kp^2 + \\delta p - n = 0$ to recover $p$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2908,7 +2908,7 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("DEPENDENT_PRIME=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n||!e.e)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=4n*t*n;for(let e=1n;e<=500000n;e++){let n=1n+e*r,i=Number(n&15n);if(i!==1&&i!==9)continue;let a=k(n);if(a*a!==n)continue;let o=-1n+a;if(o>0n&&o%(2n*e)==0n){let n=o/(2n*e);if(n>1n&&t%n===0n){let r=t/n;return Promise.resolve(`Factor found!\np = ${n}\nq = ${r}\nk = ${e}\nDEPENDENT_PRIME=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $qe \\equiv 1 \\pmod{p}$, solve $kp^2 + p - ne = 0$ for $p$ by iterating $k$.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=4n*n*r;for(let e=1n;e<=500000n;e++){t&&e%50000n==0n&&t(Number(e*100n/500000n));let r=1n+e*i,a=Number(r&15n);if(a!==1&&a!==9)continue;let o=k(r);if(o*o!==r)continue;let s=-1n+o;if(s>0n&&s%(2n*e)==0n){let r=s/(2n*e);if(r>1n&&n%r===0n){let i=n/r;return t?.(100),Promise.resolve(`Factor found!\np = ${r}\nq = ${i}\nk = ${e}\nDEPENDENT_PRIME=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $qe \\equiv 1 \\pmod{p}$, solve $kp^2 + p - ne = 0$ for $p$ by iterating $k$.
 
 \\textbf{Setup:}
 \\begin{itemize}

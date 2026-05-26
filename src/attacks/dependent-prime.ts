@@ -70,13 +70,16 @@ def _attack():
         print(f"ERROR: {ex}")
         print("DEPENDENT_PRIME=FAILED")
 _attack()`,
-  frontendCheck: (vals) => {
+  frontendCheck: (vals, onProgress) => {
     if (!vals.n || !vals.e) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
       const e = BigInt(vals.e);
       const fourNE = 4n * n * e;
       for (let k = 1n; k <= 500000n; k++) {
+        if (onProgress && k % 50000n === 0n) {
+          onProgress(Number(k * 100n / 500000n));
+        }
         const disc = 1n + k * fourNE;
         // Mod-16 perfect square pre-filter: disc ≡ 1 (mod 4), so valid squares mod 16 are only 1 and 9
         // This rejects ~50% of candidates without calling isqrt
@@ -89,6 +92,7 @@ _attack()`,
           const p = num / (2n * k);
           if (p > 1n && n % p === 0n) {
             const q = n / p;
+            onProgress?.(100);
             return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nk = ${k}\nDEPENDENT_PRIME=SUCCESS`);
           }
         }

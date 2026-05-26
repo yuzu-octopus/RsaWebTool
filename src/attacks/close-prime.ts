@@ -119,7 +119,7 @@ export const attack: Attack = {
         print(f"ERROR: {ex}")
         print("CLOSE_PRIME=FAILED")
 _attack()`,
-  frontendCheck: (vals) => {
+  frontendCheck: (vals, onProgress) => {
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
@@ -132,6 +132,9 @@ _attack()`,
       let b2 = a * a - n;
       const limit = a + 1000000n;
       while (a < limit) {
+        if (onProgress && a % 50000n === 0n) {
+          onProgress(Number((a - initialA) * 100n / (limit - initialA)));
+        }
         // Mod-16 perfect square pre-filter: valid squares end in 0,1,4,9 hex
         const lastNybble = Number(b2 & 15n);
         if (lastNybble === 0 || lastNybble === 1 || lastNybble === 4 || lastNybble === 9) {
@@ -140,6 +143,7 @@ _attack()`,
             const p = a - b;
             const q = a + b;
             if (p > 1n && q > 1n && p * q === n) {
+              onProgress?.(100);
               return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\niterations = ${a - initialA}\nCLOSE_PRIME=SUCCESS`);
             }
           }
