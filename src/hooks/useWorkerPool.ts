@@ -29,11 +29,12 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
   const queueRef = useRef<QueuedTask[]>([]);
   const idCounterRef = useRef(0);
   const fallbackRef = useRef(false);
+  const freeRef = useRef<number[]>([]);
 
   const processQueue = () => {
     while (queueRef.current.length > 0) {
-      const freeIndex = busyRef.current.indexOf(false);
-      if (freeIndex === -1) break;
+      if (freeRef.current.length === 0) break;
+      const freeIndex = freeRef.current.shift()!;
       const task = queueRef.current.shift()!;
       busyRef.current[freeIndex] = true;
       workersRef.current[freeIndex].postMessage({
@@ -45,6 +46,8 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
   };
 
   useEffect(() => {
+    const workers = workersRef.current;
+
     if (typeof Worker === 'undefined') {
       fallbackRef.current = true;
       return;
@@ -73,30 +76,35 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
             if (error) pending.reject(new Error(error));
             else pending.resolve(result);
           }
+          freeRef.current.push(i);
           busyRef.current[i] = false;
           processQueue();
         };
         worker.onerror = () => {
+          freeRef.current.push(i);
           busyRef.current[i] = false;
           processQueue();
         };
-        workersRef.current.push(worker);
+        workers.push(worker);
         busyRef.current.push(false);
       }
+      freeRef.current = Array.from({ length: poolSize }, (_, i) => i);
     } catch (e) {
       console.warn('useWorkerPool: failed to create Workers, falling back to main thread:', e);
       fallbackRef.current = true;
     }
 
+    const pending = pendingRef.current;
+    const queue = queueRef.current;
     return () => {
-      for (const w of workersRef.current) {
+      for (const w of workers) {
         w.terminate();
       }
       workersRef.current = [];
       busyRef.current = [];
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      pendingRef.current.clear();
-      queueRef.current = [];
+      freeRef.current = [];
+      pending.clear();
+      queue.length = 0;
     };
   }, [poolSize]);
 
@@ -122,8 +130,8 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
       const id = ++idCounterRef.current;
       pendingRef.current.set(id, { resolve, reject, onProgress });
 
-      const freeIndex = busyRef.current.indexOf(false);
-      if (freeIndex !== -1) {
+      const freeIndex = freeRef.current.shift();
+      if (freeIndex !== undefined) {
         busyRef.current[freeIndex] = true;
         workersRef.current[freeIndex].postMessage({
           id,

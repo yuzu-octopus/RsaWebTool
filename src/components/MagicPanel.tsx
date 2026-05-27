@@ -117,10 +117,14 @@ function buildErrorInsights(
   sageResults?: { success: boolean; stdout: string; error?: string }[],
 ): string | null {
   const errParts: string[] = [];
+  const seenLabels = new Set<string>();
   for (const r of preCheckResults) {
     if (r?.error) {
       const label = r.error.includes('timed out') ? 'frontendCheck timed out' : 'frontendCheck error';
-      if (!errParts.includes(label)) errParts.push(label);
+      if (!seenLabels.has(label)) {
+        seenLabels.add(label);
+        errParts.push(label);
+      }
     }
   }
   if (sageResults) {
@@ -159,8 +163,9 @@ export function MagicPanel() {
   const { runAttack, cancelCurrentRun } = useWorkerPool();
 
   useEffect(() => {
+    const timer = testcaseTimerRef.current;
     return () => {
-      if (testcaseTimerRef.current) clearTimeout(testcaseTimerRef.current);
+      if (timer) clearTimeout(timer);
     };
   }, []);
 
@@ -179,7 +184,7 @@ export function MagicPanel() {
   }, [paramsFromInput]);
 
   const sortedApplicable = useMemo(() =>
-    [...applicablePreview].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]),
+    applicablePreview.toSorted((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]),
     [applicablePreview],
   );
 
@@ -224,6 +229,8 @@ export function MagicPanel() {
     // Phase 1: Run all frontendChecks concurrently, early-stop on first success
     const preCheckResults: ({ result?: string; error?: string; isSuccess?: boolean } | null)[] = [];
     const earlySuccess: { value: { index: number; attack: Attack; result: string } | null } = { value: null };
+
+    if (currentRunId !== runIdRef.current) return;
 
     await new Promise<void>((resolveAll) => {
       let completed = 0;
@@ -342,6 +349,7 @@ export function MagicPanel() {
     const codes = remaining.map(r => r.attack.sageTemplate(params));
 
     try {
+      if (currentRunId !== runIdRef.current) return;
       const results = await executeAll(codes, 6, DEFAULT_SAGE_TIMEOUT, (remainingIndex, result) => {
         if (currentRunId !== runIdRef.current) return true;
         const originalIndex = remaining[remainingIndex].originalIndex;
@@ -441,7 +449,7 @@ export function MagicPanel() {
             <AutoFixHigh sx={{ fontSize: 'inherit' }} /> Magic Cracker
           </Typography>
           <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 3 }}>
-            Paste everything you have — we'll figure out which attacks to try
+            Paste everything you have: we'll figure out which attacks to try
           </Typography>
 
           <TextField
@@ -462,13 +470,13 @@ export function MagicPanel() {
                 Paste any of these formats:
               </Typography>
               <Box sx={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.7rem', color: draculaColors.foreground, '& div': { mb: 0.5 } }}>
-                <div>n = <span style={{ color: draculaColors.cyan }}>1234567890abcdef...</span></div>
+                <div>n = <span style={{ color: draculaColors.cyan }}>1234567890abcdef…</span></div>
                 <div>e = <span style={{ color: draculaColors.cyan }}>65537</span></div>
-                <div style={{ color: draculaColors.comment }}>— or PEM public key —</div>
+                <div style={{ color: draculaColors.comment }}>/ or PEM public key /</div>
                 <div style={{ color: draculaColors.comment }}>-----BEGIN RSA PUBLIC KEY-----</div>
-                <div style={{ color: draculaColors.comment }}>— or just hex/decimal n —</div>
+                <div style={{ color: draculaColors.comment }}>/ or just hex/decimal n /</div>
                 <div style={{ color: draculaColors.comment }}>00c3a7...</div>
-                <div style={{ color: draculaColors.comment }}>— or JSON —</div>
+                <div style={{ color: draculaColors.comment }}>/ or JSON /</div>
                 <div style={{ color: draculaColors.cyan }}>{`{"n": "0x...", "e": 65537, "ct": "..."}`}</div>
               </Box>
             </Box>
@@ -587,14 +595,14 @@ export function MagicPanel() {
               />
               <Typography variant="body2" sx={{ color: draculaColors.purple, mt: 1, textAlign: 'center', fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
                 <HourglassEmpty sx={{ fontSize: '1rem', animation: `${hourglassSpin} 3s ease-in-out infinite` }} />
-                Elapsed: {timer.formatted} — {jobs.filter(j => j.status !== 'running').length}/{jobs.length} completed
+                Elapsed: {timer.formatted} / {jobs.filter(j => j.status !== 'running').length}/{jobs.length} completed
               </Typography>
             </Box>
           )}
 
           {earlyStop && (
             <Typography variant="body2" sx={{ color: draculaColors.green, mt: 1, textAlign: 'center' }}>
-              Found result — stopping early
+              Found result: stopping early
             </Typography>
           )}
 
@@ -617,7 +625,7 @@ export function MagicPanel() {
           {errorInsights && !running && (
             <Box sx={{ mt: 1.5, p: 1, borderRadius: 1, backgroundColor: draculaColors.currentLine, border: `1px solid ${draculaColors.comment}` }}>
               <Typography sx={{ color: draculaColors.orange, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>
-                No attack succeeded — {errorInsights}
+                No attack succeeded: {errorInsights}
               </Typography>
               <Typography sx={{ color: draculaColors.comment, fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", mt: 0.5 }}>
                 Try checking parameter names, using a PEM key, or selecting a specific attack from the sidebar

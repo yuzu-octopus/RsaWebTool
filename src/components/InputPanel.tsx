@@ -94,8 +94,7 @@ export function InputPanel() {
     attackIdRef.current = currentAttackId;
 
     const missingFields = selectedAttack.inputs
-      .filter(f => f.required !== false && !inputValues[f.name]?.trim())
-      .map(f => f.label || f.name);
+      .flatMap(f => (f.required !== false && !inputValues[f.name]?.trim()) ? [f.label || f.name] : []);
     if (missingFields.length > 0) {
       const msg = `Missing required inputs:\n${missingFields.map(f => `- ${f}`).join('\n')}`;
       setOutputError(msg);
@@ -129,8 +128,8 @@ export function InputPanel() {
       }
 
       const code = selectedAttack.sageTemplate(inputValues);
-      const result = await execute(code, DEFAULT_SAGE_TIMEOUT, controller.signal);
       if (attackIdRef.current !== currentAttackId) return;
+      const result = await execute(code, DEFAULT_SAGE_TIMEOUT, controller.signal);
       if (result.success) {
         let displayStdout = result.stdout;
         const decryptedSage = autoDecrypt(selectedAttack, inputValues, result.stdout);
@@ -272,7 +271,7 @@ export function InputPanel() {
                 </Button>
                 <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 2, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
                   <CircularProgress size={16} data-testid="loading-spinner" sx={{ color: draculaColors.orange }} />
-                  Running... {timer.formatted}
+                    Running… {timer.formatted}
                 </Typography>
                 {progress > 0 && (
                   <Box sx={{ mt: 1.5, width: '100%', maxWidth: 300, mx: 'auto' }}>

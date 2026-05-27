@@ -150,7 +150,7 @@ export const attack: Attack = {
                 gg = []
                 for ii in range(mm):
                     for jj in range(dd):
-                        gg.append((modulus ** (mm - ii - 1)) * (x ** jj) * (pol ** ii))
+                        gg.append((modulus ** (mm - ii)) * (x ** jj) * (pol ** ii))
                 for ii in range(tt):
                     gg.append((x ** ii) * (pol ** mm))
                 BB = matrix(ZZ, nn)
@@ -161,9 +161,9 @@ export const attack: Attack = {
                     BB = BB.LLL()
                 except (ValueError, RuntimeError):
                     return []
-                new_pol = BB[nn - 1][0] * (x ** 0)
+                new_pol = BB[0][0] * (x ** 0)
                 for ii in range(1, nn):
-                    new_pol += (BB[nn - 1][ii] // (XX ** ii)) * (x ** ii)
+                    new_pol += (BB[0][ii] // (XX ** ii)) * (x ** ii)
                 roots = []
                 for r, _ in new_pol.roots():
                     if r.is_zero():
@@ -175,17 +175,21 @@ export const attack: Attack = {
             low = c_prime // 2
             high = (c_prime + ord_prime) // 2
             total = Integer(high - low + 1)
-            MAX_ITER = 3000
+            MAX_ITER = 20
             out.append("Search range: [" + str(low) + ", " + str(high) + "] (" + str(total) + " candidates)")
             found = False
             if total > MAX_ITER:
                 out.append("WARNING: Search space (" + str(total) + ") exceeds SageCell limit (" + str(MAX_ITER) + ").")
                 out.append("The key IS ROCA-vulnerable (confirmed via discrete_log detection).")
-                out.append("To factor, use FactorDB or run the ROCA attack on local Sage with:")
-                out.append("  M' = " + str(M_prime))
-                out.append("  c' = " + str(c_prime))
-                out.append("  ord' = " + str(ord_prime))
-                out.append("  X = " + str(X))
+                out.append("For full factorization, SageCell's 120s timeout is insufficient.")
+                out.append("Options:")
+                out.append("  1. Try FactorDB: https://factordb.com/?query=" + str(n))
+                out.append("  2. Run locally with SageMath using:")
+                out.append("     M' = " + str(M_prime))
+                out.append("     c' = " + str(c_prime))
+                out.append("     ord' = " + str(ord_prime))
+                out.append("     X = " + str(X))
+                out.append("     Search range a' in [" + str(low) + ", " + str(high) + "]")
                 out.append("ROCA=FAILED")
                 print("\\n".join(out))
                 return

@@ -63,7 +63,7 @@ export const attack: Attack = {
             # Build the set of all possible remainders {base^i mod M}
             r_set = set()
             r_cur = Integer(1)
-            MAX_SET = 50000
+            MAX_SET = 10000
             out.append(f"Order = {ord_val}" + (f", scanning up to {MAX_SET} remainders (capped)" if ord_val > MAX_SET else ""))
             for _ in range(min(ord_val, MAX_SET)):
                 r_set.add(r_cur)
@@ -86,10 +86,10 @@ export const attack: Attack = {
             out.append(f"Found {len(candidates)} candidate remainder(s)")
             out.append(f"M = {M} (product of first {len(primes_subset)} primes, ~{M.nbits()} bits)")
             # Coppersmith path (fast lattice reduction)
-            bound = min(int(ceil(Integer(isqrt(n)) / M)), 500000)
+            bound = min(int(ceil(Integer(isqrt(n)) / M)), 100000)
             out.append(f"Direct search bound = {bound} (k has ~{Integer(bound).nbits()} bits)")
             factored = False
-            MAX_COPPER = min(len(candidates), 20)
+            MAX_COPPER = min(len(candidates), 15)
             try:
                 R.<x> = PolynomialRing(ZZ)
                 for r_candidate in list(candidates)[:MAX_COPPER]:
@@ -115,7 +115,7 @@ export const attack: Attack = {
                 pass
             if not factored:
                 out.append("Coppersmith did not find root. Falling back to direct search...")
-                max_total_ops = 100000
+                max_total_ops = 20000
                 per_r = min(int(bound) + 1, max(1, max_total_ops // max(1, len(candidates))))
                 out.append(f"Direct search: {len(candidates)} remainder(s), up to {per_r} k-values each")
                 for r_candidate in list(candidates):

@@ -4225,7 +4225,7 @@ Tip: More runs per position increases accuracy. With 31 runs and 90% accuracy pe
                 gg = []
                 for ii in range(mm):
                     for jj in range(dd):
-                        gg.append((modulus ** (mm - ii - 1)) * (x ** jj) * (pol ** ii))
+                        gg.append((modulus ** (mm - ii)) * (x ** jj) * (pol ** ii))
                 for ii in range(tt):
                     gg.append((x ** ii) * (pol ** mm))
                 BB = matrix(ZZ, nn)
@@ -4236,9 +4236,9 @@ Tip: More runs per position increases accuracy. With 31 runs and 90% accuracy pe
                     BB = BB.LLL()
                 except (ValueError, RuntimeError):
                     return []
-                new_pol = BB[nn - 1][0] * (x ** 0)
+                new_pol = BB[0][0] * (x ** 0)
                 for ii in range(1, nn):
-                    new_pol += (BB[nn - 1][ii] // (XX ** ii)) * (x ** ii)
+                    new_pol += (BB[0][ii] // (XX ** ii)) * (x ** ii)
                 roots = []
                 for r, _ in new_pol.roots():
                     if r.is_zero():
@@ -4250,17 +4250,21 @@ Tip: More runs per position increases accuracy. With 31 runs and 90% accuracy pe
             low = c_prime // 2
             high = (c_prime + ord_prime) // 2
             total = Integer(high - low + 1)
-            MAX_ITER = 3000
+            MAX_ITER = 20
             out.append("Search range: [" + str(low) + ", " + str(high) + "] (" + str(total) + " candidates)")
             found = False
             if total > MAX_ITER:
                 out.append("WARNING: Search space (" + str(total) + ") exceeds SageCell limit (" + str(MAX_ITER) + ").")
                 out.append("The key IS ROCA-vulnerable (confirmed via discrete_log detection).")
-                out.append("To factor, use FactorDB or run the ROCA attack on local Sage with:")
-                out.append("  M' = " + str(M_prime))
-                out.append("  c' = " + str(c_prime))
-                out.append("  ord' = " + str(ord_prime))
-                out.append("  X = " + str(X))
+                out.append("For full factorization, SageCell's 120s timeout is insufficient.")
+                out.append("Options:")
+                out.append("  1. Try FactorDB: https://factordb.com/?query=" + str(n))
+                out.append("  2. Run locally with SageMath using:")
+                out.append("     M' = " + str(M_prime))
+                out.append("     c' = " + str(c_prime))
+                out.append("     ord' = " + str(ord_prime))
+                out.append("     X = " + str(X))
+                out.append("     Search range a' in [" + str(low) + ", " + str(high) + "]")
                 out.append("ROCA=FAILED")
                 print("\\n".join(out))
                 return
@@ -4375,7 +4379,7 @@ p &= M \\cdot k_1 + r_1 \\qed
             # Build the set of all possible remainders {base^i mod M}
             r_set = set()
             r_cur = Integer(1)
-            MAX_SET = 50000
+            MAX_SET = 10000
             out.append(f"Order = {ord_val}" + (f", scanning up to {MAX_SET} remainders (capped)" if ord_val > MAX_SET else ""))
             for _ in range(min(ord_val, MAX_SET)):
                 r_set.add(r_cur)
@@ -4398,10 +4402,10 @@ p &= M \\cdot k_1 + r_1 \\qed
             out.append(f"Found {len(candidates)} candidate remainder(s)")
             out.append(f"M = {M} (product of first {len(primes_subset)} primes, ~{M.nbits()} bits)")
             # Coppersmith path (fast lattice reduction)
-            bound = min(int(ceil(Integer(isqrt(n)) / M)), 500000)
+            bound = min(int(ceil(Integer(isqrt(n)) / M)), 100000)
             out.append(f"Direct search bound = {bound} (k has ~{Integer(bound).nbits()} bits)")
             factored = False
-            MAX_COPPER = min(len(candidates), 20)
+            MAX_COPPER = min(len(candidates), 15)
             try:
                 R.<x> = PolynomialRing(ZZ)
                 for r_candidate in list(candidates)[:MAX_COPPER]:
@@ -4427,7 +4431,7 @@ p &= M \\cdot k_1 + r_1 \\qed
                 pass
             if not factored:
                 out.append("Coppersmith did not find root. Falling back to direct search...")
-                max_total_ops = 100000
+                max_total_ops = 20000
                 per_r = min(int(bound) + 1, max(1, max_total_ops // max(1, len(candidates))))
                 out.append(f"Direct search: {len(candidates)} remainder(s), up to {per_r} k-values each")
                 for r_candidate in list(candidates):

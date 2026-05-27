@@ -273,9 +273,10 @@ export const generateTestcase = (): Record<string, string> => {
   // Generate using a random Mersenne prime: 2^p - 1
   // Skip trivial ones (2,3,5,7); use medium ones for variety
   const mersenneP = [17, 19, 31, 61, 89, 107, 127];
-  const candidates = mersenneP
-    .map(p => ({ p, val: (1n << BigInt(p)) - 1n }))
-    .filter(({ val }) => isPrimeMR(val));
+  const candidates = mersenneP.flatMap(p => {
+    const val = (1n << BigInt(p)) - 1n;
+    return isPrimeMR(val) ? [{ p, val }] : [];
+  });
   // Fallback: 2^17 - 1 = 131071 is a known Mersenne prime guaranteed to pass
   const mersenne = candidates.length > 0
     ? candidates[Math.floor(Math.random() * candidates.length)].val
