@@ -32,6 +32,7 @@ interface ProofSegment {
 const displayMathRegex = /\\begin\{(align\*|equation\*|gather\*|aligned)\}([\s\S]*?)\\end\{\1\}/g;
 const itemizeRegex = /\\begin\{itemize\}([\s\S]*?)\\end\{itemize\}/g;
 const inlineMathRegex = /\$([^$]+)\$|\\\(([^)]+)\\\)/g;
+const bracketRegex = /^[(){}[\]]+$/;
 
 /**
  * Parses a LaTeX proof string into segments.
@@ -108,7 +109,7 @@ function autoWrapMathInParagraph(text: string): string {
     let mathSegment: string[] = [];
     const newWords: string[] = [];
     
-    const mathFunctionNames = ['log', 'gcd', 'mod', 'div', 'lcm', 'max', 'min', 'sin', 'cos', 'tan', 'det', 'res', 'ln', 'exp', 'deg'];
+    const mathFunctionNames = new Set(['log', 'gcd', 'mod', 'div', 'lcm', 'max', 'min', 'sin', 'cos', 'tan', 'det', 'res', 'ln', 'exp', 'deg']);
     
     const isMathToken = (token: string, canStart: boolean): boolean => {
       const t = token.trim();
@@ -127,11 +128,11 @@ function autoWrapMathInParagraph(text: string): string {
       }
       
       // Case-sensitive check for math functions
-      if (mathFunctionNames.includes(t)) {
+      if (mathFunctionNames.has(t)) {
         return true;
       }
       
-      if (new RegExp('^[()\\[\\]{}]+$').test(t)) {
+      if (bracketRegex.test(t)) {
         return true;
       }
       

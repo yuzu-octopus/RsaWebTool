@@ -436,7 +436,7 @@ export function MagicPanel() {
   return (
     <Box sx={colFlexSx}>
       <Box sx={{ ...centeredPanelSx, p: 2 }}>
-        <Box sx={{ width: '100%', maxWidth: 640 }}>
+        <Box sx={{ width: '100%', maxWidth: 640, pb: '30vh' }}>
           <Typography variant="h3" sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
             <AutoFixHigh sx={{ fontSize: 'inherit' }} /> Magic Cracker
           </Typography>
@@ -532,7 +532,7 @@ export function MagicPanel() {
             </Box>
           )}
 
-          {/* Generate Testcase button */}
+          {/* Generate Testcase + Run/Stop buttons */}
           <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
             <Button
               fullWidth
@@ -543,34 +543,33 @@ export function MagicPanel() {
             >
               Generate Testcase
             </Button>
+
+            {running ? (
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={handleStop}
+                sx={colorGhostBtn(draculaColors.red)}
+              >
+                <Stop sx={{ mr: 1 }} /> Stop
+              </Button>
+            ) : (
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={() => { void handleCrack(); }}
+                disabled={!rawInput.trim()}
+                sx={{ ...colorGhostBtn(draculaColors.purple), '&:disabled': { borderColor: draculaColors.comment, color: draculaColors.comment } }}
+              >
+                <Science sx={{ mr: 1 }} /> Crack It
+              </Button>
+            )}
           </Box>
 
           {testcaseMsg && (
-            <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, mb: 2, textAlign: 'center', fontSize: '0.75rem' }}>
+            <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, textAlign: 'center', fontSize: '0.75rem' }}>
               {testcaseMsg}
             </Typography>
-          )}
-
-          {/* Run / Stop button */}
-          {running ? (
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={handleStop}
-              sx={colorGhostBtn(draculaColors.red)}
-            >
-              <Stop sx={{ mr: 1 }} /> Stop
-            </Button>
-          ) : (
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => { void handleCrack(); }}
-              disabled={!rawInput.trim()}
-              sx={{ ...colorGhostBtn(draculaColors.purple), '&:disabled': { borderColor: draculaColors.comment, color: draculaColors.comment } }}
-            >
-              <Science sx={{ mr: 1 }} /> Crack It
-            </Button>
           )}
 
           {/* Progress bar and status */}

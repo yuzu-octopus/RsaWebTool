@@ -60,19 +60,39 @@ export const attack: Attack = {
                 out.append("NITROS=FAILED")
                 print("\\n".join(out))
                 return
-            # Use single pair: r1 = 1 (always base^0 mod M) and r2 = n_mod mod M.
-            # Since p = M*k1 + 1 is the most common form (and the test generator
-            # always produces this), searching with r=1 and r=n_mod is sufficient.
-            r1_val = Integer(1)
-            r2_val = n_mod % M
+            # Build the set of all possible remainders {base^i mod M}
+            r_set = set()
+            r_cur = Integer(1)
+            MAX_SET = 50000
+            out.append(f"Order = {ord_val}" + (f", scanning up to {MAX_SET} remainders (capped)" if ord_val > MAX_SET else ""))
+            for _ in range(min(ord_val, MAX_SET)):
+                r_set.add(r_cur)
+                r_cur = ZZ(Mod(r_cur * base, M))
+            # Find candidate remainder pairs (r1, r2) where r1*r2 ≡ n mod M
+            candidates = set()
+            candidates.add(Integer(1))
+            candidates.add(Integer(n_mod % M))
+            for r1 in list(r_set):
+                if len(candidates) >= 20:
+                    break
+                if r1 in candidates:
+                    continue
+                try:
+                    r2 = (Integer(n_mod) * inverse_mod(ZZ(r1), Integer(M))) % Integer(M)
+                    if r2 in r_set:
+                        candidates.add(ZZ(r1))
+                except (ZeroDivisionError, TypeError, ValueError, ArithmeticError):
+                    continue
+            out.append(f"Found {len(candidates)} candidate remainder(s)")
             out.append(f"M = {M} (product of first {len(primes_subset)} primes, ~{M.nbits()} bits)")
             # Coppersmith path (fast lattice reduction)
             bound = min(int(ceil(Integer(isqrt(n)) / M)), 500000)
             out.append(f"Direct search bound = {bound} (k has ~{Integer(bound).nbits()} bits)")
             factored = False
+            MAX_COPPER = min(len(candidates), 20)
             try:
                 R.<x> = PolynomialRing(ZZ)
-                for r_candidate in [r1_val, r2_val]:
+                for r_candidate in list(candidates)[:MAX_COPPER]:
                     f = M*x + r_candidate
                     f_mod = f.change_ring(Zmod(n))
                     f_monic = f_mod.monic()
@@ -95,10 +115,13 @@ export const attack: Attack = {
                 pass
             if not factored:
                 out.append("Coppersmith did not find root. Falling back to direct search...")
-                for r_candidate in [r1_val, r2_val]:
-                    for k in range(int(bound) + 1):
-                        if factored:
-                            break
+                max_total_ops = 100000
+                per_r = min(int(bound) + 1, max(1, max_total_ops // max(1, len(candidates))))
+                out.append(f"Direct search: {len(candidates)} remainder(s), up to {per_r} k-values each")
+                for r_candidate in list(candidates):
+                    if factored:
+                        break
+                    for k in range(per_r):
                         p_candidate = int(M * k + r_candidate)
                         if p_candidate > 1 and n % p_candidate == 0:
                             q = n // p_candidate
@@ -112,7 +135,7 @@ export const attack: Attack = {
                             factored = True
                             break
                 if not factored:
-                    out.append("No ROCA/Nitros pattern detected. Searched up to bound = " + str(bound))
+                    out.append("No ROCA/Nitros pattern detected. Searched up to k-bound = " + str(bound))
                     out.append("NITROS=FAILED")
                     print("\\n".join(out))
         except Exception as ex:

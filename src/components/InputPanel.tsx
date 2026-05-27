@@ -94,8 +94,7 @@ export function InputPanel() {
     attackIdRef.current = currentAttackId;
 
     const missingFields = selectedAttack.inputs
-      .filter(f => f.required !== false)
-      .filter(f => !inputValues[f.name]?.trim())
+      .filter(f => f.required !== false && !inputValues[f.name]?.trim())
       .map(f => f.label || f.name);
     if (missingFields.length > 0) {
       const msg = `Missing required inputs:\n${missingFields.map(f => `- ${f}`).join('\n')}`;

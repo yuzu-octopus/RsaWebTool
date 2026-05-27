@@ -92,7 +92,7 @@ function waitForSageCell(timeoutMs = 10000, signal?: AbortSignal): Promise<void>
   });
 }
 
-export function createSageMathExecutor() {
+function createSageMathExecutor() {
   const execute = async (code: string, timeoutMs = DEFAULT_SAGE_TIMEOUT, signal?: AbortSignal): Promise<SageResult> => {
     if (signal?.aborted) {
       return { success: false, stdout: '', error: 'Cancelled' };

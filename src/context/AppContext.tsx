@@ -9,13 +9,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [outputError, setOutputError] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryEntry[]>(() => {
     try {
-      const stored = localStorage.getItem('rsa-history');
+      const stored = localStorage.getItem('rsa-history:v1') ?? localStorage.getItem('rsa-history');
       if (!stored) return [];
       const entries = JSON.parse(stored) as HistoryEntry[];
       const cutoff = Date.now() - 86_400_000; // 24 hours
-      return entries
-        .map(e => ({ ...e, timestamp: new Date(e.timestamp) }))
-        .filter(e => e.timestamp.getTime() > cutoff);
+      return entries.reduce<HistoryEntry[]>((acc, e) => {
+        const t = new Date(e.timestamp);
+        if (t.getTime() > cutoff) acc.push({ ...e, timestamp: t });
+        return acc;
+      }, []);
     } catch {
       return [];
     }
@@ -30,7 +32,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // Persist to localStorage (truncate result to 200 chars to stay under quota)
       try {
         const stored = updated.map(e => ({ ...e, result: e.result.length > 200 ? e.result.slice(0, 200) + '...' : e.result }));
-        localStorage.setItem('rsa-history', JSON.stringify(stored));
+        localStorage.setItem('rsa-history:v1', JSON.stringify(stored));
       } catch { /* localStorage full or unavailable — silently ignore */ }
       return updated;
     });

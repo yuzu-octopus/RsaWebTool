@@ -42,7 +42,7 @@ export function OutputPanel() {
   const [notepadOpen, setNotepadOpen] = useState(false);
   const [notepadText, setNotepadText] = useState(() => {
     try {
-      const stored = localStorage.getItem('notepad');
+      const stored = localStorage.getItem('notepad:v1') ?? localStorage.getItem('notepad');
       if (stored) {
         const { text, timestamp } = JSON.parse(stored) as { text: string; timestamp: number };
         if (Date.now() - timestamp < 3600000) return text;
@@ -78,7 +78,7 @@ export function OutputPanel() {
     if (!notepadOpen) return;
     const timer = setTimeout(() => {
       try {
-        localStorage.setItem('notepad', JSON.stringify({ text: notepadText, timestamp: Date.now() }));
+        localStorage.setItem('notepad:v1', JSON.stringify({ text: notepadText, timestamp: Date.now() }));
       } catch { /* ignore */ }
     }, 500);
     return () => clearTimeout(timer);
@@ -214,6 +214,7 @@ export function OutputPanel() {
             value={notepadText}
             onChange={e => handleNotepadChange(e.target.value)}
             placeholder="Take notes here..."
+            aria-label="Notepad"
             style={{
               width: '100%',
               height: `${notepadHeight}px`,
@@ -227,10 +228,17 @@ export function OutputPanel() {
               border: `1px solid ${draculaColors.comment}`,
               borderRadius: '4px',
               outline: 'none',
+              boxShadow: 'none',
               boxSizing: 'border-box',
             }}
-            onFocus={e => (e.target.style.borderColor = draculaColors.purple)}
-            onBlur={e => (e.target.style.borderColor = draculaColors.comment)}
+            onFocus={e => {
+              e.target.style.borderColor = draculaColors.purple;
+              e.target.style.boxShadow = `0 0 0 2px ${draculaColors.purple}40`;
+            }}
+            onBlur={e => {
+              e.target.style.borderColor = draculaColors.comment;
+              e.target.style.boxShadow = 'none';
+            }}
           />
         </Collapse>
       </Box>

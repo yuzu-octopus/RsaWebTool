@@ -4087,9 +4087,10 @@ How to use:
 3. The attack uses majority voting per bit position, then accumulates voted bits into binary fraction m/n
 4. The final m is computed as ceil(q * n / 2^k) where q is the accumulated voted bits
 
-Tip: More runs per position increases accuracy. With 31 runs and 90% accuracy per bit, majority voting gives >99.9% confidence per bit position after 31 runs.`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_runs},{id:`roca`,name:`ROCA Vulnerability`,category:`Advanced`,description:`Factors ROCA-vulnerable (Infineon) RSA keys where p = k·M + (65537^i mod M) via Coppersmith. Use for vulnerable TPM/HSM key recovery.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+Tip: More runs per position increases accuracy. With 31 runs and 90% accuracy per bit, majority voting gives >99.9% confidence per bit position after 31 runs.`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_runs},{id:`roca`,name:`ROCA Vulnerability`,category:`Advanced`,description:`Factors ROCA-vulnerable (Infineon) RSA keys where p = k·M + (65537^i mod M) via discrete_log detection and Howgrave-Graham Coppersmith. For 512-bit keys SageCell may timeout; use FactorDB or local Sage for full factorization.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     out = []
     try:
+        R.<x> = PolynomialRing(ZZ)
         try:
             if not "${e.n}".strip():
                 out.append("ERROR: n is required")
@@ -4097,85 +4098,195 @@ Tip: More runs per position increases accuracy. With 31 runs and 90% accuracy pe
                 print("\\n".join(out))
                 return
             n = Integer(${e.n})
+            if n < 2:
+                out.append("n is too small to factor")
+                out.append("ROCA=FAILED")
+                print("\\n".join(out))
+                return
             if n % 2 == 0:
-                out.append("n is even. p = 2, q = " + str(n // 2))
+                out.append("n is even: " + str(n))
+                out.append("p = 2")
+                out.append("q = " + str(n // 2))
+                out.append("Verification: 2 * " + str(n // 2) + " = " + str(n))
                 out.append("ROCA=SUCCESS")
                 print("\\n".join(out))
                 return
-            if is_prime(n):
+            if n.is_prime():
                 out.append("n is prime. Not a valid RSA modulus.")
                 out.append("ROCA=FAILED")
                 print("\\n".join(out))
                 return
+            if n.is_square():
+                p = isqrt(n)
+                out.append("n is a perfect square: " + str(p) + "^2 = " + str(n))
+                out.append("p = " + str(p))
+                out.append("q = " + str(p))
+                out.append("ROCA=SUCCESS")
+                print("\\n".join(out))
+                return
             out.append("ROCA vulnerability check")
             out.append("n = " + str(n))
-            primes_list = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
-
-            # Precompute remainder set once for the largest M
-            _M_max = 1
-            for _p in primes_list:
-                if _M_max * _p > 2**50:
+            bits = n.nbits()
+            out.append("n bits = " + str(bits))
+            # Full list of primes up to 167 (39 primes)
+            primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167]
+            # Build M as product of first N primes where M < sqrt(n)
+            M = 1
+            used = []
+            sqrt_n = Integer(isqrt(n))
+            for p in primes:
+                if M * p >= sqrt_n:
                     break
-                _M_max *= _p
-            _ord_max = Mod(65537, _M_max).multiplicative_order()
-            _cached_rem = set()
-            _r = 1
-            for _ in range(_ord_max):
-                _cached_rem.add(_r)
-                _r = (_r * 65537) % _M_max
-
-            best_M = None
-            best_r = 0
-            for num_primes in range(4, len(primes_list) + 1):
-                M = prod(primes_list[:num_primes])
-                if M > 2**50:
-                    break
-                # Build R(M) by reducing cached remainders mod M
-                rem = {_x % M for _x in _cached_rem}
-                n_mod = n % M
-                for r in rem:
-                    if n_mod * inverse_mod(r, M) % M in rem:
-                        best_M = M
-                        best_r = r
+                M *= p
+                used.append(p)
+            if len(used) < 4:
+                out.append("n too small for ROCA (need at least 4 primes in M)")
+                out.append("ROCA=FAILED")
+                print("\\n".join(out))
+                return
+            out.append("M = product of " + str(len(used)) + " primes [up to " + str(used[-1]) + "] = " + str(M) + " (" + str(Integer(M).nbits()) + " bits)")
+            # Detection: check if n mod M is in the subgroup generated by 65537
+            Rm = Zmod(M)
+            g = Rm(65537)
+            n_mod_M = Rm(n)
+            ord_M = g.multiplicative_order()
+            out.append("Order(65537 mod M) = " + str(ord_M) + " (" + str(ord_M.nbits()) + " bits)")
+            # Check if n mod M is in subgroup via discrete_log
+            detected = False
+            try:
+                c = discrete_log(n_mod_M, g)
+                detected = True
+                out.append("discrete_log(n, 65537) mod M = " + str(c))
+            except (ValueError, TypeError, ArithmeticError):
+                out.append("n mod M is NOT in the subgroup generated by 65537 mod M")
+                out.append("n does NOT appear to be ROCA-vulnerable")
+                out.append("ROCA=FAILED")
+                print("\\n".join(out))
+                return
+            if not detected:
+                out.append("ROCA=FAILED")
+                print("\\n".join(out))
+                return
+            out.append("ROCA VULNERABILITY DETECTED")
+            # Compute max M' dividing M_val where ord_{65537}(M') divides ord_
+            def _cmm(M_val, ord_):
+                for pf, pe in factor(M_val):
+                    pp = pf ** pe
+                    ord_pp = Zmod(pp)(65537).multiplicative_order()
+                    if ord_ % ord_pp != 0:
+                        M_val //= pp
+                return M_val
+            # Greedy M' optimization
+            def _gfm(M_val):
+                ord_val = Zmod(M_val)(65537).multiplicative_order()
+                while True:
+                    best_r = 0
+                    best_ord = ord_val
+                    best_M = M_val
+                    for of, oe in factor(ord_val):
+                        for _pi in range(1, oe + 1):
+                            ord_try = ord_val // (of ** _pi)
+                            M_try = _cmm(M_val, ord_try)
+                            if M_try > 0 and M_try != M_val:
+                                r = (log(ord_val, 2) - log(ord_try, 2)) / (log(M_val, 2) - log(M_try, 2))
+                                if r > best_r:
+                                    best_r = r
+                                    best_ord = ord_try
+                                    best_M = M_try
+                    if best_r <= 0 or Integer(best_M).nbits() < bits // 4:
                         break
-            if best_M is not None:
-                r = best_r
-                M = best_M
-                bound = ceil(sqrt(n) / M * 2)
-                found_k = None
-                try:
-                    R.<x> = PolynomialRing(ZZ)
-                    f = M*x + r
-                    f_mod = f.change_ring(Zmod(n))
-                    f_monic = f_mod.monic()
-                    roots = f_monic.small_roots(X=bound, beta=0.5, epsilon=0.05)
-                    if roots:
-                        k = int(roots[0])
-                        p = int(M * k + r)
-                        if p > 1 and n % p == 0:
-                            found_k = k
-                except Exception:
-                    pass
-                if found_k is None:
-                    for k in range(1, bound):
-                        if n % (M * k + r) == 0:
-                            found_k = k
-                            break
-                if found_k is not None:
-                    k = found_k
-                    p = int(M * k + r)
-                    q = n // p
-                    out.append("VULNERABLE: n uses ROCA-generated primes.")
-                    out.append("Verification: p * q = " + str(p * q))
-                    out.append("p = " + str(p))
-                    out.append("q = " + str(q))
-                    out.append("")
-                    out.append("ROCA=SUCCESS")
-                else:
-                    out.append("No root found with M = " + str(M))
-                    out.append("ROCA=FAILED")
+                    ord_val = best_ord
+                    M_val = best_M
+                return M_val, ord_val
+            M_prime, ord_prime = _gfm(M)
+            g_mod_Mp = Zmod(M_prime)(65537)
+            c_prime = discrete_log(Zmod(M_prime)(n), g_mod_Mp)
+            X = Integer(2 * isqrt(n) // M_prime)
+            out.append("M' (optimized) = " + str(M_prime) + " (" + str(Integer(M_prime).nbits()) + " bits)")
+            out.append("Order(65537 mod M') = " + str(ord_prime) + " (" + str(ord_prime.nbits()) + " bits)")
+            out.append("discrete_log(n, 65537) mod M' = " + str(c_prime))
+            out.append("X bound = " + str(X) + " (" + str(X.nbits()) + " bits)")
+            if X < 1:
+                out.append("X < 1: M' >= sqrt(n), no valid k values fit the bound.")
+                out.append("ROCA=FAILED")
+                print("\\n".join(out))
+                return
+            # Coppersmith params based on key size
+            if bits <= 960:
+                mm, tt = 5, 6
+            elif bits <= 1952:
+                mm, tt = 4, 5
             else:
-                out.append("n does NOT appear to be ROCA-vulnerable.")
+                mm, tt = 7, 8
+            # Howgrave-Graham Coppersmith for univariate modular polynomial
+            def _chu(pol, modulus, beta, mm, tt, XX):
+                dd = pol.degree()
+                nn = dd * mm + tt
+                gg = []
+                for ii in range(mm):
+                    for jj in range(dd):
+                        gg.append((modulus ** (mm - ii - 1)) * (x ** jj) * (pol ** ii))
+                for ii in range(tt):
+                    gg.append((x ** ii) * (pol ** mm))
+                BB = matrix(ZZ, nn)
+                for ii in range(nn):
+                    for jj in range(nn):
+                        BB[ii, jj] = gg[ii][jj] * (XX ** jj)
+                try:
+                    BB = BB.LLL()
+                except (ValueError, RuntimeError):
+                    return []
+                new_pol = BB[nn - 1][0] * (x ** 0)
+                for ii in range(1, nn):
+                    new_pol += (BB[nn - 1][ii] // (XX ** ii)) * (x ** ii)
+                roots = []
+                for r, _ in new_pol.roots():
+                    if r.is_zero():
+                        continue
+                    if gcd(modulus, ZZ(pol(r))) >= ZZ(modulus ** beta):
+                        roots.append(ZZ(r))
+                return roots
+            # Search phase
+            low = c_prime // 2
+            high = (c_prime + ord_prime) // 2
+            total = Integer(high - low + 1)
+            MAX_ITER = 3000
+            out.append("Search range: [" + str(low) + ", " + str(high) + "] (" + str(total) + " candidates)")
+            found = False
+            if total > MAX_ITER:
+                out.append("WARNING: Search space (" + str(total) + ") exceeds SageCell limit (" + str(MAX_ITER) + ").")
+                out.append("The key IS ROCA-vulnerable (confirmed via discrete_log detection).")
+                out.append("To factor, use FactorDB or run the ROCA attack on local Sage with:")
+                out.append("  M' = " + str(M_prime))
+                out.append("  c' = " + str(c_prime))
+                out.append("  ord' = " + str(ord_prime))
+                out.append("  X = " + str(X))
+                out.append("ROCA=FAILED")
+                print("\\n".join(out))
+                return
+            for a_prime in range(low, low + total):
+                r_mod = ZZ(Mod(65537, M_prime) ^ a_prime)
+                known = ZZ(r_mod * inverse_mod(M_prime, n) % n)
+                pol = x + known
+                roots_found = _chu(pol, n, 0.5, mm, tt, X)
+                for k_val in roots_found:
+                    p_candidate = ZZ(k_val * M_prime + r_mod)
+                    if p_candidate > 1 and p_candidate < n and n % p_candidate == 0:
+                        q_val = n // p_candidate
+                        out.append("VULNERABLE: n uses ROCA-generated primes.")
+                        out.append("a' = " + str(a_prime))
+                        out.append("k = " + str(k_val))
+                        out.append("Verification: p * q = " + str(p_candidate * q_val))
+                        out.append("p = " + str(p_candidate))
+                        out.append("q = " + str(q_val))
+                        out.append("")
+                        out.append("ROCA=SUCCESS")
+                        found = True
+                        break
+                if found:
+                    break
+            if not found:
+                out.append("No factor found in search range. Try running locally with larger bounds.")
                 out.append("ROCA=FAILED")
         except Exception as ex:
             out.append("ERROR: " + str(ex))
@@ -4195,6 +4306,8 @@ _attack()`,proof:`\\textbf{Theorem:} ROCA (Return of Coppersmith's Attack) prime
 \\item Remainder set $\\mathcal{R} = \\{65537^i \\bmod M : i \\geq 0\\}$ is small (size = ord$_M(65537)$)
 \\end{itemize}
 
+\\textbf{Detection:} Since $n \\equiv r_1 r_2 \\pmod{M}$ and $r_1, r_2 \\in \\mathcal{R}$ (a multiplicative subgroup), we have $n \\bmod M \\in \\mathcal{R}$. Checked via discrete logarithm.
+
 \\textbf{Proof:}
 \\begin{align*}
 n &= (k_1 M + r_1)(k_2 M + r_2) \\\\
@@ -4207,6 +4320,8 @@ p &= M \\cdot k_1 + r_1 \\qed
 \\end{align*}
 
 \\textbf{Explanation:} The Infineon RSA key generator had a bug: it generated primes by starting with a random $k$, computing $p = k \\cdot M + (65537^i \\bmod M)$, and testing primality. Since $M$ is large (product of many small primes), the $k$ values are small (often $k < \\sqrt{n}/M \\ll n^{0.5}$), making $p$'s high bits predictable. Coppersmith's theorem says we can find small roots of $f(x) = Mx + r \\bmod p$ when $|x| < p^\\beta$. With $\\beta = 0.5$ and $X = \\sqrt{n}/M$, the bounded root $k$ is recovered via lattice reduction (LLL). This attack factored 512-bit keys in minutes and 1024-bit keys in hours in practice.
+
+\\textbf{Optimization:} The greedy M' search reduces the search space by removing prime factors from M that contribute the least order-reduction per M-reduction, yielding a smaller Coppersmith bound $X = \\sqrt{n}/M'$.
 
 \\textbf{References:} M. Nemec, M. Sys, P. Svenda, D. Klinec, V. Matyas, "The Return of Coppersmith's Attack: Practical Factorization of Widely Used RSA Moduli", CCS 2017`,priority:`high`,applicableCheck:e=>!!e.n},{id:`nitros`,name:`Nitros / ROCA Variant`,category:`Advanced`,description:`Factors RSA keys with generalized ROCA primes p = k·M + (a^i mod M) for arbitrary generator a. Use when prime generation follows a ROCA-like pattern with non-standard base.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`base`,label:`Base (default 65537)`,placeholder:`65537`,required:!1,multiline:!1}],sageTemplate:e=>`def _attack():
     try:
@@ -4257,19 +4372,39 @@ p &= M \\cdot k_1 + r_1 \\qed
                 out.append("NITROS=FAILED")
                 print("\\n".join(out))
                 return
-            # Use single pair: r1 = 1 (always base^0 mod M) and r2 = n_mod mod M.
-            # Since p = M*k1 + 1 is the most common form (and the test generator
-            # always produces this), searching with r=1 and r=n_mod is sufficient.
-            r1_val = Integer(1)
-            r2_val = n_mod % M
+            # Build the set of all possible remainders {base^i mod M}
+            r_set = set()
+            r_cur = Integer(1)
+            MAX_SET = 50000
+            out.append(f"Order = {ord_val}" + (f", scanning up to {MAX_SET} remainders (capped)" if ord_val > MAX_SET else ""))
+            for _ in range(min(ord_val, MAX_SET)):
+                r_set.add(r_cur)
+                r_cur = ZZ(Mod(r_cur * base, M))
+            # Find candidate remainder pairs (r1, r2) where r1*r2 ≡ n mod M
+            candidates = set()
+            candidates.add(Integer(1))
+            candidates.add(Integer(n_mod % M))
+            for r1 in list(r_set):
+                if len(candidates) >= 20:
+                    break
+                if r1 in candidates:
+                    continue
+                try:
+                    r2 = (Integer(n_mod) * inverse_mod(ZZ(r1), Integer(M))) % Integer(M)
+                    if r2 in r_set:
+                        candidates.add(ZZ(r1))
+                except (ZeroDivisionError, TypeError, ValueError, ArithmeticError):
+                    continue
+            out.append(f"Found {len(candidates)} candidate remainder(s)")
             out.append(f"M = {M} (product of first {len(primes_subset)} primes, ~{M.nbits()} bits)")
             # Coppersmith path (fast lattice reduction)
             bound = min(int(ceil(Integer(isqrt(n)) / M)), 500000)
             out.append(f"Direct search bound = {bound} (k has ~{Integer(bound).nbits()} bits)")
             factored = False
+            MAX_COPPER = min(len(candidates), 20)
             try:
                 R.<x> = PolynomialRing(ZZ)
-                for r_candidate in [r1_val, r2_val]:
+                for r_candidate in list(candidates)[:MAX_COPPER]:
                     f = M*x + r_candidate
                     f_mod = f.change_ring(Zmod(n))
                     f_monic = f_mod.monic()
@@ -4292,10 +4427,13 @@ p &= M \\cdot k_1 + r_1 \\qed
                 pass
             if not factored:
                 out.append("Coppersmith did not find root. Falling back to direct search...")
-                for r_candidate in [r1_val, r2_val]:
-                    for k in range(int(bound) + 1):
-                        if factored:
-                            break
+                max_total_ops = 100000
+                per_r = min(int(bound) + 1, max(1, max_total_ops // max(1, len(candidates))))
+                out.append(f"Direct search: {len(candidates)} remainder(s), up to {per_r} k-values each")
+                for r_candidate in list(candidates):
+                    if factored:
+                        break
+                    for k in range(per_r):
                         p_candidate = int(M * k + r_candidate)
                         if p_candidate > 1 and n % p_candidate == 0:
                             q = n // p_candidate
@@ -4309,7 +4447,7 @@ p &= M \\cdot k_1 + r_1 \\qed
                             factored = True
                             break
                 if not factored:
-                    out.append("No ROCA/Nitros pattern detected. Searched up to bound = " + str(bound))
+                    out.append("No ROCA/Nitros pattern detected. Searched up to k-bound = " + str(bound))
                     out.append("NITROS=FAILED")
                     print("\\n".join(out))
         except Exception as ex:

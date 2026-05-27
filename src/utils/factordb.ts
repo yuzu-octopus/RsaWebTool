@@ -5,7 +5,7 @@ export interface FactorDBResult {
   factors: [string, number][] | null
 }
 
-export class FactorDBError extends Error {
+class FactorDBError extends Error {
   status?: number
 
   constructor(message: string, status?: number) {

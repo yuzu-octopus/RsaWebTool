@@ -17,7 +17,7 @@ import type { Attack } from '../types';
 import { useAppContext } from '../hooks/useAppContext';
 import { FACTORDB_PROXY_URL } from '../config';
 
-export const drawerWidth = 220;
+const drawerWidth = 220;
 
 interface ServiceStatus {
   factordb: 'checking' | 'ok' | 'error';
