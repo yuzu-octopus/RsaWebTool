@@ -62,7 +62,7 @@ export function formatFactorDBResult(result: FactorDBResult): string {
   if (result.status === "FF" && result.factors) {
     lines.push("Fully factored!")
     for (const [factor, exp] of result.factors) {
-      lines.push(`  ${factor}^${exp}`)
+      lines.push(exp > 1 ? `  ${factor}^${exp}` : `  ${factor}`)
     }
     if (result.factors.length === 2) {
       const p = powWithBound(result.factors[0][0], result.factors[0][1])
@@ -73,7 +73,7 @@ export function formatFactorDBResult(result: FactorDBResult): string {
   } else if (result.status === "CF" && result.factors) {
     lines.push("Partially factored:")
     for (const [factor, exp] of result.factors) {
-      lines.push(`  ${factor}^${exp}`)
+      lines.push(exp > 1 ? `  ${factor}^${exp}` : `  ${factor}`)
     }
   } else {
     lines.push("No factors found")
