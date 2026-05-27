@@ -10,7 +10,7 @@ import { ProofIndex } from './components/ProofIndex';
 import { RsaCalculator } from './components/RsaCalculator';
 import { FormatConverter } from './components/FormatConverter';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { flexPanelSx } from './styles/shared';
+import { flexPanelSx, FONT_FAMILY } from './styles/shared';
 import { setFactorDBProxy } from './utils/factordb';
 import { FACTORDB_PROXY_URL } from './config';
 import { useAppContext } from './hooks/useAppContext';
@@ -62,7 +62,7 @@ function AppContent() {
               border: `2px solid ${borderColor}`,
               borderRadius: '4px',
               color: draculaColors.foreground,
-              fontFamily: "'JetBrains Mono', monospace",
+              fontFamily: FONT_FAMILY,
               fontSize: '0.8rem',
             },
           },

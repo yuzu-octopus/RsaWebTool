@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { gcd } from '../utils/bigint';
 import { randomPrime } from '../utils/testcases/core';
+import { sageGuardBlock } from './guard';
 
 export const attack: Attack = {
   id: 'pollard-rho',
@@ -17,31 +18,7 @@ export const attack: Attack = {
             n = Integer(${vals.n})
             print(f"Pollard's Rho (Brent variant) on n = {n}")
             print()
-            if n < 2:
-                print(f"n = {n} is too small to factor")
-                print("POLLARD_RHO=FAILED")
-                return
-            if n % 2 == 0:
-                print(f"n is even: {n}")
-                print(f"Verification: 2 * {n // 2} = {n}")
-                print(f"p = 2")
-                print(f"q = {n // 2}")
-                print()
-                print("POLLARD_RHO=SUCCESS")
-                return
-            if n.is_prime():
-                print(f"n is prime: {n}")
-                print("POLLARD_RHO=FAILED")
-                return
-            if n.is_square():
-                p = isqrt(n)
-                print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"Verification: p * q = {p * p}")
-                print(f"p = {p}")
-                print(f"q = {p}")
-                print()
-                print("POLLARD_RHO=SUCCESS")
-                return
+            ${sageGuardBlock("POLLARD_RHO", '            ')}
             # Brent's cycle detection with batched GCD (primefac-style, BIT 1980)
             # Batched GCD reduces overhead: accumulate |x-y| products, one gcd per batch
             # Backtracking handles g == n case (when accumulated product contains all factors)

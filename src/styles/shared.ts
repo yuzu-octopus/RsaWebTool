@@ -1,5 +1,7 @@
 import { draculaColors } from '../theme/dracula';
 
+export const FONT_FAMILY = "'JetBrains Mono', monospace" as const;
+
 /**
  * Shared MUI sx style objects for consistent layout and theming across components.
  */
@@ -29,7 +31,7 @@ export const outputBoxSx = {
   borderRadius: 1,
   backgroundColor: draculaColors.currentLine,
   border: `1px solid ${draculaColors.purple}`,
-  fontFamily: "'JetBrains Mono', monospace",
+  fontFamily: FONT_FAMILY,
   fontSize: '0.8rem',
   color: draculaColors.foreground,
   whiteSpace: 'pre-wrap' as const,
@@ -40,7 +42,7 @@ export const outputBoxSx = {
 
 export const tabSx = {
   color: draculaColors.comment,
-  fontFamily: "'JetBrains Mono', monospace",
+  fontFamily: FONT_FAMILY,
   fontSize: '0.85rem',
   minHeight: 40,
   '&.Mui-selected': {
@@ -51,7 +53,7 @@ export const tabSx = {
 export const ghostBtnSx = {
   borderColor: draculaColors.purple,
   color: draculaColors.purple,
-  fontFamily: "'JetBrains Mono', monospace",
+  fontFamily: FONT_FAMILY,
   fontSize: '0.7rem',
   '&:hover': { backgroundColor: draculaColors.purple, color: draculaColors.background },
 } as const;
@@ -60,7 +62,7 @@ export function colorGhostBtn(color: string) {
   return {
     borderColor: color,
     color,
-    fontFamily: "'JetBrains Mono', monospace",
+    fontFamily: FONT_FAMILY,
     fontSize: '0.8rem',
     '&:hover': { backgroundColor: color, color: draculaColors.background },
   } as const;

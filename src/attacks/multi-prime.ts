@@ -31,6 +31,15 @@ export const attack: Attack = {
                 print("No factorization possible")
                 print("MULTI_PRIME=FAILED")
                 return
+            if n.is_square():
+                p = isqrt(n)
+                print(f"n is a perfect square: {p}^2 = {n}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
+                print("MULTI_PRIME=SUCCESS")
+                return
             # Use trial division + Sage's factor() for complete factorization
             def factor_all(m):
                 """Complete factorization using trial division + Sage's factor()"""

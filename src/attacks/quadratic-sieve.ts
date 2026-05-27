@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { sageGuardBlock } from './guard';
 import { randomPrime } from '../utils/testcases/core';
 
 export const attack: Attack = {
@@ -19,32 +20,7 @@ export const attack: Attack = {
         print()
         #
         # Check for trivial cases
-        if n < 2:
-            print(f"n = {n} is too small to factor")
-            print("QUADRATIC_SIEVE=FAILED")
-            return
-        if n % 2 == 0:
-            print(f"n is even: {n}")
-            print(f"Verification: 2 * {n // 2} = {n}")
-            print(f"p = 2")
-            print(f"q = {n // 2}")
-            print()
-            print("QUADRATIC_SIEVE=SUCCESS")
-            return
-        if n.is_prime():
-            print(f"n is prime: {n}")
-            print("No factorization possible")
-            print("QUADRATIC_SIEVE=FAILED")
-            return
-        if n.is_square():
-            p = isqrt(n)
-            print(f"n is a perfect square: {p}^2 = {n}")
-            print(f"Verification: p * q = {p * p}")
-            print(f"p = {p}")
-            print(f"q = {p}")
-            print()
-            print("QUADRATIC_SIEVE=SUCCESS")
-            return
+        ${sageGuardBlock("QUADRATIC_SIEVE")}
         #
         # Check size before attempting factorization
         if n.nbits() > 330:

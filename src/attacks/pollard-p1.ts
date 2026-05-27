@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { sageGuardBlock } from './guard';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 
 export const attack: Attack = {
@@ -27,31 +28,7 @@ def _attack():
             print(f"B2 = {B2}")
         print()
         # Trivial checks
-        if n < 2:
-            print(f"n = {n} is too small")
-            print("POLLARD_P1=FAILED")
-            return
-        if n % 2 == 0:
-            print(f"n is even: {n}")
-            print(f"Verification: 2 * {n // 2} = {n}")
-            print(f"p = 2")
-            print(f"q = {n // 2}")
-            print()
-            print("POLLARD_P1=SUCCESS")
-            return
-        if n.is_prime():
-            print(f"n = {n} is prime")
-            print("POLLARD_P1=FAILED")
-            return
-        if n.is_square():
-            p = isqrt(n)
-            print(f"n is a perfect square: {p}^2 = {n}")
-            print(f"Verification: p * q = {p * p}")
-            print(f"p = {p}")
-            print(f"q = {p}")
-            print()
-            print("POLLARD_P1=SUCCESS")
-            return
+        ${sageGuardBlock("POLLARD_P1")}
         # Use Python int for fast modular exponentiation
         n_int = int(n)
         # Sieve primes up to B1 (pure Python, no prime_range)

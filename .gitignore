@@ -2,8 +2,6 @@
 node_modules
 
 # Build output (GitHub Pages from docs/)
-dist
-dist-ssr
 docs
 
 # Environment
@@ -29,11 +27,9 @@ pnpm-debug.log*
 
 # Agent config (local — not part of the web app)
 .opencode/
-.superpowers/
 .playwright-mcp/
 opencode.json
 AGENTS.md
-GEMINI.md
 
 # Test infrastructure (scripts + artifacts, tracked separately)
 scripts/

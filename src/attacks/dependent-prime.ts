@@ -36,7 +36,10 @@ def _attack():
             if n.is_square():
                 p = isqrt(n)
                 print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"p = q = {p}")
+                print(f"Verification: p * q = {p * p}")
+                print(f"p = {p}")
+                print(f"q = {p}")
+                print()
                 print("DEPENDENT_PRIME=SUCCESS")
                 return
             # Use Python ints for fast iteration

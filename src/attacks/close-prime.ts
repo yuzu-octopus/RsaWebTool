@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { isqrt } from '../utils/bigint';
 import { randomPrime, isPrimeMR } from '../utils/testcases/core';
+import { sageGuardBlock } from './guard';
 
 export const attack: Attack = {
   id: 'close-prime',
@@ -16,31 +17,7 @@ export const attack: Attack = {
             n = Integer(${vals.n})
             import math
             n_int = int(n)
-            if n < 2:
-                print(f"n = {n} is too small to factor")
-                print("CLOSE_PRIME=FAILED")
-                return
-            if n % 2 == 0:
-                print(f"n is even: {n}")
-                print(f"p = 2")
-                print(f"q = {n // 2}")
-                print(f"Verification: 2 * {n // 2} = {n}")
-                print("CLOSE_PRIME=SUCCESS")
-                return
-            if n.is_prime():
-                print(f"n is prime: {n}")
-                print("No factorization possible")
-                print("CLOSE_PRIME=FAILED")
-                return
-            if n.is_square():
-                p = isqrt(n)
-                print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"Verification: p * q = {p * p}")
-                print(f"p = {p}")
-                print(f"q = {p}")
-                print()
-                print("CLOSE_PRIME=SUCCESS")
-                return
+            ${sageGuardBlock("CLOSE_PRIME", '            ')}
             # Step 1: Fermat factorization (fast for close primes)
             print(f"Close-prime attack on n ({n.nbits()} bits): trying Fermat first...")
             a, rem = n.sqrtrem()

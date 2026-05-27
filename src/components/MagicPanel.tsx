@@ -22,7 +22,7 @@ import { useWorkerPool } from '../hooks/useWorkerPool';
 import { attacks, submitToFactorDB, autoDecrypt } from '../attacks';
 import { detectFormat, parsePEM } from '../utils/converters';
 import { generateKeyPair, encrypt, TESTCASE_BITS } from '../utils/testcases/core';
-import { isActualSuccess } from '../utils/sage-output';
+import { isActualSuccess } from '../utils/sageOutput';
 import { inputSx } from '../styles/inputSx';
 import { colFlexSx, centeredPanelSx, colorGhostBtn } from '../styles/shared';
 import type { Attack } from '../types';

@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { isqrt } from '../utils/bigint';
+import { sageGuardBlock } from './guard';
 
 const numGcd = (a: number, b: number): number => {
   while (b) { [a, b] = [b, a % b]; }
@@ -27,31 +28,7 @@ def _attack():
     try:
         n = Integer(${vals.n})
         #
-        if n < 2:
-            print(f"n = {n} is too small to factor")
-            print("SMALL_FRACTION=FAILED")
-            return
-        if n % 2 == 0:
-            print(f"n is even: {n}")
-            print(f"p = 2")
-            print(f"q = {n // 2}")
-            print(f"Verification: 2 * {n // 2} = {n}")
-            print("SMALL_FRACTION=SUCCESS")
-            return
-        if n.is_prime():
-            print(f"n is prime: {n}")
-            print("No factorization possible")
-            print("SMALL_FRACTION=FAILED")
-            return
-        if n.is_square():
-            p = isqrt(n)
-            print(f"n is a perfect square: {p}^2 = {n}")
-            print(f"Verification: p * q = {p * p}")
-            print(f"p = {p}")
-            print(f"q = {p}")
-            print()
-            print("SMALL_FRACTION=SUCCESS")
-            return
+        ${sageGuardBlock("SMALL_FRACTION")}
         #
         # Small fraction attack: p/q ≈ a/b for small a, b
         # Use Python ints for fast trial division

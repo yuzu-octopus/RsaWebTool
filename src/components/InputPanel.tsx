@@ -17,7 +17,7 @@ import { useSageMath, DEFAULT_SAGE_TIMEOUT } from '../hooks/useSageMath';
 import { useWorkerPool } from '../hooks/useWorkerPool';
 import { ProofRenderer } from './ProofRenderer';
 import { testcaseGenerators, submitToFactorDB, autoDecrypt } from '../attacks';
-import { isActualSuccess } from '../utils/sage-output';
+import { isActualSuccess } from '../utils/sageOutput';
 import { inputSx } from '../styles/inputSx';
 import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn } from '../styles/shared';
 import { useTimer } from '../hooks/useTimer';

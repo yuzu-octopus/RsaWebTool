@@ -134,12 +134,12 @@ Live conversion between hex, decimal, base64, and text.
 
 ```
 src/
-  attacks/    47 attack implementations (flat directory)
+  attacks/    47 attack implementations + guard.ts (shared sage guard helper)
   components/ UI components (Sidebar, InputPanel, MagicPanel, OutputPanel, etc.)
   hooks/      useSageMath, useWorkerPool, useDragResize, useAppContext, useTimer
   context/    AppContext (flat state, history cap 50)
-  utils/      bigint math, converters, FactorDB client, testcase generators
-  styles/     shared MUI sx style objects
+  utils/      bigint math, converters, FactorDB client, sage output parser, testcase generators
+  styles/     shared MUI sx style objects, FONT_FAMILY constant
   theme/      Dracula MUI theme
   types/      Attack, InputField, HistoryEntry, NotificationState interfaces
 workers/      Cloudflare Worker CORS proxy for FactorDB

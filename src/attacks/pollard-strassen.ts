@@ -1,5 +1,6 @@
 import type { Attack } from '../types';
 import { randomPrime } from '../utils/testcases/core';
+import { sageGuardBlock } from './guard';
 
 export const attack: Attack = {
   id: 'pollard-strassen',
@@ -16,31 +17,7 @@ def _attack():
             n = Integer(${vals.n})
             print(f"Pollard-Strassen factorization on n = {n}")
             print()
-            if n < 2:
-                print(f"n = {n} is too small to factor")
-                print("POLLARD_STRASSEN=FAILED")
-                return
-            if n % 2 == 0:
-                print(f"n is even: {n}")
-                print(f"Verification: p * q = {2 * (n // 2)}")
-                print(f"p = 2")
-                print(f"q = {n // 2}")
-                print()
-                print("POLLARD_STRASSEN=SUCCESS")
-                return
-            if n.is_prime():
-                print(f"n is prime: {n}")
-                print("POLLARD_STRASSEN=FAILED")
-                return
-            if n.is_square():
-                p = isqrt(n)
-                print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"Verification: p * q = {p * p}")
-                print(f"p = {p}")
-                print(f"q = {p}")
-                print()
-                print("POLLARD_STRASSEN=SUCCESS")
-                return
+            ${sageGuardBlock("POLLARD_STRASSEN", '            ')}
             c = int(floor(RR(n) ** (1/4))) + 1
             if c > 50000:
                 print(f"n is too large for Strassen (n^(1/4) = {c} > 50000)")

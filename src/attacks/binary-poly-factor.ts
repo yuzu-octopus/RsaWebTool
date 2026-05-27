@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { sageGuardBlock } from './guard';
 
 export const attack: Attack = {
   id: 'binary-poly-factor',
@@ -12,31 +13,7 @@ export const attack: Attack = {
     try:
         try:
             n = Integer(${vals.n})
-            if n < 2:
-                print(f"n = {n} is too small to factor")
-                print("BINARY_POLY_FACTOR=FAILED")
-                return
-            if n % 2 == 0:
-                print(f"n is even: {n}")
-                print(f"p = 2")
-                print(f"q = {n // 2}")
-                print(f"Verification: 2 * {n // 2} = {n}")
-                print("BINARY_POLY_FACTOR=SUCCESS")
-                return
-            if n.is_prime():
-                print(f"n is prime: {n}")
-                print("No factorization possible")
-                print("BINARY_POLY_FACTOR=FAILED")
-                return
-            if n.is_square():
-                p = isqrt(n)
-                print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"Verification: p * q = {p * p}")
-                print(f"p = {p}")
-                print(f"q = {p}")
-                print()
-                print("BINARY_POLY_FACTOR=SUCCESS")
-                return
+            ${sageGuardBlock("BINARY_POLY_FACTOR", '            ')}
             if n > 0 and (n & (n - 1)) == 0:
                 print(f"n is a power of 2: n = 2^{n.nbits() - 1}")
                 print("No non-trivial factorization possible")
