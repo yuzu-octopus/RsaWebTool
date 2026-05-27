@@ -23,23 +23,24 @@ export const attack: Attack = {
             end = math.isqrt(n_int)
             solutions = []
             a = 0
+            a_sq = 0
             max_iter = 5000000
             while a < end and len(solutions) < 2:
                 if a > max_iter:
                     print(f"Euler factorization failed: exceeded {max_iter} iterations")
                     print("EULER=FAILED")
                     return
-                rem = n_int - a*a
-                if rem >= 0:
-                    b = math.isqrt(rem)
-                    if b*b == rem:
-                        distinct = True
-                        for sol in solutions:
-                            if sol[0] == b and sol[1] == a:
-                                distinct = False
-                                break
-                        if distinct:
-                            solutions.append([b, a])
+                rem = n_int - a_sq
+                b = math.isqrt(rem)
+                if b*b == rem:
+                    distinct = True
+                    for sol in solutions:
+                        if sol[0] == b and sol[1] == a:
+                            distinct = False
+                            break
+                    if distinct:
+                        solutions.append([b, a])
+                a_sq += 2*a + 1
                 a += 1
             if len(solutions) < 2:
                 print(f"Euler factorization failed: could not find two distinct sum-of-squares representations")

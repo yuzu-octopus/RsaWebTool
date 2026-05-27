@@ -48,6 +48,10 @@ def _attack():
             found = False
             for delta in range(-100000, 100001):
                 disc = delta * delta + 4 * k_int * n_int
+                # Valid squares mod 16: only 0, 1, 4, 9
+                last_nibble = disc & 15
+                if last_nibble not in (0, 1, 4, 9):
+                    continue
                 sqrt_disc = math.isqrt(disc)
                 if sqrt_disc * sqrt_disc == disc:
                     num = -delta + sqrt_disc

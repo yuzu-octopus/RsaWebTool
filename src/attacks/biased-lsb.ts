@@ -39,6 +39,7 @@ export const attack: Attack = {
             e = Integer(e_val) if e_val else Integer(65537)
             orig_c = Integer(${vals.c})
             two_e = pow(2, int(e), int(n))
+            two_e_sage = Integer(two_e)
             c = (Integer(${vals.c}) * Integer(two_e)) % n
             # Parse oracle runs (multiple response strings, newline-separated)
             runs_str = """${vals.oracle_runs}""".strip()
@@ -82,12 +83,11 @@ export const attack: Attack = {
                     upper = mid
                 else:
                     lower = mid
-                c = Integer((int(c) * two_e) % int(n))
+                c = (c * two_e_sage) % n
                 if i < 5 or i >= len(voted_bits) - 3:
                     out.append(f"Step {i+1}: bit={bit}, lower={lower}, upper={upper}")
             # Scan candidates near the rational interval [lower, upper)
             # After log2(n) steps, interval should contain exactly one integer
-            from math import ceil, floor
             candidate_start = Integer(ceil(lower))
             candidate_end = Integer(floor(upper)) + 1
             found_m = None

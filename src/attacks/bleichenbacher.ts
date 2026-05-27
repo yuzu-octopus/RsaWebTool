@@ -69,8 +69,12 @@ export const attack: Attack = {
                 b = 3 * B - 1
             else:
                 # Find r such that interval overlaps with [2B, 3B)
-                for r in range(0, int(s1) + 1):
-                    r_int = Integer(r)
+                a = 2 * B
+                b = 3 * B - 1
+                r_min = ceil((a * s1 - 3 * B + 1) / n)
+                r_max = floor((b * s1 - 2 * B) / n)
+                for r in range(int(r_min), int(r_max) + 1):
+                    r_int = r
                     ca = ceil((2 * B + r_int * n) / s1)
                     cb = floor((3 * B - 1 + r_int * n) / s1)
                     inter_a = max(2 * B, ca)
@@ -90,7 +94,7 @@ export const attack: Attack = {
                 new_a = None
                 new_b = None
                 for r in range(int(r_min), int(r_max) + 1):
-                    r_int = Integer(r)
+                    r_int = r
                     ca = ceil((2 * B + r_int * n) / s)
                     cb = floor((3 * B - 1 + r_int * n) / s)
                     inter_a = max(a, ca)

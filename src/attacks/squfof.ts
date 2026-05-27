@@ -19,22 +19,49 @@ export const attack: Attack = {
             print()
             ${sageGuardBlock("SQUFOF", '            ')}
             # SQUFOF works best for small factors; extract small factor first
-            # Use prime_range for ~3x faster traversal vs trial division by odds
+            # Use batched GCD for ~1000x fewer GCD calls vs individual trial division
             n_int = int(n)
             found_small = False
-            for trial in prime_range(3, 200000):
-                t_int = int(trial)
-                if n_int % t_int == 0:
-                    p = Integer(t_int)
-                    q = n // p
-                    print(f"Small factor found: p = {p}")
-                    print(f"Verification: p * q = {p * q}")
-                    print(f"p = {p}")
-                    print(f"q = {q}")
-                    print()
-                    print("SQUFOF=SUCCESS")
-                    found_small = True
-                    break
+            primes_list = prime_range(3, 200000)
+            prod = 1
+            for i, trial in enumerate(primes_list):
+                prod = (prod * int(trial)) % n_int
+                if (i + 1) % 1000 == 0:
+                    g = math.gcd(prod, n_int)
+                    if 1 < g < n_int:
+                        for t in range(i - 999, i + 1):
+                            trial_t = primes_list[t]
+                            if n_int % trial_t == 0:
+                                p = Integer(trial_t)
+                                q = n // p
+                                print(f"Small factor found: p = {p}")
+                                print(f"Verification: p * q = {p * q}")
+                                print(f"p = {p}")
+                                print(f"q = {q}")
+                                print()
+                                print("SQUFOF=SUCCESS")
+                                found_small = True
+                                break
+                        break
+                    prod = 1
+            # Final partial batch
+            if not found_small and prod != 1:
+                g = math.gcd(prod, n_int)
+                if 1 < g < n_int:
+                    start = (len(primes_list) // 1000) * 1000
+                    for t in range(start, len(primes_list)):
+                        trial_t = primes_list[t]
+                        if n_int % trial_t == 0:
+                            p = Integer(trial_t)
+                            q = n // p
+                            print(f"Small factor found: p = {p}")
+                            print(f"Verification: p * q = {p * q}")
+                            print(f"p = {p}")
+                            print(f"q = {q}")
+                            print()
+                            print("SQUFOF=SUCCESS")
+                            found_small = True
+                            break
             if found_small:
                 return
             # Shanks' Square Forms Factorization (SQUFOF)

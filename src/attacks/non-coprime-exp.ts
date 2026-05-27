@@ -70,7 +70,7 @@ print("NON_COPRIME_EXP=FAILED")`;
                     # Manual fallback for small e: iterate candidates
                     if e <= 10 and p < 2000000:
                         for x in range(p):
-                            if (x**e) % p == cp:
+                            if power_mod(x, e, p) == cp:
                                 roots_p.append(Fp(x))
                 if not roots_p:
                     # Manual Tonelli-Shanks fallback for e=2, p ≡ 3 mod 4
@@ -97,7 +97,7 @@ print("NON_COPRIME_EXP=FAILED")`;
                     roots_q = []
                     if e <= 10 and q < 2000000:
                         for x in range(q):
-                            if (x**e) % q == cq:
+                            if power_mod(x, e, q) == cq:
                                 roots_q.append(Fq(x))
                 if not roots_q:
                     if e == 2 and q % 4 == 3:

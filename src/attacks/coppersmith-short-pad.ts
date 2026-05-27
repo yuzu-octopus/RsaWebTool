@@ -19,6 +19,7 @@ export const attack: Attack = {
     }
     return `def _attack():
     try:
+        out = []
         n = Integer(${vals.n})
         e = Integer(${vals.e})
         e_int = int(e)
@@ -38,10 +39,10 @@ export const attack: Attack = {
                 else:
                     high = mid - 1
             return low
-        print("Coppersmith Short Pad Attack")
-        print(f"n = {n}")
-        print(f"e = {e}")
-        print("Recovering messages via integer e-th root...")
+        out.append("Coppersmith Short Pad Attack")
+        out.append(f"n = {n}")
+        out.append(f"e = {e}")
+        out.append("Recovering messages via integer e-th root...")
         m1_val = None
         m2_val = None
         # Method 1: Sage's built-in nth_root
@@ -76,16 +77,19 @@ export const attack: Attack = {
         if m1_val is not None and m2_val is not None:
             if pow(int(m1_val), e_int, int(n)) == c1 and pow(int(m2_val), e_int, int(n)) == c2:
                 delta_val = m2_val - m1_val
-                print(f"Found messages: m1 = {m1_val}, m2 = {m2_val}, delta = {delta_val}")
-                print()
-                print("COPPERSMITH_SHORT_PAD=SUCCESS")
+                out.append(f"Found messages: m1 = {m1_val}, m2 = {m2_val}, delta = {delta_val}")
+                out.append("")
+                out.append("COPPERSMITH_SHORT_PAD=SUCCESS")
+                print("\\n".join(out))
                 return
-        print("Could not recover messages.")
-        print("COPPERSMITH_SHORT_PAD=FAILED")
+        out.append("Could not recover messages.")
+        out.append("COPPERSMITH_SHORT_PAD=FAILED")
+        print("\\n".join(out))
         return
-    except Exception as e:
-        print("ERROR:", e)
-        print("COPPERSMITH_SHORT_PAD=FAILED")
+    except Exception as err:
+        out.append("ERROR: " + str(err))
+        out.append("COPPERSMITH_SHORT_PAD=FAILED")
+        print("\\n".join(out))
 _attack()`;
   },
   frontendCheck: (vals: Record<string, string>) => {

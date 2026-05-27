@@ -33,21 +33,31 @@ export const attack: Attack = {
             out.append("ROCA vulnerability check")
             out.append("n = " + str(n))
             primes_list = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43]
+
+            # Precompute remainder set once for the largest M
+            _M_max = 1
+            for _p in primes_list:
+                if _M_max * _p > 2**50:
+                    break
+                _M_max *= _p
+            _ord_max = Mod(65537, _M_max).multiplicative_order()
+            _cached_rem = set()
+            _r = 1
+            for _ in range(_ord_max):
+                _cached_rem.add(_r)
+                _r = (_r * 65537) % _M_max
+
             best_M = None
             best_r = 0
             for num_primes in range(4, len(primes_list) + 1):
                 M = prod(primes_list[:num_primes])
                 if M > 2**50:
                     break
-                ord_val = Mod(65537, M).multiplicative_order()
-                remainders = set()
-                r = 1  # 65537^0 mod M
-                for idx in range(ord_val):
-                    remainders.add(r)
-                    r = (r * 65537) % M
+                # Build R(M) by reducing cached remainders mod M
+                rem = {_x % M for _x in _cached_rem}
                 n_mod = n % M
-                for r in remainders:
-                    if n_mod * inverse_mod(r, M) % M in remainders:
+                for r in rem:
+                    if n_mod * inverse_mod(r, M) % M in rem:
                         best_M = M
                         best_r = r
                         break

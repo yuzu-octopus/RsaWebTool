@@ -39,7 +39,7 @@ export const attack: Attack = {
             # Checks ALL LLL rows to bypass Sage's Row-0 (degree-1) bug.
             x = ZZ['x'].gen()
             f_ZZ = nearp + x
-            X = Integer(n).nth_root(4, truncate_mode=True)[0] + 1
+            X = n.nth_root(4, truncate_mode=True)[0] + 1
             m = 5; t = 5; dim = m + t
             shifts = []
             for i in range(m):
@@ -64,7 +64,7 @@ export const attack: Attack = {
                 for delta in range(-2, 3):
                     r = Integer(floor(r_approx)) + delta
                     if abs(r) < X:
-                        candidate = Integer(nearp + r)
+                        candidate = nearp + r
                         if n % candidate == 0:
                             found_p = candidate
                             break

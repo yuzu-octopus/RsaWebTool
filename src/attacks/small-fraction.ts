@@ -68,7 +68,7 @@ def _attack():
                     for delta in range(1, trial_window + 1):
                         divs_tried += 1
                         q_candidate = q0 + delta
-                        if q_candidate > 1 and n_int % q_candidate == 0:
+                        if q_candidate > 1 and (q_candidate & 1) and n_int % q_candidate == 0:
                             q_sage = Integer(q_candidate)
                             p_sage = n // q_sage
                             if p_sage > 1 and p_sage * q_sage == n:
@@ -81,7 +81,7 @@ def _attack():
                                 found = True
                                 break
                         q_candidate = q0 - delta
-                        if q_candidate > 1 and n_int % q_candidate == 0:
+                        if q_candidate > 1 and (q_candidate & 1) and n_int % q_candidate == 0:
                             q_sage = Integer(q_candidate)
                             p_sage = n // q_sage
                             if p_sage > 1 and p_sage * q_sage == n:

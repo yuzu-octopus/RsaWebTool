@@ -13,24 +13,25 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
         n = Integer(${vals.n})
+        bits = n.nbits()
         #
         print(f"Quadratic Sieve on n = {n}")
-        print(f"Number of digits: {n.nbits() / 3.32:.0f}")
-        print(f"Bit length: {n.nbits()}")
+        print(f"Number of digits: {bits / 3.32:.0f}")
+        print(f"Bit length: {bits}")
         print()
         #
         # Check for trivial cases
         ${sageGuardBlock("QUADRATIC_SIEVE")}
         #
         # Check size before attempting factorization
-        if n.nbits() > 330:
-            print(f"WARNING: n has {n.nbits()} bits ({n.nbits() / 3.32:.0f} digits)")
+        if bits > 330:
+            print(f"WARNING: n has {bits} bits ({bits / 3.32:.0f} digits)")
             print("Quadratic Sieve is effective up to ~100 digits (330 bits)")
             print("For larger numbers, try ECM, Pollard's p-1, or other methods")
             print()
         #
         # Trial division handles small testcases reliably and is always available
-        if n.nbits() <= 40:
+        if bits <= 40:
             tdiv_limit = 1000000
             tdiv = trial_division(n, tdiv_limit)
             if tdiv and 1 < tdiv < n:

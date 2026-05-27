@@ -73,12 +73,25 @@ _attack()`;
       return x;
     };
 
+    let root = 1n;
     for (let k = 0n; k <= kBound; k++) {
       if (onProgress && kBound > 1000n && k % 1000n === 0n) {
         onProgress(Number(k * 100n / kBound));
       }
       const candidate = c + k * n;
-      const root = iroot(candidate);
+      if (k === 0n) {
+        root = iroot(candidate);
+      } else {
+        // Warm-start Newton: previous root is close to new root
+        let x = root;
+        while (true) {
+          const x_em1 = x ** (e - 1n);
+          const next = ((e - 1n) * x * x_em1 + candidate) / (e * x_em1);
+          if (next >= x) break;
+          x = next;
+        }
+        root = x;
+      }
       if (root ** e === candidate) { onProgress?.(100); return Promise.resolve(`m = ${root}\nk = ${k}\nSMALL_PUBLIC_EXP=SUCCESS`); }
       if ((root + 1n) ** e === candidate) { onProgress?.(100); return Promise.resolve(`m = ${root + 1n}\nk = ${k}\nSMALL_PUBLIC_EXP=SUCCESS`); }
       if (root > 0n && (root - 1n) ** e === candidate) { onProgress?.(100); return Promise.resolve(`m = ${root - 1n}\nk = ${k}\nSMALL_PUBLIC_EXP=SUCCESS`); }

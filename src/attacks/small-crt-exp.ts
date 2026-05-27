@@ -84,7 +84,7 @@ _attack()`,
 
       for (let dp = 0n; dp <= bound; dp++) {
         // x = (current - 2) mod n, always non-negative
-        const x = ((current - 2n) % n + n) % n;
+        const x = (current - 2n + n) % n;
         if (onProgress && bound > 10000n && dp % 50000n === 0n) {
           onProgress(Number(dp * 100n / bound));
         }
@@ -98,7 +98,7 @@ _attack()`,
             const batchEnd = dp;
             let curScan = modPow(step, batchStart, n);
             for (let dpScan = batchStart; dpScan <= batchEnd; dpScan++) {
-              const xScan = ((curScan - 2n) % n + n) % n;
+              const xScan = (curScan - 2n + n) % n;
               if (gcd(xScan, n) > 1n) {
                 const p0 = g;
                 const q0 = n / g;

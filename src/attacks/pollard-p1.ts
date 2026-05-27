@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { sageGuardBlock } from './guard';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
+import { gcd, modPow } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'pollard-p1',
@@ -15,6 +16,7 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => `import math
 def _attack():
     try:
+        out = []
         n = Integer(${vals.n})
         B1 = int(Integer(${vals.B || '10000'}))
         if B1 < 2:
@@ -22,11 +24,11 @@ def _attack():
         B2 = int(Integer(${vals.B2 || '0'}))
         if B2 < 0:
             B2 = 0
-        print(f"Pollard's p-1 on n = {n} ({n.nbits()} bits)")
-        print(f"B1 = {B1}")
+        out.append(f"Pollard's p-1 on n = {n} ({n.nbits()} bits)")
+        out.append(f"B1 = {B1}")
         if B2 > B1:
-            print(f"B2 = {B2}")
-        print()
+            out.append(f"B2 = {B2}")
+        out.append("")
         # Trivial checks
         ${sageGuardBlock("POLLARD_P1")}
         # Use Python int for fast modular exponentiation
@@ -46,27 +48,28 @@ def _attack():
             i += 1
         primes = [i for i in range(limit + 1) if sieve[i]]
         # Stage 1: compute 2^lcm(1..B1) mod n
-        print(f"Stage 1: {len(primes)} primes up to B1={B1}...")
+        out.append(f"Stage 1: {len(primes)} primes up to B1={B1}...")
         a = 2
         for p in primes:
-            q = p
-            while q <= limit:
-                a = pow(a, p, n_int)
-                q *= p
+            pp = p
+            while pp * p <= limit:
+                pp *= p
+            a = pow(a, pp, n_int)
         g = math.gcd(a - 1, n_int)
         if 1 < g < n_int:
             g_sage = Integer(g)
             q_val = n // g_sage
-            print(f"Verification: p * q = {g_sage * q_val}")
-            print(f"p = {g_sage}")
-            print(f"q = {q_val}")
-            print()
-            print("POLLARD_P1=SUCCESS")
+            out.append(f"Verification: p * q = {g_sage * q_val}")
+            out.append(f"p = {g_sage}")
+            out.append(f"q = {q_val}")
+            out.append("")
+            out.append("POLLARD_P1=SUCCESS")
+            print("\\n".join(out))
             return
         # Stage 2 (optional, only if B2 > B1 and Stage 1 failed)
         if B2 > B1:
             limit2 = B2
-            print(f"Stage 2: checking primes in ({limit}, {limit2}]...")
+            out.append(f"Stage 2: checking primes in ({limit}, {limit2}]...")
             sieve2 = [True] * (limit2 + 1)
             if limit2 >= 0:
                 sieve2[0] = False
@@ -91,19 +94,22 @@ def _attack():
                 if 1 < g < n_int:
                     g_sage = Integer(g)
                     q_val = n // g_sage
-                    print(f"Verified: p * q = {g_sage * q_val}")
-                    print(f"p = {g_sage}")
-                    print(f"q = {q_val}")
-                    print()
-                    print("POLLARD_P1=SUCCESS")
+                    out.append(f"Verified: p * q = {g_sage * q_val}")
+                    out.append(f"p = {g_sage}")
+                    out.append(f"q = {q_val}")
+                    out.append("")
+                    out.append("POLLARD_P1=SUCCESS")
+                    print("\\n".join(out))
                     return
-        print(f"Pollard p-1 failed: p-1 is not {B1}-smooth")
+        out.append(f"Pollard p-1 failed: p-1 is not {B1}-smooth")
         if B2 > B1:
-            print(f"(also not {B2}-smooth with one large factor)")
-        print("POLLARD_P1=FAILED")
+            out.append(f"(also not {B2}-smooth with one large factor)")
+        out.append("POLLARD_P1=FAILED")
+        print("\\n".join(out))
     except Exception as e:
-        print(f"ERROR: {e}")
-        print("POLLARD_P1=FAILED")
+        out.append(f"ERROR: {e}")
+        out.append("POLLARD_P1=FAILED")
+        print("\\n".join(out))
 _attack()`,
   proof: `\\textbf{Theorem:} If $p-1$ is $B_1$-smooth, compute $a^M \\bmod n$ with $M = \\operatorname{lcm}(1,\\ldots,B_1)$ to reveal $p$ via $\\gcd(a^M-1, n)$.
 
@@ -126,6 +132,73 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
 \\textbf{Explanation:} Pollard's $p-1$ method exploits Fermat's Little Theorem: if $p-1$ divides $M = \\operatorname{lcm}(1,\\ldots,B_1)$, then $a^M \\equiv 1 \\pmod{p}$, so $\\gcd(a^M-1, n)$ reveals $p$. Stage 1 computes $a^M$ by raising $a$ to each prime power $\\leq B_1$. Stage 2 handles the case where $p-1$ has one prime factor between $B_1$ and $B_2$.
 
 \\textbf{References:} J. M. Pollard, "Theorems on Factorization and Primality Testing", Proc. Cambridge Philos. Soc., 1974`,
+  frontendCheck: (vals, onProgress) => {
+    if (!vals.n) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const B1 = parseInt(vals.B) || 10000;
+      const B2 = parseInt(vals.B2) || 0;
+      if (B1 < 2) return Promise.resolve(null);
+
+      const limit = Math.max(B1, B2);
+      const sieve = new Uint8Array(limit + 1);
+      const primes: number[] = [];
+      for (let i = 2; i <= limit; i++) {
+        if (!sieve[i]) {
+          primes.push(i);
+          for (let j = i * i; j <= limit; j += i) sieve[j] = 1;
+        }
+      }
+
+      let stage1Count = 0;
+      for (const p of primes) {
+        if (p > B1) break;
+        stage1Count++;
+      }
+      const stage2Count = B2 > B1 ? primes.length - stage1Count : 0;
+      const totalOps = stage1Count + stage2Count;
+      let opsDone = 0;
+
+      let a = 2n;
+      for (const p of primes) {
+        if (p > B1) break;
+        let pp = p;
+        while (pp * p <= B1) pp *= p;
+        a = modPow(a, BigInt(pp), n);
+        opsDone++;
+        if (onProgress && totalOps > 0 && opsDone % Math.max(1, Math.floor(totalOps / 10)) === 0) {
+          onProgress(Math.min(99, Math.round(opsDone * 100 / totalOps)));
+        }
+      }
+
+      let g = gcd(a - 1n, n);
+      if (g > 1n && g < n) {
+        onProgress?.(100);
+        return Promise.resolve(`Factor found!\np = ${g}\nq = ${n / g}\nPOLLARD_P1=SUCCESS`);
+      }
+
+      if (B2 > B1) {
+        for (const p of primes) {
+          if (p <= B1) continue;
+          a = modPow(a, BigInt(p), n);
+          opsDone++;
+          if (onProgress && totalOps > 0 && opsDone % Math.max(1, Math.floor(totalOps / 10)) === 0) {
+            onProgress(Math.min(99, Math.round(opsDone * 100 / totalOps)));
+          }
+          g = gcd(a - 1n, n);
+          if (g > 1n && g < n) {
+            onProgress?.(100);
+            return Promise.resolve(`Factor found!\np = ${g}\nq = ${n / g}\nPOLLARD_P1=SUCCESS`);
+          }
+        }
+      }
+
+      onProgress?.(100);
+      return Promise.resolve(null);
+    } catch {
+      return Promise.resolve(null);
+    }
+  },
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

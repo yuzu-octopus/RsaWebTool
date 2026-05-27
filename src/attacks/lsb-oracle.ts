@@ -38,6 +38,7 @@ export const attack: Attack = {
             orig_c = c
             oracle_bits = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
             two_e = pow(2, int(e), int(n))
+            two_e_sage = Integer(two_e)
             out.append("LSB Oracle Attack on RSA")
             out.append(f"n = {n} ({n.nbits()} bits)")
             out.append(f"e = {e}")
@@ -56,7 +57,7 @@ export const attack: Attack = {
             upper = QQ(n)
             for i, bit in enumerate(oracle_bits):
                 mid = (lower + upper) / 2
-                c = Integer((int(c) * two_e) % int(n))
+                c = (c * two_e_sage) % n
                 if bit == 0:
                     upper = mid
                 else:

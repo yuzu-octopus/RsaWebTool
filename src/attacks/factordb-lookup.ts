@@ -22,12 +22,14 @@ export const attack: Attack = {
   },
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
-        try:
-            # Validate inputs
-            if not "${vals.n}".strip():
-                print("ERROR: n is required")
-                print("FACTORDB_LOOKUP=FAILED")
-                return
+            try:
+                out = []
+                # Validate inputs
+                if not "${vals.n}".strip():
+                    out.append("ERROR: n is required")
+                    out.append("FACTORDB_LOOKUP=FAILED")
+                    print("\\n".join(out))
+                    return
             # Simple Floyd cycle Pollard's rho for fallback factorization
             def pollard_rho_factor(n):
                 if n % 2 == 0:
@@ -49,46 +51,51 @@ export const attack: Attack = {
             n = Integer(${vals.n})
             # Pre-checks
             if n < 2:
-                print(f"n = {n} is too small to factor")
-                print("FACTORDB_LOOKUP=FAILED")
+                out.append(f"n = {n} is too small to factor")
+                out.append("FACTORDB_LOOKUP=FAILED")
+                print("\\n".join(out))
                 return
             if n % 2 == 0:
-                print(f"n is even. p = 2, q = {n // 2}")
-                print("FACTORDB_LOOKUP=SUCCESS")
+                out.append(f"n is even. p = 2, q = {n // 2}")
+                out.append("FACTORDB_LOOKUP=SUCCESS")
+                print("\\n".join(out))
                 return
             if n.is_prime():
-                print("n is prime. Not a valid RSA modulus.")
-                print("FACTORDB_LOOKUP=FAILED")
+                out.append("n is prime. Not a valid RSA modulus.")
+                out.append("FACTORDB_LOOKUP=FAILED")
+                print("\\n".join(out))
                 return
             if n.is_square():
                 p = isqrt(n)
-                print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"Verification: p * q = {p * p}")
-                print(f"p = {p}")
-                print(f"q = {p}")
-                print()
-                print("FACTORDB_LOOKUP=SUCCESS")
+                out.append(f"n is a perfect square: {p}^2 = {n}")
+                out.append(f"Verification: p * q = {p * p}")
+                out.append(f"p = {p}")
+                out.append(f"q = {p}")
+                out.append("")
+                out.append("FACTORDB_LOOKUP=SUCCESS")
+                print("\\n".join(out))
                 return
-            print(f"Checking if n = {n} has known factors")
-            print()
+            out.append(f"Checking if n = {n} has known factors")
+            out.append("")
             # Step 1: Trial division with small primes
-            print("Step 1: Trial division with small primes...")
+            out.append("Step 1: Trial division with small primes...")
             for p in primes(10000):
                 if n % p == 0:
                     q = n // p
-                    print(f"Found small factor: p = {p}")
-                    print(f"q = {q}")
+                    out.append(f"Found small factor: p = {p}")
+                    out.append(f"q = {q}")
                     if q.is_prime():
-                        print("q is prime. Factorization complete!")
+                        out.append("q is prime. Factorization complete!")
                     else:
-                        print("q is composite. Further factorization needed.")
-                        print(f"q factors: {factor(q)}")
-                    print("FACTORDB_LOOKUP=SUCCESS")
+                        out.append("q is composite. Further factorization needed.")
+                        out.append(f"q factors: {factor(q)}")
+                    out.append("FACTORDB_LOOKUP=SUCCESS")
+                    print("\\n".join(out))
                     return
-            print("No factors found below 10000.")
+            out.append("No factors found below 10000.")
             # Step 2: ECM factorization
-            print()
-            print("Step 2: ECM factorization...")
+            out.append("")
+            out.append("Step 2: ECM factorization...")
             try:
                 fac = n.factor(algorithm='ecm')
                 if fac:
@@ -98,35 +105,39 @@ export const attack: Attack = {
                         break
                     if fac_p is not None and 1 < fac_p < n:
                         q = n // fac_p
-                        print(f"p = {fac_p}")
-                        print(f"q = {q}")
-                        print(f"Verification: p * q = {fac_p * q}")
-                        print("FACTORDB_LOOKUP=SUCCESS")
+                        out.append(f"p = {fac_p}")
+                        out.append(f"q = {q}")
+                        out.append(f"Verification: p * q = {fac_p * q}")
+                        out.append("FACTORDB_LOOKUP=SUCCESS")
+                        print("\\n".join(out))
                         return
                     else:
-                        print("ECM found no non-trivial factors.")
+                        out.append("ECM found no non-trivial factors.")
                 else:
-                    print("ECM did not find factors.")
+                    out.append("ECM did not find factors.")
             except Exception as ex:
-                print(f"ECM failed: {ex}")
+                out.append(f"ECM failed: {ex}")
             # Step 3: Pollard's rho fallback
-            print()
-            print("Step 3: Pollard's rho...")
+            out.append("")
+            out.append("Step 3: Pollard's rho...")
             try:
                 f = pollard_rho_factor(n)
                 if f is not None and f != n:
-                    print(f"Pollard's rho found: {f}")
-                    print(f"Other factor: {n // f}")
-                    print("FACTORDB_LOOKUP=SUCCESS")
+                    out.append(f"Pollard's rho found: {f}")
+                    out.append(f"Other factor: {n // f}")
+                    out.append("FACTORDB_LOOKUP=SUCCESS")
+                    print("\\n".join(out))
                     return
                 else:
-                    print("Pollard's rho did not find a factor.")
+                    out.append("Pollard's rho did not find a factor.")
             except Exception as ex:
-                print(f"Pollard's rho failed: {ex}")
-            print("FACTORDB_LOOKUP=FAILED")
+                out.append(f"Pollard's rho failed: {ex}")
+            out.append("FACTORDB_LOOKUP=FAILED")
+            print("\\n".join(out))
         except Exception as ex:
-            print(f"ERROR: {ex}")
-            print("FACTORDB_LOOKUP=FAILED")
+            out.append(f"ERROR: {ex}")
+            out.append("FACTORDB_LOOKUP=FAILED")
+            print("\\n".join(out))
         #
     except BaseException as ex:
         print(f"ERROR: {ex}")

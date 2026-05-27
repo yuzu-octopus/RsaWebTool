@@ -57,9 +57,27 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{
         ``,
       ];
 
+      // Fast path: batch GCD pre-filter
+      // Compute product of all moduli and check each against the rest
+      let batchProduct = 1n;
+      for (const m of moduli) batchProduct *= m;
+
+      const hitIndices: number[] = [];
+      for (let i = 0; i < moduli.length; i++) {
+        if (gcd(batchProduct / moduli[i], moduli[i]) !== 1n) {
+          hitIndices.push(i);
+        }
+      }
+
+      if (hitIndices.length < 2) {
+        return null;  // No shared factor among any moduli
+      }
+
       let foundAny = false;
 
-      for (let i = 0; i < moduli.length; i++) {
+      // Only check pairs involving hit indices
+      for (let ii = 0; ii < hitIndices.length; ii++) {
+        const i = hitIndices[ii];
         const ni = moduli[i];
         for (let j = i + 1; j < moduli.length; j++) {
           const nj = moduli[j];

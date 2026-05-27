@@ -28,9 +28,13 @@ def _attack():
                 dLow_int = int(dLow)
                 m = dLow_int.bit_length()
                 kBound = 1 << min(m + 2, 24)
+                # Incremental d_approx update (avoid BigInt division per iteration)
+                q = n_int // e_int
+                r = n_int % e_int
+                d_approx = (n_int + 1) // e_int
+                rem = (n_int + 1) % e_int
                 found = False
                 for k in range(1, kBound + 1):
-                    d_approx = (k * n_int + 1) // e_int
                     if (d_approx & ((1 << m) - 1)) == dLow_int:
                         d_phi = (e_int * d_approx - 1) // k
                         s = n_int - d_phi + 1
@@ -50,6 +54,12 @@ def _attack():
                                     print("PARTIAL_D=SUCCESS")
                                     found = True
                                     break
+                    # Increment d_approx for next iteration
+                    d_approx += q
+                    rem += r
+                    if rem >= e_int:
+                        d_approx += 1
+                        rem -= e_int
                 if not found:
                     print("PARTIAL_D=FAILED: no valid d found")
         except Exception as ex:
@@ -131,7 +141,7 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\\\implies p,q \\qed
 \\textbf{Explanation:} For each $k \\in [1,e]$, compute $d_{\\text{approx}} = \\lfloor(kn+1)/e\\rfloor$. If the low $m$ bits match $d_{\\text{low}}$, recover $\\varphi(n) = (ed-1)/k$ and solve the quadratic $x^2 - (n-\\varphi+1)x + n = 0$ for $p$ and $q$. The search bound is limited to $k < 2^{m+2}$ (cap at $\\sim 16\\times 10^6$) for efficiency.
 
 \\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,
-  usageGuide: 'This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.\n\nHow to use:\n1. You have modulus n, public exponent e, and dLow (the low-order bits of d)\n2. Provide n, e, and dLow\n3. The attack iterates k in ed = k\\phi(n) + 1, checking if d_approx has matching low bits\n4. For each matching candidate, it computes \\phi(n) and solves the quadratic for p,q\n\nTip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~16M iterations); the frontendCheck always attempts the search regardless of e size.',
+  usageGuide: 'This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.\n\nHow to use:\n1. You have modulus n, public exponent e, and dLow (the low-order bits of d)\n2. Provide n, e, and dLow\n3. The attack iterates k in ed = k\\phi(n) + 1, checking if d_approx has matching low bits\n4. For each matching candidate, it computes \\phi(n) and solves the quadratic for p,q\n\nTip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~16M iterations). Uses incremental d_approx update (avoiding BigInt division per iteration) for performance.',
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.dLow,
 };

@@ -39,12 +39,11 @@ export const attack: Attack = {
             n = Integer(${vals.n})
             e = Integer(${vals.e})
             c = Integer(${vals.c})
-            orig_c = c
             # Parse oracle responses into a list
             oracle_list = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
             oracle_idx = [0]
         #
-            def oracle(query_c):
+            def oracle():
                 """Simulate oracle using pre-computed responses.
                 Returns True (1) if decrypted value >= B, False (0) if < B."""
                 if oracle_idx[0] >= len(oracle_list):
@@ -75,12 +74,9 @@ export const attack: Attack = {
             # Start with f1=2, double until oracle returns True (>= B)
             out.append("=== Step 1: Finding f1 ===")
             f1 = Integer(2)
-            two_e = Integer(pow(2, int(e), int(n)))  # precompute 2^e mod n once
-            cur = two_e  # 2^e mod n = (2^e)^1 mod n
-            while not oracle((cur * c) % n):
+            while not oracle():
                 queries_used[0] += 1
                 f1 *= 2
-                cur = (cur * two_e) % n  # incremental: one mul per step
             queries_used[0] += 1
             out.append(f"f1 = {f1} (f1*m mod n >= B confirmed)")
             out.append("")
@@ -91,7 +87,7 @@ export const attack: Attack = {
             out.append("=== Step 2: Finding f2 ===")
             f1_half = f1 // 2
             f2 = floor_div(n + B, B) * f1_half
-            while oracle((pow(int(f2), int(e), int(n)) * c) % n):
+            while oracle():
                 queries_used[0] += 1
                 f2 += f1_half
             queries_used[0] += 1
@@ -116,7 +112,7 @@ export const attack: Attack = {
                 if f3 == 0:
                     f3 = Integer(1)
                 # Query oracle with f3
-                oracle_result = oracle((pow(int(f3), int(e), int(n)) * c) % n)
+                oracle_result = oracle()
                 queries_used[0] += 1
                 iNB = i_val * n + B
                 if oracle_result:
@@ -137,15 +133,15 @@ export const attack: Attack = {
             # Verify
             v = Integer(pow(int(m), int(e), int(n)))
             out.append(f"Verification: m^e mod n = {v}")
-            out.append(f"Original c = {orig_c}")
-            if v == orig_c:
+            out.append(f"Original c = {c}")
+            if v == c:
                 out.append("VERIFICATION PASSED!")
                 out.append("")
                 out.append("MANGER=SUCCESS")
             else:
                 out.append("Verification failed - may need more oracle responses")
                 out.append(f"m^e mod n = {v}")
-                out.append(f"c = {orig_c}")
+                out.append(f"c = {c}")
                 out.append("")
                 out.append("MANGER=FAILED")
             print("\\n".join(out))

@@ -15,9 +15,10 @@ export const attack: Attack = {
     import math
     try:
         try:
+            out = []
             n = Integer(${vals.n})
-            print(f"Pollard's Rho (Brent variant) on n = {n}")
-            print()
+            out.append(f"Pollard's Rho (Brent variant) on n = {n}")
+            out.append("")
             ${sageGuardBlock("POLLARD_RHO", '            ')}
             # Brent's cycle detection with batched GCD (primefac-style, BIT 1980)
             # Batched GCD reduces overhead: accumulate |x-y| products, one gcd per batch
@@ -58,25 +59,31 @@ export const attack: Attack = {
                 if d is not None:
                     p = d
                     q = n // p
-                    print(f"Verification: p * q = {p * q}")
-                    print(f"p = {p}")
-                    print(f"q = {q}")
-                    print(f"c value: {c_val}")
-                    print()
-                    print("POLLARD_RHO=SUCCESS")
+                    out.append(f"Verification: p * q = {p * q}")
+                    out.append(f"p = {p}")
+                    out.append(f"q = {q}")
+                    out.append(f"c value: {c_val}")
+                    out.append("")
+                    out.append("POLLARD_RHO=SUCCESS")
                     found = True
                     break
             if not found:
-                print("Pollard's rho (Brent variant) failed: no factor found")
-                print("Try ECM or other methods")
-                print("POLLARD_RHO=FAILED")
+                out.append("Pollard's rho (Brent variant) failed: no factor found")
+                out.append("Try ECM or other methods")
+                out.append("POLLARD_RHO=FAILED")
+            print("\\n".join(out))
         except Exception as e:
-            print(f"ERROR: {e}")
-            print("POLLARD_RHO=FAILED")
+            out.append(f"ERROR: {e}")
+            out.append("POLLARD_RHO=FAILED")
+            print("\\n".join(out))
         #
     except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("POLLARD_RHO=FAILED")
+        try:
+            out.append(f"ERROR: {ex}")
+            out.append("POLLARD_RHO=FAILED")
+        except:
+            out = [f"ERROR: {ex}", "POLLARD_RHO=FAILED"]
+        print("\\n".join(out))
 _attack()`,
   frontendCheck: (vals, onProgress) => {
     if (!vals.n) return Promise.resolve(null);
@@ -101,9 +108,11 @@ _attack()`,
         let iter = 0;
         while (g === 1n && iter < maxIter) {
           x = y;
-          for (let i = 0n; i < r && iter < maxIter; i++) {
+          let count = 0;
+          while (count < Number(r) && iter < maxIter) {
             y = (y * y + c_i) % n_i;
             iter++;
+            count++;
           }
           k = 0n;
           while (k < r && g === 1n && iter < maxIter) {

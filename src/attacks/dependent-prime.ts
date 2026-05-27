@@ -49,6 +49,10 @@ def _attack():
             found = False
             for k in range(1, 500001):
                 disc = 1 + 4 * k * ne_int
+                # Valid squares mod 16 for disc ≡ 1 (mod 4): only 1 and 9
+                last_nibble = disc & 15
+                if last_nibble != 1 and last_nibble != 9:
+                    continue
                 sqrt_disc = math.isqrt(disc)
                 if sqrt_disc * sqrt_disc == disc:
                     num = -1 + sqrt_disc

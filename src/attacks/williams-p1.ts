@@ -92,7 +92,7 @@ export const attack: Attack = {
                     result, result1 = result1, V2j2
             return result
         #
-        def williams_p1_stage(n, B1, B2, P, stage1_primes, stage2_primes, prime_set):
+        def williams_p1_stage(n, B1, B2, P, stage1_primes, stage2_primes):
             M = 1
             for p in stage1_primes:
                 pp = p
@@ -106,13 +106,17 @@ export const attack: Attack = {
             if B2 > B1:
                 V_curr = VM
                 V_prev = 2
-                for k in range(2, B2 + 1):
+                # Advance from k=2 to k=B1 (no GCD checks — pure recurrence)
+                for k in range(2, B1 + 1):
                     V_next = (V_curr * VM - V_prev) % n
                     V_prev, V_curr = V_curr, V_next
-                    if k > B1 and k in prime_set:
-                        g = gcd(V_curr - 2, n)
-                        if 1 < g < n:
-                            return Integer(g)
+                # Now check primes in Stage 2
+                for k in range(B1 + 1, B2 + 1):
+                    V_next = (V_curr * VM - V_prev) % n
+                    V_prev, V_curr = V_curr, V_next
+                    g = gcd(V_curr - 2, n)
+                    if 1 < g < n:
+                        return Integer(g)
             return None
         #
         # Build bound configurations: original + auto-escalation
@@ -143,9 +147,8 @@ export const attack: Attack = {
                 # Cache prime lists per config (avoid recomputation per P value)
                 stage1_primes = prime_range(B1_cur + 1)
                 stage2_primes = prime_range(max(3, B1_cur+1), B2_cur + 1) if B2_cur > B1_cur else []
-                prime_set = set(stage2_primes)
                 for P in range(3, 8):
-                    g = williams_p1_stage(n, B1_cur, B2_cur, P, stage1_primes, stage2_primes, prime_set)
+                    g = williams_p1_stage(n, B1_cur, B2_cur, P, stage1_primes, stage2_primes)
                     if g is not None:
                         p = Integer(g)
                         q = n // g

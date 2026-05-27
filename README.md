@@ -9,7 +9,7 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 ## Features
 
 - **47 attacks** — Factorization, Lattice, Protocol, Oracle, and Advanced categories
-- **27 browser-side checks** — instant results via native BigInt (no SageCell needed)
+- **28 browser-side checks** — instant results via native BigInt (no SageCell needed)
 - **SageMathCell integration** — runs SageMath code for Coppersmith, lattice reduction, and complex math
 - **FactorDB lookup** — auto-queries FactorDB and auto-submits discovered factorizations
 - **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution with early-stop
@@ -45,7 +45,7 @@ Open `http://localhost:5173` in your browser.
 | multi-prime-gcd | GCD across multi-prime setups | ✓ |
 | novelty-primes | Window search near powers of 2 and constants | ✓ |
 | pisano-period | Period detection via 2^i mod n | ✓ |
-| pollard-p1 | Pollard's p-1 factorization | — |
+| pollard-p1 | Pollard's p-1 factorization | ✓ |
 | pollard-rho | Brent's cycle detection with batched GCD | ✓ |
 | pollard-strassen | Pollard-Strassen algorithm | — |
 | quadratic-sieve | Quadratic sieve | — |

@@ -40,7 +40,7 @@ export const attack: Attack = {
             # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
             x = ZZ['x'].gen()
             f_ZZ = p_msb + x
-            X = Integer(n).nth_root(4, truncate_mode=True)[0] + 1
+            X = n.nth_root(4, truncate_mode=True)[0] + 1
             m = 5; t = 5; dim = m + t
             shifts = []
             for i in range(m):
@@ -62,7 +62,7 @@ export const attack: Attack = {
                 for delta in range(-2, 3):
                     r = Integer(floor(r_approx)) + delta
                     if abs(r) < X:
-                        candidate = Integer(p_msb + r)
+                        candidate = p_msb + r
                         if n % candidate == 0:
                             found_p = candidate
                             break

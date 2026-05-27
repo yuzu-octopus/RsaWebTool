@@ -60,20 +60,49 @@ print("KNOWN_PLAINTEXT=FAILED")`;
             if unknown_bits <= 20:
                 print(f"Brute forcing 2^{unknown_bits} possibilities...")
                 found = False
-                for k in range(shift):
-                    m_try = prefix_int * shift + k
-                    if pow(int(m_try), int(e), int(n)) == c:
-                        print(f"FOUND! m = {m_try}")
-                        try:
-                            m_hex = hex(m_try)[2:]
-                            if len(m_hex) % 2 != 0:
-                                m_hex = '0' + m_hex
-                            print(f"m as bytes: {bytes.fromhex(m_hex)}")
-                        except:
-                            pass
-                        print("KNOWN_PLAINTEXT=SUCCESS")
-                        found = True
-                        break
+                if e == 3:
+                    # Horner evaluation: (prefix*shift + k)^3 mod n
+                    # = A + B*k + C*k^2 + k^3 mod n (avoids modular exponentiation)
+                    n_int_h = int(n)
+                    c_int = int(c)
+                    PS_int = int(prefix_int * shift)
+                    A = pow(PS_int, 3, n_int_h)
+                    B = (3 * PS_int * PS_int) % n_int_h
+                    C_base = (3 * PS_int) % n_int_h
+                    for k in range(shift):
+                        k_mod = k % n_int_h
+                        k2 = (k_mod * k_mod) % n_int_h
+                        val = (A + B * k_mod) % n_int_h
+                        val = (val + C_base * k2) % n_int_h
+                        val = (val + k2 * k_mod) % n_int_h
+                        if val == c_int:
+                            m_try = prefix_int * shift + k
+                            print(f"FOUND! m = {m_try}")
+                            try:
+                                m_hex = hex(m_try)[2:]
+                                if len(m_hex) % 2 != 0:
+                                    m_hex = '0' + m_hex
+                                print(f"m as bytes: {bytes.fromhex(m_hex)}")
+                            except:
+                                pass
+                            print("KNOWN_PLAINTEXT=SUCCESS")
+                            found = True
+                            break
+                else:
+                    for k in range(shift):
+                        m_try = prefix_int * shift + k
+                        if pow(int(m_try), int(e), int(n)) == c:
+                            print(f"FOUND! m = {m_try}")
+                            try:
+                                m_hex = hex(m_try)[2:]
+                                if len(m_hex) % 2 != 0:
+                                    m_hex = '0' + m_hex
+                                print(f"m as bytes: {bytes.fromhex(m_hex)}")
+                            except:
+                                pass
+                            print("KNOWN_PLAINTEXT=SUCCESS")
+                            found = True
+                            break
                 if not found:
                     print("Brute force exhausted without finding match.")
                     print("KNOWN_PLAINTEXT=FAILED")
@@ -125,26 +154,62 @@ _attack()`;
         for (const b of prefixBytes) prefixInt = (prefixInt << 8n) + BigInt(b);
         const shift = 1n << BigInt(unknownBits);
         const limit = Number(shift);
-        for (let k = 0; k < limit; k++) {
-          if (onProgress && limit > 1000) {
-            const pct = Math.round(k * 100 / limit);
-            if (pct !== lastProgress) {
-              lastProgress = pct;
-              onProgress(pct);
+        if (e === 3n) {
+          // Horner evaluation: (prefix*shift + k)^3 mod n
+          // = A + B*k + C*k^2 + k^3 mod n (avoids modular exponentiation)
+          const PS = prefixInt << BigInt(unknownBits);
+          const PS_mod = PS % n;
+          const A = modPow(PS_mod, 3n, n);
+          const B = (3n * PS_mod * PS_mod) % n;
+          const C = (3n * PS_mod) % n;
+          for (let k = 0; k < limit; k++) {
+            if (onProgress && limit > 1000) {
+              const pct = Math.round(k * 100 / limit);
+              if (pct !== lastProgress) {
+                lastProgress = pct;
+                onProgress(pct);
+              }
+            }
+            const k_mod = BigInt(k) % n;
+            const k2 = (k_mod * k_mod) % n;
+            const val = (((A + B * k_mod) % n + C * k2) % n + k2 * k_mod) % n;
+            if (val === c) {
+              const mTry = (prefixInt << BigInt(unknownBits)) + BigInt(k);
+              onProgress?.(100);
+              try {
+                const hexStr = mTry.toString(16);
+                const padded = hexStr.length % 2 ? '0' + hexStr : hexStr;
+                const bytes = new Uint8Array(padded.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
+                const text = new TextDecoder().decode(bytes);
+                return Promise.resolve(`FOUND! m = ${mTry}\nm as bytes: ${text}\nKNOWN_PLAINTEXT=SUCCESS`);
+              } catch {
+                onProgress?.(100);
+                return Promise.resolve(`FOUND! m = ${mTry}\nKNOWN_PLAINTEXT=SUCCESS`);
+              }
             }
           }
-          const mTry = (prefixInt << BigInt(unknownBits)) + BigInt(k);
-          if (modPow(mTry, e, n) === c) {
-            onProgress?.(100);
-            try {
-              const hexStr = mTry.toString(16);
-              const padded = hexStr.length % 2 ? '0' + hexStr : hexStr;
-              const bytes = new Uint8Array(padded.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
-              const text = new TextDecoder().decode(bytes);
-              return Promise.resolve(`FOUND! m = ${mTry}\nm as bytes: ${text}\nKNOWN_PLAINTEXT=SUCCESS`);
-            } catch {
+        } else {
+          for (let k = 0; k < limit; k++) {
+            if (onProgress && limit > 1000) {
+              const pct = Math.round(k * 100 / limit);
+              if (pct !== lastProgress) {
+                lastProgress = pct;
+                onProgress(pct);
+              }
+            }
+            const mTry = (prefixInt << BigInt(unknownBits)) + BigInt(k);
+            if (modPow(mTry, e, n) === c) {
               onProgress?.(100);
-              return Promise.resolve(`FOUND! m = ${mTry}\nKNOWN_PLAINTEXT=SUCCESS`);
+              try {
+                const hexStr = mTry.toString(16);
+                const padded = hexStr.length % 2 ? '0' + hexStr : hexStr;
+                const bytes = new Uint8Array(padded.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
+                const text = new TextDecoder().decode(bytes);
+                return Promise.resolve(`FOUND! m = ${mTry}\nm as bytes: ${text}\nKNOWN_PLAINTEXT=SUCCESS`);
+              } catch {
+                onProgress?.(100);
+                return Promise.resolve(`FOUND! m = ${mTry}\nKNOWN_PLAINTEXT=SUCCESS`);
+              }
             }
           }
         }

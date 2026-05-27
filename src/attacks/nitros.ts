@@ -14,35 +14,40 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
         try:
+            out = []
             n_input = "${vals.n}".strip()
             if not n_input:
-                print("ERROR: n is required")
-                print("NITROS=FAILED")
+                out.append("ERROR: n is required")
+                out.append("NITROS=FAILED")
+                print("\\n".join(out))
                 return
             n = Integer(n_input)
             base_val = "${vals.base}".strip()
             base = Integer(base_val) if base_val else Integer(65537)
             # Even check
             if n % 2 == 0:
-                print(f"n is even. p = 2, q = {n // 2}")
-                print("NITROS=SUCCESS")
+                out.append(f"n is even. p = 2, q = {n // 2}")
+                out.append("NITROS=SUCCESS")
+                print("\\n".join(out))
                 return
             # Prime check
             if is_prime(n):
-                print("n is prime. Not a valid RSA modulus.")
-                print("NITROS=FAILED")
+                out.append("n is prime. Not a valid RSA modulus.")
+                out.append("NITROS=FAILED")
+                print("\\n".join(out))
                 return
-            print("Nitros / Extended ROCA attack")
-            print(f"n = {n}")
-            print(f"base = {base}")
-            print()
+            out.append("Nitros / Extended ROCA attack")
+            out.append(f"n = {n}")
+            out.append(f"base = {base}")
+            out.append("")
             # Use a single well-chosen M (product of first 16 primes ≈ 2^53)
             # This keeps Coppersmith fast while covering typical Nitros/ROCA primes
             primes_subset = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53]
             M = prod(primes_subset)
             if gcd(base, M) != 1:
-                print(f"M = {M}: gcd(base, M) = {gcd(base, M)} != 1, skipping...")
-                print("NITROS=FAILED")
+                out.append(f"M = {M}: gcd(base, M) = {gcd(base, M)} != 1, skipping...")
+                out.append("NITROS=FAILED")
+                print("\\n".join(out))
                 return
             # Compute multiplicative order of base modulo M
             ord_val = Mod(base, M).multiplicative_order()
@@ -51,18 +56,19 @@ export const attack: Attack = {
             # n_mod^ord_val == 1 mod M if and only if n_mod is a power of base mod M.
             # This avoids enumerating all 8M+ remainders.
             if pow(Integer(n_mod), ord_val, Integer(M)) != 1:
-                print("n_mod not in remainder subgroup — primes are not Nitros-form for this M.")
-                print("NITROS=FAILED")
+                out.append("n_mod not in remainder subgroup — primes are not Nitros-form for this M.")
+                out.append("NITROS=FAILED")
+                print("\\n".join(out))
                 return
             # Use single pair: r1 = 1 (always base^0 mod M) and r2 = n_mod mod M.
             # Since p = M*k1 + 1 is the most common form (and the test generator
             # always produces this), searching with r=1 and r=n_mod is sufficient.
             r1_val = Integer(1)
             r2_val = n_mod % M
-            print(f"M = {M} (product of first {len(primes_subset)} primes, ~{M.nbits()} bits)")
+            out.append(f"M = {M} (product of first {len(primes_subset)} primes, ~{M.nbits()} bits)")
             # Coppersmith path (fast lattice reduction)
-            bound = min(int(ceil(sqrt(n) / M)), 500000)  # cap to avoid timeout
-            print(f"Direct search bound = {bound} (k has ~{Integer(bound).nbits()} bits)")
+            bound = min(int(ceil(Integer(isqrt(n)) / M)), 500000)
+            out.append(f"Direct search bound = {bound} (k has ~{Integer(bound).nbits()} bits)")
             factored = False
             try:
                 R.<x> = PolynomialRing(ZZ)
@@ -76,18 +82,19 @@ export const attack: Attack = {
                         p_candidate = int(M * k + r_candidate)
                         if p_candidate > 1 and n % p_candidate == 0:
                             q = n // p_candidate
-                            print(f"Factor found via Coppersmith! r={r_candidate}, k={k}")
-                            print(f"Verification: p * q = {p_candidate * q}")
-                            print(f"p = {p_candidate}")
-                            print(f"q = {q}")
-                            print()
-                            print("NITROS=SUCCESS")
+                            out.append(f"Factor found via Coppersmith! r={r_candidate}, k={k}")
+                            out.append(f"Verification: p * q = {p_candidate * q}")
+                            out.append(f"p = {p_candidate}")
+                            out.append(f"q = {q}")
+                            out.append("")
+                            out.append("NITROS=SUCCESS")
+                            print("\\n".join(out))
                             factored = True
                             break
             except Exception:
                 pass
             if not factored:
-                print("Coppersmith did not find root. Falling back to direct search...")
+                out.append("Coppersmith did not find root. Falling back to direct search...")
                 for r_candidate in [r1_val, r2_val]:
                     for k in range(int(bound) + 1):
                         if factored:
@@ -95,20 +102,23 @@ export const attack: Attack = {
                         p_candidate = int(M * k + r_candidate)
                         if p_candidate > 1 and n % p_candidate == 0:
                             q = n // p_candidate
-                            print(f"Factor found via direct search! r={r_candidate}, k={k}")
-                            print(f"Verification: p * q = {p_candidate * q}")
-                            print(f"p = {p_candidate}")
-                            print(f"q = {q}")
-                            print()
-                            print("NITROS=SUCCESS")
+                            out.append(f"Factor found via direct search! r={r_candidate}, k={k}")
+                            out.append(f"Verification: p * q = {p_candidate * q}")
+                            out.append(f"p = {p_candidate}")
+                            out.append(f"q = {q}")
+                            out.append("")
+                            out.append("NITROS=SUCCESS")
+                            print("\\n".join(out))
                             factored = True
                             break
                 if not factored:
-                    print("No ROCA/Nitros pattern detected. Searched up to bound =", bound)
-                    print("NITROS=FAILED")
+                    out.append("No ROCA/Nitros pattern detected. Searched up to bound = " + str(bound))
+                    out.append("NITROS=FAILED")
+                    print("\\n".join(out))
         except Exception as ex:
-            print(f"ERROR: {ex}")
-            print("NITROS=FAILED")
+            out.append(f"ERROR: {ex}")
+            out.append("NITROS=FAILED")
+            print("\\n".join(out))
         #
     except BaseException as ex:
         print(f"ERROR: {ex}")

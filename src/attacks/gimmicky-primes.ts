@@ -92,6 +92,8 @@ export const attack: Attack = {
                 factorial *= k
                 for sign in [1, -1]:
                     candidate = factorial + sign
+                    if candidate > n_int:
+                        break
                     if candidate > 1 and n_int % candidate == 0:
                         print(f"  Found factorial prime factor: {k}! {'+' if sign == 1 else '-'} 1")
                         print(f"  Cofactor: {n // candidate}")
@@ -99,6 +101,9 @@ export const attack: Attack = {
                         print(f"p = {candidate}")
                         print(f"q = {n // candidate}")
                         found = True
+                else:
+                    continue
+                break
             # 7. Carol and Kynea primes: (2^k - 1)^2 - 2, (2^k + 1)^2 - 2
             # Cap k at 100 to keep candidate sizes manageable (≈ 2^200 max)
             print()
@@ -106,6 +111,8 @@ export const attack: Attack = {
             for k in range(1, 1001):
                 for sign in [-1, 1]:
                     candidate = (2**k + sign)**2 - 2
+                    if candidate > n_int:
+                        break
                     if candidate > 1 and n_int % candidate == 0:
                         name = "Carol" if sign == -1 else "Kynea"
                         print(f"  Found {name} prime factor: (2^{k} {'-' if sign == -1 else '+' } 1)^2 - 2")
@@ -114,6 +121,9 @@ export const attack: Attack = {
                         print(f"p = {candidate}")
                         print(f"q = {n // candidate}")
                         found = True
+                else:
+                    continue
+                break
             # 8. Cullen and Woodall primes: k * 2^k +/- 1
             # Cap k at 100 to keep candidate sizes manageable (k*2^k ≈ 2^107 max)
             print()
@@ -121,6 +131,8 @@ export const attack: Attack = {
             for k in range(1, 1001):
                 for sign in [1, -1]:
                     candidate = k * 2**k + sign
+                    if candidate > n_int:
+                        break
                     if candidate > 1 and n_int % candidate == 0:
                         name = "Cullen" if sign == 1 else "Woodall"
                         print(f"  Found {name} prime factor: {k} * 2^{k} {'+' if sign == 1 else '-'} 1")
@@ -129,6 +141,9 @@ export const attack: Attack = {
                         print(f"p = {candidate}")
                         print(f"q = {n // candidate}")
                         found = True
+                else:
+                    continue
+                break
             if found:
                 print()
                 print("GIMMICKY_PRIMES=SUCCESS")

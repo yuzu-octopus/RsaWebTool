@@ -152,15 +152,14 @@ _attack()`,
     try {
       const n = BigInt(vals.n);
       if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}\nPISANO_PERIOD=SUCCESS`);
-      const seen = new Map<string, bigint>();
+      const seen = new Map<bigint, bigint>();
       let pow_val = 1n;
       const limit = 200000n;
       for (let i = 0n; i < limit; i++) {
         if (onProgress && i % 10000n === 0n) {
           onProgress(Number(i * 100n / limit));
         }
-        const val = (pow_val - 1n + n) % n;
-        const key = val.toString();
+        const val = pow_val === 0n ? n - 1n : pow_val - 1n;
         if (val === 0n && i > 0n) {
           const s = n - i + 1n;
           const disc = s * s - 4n * n;
@@ -176,8 +175,8 @@ _attack()`,
             }
           }
         }
-        if (seen.has(key)) {
-          const prev_i = seen.get(key)!;
+        if (seen.has(val)) {
+          const prev_i = seen.get(val)!;
           const period = i - prev_i;
           for (let mult = 1n; mult < 200n; mult++) {
             const phi_guess = period * mult;
@@ -197,7 +196,7 @@ _attack()`,
             }
           }
         }
-        seen.set(key, i);
+        seen.set(val, i);
         pow_val = (pow_val * 2n) % n;
       }
       return Promise.resolve(null);

@@ -12,33 +12,37 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
         try:
+            out = []
             n = Integer(${vals.n})
-            import math
             n_int = int(n)
             if n < 2:
-                print(f"n = {n} is too small to factor")
-                print("MULTI_PRIME=FAILED")
+                out.append(f"n = {n} is too small to factor")
+                out.append("MULTI_PRIME=FAILED")
+                print("\\n".join(out))
                 return
             if n % 2 == 0:
-                print(f"n is even: {n}")
-                print(f"p = 2")
-                print(f"q = {n // 2}")
-                print(f"Verification: 2 * {n // 2} = {n}")
-                print("MULTI_PRIME=SUCCESS")
+                out.append(f"n is even: {n}")
+                out.append(f"p = 2")
+                out.append(f"q = {n // 2}")
+                out.append(f"Verification: 2 * {n // 2} = {n}")
+                out.append("MULTI_PRIME=SUCCESS")
+                print("\\n".join(out))
                 return
             if n.is_prime():
-                print(f"n is prime: {n}")
-                print("No factorization possible")
-                print("MULTI_PRIME=FAILED")
+                out.append(f"n is prime: {n}")
+                out.append("No factorization possible")
+                out.append("MULTI_PRIME=FAILED")
+                print("\\n".join(out))
                 return
             if n.is_square():
                 p = isqrt(n)
-                print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"Verification: p * q = {p * p}")
-                print(f"p = {p}")
-                print(f"q = {p}")
-                print()
-                print("MULTI_PRIME=SUCCESS")
+                out.append(f"n is a perfect square: {p}^2 = {n}")
+                out.append(f"Verification: p * q = {p * p}")
+                out.append(f"p = {p}")
+                out.append(f"q = {p}")
+                out.append("")
+                out.append("MULTI_PRIME=SUCCESS")
+                print("\\n".join(out))
                 return
             # Use trial division + Sage's factor() for complete factorization
             def factor_all(m):
@@ -59,58 +63,64 @@ export const attack: Attack = {
                 for p, e in factor(rem_sage):
                     fac.extend([p] * e)
                 return sorted(fac)
-            print(f"Attempting multi-prime factorization of n = {n}")
-            print(f"Bit length: {n.nbits()} bits ({n.nbits() / 3.32:.0f} digits)")
-            print()
+            out.append(f"Attempting multi-prime factorization of n = {n}")
+            out.append(f"Bit length: {n.nbits()} bits ({n.nbits() / 3.32:.0f} digits)")
+            out.append("")
             prime_factors = factor_all(n)
-            print(f"Prime factors ({len(prime_factors)} total):")
+            out.append(f"Prime factors ({len(prime_factors)} total):")
             for i, p in enumerate(prime_factors):
                 prime_status = "prime" if p.is_prime() else "composite"
-                print(f"  p[{i+1}] = {p} ({p.nbits()} bits, {prime_status})")
-            print()
+                out.append(f"  p[{i+1}] = {p} ({p.nbits()} bits, {prime_status})")
+            out.append("")
             # Verify product
             product = 1
             for p in prime_factors:
                 product *= p
-            print(f"Verification: product = {product}")
-            print(f"Matches n: {product == n}")
-            print()
+            out.append(f"Verification: product = {product}")
+            out.append(f"Matches n: {product == n}")
+            out.append("")
             # Check if any factor is composite (partial factorization)
             all_prime = all(p.is_prime() for p in prime_factors)
             if len(prime_factors) > 2 and all_prime:
-                print("Multi-prime RSA detected!")
-                print(f"n = {' × '.join(str(p) for p in prime_factors)}")
-                print()
+                out.append("Multi-prime RSA detected!")
+                out.append(f"n = {' × '.join(str(p) for p in prime_factors)}")
+                out.append("")
                 # Compute phi(n) correctly for multi-prime with possible repeated factors
                 from collections import Counter
                 factor_counts = Counter(prime_factors)
                 phi = 1
                 for p, k in factor_counts.items():
                     phi *= p**(k-1) * (p - 1)
-                print(f"phi(n) = {phi}")
-                print()
-                print("MULTI_PRIME=SUCCESS")
+                out.append(f"phi(n) = {phi}")
+                out.append("")
+                out.append("MULTI_PRIME=SUCCESS")
             elif len(prime_factors) == 2 and all_prime:
-                print("Standard 2-prime RSA (not multi-prime).")
+                out.append("Standard 2-prime RSA (not multi-prime).")
                 p, q = prime_factors[0], prime_factors[1]
-                print(f"p = {p}")
-                print(f"q = {q}")
-                print(f"phi(n) = {(p-1)*(q-1)}")
-                print("MULTI_PRIME=FAILED (only 2 factors)")
+                out.append(f"p = {p}")
+                out.append(f"q = {q}")
+                out.append(f"phi(n) = {(p-1)*(q-1)}")
+                out.append("MULTI_PRIME=FAILED (only 2 factors)")
             elif not all_prime:
-                print("Partial factorization only — some factors remain composite.")
-                print("Suggestion: Try running ECM again with higher B1 bounds.")
-                print("MULTI_PRIME=FAILED")
+                out.append("Partial factorization only — some factors remain composite.")
+                out.append("Suggestion: Try running ECM again with higher B1 bounds.")
+                out.append("MULTI_PRIME=FAILED")
             else:
-                print("n could not be factored into multiple primes.")
-                print("MULTI_PRIME=FAILED")
+                out.append("n could not be factored into multiple primes.")
+                out.append("MULTI_PRIME=FAILED")
+            print("\\n".join(out))
         except Exception as e:
-            print(f"Error in Multi-Prime RSA factorization: {e}")
-            print("MULTI_PRIME=FAILED")
+            out.append(f"Error in Multi-Prime RSA factorization: {e}")
+            out.append("MULTI_PRIME=FAILED")
+            print("\\n".join(out))
         #
     except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("MULTI_PRIME=FAILED")
+        try:
+            out.append(f"ERROR: {ex}")
+            out.append("MULTI_PRIME=FAILED")
+        except:
+            out = [f"ERROR: {ex}", "MULTI_PRIME=FAILED"]
+        print("\\n".join(out))
 _attack()`,
   proof: `\\textbf{Theorem:} Multi-prime RSA uses $n = \\prod_{i=1}^{k} p_i$ with $k \\geq 3$, reducing each factor's bit size and enabling easier factorization.
 

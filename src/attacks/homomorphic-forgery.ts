@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
-import { modPow } from '../utils/bigint';
+import { modPow, modInverse } from '../utils/bigint';
 
 export const attack: Attack = {
   id: 'homomorphic-forgery',
@@ -112,23 +112,59 @@ _attack()`;
         if (modPow(s_i, e, n) !== m_i) return Promise.resolve(null);
       }
 
-      // Powerset search (limited to 15 pairs — 2^15 = 32768 subsets)
-      if (pairs.length > 15) return Promise.resolve(null);
-      const count = 1 << pairs.length;
-      for (let mask = 1; mask < count; mask++) {
-        if (onProgress && count > 100 && mask % 1000 === 0) {
-          onProgress(Math.round(mask * 100 / count));
+      // Meet-in-the-middle: split oracle pairs into two halves
+      // Reduces 2^n search to 2^(n/2+1) operations
+      if (pairs.length > 30) return Promise.resolve(null);
+      const mid = Math.floor(pairs.length / 2);
+      const left = pairs.slice(0, mid);
+      const right = pairs.slice(mid);
+
+      // Build hash map for right half products
+      const rightMap = new Map<string, { m: bigint; s: bigint }[]>();
+      const rightCount = 1 << right.length;
+      for (let mask = 1; mask < rightCount; mask++) {
+        if (onProgress && mask % 500 === 0) {
+          onProgress(Math.round(mask * 50 / rightCount));
         }
         let prodM = 1n, prodS = 1n;
-        for (let i = 0; i < pairs.length; i++) {
-          if (mask & (1 << i)) {
-            prodM = (prodM * pairs[i][0]) % n;
-            prodS = (prodS * pairs[i][1]) % n;
+        for (let j = 0; j < right.length; j++) {
+          if (mask & (1 << j)) {
+            prodM = (prodM * right[j][0]) % n;
+            prodS = (prodS * right[j][1]) % n;
           }
         }
-        if (prodM === targetM) {
-          onProgress?.(100);
-          return Promise.resolve(`Factor found!\nForged signature: s = ${prodS}\nVerification: s^e mod n = ${modPow(prodS, e, n)}\nHOMOMORPHIC_FORGERY=SUCCESS`);
+        const key = prodM.toString();
+        if (!rightMap.has(key)) rightMap.set(key, []);
+        rightMap.get(key)!.push({ m: prodM, s: prodS });
+      }
+
+      // Search left half for matching complement
+      const targetM_mod = targetM % n;
+      const leftCount = 1 << left.length;
+      for (let mask = 1; mask < leftCount; mask++) {
+        if (onProgress && mask % 500 === 0) {
+          onProgress(50 + Math.round(mask * 50 / leftCount));
+        }
+        let prodM = 1n, prodS = 1n;
+        for (let j = 0; j < left.length; j++) {
+          if (mask & (1 << j)) {
+            prodM = (prodM * left[j][0]) % n;
+            prodS = (prodS * left[j][1]) % n;
+          }
+        }
+        const inv = modInverse(prodM, n);
+        if (inv === null) continue;
+        const need = (targetM_mod * inv) % n;
+        const rightEntries = rightMap.get(need.toString());
+        if (rightEntries) {
+          for (const entry of rightEntries) {
+            const finalM = (prodM * entry.m) % n;
+            const finalS = (prodS * entry.s) % n;
+            if (finalM === targetM_mod) {
+              onProgress?.(100);
+              return Promise.resolve(`Forged signature: s = ${finalS}\nVerification: s^e mod n = ${modPow(finalS, e, n)}\nHOMOMORPHIC_FORGERY=SUCCESS`);
+            }
+          }
         }
       }
       return Promise.resolve(null);
@@ -155,7 +191,7 @@ s^* &= s_1 \\cdot s_2 \\bmod n \\\\
 \\textbf{Explanation:} Since $(m_1 m_2)^d = m_1^d \\cdot m_2^d \\pmod{n}$, multiplying known signatures yields a valid signature for the product of their messages. The attack searches subsets of oracle pairs whose message-product equals $m^*$, then multiplies the corresponding signatures. Modern padding schemes (OAEP, PSS) destroy this homomorphism by hashing and randomizing before signing.
 
 \\textbf{References:} Rivest, Shamir, Adleman, 1978; Boneh, "Twenty Years of Attacks on RSA," 1999`,
-  usageGuide: 'This attack exploits RSA\'s multiplicative homomorphism to forge signatures from known oracle pairs.\n\nHow to use:\n1. Obtain oracle pairs (m_i, s_i) where s_i is a valid signature on m_i under the target public key\n2. Provide n, e, target_m (message to forge), and oracle_pairs formatted as "m1,s1;m2,s2;..."\n3. The attack searches subset products: if target_m = product of some subset of m_i (mod n), then the forged signature = product of the corresponding s_i (mod n)\n\nTip: The more oracle pairs you have, the more likely you can factor target_m into a subset product. Modern RSA with OAEP/PSS padding prevents this attack.',
+  usageGuide: 'This attack exploits RSA\'s multiplicative homomorphism to forge signatures from known oracle pairs.\n\nHow to use:\n1. Obtain oracle pairs (m_i, s_i) where s_i is a valid signature on m_i under the target public key\n2. Provide n, e, target_m (message to forge), and oracle_pairs formatted as "m1,s1;m2,s2;..."\n3. The attack uses meet-in-the-middle: split oracle pairs into two halves, build a product hash map for the right half, then search the left half for matching complements. This reduces the 2^n search to 2^(n/2+1) operations.\n\nTip: The more oracle pairs you have, the more likely you can factor target_m into a subset product. Up to 30 pairs supported (2^15 + 2^15 ≈ 65K operations). Modern RSA with OAEP/PSS padding prevents this attack.',
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.target_m && !!p.oracle_pairs,
 };
