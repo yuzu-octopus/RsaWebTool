@@ -26,7 +26,9 @@ export const attack: Attack = {
             base = Integer(base_val) if base_val else Integer(65537)
             # Even check
             if n % 2 == 0:
-                out.append(f"n is even. p = 2, q = {n // 2}")
+                out.append("n is even.")
+                out.append(f"p = 2")
+                out.append(f"q = {n // 2}")
                 out.append("NITROS=SUCCESS")
                 print("\\n".join(out))
                 return

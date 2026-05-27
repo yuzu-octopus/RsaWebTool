@@ -143,23 +143,22 @@ for (const cat of CATEGORIES) {
 }
 
 /**
- * Submit p,q to FactorDB if the attack is a Factorization-category attack
- * and the result contains extractable p,q values.
+ * Submit p,q to FactorDB if the result contains extractable p,q values.
+ * Works for any attack that factors n (Factorization, Lattice, Advanced, etc.)
+ * as long as n is provided in the input params.
  */
 export function submitToFactorDB(
-  attack: Attack,
+  _attack: Attack,
   result: string,
   n: string | undefined,
   notify: (msg: string, severity?: 'success' | 'error' | 'info') => void,
 ) {
-  if (attacksByCategory.get('Factorization')?.includes(attack)) {
-    const pq = extractPQ(result);
-    if (pq && n) {
-      reportFactor(n, [pq.p, pq.q]).then(
-        resp => notify(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB', 'info'),
-        () => notify('Failed to submit to FactorDB', 'error'),
-      );
-    }
+  const pq = extractPQ(result);
+  if (pq && n) {
+    reportFactor(n, [pq.p, pq.q]).then(
+      resp => notify(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB', 'info'),
+      () => notify('Failed to submit to FactorDB', 'error'),
+    );
   }
 }
 

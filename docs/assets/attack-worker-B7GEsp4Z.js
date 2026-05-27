@@ -3322,7 +3322,8 @@ print("NON_COPRIME_EXP=FAILED")`:`def _attack():
         q = Integer(${e.q})
         print(f"Non-Coprime Exponent Attack")
         print(f"n = {n}, e = {e}")
-        print(f"p = {p}, q = {q}")
+        print(f"p = {p}")
+        print(f"q = {q}")
         print()
         phi = (p - 1) * (q - 1)
         g = gcd(e, phi)
@@ -4342,7 +4343,9 @@ p &= M \\cdot k_1 + r_1 \\qed
             base = Integer(base_val) if base_val else Integer(65537)
             # Even check
             if n % 2 == 0:
-                out.append(f"n is even. p = 2, q = {n // 2}")
+                out.append("n is even.")
+                out.append(f"p = 2")
+                out.append(f"q = {n // 2}")
                 out.append("NITROS=SUCCESS")
                 print("\\n".join(out))
                 return
