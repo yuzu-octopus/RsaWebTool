@@ -136,5 +136,24 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
     });
   }, []);
 
-  return { runAttack };
+  const cancelCurrentRun = useCallback(() => {
+    const cancelledIds = Array.from(pendingRef.current.keys());
+
+    // Resolve all pending with null — caller will discard cancelled results
+    for (const [, pending] of pendingRef.current) {
+      pending.resolve(null);
+    }
+    pendingRef.current.clear();
+
+    // Clear the queue so no queued tasks start
+    queueRef.current = [];
+
+    // Send cancel signal to all workers
+    // Workers that receive this before posting results will discard them
+    for (const worker of workersRef.current) {
+      worker.postMessage({ type: 'cancel', ids: cancelledIds });
+    }
+  }, []);
+
+  return { runAttack, cancelCurrentRun };
 }

@@ -561,7 +561,7 @@ p &\\mid (x_i - x_j) \\\\
 
 \\textbf{Explanation:} Pollard's rho uses $f(x) = x^2 + c$ to generate a sequence that eventually cycles modulo $p$. Brent's cycle detection compares each value against a saved snapshot at powers of two, requiring only one evaluation per step instead of Floyd's three. Batched GCD reduces overhead by accumulating $m$ differences into one product before each GCD call. If the accumulated product contains $n$ as a factor, backtracking identifies the exact step.
 
-\\textbf{References:} J. M. Pollard, "A Monte Carlo Method for Factorization", BIT 1975; R. P. Brent, "An Improved Monte Carlo Factorization Algorithm", BIT 1980`,priority:`medium`,applicableCheck:e=>!!e.n},L={id:`williams-p1`,name:`Williams' p+1 Method`,category:`Factorization`,description:`Factors n when p+1 is B1-smooth using Lucas sequences V_k(P,1). Stage 2 extends to handle one larger prime factor beyond B1. Use when Pollard p-1 fails.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B1 (stage 1 bound, optional)`,placeholder:`10000`,required:!1,multiline:!1},{name:`B2`,label:`B2 (stage 2 bound, optional)`,placeholder:`0 (disabled)`,required:!1,multiline:!1}],sageTemplate:e=>`def _attack():
+\\textbf{References:} J. M. Pollard, "A Monte Carlo Method for Factorization", BIT 1975; R. P. Brent, "An Improved Monte Carlo Factorization Algorithm", BIT 1980`,priority:`medium`,applicableCheck:e=>!!e.n},ne={id:`williams-p1`,name:`Williams' p+1 Method`,category:`Factorization`,description:`Factors n when p+1 is B1-smooth using Lucas sequences V_k(P,1). Stage 2 extends to handle one larger prime factor beyond B1. Use when Pollard p-1 fails.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`B`,label:`B1 (stage 1 bound, optional)`,placeholder:`10000`,required:!1,multiline:!1},{name:`B2`,label:`B2 (stage 2 bound, optional)`,placeholder:`0 (disabled)`,required:!1,multiline:!1}],sageTemplate:e=>`def _attack():
     try:
         n = Integer(${e.n})
         #
@@ -749,7 +749,7 @@ V_M &= \\alpha^M + \\alpha^{-M} \\equiv 2 \\pmod{p} \\\\
 
 \\textbf{Explanation:} Like Pollard's p-1 but for factors where $p+1$ is smooth. The Lucas sequence $V_k$ lives in the quadratic extension $\\mathbb{F}_{p^2}$, where the multiplicative order divides $p+1$. When $(D/p) = -1$, the element $\\alpha$ has norm 1 and satisfies $\\alpha^{p+1} = 1$, so if $p+1 \\mid M$ then $V_M \\equiv 2 \\pmod{p}$. Stage 2 catches the case where $p+1$ has one large prime factor beyond $B1$ by checking multiples of $M$.
 
-\\textbf{References:} H. C. Williams, "A p+1 Method of Factoring", Mathematics of Computation, 1982`,priority:`medium`,applicableCheck:e=>!!e.n},R={id:`quadratic-sieve`,name:`Quadratic Sieve`,category:`Factorization`,description:`Factors n by finding congruent squares via smoothness over a factor base. Use for medium-sized semiprimes (< 100 digits) with similar-sized factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} H. C. Williams, "A p+1 Method of Factoring", Mathematics of Computation, 1982`,priority:`medium`,applicableCheck:e=>!!e.n},L={id:`quadratic-sieve`,name:`Quadratic Sieve`,category:`Factorization`,description:`Factors n by finding congruent squares via smoothness over a factor base. Use for medium-sized semiprimes (< 100 digits) with similar-sized factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         n = Integer(${e.n})
         bits = n.nbits()
@@ -874,7 +874,7 @@ X^2 &\\equiv Y^2 \\pmod{n} \\\\
 
 \\textbf{Explanation:} The QS finds many integers $x$ where $Q(x)$ factors completely over the factor base (a "smooth" number). Each smooth $Q(x)$ gives an exponent vector modulo 2. A linear dependency among these vectors means the product of the corresponding $Q(x_i)$ values is a perfect square. Since $Q(x) \\equiv (x+m)^2 \\pmod{n}$, we get $X^2 \\equiv Y^2 \\pmod{n}$ with $X \\not\\equiv \\pm Y \\pmod{n}$ about half the time, yielding a factor via GCD.
 
-\\textbf{References:} C. Pomerance, "The Quadratic Sieve Factoring Algorithm", Eurocrypt 1984`,priority:`high`,applicableCheck:e=>!!e.n},z={id:`squfof`,name:`SQUFOF`,category:`Factorization`,description:`Factors n by finding a square form in the cycle of reduced binary quadratic forms. Use for n < 10^14 (faster than trial division for medium-sized factors).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} C. Pomerance, "The Quadratic Sieve Factoring Algorithm", Eurocrypt 1984`,priority:`high`,applicableCheck:e=>!!e.n},R={id:`squfof`,name:`SQUFOF`,category:`Factorization`,description:`Factors n by finding a square form in the cycle of reduced binary quadratic forms. Use for n < 10^14 (faster than trial division for medium-sized factors).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -1022,7 +1022,7 @@ The algorithm searches the forward cycle for a square $c_i$, then starts a rever
 
 \\textbf{Explanation:} SQUFOF (SQUare FOrm Factorization) exploits the structure of the class group of binary quadratic forms. The key insight is that when discriminant $D$ corresponds to a composite $n = pq$, the cycle of reduced forms contains a square form whose square root reveals one prime factor. It works well for $n < 10^{14}$ and requires no large-integer arithmetic beyond GCD.
 
-\\textbf{References:} Shanks, 1975; Gower \\& Wagstaff, Math. Comp., 2008`,priority:`medium`,applicableCheck:e=>!!e.n},B={id:`binary-poly-factor`,name:`Binary Polynomial Factoring`,category:`Factorization`,description:`Factors n by factoring its binary representation as a polynomial over Z[x] and evaluating at x=2. Use when the binary convolution of p and q has no carries.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Shanks, 1975; Gower \\& Wagstaff, Math. Comp., 2008`,priority:`medium`,applicableCheck:e=>!!e.n},z={id:`binary-poly-factor`,name:`Binary Polynomial Factoring`,category:`Factorization`,description:`Factors n by factoring its binary representation as a polynomial over Z[x] and evaluating at x=2. Use when the binary convolution of p and q has no carries.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -1108,7 +1108,7 @@ If the binary convolution of $p$ and $q$ produces no carries, then $f_{pq}(x) = 
 
 \\textbf{Explanation:} When multiplying two integers whose binary representations trigger no carries (i.e., every bit position gets at most one 1 from each factor), the binary polynomial of the product equals the product of the binary polynomials. Factoring this polynomial over $\\mathbb{Z}[x]$ and evaluating at $x = 2$ recovers the original integers. This is a rare special case but works instantly when applicable.
 
-\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen \\& Gerhard, "Modern Computer Algebra", Chapter 5`,priority:`low`,applicableCheck:e=>!!e.n},V=(e,t)=>{for(;t;)[e,t]=[t,e%t];return e},H=[];for(let e=-2e3;e<=2e3;e++)H.push(BigInt(e));let U={id:`small-fraction`,name:`Small Fraction Attack`,category:`Factorization`,description:`Factors n when p/q approximates a small rational a/b using parity-optimized trial division over the search window. Use when p/q is close to a simple fraction with denominator ≤ 100.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen \\& Gerhard, "Modern Computer Algebra", Chapter 5`,priority:`low`,applicableCheck:e=>!!e.n},B=(e,t)=>{for(;t;)[e,t]=[t,e%t];return e},V=[];for(let e=-2e3;e<=2e3;e++)V.push(BigInt(e));let H={id:`small-fraction`,name:`Small Fraction Attack`,category:`Factorization`,description:`Factors n when p/q approximates a small rational a/b using parity-optimized trial division over the search window. Use when p/q is close to a simple fraction with denominator ≤ 100.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
 def _attack():
     try:
         n = Integer(${e.n})
@@ -1199,7 +1199,7 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("SMALL_FRACTION=FAILED")
-_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${n/2n}\nSMALL_FRACTION=SUCCESS`);let r=e=>(e&1n)!=0n;for(let e=1;e<=100;e++){t&&t(Math.round((e-1)*100/100),`b = ${e} / 100`);for(let i=1;i<=e;i++){if(V(i,e)!==1)continue;let a=k(n*BigInt(e)/BigInt(i));if(!(a<=1n))for(let o of H){let s=a+o;if(r(s)&&n%s===0n){let r=n/s;if(r>1n)return t?.(100),Promise.resolve(`Factor found!\np = ${r}\nq = ${s}\nUsing a=${i}, b=${e}\nSMALL_FRACTION=SUCCESS`)}}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},usageGuide:`This attack factors n when the ratio of its two prime factors p/q is close to a simple fraction a/b with small denominator (≤ 100).
+_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${n/2n}\nSMALL_FRACTION=SUCCESS`);let r=e=>(e&1n)!=0n;for(let e=1;e<=100;e++){t&&t(Math.round((e-1)*100/100),`b = ${e} / 100`);for(let i=1;i<=e;i++){if(B(i,e)!==1)continue;let a=k(n*BigInt(e)/BigInt(i));if(!(a<=1n))for(let o of V){let s=a+o;if(r(s)&&n%s===0n){let r=n/s;if(r>1n)return t?.(100),Promise.resolve(`Factor found!\np = ${r}\nq = ${s}\nUsing a=${i}, b=${e}\nSMALL_FRACTION=SUCCESS`)}}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},usageGuide:`This attack factors n when the ratio of its two prime factors p/q is close to a simple fraction a/b with small denominator (≤ 100).
 
 How it works:
 1. For each coprime pair (a,b) with 1 ≤ b ≤ 100 and 1 ≤ a ≤ b, estimate q₀ ≈ √(n·b/a)
@@ -1229,7 +1229,7 @@ q_0 &= \\left\\lfloor\\sqrt{\\frac{nb}{a}}\\right\\rfloor \\\\
 
 \\textbf{Explanation:} When $p \\approx (a/b) \\cdot q$, substituting into $n = pq$ gives $q^2 \\approx nb/a$. We compute $q_0 = \\lfloor\\sqrt{nb/a}\\rfloor$ for each coprime $a,b$ and test $q_0 \\pm 2000$ for an exact divisor of $n$. Since $n$ is odd (product of odd primes), even candidates can never divide $n$ and are skipped via a $\\& 1$ bit check — cutting the effective trial division count in half. Precomputed BigInt offsets avoid per-iteration allocation. The search examines $\\approx 5050$ fraction pairs, each with $4001$ delta candidates, halved to $\\approx 10$M BigInt divisions worst-case.
 
-\\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,priority:`medium`,applicableCheck:e=>!!e.n},W={id:`batch-gcd`,name:`Batch GCD`,category:`Factorization`,description:`Finds shared prime factors across a list of RSA moduli by computing gcd of each against the product of all others. Use when multiple moduli may share primes.`,inputs:[{name:`n_values`,label:`Moduli (one per line or comma-separated)`,placeholder:`n1\\nn2\\nn3...`,multiline:!0,rows:5}],sageTemplate:()=>`print("Batch GCD requires multiple moduli — run in browser mode")`,frontendCheck:async e=>{try{let t=(e.n_values||``).trim();if(!t)return`ERROR: Missing required input: n_values (comma-separated moduli)
+\\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,priority:`medium`,applicableCheck:e=>!!e.n},U={id:`batch-gcd`,name:`Batch GCD`,category:`Factorization`,description:`Finds shared prime factors across a list of RSA moduli by computing gcd of each against the product of all others. Use when multiple moduli may share primes.`,inputs:[{name:`n_values`,label:`Moduli (one per line or comma-separated)`,placeholder:`n1\\nn2\\nn3...`,multiline:!0,rows:5}],sageTemplate:()=>`print("Batch GCD requires multiple moduli — run in browser mode")`,frontendCheck:async e=>{try{let t=(e.n_values||``).trim();if(!t)return`ERROR: Missing required input: n_values (comma-separated moduli)
 BATCH_GCD=FAILED`;let n=t.split(/[\n,]+/).map(e=>e.trim()).filter(e=>e.length>0).map(e=>BigInt(e));if(n.length<2)return null;let r=1n;for(let e of n)r*=e;let i=[`Batch GCD Attack (browser-side, BigInt)`,`Processing ${n.length} moduli...`,``],a=!1;for(let e=0;e<n.length;e++){let t=n[e];if(t<=1n)continue;let o=O(t,r/t);if(o>1n&&o<t){a=!0;let n=o,r=t/o;i.push(`n[${e}] = ${t}`),i.push(`  Shared factor found: p = ${n}`),i.push(`  q = ${r}`),i.push(`  Verification: p * q = ${n*r}`),i.push(``)}else o===t&&(i.push(`n[${e}] = ${t}`),i.push(`  WARNING: n divides product of others (duplicate or fully shared)`),i.push(``))}return a?(i.push(`Batch GCD complete.`),i.push(`BATCH_GCD=SUCCESS`),i.join(`
 `)):null}catch{return null}},proof:`\\textbf{Theorem:} Given moduli $\\{n_1, \\ldots, n_k\\}$, if any two share a prime, then $\\gcd(n_i, \\prod_{j \\neq i} n_j)$ reveals it.
 
@@ -1250,7 +1250,7 @@ The product $\\prod_{j \\neq i} n_j$ can be computed efficiently using a product
 
 \\textbf{Explanation:} When RSA keys are generated with insufficient randomness, two moduli may share a common prime factor. Computing the GCD of each modulus against the product of all others efficiently catches this. In practice, this attack found real-world weak keys — the 2012 "Mining Your Ps and Qs" study found 0.2\\% of TLS certificates shared factors.
 
-\\textbf{References:} Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012; Bernstein, "How to Find Small Factors of Products", 2004`,priority:`high`,applicableCheck:e=>{let t=(e.n_values||``).trim();return t?t.split(/[\n,]+/).filter(e=>e.trim()).length>=2:!1}},G={id:`multi-prime`,name:`Multi-Prime RSA`,category:`Factorization`,description:`Factors n with k >= 3 prime factors using trial division and Sage factor(). Use for multi-prime RSA moduli.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012; Bernstein, "How to Find Small Factors of Products", 2004`,priority:`high`,applicableCheck:e=>{let t=(e.n_values||``).trim();return t?t.split(/[\n,]+/).filter(e=>e.trim()).length>=2:!1}},W={id:`multi-prime`,name:`Multi-Prime RSA`,category:`Factorization`,description:`Factors n with k >= 3 prime factors using trial division and Sage factor(). Use for multi-prime RSA moduli.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             out = []
@@ -1381,156 +1381,128 @@ p_i &\\approx n^{1/k} \\text{ (each prime is smaller than in 2-prime RSA)} \\\\
 
 \\textbf{Explanation:} Multi-prime RSA (also called "RSA Multiprime") uses three or more primes for a fixed modulus size, making each prime factor smaller and easier to find via generic factorization algorithms. The attack uses trial division up to 10,000 followed by Sage's factor() for complete factorization.
 
-\\textbf{References:} G. J. Simmons and M. J. Norris, "Preliminary Comments on the MIT Public Key Cryptosystem", Cryptologia, 1976; D. Boneh, "Twenty Years of Attacks on RSA", Notices of the AMS, 1999`,priority:`medium`,applicableCheck:e=>!!e.n},K={id:`gimmicky-primes`,name:`Gimmicky Primes`,category:`Factorization`,description:`Detects special-form primes (Mersenne, primorial, Fermat, Fibonacci, repunit, and others) by trial division. Use for CTF moduli with crafted prime factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} G. J. Simmons and M. J. Norris, "Preliminary Comments on the MIT Public Key Cryptosystem", Cryptologia, 1976; D. Boneh, "Twenty Years of Attacks on RSA", Notices of the AMS, 1999`,priority:`medium`,applicableCheck:e=>!!e.n},G={id:`gimmicky-primes`,name:`Gimmicky Primes`,category:`Factorization`,description:`Detects special-form primes (Mersenne, primorial, Fermat, Fibonacci, repunit, and others) by trial division. Use for CTF moduli with crafted prime factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
             import math
             n_int = int(n)
             ${I(`GIMMICKY_PRIMES`,`            `)}
-            found = False
+            out = []
+            fp = None
+            fq = None
+            ftype = None
+            fdetail = None
+            def _found(t, d, pv):
+                nonlocal fp, fq, ftype, fdetail
+                fp = pv
+                fq = n // pv
+                ftype = t
+                fdetail = d
             # 1. Mersenne primes: 2^p - 1
-            print("Checking Mersenne primes (2^p - 1)...")
-            for p in [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127, 521, 607, 1279, 2203, 2281, 3217, 4253, 4423]:
-                mersenne = 2**p - 1
-                if n_int % mersenne == 0:
-                    print(f"  Found Mersenne prime factor: 2^{p} - 1 = {mersenne}")
-                    print(f"  Cofactor: {n // mersenne}")
-                    print(f"  Verification: {mersenne} * {n // mersenne} = {n}")
-                    print(f"p = {mersenne}")
-                    print(f"q = {n // mersenne}")
-                    found = True
+            if fp is None:
+                for p in [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127, 521, 607, 1279, 2203, 2281, 3217, 4253, 4423]:
+                    mersenne = 2**p - 1
+                    if n_int % mersenne == 0:
+                        _found("Mersenne prime", f"2^{p} - 1", mersenne)
+                        break
             # 2. Primorial primes: p# +/- 1
-            print()
-            print("Checking primorial primes (p# \u00b1 1)...")
-            primes_list = list(prime_range(2, 200))
-            primorial = 1
-            for p in primes_list:
-                primorial *= p
-                for sign in [1, -1]:
-                    candidate = primorial + sign
-                    if candidate > 1 and n_int % int(candidate) == 0:
-                        print(f"  Found primorial prime factor: {candidate} = {p}# {'+' if sign == 1 else '-'} 1")
-                        print(f"  Cofactor: {n // candidate}")
-                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
-                        print(f"p = {candidate}")
-                        print(f"q = {n // candidate}")
-                        found = True
+            if fp is None:
+                primes_list = list(prime_range(2, 200))
+                primorial = 1
+                for p in primes_list:
+                    primorial *= p
+                    for sign in [1, -1]:
+                        candidate = primorial + sign
+                        if candidate > 1 and n_int % int(candidate) == 0:
+                            _found("primorial prime", f"{p}# {'+' if sign == 1 else '-'} 1", int(candidate))
+                            break
+                    if fp is not None:
+                        break
             # 3. Fermat primes: 2^(2^k) + 1
-            print()
-            print("Checking Fermat primes (2^(2^k) + 1)...")
-            for k in range(0, 5):
-                fermat = 2**(2**k) + 1
-                if n_int % fermat == 0:
-                    print(f"  Found Fermat prime factor: 2^(2^{k}) + 1 = {fermat}")
-                    print(f"  Cofactor: {n // fermat}")
-                    print(f"  Verification: {fermat} * {n // fermat} = {n}")
-                    print(f"p = {fermat}")
-                    print(f"q = {n // fermat}")
-                    found = True
+            if fp is None:
+                for k in range(0, 5):
+                    fermat = 2**(2**k) + 1
+                    if n_int % fermat == 0:
+                        _found("Fermat prime", f"2^(2^{k}) + 1", fermat)
+                        break
             # 4. Fibonacci primes
-            print()
-            print("Checking Fibonacci primes...")
-            fib_primes = [2, 3, 5, 13, 89, 233, 1597, 28657, 514229, 433494437, 2971215073]
-            for fib in fib_primes:
-                if n_int % fib == 0:
-                    print(f"  Found Fibonacci prime factor: {fib}")
-                    print(f"  Cofactor: {n // fib}")
-                    print(f"  Verification: {fib} * {n // fib} = {n}")
-                    print(f"p = {fib}")
-                    print(f"q = {n // fib}")
-                    found = True
+            if fp is None:
+                fib_primes = [2, 3, 5, 13, 89, 233, 1597, 28657, 514229, 433494437, 2971215073]
+                for fib in fib_primes:
+                    if n_int % fib == 0:
+                        _found("Fibonacci prime", str(fib), fib)
+                        break
             # 5. Repunit primes: (10^p - 1) / 9
-            print()
-            print("Checking repunit primes...")
-            for p in [2, 19, 23, 317, 1031]:
-                try:
-                    repunit = (10**p - 1) // 9
-                    if n_int % repunit == 0:
-                        print(f"  Found repunit prime factor: R({p}) = {repunit}")
-                        print(f"  Cofactor: {n // repunit}")
-                        print(f"  Verification: {repunit} * {n // repunit} = {n}")
-                        print(f"p = {repunit}")
-                        print(f"q = {n // repunit}")
-                        found = True
-                except Exception:
-                    pass
+            if fp is None:
+                for p in [2, 19, 23, 317, 1031]:
+                    try:
+                        repunit = (10**p - 1) // 9
+                        if n_int % repunit == 0:
+                            _found("repunit prime", f"R({p})", repunit)
+                            break
+                    except Exception:
+                        pass
             # 6. Factorial primes: k! +/- 1
-            print()
-            print("Checking factorial primes (k! \u00b1 1)...")
-            factorial = 1
-            for k in range(1, 1001):
-                factorial *= k
-                for sign in [1, -1]:
-                    candidate = factorial + sign
-                    if candidate > n_int:
+            if fp is None:
+                factorial = 1
+                for k in range(1, 1001):
+                    factorial *= k
+                    for sign in [1, -1]:
+                        candidate = factorial + sign
+                        if candidate > n_int:
+                            break
+                        if candidate > 1 and n_int % candidate == 0:
+                            _found("factorial prime", f"{k}! {'+' if sign == 1 else '-'} 1", candidate)
+                            break
+                    if fp is not None:
                         break
-                    if candidate > 1 and n_int % candidate == 0:
-                        print(f"  Found factorial prime factor: {k}! {'+' if sign == 1 else '-'} 1")
-                        print(f"  Cofactor: {n // candidate}")
-                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
-                        print(f"p = {candidate}")
-                        print(f"q = {n // candidate}")
-                        found = True
-                else:
-                    continue
-                break
-            # 7. Carol and Kynea primes: (2^k - 1)^2 - 2, (2^k + 1)^2 - 2
-            # Cap k at 100 to keep candidate sizes manageable (≈ 2^200 max)
-            print()
-            print("Checking Carol and Kynea primes...")
-            for k in range(1, 1001):
-                for sign in [-1, 1]:
-                    candidate = (2**k + sign)**2 - 2
-                    if candidate > n_int:
+            # 7. Carol and Kynea primes
+            if fp is None:
+                for k in range(1, 1001):
+                    for sign in [-1, 1]:
+                        candidate = (2**k + sign)**2 - 2
+                        if candidate > n_int:
+                            break
+                        if candidate > 1 and n_int % candidate == 0:
+                            name = "Carol" if sign == -1 else "Kynea"
+                            _found(f"{name} prime", f"(2^{k} {'-' if sign == -1 else '+'} 1)^2 - 2", candidate)
+                            break
+                    if fp is not None:
                         break
-                    if candidate > 1 and n_int % candidate == 0:
-                        name = "Carol" if sign == -1 else "Kynea"
-                        print(f"  Found {name} prime factor: (2^{k} {'-' if sign == -1 else '+' } 1)^2 - 2")
-                        print(f"  Cofactor: {n // candidate}")
-                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
-                        print(f"p = {candidate}")
-                        print(f"q = {n // candidate}")
-                        found = True
-                else:
-                    continue
-                break
-            # 8. Cullen and Woodall primes: k * 2^k +/- 1
-            # Cap k at 100 to keep candidate sizes manageable (k*2^k ≈ 2^107 max)
-            print()
-            print("Checking Cullen and Woodall primes (k * 2^k \u00b1 1)...")
-            for k in range(1, 1001):
-                for sign in [1, -1]:
-                    candidate = k * 2**k + sign
-                    if candidate > n_int:
+            # 8. Cullen and Woodall primes
+            if fp is None:
+                for k in range(1, 1001):
+                    for sign in [1, -1]:
+                        candidate = k * 2**k + sign
+                        if candidate > n_int:
+                            break
+                        if candidate > 1 and n_int % candidate == 0:
+                            name = "Cullen" if sign == 1 else "Woodall"
+                            _found(f"{name} prime", f"{k} * 2^{k} {'+' if sign == 1 else '-'} 1", candidate)
+                            break
+                    if fp is not None:
                         break
-                    if candidate > 1 and n_int % candidate == 0:
-                        name = "Cullen" if sign == 1 else "Woodall"
-                        print(f"  Found {name} prime factor: {k} * 2^{k} {'+' if sign == 1 else '-'} 1")
-                        print(f"  Cofactor: {n // candidate}")
-                        print(f"  Verification: {candidate} * {n // candidate} = {n}")
-                        print(f"p = {candidate}")
-                        print(f"q = {n // candidate}")
-                        found = True
-                else:
-                    continue
-                break
-            if found:
-                print()
-                print("GIMMICKY_PRIMES=SUCCESS")
+            if fp is not None and fp > 1:
+                out.append(f"p is {ftype} ({fdetail})")
+                out.append(f"p = {fp}")
+                out.append(f"q = {fq}")
+                out.append("")
+                out.append("GIMMICKY_PRIMES=SUCCESS")
             else:
-                print("No gimmicky prime factors found.")
-                print("The factors are likely standard randomly-generated primes.")
-                print()
-                print("GIMMICKY_PRIMES=FAILED")
+                out.append("No gimmicky prime factors found.")
+                out.append("The factors are likely standard randomly-generated primes.")
+                out.append("")
+                out.append("GIMMICKY_PRIMES=FAILED")
         except Exception as e:
-            print(f"Error in gimmicky primes check: {e}")
-            print("GIMMICKY_PRIMES=FAILED")
+            out.append(f"Error in gimmicky primes check: {e}")
+            out.append("GIMMICKY_PRIMES=FAILED")
         #
     except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("GIMMICKY_PRIMES=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t<2n)return Promise.resolve(null);if(t%2n==0n)return Promise.resolve(`n is even: ${t}\np = 2\nq = ${t/2n}\nGIMMICKY_PRIMES=SUCCESS`);let n=t,r=e=>e>1n&&n%e===0n?e:null,i=e=>`Factor found!\nCofactor: ${n/e}\nVerification: ${e} * ${n/e} = ${n}\nGIMMICKY_PRIMES=SUCCESS`;for(let e of[2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281,3217,4253,4423]){let t=r((1n<<BigInt(e))-1n);if(t)return Promise.resolve(i(t))}let a=[2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199],o=1n;for(let e of a){o*=BigInt(e);for(let e of[1n,-1n]){let t=o+e;if(t>1n&&n%t===0n)return Promise.resolve(i(t))}}for(let e=0;e<5;e++){let t=r((1n<<(1n<<BigInt(e)))+1n);if(t)return Promise.resolve(i(t))}for(let e of[2n,3n,5n,13n,89n,233n,1597n,28657n,514229n,433494437n,2971215073n])if(e<n&&n%e===0n)return Promise.resolve(i(e));for(let e of[2,19,23,317,1031])try{let t=(10n**BigInt(e)-1n)/9n;if(t<n&&n%t===0n)return Promise.resolve(i(t))}catch{continue}let s=1n;for(let e=1;e<=1e3;e++){s*=BigInt(e);for(let e of[1n,-1n]){let t=s+e;if(t>1n&&n%t===0n)return Promise.resolve(i(t))}}for(let e=1;e<=1e3;e++){let t=1n<<BigInt(e);for(let e of[-1n,1n]){let r=(t+e)**2n-2n;if(r>1n&&n%r===0n)return Promise.resolve(i(r))}}for(let e=1;e<=1e3;e++){let t=1n<<BigInt(e),r=BigInt(e);for(let e of[1n,-1n]){let a=r*t+e;if(a>1n&&n%a===0n)return Promise.resolve(i(a))}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $p$ is a special-form prime from a known set $\\mathcal{S}$, trial division against $\\mathcal{S}$ finds $p$ in $O(|\\mathcal{S}| \\cdot \\log^2 n)$.
+        out.append(f"ERROR: {ex}")
+        out.append("GIMMICKY_PRIMES=FAILED")
+    print("\\n".join(out))
+_attack()`,frontendCheck:e=>{if(!e.n)return Promise.resolve(null);try{let t=BigInt(e.n);if(t<2n)return Promise.resolve(null);if(t%2n==0n)return Promise.resolve(`n is even: ${t}\np = 2\nq = ${t/2n}\nGIMMICKY_PRIMES=SUCCESS`);let n=null,r=e=>e>1n&&t%e===0n;for(let e of[2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281,3217,4253,4423]){let t=(1n<<BigInt(e))-1n;if(r(t)){n={type:`Mersenne prime`,detail:`2^${e} - 1`,p:t};break}}if(!n){let e=[2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199],r=1n;for(let i of e){r*=BigInt(i);for(let e of[1n,-1n]){let a=r+e;if(a>1n&&t%a===0n){n={type:`primorial prime`,detail:`${i}# ${e===1n?`+`:`-`} 1`,p:a};break}}if(n)break}}if(!n)for(let e=0;e<5;e++){let t=(1n<<(1n<<BigInt(e)))+1n;if(r(t)){n={type:`Fermat prime`,detail:`2^(2^${e}) + 1`,p:t};break}}if(!n){for(let e of[2n,3n,5n,13n,89n,233n,1597n,28657n,514229n,433494437n,2971215073n])if(e<t&&t%e===0n){n={type:`Fibonacci prime`,detail:e.toString(),p:e};break}}if(!n)for(let e of[2,19,23,317,1031])try{let r=(10n**BigInt(e)-1n)/9n;if(r<t&&t%r===0n){n={type:`repunit prime`,detail:`R(${e})`,p:r};break}}catch{continue}if(!n){let e=1n;for(let r=1;r<=1e3;r++){e*=BigInt(r);for(let i of[1n,-1n]){let a=e+i;if(a>1n&&t%a===0n){n={type:`factorial prime`,detail:`${r}! ${i===1n?`+`:`-`} 1`,p:a};break}}if(n)break}}if(!n)for(let e=1;e<=1e3;e++){let r=1n<<BigInt(e);for(let i of[-1n,1n]){let a=(r+i)**2n-2n;if(a>1n&&t%a===0n){n={type:`${i===-1n?`Carol`:`Kynea`} prime`,detail:`(2^${e} ${i===-1n?`-`:`+`} 1)^2 - 2`,p:a};break}}if(n)break}if(!n)for(let e=1;e<=1e3;e++){let r=1n<<BigInt(e),i=BigInt(e);for(let a of[1n,-1n]){let o=i*r+a;if(o>1n&&t%o===0n){n={type:`${a===1n?`Cullen`:`Woodall`} prime`,detail:`${e} * 2^${e} ${a===1n?`+`:`-`} 1`,p:o};break}}if(n)break}if(n){let e=t/n.p;return Promise.resolve(`p is ${n.type} (${n.detail})\np = ${n.p}\nq = ${e}\n\nGIMMICKY_PRIMES=SUCCESS`)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $p$ is a special-form prime from a known set $\\mathcal{S}$, trial division against $\\mathcal{S}$ finds $p$ in $O(|\\mathcal{S}| \\cdot \\log^2 n)$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -1548,7 +1520,7 @@ s \\mid n &\\implies p = s,\\; q = n/s \\\\
 
 \\textbf{Explanation:} In CTF challenges, primes are sometimes constructed from known sequences (Mersenne $2^p-1$, primorial $p\\#\\pm1$, Fermat $2^{2^k}+1$, etc.). This attack checks all small candidates from each family by trial division. The set size is a few hundred candidates, so the check completes nearly instantly.
 
-\\textbf{References:} C. Caldwell, "The Prime Pages" (https://t5k.org); P. Ribenboim, "The New Book of Prime Number Records", Springer 1996`,priority:`low`,applicableCheck:e=>!!e.n},q={id:`close-prime`,name:`Close-Prime`,category:`Factorization`,description:`Factors n when p and q are close via Fermat iteration and Londahl BSGS fallback. Use when primes are suspected close together.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} C. Caldwell, "The Prime Pages" (https://t5k.org); P. Ribenboim, "The New Book of Prime Number Records", Springer 1996`,priority:`low`,applicableCheck:e=>!!e.n},K={id:`close-prime`,name:`Close-Prime`,category:`Factorization`,description:`Factors n when p and q are close via Fermat iteration and Londahl BSGS fallback. Use when primes are suspected close together.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -1652,7 +1624,7 @@ a_i^2 - n \\text{ is square} &\\implies p = a_i - b_i,\\; q = a_i + b_i \\\\
 
 \\textbf{Explanation:} Fermat represents $n$ as $a^2 - b^2$ and searches for $a$ such that $a^2 - n$ is a perfect square. Each step increments $a$ by 1 and updates $b^2$ additively, avoiding multiplication. When $|p-q| < 10^6$, Fermat converges quickly. Londahl's BSGS recovers $\\phi(n)$ via a discrete-log collision for larger gaps.
 
-\\textbf{References:} Fermat (1643); C. L\\"ondahl, "Finding Close-Prime Factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,priority:`medium`,applicableCheck:e=>!!e.n},J={id:`novelty-primes`,name:`Novelty Primes`,category:`Factorization`,description:`Detects primes near powers of two or mathematical constants via windowed trial division. Use for CTF moduli with novelty-crafted primes.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+\\textbf{References:} Fermat (1643); C. L\\"ondahl, "Finding Close-Prime Factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,priority:`medium`,applicableCheck:e=>!!e.n},q={id:`novelty-primes`,name:`Novelty Primes`,category:`Factorization`,description:`Detects primes near powers of two or mathematical constants via windowed trial division. Use for CTF moduli with novelty-crafted primes.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
 def _attack():
     try:
         try:
@@ -1747,7 +1719,7 @@ n \\bmod (2^k + \\delta) = 0 &\\implies p = 2^k + \\delta,\\; q = n/p \\\\
 
 \\textbf{Explanation:} CTF challenge authors sometimes construct primes from well-known numbers — $p = 2^k \\pm \\delta$ (near powers of two) or $p = \\lfloor \\pi \\times 10^m \\rfloor \\pm \\delta$ (from mathematical constants). This attack checks candidates in a window around each known value, testing divisibility of $n$.
 
-\\textbf{References:} Cryptopals; Cryptohack.org; various CTF writeups`,priority:`low`,applicableCheck:e=>!!e.n},Y={id:`franklin-reiter-related-message`,name:`Franklin-Reiter Related Message Attack`,category:`Message / Protocol`,description:`Recovers m from two ciphertexts with linearly related plaintexts via polynomial GCD. Use when c1 = m^e and c2 = (a·m + b)^e mod n with known a, b.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c1`,label:`c1 (ciphertext of m)`,placeholder:`Enter c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (ciphertext of a·m + b)`,placeholder:`Enter c2...`,multiline:!0,rows:3},{name:`a`,label:`a (linear coefficient)`,placeholder:`2`,multiline:!1},{name:`b`,label:`b (linear offset)`,placeholder:`0`,multiline:!1}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Cryptopals; Cryptohack.org; various CTF writeups`,priority:`low`,applicableCheck:e=>!!e.n},J={id:`franklin-reiter-related-message`,name:`Franklin-Reiter Related Message Attack`,category:`Message / Protocol`,description:`Recovers m from two ciphertexts with linearly related plaintexts via polynomial GCD. Use when c1 = m^e and c2 = (a·m + b)^e mod n with known a, b.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c1`,label:`c1 (ciphertext of m)`,placeholder:`Enter c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (ciphertext of a·m + b)`,placeholder:`Enter c2...`,multiline:!0,rows:3},{name:`a`,label:`a (linear coefficient)`,placeholder:`2`,multiline:!1},{name:`b`,label:`b (linear offset)`,placeholder:`0`,multiline:!1}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -1912,7 +1884,7 @@ How to use:
 3. Provide n, e, c1, c2, a, and b
 4. The attack computes gcd(m1^e - c1, (a*m1 + b)^e - c2) to recover m1
 
-Tip: The attack requires e = 3 for reliable algebraic recovery; e = 5 or 7 may work via polynomial GCD but can fail over composite moduli. For convenience, paste into Magic Mode which auto-detects the parameters.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.c1&&!!e.c2},X={id:`simple-lattice`,name:`Simple Lattice`,category:`Partial Key / Lattice`,description:`Recovers p from an approximate value nearp using Coppersmith's lattice when |nearp - p| < n^(1/4). Use when a close approximation of p is known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`nearp`,label:`nearp (approximate p)`,placeholder:`Enter approximate p value...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+Tip: The attack requires e = 3 for reliable algebraic recovery; e = 5 or 7 may work via polynomial GCD but can fail over composite moduli. For convenience, paste into Magic Mode which auto-detects the parameters.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.c1&&!!e.c2},Y={id:`simple-lattice`,name:`Simple Lattice`,category:`Partial Key / Lattice`,description:`Recovers p from an approximate value nearp using Coppersmith's lattice when |nearp - p| < n^(1/4). Use when a close approximation of p is known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`nearp`,label:`nearp (approximate p)`,placeholder:`Enter approximate p value...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -2013,7 +1985,7 @@ How to use:
 3. Provide n and nearp
 4. The attack constructs a lattice and uses LLL to find the exact p
 
-Tip: nearp can come from side-channel leaks, known bits of p, or approximations from other attacks. If |nearp - p| > n^(1/4) the attack may fail.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.nearp},Z={id:`partial-d`,name:`Partial d Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers d from leaked low-order bits by iterating k in ed = k·φ(n)+1. Use when low-order bits of d are exposed via side-channel.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dLow`,label:`dLow (low bits of d)`,placeholder:`Enter known low bits of d...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+Tip: nearp can come from side-channel leaks, known bits of p, or approximations from other attacks. If |nearp - p| > n^(1/4) the attack may fail.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.nearp},X={id:`partial-d`,name:`Partial d Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers d from leaked low-order bits by iterating k in ed = k·φ(n)+1. Use when low-order bits of d are exposed via side-channel.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dLow`,label:`dLow (low bits of d)`,placeholder:`Enter known low bits of d...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
 def _attack():
     try:
         try:
@@ -2095,7 +2067,7 @@ How to use:
 3. The attack iterates k in ed = k\\phi(n) + 1, checking if d_approx has matching low bits
 4. For each matching candidate, it computes \\phi(n) and solves the quadratic for p,q
 
-Tip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~16M iterations). Uses incremental d_approx update (avoiding BigInt division per iteration) for performance.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.dLow},ne={id:`partial-pq-bits`,name:`Partial p/q Bits`,category:`Partial Key / Lattice`,description:`Recovers p from known high (MSB) or low (LSB) bits using Coppersmith's lattice. Use when half or more of p's bits are known via side-channel.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`knownBits`,label:`knownBits (known bits of p)`,placeholder:`Enter known bits as integer...`,multiline:!0,rows:3},{name:`bitPosition`,label:`bitPosition`,placeholder:`msb or lsb`,multiline:!1}],sageTemplate:e=>`def _attack():
+Tip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~16M iterations). Uses incremental d_approx update (avoiding BigInt division per iteration) for performance.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.dLow},re={id:`partial-pq-bits`,name:`Partial p/q Bits`,category:`Partial Key / Lattice`,description:`Recovers p from known high (MSB) or low (LSB) bits using Coppersmith's lattice. Use when half or more of p's bits are known via side-channel.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`knownBits`,label:`knownBits (known bits of p)`,placeholder:`Enter known bits as integer...`,multiline:!0,rows:3},{name:`bitPosition`,label:`bitPosition`,placeholder:`msb or lsb`,multiline:!1}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -2230,7 +2202,7 @@ How to use:
 2. Provide n, knownBits, and bitPosition (\\"msb\\" or \\"lsb\\")
 3. The attack uses Coppersmith\\'s method to find the missing bits
 
-Tip: This is inherently probabilistic — the lattice may fail even with the right inputs. Try with more known bits if it fails. bitPosition=msb = known high bits, lsb = known low bits.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},Q=5000n,$=[P,F,ee,te,L,R,z,B,U,W,G,K,q,J,{id:`euler`,name:`Euler Factorization`,category:`Factorization`,description:`Factors n by finding two distinct representations as a sum of squares a^2+b^2 = c^2+d^2 = n. Use when both primes are ≡ 1 (mod 4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+Tip: This is inherently probabilistic — the lattice may fail even with the right inputs. Try with more known bits if it fails. bitPosition=msb = known high bits, lsb = known low bits.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},Z=5000n,Q=[P,F,ee,te,ne,L,R,z,H,U,W,G,K,q,{id:`euler`,name:`Euler Factorization`,category:`Factorization`,description:`Factors n by finding two distinct representations as a sum of squares a^2+b^2 = c^2+d^2 = n. Use when both primes are ≡ 1 (mod 4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -2498,7 +2470,7 @@ p,q &= \\frac{n - \\phi + 1 \\pm \\sqrt{(n - \\phi + 1)^2 - 4n}}{2} \\qed
 
 \\textbf{Explanation:} The Pisano period attack tracks $2^i \\bmod n$ via recurrence ($v_{i+1} = 2 \\cdot v_i \\bmod n$). When a value repeats, the index difference is a multiple of the multiplicative order of 2 modulo $n$, which divides $\\lambda(n)$. Each candidate $\\phi$ is tested by checking whether the quadratic discriminant is a perfect square.
 
-\\textbf{References:} Wuliangshun, "Integer Factorization With Pisano Period", IEEE Access, 2019`,priority:`medium`,applicableCheck:e=>!!e.n},X,Z,ne,{id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via FLT-based batch GCD search over small CRT exponent d_p. Use when d_p = d mod (p-1) is small (< bound, default 1,000,000).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 5000000`,required:!1,multiline:!1}],sageTemplate:e=>`import math
+\\textbf{References:} Wuliangshun, "Integer Factorization With Pisano Period", IEEE Access, 2019`,priority:`medium`,applicableCheck:e=>!!e.n},Y,X,re,{id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via FLT-based batch GCD search over small CRT exponent d_p. Use when d_p = d mod (p-1) is small (< bound, default 1,000,000).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 5000000`,required:!1,multiline:!1}],sageTemplate:e=>`import math
 def _attack():
     try:
         n = Integer(${e.n})
@@ -2546,7 +2518,7 @@ def _attack():
                 print("SMALL_CRT_EXP=FAILED")
     except Exception as ex:
         print(f"SMALL_CRT_EXP=FAILED: {ex}")
-_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=e.bound?BigInt(e.bound):5000000n,a=M(2n,r,n),o=1n,s=1n,c=0n;for(let e=0n;e<=i;e++){let l=(o-2n+n)%n;if(t&&i>10000n&&e%50000n==0n&&t(Number(e*100n/i),`dp = ${e.toString()} / ${i.toString()}`),s=s*l%n,e%Q==Q-1n||e===i){let i=O(s,n);if(i>1n&&i<n){let o=e,s=M(a,c,n);for(let e=c;e<=o;e++){if(O((s-2n+n)%n,n)>1n){let a=i,o=n/i,s=j(r,(a-1n)*(o-1n)),c=s?`\nPrivate exponent d = ${s}`:``;return t?.(100),Promise.resolve(`Factor found at dp = ${e}!\np = ${a}\nq = ${o}${c}\nSMALL_CRT_EXP=SUCCESS`)}s=s*a%n}}s=1n,c=e+1n}o=o*a%n}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small ($< \\text{bound}$), Fermat's Little Theorem with batched GCD recovers $p$ in $O(\\text{bound})$ time.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=e.bound?BigInt(e.bound):5000000n,a=M(2n,r,n),o=1n,s=1n,c=0n;for(let e=0n;e<=i;e++){let l=(o-2n+n)%n;if(t&&i>10000n&&e%50000n==0n&&t(Number(e*100n/i),`dp = ${e.toString()} / ${i.toString()}`),s=s*l%n,e%Z==Z-1n||e===i){let i=O(s,n);if(i>1n&&i<n){let o=e,s=M(a,c,n);for(let e=c;e<=o;e++){if(O((s-2n+n)%n,n)>1n){let a=i,o=n/i,s=j(r,(a-1n)*(o-1n)),c=s?`\nPrivate exponent d = ${s}`:``;return t?.(100),Promise.resolve(`Factor found at dp = ${e}!\np = ${a}\nq = ${o}${c}\nSMALL_CRT_EXP=SUCCESS`)}s=s*a%n}}s=1n,c=e+1n}o=o*a%n}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small ($< \\text{bound}$), Fermat's Little Theorem with batched GCD recovers $p$ in $O(\\text{bound})$ time.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -4180,12 +4152,12 @@ Tip: More runs per position increases accuracy. With 31 runs and 90% accuracy pe
                     if roots:
                         k = int(roots[0])
                         p = int(M * k + r)
-                        if n % p == 0:
+                        if p > 1 and n % p == 0:
                             found_k = k
                 except Exception:
                     pass
                 if found_k is None:
-                    for k in range(bound):
+                    for k in range(1, bound):
                         if n % (M * k + r) == 0:
                             found_k = k
                             break
@@ -4906,7 +4878,7 @@ p &= \\gcd(\\text{leak} - a, n) \\qed
 
 \\textbf{References:} Common CTF pattern; based on Fermat's Little Theorem`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.a&&!!e.leak,frontendCheck:async e=>{try{if(!e.n||!e.a||!e.leak)return`ERROR: Missing required input: n, a, or leak
 IMPLICIT_KEY_EXPOSURE=FAILED`;let t=BigInt(e.n),n=BigInt(e.a),r=BigInt(e.leak),i=O(r-n,t);if(i>1n&&i<t){let e=i,a=t/e;return[`Implicit Key Exposure Attack (browser-side, BigInt)`,`n = ${t}`,`a = ${n}`,`leak = ${r}`,``,`Factors recovered:`,`p = ${e}`,`q = ${a}`,`Verification: p * q = ${e*a}`,`Verification: a^p mod n = ${M(n,e,t)} == leak? ${M(n,e,t)===r}`,``,`IMPLICIT_KEY_EXPOSURE=SUCCESS`].join(`
-`)}return null}catch{return null}}},Y,{id:`common-prime-rsa`,name:`Common Prime RSA`,category:`Factorization`,description:`Factors two RSA moduli n1, n2 that share a common prime by computing gcd(n1, n2). Use when two moduli may share a prime factor.`,inputs:[{name:`n1`,label:`n1 (first modulus)`,placeholder:`Enter n1...`,multiline:!0,rows:3},{name:`n2`,label:`n2 (second modulus)`,placeholder:`Enter n2...`,multiline:!0,rows:3}],sageTemplate:()=>`print("Common Prime RSA requires multiple moduli — run in browser mode")`,proof:`\\textbf{Theorem:} If $n_1 = p \\cdot q_1$ and $n_2 = p \\cdot q_2$ share a prime $p$, then $\\gcd(n_1, n_2) = p$.
+`)}return null}catch{return null}}},J,{id:`common-prime-rsa`,name:`Common Prime RSA`,category:`Factorization`,description:`Factors two RSA moduli n1, n2 that share a common prime by computing gcd(n1, n2). Use when two moduli may share a prime factor.`,inputs:[{name:`n1`,label:`n1 (first modulus)`,placeholder:`Enter n1...`,multiline:!0,rows:3},{name:`n2`,label:`n2 (second modulus)`,placeholder:`Enter n2...`,multiline:!0,rows:3}],sageTemplate:()=>`print("Common Prime RSA requires multiple moduli — run in browser mode")`,proof:`\\textbf{Theorem:} If $n_1 = p \\cdot q_1$ and $n_2 = p \\cdot q_2$ share a prime $p$, then $\\gcd(n_1, n_2) = p$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -5016,4 +4988,4 @@ c1, n1
 c2, n2
 c3, n3
 
-Tip: For convenience, paste this into Magic Mode which auto-detects the format. Works when m^e < n1*n2*...*ne.`,priority:`high`,applicableCheck:e=>!!e.e&&!!e.ciphertexts}],re=[`Factorization`,`Partial Key / Lattice`,`Message / Protocol`,`Oracle`,`Advanced`],ie=new Map;for(let e of re)ie.set(e,$.filter(t=>t.category===e));n(`https://factordb-proxy.octopusyuzu.workers.dev`),self.onmessage=async e=>{let{id:t,attackId:n,params:r}=e.data,i=$.find(e=>e.id===n);if(!i?.frontendCheck){self.postMessage({id:t,result:null});return}try{let e=await i.frontendCheck(r,(e,n)=>{self.postMessage({type:`progress`,id:t,pct:e,detail:n})});self.postMessage({id:t,result:e})}catch(e){self.postMessage({id:t,result:null,error:String(e)})}}})();
+Tip: For convenience, paste this into Magic Mode which auto-detects the format. Works when m^e < n1*n2*...*ne.`,priority:`high`,applicableCheck:e=>!!e.e&&!!e.ciphertexts}],ie=[`Factorization`,`Partial Key / Lattice`,`Message / Protocol`,`Oracle`,`Advanced`],ae=new Map;for(let e of ie)ae.set(e,Q.filter(t=>t.category===e));n(`https://factordb-proxy.octopusyuzu.workers.dev`);let $=new Set;self.onmessage=e=>{let t=e.data;if(`type`in t&&t.type===`cancel`){for(let e of t.ids)$.add(e);return}let{id:n,attackId:r,params:i}=t;if($.has(n)){$.delete(n);return}let a=Q.find(e=>e.id===r);if(!a?.frontendCheck){$.has(n)||self.postMessage({id:n,result:null});return}(async()=>{try{let e=await a.frontendCheck(i,(e,t)=>{$.has(n)||self.postMessage({type:`progress`,id:n,pct:e,detail:t})});$.has(n)||self.postMessage({id:n,result:e})}catch(e){$.has(n)||self.postMessage({id:n,result:null,error:String(e)})}})()}})();

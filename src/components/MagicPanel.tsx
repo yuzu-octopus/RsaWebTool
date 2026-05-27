@@ -141,13 +141,14 @@ export function MagicPanel() {
   const [earlyStop, setEarlyStop] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const runIdRef = useRef(0);
+  const stopRequestedRef = useRef(false);
   const [showApplicable, setShowApplicable] = useState(false);
   const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
   const [errorInsights, setErrorInsights] = useState<string | null>(null);
   const testcaseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timer = useTimer();
-  const { runAttack } = useWorkerPool();
+  const { runAttack, cancelCurrentRun } = useWorkerPool();
 
   useEffect(() => {
     return () => {
@@ -212,37 +213,97 @@ export function MagicPanel() {
     }));
     setJobs(initialJobs);
 
-    // Run all frontendChecks concurrently, updating job status as each completes
-    const preCheckPromises = applicable.map(async (a, i) => {
-      try {
-        const result = await runAttack(a.id, params);
-        if (result !== null) {
-          const isSuccess = isActualSuccess(result);
-          setJobs(prev => {
-            const updated = [...prev];
-            updated[i] = { ...updated[i], status: isSuccess ? 'success' : 'error', result };
-            return updated;
+    // Phase 1: Run all frontendChecks concurrently, early-stop on first success
+    const preCheckResults: ({ result?: string; error?: string; isSuccess?: boolean } | null)[] = [];
+    const earlySuccess: { value: { index: number; attack: Attack; result: string } | null } = { value: null };
+
+    await new Promise<void>((resolveAll) => {
+      let completed = 0;
+      const total = applicable.length;
+
+      for (let i = 0; i < total; i++) {
+        const a = applicable[i];
+        const idx = i;
+
+        runAttack(a.id, params)
+          .then(result => {
+            if (currentRunId !== runIdRef.current) return; // stale run
+            if (earlySuccess.value) return; // already found success, discard
+
+            completed++;
+            if (result !== null) {
+              const isSuccess = isActualSuccess(result);
+              preCheckResults[idx] = { result, isSuccess };
+              setJobs(prev => {
+                const updated = [...prev];
+                updated[idx] = { ...updated[idx], status: isSuccess ? 'success' : 'error', result };
+                return updated;
+              });
+
+              if (isSuccess) {
+                earlySuccess.value = { index: idx, attack: a, result };
+                cancelCurrentRun();
+                resolveAll();
+                return;
+              }
+            }
+
+            if (completed >= total) resolveAll();
+          })
+          .catch(err => {
+            if (currentRunId !== runIdRef.current) return;
+            if (earlySuccess.value) return;
+
+            completed++;
+            const error = err instanceof Error ? err.message : 'Unknown frontendCheck error';
+            preCheckResults[idx] = { error };
+            setJobs(prev => {
+              const updated = [...prev];
+              updated[idx] = { ...updated[idx], status: 'error', error };
+              return updated;
+            });
+
+            if (completed >= total) resolveAll();
           });
-          return { index: i, result, isSuccess };
-        }
-      } catch (e) {
-        const error = e instanceof Error ? e.message : 'Unknown frontendCheck error';
-        setJobs(prev => {
-          const updated = [...prev];
-          updated[i] = { ...updated[i], status: 'error', error };
-          return updated;
-        });
-        return { index: i, error };
       }
-      return null;
     });
 
-    const settledPreChecks = await Promise.all(preCheckPromises);
-    // preCheckResults uses sparse entries: attacks without frontendCheck (or that returned null)
-    // remain at undefined indexes. The remaining-loop below treats undefined as "needs SageCell".
-    const preCheckResults: ({ result?: string; error?: string; isSuccess?: boolean } | null)[] = [];
-    for (const r of settledPreChecks) {
-      if (r) preCheckResults[r.index] = r;
+    if (currentRunId !== runIdRef.current) return;
+
+    // If user pressed Stop during frontendCheck phase, bail out immediately
+    if (stopRequestedRef.current) {
+      stopRequestedRef.current = false;
+      setJobs(prev => prev.map(j => j.status === 'running' ? { ...j, status: 'cancelled' as const } : j));
+      if (currentRunId === runIdRef.current) {
+        timer.stop();
+        setRunning(false);
+        abortControllerRef.current = null;
+      }
+      return;
+    }
+
+    // Mark any remaining running jobs as aborted (in-flight workers were cancelled)
+    setJobs(prev => prev.map(j => j.status === 'running' ? { ...j, status: 'aborted' as const } : j));
+
+    // If a frontendCheck succeeded, surface result immediately (skip SageCell)
+    const success = earlySuccess.value;
+    if (success) {
+      timer.stop();
+      setRunning(false);
+      abortControllerRef.current = null;
+      let displayResult = success.result;
+      const decrypted = autoDecrypt(success.attack, params, success.result);
+      if (decrypted) displayResult += '\n\n## Decrypted message\n' + decrypted;
+      setOutputResult(displayResult);
+      addToHistory(success.attack.id, success.attack.name, success.result, true);
+      showNotification(`${success.attack.name}: success`, 'success');
+      submitToFactorDB(success.attack, success.result, params.n, showNotification);
+      if (decrypted) {
+        setJobs(prev => prev.map(j =>
+          j.attackId === success.attack.id ? { ...j, result: displayResult } : j
+        ));
+      }
+      return;
     }
 
     // Build remaining list (attacks that need SageCell)
@@ -253,31 +314,13 @@ export function MagicPanel() {
       }
     }
 
-    // If all attacks resolved by frontendCheck, short-circuit
+    // If all attacks resolved by frontendCheck (no success), short-circuit
     if (remaining.length === 0) {
       if (currentRunId !== runIdRef.current) return;
       timer.stop();
       setRunning(false);
       abortControllerRef.current = null;
-      const firstSuccess = preCheckResults.find(r => r?.isSuccess);
-      if (firstSuccess && firstSuccess.result) {
-        const idx = preCheckResults.indexOf(firstSuccess);
-        const attack = applicable[idx];
-        let displayResult = firstSuccess.result;
-        const decrypted = autoDecrypt(attack, params, firstSuccess.result);
-        if (decrypted) displayResult += '\n\n## Decrypted message\n' + decrypted;
-        setOutputResult(displayResult);
-        addToHistory(attack.id, attack.name, firstSuccess.result, true);
-        showNotification(`${attack.name}: success`, 'success');
-        submitToFactorDB(attack, firstSuccess.result, params.n, showNotification);
-        if (decrypted) {
-          setJobs(prev => prev.map(j =>
-            j.attackId === attack.id ? { ...j, result: displayResult } : j
-          ));
-        }
-      } else {
-        setErrorInsights(buildErrorInsights(preCheckResults));
-      }
+      setErrorInsights(buildErrorInsights(preCheckResults));
       return;
     }
 
@@ -341,8 +384,10 @@ export function MagicPanel() {
   };
 
   const handleStop = useCallback(() => {
+    stopRequestedRef.current = true;
     abortControllerRef.current?.abort();
-  }, []);
+    cancelCurrentRun();
+  }, [cancelCurrentRun]);
 
   const handleGenerateTestcase = useCallback(() => {
     if (testcaseTimerRef.current) clearTimeout(testcaseTimerRef.current);
@@ -486,7 +531,7 @@ export function MagicPanel() {
           </Box>
 
           {testcaseMsg && (
-            <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, textAlign: 'center', fontSize: '0.75rem' }}>
+            <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, mb: 2, textAlign: 'center', fontSize: '0.75rem' }}>
               {testcaseMsg}
             </Typography>
           )}

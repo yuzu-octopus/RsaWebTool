@@ -75,12 +75,12 @@ export const attack: Attack = {
                     if roots:
                         k = int(roots[0])
                         p = int(M * k + r)
-                        if n % p == 0:
+                        if p > 1 and n % p == 0:
                             found_k = k
                 except Exception:
                     pass
                 if found_k is None:
-                    for k in range(bound):
+                    for k in range(1, bound):
                         if n % (M * k + r) == 0:
                             found_k = k
                             break
