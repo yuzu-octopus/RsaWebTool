@@ -11,8 +11,8 @@ import {
   Divider,
   Collapse,
   LinearProgress,
-  CircularProgress,
 } from '@mui/material';
+import { keyframes } from '@mui/material/styles';
 import { AutoFixHigh, Science, CheckCircle, Cancel, HourglassEmpty, SkipNext, Stop, ExpandMore, ExpandLess, Casino, ContentCopy } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
@@ -28,6 +28,14 @@ import { colFlexSx, centeredPanelSx, colorGhostBtn } from '../styles/shared';
 import type { Attack } from '../types';
 
 const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
+
+const hourglassSpin = keyframes`
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(180deg); }
+  50% { transform: rotate(180deg); }
+  75% { transform: rotate(360deg); }
+  100% { transform: rotate(360deg); }
+`;
 
 // Categorized parameter names for key=value extraction
 const kvParamNames = [
@@ -97,7 +105,7 @@ function statusIcon(status: MagicJob['status']) {
   if (status === 'error') return <Cancel sx={{ color: draculaColors.red, fontSize: '1rem', mr: 0.5 }} />;
   if (status === 'cancelled') return <Stop sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5 }} />;
   if (status === 'aborted') return <SkipNext sx={{ color: draculaColors.comment, fontSize: '1rem', mr: 0.5 }} />;
-  return <HourglassEmpty sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5 }} />;
+  return <HourglassEmpty sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5, animation: `${hourglassSpin} 3s ease-in-out infinite` }} />;
 }
 
 /**
@@ -246,6 +254,13 @@ export function MagicPanel() {
                 resolveAll();
                 return;
               }
+            } else {
+              // frontendCheck returned null (not applicable) — mark aborted so progress bar advances
+              setJobs(prev => {
+                const updated = [...prev];
+                updated[idx] = { ...updated[idx], status: 'aborted' as const };
+                return updated;
+              });
             }
 
             if (completed >= total) resolveAll();
@@ -572,7 +587,7 @@ export function MagicPanel() {
                 }}
               />
               <Typography variant="body2" sx={{ color: draculaColors.purple, mt: 1, textAlign: 'center', fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                <CircularProgress size={16} sx={{ color: draculaColors.purple }} />
+                <HourglassEmpty sx={{ fontSize: '1rem', animation: `${hourglassSpin} 3s ease-in-out infinite` }} />
                 Elapsed: {timer.formatted} — {jobs.filter(j => j.status !== 'running').length}/{jobs.length} completed
               </Typography>
             </Box>
