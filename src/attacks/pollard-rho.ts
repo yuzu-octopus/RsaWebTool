@@ -158,6 +158,12 @@ p &\\mid (x_i - x_j) \\\\
 
 \\textbf{Explanation:} Pollard's rho uses $f(x) = x^2 + c$ to generate a sequence that eventually cycles modulo $p$. Brent's cycle detection compares each value against a saved snapshot at powers of two, requiring only one evaluation per step instead of Floyd's three. Batched GCD reduces overhead by accumulating $m$ differences into one product before each GCD call. If the accumulated product contains $n$ as a factor, backtracking identifies the exact step.
 
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Brent cycle detection:} Saves one snapshot per step at powers of two — requires only one evaluation per iteration vs Floyd's three, reducing modular multiplications by $\\sim 2\\times$ per cycle.
+\\item \\textbf{Batched GCD:} Accumulates $m = 100$ product differences into $\\prod |x_i - y_i|$ before each GCD call, reducing expensive GCD operations by $\\sim 100\\times$. Backtracks within the winning batch when the accumulated product contains all of $n$.
+\\end{itemize}
+
 \\textbf{References:} J. M. Pollard, "A Monte Carlo Method for Factorization", BIT 1975; R. P. Brent, "An Improved Monte Carlo Factorization Algorithm", BIT 1980`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,

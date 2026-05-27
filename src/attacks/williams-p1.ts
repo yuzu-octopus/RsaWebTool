@@ -200,6 +200,12 @@ V_M &= \\alpha^M + \\alpha^{-M} \\equiv 2 \\pmod{p} \\\\
 
 \\textbf{Explanation:} Like Pollard's p-1 but for factors where $p+1$ is smooth. The Lucas sequence $V_k$ lives in the quadratic extension $\\mathbb{F}_{p^2}$, where the multiplicative order divides $p+1$. When $(D/p) = -1$, the element $\\alpha$ has norm 1 and satisfies $\\alpha^{p+1} = 1$, so if $p+1 \\mid M$ then $V_M \\equiv 2 \\pmod{p}$. Stage 2 catches the case where $p+1$ has one large prime factor beyond $B1$ by checking multiples of $M$.
 
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Binary ladder Lucas evaluation:} Computes $V_k(P, 1)$ using the $(V_j, V_{j+1})$ invariant with MSB-first bit processing. Updates use $V_{2j} = V_j^2 - 2$ and $V_{2j+1} = V_j \\cdot V_{j+1} - P$, avoiding generic Lucas sequence overhead.
+\\item \\textbf{Auto-escalating bounds:} Tries three increasing bound configurations $(B_1, B_2) \\in \\{(100, 1000), (1000, 10000), (10000, 50000)\\}$, with cached prime lists and P values, automatically escalating on failure.
+\\end{itemize}
+
 \\textbf{References:} H. C. Williams, "A p+1 Method of Factoring", Mathematics of Computation, 1982`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,

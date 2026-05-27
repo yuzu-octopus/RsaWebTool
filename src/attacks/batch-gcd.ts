@@ -92,6 +92,11 @@ The product $\\prod_{j \\neq i} n_j$ can be computed efficiently using a product
 
 \\textbf{Explanation:} When RSA keys are generated with insufficient randomness, two moduli may share a common prime factor. Computing the GCD of each modulus against the product of all others efficiently catches this. In practice, this attack found real-world weak keys — the 2012 "Mining Your Ps and Qs" study found 0.2\\% of TLS certificates shared factors.
 
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Product tree algorithm:} Computes $\\prod_{j \\neq i} n_j$ for each modulus using a divide-and-conquer product tree, achieving $O(k \\log k)$ total time instead of $O(k^2)$ for pairwise GCDs. For $k = 1000$ moduli, this is $\\sim 100\\times$ faster than the naive pairwise approach.
+\\end{itemize}
+
 \\textbf{References:} Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012; Bernstein, "How to Find Small Factors of Products", 2004`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => {

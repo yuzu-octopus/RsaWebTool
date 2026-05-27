@@ -29,6 +29,11 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{
 
 \\textbf{Explanation:} When multiple RSA moduli are generated with insufficient entropy, two moduli may coincidentally share a prime factor. Pairwise GCD detects this — if $\\gcd(n_i, n_j) > 1$, the shared factor divides both moduli. Each unordered pair $(i,j)$ is checked once for $k$ moduli, yielding $O(k^2)$ GCD operations.
 
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Two-stage batch GCD:} Stage 1 computes the product of all moduli and checks each $n_i$ via a single $\\gcd(\\prod_{j \\neq i} n_j,\\; n_i)$ to quickly identify which moduli share factors (hit indices). Stage 2 only performs pairwise GCDs involving hit indices, avoiding $O(k^2)$ work when most moduli have no shared factors.
+\\end{itemize}
+
 \\textbf{References:} N. Heninger, Z. Durumeric, E. Wustrow, J. A. Halderman, "Mining Your Ps and Qs", USENIX Security Symposium, 2012`,
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => {

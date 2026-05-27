@@ -190,6 +190,11 @@ s^* &= s_1 \\cdot s_2 \\bmod n \\\\
 
 \\textbf{Explanation:} Since $(m_1 m_2)^d = m_1^d \\cdot m_2^d \\pmod{n}$, multiplying known signatures yields a valid signature for the product of their messages. The attack searches subsets of oracle pairs whose message-product equals $m^*$, then multiplies the corresponding signatures. Modern padding schemes (OAEP, PSS) destroy this homomorphism by hashing and randomizing before signing.
 
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Meet-in-the-middle search:} Splits the $n$ oracle signature pairs into two halves of size $n/2$. Builds a product-to-signature hash map for the right half ($2^{n/2}$ entries), then searches the left half for multiplicative complements that produce the target message. Reduces subset-search complexity from $O(2^n)$ to $O(2^{n/2+1})$ with early stop on first match.
+\\end{itemize}
+
 \\textbf{References:} Rivest, Shamir, Adleman, 1978; Boneh, "Twenty Years of Attacks on RSA," 1999`,
   usageGuide: 'This attack exploits RSA\'s multiplicative homomorphism to forge signatures from known oracle pairs.\n\nHow to use:\n1. Obtain oracle pairs (m_i, s_i) where s_i is a valid signature on m_i under the target public key\n2. Provide n, e, target_m (message to forge), and oracle_pairs formatted as "m1,s1;m2,s2;..."\n3. The attack uses meet-in-the-middle: split oracle pairs into two halves, build a product hash map for the right half, then search the left half for matching complements. This reduces the 2^n search to 2^(n/2+1) operations.\n\nTip: The more oracle pairs you have, the more likely you can factor target_m into a subset product. Up to 30 pairs supported (2^15 + 2^15 ≈ 65K operations). Modern RSA with OAEP/PSS padding prevents this attack.',
   priority: 'low',

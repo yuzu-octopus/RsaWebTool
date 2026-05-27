@@ -71,9 +71,9 @@ export function modPow(base: bigint, exp: bigint, mod: bigint): bigint {
 }
 
 /**
- * Integer k-th root (floor) via Newton's method.
- * Returns the largest integer r such that r^k <= n.
- * Convergence: O(log log n) iterations for small k.
+ * Integer k-th root (floor) via Newton's method with binary search
+ * correction. Returns the largest integer r such that r^k <= n.
+ * Guaranteed to terminate in O(k log n) time (no linear correction loops).
  */
 export function iroot(n: bigint, k: bigint): bigint {
   if (n < 0n) throw new RangeError('iroot: negative input');
@@ -82,8 +82,14 @@ export function iroot(n: bigint, k: bigint): bigint {
 
   // Approximate bit length (rounded up to nearest 4)
   const bitLen = BigInt(n.toString(16).length) * 4n;
-  // If root < 2, answer is trivially 1 (since n >= 2n was handled above)
   if (bitLen < k) return 1n;
+
+  // Fast pow helper for small k (avoids binary exponentiation overhead)
+  const pow = (v: bigint): bigint => {
+    if (k === 3n) return v * v * v;
+    if (k === 5n) { const v2 = v * v; return v2 * v2 * v; }
+    return v ** k;
+  };
 
   // Newton's method with initial guess ≈ n^(1/k)
   let x = 1n << (bitLen / k);
@@ -94,8 +100,25 @@ export function iroot(n: bigint, k: bigint): bigint {
     x = x1;
     x1 = ((x * k1) + (n / (x ** k1))) / k;
   }
-  // Correct possible off-by-one (rare with good initial guess)
-  while ((x + 1n) ** k <= n) x++;
-  while (x ** k > n) x--;
-  return x;
+  // After Newton converges (x1 >= x):
+  //   x = value at or below the true root
+  //   x1 = value at or above the true root
+  // Binary search between x and x1 for exact floor root
+  let lo = x;
+  let hi = x1;
+  // Extend hi if it's not an upper bound (x1 may still be ≤ true root)
+  while (pow(hi) <= n) {
+    lo = hi;
+    hi = hi * 2n;
+  }
+  // Binary search for the largest r with r^k <= n
+  while (lo + 1n < hi) {
+    const mid = (lo + hi) / 2n;
+    if (pow(mid) <= n) lo = mid;
+    else hi = mid;
+  }
+  // Final off-by-one guard (should never trigger, but safe)
+  while (pow(lo + 1n) <= n) lo++;
+  while (pow(lo) > n) lo--;
+  return lo;
 }

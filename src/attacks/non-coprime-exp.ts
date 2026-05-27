@@ -150,6 +150,11 @@ m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\quad \\text{for each pair} \\\\
 
 \\textbf{Explanation:} RSA requires $\\gcd(e, \\varphi(n)) = 1$ for a unique decryption exponent $d$. When this fails, the encryption map $m \\mapsto m^e \\bmod n$ is many-to-one: multiple plaintexts produce the same ciphertext. The attack finds all e-th roots in $\\mathbb{F}_p$ and $\\mathbb{F}_q$ using finite field algebra, then combines them via CRT. Each combination is a valid preimage of $c$.
 
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Three-level e-th root fallback:} Tries progressively slower methods: (1) Sage's $\\mathbb{F}_p.\\mathtt{nth\\_root}(e, all=True)$ for a complete root set, (2) manual iteration for small $e \\leq 10$ and small fields $p < 2 \\times 10^6$, (3) Tonelli-Shanks for $e = 2$ with $p \\equiv 3 \\pmod{4}$. CRT combines all cross-product root pairs from both primes.
+\\end{itemize}
+
 \\textbf{References:} Williams, 1980; May, "Attacks on RSA with Small Parameters," 2003`,
   priority: 'low',
   applicableCheck: (vals: Record<string, string>) => !!vals.n && !!vals.e && !!vals.c,

@@ -78,6 +78,12 @@ Compute each $P_i$ incrementally and take $\\gcd(P_i, n)$. When a match is found
 
 \\textbf{Explanation:} If $p \\mid n$ and $p \\leq n^{1/4}$, then $p$ lies in some interval $I_i$. Since every element of $I_i$ divides $P_i$, we have $p \\mid P_i$ and hence $\\gcd(P_i, n) \\geq p > 1$. The backtrack step finds $p$ within the winning interval by rebuilding the product one term at a time until the GCD becomes non-trivial.
 
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Incremental product accumulation:} The factorial product $P_i$ is built incrementally as terms are iterated — each step multiplies the running product by the next integer, avoiding recomputation from scratch per batch.
+\\item \\textbf{Batched GCD with backtracking:} A GCD is computed only once per $batch\\_size = 1000$ terms. When a hit is found, the batch is re-scanned linearly to pinpoint the exact factor, reducing GCD calls by $\\sim 1000\\times$.
+\\end{itemize}
+
 \\textbf{References:} Strassen, 1977; Pollard, 1974`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,

@@ -131,6 +131,12 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
 
 \\textbf{Explanation:} Pollard's $p-1$ method exploits Fermat's Little Theorem: if $p-1$ divides $M = \\operatorname{lcm}(1,\\ldots,B_1)$, then $a^M \\equiv 1 \\pmod{p}$, so $\\gcd(a^M-1, n)$ reveals $p$. Stage 1 computes $a^M$ by raising $a$ to each prime power $\\leq B_1$. Stage 2 handles the case where $p-1$ has one prime factor between $B_1$ and $B_2$.
 
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Python Eratosthenes sieve:} Generates prime lists up to $B_1$ and $B_2$ using a pure-Python bit sieve, avoiding Sage's $\\mathtt{prime\\_range}$ overhead in interactive mode and allowing direct control over the sieve size.
+\\item \\textbf{Incremental Stage 2:} Updates $H_q$ incrementally as $H_q = H_q \\cdot a^{d} \\bmod n$ where $d = q_j - q_{j-1}$ is the gap between consecutive primes in $(B_1, B_2]$, then accumulates $\\prod (H_q - 1)$ for a single GCD per product batch.
+\\end{itemize}
+
 \\textbf{References:} J. M. Pollard, "Theorems on Factorization and Primality Testing", Proc. Cambridge Philos. Soc., 1974`,
   frontendCheck: (vals, onProgress) => {
     if (!vals.n) return Promise.resolve(null);

@@ -154,6 +154,12 @@ a_i^2 - n \\text{ is square} &\\implies p = a_i - b_i,\\; q = a_i + b_i \\\\
 
 \\textbf{Explanation:} Fermat represents $n$ as $a^2 - b^2$ and searches for $a$ such that $a^2 - n$ is a perfect square. Each step increments $a$ by 1 and updates $b^2$ additively, avoiding multiplication. When $|p-q| < 10^6$, Fermat converges quickly. Londahl's BSGS recovers $\\phi(n)$ via a discrete-log collision for larger gaps.
 
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Incremental Fermat update:} The difference-of-squares term $a^2 - n$ updates via $b^2 \\mathrel{+}= 2a + 1$ each iteration, avoiding a full $a^2$ multiplication per step.
+\\item \\textbf{Parity-optimized BSGS (Londahl fallback):} When Fermat's direct search exceeds $10^6$ steps, switches to Londahl's baby-step giant-step. Baby-step table construction skips entries where $(j \\& 1)$ mismatches $\\phi(n)$ parity, halving the table size.
+\\end{itemize}
+
 \\textbf{References:} Fermat (1643); C. L\\"ondahl, "Finding Close-Prime Factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,

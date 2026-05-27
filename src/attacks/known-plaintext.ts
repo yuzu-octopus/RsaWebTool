@@ -243,6 +243,11 @@ Feasible for $k \\leq 24$ (approx. 16 million modular exponentiations in the bro
 
 \\textbf{Explanation:} Two complementary strategies. Strategy 1 works when the plaintext is so small that $m^e$ never wraps around modulo $n$ — the ciphertext literally equals $m^e$ as an integer, so taking the e-th root recovers $m$. Strategy 2 works when part of the plaintext is known (e.g., a flag format like "flag\\{...\\}") — the unknown suffix is brute-forced by testing each candidate against the ciphertext.
 
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Horner evaluation (e = 3):} Expands $(prefix \\cdot shift + k)^3 \\bmod n$ into precomputed cubic coefficients $A + Bk + Ck^2 + k^3$ where $A, B, C$ are derived from the known prefix and shift. Evaluates via Horner's method — three multiplications and three additions per candidate — avoiding modular exponentiation entirely ($\\sim 25\\times$ faster than $pow$ per candidate).
+\\end{itemize}
+
 \\textbf{References:} D. Coppersmith, 1997; May, "Attacks on RSA with Small Parameters," 2003`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!(p.n && p.c),

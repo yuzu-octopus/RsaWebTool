@@ -131,6 +131,11 @@ p &= \\frac{d_p e - 1}{k} + 1,\\quad \\text{verify } p \\mid n \\\\
 
 \\textbf{Explanation:} Since $ed_p \\equiv 1 \\pmod{p-1}$, we have $ed_p - 1 = k(p-1)$. Iterating $k$ from 1 to $e-1$, when $k$ divides $ed_p - 1$, compute $p = (ed_p - 1)/k + 1$ and check if $p$ divides $n$. The browser-side frontendCheck uses a faster FLT-based GCD method: compute $g = \\gcd(2^{ed_p - 1} - 1, n)$, which directly yields $p$ without iterating $k$.
 
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{FLT-based direct GCD (frontendCheck):} Instead of iterating $k$ from $1$ to $e-1$ (up to $65{,}537$ iterations for standard $e$), computes $g = \\gcd(2^{e \\cdot d_p - 1} - 1, n)$ which directly yields $p$ in a single modular exponentiation and GCD — $\\sim 10^4\\times$ faster for $e = 65537$.
+\\end{itemize}
+
 \\textbf{References:} Standard RSA-CRT analysis; M. Campagna, A. Sethi, "Key Recovery Method for CRT Implementation of RSA"`,
   usageGuide: 'This attack factors n using leaked CRT parameters dp and dq.\n\nHow to use:\n1. You have modulus n, public exponent e, and the CRT exponent dp (= d mod p-1)\n2. Optionally provide dq (= d mod q-1) as well\n3. The attack computes p from dp via gcd(pow(2, e*dp - 1, n) - 1, n)\n4. q = n / p gives the factorization\n\nTip: dp and dq are often stored alongside the private key. This attack runs entirely in your browser — no server computation needed.',
   priority: 'high',

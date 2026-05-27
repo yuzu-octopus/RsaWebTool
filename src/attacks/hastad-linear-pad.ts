@@ -180,6 +180,11 @@ m &= \\text{small\\_roots}(F) \\quad \\text{(since $|m| < N^{1/e}$)}
 
 \\textbf{Explanation:} This generalizes Hastad's Broadcast Attack to affine-padded messages. CRT combines the polynomials into one modulo $N = \\prod n_i$, then Coppersmith's method finds the small root $m$. The requirement $k \\geq e$ ensures enough information to overcome the linear padding. Each $(a_i, b_i)$ must be known.
 
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Horner evaluation with precomputed coefficients:} For each modulus $n_i$ with $(a_i, b_i)$, precomputes the polynomial coefficients $A_i, B_i, C_i, D_i$ for $(a_i m + b_i)^3 - c_i$. Evaluates each candidate as $((A_i m + B_i)m + C_i)m + D_i \\bmod n_i$ — four operations per candidate per modulus instead of a full modular exponentiation.
+\\end{itemize}
+
 \\textbf{References:} J. Hastad, "Solving Low-Exponent RSA," Eurocrypt 1988; Coppersmith et al., 1996`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.triples && !!p.e,

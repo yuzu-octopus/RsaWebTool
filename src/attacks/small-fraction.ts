@@ -172,6 +172,12 @@ q_0 &= \\left\\lfloor\\sqrt{\\frac{nb}{a}}\\right\\rfloor \\\\
 
 \\textbf{Explanation:} When $p \\approx (a/b) \\cdot q$, substituting into $n = pq$ gives $q^2 \\approx nb/a$. We compute $q_0 = \\lfloor\\sqrt{nb/a}\\rfloor$ for each coprime $a,b$ and test $q_0 \\pm 2000$ for an exact divisor of $n$. Since $n$ is odd (product of odd primes), even candidates can never divide $n$ and are skipped via a $\\& 1$ bit check — cutting the effective trial division count in half. Precomputed BigInt offsets avoid per-iteration allocation. The search examines $\\approx 5050$ fraction pairs, each with $4001$ delta candidates, halved to $\\approx 10$M BigInt divisions worst-case.
 
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Parity pre-filter:} Since $n$ is odd (product of odd primes), even $q$ can never divide $n$, so a single-bit check $(q \\& 1)$ skips half the trial divisions with zero BigInt arithmetic cost.
+\\item \\textbf{Precomputed BigInt offsets:} Delta candidates are stored in a precomputed array as $BigInt$ values, avoiding per-iteration $BigInt(number)$ allocation overhead in the inner loop.
+\\end{itemize}
+
 \\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,

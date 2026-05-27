@@ -95,7 +95,7 @@ Open `http://localhost:5173` in your browser.
 | factordb-lookup | Fetch factorization from FactorDB API | ✓ |
 | nitros | NITROS attack | — |
 | roca | ROCA vulnerability (CVE-2017-15361) | — |
-| small-public-exp | Small public exponent attack | — |
+| small-public-exp | Small public exponent attack (modular pre-filter, warm-start Newton) | ✓ |
 
 ## Usage
 

@@ -159,6 +159,11 @@ The algorithm searches the forward cycle for a square $c_i$, then starts a rever
 
 \\textbf{Explanation:} SQUFOF (SQUare FOrm Factorization) exploits the structure of the class group of binary quadratic forms. The key insight is that when discriminant $D$ corresponds to a composite $n = pq$, the cycle of reduced forms contains a square form whose square root reveals one prime factor. It works well for $n < 10^{14}$ and requires no large-integer arithmetic beyond GCD.
 
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Batched GCD trial division:} Before the main SQUFOF algorithm, extracts small factors by trial division against primes in batches of 1000. The product of each prime batch is accumulated modulo $n$ before a single GCD call, reducing GCD operations by $\\sim 1000\\times$ vs individual trial division.
+\\end{itemize}
+
 \\textbf{References:} Shanks, 1975; Gower \\& Wagstaff, Math. Comp., 2008`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,

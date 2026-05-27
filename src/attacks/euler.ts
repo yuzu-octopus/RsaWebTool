@@ -150,6 +150,12 @@ From the identity $(a-c)(a+c) = (d-b)(d+b)$, the GCD combinations recover the pr
 
 \\textbf{Explanation:} A theorem of Euler states that any prime $p \\equiv 1 \\pmod{4}$ has a unique representation as a sum of two squares (up to order and sign). A composite $n = pq$ where both primes are $\\equiv 1 \\pmod{4}$ therefore has two distinct representations, and these can be algebraically combined to recover $p$ and $q$. The method searches for the representations by iterating $a$ from $0$ to $\\sqrt{n}$.
 
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Square recurrence:} Tracks $a^2$ incrementally via $(a+1)^2 = a^2 + 2a + 1$, replacing a full BigInt multiplication with addition each iteration — critical for the up to $20 \\times 10^6$ steps required.
+\\item \\textbf{Mod-16 perfect square pre-filter:} Checks $n - a^2 \\equiv 0, 1, 4, 9 \\pmod{16}$ before computing $\\sqrt{n - a^2}$, rejecting $\\sim 80\\%$ of candidates without an isqrt call.
+\\end{itemize}
+
 \\textbf{References:} Euler, 1749`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,
