@@ -157,7 +157,8 @@ _attack()`,
       const limit = 200000n;
       for (let i = 0n; i < limit; i++) {
         if (onProgress && i % 10000n === 0n) {
-          onProgress(Number(i * 100n / limit));
+          const pct = Number(i * 100n / limit);
+          onProgress(pct, `i = ${i.toString()} / ${limit.toString()}`);
         }
         const val = pow_val === 0n ? n - 1n : pow_val - 1n;
         if (val === 0n && i > 0n) {

@@ -68,7 +68,7 @@ def _attack():
         print(f"ERROR: {ex}")
         print("PARTIAL_D=FAILED")
 _attack()`,
-  frontendCheck: (vals: Record<string, string>, onProgress?: (pct: number) => void) => {
+  frontendCheck: (vals: Record<string, string>, onProgress?: (pct: number, detail?: string) => void) => {
     if (!vals.n || !vals.e || !vals.dLow) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
@@ -90,7 +90,8 @@ _attack()`,
 
       for (let k = 1n; k <= kBound; k++) {
         if (onProgress && kBound > 10000n && k % 100000n === 0n) {
-          onProgress(Number(k * 100n / kBound));
+          const pct = Number(k * 100n / kBound);
+          onProgress(pct, `k = ${k.toString()} / ${kBound.toString()}`);
         }
         if ((dApprox & mask) === dLow) {
           // Found candidate — verify

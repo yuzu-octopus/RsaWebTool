@@ -167,7 +167,8 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
         a = modPow(a, BigInt(pp), n);
         opsDone++;
         if (onProgress && totalOps > 0 && opsDone % Math.max(1, Math.floor(totalOps / 10)) === 0) {
-          onProgress(Math.min(99, Math.round(opsDone * 100 / totalOps)));
+          const pct = Math.min(99, Math.round(opsDone * 100 / totalOps));
+          onProgress(pct, `Stage 1: ${pct}%`);
         }
       }
 
@@ -182,9 +183,10 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
           if (p <= B1) continue;
           a = modPow(a, BigInt(p), n);
           opsDone++;
-          if (onProgress && totalOps > 0 && opsDone % Math.max(1, Math.floor(totalOps / 10)) === 0) {
-            onProgress(Math.min(99, Math.round(opsDone * 100 / totalOps)));
-          }
+        if (onProgress && totalOps > 0 && opsDone % Math.max(1, Math.floor(totalOps / 10)) === 0) {
+          const pct = Math.min(99, Math.round(opsDone * 100 / totalOps));
+          onProgress(pct, `Stage 2: ${pct}%`);
+        }
           g = gcd(a - 1n, n);
           if (g > 1n && g < n) {
             onProgress?.(100);

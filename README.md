@@ -9,7 +9,7 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 ## Features
 
 - **47 attacks** — Factorization, Lattice, Protocol, Oracle, and Advanced categories
-- **28 browser-side checks** — instant results via native BigInt (no SageCell needed)
+- **28 browser-side checks** — instant results via native BigInt (no SageCell needed), with live progress bars showing iteration variable + count on longer-running attacks
 - **SageMathCell integration** — runs SageMath code for Coppersmith, lattice reduction, and complex math
 - **FactorDB lookup** — auto-queries FactorDB and auto-submits discovered factorizations
 - **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution with early-stop
@@ -106,6 +106,9 @@ Select an attack from the sidebar. The Input Panel shows:
 
 ### Magic Panel
 Click the wand icon in the sidebar. Paste all known RSA parameters — the tool auto-detects values via regex, shows which attacks apply, and runs them all in parallel (up to 6 at a time). Stops at first success.
+
+### Progress Bars
+Iterative frontendCheck attacks (close-prime, euler, pollard-p1, small-crt-exp, dependent-prime, etc.) show a determinate progress bar with live iteration variable and count below the Run button. Works through both Web Workers and main-thread fallback.
 
 ### Output Panel
 Results appear in the Output Panel on the right. Features:

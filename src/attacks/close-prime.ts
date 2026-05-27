@@ -110,7 +110,9 @@ _attack()`,
       const limit = a + 1000000n;
       while (a < limit) {
         if (onProgress && a % 50000n === 0n) {
-          onProgress(Number((a - initialA) * 100n / (limit - initialA)));
+          const iter = Number(a - initialA);
+          const total = Number(limit - initialA);
+          onProgress(Math.round(iter * 100 / total), `a = ${iter.toLocaleString()} / ${total.toLocaleString()}`);
         }
         // Mod-16 perfect square pre-filter: valid squares end in 0,1,4,9 hex
         const lastNybble = Number(b2 & 15n);
@@ -121,7 +123,7 @@ _attack()`,
             const q = a + b;
             if (p > 1n && q > 1n && p * q === n) {
               onProgress?.(100);
-              return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\niterations = ${a - initialA}\nCLOSE_PRIME=SUCCESS`);
+              return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\n|p - q| = ${q - p}\niterations = ${a - initialA}\nCLOSE_PRIME=SUCCESS`);
             }
           }
         }

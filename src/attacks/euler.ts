@@ -90,7 +90,8 @@ _attack()`,
       for (let a = 0n; a < end && solutions.length < 2; a++) {
         if (onProgress && a % 100000n === 0n) {
           const pct = a > maxIter ? 100 : Number(a * 100n / (end < maxIter ? end : maxIter));
-          onProgress(pct);
+          const denominator = end < maxIter ? end : maxIter;
+          onProgress(pct, `a = ${a.toString()} / ${denominator.toString()}`);
         }
         if (a > maxIter) {
           onProgress?.(100);

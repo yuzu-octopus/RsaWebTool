@@ -87,7 +87,9 @@ _attack()`,
         const discNybble = Number(disc & 15n);
         if (discNybble !== 0 && discNybble !== 1 && discNybble !== 4 && discNybble !== 9) continue;
         if (onProgress && delta % 10000n === 0n) {
-          onProgress(Number((delta + 1000000n) * 100n / 2000001n));
+          const pct = Number((delta + 1000000n) * 100n / 2000001n);
+          const deltaStr = delta >= 0n ? `+${delta.toString()}` : delta.toString();
+          onProgress(pct, `δ = ${deltaStr}`);
         }
         const sqrt_disc = isqrt(disc);
         if (sqrt_disc * sqrt_disc !== disc) continue;

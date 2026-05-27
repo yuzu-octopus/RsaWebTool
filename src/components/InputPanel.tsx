@@ -32,6 +32,7 @@ export function InputPanel() {
   const attackIdRef = useRef<string | null>(null);
   const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  const [progressDetail, setProgressDetail] = useState('');
   const mountedRef = useRef(true);
   const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const timer = useTimer();
@@ -107,7 +108,11 @@ export function InputPanel() {
 
     try {
       if (selectedAttack.frontendCheck) {
-        const preResult = await runAttack(selectedAttack.id, inputValues, setProgress);
+        const handleProgress = (pct: number, detail?: string) => {
+          setProgress(pct);
+          if (detail !== undefined) setProgressDetail(detail);
+        };
+        const preResult = await runAttack(selectedAttack.id, inputValues, handleProgress);
         if (preResult !== null) {
           if (attackIdRef.current !== currentAttackId) return;
           let displayPreResult = preResult;
@@ -283,7 +288,7 @@ export function InputPanel() {
                       }}
                     />
                     <Typography variant="caption" sx={{ color: draculaColors.comment, mt: 0.5, textAlign: 'center', display: 'block' }}>
-                      {progress}%
+                      {progress}%{progressDetail ? ` — ${progressDetail}` : ''}
                     </Typography>
                   </Box>
                 )}

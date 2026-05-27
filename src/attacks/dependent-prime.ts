@@ -85,7 +85,8 @@ _attack()`,
       const fourNE = 4n * n * e;
       for (let k = 1n; k <= 5000000n; k++) {
         if (onProgress && k % 500000n === 0n) {
-          onProgress(Number(k * 100n / 5000000n));
+          const pct = Number(k * 100n / 5000000n);
+          onProgress(pct, `k = ${k.toString()} / 5,000,000`);
         }
         const disc = 1n + k * fourNE;
         // Mod-16 perfect square pre-filter: disc ≡ 1 (mod 4), so valid squares mod 16 are only 1 and 9

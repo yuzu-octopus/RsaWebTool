@@ -23,7 +23,7 @@ export interface Attack {
   usageGuide?: string;
   priority: 'high' | 'medium' | 'low';
   applicableCheck: (params: Record<string, string>) => boolean;
-  frontendCheck?: (vals: Record<string, string>, onProgress?: (pct: number) => void) => Promise<string | null>;
+  frontendCheck?: (vals: Record<string, string>, onProgress?: (pct: number, detail?: string) => void) => Promise<string | null>;
   generateTestcase?: () => Record<string, string>;
 }
 

@@ -89,7 +89,7 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
     #
 _attack()`;
   },
-  frontendCheck: (vals: Record<string, string>, onProgress?: (pct: number) => void) => {
+  frontendCheck: (vals: Record<string, string>, onProgress?: (pct: number, detail?: string) => void) => {
     if (!vals.n || !vals.e || !vals.target_m || !vals.oracle_pairs) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
@@ -124,7 +124,7 @@ _attack()`;
       const rightCount = 1 << right.length;
       for (let mask = 1; mask < rightCount; mask++) {
         if (onProgress && mask % 500 === 0) {
-          onProgress(Math.round(mask * 50 / rightCount));
+          onProgress(Math.round(mask * 50 / rightCount), `right mask ${mask} / ${rightCount}`);
         }
         let prodM = 1n, prodS = 1n;
         for (let j = 0; j < right.length; j++) {
@@ -143,7 +143,7 @@ _attack()`;
       const leftCount = 1 << left.length;
       for (let mask = 1; mask < leftCount; mask++) {
         if (onProgress && mask % 500 === 0) {
-          onProgress(50 + Math.round(mask * 50 / leftCount));
+          onProgress(50 + Math.round(mask * 50 / leftCount), `left mask ${mask} / ${leftCount}`);
         }
         let prodM = 1n, prodS = 1n;
         for (let j = 0; j < left.length; j++) {

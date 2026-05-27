@@ -4,6 +4,7 @@ import { WORKER_POOL_SIZE } from '../config';
 interface PendingTask {
   resolve: (value: string | null) => void;
   reject: (reason: unknown) => void;
+  onProgress?: (pct: number, detail?: string) => void;
 }
 
 interface QueuedTask {
@@ -55,8 +56,17 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
           new URL('../workers/attack-worker.ts', import.meta.url),
           { type: 'module' },
         );
-        worker.onmessage = (e: MessageEvent<{ id: number; result: string | null; error?: string }>) => {
-          const { id, result, error } = e.data;
+        worker.onmessage = (e: MessageEvent) => {
+          const data = e.data as { type: 'progress'; id: number; pct: number; detail?: string } | { id: number; result: string | null; error?: string };
+          if ('type' in data) {
+            const { id, pct, detail } = data;
+            const pending = pendingRef.current.get(id);
+            if (pending?.onProgress) {
+              pending.onProgress(pct, detail);
+            }
+            return;
+          }
+          const { id, result, error } = data;
           const pending = pendingRef.current.get(id);
           if (pending) {
             pendingRef.current.delete(id);
@@ -93,7 +103,7 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
   const runAttack = useCallback((
     attackId: string,
     vals: Record<string, string>,
-    onProgress?: (pct: number) => void,
+    onProgress?: (pct: number, detail?: string) => void,
   ): Promise<string | null> => {
     return new Promise<string | null>((resolve, reject) => {
       // Fallback: Workers unavailable → run on main thread via dynamic import
@@ -110,7 +120,7 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
       }
 
       const id = ++idCounterRef.current;
-      pendingRef.current.set(id, { resolve, reject });
+      pendingRef.current.set(id, { resolve, reject, onProgress });
 
       const freeIndex = busyRef.current.indexOf(false);
       if (freeIndex !== -1) {

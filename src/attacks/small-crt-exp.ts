@@ -86,7 +86,8 @@ _attack()`,
         // x = (current - 2) mod n, always non-negative
         const x = (current - 2n + n) % n;
         if (onProgress && bound > 10000n && dp % 50000n === 0n) {
-          onProgress(Number(dp * 100n / bound));
+          const pct = Number(dp * 100n / bound);
+          onProgress(pct, `dp = ${dp.toString()} / ${bound.toString()}`);
         }
         product = (product * x) % n;
 

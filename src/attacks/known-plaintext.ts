@@ -167,7 +167,7 @@ _attack()`;
               const pct = Math.round(k * 100 / limit);
               if (pct !== lastProgress) {
                 lastProgress = pct;
-                onProgress(pct);
+                onProgress(pct, `k = ${k.toLocaleString()} / ${limit.toLocaleString()}`);
               }
             }
             const k_mod = BigInt(k) % n;
@@ -194,7 +194,7 @@ _attack()`;
               const pct = Math.round(k * 100 / limit);
               if (pct !== lastProgress) {
                 lastProgress = pct;
-                onProgress(pct);
+                onProgress(pct, `k = ${k.toLocaleString()} / ${limit.toLocaleString()}`);
               }
             }
             const mTry = (prefixInt << BigInt(unknownBits)) + BigInt(k);

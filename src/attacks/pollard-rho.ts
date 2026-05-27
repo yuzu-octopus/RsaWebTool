@@ -96,7 +96,7 @@ _attack()`,
           const progress = Math.round(Number(c - 1n) * 100 / 9);
           if (progress > totalProgressCalls) {
             totalProgressCalls = progress;
-            onProgress(progress);
+            onProgress(progress, `curve ${Number(c)} / 9`);
           }
         }
         const n_i = n;

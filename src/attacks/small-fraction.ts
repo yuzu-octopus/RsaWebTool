@@ -126,7 +126,8 @@ _attack()`,
 
       for (let b = 1; b <= 100; b++) {
         if (onProgress) {
-          onProgress(Math.round((b - 1) * 100 / 100));
+          const pct = Math.round((b - 1) * 100 / 100);
+          onProgress(pct, `b = ${b} / 100`);
         }
         for (let a = 1; a <= b; a++) {
           if (numGcd(a, b) !== 1) continue;

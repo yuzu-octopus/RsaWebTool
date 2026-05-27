@@ -51,7 +51,7 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
     #
 _attack()`;
   },
-  frontendCheck: (vals: Record<string, string>, onProgress?: (pct: number) => void): Promise<string | null> => {
+  frontendCheck: (vals: Record<string, string>, onProgress?: (pct: number, detail?: string) => void): Promise<string | null> => {
     const n = BigInt(vals.n);
     const e = BigInt(vals.e || '3');
     const c = BigInt(vals.c);
@@ -76,7 +76,8 @@ _attack()`;
     let root = 1n;
     for (let k = 0n; k <= kBound; k++) {
       if (onProgress && kBound > 1000n && k % 1000n === 0n) {
-        onProgress(Number(k * 100n / kBound));
+        const pct = Number(k * 100n / kBound);
+        onProgress(pct, `k = ${k.toString()} / ${kBound.toString()}`);
       }
       const candidate = c + k * n;
       if (k === 0n) {
