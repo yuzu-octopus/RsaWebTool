@@ -1,5 +1,5 @@
 export interface FactorDBResult {
-  id: string
+  id: string | number
   // Known values: "FF" | "CF" | "PRP" | "Composite" | "Unknown"
   status: string
   factors: [string, number][] | null
@@ -46,7 +46,7 @@ export async function queryFactorDB(
     const res = await fetch(baseUrl, { signal: controller.signal })
     if (!res.ok) throw new FactorDBError(`HTTP ${res.status}`, res.status)
     const data: unknown = await res.json()
-    if (typeof data !== 'object' || data === null || typeof (data as Record<string, unknown>).id !== 'string') {
+    if (typeof data !== 'object' || data === null || !['string', 'number'].includes(typeof (data as Record<string, unknown>).id)) {
       throw new FactorDBError('Invalid FactorDB response format')
     }
     return data as FactorDBResult
