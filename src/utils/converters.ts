@@ -1,5 +1,10 @@
 export type Format = 'hex' | 'dec' | 'base64' | 'text';
 
+/** Strip all whitespace from a numeric string (spaces, tabs, newlines) */
+export function stripNumber(input: string): string {
+  return input.replace(/\s/g, '');
+}
+
 function parseHexToBytes(hex: string): Uint8Array {
   const cleaned = hex.replace(/^0x/i, '').replace(/\s/g, '');
   if (cleaned.length === 0) return new Uint8Array(0);
@@ -79,7 +84,7 @@ export function convertFormat(input: string, from: Format, to: Format): string {
 export type DetectedFormat = 'hex' | 'decimal' | 'base64' | 'ascii' | 'unknown';
 
 export function detectFormat(input: string): DetectedFormat {
-  const raw = input.trim();
+  const raw = input.replace(/\s/g, '');
   // Explicit 0x prefix → always hex
   if (/^0x[0-9a-fA-F]+$/i.test(raw)) return 'hex';
 

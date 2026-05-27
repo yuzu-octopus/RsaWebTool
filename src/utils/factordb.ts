@@ -40,7 +40,7 @@ export async function queryFactorDB(
     : `https://factordb.com/api?query=${encodeURIComponent(nStr)}`
 
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 10_000)
+  const timeout = setTimeout(() => controller.abort(), 20_000)
 
   try {
     const res = await fetch(baseUrl, { signal: controller.signal })
@@ -95,8 +95,8 @@ export async function reportFactor(
   if (!number) throw new FactorDBError("reportFactor: number is empty")
   if (!Array.isArray(factors) || factors.length === 0) throw new FactorDBError("reportFactor: factors array is empty")
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 10_000)
-
+  const timeout = setTimeout(() => controller.abort(), 15_000)
+ 
   try {
     if (corsProxy) {
       const url = `${corsProxy}/report`

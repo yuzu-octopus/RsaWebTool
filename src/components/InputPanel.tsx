@@ -93,8 +93,14 @@ export function InputPanel() {
     const currentAttackId = selectedAttack.id;
     attackIdRef.current = currentAttackId;
 
+    // Strip all whitespace from input values (e.g. spaces in numbers pasted from websites)
+    const vals: Record<string, string> = {};
+    for (const [key, value] of Object.entries(inputValues)) {
+      vals[key] = value.replace(/\s/g, '');
+    }
+
     const missingFields = selectedAttack.inputs
-      .flatMap(f => (f.required !== false && !inputValues[f.name]?.trim()) ? [f.label || f.name] : []);
+      .flatMap(f => (f.required !== false && !vals[f.name]?.trim()) ? [f.label || f.name] : []);
     if (missingFields.length > 0) {
       const msg = `Missing required inputs:\n${missingFields.map(f => `- ${f}`).join('\n')}`;
       setOutputError(msg);
@@ -110,35 +116,35 @@ export function InputPanel() {
           setProgress(pct);
           if (detail !== undefined) setProgressDetail(detail);
         };
-        const preResult = await runAttack(selectedAttack.id, inputValues, handleProgress);
+        const preResult = await runAttack(selectedAttack.id, vals, handleProgress);
         if (preResult !== null) {
           if (attackIdRef.current !== currentAttackId) return;
           let displayPreResult = preResult;
-          const decryptedPre = autoDecrypt(selectedAttack, inputValues, preResult);
+          const decryptedPre = autoDecrypt(selectedAttack, vals, preResult);
           if (decryptedPre) displayPreResult += '\n\n## Decrypted message\n' + decryptedPre;
           setOutputResult(displayPreResult);
           addToHistory(selectedAttack.id, selectedAttack.name, preResult, isActualSuccess(preResult));
           const preSuccess = isActualSuccess(preResult);
           showNotification(`${selectedAttack.name}: ${preSuccess ? 'success' : 'failed'}`, preSuccess ? 'success' : 'error');
-          if (preSuccess) submitToFactorDB(selectedAttack, preResult, inputValues.n, showNotification);
+          if (preSuccess) submitToFactorDB(selectedAttack, preResult, vals.n, showNotification);
           timer.stop();
           setLoading(false);
           return;
         }
       }
 
-      const code = selectedAttack.sageTemplate(inputValues);
+      const code = selectedAttack.sageTemplate(vals);
       if (attackIdRef.current !== currentAttackId) return;
       const result = await execute(code, DEFAULT_SAGE_TIMEOUT, controller.signal);
       if (result.success) {
         let displayStdout = result.stdout;
-        const decryptedSage = autoDecrypt(selectedAttack, inputValues, result.stdout);
+        const decryptedSage = autoDecrypt(selectedAttack, vals, result.stdout);
         if (decryptedSage) displayStdout += '\n\n## Decrypted message\n' + decryptedSage;
         setOutputResult(displayStdout);
         addToHistory(selectedAttack.id, selectedAttack.name, result.stdout, isActualSuccess(result.stdout));
         const runSuccess = isActualSuccess(result.stdout);
         showNotification(`${selectedAttack.name}: ${runSuccess ? 'success' : 'failed'}`, runSuccess ? 'success' : 'error');
-        if (runSuccess) submitToFactorDB(selectedAttack, result.stdout, inputValues.n, showNotification);
+        if (runSuccess) submitToFactorDB(selectedAttack, result.stdout, vals.n, showNotification);
       } else {
         setOutputError(result.error || 'SageCell execution failed with no specific error. Check that all required inputs are filled.');
         addToHistory(selectedAttack.id, selectedAttack.name, result.error || 'SageCell execution failed with no specific error. Check that all required inputs are filled.', false);

@@ -9,11 +9,11 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 ## Features
 
 - **47 attacks** — Factorization, Lattice, Protocol, Oracle, and Advanced categories
-- **28 browser-side checks** — instant results via native BigInt (no SageCell needed), with live progress bars showing iteration variable + count on longer-running attacks
+- **30 browser-side checks** — instant results via native BigInt (no SageCell needed), with live progress bars showing iteration variable + count on longer-running attacks
 - **SageMathCell integration** — runs SageMath code for Coppersmith, lattice reduction, and complex math
 - **FactorDB lookup** — auto-queries FactorDB and auto-submits discovered factorizations
 - **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution with early-stop
-- **RSA Calculator** — standalone key generation, encryption, decryption (pure BigInt)
+- **RSA Calculator** — standalone key generation, encryption, decryption (pure BigInt). e defaults to 65537; Decrypt accepts any 2 of (p, q, n) with auto-derivation
 - **Format Converter** — live Hex / Decimal / Base64 / Text conversion
 - **Proof Index** — searchable catalog of all 47 attack proofs with KaTeX rendering
 - **Dracula theme** — dark, developer-friendly UI
@@ -118,7 +118,7 @@ Results appear in the Output Panel on the right. Features:
 - Resizable notepad (drag from bottom)
 
 ### RSA Calculator
-Standalone BigInt operations: key generation, encryption, and decryption.
+Standalone BigInt operations: key generation, encryption, and decryption. Smart defaults: `e` defaults to 65537 in Key Gen and Encrypt when left empty. Decrypt accepts any 2 of (p, q, n) and auto-derives the third.
 
 ### Format Converter
 Live conversion between hex, decimal, base64, and text.
@@ -154,7 +154,7 @@ workers/      Cloudflare Worker CORS proxy for FactorDB
 SageMathCell runs in an offscreen DOM container. 120s timeout (10s load + 110s exec). No internet access (firewalled since 2021) — all attack templates must be self-contained math.
 
 ### FactorDB
-Auto-lookup via Cloudflare Worker CORS proxy. When a Factorization-category attack succeeds, discovered p,q are auto-submitted to FactorDB.
+Auto-lookup via Cloudflare Worker CORS proxy (20s timeout). When a Factorization-category attack succeeds, discovered p,q are auto-submitted to FactorDB. Network errors propagate immediately to the user rather than silently falling through to SageCell.
 
 ## Deployment
 

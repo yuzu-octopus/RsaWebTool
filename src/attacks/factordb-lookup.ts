@@ -10,15 +10,11 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
   frontendCheck: async (vals: Record<string, string>) => {
-    try {
-      const result = await queryFactorDB(vals.n);
-      if (result.status === "FF" && result.factors && result.factors.length >= 2) {
-        return formatFactorDBResult(result) + "\nFACTORDB_LOOKUP=SUCCESS";
-      }
-      return null;
-    } catch {
-      return null;
+    const result = await queryFactorDB(vals.n);
+    if (result.status === "FF" && result.factors && result.factors.length >= 2) {
+      return formatFactorDBResult(result) + "\nFACTORDB_LOOKUP=SUCCESS";
     }
+    return null;
   },
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:

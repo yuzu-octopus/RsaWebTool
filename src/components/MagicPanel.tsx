@@ -66,7 +66,7 @@ function extractParams(input: string): Record<string, string> {
   let match;
   while ((match = kvRegex.exec(input)) !== null) {
     if (match.groups?.name && match.groups?.value) {
-      params[match.groups.name] = match.groups.value.trim();
+      params[match.groups.name] = match.groups.value.replace(/\s/g, '');
     }
   }
   // JSON structured input support ({ "n": "0x...", "e": "65537", "ct": "..." })
@@ -76,7 +76,7 @@ function extractParams(input: string): Record<string, string> {
       for (const [key, value] of Object.entries(json)) {
         const mapped = KEY_ALIASES[key.toLowerCase()] || key;
         if (typeof value === 'string' && !params[mapped]) {
-          params[mapped] = value;
+          params[mapped] = value.replace(/\s/g, '');
         } else if (typeof value === 'number' && !params[mapped]) {
           params[mapped] = value.toString();
         }

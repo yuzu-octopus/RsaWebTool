@@ -18,7 +18,7 @@ import { colFlexSx, centeredPanelSx, outputBoxSx, tabSx } from '../styles/shared
 
 
 function parseBigInt(input: string): bigint | null {
-  const trimmed = input.trim();
+  const trimmed = input.replace(/\s/g, '');
   if (!trimmed) return null;
   try {
     const fmt = detectFormat(trimmed);
@@ -100,7 +100,7 @@ export function RsaCalculator() {
     setCalcResult({ output: null, error: null });
     const p = parseBigInt(kgP);
     const q = parseBigInt(kgQ);
-    const e = parseBigInt(kgE);
+    const e = parseBigInt(kgE) || 65537n;
 
     if (p === null || q === null) {
       setCalcResult({ output: null, error: 'p and q must be valid numbers' });
@@ -108,10 +108,6 @@ export function RsaCalculator() {
     }
     if (p <= 1n || q <= 1n) {
       setCalcResult({ output: null, error: 'p and q must be > 1' });
-      return;
-    }
-    if (e === null) {
-      setCalcResult({ output: null, error: 'e must be a valid number' });
       return;
     }
     if (e <= 0n) {
@@ -133,10 +129,10 @@ export function RsaCalculator() {
     setCalcResult({ output: null, error: null });
     const m = parseBigInt(encM);
     const n = parseBigInt(encN);
-    const e = parseBigInt(encE);
+    const e = parseBigInt(encE) || 65537n;
 
-    if (m === null || n === null || e === null) {
-      setCalcResult({ output: null, error: 'm, n, and e must be valid numbers' });
+    if (m === null || n === null) {
+      setCalcResult({ output: null, error: 'm and n must be valid numbers (e defaults to 65537)' });
       return;
     }
     if (n <= 1n) {
@@ -164,10 +160,28 @@ export function RsaCalculator() {
   const handleDecrypt = () => {
     setCalcResult({ output: null, error: null });
     const c = parseBigInt(decC);
-    const n = parseBigInt(decN);
+    let n = parseBigInt(decN);
+    let p = parseBigInt(decP);
+    let q = parseBigInt(decQ);
+    const e = parseBigInt(decE);
+    const d = parseBigInt(decD);
 
-    if (c === null || n === null) {
-      setCalcResult({ output: null, error: 'c and n must be valid numbers' });
+    if (c === null) {
+      setCalcResult({ output: null, error: 'c must be a valid number' });
+      return;
+    }
+
+    // Derive missing n, p, or q from the other two (any 2 of p, q, n)
+    if (n === null && p !== null && q !== null) {
+      n = p * q;
+    } else if (q === null && n !== null && p !== null && n % p === 0n) {
+      q = n / p;
+    } else if (p === null && n !== null && q !== null && n % q === 0n) {
+      p = n / q;
+    }
+
+    if (n === null) {
+      setCalcResult({ output: null, error: 'Provide n, or p+q (any 2 of p, q, n)' });
       return;
     }
     if (n <= 1n) {
@@ -180,33 +194,21 @@ export function RsaCalculator() {
     }
 
     let m: bigint | null = null;
-    const dProvided = decD.trim() !== '';
-    const pProvided = decP.trim() !== '';
-    const qProvided = decQ.trim() !== '';
-    const eProvided = decE.trim() !== '';
 
-    if (dProvided) {
-      const d = parseBigInt(decD);
-      if (d !== null && d > 0n) {
-        m = modPow(c, d, n);
-      }
+    if (d !== null && d > 0n) {
+      m = modPow(c, d, n);
     }
 
-    if (m === null && pProvided && qProvided && eProvided) {
-      const p = parseBigInt(decP);
-      const q = parseBigInt(decQ);
-      const e = parseBigInt(decE);
-      if (p !== null && q !== null && e !== null && p > 1n && q > 1n && e > 0n) {
-        const phi = (p - 1n) * (q - 1n);
-        const dComputed = modInverse(e, phi);
-        if (dComputed !== null) {
-          m = modPow(c, dComputed, n);
-        }
+    if (m === null && p !== null && q !== null && e !== null && e > 0n) {
+      const phi = (p - 1n) * (q - 1n);
+      const dComputed = modInverse(e, phi);
+      if (dComputed !== null) {
+        m = modPow(c, dComputed, n);
       }
     }
 
     if (m === null) {
-      setCalcResult({ output: null, error: 'Provide d, or p+q+e' });
+      setCalcResult({ output: null, error: 'Provide d, or at least 2 of (p, q, n) + e' });
       return;
     }
 
@@ -278,7 +280,7 @@ export function RsaCalculator() {
                 fullWidth
                 variant="contained"
                 onClick={handleEncrypt}
-                disabled={!encM.trim() || !encN.trim() || !encE.trim()}
+                disabled={!encM.trim() || !encN.trim()}
                 sx={{
                   backgroundColor: draculaColors.purple,
                   fontFamily: "'JetBrains Mono', monospace",
@@ -303,12 +305,12 @@ export function RsaCalculator() {
                 <TextField fullWidth label="p (optional)" value={decP} onChange={e => setDecP(e.target.value)} variant="outlined" sx={inputSx} />
                 <TextField fullWidth label="q (optional)" value={decQ} onChange={e => setDecQ(e.target.value)} variant="outlined" sx={inputSx} />
               </Box>
-              <TextField fullWidth label="e (optional, needed with p+q)" value={decE} onChange={e => setDecE(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} />
+              <TextField fullWidth label="e (optional)" value={decE} onChange={e => setDecE(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} />
               <Button
                 fullWidth
                 variant="contained"
                 onClick={handleDecrypt}
-                disabled={!decC.trim() || !decN.trim()}
+                disabled={!decC.trim() || (!decN.trim() && (!decP.trim() || !decQ.trim()))}
                 sx={{
                   backgroundColor: draculaColors.purple,
                   fontFamily: "'JetBrains Mono', monospace",
