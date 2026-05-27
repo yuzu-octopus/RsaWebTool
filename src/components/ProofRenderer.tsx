@@ -95,10 +95,19 @@ function parseTextBlock(text: string): ProofSegment[] {
 
 /**
  * Heuristically wraps math-like expressions in text with $...$ delimiters.
+ * Text-formatting commands (\textbf{}, \textit{}, \text{}) are hidden from
+ * math detection via placeholders and handled by renderInlineText instead.
  */
 function autoWrapMathInParagraph(text: string): string {
+  // Hide text-formatting commands from math detection by replacing with placeholders
+  const fmtMarkers: string[] = [];
+  const hidden = text.replace(/\\(textbf|textit|text)\{([^}]*)\}/g, (match) => {
+    fmtMarkers.push(match);
+    return `\x00FMT${fmtMarkers.length - 1}\x00`;
+  });
+
   // Split by existing math blocks to avoid double wrapping
-  const parts = text.split(/([$][^$]+[$]|\\\(.*?[^\\]\\\))/);
+  const parts = hidden.split(/([$][^$]+[$]|\\\(.*?[^\\]\\\))/);
   
   for (let i = 0; i < parts.length; i++) {
     if (i % 2 === 1) continue; // Already math
@@ -114,6 +123,9 @@ function autoWrapMathInParagraph(text: string): string {
     const isMathToken = (token: string, canStart: boolean): boolean => {
       const t = token.trim();
       if (!t) return false;
+
+      // Placeholders for text-formatting commands — never math
+      if (t.startsWith('\x00FMT')) return false;
       
       if (t.includes('\\') || t.includes('_') || t.includes('^') || /[=<>+\-*|~]/.test(t) || t.includes('/')) {
         return true;
@@ -204,7 +216,12 @@ function autoWrapMathInParagraph(text: string): string {
     parts[i] = newWords.join('');
   }
   
-  return parts.join('');
+  // Restore text-formatting placeholders (split/join avoids regex control chars)
+  let result = parts.join('');
+  for (let i = 0; i < fmtMarkers.length; i++) {
+    result = result.split(`\x00FMT${i}\x00`).join(fmtMarkers[i]);
+  }
+  return result;
 }
 
 /**
