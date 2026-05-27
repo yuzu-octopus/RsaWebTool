@@ -228,8 +228,8 @@ p,q &= \\frac{n - \\phi + 1 \\pm \\sqrt{(n - \\phi + 1)^2 - 4n}}{2} \\qed
 
 export const generateTestcase = (): Record<string, string> => {
   for (let attempt = 0; attempt < 10000; attempt++) {
-    const p = randomPrime(8);
-    const q = randomPrime(8);
+    const p = randomPrime(10);
+    const q = randomPrime(10);
     const ord_p = multiplicativeOrder2(p);
     const ord_q = multiplicativeOrder2(q);
     const ord_n = lcm(ord_p, ord_q);

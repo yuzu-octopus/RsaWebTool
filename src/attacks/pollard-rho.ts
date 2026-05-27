@@ -104,7 +104,7 @@ _attack()`,
         let y = 2n, x = 2n, qProd = 1n, g = 1n;
         let r = 1n, k = 0n;
         const batchM = 100;
-        const maxIter = 50000;
+        const maxIter = 500000;
         let iter = 0;
         while (g === 1n && iter < maxIter) {
           x = y;
@@ -167,7 +167,7 @@ export const generateTestcase = (): Record<string, string> => {
   // Generate n with one SMALL factor (≤28 bits) so rho succeeds within SageCell 120s
   // Rho runs in O(sqrt(p)) — with p=28 bits, ~2^14 = 16384 iterations, very fast
   // n = 28 + 64 = 92 bits total — fast modular arithmetic
-  const p = randomPrime(28);
+  const p = randomPrime(34);
   const q = randomPrime(64);
   return { n: (p * q).toString() };
 };

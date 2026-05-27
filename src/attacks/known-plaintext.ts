@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'known-plaintext',
   name: 'Known Plaintext Attack',
   category: 'Message / Protocol',
-  description: 'Recovers m via integer e-th root when m^e < n, or via known-prefix brute-force for up to 20 unknown bits. Use when plaintext is small or partially known.',
+  description: 'Recovers m via integer e-th root when m^e < n, or via known-prefix brute-force for up to 24 unknown bits. Use when plaintext is small or partially known.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: '65537', multiline: false },
@@ -57,7 +57,7 @@ print("KNOWN_PLAINTEXT=FAILED")`;
             print(f"Prefix as integer: {prefix_int}")
             print(f"Prefix byte length: {len(prefix_bytes)}")
             shift = 1 << int(unknown_bits)
-            if unknown_bits <= 20:
+            if unknown_bits <= 24:
                 print(f"Brute forcing 2^{unknown_bits} possibilities...")
                 found = False
                 if e == 3:
@@ -148,7 +148,7 @@ _attack()`;
       const knownPrefix = vals.known_prefix || '';
       const unknownBitsStr = (vals.unknown_bits || '32').trim();
       const unknownBits = parseInt(unknownBitsStr, 10);
-      if (knownPrefix && unknownBits <= 20) {
+      if (knownPrefix && unknownBits <= 24) {
         const prefixBytes = new TextEncoder().encode(knownPrefix);
         let prefixInt = 0n;
         for (const b of prefixBytes) prefixInt = (prefixInt << 8n) + BigInt(b);
@@ -215,7 +215,7 @@ _attack()`;
         }
         return Promise.resolve(null);
       }
-      if (knownPrefix && unknownBits > 20) {
+      if (knownPrefix && unknownBits > 24) {
         return Promise.resolve(null); // too large for brute-force, fall through to SageCell
       }
       return Promise.resolve(null);
@@ -239,7 +239,7 @@ c &\\equiv (m_0 \\cdot 2^k + x)^e \\pmod{n} \\\\
 \\text{Iterate } x &= 0, 1, \\ldots, 2^k - 1 \\\\
 \\text{Check: } &(m_0 \\cdot 2^k + x)^e \\equiv c \\pmod{n}
 \\end{align*}
-Feasible for $k \\leq 20$ (approx. 1 million modular exponentiations in the browser).
+Feasible for $k \\leq 24$ (approx. 16 million modular exponentiations in the browser).
 
 \\textbf{Explanation:} Two complementary strategies. Strategy 1 works when the plaintext is so small that $m^e$ never wraps around modulo $n$ — the ciphertext literally equals $m^e$ as an integer, so taking the e-th root recovers $m$. Strategy 2 works when part of the plaintext is known (e.g., a flag format like "flag\\{...\\}") — the unknown suffix is brute-forced by testing each candidate against the ciphertext.
 
@@ -253,7 +253,7 @@ export const generateTestcase = (): Record<string, string> => {
   const { n } = generateKeyPair(256, 256, e);
   const prefix = new TextEncoder().encode('flag{');
   const prefixInt = BigInt('0x' + Array.from(prefix).map(b => b.toString(16).padStart(2, '0')).join(''));
-  const unknownBits = 16;
+  const unknownBits = 20;
   const unknown = BigInt(Math.floor(Math.random() * 2 ** unknownBits));
   const m = (prefixInt << BigInt(unknownBits)) | unknown;
   return { n: n.toString(), e: e.toString(), c: encrypt(m, n, e).toString(), known_prefix: 'flag{', unknown_bits: unknownBits.toString() };

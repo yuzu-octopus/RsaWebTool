@@ -208,7 +208,7 @@ export const generateTestcase = (): Record<string, string> => {
   while (true) {
     let pMinus1 = 2n;
     const primes = [];
-    for (let i = 2; i <= 2000; i++) {
+    for (let i = 2; i <= 5000; i++) {
       if (isPrimeMR(BigInt(i))) primes.push(BigInt(i));
     }
     // Fisher-Yates shuffle for unbiased randomness
@@ -218,7 +218,7 @@ export const generateTestcase = (): Record<string, string> => {
     }
     let currentBits = 0n;
     let idx = 0;
-    while (currentBits < 128n && idx < primes.length) {
+    while (currentBits < 256n && idx < primes.length) {
       pMinus1 *= primes[idx];
       // Use BigInt bitLength for accurate bit counting
       currentBits += BigInt(primes[idx].toString(2).length);

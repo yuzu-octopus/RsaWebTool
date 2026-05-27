@@ -83,9 +83,9 @@ _attack()`,
       const n = BigInt(vals.n);
       const e = BigInt(vals.e);
       const fourNE = 4n * n * e;
-      for (let k = 1n; k <= 500000n; k++) {
-        if (onProgress && k % 50000n === 0n) {
-          onProgress(Number(k * 100n / 500000n));
+      for (let k = 1n; k <= 5000000n; k++) {
+        if (onProgress && k % 500000n === 0n) {
+          onProgress(Number(k * 100n / 5000000n));
         }
         const disc = 1n + k * fourNE;
         // Mod-16 perfect square pre-filter: disc ≡ 1 (mod 4), so valid squares mod 16 are only 1 and 9
@@ -120,7 +120,7 @@ _attack()`,
 ne &= p(qe) = p(1 + kp) = p + kp^2 \\\\
 kp^2 + p - ne &= 0 \\\\
 p &= \\frac{-1 + \\sqrt{1 + 4kne}}{2k} \\\\
-\\text{Iterate } k &= 1, \\ldots, 5 \\cdot 10^5:\\quad \\text{check if } 1 + 4kne \\text{ is a perfect square} \\\\
+\\text{Iterate } k &= 1, \\ldots, 5 \\cdot 10^6:\\quad \\text{check if } 1 + 4kne \\text{ is a perfect square} \\\\
 \\text{If so, } p &\\mid n \\implies \\text{factorization found} \\qed
 \\end{align*}
 
@@ -140,7 +140,7 @@ export const generateTestcase = (): Record<string, string> => {
     if (q !== null && q >= 2n && isPrimeMR(q)) {
       const n = p * q;
       const k = (q * e - 1n) / p;
-      if (k > 0n && k < 500001n) {
+      if (k > 0n && k < 5000001n) {
         return { n: n.toString(), e: e.toString() };
       }
     }

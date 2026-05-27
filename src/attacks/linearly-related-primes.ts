@@ -46,7 +46,7 @@ def _attack():
             n_int = int(n)
             k_int = int(k)
             found = False
-            for delta in range(-100000, 100001):
+            for delta in range(-1000000, 1000001):
                 disc = delta * delta + 4 * k_int * n_int
                 # Valid squares mod 16: only 0, 1, 4, 9
                 last_nibble = disc & 15
@@ -82,12 +82,12 @@ _attack()`,
       const n = BigInt(vals.n);
       const k = BigInt(vals.k);
       const fourKN = 4n * k * n;
-      for (let delta = -100000n; delta <= 100000n; delta++) {
+      for (let delta = -1000000n; delta <= 1000000n; delta++) {
         const disc = delta * delta + fourKN;
         const discNybble = Number(disc & 15n);
         if (discNybble !== 0 && discNybble !== 1 && discNybble !== 4 && discNybble !== 9) continue;
         if (onProgress && delta % 10000n === 0n) {
-          onProgress(Number((delta + 100000n) * 100n / 200001n));
+          onProgress(Number((delta + 1000000n) * 100n / 2000001n));
         }
         const sqrt_disc = isqrt(disc);
         if (sqrt_disc * sqrt_disc !== disc) continue;
@@ -104,12 +104,12 @@ _attack()`,
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta| < 10^5$, solve $kp^2 + \\delta p - n = 0$ to recover $p$.
+  proof: `\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta| < 10^6$, solve $kp^2 + \\delta p - n = 0$ to recover $p$.
 
 \\textbf{Setup:}
 \\begin{itemize}
 \\item $n = pq$ and $q = kp + \\delta$
-\\item $k$ known, $\\delta$ unknown but small ($|\\delta| < 10^5$)
+\\item $k$ known, $\\delta$ unknown but small ($|\\delta| < 10^6$)
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -121,7 +121,7 @@ p &= \\frac{-\\delta + \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
 \\text{If so, } p &\\mid n \\implies \\text{factorization found} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Substituting $q = kp + \\delta$ into $n = pq$ gives a quadratic in $p$. The discriminant $\\Delta = \\delta^2 + 4kn$ must be a perfect square for integer $p$. The attack iterates $\\delta$ over $[-10^5, 10^5]$, which covers the typical range for CTF challenges and poorly generated primes. Setting $k = 1$ gives the classic twin-prime case ($p$ and $q$ close together).
+\\textbf{Explanation:} Substituting $q = kp + \\delta$ into $n = pq$ gives a quadratic in $p$. The discriminant $\\Delta = \\delta^2 + 4kn$ must be a perfect square for integer $p$. The attack iterates $\\delta$ over $[-10^6, 10^6]$, which covers the typical range for CTF challenges and poorly generated primes. Setting $k = 1$ gives the classic twin-prime case ($p$ and $q$ close together).
 
 \\textbf{References:} A. Nitaj, "Cryptanalysis of RSA with Constrained Primes", 1999`,
   usageGuide: 'This attack factors n when the two primes are linearly related: q = k*p + δ for known k.\n\nHow to use:\n1. You know that n = p*q where q = k*p + δ for some known multiplier k and small unknown δ\n2. Provide n and k\n3. The attack solves the quadratic equation k*p^2 + δ*p - n = 0 to recover p\n\nTip: This is common in CTF challenges or badly generated keys. Setting k=1 gives the classic twin-prime case (p = q + δ). For p = a*q + b form, try inverting the relationship.',
@@ -135,7 +135,7 @@ export const generateTestcase = (): Record<string, string> => {
   const r = Math.random();
   const k = r < 0.4 ? 1n : r < 0.7 ? 2n : 3n;
   // Pick a small non-zero delta, then find q = k*p + delta that is prime
-  let targetDelta = BigInt(Math.floor(Math.random() * 100) + 1); // [1, 100]
+  let targetDelta = BigInt(Math.floor(Math.random() * 1000) + 1); // [1, 1000]
   if (Math.random() < 0.5) targetDelta = -targetDelta;
   let q = k * p + targetDelta;
   // q is always > 2 for 256-bit primes; keep safety guard

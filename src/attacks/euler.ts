@@ -24,7 +24,7 @@ export const attack: Attack = {
             solutions = []
             a = 0
             a_sq = 0
-            max_iter = 5000000
+            max_iter = 20000000
             while a < end and len(solutions) < 2:
                 if a > max_iter:
                     print(f"Euler factorization failed: exceeded {max_iter} iterations")
@@ -85,7 +85,7 @@ _attack()`,
       if (n % 2n === 0n) return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n / 2n}\nEULER=SUCCESS`);
       const end = isqrt(n);
       const solutions: bigint[][] = [];
-      const maxIter = 5000000n;
+      const maxIter = 20000000n;
       let a2 = 0n; // tracks a^2 via recurrence: (a+1)^2 = a^2 + 2a + 1
       for (let a = 0n; a < end && solutions.length < 2; a++) {
         if (onProgress && a % 100000n === 0n) {
@@ -155,13 +155,13 @@ From the identity $(a-c)(a+c) = (d-b)(d+b)$, the GCD combinations recover the pr
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  function prime1mod4(bits: number): bigint {
+  function prime1mod4(bits: number = 22): bigint {
     while (true) {
       const p = randomPrime(bits);
       if (p % 4n === 1n) return p;
     }
   }
-  const nBits = 20;
+  const nBits = 22;
   const p = prime1mod4(nBits);
   const q = prime1mod4(nBits);
   return { n: (p * q).toString() };

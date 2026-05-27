@@ -541,7 +541,7 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
         except:
             out = [f"ERROR: {ex}", "POLLARD_RHO=FAILED"]
         print("\\n".join(out))
-_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${n/2n}\nPOLLARD_RHO=SUCCESS`);let r=0;for(let e=1n;e<10n;e++){if(t){let n=Math.round(Number(e-1n)*100/9);n>r&&(r=n,t(n))}let i=n,a=BigInt(e),o=2n,s=2n,c=1n,l=1n,u=1n,d=0n,f=5e4,p=0;for(;l===1n&&p<f;){s=o;let e=0;for(;e<Number(u)&&p<f;)o=(o*o+a)%i,p++,e++;for(d=0n;d<u&&l===1n&&p<f;){let e=Math.min(100,Number(u-d));for(let t=0;t<e;t++){o=(o*o+a)%i;let e=o>s?o-s:s-o;c=c*e%i,p++}l=O(c,i),c=1n,d+=BigInt(100)}u*=2n}if(l>1n&&l<i){let n=i/l;return t?.(100),Promise.resolve(`Factor found!\np = ${l}\nq = ${n}\nc = ${e}\niterations = ${p}\nPOLLARD_RHO=SUCCESS`)}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Pollard's rho algorithm with Brent's cycle detection and batched GCD finds a non-trivial factor in expected $O(n^{1/4})$ time.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${n/2n}\nPOLLARD_RHO=SUCCESS`);let r=0;for(let e=1n;e<10n;e++){if(t){let n=Math.round(Number(e-1n)*100/9);n>r&&(r=n,t(n))}let i=n,a=BigInt(e),o=2n,s=2n,c=1n,l=1n,u=1n,d=0n,f=5e5,p=0;for(;l===1n&&p<f;){s=o;let e=0;for(;e<Number(u)&&p<f;)o=(o*o+a)%i,p++,e++;for(d=0n;d<u&&l===1n&&p<f;){let e=Math.min(100,Number(u-d));for(let t=0;t<e;t++){o=(o*o+a)%i;let e=o>s?o-s:s-o;c=c*e%i,p++}l=O(c,i),c=1n,d+=BigInt(100)}u*=2n}if(l>1n&&l<i){let n=i/l;return t?.(100),Promise.resolve(`Factor found!\np = ${l}\nq = ${n}\nc = ${e}\niterations = ${p}\nPOLLARD_RHO=SUCCESS`)}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Pollard's rho algorithm with Brent's cycle detection and batched GCD finds a non-trivial factor in expected $O(n^{1/4})$ time.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2243,7 +2243,7 @@ Tip: This is inherently probabilistic — the lattice may fail even with the rig
             solutions = []
             a = 0
             a_sq = 0
-            max_iter = 5000000
+            max_iter = 20000000
             while a < end and len(solutions) < 2:
                 if a > max_iter:
                     print(f"Euler factorization failed: exceeded {max_iter} iterations")
@@ -2295,7 +2295,7 @@ Tip: This is inherently probabilistic — the lattice may fail even with the rig
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("EULER=FAILED")
-_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n<2n)return Promise.resolve(null);if(n%2n==0n)return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n/2n}\nEULER=SUCCESS`);let r=k(n),i=[],a=5000000n,o=0n;for(let e=0n;e<r&&i.length<2;e++){if(t&&e%100000n==0n&&t(e>a?100:Number(e*100n/(r<a?r:a))),e>a)return t?.(100),Promise.resolve(null);let s=n-o;o+=2n*e+1n;let c=Number(s&15n);if(c===0||c===1||c===4||c===9){let t=k(s);if(t*t===s){let n=!0;for(let r of i)if(r[0]===t&&r[1]===e){n=!1;break}n&&i.push([t,e])}}}if(i.length<2)return Promise.resolve(null);let[s,c]=[i[0],i[1]],l=O(s[0]-c[0],c[1]-s[1])**2n,u=O(s[0]+c[0],c[1]+s[1])**2n,d=O(s[0]+c[0],c[1]-s[1])**2n,f=O(s[0]-c[0],c[1]+s[1])**2n,p=O(l+u,n),m=O(f+d,n);return p<=1n||m>=n?Promise.resolve(null):(p*m!==n&&(m=n/p),t?.(100),Promise.resolve(`Factor found!\nVerification: p * q = ${p*m}\np = ${p}\nq = ${m}\nn = ${s[0]}^2 + ${s[1]}^2 = ${c[0]}^2 + ${c[1]}^2\nEULER=SUCCESS`))}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Factor $n = pq$ using two distinct representations as a sum of squares. Requires $p \\equiv q \\equiv 1 \\pmod{4}$.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n<2n)return Promise.resolve(null);if(n%2n==0n)return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n/2n}\nEULER=SUCCESS`);let r=k(n),i=[],a=20000000n,o=0n;for(let e=0n;e<r&&i.length<2;e++){if(t&&e%100000n==0n&&t(e>a?100:Number(e*100n/(r<a?r:a))),e>a)return t?.(100),Promise.resolve(null);let s=n-o;o+=2n*e+1n;let c=Number(s&15n);if(c===0||c===1||c===4||c===9){let t=k(s);if(t*t===s){let n=!0;for(let r of i)if(r[0]===t&&r[1]===e){n=!1;break}n&&i.push([t,e])}}}if(i.length<2)return Promise.resolve(null);let[s,c]=[i[0],i[1]],l=O(s[0]-c[0],c[1]-s[1])**2n,u=O(s[0]+c[0],c[1]+s[1])**2n,d=O(s[0]+c[0],c[1]-s[1])**2n,f=O(s[0]-c[0],c[1]+s[1])**2n,p=O(l+u,n),m=O(f+d,n);return p<=1n||m>=n?Promise.resolve(null):(p*m!==n&&(m=n/p),t?.(100),Promise.resolve(`Factor found!\nVerification: p * q = ${p*m}\np = ${p}\nq = ${m}\nn = ${s[0]}^2 + ${s[1]}^2 = ${c[0]}^2 + ${c[1]}^2\nEULER=SUCCESS`))}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Factor $n = pq$ using two distinct representations as a sum of squares. Requires $p \\equiv q \\equiv 1 \\pmod{4}$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2552,7 +2552,7 @@ _attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e)return Promise.resolve(null);try{
 \\begin{itemize}
 \\item $ed_p \\equiv 1 \\pmod{p-1}$, so $ed_p = 1 + k(p-1)$ for some $k$
 \\item By FLT: $2^{e \\cdot d_p} \\equiv 2 \\pmod{p}$, so $p \\mid (2^{e \\cdot d_p} - 2)$
-\\item $d_p$ is small ($< \\text{bound}$, default $10^6$)
+\\item $d_p$ is small ($< \\text{bound}$, default $10^7$)
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -2572,9 +2572,9 @@ How to use:
 1. You have n, e, and know that dp (d mod p-1) is small (< bound)
 2. The attack uses Fermat's Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p
 3. A batched GCD approach (product tree) accelerates the linear scan ~1000x by reducing gcd calls via product accumulation
-4. Provide n, e, and optionally bound         (max dp to try, default 5000000)
+4. Provide n, e, and optionally bound         (max dp to try, default 50000000)
 
-Tip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 5000000 runs in ~900ms for 1024-bit n.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},{id:`dp-dq-leak`,name:`dp/dq Leak`,category:`Partial Key / Lattice`,description:`Recovers p from leaked d_p (or q from leaked d_q) via FLT-based GCD. Use when CRT exponents d_p or d_q are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dp`,label:`dp (d mod p-1)`,placeholder:`Enter dp value...`,multiline:!0,rows:3},{name:`dq`,label:`dq (d mod q-1, optional)`,placeholder:`Enter dq value...`,required:!1,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.e);if(t<=0n||n<=0n)return null;let r=2n;if(e.dp){let i=BigInt(e.dp);if(i>0n){let e=n*i-1n;if(e>0n){let n=O(M(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(n*e).toString()}\ndp = ${i.toString()}\np = ${n.toString()}\nq = ${e.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}if(e.dq){let i=BigInt(e.dq);if(i>0n){let e=n*i-1n;if(e>0n){let n=O(M(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(e*n).toString()}\ndq = ${i.toString()}\np = ${e.toString()}\nq = ${n.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}return null}catch{return null}},sageTemplate:e=>{let t=e.dp?`
+Tip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 50000000 runs in ~900ms for 1024-bit n.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},{id:`dp-dq-leak`,name:`dp/dq Leak`,category:`Partial Key / Lattice`,description:`Recovers p from leaked d_p (or q from leaked d_q) via FLT-based GCD. Use when CRT exponents d_p or d_q are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dp`,label:`dp (d mod p-1)`,placeholder:`Enter dp value...`,multiline:!0,rows:3},{name:`dq`,label:`dq (d mod q-1, optional)`,placeholder:`Enter dq value...`,required:!1,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.e);if(t<=0n||n<=0n)return null;let r=2n;if(e.dp){let i=BigInt(e.dp);if(i>0n){let e=n*i-1n;if(e>0n){let n=O(M(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(n*e).toString()}\ndp = ${i.toString()}\np = ${n.toString()}\nq = ${e.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}if(e.dq){let i=BigInt(e.dq);if(i>0n){let e=n*i-1n;if(e>0n){let n=O(M(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(e*n).toString()}\ndq = ${i.toString()}\np = ${e.toString()}\nq = ${n.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}return null}catch{return null}},sageTemplate:e=>{let t=e.dp?`
         dp_val = int(Integer(${e.dp}))
         if dp_val > 0:
             num = dp_val * e_int - 1
@@ -2685,7 +2685,7 @@ def _attack():
             n_int = int(n)
             k_int = int(k)
             found = False
-            for delta in range(-100000, 100001):
+            for delta in range(-1000000, 1000001):
                 disc = delta * delta + 4 * k_int * n_int
                 # Valid squares mod 16: only 0, 1, 4, 9
                 last_nibble = disc & 15
@@ -2714,12 +2714,12 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("LINEARLY_RELATED_PRIMES=FAILED")
-_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.k)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.k),i=4n*r*n;for(let e=-100000n;e<=100000n;e++){let a=e*e+i,o=Number(a&15n);if(o!==0&&o!==1&&o!==4&&o!==9)continue;t&&e%10000n==0n&&t(Number((e+100000n)*100n/200001n));let s=k(a);if(s*s!==a)continue;let c=-e+s;if(c>0n&&c%(2n*r)==0n){let i=c/(2n*r);if(i>1n&&n%i===0n){let a=n/i;return t?.(100),Promise.resolve(`Factor found!\np = ${i}\nq = ${a}\nk = ${r}\ndelta = ${e}\nLINEARLY_RELATED_PRIMES=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta| < 10^5$, solve $kp^2 + \\delta p - n = 0$ to recover $p$.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.k)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.k),i=4n*r*n;for(let e=-1000000n;e<=1000000n;e++){let a=e*e+i,o=Number(a&15n);if(o!==0&&o!==1&&o!==4&&o!==9)continue;t&&e%10000n==0n&&t(Number((e+1000000n)*100n/2000001n));let s=k(a);if(s*s!==a)continue;let c=-e+s;if(c>0n&&c%(2n*r)==0n){let i=c/(2n*r);if(i>1n&&n%i===0n){let a=n/i;return t?.(100),Promise.resolve(`Factor found!\np = ${i}\nq = ${a}\nk = ${r}\ndelta = ${e}\nLINEARLY_RELATED_PRIMES=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta| < 10^6$, solve $kp^2 + \\delta p - n = 0$ to recover $p$.
 
 \\textbf{Setup:}
 \\begin{itemize}
 \\item $n = pq$ and $q = kp + \\delta$
-\\item $k$ known, $\\delta$ unknown but small ($|\\delta| < 10^5$)
+\\item $k$ known, $\\delta$ unknown but small ($|\\delta| < 10^6$)
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -2731,7 +2731,7 @@ p &= \\frac{-\\delta + \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
 \\text{If so, } p &\\mid n \\implies \\text{factorization found} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Substituting $q = kp + \\delta$ into $n = pq$ gives a quadratic in $p$. The discriminant $\\Delta = \\delta^2 + 4kn$ must be a perfect square for integer $p$. The attack iterates $\\delta$ over $[-10^5, 10^5]$, which covers the typical range for CTF challenges and poorly generated primes. Setting $k = 1$ gives the classic twin-prime case ($p$ and $q$ close together).
+\\textbf{Explanation:} Substituting $q = kp + \\delta$ into $n = pq$ gives a quadratic in $p$. The discriminant $\\Delta = \\delta^2 + 4kn$ must be a perfect square for integer $p$. The attack iterates $\\delta$ over $[-10^6, 10^6]$, which covers the typical range for CTF challenges and poorly generated primes. Setting $k = 1$ gives the classic twin-prime case ($p$ and $q$ close together).
 
 \\textbf{References:} A. Nitaj, "Cryptanalysis of RSA with Constrained Primes", 1999`,usageGuide:`This attack factors n when the two primes are linearly related: q = k*p + δ for known k.
 
@@ -2805,7 +2805,7 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("DEPENDENT_PRIME=FAILED")
-_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=4n*n*r;for(let e=1n;e<=500000n;e++){t&&e%50000n==0n&&t(Number(e*100n/500000n));let r=1n+e*i,a=Number(r&15n);if(a!==1&&a!==9)continue;let o=k(r);if(o*o!==r)continue;let s=-1n+o;if(s>0n&&s%(2n*e)==0n){let r=s/(2n*e);if(r>1n&&n%r===0n){let i=n/r;return t?.(100),Promise.resolve(`Factor found!\np = ${r}\nq = ${i}\nk = ${e}\nDEPENDENT_PRIME=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $qe \\equiv 1 \\pmod{p}$, solve $kp^2 + p - ne = 0$ for $p$ by iterating $k$.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=4n*n*r;for(let e=1n;e<=5000000n;e++){t&&e%500000n==0n&&t(Number(e*100n/5000000n));let r=1n+e*i,a=Number(r&15n);if(a!==1&&a!==9)continue;let o=k(r);if(o*o!==r)continue;let s=-1n+o;if(s>0n&&s%(2n*e)==0n){let r=s/(2n*e);if(r>1n&&n%r===0n){let i=n/r;return t?.(100),Promise.resolve(`Factor found!\np = ${r}\nq = ${i}\nk = ${e}\nDEPENDENT_PRIME=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $qe \\equiv 1 \\pmod{p}$, solve $kp^2 + p - ne = 0$ for $p$ by iterating $k$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2818,7 +2818,7 @@ _attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e)return Promise.resolve(null);try{
 ne &= p(qe) = p(1 + kp) = p + kp^2 \\\\
 kp^2 + p - ne &= 0 \\\\
 p &= \\frac{-1 + \\sqrt{1 + 4kne}}{2k} \\\\
-\\text{Iterate } k &= 1, \\ldots, 5 \\cdot 10^5:\\quad \\text{check if } 1 + 4kne \\text{ is a perfect square} \\\\
+\\text{Iterate } k &= 1, \\ldots, 5 \\cdot 10^6:\\quad \\text{check if } 1 + 4kne \\text{ is a perfect square} \\\\
 \\text{If so, } p &\\mid n \\implies \\text{factorization found} \\qed
 \\end{align*}
 
@@ -4519,7 +4519,7 @@ _attack()`,proof:`\\textbf{Theorem:} FactorDB provides instant factorization for
 
 \\textbf{Explanation:} FactorDB is the internet's largest database of integer factorizations, containing billions of entries. The attack first queries FactorDB via a CORS proxy. If the modulus has been factored before (common for CTF challenges), the result is instant. If not, SageMathCell falls back to local factorization methods: trial division for small factors, ECM for medium-sized factors, and Pollard's rho for larger ones. This makes FactorDB Lookup an excellent first diagnostic step for any unknown RSA modulus.
 
-\\textbf{References:} https://factordb.com`,priority:`low`,applicableCheck:e=>!!e.n},{id:`known-plaintext`,name:`Known Plaintext Attack`,category:`Message / Protocol`,description:`Recovers m via integer e-th root when m^e < n, or via known-prefix brute-force for up to 20 unknown bits. Use when plaintext is small or partially known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`known_prefix`,label:`Known plaintext prefix`,placeholder:`e.g., flag{`,multiline:!1},{name:`unknown_bits`,label:`Unknown bits after prefix`,placeholder:`32`,multiline:!1}],sageTemplate:e=>!e.n||!e.c?`print("ERROR: n and c are required")
+\\textbf{References:} https://factordb.com`,priority:`low`,applicableCheck:e=>!!e.n},{id:`known-plaintext`,name:`Known Plaintext Attack`,category:`Message / Protocol`,description:`Recovers m via integer e-th root when m^e < n, or via known-prefix brute-force for up to 24 unknown bits. Use when plaintext is small or partially known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`known_prefix`,label:`Known plaintext prefix`,placeholder:`e.g., flag{`,multiline:!1},{name:`unknown_bits`,label:`Unknown bits after prefix`,placeholder:`32`,multiline:!1}],sageTemplate:e=>!e.n||!e.c?`print("ERROR: n and c are required")
 print("KNOWN_PLAINTEXT=FAILED")`:`def _attack():
     try:
         n = Integer(${e.n})
@@ -4558,7 +4558,7 @@ print("KNOWN_PLAINTEXT=FAILED")`:`def _attack():
             print(f"Prefix as integer: {prefix_int}")
             print(f"Prefix byte length: {len(prefix_bytes)}")
             shift = 1 << int(unknown_bits)
-            if unknown_bits <= 20:
+            if unknown_bits <= 24:
                 print(f"Brute forcing 2^{unknown_bits} possibilities...")
                 found = False
                 if e == 3:
@@ -4620,7 +4620,7 @@ print("KNOWN_PLAINTEXT=FAILED")`:`def _attack():
     except Exception as ex:
         print(f"Error: {ex}")
         print("KNOWN_PLAINTEXT=FAILED")
-_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.c)return Promise.resolve(null);try{let n=-1,r=BigInt(e.n),i=e.e?.trim()||`65537`,a=BigInt(i),o=BigInt(e.c),s=N(o,a);if(s**a===o&&M(s,a,r)===o){t?.(100);try{let e=s.toString(16),t=e.length%2?`0`+e:e,n=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),r=new TextDecoder().decode(n);return Promise.resolve(`RECOVERED via integer e-th root! m = ${s}\nm as bytes: ${r}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`RECOVERED via integer e-th root! m = ${s}\nKNOWN_PLAINTEXT=SUCCESS`)}}let c=e.known_prefix||``,l=(e.unknown_bits||`32`).trim(),u=parseInt(l,10);if(c&&u<=20){let e=new TextEncoder().encode(c),i=0n;for(let t of e)i=(i<<8n)+BigInt(t);let s=1n<<BigInt(u),l=Number(s);if(a===3n){let e=(i<<BigInt(u))%r,a=M(e,3n,r),s=3n*e*e%r,c=3n*e%r;for(let e=0;e<l;e++){if(t&&l>1e3){let r=Math.round(e*100/l);r!==n&&(n=r,t(r))}let d=BigInt(e)%r,f=d*d%r;if((((a+s*d)%r+c*f)%r+f*d)%r===o){let n=(i<<BigInt(u))+BigInt(e);t?.(100);try{let e=n.toString(16),t=e.length%2?`0`+e:e,r=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),i=new TextDecoder().decode(r);return Promise.resolve(`FOUND! m = ${n}\nm as bytes: ${i}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`FOUND! m = ${n}\nKNOWN_PLAINTEXT=SUCCESS`)}}}}else for(let e=0;e<l;e++){if(t&&l>1e3){let r=Math.round(e*100/l);r!==n&&(n=r,t(r))}let s=(i<<BigInt(u))+BigInt(e);if(M(s,a,r)===o){t?.(100);try{let e=s.toString(16),t=e.length%2?`0`+e:e,n=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),r=new TextDecoder().decode(n);return Promise.resolve(`FOUND! m = ${s}\nm as bytes: ${r}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`FOUND! m = ${s}\nKNOWN_PLAINTEXT=SUCCESS`)}}}return Promise.resolve(null)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} When $m^e < n$, the plaintext is recovered by taking the integer e-th root of $c$. When high-order bytes of $m$ are known, brute-force over the unknown low bits recovers the full plaintext.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.c)return Promise.resolve(null);try{let n=-1,r=BigInt(e.n),i=e.e?.trim()||`65537`,a=BigInt(i),o=BigInt(e.c),s=N(o,a);if(s**a===o&&M(s,a,r)===o){t?.(100);try{let e=s.toString(16),t=e.length%2?`0`+e:e,n=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),r=new TextDecoder().decode(n);return Promise.resolve(`RECOVERED via integer e-th root! m = ${s}\nm as bytes: ${r}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`RECOVERED via integer e-th root! m = ${s}\nKNOWN_PLAINTEXT=SUCCESS`)}}let c=e.known_prefix||``,l=(e.unknown_bits||`32`).trim(),u=parseInt(l,10);if(c&&u<=24){let e=new TextEncoder().encode(c),i=0n;for(let t of e)i=(i<<8n)+BigInt(t);let s=1n<<BigInt(u),l=Number(s);if(a===3n){let e=(i<<BigInt(u))%r,a=M(e,3n,r),s=3n*e*e%r,c=3n*e%r;for(let e=0;e<l;e++){if(t&&l>1e3){let r=Math.round(e*100/l);r!==n&&(n=r,t(r))}let d=BigInt(e)%r,f=d*d%r;if((((a+s*d)%r+c*f)%r+f*d)%r===o){let n=(i<<BigInt(u))+BigInt(e);t?.(100);try{let e=n.toString(16),t=e.length%2?`0`+e:e,r=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),i=new TextDecoder().decode(r);return Promise.resolve(`FOUND! m = ${n}\nm as bytes: ${i}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`FOUND! m = ${n}\nKNOWN_PLAINTEXT=SUCCESS`)}}}}else for(let e=0;e<l;e++){if(t&&l>1e3){let r=Math.round(e*100/l);r!==n&&(n=r,t(r))}let s=(i<<BigInt(u))+BigInt(e);if(M(s,a,r)===o){t?.(100);try{let e=s.toString(16),t=e.length%2?`0`+e:e,n=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),r=new TextDecoder().decode(n);return Promise.resolve(`FOUND! m = ${s}\nm as bytes: ${r}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`FOUND! m = ${s}\nKNOWN_PLAINTEXT=SUCCESS`)}}}return Promise.resolve(null)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} When $m^e < n$, the plaintext is recovered by taking the integer e-th root of $c$. When high-order bytes of $m$ are known, brute-force over the unknown low bits recovers the full plaintext.
 
 \\textbf{Strategy 1: Integer e-th Root}
 \\begin{align*}
@@ -4636,7 +4636,7 @@ c &\\equiv (m_0 \\cdot 2^k + x)^e \\pmod{n} \\\\
 \\text{Iterate } x &= 0, 1, \\ldots, 2^k - 1 \\\\
 \\text{Check: } &(m_0 \\cdot 2^k + x)^e \\equiv c \\pmod{n}
 \\end{align*}
-Feasible for $k \\leq 20$ (approx. 1 million modular exponentiations in the browser).
+Feasible for $k \\leq 24$ (approx. 16 million modular exponentiations in the browser).
 
 \\textbf{Explanation:} Two complementary strategies. Strategy 1 works when the plaintext is so small that $m^e$ never wraps around modulo $n$ — the ciphertext literally equals $m^e$ as an integer, so taking the e-th root recovers $m$. Strategy 2 works when part of the plaintext is known (e.g., a flag format like "flag\\{...\\}") — the unknown suffix is brute-forced by testing each candidate against the ciphertext.
 

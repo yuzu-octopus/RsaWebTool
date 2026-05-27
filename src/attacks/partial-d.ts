@@ -159,7 +159,7 @@ export const generateTestcase = (): Record<string, string> => {
     d += 1n;
   }
   const e = modInverse(d, phi)!;
-  // Leak low 20 bits of d
-  const dLow = d & ((1n << 20n) - 1n);
+  // Leak low 22 bits of d
+  const dLow = d & ((1n << 22n) - 1n);
   return { n: n.toString(), e: e.toString(), dLow: dLow.toString() };
 };

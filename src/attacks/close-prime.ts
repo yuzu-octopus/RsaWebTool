@@ -161,7 +161,7 @@ export const generateTestcase = (): Record<string, string> => {
   // Use 512-bit close primes — Fermat converges in < 5000 iterations
   // for |p - q| < 10000, regardless of absolute bit size
   const p = randomPrime(512);
-  const delta = Math.floor(Math.random() * 5000) * 2 + 2;
+  const delta = Math.floor(Math.random() * 250000) * 2 + 2;
   let q = p + BigInt(delta);
   while (!isPrimeMR(q)) q += 2n;
   return { n: (p * q).toString() };
