@@ -244,14 +244,14 @@ n &= (k_1 M + r_1)(k_2 M + r_2) \\\\
 n &\\equiv r_1 r_2 \\pmod{M} \\quad \\text{(both remainders in }\\mathcal{R}\\text{)} \\\\
 \\text{If } n \\cdot r_2^{-1} \\bmod M &\\in \\mathcal{R}\\text{, then } r_1 = n \\cdot r_2^{-1} \\bmod M \\\\
 f(x) &= Mx + r_1 \\equiv 0 \\pmod{p} \\quad\\text{with root } x = k_1 \\\\
-|k_1| &< \\sqrt{n}/M < p \\quad\\text{(since } M > n^{1/4}\\text{)} \\\\
-\\text{Coppersmith (} \\beta = 0.5, X = \\sqrt{n}/M \\text{)} &\\implies k_1 \\text{ found in poly-time} \\\\
+|k_1| &< 2\\sqrt{n}/M' < p \\quad\\text{(safety margin factor 2)} \\\\
+\\text{Coppersmith (} \\beta = 0.5, X = 2\\sqrt{n}/M' \\text{)} &\\implies k_1 \\text{ found in poly-time} \\\\
 p &= M \\cdot k_1 + r_1 \\qed
 \\end{align*}
 
-\\textbf{Explanation:} The Infineon RSA key generator had a bug: it generated primes by starting with a random $k$, computing $p = k \\cdot M + (65537^i \\bmod M)$, and testing primality. Since $M$ is large (product of many small primes), the $k$ values are small (often $k < \\sqrt{n}/M \\ll n^{0.5}$), making $p$'s high bits predictable. Coppersmith's theorem says we can find small roots of $f(x) = Mx + r \\bmod p$ when $|x| < p^\\beta$. With $\\beta = 0.5$ and $X = \\sqrt{n}/M$, the bounded root $k$ is recovered via lattice reduction (LLL). This attack factored 512-bit keys in minutes and 1024-bit keys in hours in practice.
+\\textbf{Explanation:} The Infineon RSA key generator had a bug: it generated primes by starting with a random $k$, computing $p = k \\cdot M + (65537^i \\bmod M)$, and testing primality. Since $M$ is large (product of many small primes), the $k$ values are small (often $k < \\sqrt{n}/M \\ll n^{0.5}$), making $p$'s high bits predictable. Coppersmith's theorem says we can find small roots of $f(x) = Mx + r \\bmod p$ when $|x| < p^\\beta$. With $\\beta = 0.5$ and $X = 2\\sqrt{n}/M'$ (factor 2 safety margin), the bounded root $k$ is recovered via lattice reduction (LLL). This attack factored 512-bit keys in minutes and 1024-bit keys in hours in practice.
 
-\\textbf{Optimization:} The greedy M' search reduces the search space by removing prime factors from M that contribute the least order-reduction per M-reduction, yielding a smaller Coppersmith bound $X = \\sqrt{n}/M'$.
+\\textbf{Optimization:} The greedy M' search reduces the search space by removing prime factors from M that contribute the least order-reduction per M-reduction, yielding a smaller Coppersmith bound $X = 2\\sqrt{n}/M'$.
 
 \\textbf{References:} M. Nemec, M. Sys, P. Svenda, D. Klinec, V. Matyas, "The Return of Coppersmith's Attack: Practical Factorization of Widely Used RSA Moduli", CCS 2017`,
   priority: 'high',

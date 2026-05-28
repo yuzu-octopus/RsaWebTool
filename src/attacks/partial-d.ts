@@ -143,7 +143,7 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\\\implies p,q \\qed
 
 \\textbf{Optimizations:}
 \\begin{itemize}
-\\item \\textbf{Incremental $d_{\\text{approx}}$ update:} Instead of recomputing $d_{\\text{approx}} = \\lfloor (kn+1)/e \\rfloor$ from scratch each iteration (costly BigInt division), maintains a running quotient/remainder: increments $d_{\\text{approx}}$ by $q = (d_{\\text{approx}} + n) \\div e$ and tracks a running remainder, updating both additively per step.
+\\item \\textbf{Incremental }$d_{\\text{approx}}$\\textbf{ update:} Instead of recomputing $d_{\\text{approx}} = \\lfloor (kn+1)/e \\rfloor$ from scratch each iteration (costly BigInt division), maintains a running quotient/remainder: increments $d_{\\text{approx}}$ by $q = (d_{\\text{approx}} + n) \\div e$ and tracks a running remainder, updating both additively per step.
 \\end{itemize}
 
 \\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,

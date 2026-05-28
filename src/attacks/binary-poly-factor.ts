@@ -96,7 +96,7 @@ If the binary convolution of $p$ and $q$ produces no carries, then $f_{pq}(x) = 
 
 \\textbf{Explanation:} When multiplying two integers whose binary representations trigger no carries (i.e., every bit position gets at most one 1 from each factor), the binary polynomial of the product equals the product of the binary polynomials. Factoring this polynomial over $\\mathbb{Z}[x]$ and evaluating at $x = 2$ recovers the original integers. This is a rare special case but works instantly when applicable.
 
-\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen \\& Gerhard, "Modern Computer Algebra", Chapter 5`,
+\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen & Gerhard, "Modern Computer Algebra", Chapter 5`,
   priority: 'low',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

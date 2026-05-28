@@ -74,7 +74,7 @@ print("BLEICHENBACHER_SIG=FAILED")`;
     #
 _attack()`;
   },
-  proof: `\\textbf{Theorem:} When $e = 3$ and the verifier accepts trailing garbage bytes after the hash, a valid PKCS\\#1 v1.5 signature can be forged by taking the integer cube root of a crafted padding structure.
+  proof: `\\textbf{Theorem:} When $e = 3$ and the verifier accepts trailing garbage bytes after the hash, a valid PKCS#1 v1.5 signature can be forged by taking the integer cube root of a crafted padding structure.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -90,7 +90,7 @@ S^3 &= \\text{target} + \\varepsilon, \\quad 0 \\leq \\varepsilon < 3S^2
 \\end{align*}
 The error $\\varepsilon$ from rounding up is bounded by $3S^2$. Garbage bytes at the end of the padding absorb this error, keeping the $\\text{0x0001FF}^8\\text{00}H$ prefix intact.
 
-\\textbf{Explanation:} PKCS\\#1 v1.5 signature padding places the hash after a fixed $\\text{0x0001FF\\ldots FF00}$ marker. A lax verifier checks only the marker and hash position, ignoring any bytes after the hash. By crafting a target integer with the correct prefix and enough trailing garbage bytes, then taking its cube root, we obtain $S$ such that $S^3$ has the correct padding and hash — the cube root rounding error is harmlessly absorbed into the garbage. This only works for $e = 3$ because the cube root is computable over integers and the error is small.
+\\textbf{Explanation:} PKCS#1 v1.5 signature padding places the hash after a fixed $\\text{0x0001FF\\ldots FF00}$ marker. A lax verifier checks only the marker and hash position, ignoring any bytes after the hash. By crafting a target integer with the correct prefix and enough trailing garbage bytes, then taking its cube root, we obtain $S$ such that $S^3$ has the correct padding and hash — the cube root rounding error is harmlessly absorbed into the garbage. This only works for $e = 3$ because the cube root is computable over integers and the error is small.
 
 \\textbf{References:} D. Bleichenbacher, Crypto 2006 rump session presentation`,
   usageGuide: 'This attack forges RSA signatures by exploiting that s^3 < n makes the cube root computable over integers.\n\nHow to use:\n1. You have modulus n and a hash value you want a signature for\n2. Provide n and hash_hex (hash as hex string)\n3. The attack constructs an integer with PKCS#1 v1.5 padding + target hash, then takes its cube root\n4. The rounded cube root S satisfies S^3 = target + epsilon, where epsilon is absorbed by garbage bytes\n\nTip: e must be exactly 3 for this attack. The modulus must be large enough to accommodate the hash plus 8 bytes of padding plus garbage bytes. RSA with OAEP/PSS padding is NOT vulnerable.',

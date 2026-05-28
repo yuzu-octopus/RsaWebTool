@@ -4,24 +4,6 @@ import 'katex/dist/katex.min.css';
 import { Box, Typography } from '@mui/material';
 import { draculaColors } from '../theme/dracula';
 
-/**
- * Applies Unicode replacements to text-only content.
- */
-function applyTextReplacements(text: string): string {
-  let result = text;
-  result = result.replace(/\\cdot/g, '·');
-  result = result.replace(/\\times/g, '×');
-  result = result.replace(/\\leq/g, '≤');
-  result = result.replace(/\\geq/g, '≥');
-  result = result.replace(/\\neq/g, '≠');
-  result = result.replace(/\\approx/g, '≈');
-  result = result.replace(/\\infty/g, '∞');
-  result = result.replace(/\\quad/g, '    ');
-  result = result.replace(/\\,/g, ' ');
-  result = result.replace(/\\qed/g, '∎');
-  return result;
-}
-
 interface ProofSegment {
   type: 'text' | 'displayMath' | 'list';
   content: string;
@@ -32,7 +14,6 @@ interface ProofSegment {
 const displayMathRegex = /\\begin\{(align\*|equation\*|gather\*|aligned)\}([\s\S]*?)\\end\{\1\}/g;
 const itemizeRegex = /\\begin\{itemize\}([\s\S]*?)\\end\{itemize\}/g;
 const inlineMathRegex = /\$([^$]+)\$|\\\(([^)]+)\\\)/g;
-const bracketRegex = /^[(){}[\]]+$/;
 
 /**
  * Parses a LaTeX proof string into segments.
@@ -79,7 +60,7 @@ function parseTextBlock(text: string): ProofSegment[] {
   while ((m = itemizeRegex.exec(text)) !== null) {
     if (m.index > lastEnd) {
       const before = text.slice(lastEnd, m.index).trim();
-      if (before) segments.push({ type: 'text', content: applyTextReplacements(before) });
+      if (before) segments.push({ type: 'text', content: before });
     }
     segments.push({ type: 'list', content: m[1] });
     lastEnd = m.index + m[0].length;
@@ -87,149 +68,16 @@ function parseTextBlock(text: string): ProofSegment[] {
 
   if (lastEnd < text.length) {
     const after = text.slice(lastEnd).trim();
-    if (after) segments.push({ type: 'text', content: applyTextReplacements(after) });
+    if (after) segments.push({ type: 'text', content: after });
   }
 
-  return segments.length > 0 ? segments : [{ type: 'text', content: applyTextReplacements(text) }];
-}
-
-/**
- * Heuristically wraps math-like expressions in text with $...$ delimiters.
- * Text-formatting commands (\textbf{}, \textit{}, \text{}) are hidden from
- * math detection via placeholders and handled by renderInlineText instead.
- */
-function autoWrapMathInParagraph(text: string): string {
-  // Hide text-formatting commands from math detection by replacing with placeholders
-  const fmtMarkers: string[] = [];
-  const hidden = text.replace(/\\(textbf|textit|text)\{([^}]*)\}/g, (match) => {
-    fmtMarkers.push(match);
-    return `\x00FMT${fmtMarkers.length - 1}\x00`;
-  });
-
-  // Split by existing math blocks to avoid double wrapping
-  const parts = hidden.split(/([$][^$]+[$]|\\\(.*?[^\\]\\\))/);
-  
-  for (let i = 0; i < parts.length; i++) {
-    if (i % 2 === 1) continue; // Already math
-    
-    const current = parts[i];
-    const tokens = current.split(/(\s+|[.,;:!]+)/).filter(t => t !== '');
-    let inMath = false;
-    let mathSegment: string[] = [];
-    const newWords: string[] = [];
-    
-    const mathFunctionNames = new Set(['log', 'gcd', 'mod', 'div', 'lcm', 'max', 'min', 'sin', 'cos', 'tan', 'det', 'res', 'ln', 'exp', 'deg']);
-    
-    const isMathToken = (token: string, canStart: boolean): boolean => {
-      const t = token.trim();
-      if (!t) return false;
-
-      // Placeholders for text-formatting commands — never math
-      if (t.startsWith('\x00FMT')) return false;
-      
-      if (t.includes('\\') || t.includes('_') || t.includes('^') || /[=<>+\-*|~]/.test(t) || t.includes('/')) {
-        return true;
-      }
-      
-      if (/^[a-zA-Z]$/.test(t)) {
-        return true;
-      }
-      
-      if (/^[0-9]+(\.[0-9]+)?$/.test(t)) {
-        return true;
-      }
-      
-      // Case-sensitive check for math functions
-      if (mathFunctionNames.has(t)) {
-        return true;
-      }
-      
-      if (bracketRegex.test(t)) {
-        return true;
-      }
-      
-      if (/^[.,;:!]+$/.test(t)) {
-        return !canStart;
-      }
-      
-      if (/^[a-zA-Z]{2,}$/.test(t)) {
-        return false;
-      }
-      
-      if (/^[\]a-zA-Z0-9()[{},.:;!+=<>*/|\\_-]+$/.test(t)) {
-        return /[^a-zA-Z]/.test(t);
-      }
-      
-      return false;
-    };
-    
-    const hasStrongMathIndicator = (segment: string[]): boolean => {
-      const combined = segment.join('');
-      return combined.includes('\\') || combined.includes('_') || combined.includes('^') || /[=<>+\-*/|]/.test(combined);
-    };
-    
-    const flushMath = () => {
-      if (mathSegment.length > 0) {
-        const segmentToWrap = [...mathSegment];
-        let trailingPunc = '';
-        
-        while (segmentToWrap.length > 0) {
-          const lastToken = segmentToWrap[segmentToWrap.length - 1];
-          if (/^[.,;:!]+$/.test(lastToken.trim())) {
-            trailingPunc = lastToken + trailingPunc;
-            segmentToWrap.pop();
-          } else {
-            break;
-          }
-        }
-        
-        if (segmentToWrap.length > 0 && hasStrongMathIndicator(segmentToWrap)) {
-          newWords.push('$' + segmentToWrap.join('') + '$' + trailingPunc);
-        } else {
-          newWords.push(mathSegment.join(''));
-        }
-        mathSegment = [];
-      }
-      inMath = false;
-    };
-    
-    for (const w of tokens) {
-      if (/^\s+$/.test(w)) {
-        if (inMath) {
-          mathSegment.push(w);
-        } else {
-          newWords.push(w);
-        }
-        continue;
-      }
-      
-      if (isMathToken(w, !inMath)) {
-        inMath = true;
-        mathSegment.push(w);
-      } else {
-        flushMath();
-        newWords.push(w);
-      }
-    }
-    flushMath();
-    
-    parts[i] = newWords.join('');
-  }
-  
-  // Restore text-formatting placeholders (split/join avoids regex control chars)
-  let result = parts.join('');
-  for (let i = 0; i < fmtMarkers.length; i++) {
-    result = result.split(`\x00FMT${i}\x00`).join(fmtMarkers[i]);
-  }
-  return result;
+  return segments.length > 0 ? segments : [{ type: 'text', content: text }];
 }
 
 /**
  * Renders text that may contain inline math ($...$).
  */
 function InlineMath({ text }: { text: string }) {
-  const processedText = useMemo(() => autoWrapMathInParagraph(text), [text]);
-
   const parts = useMemo(() => {
     const result: React.ReactNode[] = [];
     let lastIdx = 0;
@@ -237,9 +85,9 @@ function InlineMath({ text }: { text: string }) {
 
     // Reset lastIndex as regex is stateful (global flag)
     inlineMathRegex.lastIndex = 0;
-    while ((match = inlineMathRegex.exec(processedText)) !== null) {
+    while ((match = inlineMathRegex.exec(text)) !== null) {
       if (match.index > lastIdx) {
-        const textContent = processedText.slice(lastIdx, match.index);
+        const textContent = text.slice(lastIdx, match.index);
         result.push(
           <span key={"txt-" + result.length} dangerouslySetInnerHTML={{ __html: renderInlineText(textContent) }} />
         );
@@ -259,15 +107,15 @@ function InlineMath({ text }: { text: string }) {
       lastIdx = match.index + match[0].length;
     }
 
-    if (lastIdx < processedText.length) {
-      const textContent = processedText.slice(lastIdx);
+    if (lastIdx < text.length) {
+      const textContent = text.slice(lastIdx);
       result.push(
         <span key={"txt-" + result.length} dangerouslySetInnerHTML={{ __html: renderInlineText(textContent) }} />
       );
     }
 
     return result;
-  }, [processedText]);
+  }, [text]);
 
   return <>{parts}</>;
 }
@@ -279,8 +127,8 @@ function renderInlineText(text: string): string {
   let html = text;
   html = html.replace(/\\textbf\{([^}]*)\}/g, '<strong>$1</strong>');
   html = html.replace(/\\textit\{([^}]*)\}/g, '<em>$1</em>');
-  html = html.replace(/\\text\{([^}]*)\}/g, '$1');
-  html = html.replace(/\\newline/g, '<br/>');
+  html = html.replace(/\\&/g, '&');
+  html = html.replace(/\\#/g, '#');
   return html;
 }
 
@@ -291,8 +139,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
   const segments = useMemo(() => parseProof(latex), [latex]);
 
   return (
-    <Box sx={{ p: 2, overflow: 'auto', flex: 1 }}>
-      <Box sx={{ width: '100%' }}>
+    <Box sx={{ overflow: 'auto', flex: 1 }}>
         <Box
           sx={{
             color: draculaColors.foreground,
@@ -357,9 +204,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
                 .split(/\\item\s*/)
                 .filter(item => item.trim().length > 0)
                 .map(item => {
-                  let cleaned = item.trim().replace(/\\$/g, '');
-                  // Apply text replacements for common LaTeX commands
-                  cleaned = applyTextReplacements(cleaned);
+                  const cleaned = item.trim().replace(/\\$/g, '');
                   return cleaned;
                 });
               return (
@@ -408,7 +253,6 @@ export function ProofRenderer({ latex }: { latex: string }) {
             return null;
           })}
         </Box>
-      </Box>
     </Box>
   );
 }

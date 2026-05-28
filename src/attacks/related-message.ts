@@ -233,7 +233,7 @@ m &= -g[0] \\cdot g[1]^{-1} \\pmod{n}
 
 \\textbf{Explanation:} Both polynomials $f_1$ and $f_2$ share $m$ as a root modulo $n$. The polynomial GCD extracts their common linear factor $(x - m)$. For $e = 3$, a closed-form algebraic elimination is available without polynomial arithmetic over composite moduli.
 
-\\textbf{References:} Franklin \\& Reiter, 1996; Boneh, "Twenty Years of Attacks on RSA," 1999`,
+\\textbf{References:} Franklin & Reiter, 1996; Boneh, "Twenty Years of Attacks on RSA," 1999`,
   usageGuide: 'This attack recovers m when two related messages are encrypted with the same public key.\n\nHow to use:\n1. You have two ciphertexts c1, c2 encrypted under the same (n, e)\n2. The plaintexts are related: m2 = a*m1 + b for known a, b\n3. Provide n, e, c1, c2, a, and b\n4. The attack computes gcd(m1^e - c1, (a*m1 + b)^e - c2) to recover m1\n\nTip: The attack requires e = 3 for reliable algebraic recovery; e = 5 or 7 may work via polynomial GCD but can fail over composite moduli. For convenience, paste into Magic Mode which auto-detects the parameters.',
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.c1 && !!p.c2,

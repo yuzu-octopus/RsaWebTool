@@ -152,7 +152,7 @@ _attack()`,
 \\item \\textbf{k-based FLT approach (frontendCheck):} For $e \\leq 10^6$, directly computes $n \\bmod pCandidate$ which is $\\sim 400\\times$ cheaper than GCD (0.095 $\\mu$s vs 39 $\\mu$s). The modular reduction $2^{e \\cdot d_p} - 2 \\equiv 0 \\pmod{p}$ is equivalent to $p \\mid (2^{e \\cdot d_p} - 2)$.
 \\end{itemize}
 
-\\textbf{References:} Boneh \\textit{et al.}, "Cryptanalysis of RSA with Small CRT Exponents", CRYPTO 1998; Cohn \\& Heninger, ePrint 2011/436`,
+\\textbf{References:} Boneh \\textit{et al.}, "Cryptanalysis of RSA with Small CRT Exponents", CRYPTO 1998; Cohn & Heninger, ePrint 2011/436`,
    usageGuide: 'This attack recovers the private key when either dp or dq (the CRT exponents) is small.\n\nHow to use:\n1. You have n, e, and know that dp (d mod p-1) is small (< bound)\n2. The attack uses Fermat\'s Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p\n3. A batched GCD approach (product tree) accelerates the linear scan ~1000x by reducing gcd calls via product accumulation\n4. Provide n, e, and optionally bound         (max dp to try, default 50000000)\n\nTip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 50000000 runs in ~900ms for 1024-bit n.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e,

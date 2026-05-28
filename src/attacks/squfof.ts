@@ -164,7 +164,7 @@ The algorithm searches the forward cycle for a square $c_i$, then starts a rever
 \\item \\textbf{Batched GCD trial division:} Before the main SQUFOF algorithm, extracts small factors by trial division against primes in batches of 1000. The product of each prime batch is accumulated modulo $n$ before a single GCD call, reducing GCD operations by $\\sim 1000\\times$ vs individual trial division.
 \\end{itemize}
 
-\\textbf{References:} Shanks, 1975; Gower \\& Wagstaff, Math. Comp., 2008`,
+\\textbf{References:} Shanks, 1975; Gower & Wagstaff, Math. Comp., 2008`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n,
 };

@@ -1050,7 +1050,7 @@ The algorithm searches the forward cycle for a square $c_i$, then starts a rever
 \\item \\textbf{Batched GCD trial division:} Before the main SQUFOF algorithm, extracts small factors by trial division against primes in batches of 1000. The product of each prime batch is accumulated modulo $n$ before a single GCD call, reducing GCD operations by $\\sim 1000\\times$ vs individual trial division.
 \\end{itemize}
 
-\\textbf{References:} Shanks, 1975; Gower \\& Wagstaff, Math. Comp., 2008`,priority:`medium`,applicableCheck:e=>!!e.n},z={id:`binary-poly-factor`,name:`Binary Polynomial Factoring`,category:`Factorization`,description:`Factors n by factoring its binary representation as a polynomial over Z[x] and evaluating at x=2. Use when the binary convolution of p and q has no carries.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Shanks, 1975; Gower & Wagstaff, Math. Comp., 2008`,priority:`medium`,applicableCheck:e=>!!e.n},z={id:`binary-poly-factor`,name:`Binary Polynomial Factoring`,category:`Factorization`,description:`Factors n by factoring its binary representation as a polynomial over Z[x] and evaluating at x=2. Use when the binary convolution of p and q has no carries.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -1136,7 +1136,7 @@ If the binary convolution of $p$ and $q$ produces no carries, then $f_{pq}(x) = 
 
 \\textbf{Explanation:} When multiplying two integers whose binary representations trigger no carries (i.e., every bit position gets at most one 1 from each factor), the binary polynomial of the product equals the product of the binary polynomials. Factoring this polynomial over $\\mathbb{Z}[x]$ and evaluating at $x = 2$ recovers the original integers. This is a rare special case but works instantly when applicable.
 
-\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen \\& Gerhard, "Modern Computer Algebra", Chapter 5`,priority:`low`,applicableCheck:e=>!!e.n},B=(e,t)=>{for(;t;)[e,t]=[t,e%t];return e},V=[];for(let e=-2e3;e<=2e3;e++)V.push(BigInt(e));let H={id:`small-fraction`,name:`Small Fraction Attack`,category:`Factorization`,description:`Factors n when p/q approximates a small rational a/b using parity-optimized trial division over the search window. Use when p/q is close to a simple fraction with denominator ≤ 100.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen & Gerhard, "Modern Computer Algebra", Chapter 5`,priority:`low`,applicableCheck:e=>!!e.n},B=(e,t)=>{for(;t;)[e,t]=[t,e%t];return e},V=[];for(let e=-2e3;e<=2e3;e++)V.push(BigInt(e));let H={id:`small-fraction`,name:`Small Fraction Attack`,category:`Factorization`,description:`Factors n when p/q approximates a small rational a/b using parity-optimized trial division over the search window. Use when p/q is close to a simple fraction with denominator ≤ 100.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
 def _attack():
     try:
         n = Integer(${e.n})
@@ -1921,7 +1921,7 @@ m &= -g[0] \\cdot g[1]^{-1} \\pmod{n}
 
 \\textbf{Explanation:} Both polynomials $f_1$ and $f_2$ share $m$ as a root modulo $n$. The polynomial GCD extracts their common linear factor $(x - m)$. For $e = 3$, a closed-form algebraic elimination is available without polynomial arithmetic over composite moduli.
 
-\\textbf{References:} Franklin \\& Reiter, 1996; Boneh, "Twenty Years of Attacks on RSA," 1999`,usageGuide:`This attack recovers m when two related messages are encrypted with the same public key.
+\\textbf{References:} Franklin & Reiter, 1996; Boneh, "Twenty Years of Attacks on RSA," 1999`,usageGuide:`This attack recovers m when two related messages are encrypted with the same public key.
 
 How to use:
 1. You have two ciphertexts c1, c2 encrypted under the same (n, e)
@@ -2106,7 +2106,7 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\\\implies p,q \\qed
 
 \\textbf{Optimizations:}
 \\begin{itemize}
-\\item \\textbf{Incremental $d_{\\text{approx}}$ update:} Instead of recomputing $d_{\\text{approx}} = \\lfloor (kn+1)/e \\rfloor$ from scratch each iteration (costly BigInt division), maintains a running quotient/remainder: increments $d_{\\text{approx}}$ by $q = (d_{\\text{approx}} + n) \\div e$ and tracks a running remainder, updating both additively per step.
+\\item \\textbf{Incremental }$d_{\\text{approx}}$\\textbf{ update:} Instead of recomputing $d_{\\text{approx}} = \\lfloor (kn+1)/e \\rfloor$ from scratch each iteration (costly BigInt division), maintains a running quotient/remainder: increments $d_{\\text{approx}}$ by $q = (d_{\\text{approx}} + n) \\div e$ and tracks a running remainder, updating both additively per step.
 \\end{itemize}
 
 \\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,usageGuide:`This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.
@@ -2606,7 +2606,7 @@ _attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e)return Promise.resolve(null);try{
 \\item \\textbf{k-based FLT approach (frontendCheck):} For $e \\leq 10^6$, directly computes $n \\bmod pCandidate$ which is $\\sim 400\\times$ cheaper than GCD (0.095 $\\mu$s vs 39 $\\mu$s). The modular reduction $2^{e \\cdot d_p} - 2 \\equiv 0 \\pmod{p}$ is equivalent to $p \\mid (2^{e \\cdot d_p} - 2)$.
 \\end{itemize}
 
-\\textbf{References:} Boneh \\textit{et al.}, "Cryptanalysis of RSA with Small CRT Exponents", CRYPTO 1998; Cohn \\& Heninger, ePrint 2011/436`,usageGuide:`This attack recovers the private key when either dp or dq (the CRT exponents) is small.
+\\textbf{References:} Boneh \\textit{et al.}, "Cryptanalysis of RSA with Small CRT Exponents", CRYPTO 1998; Cohn & Heninger, ePrint 2011/436`,usageGuide:`This attack recovers the private key when either dp or dq (the CRT exponents) is small.
 
 How to use:
 1. You have n, e, and know that dp (d mod p-1) is small (< bound)
@@ -2943,7 +2943,7 @@ When $a < 0$, compute $c_1^a = (c_1^{-1})^{|a|} \\pmod{n}$. Same for $b < 0$.
 
 \\textbf{Explanation:} Bezout's identity guarantees integers $a, b$ satisfying $a e_1 + b e_2 = 1$ because $\\gcd(e_1, e_2) = 1$. Multiplying $c_1^a \\cdot c_2^b$ yields $m^{a e_1 + b e_2} = m$. This is why coprime exponents are essential: if $\\gcd(e_1, e_2) > 1$, the GCD may directly factor $n$.
 
-\\textbf{References:} Simmons \\& Norris, 1977; Boneh, "Twenty Years of Attacks on RSA," 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e1&&!!e.e2&&!!e.c1&&!!e.c2},{id:`coppersmith-short-pad`,name:`Coppersmith Short Pad Attack`,category:`Partial Key / Lattice`,description:`Recovers messages m1, m2 from two ciphertexts with small padding differences via integer e-th root. Use when same message is encrypted twice with small random pads (e=3, no modular wrap-around).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.c1||!e.c2?`print("ERROR: Missing required inputs (n, e, c1, c2)")
+\\textbf{References:} Simmons & Norris, 1977; Boneh, "Twenty Years of Attacks on RSA," 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e1&&!!e.e2&&!!e.c1&&!!e.c2},{id:`coppersmith-short-pad`,name:`Coppersmith Short Pad Attack`,category:`Partial Key / Lattice`,description:`Recovers messages m1, m2 from two ciphertexts with small padding differences via integer e-th root. Use when same message is encrypted twice with small random pads (e=3, no modular wrap-around).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.c1||!e.c2?`print("ERROR: Missing required inputs (n, e, c1, c2)")
 print("COPPERSMITH_SHORT_PAD=FAILED")`:`def _attack():
     try:
         out = []
@@ -3321,54 +3321,55 @@ How to use:
 3. Provide n, e, c, and the full list of oracle bits (from query 0 to query log2(n))
 4. The attack accumulates bits into a binary fraction to recover the message
 
-Tip: You need roughly n.bit_length() oracle responses for full recovery. Each bit halves the uncertainty.`,priority:`medium`,applicableCheck:e=>!!(e.n&&e.e&&e.c&&e.oracle_responses)},{id:`rsa-crt-fault`,name:`RSA-CRT Fault Attack (Bellcore)`,category:`Message / Protocol`,description:`Factors n from a single faulty CRT signature via gcd. Use when a transient fault corrupts one of two CRT exponentiations during signing.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`m`,label:`m (message)`,placeholder:`Enter message m...`,multiline:!0,rows:3},{name:`sig_valid`,label:`Valid signature`,placeholder:`Enter valid signature...`,multiline:!0,rows:3},{name:`sig_faulty`,label:`Faulty signature`,placeholder:`Enter faulty signature...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.m||!e.sig_valid||!e.sig_faulty?`print("ERROR: Missing required inputs (n, e, m, sig_valid, sig_faulty)")
+Tip: You need roughly n.bit_length() oracle responses for full recovery. Each bit halves the uncertainty.`,priority:`medium`,applicableCheck:e=>!!(e.n&&e.e&&e.c&&e.oracle_responses)},{id:`rsa-crt-fault`,name:`RSA-CRT Fault Attack (Bellcore)`,category:`Message / Protocol`,description:`Factors n from a single faulty CRT signature via gcd. Use when a transient fault corrupts one of two CRT exponentiations during signing.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`m`,label:`m (message)`,placeholder:`Enter message m...`,multiline:!0,rows:3},{name:`sig_valid`,label:`Valid signature`,placeholder:`Enter valid signature...`,multiline:!0,rows:3},{name:`sig_faulty`,label:`Faulty signature`,placeholder:`Enter faulty signature...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.m||!e.sig_faulty?`print("ERROR: Missing required inputs (n, e, m, sig_faulty)")
 print("RSA_CRT_FAULT=FAILED")`:`def _attack():
     try:
+        out = []
         n = Integer(${e.n})
         e = Integer(${e.e})
         m = Integer(${e.m})
-        sig_valid = Integer(${e.sig_valid})
         sig_faulty = Integer(${e.sig_faulty})
-        print(f"RSA-CRT Fault Attack (Bellcore Attack)")
-        print(f"n = {n}")
-        print(f"Valid sig: {sig_valid}")
-        # Verify the valid signature
-        v_valid = power_mod(sig_valid, e, n)
-        print(f"sig_valid^e mod n = {v_valid}")
-        print(f"Expected m = {m}")
-        print(f"Valid sig check: {v_valid == m}")
-        # Faulty signature: correct mod one prime, wrong mod the other
-        # gcd(sig_faulty^e - m, n) reveals the factor
+        sig_valid_str = "${(e.sig_valid||``).trim()}"
+        if sig_valid_str:
+            sig_valid = Integer(sig_valid_str)
+        out.append("RSA-CRT Fault Attack (Bellcore Attack)")
+        out.append(f"n = {n}")
+        if sig_valid_str:
+            out.append(f"Valid sig: {sig_valid}")
+            v_valid = power_mod(sig_valid, e, n)
+            out.append(f"sig_valid^e mod n = {v_valid}")
+            out.append(f"Expected m = {m}")
+            out.append(f"Valid sig check: {v_valid == m}")
         sig_faulty_e = power_mod(sig_faulty, e, n)
-        print(f"sig_faulty^e mod n = {sig_faulty_e}")
-        # Compute GCD
+        out.append(f"sig_faulty^e mod n = {sig_faulty_e}")
         g = gcd(sig_faulty_e - m, n)
-        print(f"gcd(sig_faulty^e - m, n) = {g}")
+        out.append(f"gcd(sig_faulty^e - m, n) = {g}")
         if 1 < g < n:
             p = g
             q = n // g
-            print(f"\\nFactorization found!")
-            print(f"Verification: p * q = {p * q}")
-            print(f"p is prime: {p.is_prime()}")
-            print(f"q is prime: {q.is_prime()}")
-            print(f"p = {p}")
-            print(f"q = {q}")
-            # Compute private key
+            out.append(f"\\nFactorization found!")
+            out.append(f"Verification: p * q = {p * q}")
+            out.append(f"p is prime: {p.is_prime()}")
+            out.append(f"q is prime: {q.is_prime()}")
+            out.append(f"p = {p}")
+            out.append(f"q = {q}")
             phi = (p - 1) * (q - 1)
             d = inverse_mod(e, phi)
-            print(f"\\nPrivate exponent d = {d}")
-            # Verify with valid signature
+            out.append(f"\\nPrivate exponent d = {d}")
             sig_recovered = power_mod(m, d, n)
-            print(f"Recovered sig: {sig_recovered}")
-            print(f"Matches valid sig: {sig_recovered == sig_valid}")
-            print()
-            print("RSA_CRT_FAULT=SUCCESS")
+            out.append(f"Recovered sig: {sig_recovered}")
+            if sig_valid_str:
+                out.append(f"Matches valid sig: {sig_recovered == sig_valid}")
+            out.append("")
+            out.append("RSA_CRT_FAULT=SUCCESS")
         else:
-            print("GCD did not reveal a factor. The fault may not be a CRT fault.")
-            print("RSA_CRT_FAULT=FAILED")
+            out.append("GCD did not reveal a factor. The fault may not be a CRT fault.")
+            out.append("RSA_CRT_FAULT=FAILED")
+        print("\\n".join(out))
     except Exception as e:
-        print(f"ERROR: {e}")
-        print("RSA_CRT_FAULT=FAILED")
+        out.append(f"ERROR: {e}")
+        out.append("RSA_CRT_FAULT=FAILED")
+        print("\\n".join(out))
     #
 _attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.m||!e.sig_faulty)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.m),i=O(M(BigInt(e.sig_faulty),n,t)-r,t);if(i>1n&&i<t){let e=t/i,r=j(n,(i-1n)*(e-1n)),a=r?`\nPrivate exponent d = ${r}`:``;return Promise.resolve(`Factor found!\np = ${i}\nq = ${e}${a}\nRSA_CRT_FAULT=SUCCESS`)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} A single faulty CRT signature $s'$ on a known message $m$ reveals the factorization of $n = pq$ via $\\gcd(s'^e - m, n)$.
 
@@ -3399,7 +3400,7 @@ How to use:
 
 Required: n, e, m (the signed message as an integer), sig_valid, sig_faulty
 
-Tip: The two signatures must be from the SAME message using the SAME key. The fault must affect only one of the two CRT exponentiations.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.m&&!!e.sig_valid&&!!e.sig_faulty},{id:`non-coprime-exp`,name:`Non-Coprime Exponent Attack`,category:`Message / Protocol`,description:`Resolves multiple plaintexts when gcd(e, phi(n)) > 1 using known p and q factors. Use after factoring n, when public exponent shares a factor with phi(n).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`p`,label:`p (prime factor)`,placeholder:`Enter prime factor p...`,multiline:!0,rows:3,required:!1,tooltip:`Known prime factor of n. Required for e-th root disambiguation.`},{name:`q`,label:`q (prime factor)`,placeholder:`Enter prime factor q...`,multiline:!0,rows:3,required:!1,tooltip:`Known prime factor of n. Required for e-th root disambiguation.`}],sageTemplate:e=>!e.n||!e.e||!e.c?`print("ERROR: Missing required inputs (n, e, c)")
+Tip: The two signatures must be from the SAME message using the SAME key. The fault must affect only one of the two CRT exponentiations.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.m&&!!e.sig_faulty},{id:`non-coprime-exp`,name:`Non-Coprime Exponent Attack`,category:`Message / Protocol`,description:`Resolves multiple plaintexts when gcd(e, phi(n)) > 1 using known p and q factors. Use after factoring n, when public exponent shares a factor with phi(n).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`p`,label:`p (prime factor)`,placeholder:`Enter prime factor p...`,multiline:!0,rows:3,required:!1,tooltip:`Known prime factor of n. Required for e-th root disambiguation.`},{name:`q`,label:`q (prime factor)`,placeholder:`Enter prime factor q...`,multiline:!0,rows:3,required:!1,tooltip:`Known prime factor of n. Required for e-th root disambiguation.`}],sageTemplate:e=>!e.n||!e.e||!e.c?`print("ERROR: Missing required inputs (n, e, c)")
 print("NON_COPRIME_EXP=FAILED")`:!e.p||!e.q?`print("ERROR: This attack requires p and q to resolve multiple e-th roots. Use factorization attacks first to find p and q.")
 print("NON_COPRIME_EXP=FAILED")`:`def _attack():
     try:
@@ -3691,7 +3692,7 @@ print("BLEICHENBACHER_SIG=FAILED")`:`def _attack():
         print(f"ERROR: {ex}")
         print("BLEICHENBACHER_SIG=FAILED")
     #
-_attack()`,proof:`\\textbf{Theorem:} When $e = 3$ and the verifier accepts trailing garbage bytes after the hash, a valid PKCS\\#1 v1.5 signature can be forged by taking the integer cube root of a crafted padding structure.
+_attack()`,proof:`\\textbf{Theorem:} When $e = 3$ and the verifier accepts trailing garbage bytes after the hash, a valid PKCS#1 v1.5 signature can be forged by taking the integer cube root of a crafted padding structure.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -3707,7 +3708,7 @@ S^3 &= \\text{target} + \\varepsilon, \\quad 0 \\leq \\varepsilon < 3S^2
 \\end{align*}
 The error $\\varepsilon$ from rounding up is bounded by $3S^2$. Garbage bytes at the end of the padding absorb this error, keeping the $\\text{0x0001FF}^8\\text{00}H$ prefix intact.
 
-\\textbf{Explanation:} PKCS\\#1 v1.5 signature padding places the hash after a fixed $\\text{0x0001FF\\ldots FF00}$ marker. A lax verifier checks only the marker and hash position, ignoring any bytes after the hash. By crafting a target integer with the correct prefix and enough trailing garbage bytes, then taking its cube root, we obtain $S$ such that $S^3$ has the correct padding and hash — the cube root rounding error is harmlessly absorbed into the garbage. This only works for $e = 3$ because the cube root is computable over integers and the error is small.
+\\textbf{Explanation:} PKCS#1 v1.5 signature padding places the hash after a fixed $\\text{0x0001FF\\ldots FF00}$ marker. A lax verifier checks only the marker and hash position, ignoring any bytes after the hash. By crafting a target integer with the correct prefix and enough trailing garbage bytes, then taking its cube root, we obtain $S$ such that $S^3$ has the correct padding and hash — the cube root rounding error is harmlessly absorbed into the garbage. This only works for $e = 3$ because the cube root is computable over integers and the error is small.
 
 \\textbf{References:} D. Bleichenbacher, Crypto 2006 rump session presentation`,usageGuide:`This attack forges RSA signatures by exploiting that s^3 < n makes the cube root computable over integers.
 
@@ -4417,14 +4418,14 @@ n &= (k_1 M + r_1)(k_2 M + r_2) \\\\
 n &\\equiv r_1 r_2 \\pmod{M} \\quad \\text{(both remainders in }\\mathcal{R}\\text{)} \\\\
 \\text{If } n \\cdot r_2^{-1} \\bmod M &\\in \\mathcal{R}\\text{, then } r_1 = n \\cdot r_2^{-1} \\bmod M \\\\
 f(x) &= Mx + r_1 \\equiv 0 \\pmod{p} \\quad\\text{with root } x = k_1 \\\\
-|k_1| &< \\sqrt{n}/M < p \\quad\\text{(since } M > n^{1/4}\\text{)} \\\\
-\\text{Coppersmith (} \\beta = 0.5, X = \\sqrt{n}/M \\text{)} &\\implies k_1 \\text{ found in poly-time} \\\\
+|k_1| &< 2\\sqrt{n}/M' < p \\quad\\text{(safety margin factor 2)} \\\\
+\\text{Coppersmith (} \\beta = 0.5, X = 2\\sqrt{n}/M' \\text{)} &\\implies k_1 \\text{ found in poly-time} \\\\
 p &= M \\cdot k_1 + r_1 \\qed
 \\end{align*}
 
-\\textbf{Explanation:} The Infineon RSA key generator had a bug: it generated primes by starting with a random $k$, computing $p = k \\cdot M + (65537^i \\bmod M)$, and testing primality. Since $M$ is large (product of many small primes), the $k$ values are small (often $k < \\sqrt{n}/M \\ll n^{0.5}$), making $p$'s high bits predictable. Coppersmith's theorem says we can find small roots of $f(x) = Mx + r \\bmod p$ when $|x| < p^\\beta$. With $\\beta = 0.5$ and $X = \\sqrt{n}/M$, the bounded root $k$ is recovered via lattice reduction (LLL). This attack factored 512-bit keys in minutes and 1024-bit keys in hours in practice.
+\\textbf{Explanation:} The Infineon RSA key generator had a bug: it generated primes by starting with a random $k$, computing $p = k \\cdot M + (65537^i \\bmod M)$, and testing primality. Since $M$ is large (product of many small primes), the $k$ values are small (often $k < \\sqrt{n}/M \\ll n^{0.5}$), making $p$'s high bits predictable. Coppersmith's theorem says we can find small roots of $f(x) = Mx + r \\bmod p$ when $|x| < p^\\beta$. With $\\beta = 0.5$ and $X = 2\\sqrt{n}/M'$ (factor 2 safety margin), the bounded root $k$ is recovered via lattice reduction (LLL). This attack factored 512-bit keys in minutes and 1024-bit keys in hours in practice.
 
-\\textbf{Optimization:} The greedy M' search reduces the search space by removing prime factors from M that contribute the least order-reduction per M-reduction, yielding a smaller Coppersmith bound $X = \\sqrt{n}/M'$.
+\\textbf{Optimization:} The greedy M' search reduces the search space by removing prime factors from M that contribute the least order-reduction per M-reduction, yielding a smaller Coppersmith bound $X = 2\\sqrt{n}/M'$.
 
 \\textbf{References:} M. Nemec, M. Sys, P. Svenda, D. Klinec, V. Matyas, "The Return of Coppersmith's Attack: Practical Factorization of Widely Used RSA Moduli", CCS 2017`,priority:`high`,applicableCheck:e=>!!e.n},{id:`nitros`,name:`Nitros / ROCA Variant`,category:`Advanced`,description:`Factors RSA keys with generalized ROCA primes p = k·M + (a^i mod M) for arbitrary generator a. Use when prime generation follows a ROCA-like pattern with non-standard base.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`base`,label:`Base (default 65537)`,placeholder:`65537`,required:!1,multiline:!1}],sageTemplate:e=>`def _attack():
     try:
@@ -4577,13 +4578,13 @@ _attack()`,proof:`\\textbf{Theorem:} Generalized ROCA primes have the form $p = 
 \\begin{align*}
 n &\\equiv r_1 r_2 \\pmod{M}, \\quad r_1, r_2 \\in \\mathcal{R} \\\\
 n^{\\text{ord}_M(a)} &\\equiv r_1^{\\text{ord}_M(a)} r_2^{\\text{ord}_M(a)} \\equiv 1 \\cdot 1 = 1 \\pmod{M} \\\\
-\\text{Check: } n^{\\text{ord}_M(a)} \\equiv 1 \\pmod{M} &\\implies \\text{primes are Nitros-form} \\\\
+\\text{Check: } n^{\\text{ord}_M(a)} \\equiv 1 \\pmod{M} &\\implies n \\bmod M \\in \\langle a \\rangle \\text{ -- consistent with Nitros-form primes} \\\\
 f(x) &= Mx + r_1 \\equiv 0 \\pmod{p} \\quad\\text{with root } x = k_1 \\\\
 |k_1| &< \\sqrt{n}/M < p \\quad\\text{(since } M > n^{1/4}\\text{)} \\\\
 \\text{Coppersmith (} \\beta = 0.5, X = \\sqrt{n}/M \\text{)} &\\implies p = M \\cdot k_1 + r_1 \\qed
 \\end{align*}
 
-\\textbf{Explanation:} The Nitros attack extends ROCA to arbitrary generator bases. Instead of $65537$, any base $a$ can generate the remainder set. The key insight is that the subgroup generated by $a$ modulo $M$ has size $\\text{ord}_M(a)$, and this is typically small enough to enumerate. To test if $n$ is vulnerable, compute $n^{\\text{ord}_M(a)} \\bmod M$ -- if the result is 1, $n$ is in the subgroup and the primes are Nitros-form. The recovery then proceeds identically to ROCA: use Coppersmith to find $k_1$, the small root of $f(x) = Mx + r_1$ modulo $p$.
+\\textbf{Explanation:} The Nitros attack extends ROCA to arbitrary generator bases. Instead of $65537$, any base $a$ can generate the remainder set. The key insight is that the subgroup generated by $a$ modulo $M$ has size $\\text{ord}_M(a)$, and this is typically small enough to enumerate. To test if $n$ is vulnerable, compute $n^{\\text{ord}_M(a)} \\bmod M$ -- if the result is 1, $n$ is in the subgroup and the primes are Nitros-form. The recovery then proceeds identically to ROCA: use Coppersmith to find $k_1$, the small root of $f(x) = Mx + r_1$ modulo $p$. However, this implementation uses a fixed $M$ (product of first 16 primes, $\\approx 2^{65}$). For $n > 256$-bit, the Coppersmith bound is capped at $100000$, so only keys with very small $k$ values ($< 2^{17}$) can be factored.
 
 \\textbf{References:} M. Nemec et al., "The Return of Coppersmith's Attack", CCS 2017; Nitros ROCA variant analysis, 2018`,priority:`medium`,applicableCheck:e=>!!e.n},{id:`factordb-lookup`,name:`FactorDB Lookup`,category:`Advanced`,description:`Looks up factorization of n in the FactorDB database with local fallbacks (trial division, ECM, Pollard's rho). Use as the first step for any unknown RSA modulus.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],frontendCheck:async e=>{let t=await i(e.n);return t.status===`FF`&&t.factors&&t.factors.length>=2?a(t)+`
 FACTORDB_LOOKUP=SUCCESS`:null},sageTemplate:e=>`def _attack():
@@ -4734,47 +4735,49 @@ _attack()`,proof:`\\textbf{Theorem:} FactorDB provides instant factorization for
 
 \\textbf{Explanation:} FactorDB is the internet's largest database of integer factorizations, containing billions of entries. The attack first queries FactorDB via a CORS proxy. If the modulus has been factored before (common for CTF challenges), the result is instant. If not, SageMathCell falls back to local factorization methods: trial division for small factors, ECM for medium-sized factors, and Pollard's rho for larger ones. This makes FactorDB Lookup an excellent first diagnostic step for any unknown RSA modulus.
 
-\\textbf{References:} https://factordb.com`,priority:`low`,applicableCheck:e=>!!e.n},{id:`known-plaintext`,name:`Known Plaintext Attack`,category:`Message / Protocol`,description:`Recovers m via integer e-th root when m^e < n, or via known-prefix brute-force for up to 24 unknown bits. Use when plaintext is small or partially known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`known_prefix`,label:`Known plaintext prefix`,placeholder:`e.g., flag{`,multiline:!1},{name:`unknown_bits`,label:`Unknown bits after prefix`,placeholder:`32`,multiline:!1}],sageTemplate:e=>!e.n||!e.c?`print("ERROR: n and c are required")
+\\textbf{References:} https://factordb.com`,priority:`low`,applicableCheck:e=>!!e.n},{id:`known-plaintext`,name:`Known Plaintext Attack`,category:`Message / Protocol`,description:`Recovers m via integer e-th root when m^e < n, or via known-prefix brute-force for up to 24 unknown bits. Use when plaintext is small or partially known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`known_prefix`,label:`Known plaintext prefix`,placeholder:`e.g., flag{`,multiline:!1},{name:`unknown_bits`,label:`Unknown bits after prefix`,placeholder:`24`,multiline:!1}],sageTemplate:e=>!e.n||!e.c?`print("ERROR: n and c are required")
 print("KNOWN_PLAINTEXT=FAILED")`:`def _attack():
     try:
+        out = []
         n = Integer(${e.n})
         e_val = "${e.e}".strip()
         e = Integer(e_val) if e_val else Integer(65537)
         c = Integer(${e.c})
         known_prefix = "${e.known_prefix||``}"
-        unknown_bits = Integer("${(e.unknown_bits||`32`).trim()}")
-        print(f"Known plaintext attack on RSA")
-        print(f"n = {n} ({n.nbits()} bits)")
-        print(f"e = {e}")
-        print(f"c = {c}")
+        unknown_bits = Integer("${(e.unknown_bits||`24`).trim()}")
+        out.append(f"Known plaintext attack on RSA")
+        out.append(f"n = {n} ({n.nbits()} bits)")
+        out.append(f"e = {e}")
+        out.append(f"c = {c}")
         # Strategy 1: Try direct integer e-th root of c
         # Works when m^e < n (no modular wrap-around), which is common for e=3
         try:
             m_int_root, is_exact = c.nth_root(int(e), truncate_mode=True)
             if is_exact and pow(int(m_int_root), int(e), int(n)) == c:
-                print(f"RECOVERED via integer e-th root! m = {m_int_root}")
+                out.append(f"RECOVERED via integer e-th root! m = {m_int_root}")
                 try:
                     m_hex = hex(Integer(m_int_root))[2:]
                     if len(m_hex) % 2 != 0:
                         m_hex = '0' + m_hex
-                    print(f"m as bytes: {bytes.fromhex(m_hex)}")
+                    out.append(f"m as bytes: {bytes.fromhex(m_hex)}")
                 except Exception:
                     pass
-                print("KNOWN_PLAINTEXT=SUCCESS")
+                out.append("KNOWN_PLAINTEXT=SUCCESS")
+                print("\\n".join(out))
                 return
         except Exception:
             pass
         # Strategy 2: Known prefix + brute-force for small unknown bits
         if known_prefix:
-            print(f"Known prefix: '{known_prefix}'")
-            print(f"Unknown bits: {unknown_bits}")
+            out.append(f"Known prefix: '{known_prefix}'")
+            out.append(f"Unknown bits: {unknown_bits}")
             prefix_bytes = known_prefix.encode('utf-8')
             prefix_int = Integer(int.from_bytes(prefix_bytes, 'big'))
-            print(f"Prefix as integer: {prefix_int}")
-            print(f"Prefix byte length: {len(prefix_bytes)}")
+            out.append(f"Prefix as integer: {prefix_int}")
+            out.append(f"Prefix byte length: {len(prefix_bytes)}")
             shift = 1 << int(unknown_bits)
             if unknown_bits <= 24:
-                print(f"Brute forcing 2^{unknown_bits} possibilities...")
+                out.append(f"Brute forcing 2^{unknown_bits} possibilities...")
                 found = False
                 if e == 3:
                     # Horner evaluation: (prefix*shift + k)^3 mod n
@@ -4793,49 +4796,49 @@ print("KNOWN_PLAINTEXT=FAILED")`:`def _attack():
                         val = (val + k2 * k_mod) % n_int_h
                         if val == c_int:
                             m_try = prefix_int * shift + k
-                            print(f"FOUND! m = {m_try}")
+                            out.append(f"FOUND! m = {m_try}")
                             try:
                                 m_hex = hex(m_try)[2:]
                                 if len(m_hex) % 2 != 0:
                                     m_hex = '0' + m_hex
-                                print(f"m as bytes: {bytes.fromhex(m_hex)}")
+                                out.append(f"m as bytes: {bytes.fromhex(m_hex)}")
                             except:
                                 pass
-                            print("KNOWN_PLAINTEXT=SUCCESS")
+                            out.append("KNOWN_PLAINTEXT=SUCCESS")
                             found = True
                             break
                 else:
                     for k in range(shift):
                         m_try = prefix_int * shift + k
                         if pow(int(m_try), int(e), int(n)) == c:
-                            print(f"FOUND! m = {m_try}")
+                            out.append(f"FOUND! m = {m_try}")
                             try:
                                 m_hex = hex(m_try)[2:]
                                 if len(m_hex) % 2 != 0:
                                     m_hex = '0' + m_hex
-                                print(f"m as bytes: {bytes.fromhex(m_hex)}")
+                                out.append(f"m as bytes: {bytes.fromhex(m_hex)}")
                             except:
                                 pass
-                            print("KNOWN_PLAINTEXT=SUCCESS")
+                            out.append("KNOWN_PLAINTEXT=SUCCESS")
                             found = True
                             break
                 if not found:
-                    print("Brute force exhausted without finding match.")
-                    print("KNOWN_PLAINTEXT=FAILED")
+                    out.append("Brute force exhausted without finding match.")
+                    out.append("KNOWN_PLAINTEXT=FAILED")
             else:
-                bound = n.nbits() // e
-                print(f"Unknown portion ({unknown_bits} bits) too large for brute force.")
-                print(f"Maximum feasible unknown bits for e={e} and n={n.nbits()} bits: {bound}")
-                print("Consider: Coppersmith's method, factordb lookup, or other methods.")
-                print("KNOWN_PLAINTEXT=FAILED")
+                out.append(f"Unknown portion ({unknown_bits} bits) too large for brute force.")
+                out.append(f"Brute-force limit is 24 bits (found {unknown_bits}) — try Coppersmith's method or a different approach.")
+                out.append("KNOWN_PLAINTEXT=FAILED")
         else:
-            print("No known prefix provided.")
-            print("Provide the known portion of the plaintext to attempt recovery.")
-            print("KNOWN_PLAINTEXT=FAILED")
+            out.append("No known prefix provided.")
+            out.append("Provide the known portion of the plaintext to attempt recovery.")
+            out.append("KNOWN_PLAINTEXT=FAILED")
+        print("\\n".join(out))
     except Exception as ex:
-        print(f"Error: {ex}")
-        print("KNOWN_PLAINTEXT=FAILED")
-_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.c)return Promise.resolve(null);try{let n=-1,r=BigInt(e.n),i=e.e?.trim()||`65537`,a=BigInt(i),o=BigInt(e.c),s=N(o,a);if(s**a===o&&M(s,a,r)===o){t?.(100);try{let e=s.toString(16),t=e.length%2?`0`+e:e,n=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),r=new TextDecoder().decode(n);return Promise.resolve(`RECOVERED via integer e-th root! m = ${s}\nm as bytes: ${r}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`RECOVERED via integer e-th root! m = ${s}\nKNOWN_PLAINTEXT=SUCCESS`)}}let c=e.known_prefix||``,l=(e.unknown_bits||`32`).trim(),u=parseInt(l,10);if(c&&u<=24){let e=new TextEncoder().encode(c),i=0n;for(let t of e)i=(i<<8n)+BigInt(t);let s=1n<<BigInt(u),l=Number(s);if(a===3n){let e=(i<<BigInt(u))%r,a=M(e,3n,r),s=3n*e*e%r,c=3n*e%r;for(let e=0;e<l;e++){if(t&&l>1e3){let r=Math.round(e*100/l);r!==n&&(n=r,t(r,`k = ${e.toLocaleString()} / ${l.toLocaleString()}`))}let d=BigInt(e)%r,f=d*d%r;if((((a+s*d)%r+c*f)%r+f*d)%r===o){let n=(i<<BigInt(u))+BigInt(e);t?.(100);try{let e=n.toString(16),t=e.length%2?`0`+e:e,r=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),i=new TextDecoder().decode(r);return Promise.resolve(`FOUND! m = ${n}\nm as bytes: ${i}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`FOUND! m = ${n}\nKNOWN_PLAINTEXT=SUCCESS`)}}}}else for(let e=0;e<l;e++){if(t&&l>1e3){let r=Math.round(e*100/l);r!==n&&(n=r,t(r,`k = ${e.toLocaleString()} / ${l.toLocaleString()}`))}let s=(i<<BigInt(u))+BigInt(e);if(M(s,a,r)===o){t?.(100);try{let e=s.toString(16),t=e.length%2?`0`+e:e,n=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),r=new TextDecoder().decode(n);return Promise.resolve(`FOUND! m = ${s}\nm as bytes: ${r}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`FOUND! m = ${s}\nKNOWN_PLAINTEXT=SUCCESS`)}}}return Promise.resolve(null)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} When $m^e < n$, the plaintext is recovered by taking the integer e-th root of $c$. When high-order bytes of $m$ are known, brute-force over the unknown low bits recovers the full plaintext.
+        out.append(f"Error: {ex}")
+        out.append("KNOWN_PLAINTEXT=FAILED")
+        print("\\n".join(out))
+_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.c)return Promise.resolve(null);try{let n=-1,r=BigInt(e.n),i=e.e?.trim()||`65537`,a=BigInt(i),o=BigInt(e.c),s=N(o,a);if(s**a===o&&M(s,a,r)===o){t?.(100);try{let e=s.toString(16),t=e.length%2?`0`+e:e,n=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),r=new TextDecoder().decode(n);return Promise.resolve(`RECOVERED via integer e-th root! m = ${s}\nm as bytes: ${r}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`RECOVERED via integer e-th root! m = ${s}\nKNOWN_PLAINTEXT=SUCCESS`)}}let c=e.known_prefix||``,l=(e.unknown_bits||`24`).trim(),u=parseInt(l,10);if(c&&u<=24){let e=new TextEncoder().encode(c),i=0n;for(let t of e)i=(i<<8n)+BigInt(t);let s=1n<<BigInt(u),l=Number(s);if(a===3n){let e=(i<<BigInt(u))%r,a=M(e,3n,r),s=3n*e*e%r,c=3n*e%r;for(let e=0;e<l;e++){if(t&&l>1e3){let r=Math.round(e*100/l);r!==n&&(n=r,t(r,`k = ${e.toLocaleString()} / ${l.toLocaleString()}`))}let d=BigInt(e)%r,f=d*d%r;if((((a+s*d)%r+c*f)%r+f*d)%r===o){let n=(i<<BigInt(u))+BigInt(e);t?.(100);try{let e=n.toString(16),t=e.length%2?`0`+e:e,r=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),i=new TextDecoder().decode(r);return Promise.resolve(`FOUND! m = ${n}\nm as bytes: ${i}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`FOUND! m = ${n}\nKNOWN_PLAINTEXT=SUCCESS`)}}}}else for(let e=0;e<l;e++){if(t&&l>1e3){let r=Math.round(e*100/l);r!==n&&(n=r,t(r,`k = ${e.toLocaleString()} / ${l.toLocaleString()}`))}let s=(i<<BigInt(u))+BigInt(e);if(M(s,a,r)===o){t?.(100);try{let e=s.toString(16),t=e.length%2?`0`+e:e,n=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),r=new TextDecoder().decode(n);return Promise.resolve(`FOUND! m = ${s}\nm as bytes: ${r}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`FOUND! m = ${s}\nKNOWN_PLAINTEXT=SUCCESS`)}}}return Promise.resolve(null)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} When $m^e < n$, the plaintext is recovered by taking the integer e-th root of $c$. When high-order bytes of $m$ are known, brute-force over the unknown low bits recovers the full plaintext.
 
 \\textbf{Strategy 1: Integer e-th Root}
 \\begin{align*}
@@ -4973,55 +4976,58 @@ MULTI_PRIME_GCD=FAILED`;let n=t.split(`
         print("PHI_LEAK=FAILED")
         return
     try:
+        out = []
         try:
             n = Integer(${e.n})
             phi = Integer(${e.phi})
-            print("Phi(n) leak attack")
-            print(f"n = {n}")
-            print(f"phi(n) = {phi}")
-            print()
+            out.append("Phi(n) leak attack")
+            out.append(f"n = {n}")
+            out.append(f"phi(n) = {phi}")
+            out.append("")
             # For n = p*q: phi(n) = (p-1)(q-1) = pq - p - q + 1 = n - p - q + 1
             # So: p + q = n - phi + 1
             # And: p * q = n
             # We solve: x^2 - (p+q)x + pq = 0
             # i.e.: x^2 - (n - phi + 1)x + n = 0
             sum_pq = n - phi + 1
-            print(f"p + q = {sum_pq}")
-            print(f"p * q = {n}")
-            print()
+            out.append(f"p + q = {sum_pq}")
+            out.append(f"p * q = {n}")
+            out.append("")
             # Solve quadratic: x^2 - sum_pq * x + n = 0
             discriminant = sum_pq**2 - 4*n
-            print(f"Discriminant = {discriminant}")
+            out.append(f"Discriminant = {discriminant}")
             if discriminant < 0:
-                print("ERROR: Negative discriminant. phi(n) is inconsistent with n.")
-                print("PHI_LEAK=FAILED")
+                out.append("ERROR: Negative discriminant. phi(n) is inconsistent with n.")
+                out.append("PHI_LEAK=FAILED")
             elif discriminant == 0:
-                print("ERROR: p = q. n is a perfect square (not valid RSA).")
-                print("PHI_LEAK=FAILED")
+                out.append("ERROR: p = q. n is a perfect square (not valid RSA).")
+                out.append("PHI_LEAK=FAILED")
             else:
                 sqrt_disc = isqrt(discriminant)
                 if sqrt_disc**2 == discriminant:
                     p = (sum_pq - sqrt_disc) // 2
                     q = (sum_pq + sqrt_disc) // 2
-                    print(f"SUCCESS! Factors recovered:")
-                    print(f"Verification: p * q = {p * q}")
-                    print(f"Verification: (p-1)*(q-1) = {(p-1)*(q-1)}")
-                    print(f"p = {p}")
-                    print(f"q = {q}")
-                    print()
-                    print("PHI_LEAK=SUCCESS")
+                    out.append(f"SUCCESS! Factors recovered:")
+                    out.append(f"Verification: p * q = {p * q}")
+                    out.append(f"Verification: (p-1)*(q-1) = {(p-1)*(q-1)}")
+                    out.append(f"p = {p}")
+                    out.append(f"q = {q}")
+                    out.append("")
+                    out.append("PHI_LEAK=SUCCESS")
                 else:
-                    print(f"Discriminant is not a perfect square: {discriminant}")
-                    print("phi(n) may be incorrect, or n has more than 2 prime factors.")
-                    print("PHI_LEAK=FAILED")
+                    out.append(f"Discriminant is not a perfect square: {discriminant}")
+                    out.append("phi(n) may be incorrect, or n has more than 2 prime factors.")
+                    out.append("PHI_LEAK=FAILED")
+            print("\\n".join(out))
         except Exception as ex:
-            print(f"ERROR: {ex}")
-            print("PHI_LEAK=FAILED")
+            out.append(f"ERROR: {ex}")
+            out.append("PHI_LEAK=FAILED")
+            print("\\n".join(out))
         #
     except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("PHI_LEAK=FAILED")
-_attack()`},frontendCheck:async e=>{if(!e.n||!e.phi)return null;try{let t=BigInt(e.n),n=BigInt(e.phi),r=t-n+1n,i=r*r-4n*t;if(i<0n)return`phi(n) is inconsistent with n.\nDiscriminant is negative: ${i}`;let a=k(i);if(a*a!==i)return null;let o=(r-a)/2n,s=(r+a)/2n;if(o*s!==t)return null;let c=(o-1n)*(s-1n);return[`Phi(n) Leak Attack (browser-side, BigInt)`,`n = ${t}`,`phi(n) = ${n}`,`p + q = ${r}`,`Discriminant = ${i}`,``,`Factors recovered:`,`Verification: p * q = ${o*s}`,`Verification: (p-1)*(q-1) = ${c}`,`p = ${o}`,`q = ${s}`,`phi(n) matches: ${c===n?`YES`:`NO`}`,``,`PHI_LEAK=SUCCESS`].join(`
+        out = [f"ERROR: {ex}", "PHI_LEAK=FAILED"]
+        print("\\n".join(out))
+_attack()`},frontendCheck:async e=>{if(!e.n||!e.phi)return null;try{let t=BigInt(e.n),n=BigInt(e.phi),r=t-n+1n,i=r*r-4n*t;if(i<0n)return null;let a=k(i);if(a*a!==i)return null;let o=(r-a)/2n,s=(r+a)/2n;if(o*s!==t)return null;let c=(o-1n)*(s-1n);return[`Phi(n) Leak Attack (browser-side, BigInt)`,`n = ${t}`,`phi(n) = ${n}`,`p + q = ${r}`,`Discriminant = ${i}`,``,`Factors recovered:`,`Verification: p * q = ${o*s}`,`Verification: (p-1)*(q-1) = ${c}`,`p = ${o}`,`q = ${s}`,`phi(n) matches: ${c===n?`YES`:`NO`}`,``,`PHI_LEAK=SUCCESS`].join(`
 `)}catch{return null}},proof:`\\textbf{Theorem:} Knowing $\\phi(n)$ factors $n = pq$ in polynomial time by solving the quadratic $x^2 - (n - \\phi(n) + 1)x + n = 0$.
 
 \\textbf{Setup:}

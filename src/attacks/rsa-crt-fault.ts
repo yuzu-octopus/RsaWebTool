@@ -15,57 +15,58 @@ export const attack: Attack = {
     { name: 'sig_faulty', label: 'Faulty signature', placeholder: 'Enter faulty signature...', multiline: true, rows: 3 },
   ],
   sageTemplate: (vals: Record<string, string>) => {
-    if (!vals.n || !vals.e || !vals.m || !vals.sig_valid || !vals.sig_faulty) {
-      return `print("ERROR: Missing required inputs (n, e, m, sig_valid, sig_faulty)")
+    if (!vals.n || !vals.e || !vals.m || !vals.sig_faulty) {
+      return `print("ERROR: Missing required inputs (n, e, m, sig_faulty)")
 print("RSA_CRT_FAULT=FAILED")`;
     }
     return `def _attack():
     try:
+        out = []
         n = Integer(${vals.n})
         e = Integer(${vals.e})
         m = Integer(${vals.m})
-        sig_valid = Integer(${vals.sig_valid})
         sig_faulty = Integer(${vals.sig_faulty})
-        print(f"RSA-CRT Fault Attack (Bellcore Attack)")
-        print(f"n = {n}")
-        print(f"Valid sig: {sig_valid}")
-        # Verify the valid signature
-        v_valid = power_mod(sig_valid, e, n)
-        print(f"sig_valid^e mod n = {v_valid}")
-        print(f"Expected m = {m}")
-        print(f"Valid sig check: {v_valid == m}")
-        # Faulty signature: correct mod one prime, wrong mod the other
-        # gcd(sig_faulty^e - m, n) reveals the factor
+        sig_valid_str = "${(vals.sig_valid || '').trim()}"
+        if sig_valid_str:
+            sig_valid = Integer(sig_valid_str)
+        out.append("RSA-CRT Fault Attack (Bellcore Attack)")
+        out.append(f"n = {n}")
+        if sig_valid_str:
+            out.append(f"Valid sig: {sig_valid}")
+            v_valid = power_mod(sig_valid, e, n)
+            out.append(f"sig_valid^e mod n = {v_valid}")
+            out.append(f"Expected m = {m}")
+            out.append(f"Valid sig check: {v_valid == m}")
         sig_faulty_e = power_mod(sig_faulty, e, n)
-        print(f"sig_faulty^e mod n = {sig_faulty_e}")
-        # Compute GCD
+        out.append(f"sig_faulty^e mod n = {sig_faulty_e}")
         g = gcd(sig_faulty_e - m, n)
-        print(f"gcd(sig_faulty^e - m, n) = {g}")
+        out.append(f"gcd(sig_faulty^e - m, n) = {g}")
         if 1 < g < n:
             p = g
             q = n // g
-            print(f"\\nFactorization found!")
-            print(f"Verification: p * q = {p * q}")
-            print(f"p is prime: {p.is_prime()}")
-            print(f"q is prime: {q.is_prime()}")
-            print(f"p = {p}")
-            print(f"q = {q}")
-            # Compute private key
+            out.append(f"\\nFactorization found!")
+            out.append(f"Verification: p * q = {p * q}")
+            out.append(f"p is prime: {p.is_prime()}")
+            out.append(f"q is prime: {q.is_prime()}")
+            out.append(f"p = {p}")
+            out.append(f"q = {q}")
             phi = (p - 1) * (q - 1)
             d = inverse_mod(e, phi)
-            print(f"\\nPrivate exponent d = {d}")
-            # Verify with valid signature
+            out.append(f"\\nPrivate exponent d = {d}")
             sig_recovered = power_mod(m, d, n)
-            print(f"Recovered sig: {sig_recovered}")
-            print(f"Matches valid sig: {sig_recovered == sig_valid}")
-            print()
-            print("RSA_CRT_FAULT=SUCCESS")
+            out.append(f"Recovered sig: {sig_recovered}")
+            if sig_valid_str:
+                out.append(f"Matches valid sig: {sig_recovered == sig_valid}")
+            out.append("")
+            out.append("RSA_CRT_FAULT=SUCCESS")
         else:
-            print("GCD did not reveal a factor. The fault may not be a CRT fault.")
-            print("RSA_CRT_FAULT=FAILED")
+            out.append("GCD did not reveal a factor. The fault may not be a CRT fault.")
+            out.append("RSA_CRT_FAULT=FAILED")
+        print("\\n".join(out))
     except Exception as e:
-        print(f"ERROR: {e}")
-        print("RSA_CRT_FAULT=FAILED")
+        out.append(f"ERROR: {e}")
+        out.append("RSA_CRT_FAULT=FAILED")
+        print("\\n".join(out))
     #
 _attack()`;
   },
@@ -113,7 +114,7 @@ q &= n / p \\qed
 \\textbf{References:} Boneh, DeMillo, Lipton, "On the Importance of Checking Cryptographic Protocols for Faults," Eurocrypt 1997`,
   usageGuide: 'This attack exploits a faulty RSA-CRT signature. When a transient fault corrupts the CRT computation, the faulty signature leaks one prime factor.\n\nHow to use:\n1. Obtain a valid signature sig_valid for a message m\n2. Obtain a faulty signature sig_faulty for the same message m from a fault-injected device\n3. The attack computes gcd(sig_faulty^e - m, n) to recover p\n\nRequired: n, e, m (the signed message as an integer), sig_valid, sig_faulty\n\nTip: The two signatures must be from the SAME message using the SAME key. The fault must affect only one of the two CRT exponentiations.',
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.m && !!p.sig_valid && !!p.sig_faulty,
+  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.m && !!p.sig_faulty,
 };
 
 export const generateTestcase = (): Record<string, string> => {
