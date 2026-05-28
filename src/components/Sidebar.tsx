@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Drawer,
   List,
@@ -31,6 +31,7 @@ export function Sidebar() {
     factordb: 'checking',
     sagecell: typeof window !== 'undefined' && window.sagecell ? 'ok' : 'checking',
   });
+  const sageCellChecked = useRef(false);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -66,16 +67,19 @@ export function Sidebar() {
   }, []);
 
   useEffect(() => {
-    if (status.sagecell !== 'checking') return;
+    if (sageCellChecked.current) return;
 
     const timer = setInterval(() => {
       if (window.sagecell) {
         clearInterval(timer);
+        clearTimeout(timeout);
+        sageCellChecked.current = true;
         setStatus(prev => ({ ...prev, sagecell: 'ok' }));
       }
     }, 200);
     const timeout = setTimeout(() => {
       clearInterval(timer);
+      sageCellChecked.current = true;
       if (!window.sagecell) {
         setStatus(prev => ({ ...prev, sagecell: 'error' }));
       }
@@ -85,7 +89,7 @@ export function Sidebar() {
       clearInterval(timer);
       clearTimeout(timeout);
     };
-  }, [status.sagecell]);
+  }, []);
 
   const toggleCat = (cat: string) => {
     setExpandedCats(prev => {

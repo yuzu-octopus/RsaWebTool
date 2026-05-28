@@ -1,10 +1,5 @@
 export type Format = 'hex' | 'dec' | 'base64' | 'text';
 
-/** Strip all whitespace from a numeric string (spaces, tabs, newlines) */
-export function stripNumber(input: string): string {
-  return input.replace(/\s/g, '');
-}
-
 function parseHexToBytes(hex: string): Uint8Array {
   const cleaned = hex.replace(/^0x/i, '').replace(/\s/g, '');
   if (cleaned.length === 0) return new Uint8Array(0);

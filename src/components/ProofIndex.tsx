@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -29,12 +29,54 @@ export function ProofIndex() {
     [search]
   );
 
-  if (viewMode !== 'proofs') return null;
-
-  const handleClick = (attack: typeof attacks[0]) => {
+  const handleClick = useCallback((attack: typeof attacks[0]) => {
     setSelectedAttack(attack);
     setViewMode('attack');
-  };
+  }, [setSelectedAttack, setViewMode]);
+
+  const attackItems = useMemo(() =>
+    filtered.map(attack => {
+      const primaryContent = (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+          <Typography sx={{ color: draculaColors.cyan, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>
+            {attack.name}
+          </Typography>
+          <Typography
+            component="span"
+            sx={{
+              color: attack.frontendCheck ? draculaColors.green : draculaColors.orange,
+              fontSize: '0.65rem',
+              fontFamily: "'JetBrains Mono', monospace",
+            }}
+          >
+            ({attack.frontendCheck ? 'Local' : 'SageMath'})
+          </Typography>
+        </Box>
+      );
+      const secondaryContent = (
+        <Typography sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", fontSize: '0.75rem' }}>
+          [{attack.category}] {attack.description}
+        </Typography>
+      );
+      return (
+        <ListItem key={attack.id} disablePadding sx={{ mb: 1 }}>
+          <ListItemButton
+            onClick={() => handleClick(attack)}
+            sx={{
+              borderRadius: 1,
+              border: `1px solid ${draculaColors.comment}`,
+              '&:hover': { backgroundColor: draculaColors.background, borderColor: draculaColors.purple },
+            }}
+          >
+            <ListItemText primary={primaryContent} secondary={secondaryContent} />
+          </ListItemButton>
+        </ListItem>
+      );
+    }),
+    [filtered, handleClick],
+  );
+
+  if (viewMode !== 'proofs') return null;
 
   return (
     <Box sx={colFlexSx}>
@@ -64,43 +106,7 @@ export function ProofIndex() {
 
       <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center' }}>
         <List sx={{ width: '100%', maxWidth: 640, px: 2 }}>
-          {filtered.map(attack => (
-            <ListItem key={attack.id} disablePadding sx={{ mb: 1 }}>
-              <ListItemButton
-                onClick={() => handleClick(attack)}
-                sx={{
-                  borderRadius: 1,
-                  border: `1px solid ${draculaColors.comment}`,
-                  '&:hover': { backgroundColor: draculaColors.background, borderColor: draculaColors.purple },
-                }}
-              >
-                <ListItemText
-                  primary={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                      <Typography sx={{ color: draculaColors.cyan, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>
-                        {attack.name}
-                      </Typography>
-                      <Typography
-                        component="span"
-                        sx={{
-                          color: attack.frontendCheck ? draculaColors.green : draculaColors.orange,
-                          fontSize: '0.65rem',
-                          fontFamily: "'JetBrains Mono', monospace",
-          }}
-        >
-          ({attack.frontendCheck ? 'Local' : 'SageMath'})
-                      </Typography>
-                    </Box>
-                  }
-                  secondary={
-                    <Typography sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", fontSize: '0.75rem' }}>
-                      [{attack.category}] {attack.description}
-                    </Typography>
-                  }
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
+          {attackItems}
         </List>
       </Box>
     </Box>

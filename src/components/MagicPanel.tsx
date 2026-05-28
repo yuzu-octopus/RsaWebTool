@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
+import { useState, useRef, useMemo, useCallback, useEffect, useReducer, memo } from 'react';
 import {
   Box,
   Typography,
@@ -144,20 +144,167 @@ interface MagicJob {
   error?: string;
 }
 
+// --- Extracted memoized components ---
+
+const JobListItem = memo(function JobListItem({
+  job,
+  expanded,
+  onToggle,
+  attackId,
+}: {
+  job: MagicJob;
+  expanded: boolean;
+  onToggle: (id: string) => void;
+  attackId: string;
+}) {
+  const primaryContent = useMemo(() => (
+    <Typography sx={{
+      display: 'flex',
+      alignItems: 'center',
+      fontFamily: "'JetBrains Mono', monospace",
+      fontSize: '0.8rem',
+      color: job.status === 'success' ? draculaColors.green : job.status === 'error' ? draculaColors.red : job.status === 'cancelled' ? draculaColors.orange : draculaColors.orange,
+    }}>
+      {statusIcon(job.status)} {job.attackName}
+    </Typography>
+  ), [job.status, job.attackName]);
+
+  const secondaryContent = useMemo(() =>
+    job.error && !expanded ? (
+      <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>
+        {job.error.length > 80 ? `${job.error.slice(0, 77)}...` : job.error}
+      </Typography>
+    ) : null,
+    [job.error, expanded]
+  );
+
+  return (
+    <ListItem sx={{ px: 0, flexDirection: 'column', alignItems: 'stretch' }}>
+      <Box
+        onClick={() => onToggle(attackId)}
+        sx={{ display: 'flex', alignItems: 'center', cursor: (job.result || job.error) ? 'pointer' : 'default', width: '100%' }}
+      >
+        <ListItemText
+          primary={primaryContent}
+          secondary={secondaryContent}
+        />
+        {(job.result || job.error) && (
+          <Typography sx={{ color: draculaColors.comment, display: 'flex', alignItems: 'center', mr: 1 }}>
+            {expanded ? <ExpandLess sx={{ fontSize: '1rem' }} /> : <ExpandMore sx={{ fontSize: '1rem' }} />}
+          </Typography>
+        )}
+      </Box>
+      <Collapse in={expanded}>
+        <Box sx={{ ml: 2, mt: 0.5, p: 1, borderRadius: 1, backgroundColor: draculaColors.background, maxHeight: 200, overflow: 'auto', position: 'relative' }}>
+          {(job.result || job.error) && (
+            <IconButton
+              size="small"
+              onClick={() => { void navigator.clipboard.writeText(job.result || job.error || ''); }}
+              sx={{ position: 'absolute', top: 2, right: 2, color: draculaColors.comment, zIndex: 1 }}
+            >
+              <ContentCopy sx={{ fontSize: '0.8rem' }} />
+            </IconButton>
+          )}
+          <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+            {job.result || job.error || ''}
+          </Typography>
+        </Box>
+      </Collapse>
+    </ListItem>
+  );
+});
+
+const ExtractedParams = memo(function ExtractedParams({ params }: { params: Record<string, string> }) {
+  return (
+    <Box sx={{ mt: 2, p: 1.5, borderRadius: 1, backgroundColor: draculaColors.currentLine, border: `1px solid ${draculaColors.comment}` }}>
+      <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", mb: 0.75 }}>
+        Extracted parameters
+      </Typography>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+        {Object.entries(params).map(([key, value]) => (
+          <Box key={key} sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.25, backgroundColor: draculaColors.background, borderRadius: 0.5, px: 0.75, py: 0.25 }}>
+            <Typography sx={{ color: draculaColors.purple, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>{key}</Typography>
+            <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>=</Typography>
+            <Typography sx={{ color: value.length > 50 ? draculaColors.orange : draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {value.length > 50 ? `${value.slice(0, 47)}...` : value}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  );
+});
+
+const ApplicableList = memo(function ApplicableList({ byCategory }: { byCategory: Record<string, Attack[]> }) {
+  return (
+    <>
+      {Object.entries(byCategory).map(([cat, catAttacks]) => (
+        <Box key={cat} sx={{ mb: 1 }}>
+          <Typography sx={{ color: draculaColors.cyan, fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", mb: 0.5 }}>
+            {cat}
+          </Typography>
+          {catAttacks.map(a => (
+            <Typography key={a.id} sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", py: 0.25 }}>
+              {a.name} <Typography component="span" sx={{ color: draculaColors.comment }}>({a.priority})</Typography>
+            </Typography>
+          ))}
+        </Box>
+      ))}
+    </>
+  );
+});
+
+const ErrorInsightBox = memo(function ErrorInsightBox({ insights }: { insights: string }) {
+  return (
+    <Box sx={{ mt: 1.5, p: 1, borderRadius: 1, backgroundColor: draculaColors.currentLine, border: `1px solid ${draculaColors.comment}` }}>
+      <Typography sx={{ color: draculaColors.orange, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>
+        No attack succeeded: {insights}
+      </Typography>
+      <Typography sx={{ color: draculaColors.comment, fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", mt: 0.5 }}>
+        Try checking parameter names, using a PEM key, or selecting a specific attack from the sidebar
+      </Typography>
+    </Box>
+  );
+});
+
 export function MagicPanel() {
   const { viewMode, setOutputResult, setOutputError, addToHistory, showNotification } = useAppContext();
   const { executeAll, createController } = useSageMathParallel();
   const [rawInput, setRawInput] = useState('');
   const [jobs, setJobs] = useState<MagicJob[]>([]);
-  const [running, setRunning] = useState(false);
-  const [earlyStop, setEarlyStop] = useState(false);
+
+  type ExecutionAction =
+    | { type: 'START_EXECUTION' }
+    | { type: 'SET_EARLY_STOP' }
+    | { type: 'SET_ERROR_INSIGHTS'; insights: string | null }
+    | { type: 'FINISH' };
+  type ExecutionState = {
+    running: boolean;
+    earlyStop: boolean;
+    errorInsights: string | null;
+  };
+  const initialExecState: ExecutionState = { running: false, earlyStop: false, errorInsights: null };
+  function execReducer(state: ExecutionState, action: ExecutionAction): ExecutionState {
+    switch (action.type) {
+      case 'START_EXECUTION': return { ...initialExecState, running: true };
+      case 'SET_EARLY_STOP': return { ...state, earlyStop: true };
+      case 'SET_ERROR_INSIGHTS': return { ...state, errorInsights: action.insights };
+      case 'FINISH': return { ...state, running: false };
+      default: return state;
+    }
+  }
+  const [execState, dispatchExec] = useReducer(execReducer, initialExecState);
+  const { running, earlyStop, errorInsights } = execState;
+
   const abortControllerRef = useRef<AbortController | null>(null);
   const runIdRef = useRef(0);
   const stopRequestedRef = useRef(false);
   const [showApplicable, setShowApplicable] = useState(false);
   const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
-  const [errorInsights, setErrorInsights] = useState<string | null>(null);
+  const handleToggleJob = useCallback((attackId: string) => {
+    setExpandedJob(prev => prev === attackId ? null : attackId);
+  }, []);
   const testcaseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timer = useTimer();
   const { runAttack, cancelCurrentRun } = useWorkerPool();
@@ -208,13 +355,12 @@ export function MagicPanel() {
     const currentRunId = ++runIdRef.current;
     const controller = createController();
     abortControllerRef.current = controller;
-    setRunning(true);
+    dispatchExec({ type: 'START_EXECUTION' });
     timer.start();
     setJobs([]);
-    setEarlyStop(false);
     setOutputResult(null);
     setOutputError(null);
-    setErrorInsights(null);
+    dispatchExec({ type: 'SET_ERROR_INSIGHTS', insights: null });
 
     const params = paramsFromInput ?? {};
     const applicable = sortedApplicable;
@@ -298,7 +444,7 @@ export function MagicPanel() {
       setJobs(prev => prev.map(j => j.status === 'running' ? { ...j, status: 'cancelled' as const } : j));
       if (currentRunId === runIdRef.current) {
         timer.stop();
-        setRunning(false);
+        dispatchExec({ type: 'FINISH' });
         abortControllerRef.current = null;
       }
       return;
@@ -311,7 +457,7 @@ export function MagicPanel() {
     const success = earlySuccess.value;
     if (success) {
       timer.stop();
-      setRunning(false);
+      dispatchExec({ type: 'FINISH' });
       abortControllerRef.current = null;
       let displayResult = success.result;
       const decrypted = autoDecrypt(success.attack, params, success.result);
@@ -340,9 +486,9 @@ export function MagicPanel() {
     if (remaining.length === 0) {
       if (currentRunId !== runIdRef.current) return;
       timer.stop();
-      setRunning(false);
+      dispatchExec({ type: 'FINISH' });
       abortControllerRef.current = null;
-      setErrorInsights(buildErrorInsights(preCheckResults));
+      dispatchExec({ type: 'SET_ERROR_INSIGHTS', insights: buildErrorInsights(preCheckResults) });
       return;
     }
 
@@ -360,7 +506,7 @@ export function MagicPanel() {
           return updated;
         });
         if (result.success && isActualSuccess(result.stdout)) {
-          setEarlyStop(true);
+          dispatchExec({ type: 'SET_EARLY_STOP' });
           return true;
         }
         return false;
@@ -391,7 +537,7 @@ export function MagicPanel() {
           }
         }
       } else {
-        setErrorInsights(buildErrorInsights(preCheckResults, results));
+        dispatchExec({ type: 'SET_ERROR_INSIGHTS', insights: buildErrorInsights(preCheckResults, results) });
       }
     } catch (err: unknown) {
       if (currentRunId !== runIdRef.current) return;
@@ -400,7 +546,7 @@ export function MagicPanel() {
     } finally {
       if (currentRunId === runIdRef.current) {
         timer.stop();
-        setRunning(false);
+        dispatchExec({ type: 'FINISH' });
         abortControllerRef.current = null;
       }
     }
@@ -484,22 +630,7 @@ export function MagicPanel() {
 
           {/* Extracted params preview */}
           {extractedParams && !running && (
-            <Box sx={{ mt: 2, p: 1.5, borderRadius: 1, backgroundColor: draculaColors.currentLine, border: `1px solid ${draculaColors.comment}` }}>
-              <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", mb: 0.75 }}>
-                Extracted parameters
-              </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {Object.entries(extractedParams).map(([key, value]) => (
-                  <Box key={key} sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.25, backgroundColor: draculaColors.background, borderRadius: 0.5, px: 0.75, py: 0.25 }}>
-                    <Typography sx={{ color: draculaColors.purple, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>{key}</Typography>
-                    <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>=</Typography>
-                    <Typography sx={{ color: value.length > 50 ? draculaColors.orange : draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {value.length > 50 ? `${value.slice(0, 47)}...` : value}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-            </Box>
+            <ExtractedParams params={extractedParams} />
           )}
 
           {/* Applicable preview */}
@@ -522,20 +653,7 @@ export function MagicPanel() {
                 {applicablePreview.length} attacks applicable
               </Button>
               <Collapse in={showApplicable}>
-                <Box sx={{ px: 2, py: 1 }}>
-                  {Object.entries(applicableByCategory).map(([cat, catAttacks]) => (
-                    <Box key={cat} sx={{ mb: 1 }}>
-                      <Typography sx={{ color: draculaColors.cyan, fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", mb: 0.5 }}>
-                        {cat}
-                      </Typography>
-                      {catAttacks.map(a => (
-                        <Typography key={a.id} sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", py: 0.25 }}>
-                          {a.name} <Typography component="span" sx={{ color: draculaColors.comment }}>({a.priority})</Typography>
-                        </Typography>
-                      ))}
-                    </Box>
-                  ))}
-                </Box>
+                <ApplicableList byCategory={applicableByCategory} />
               </Collapse>
             </Box>
           )}
@@ -623,14 +741,7 @@ export function MagicPanel() {
 
           {/* Error insights */}
           {errorInsights && !running && (
-            <Box sx={{ mt: 1.5, p: 1, borderRadius: 1, backgroundColor: draculaColors.currentLine, border: `1px solid ${draculaColors.comment}` }}>
-              <Typography sx={{ color: draculaColors.orange, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>
-                No attack succeeded: {errorInsights}
-              </Typography>
-              <Typography sx={{ color: draculaColors.comment, fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", mt: 0.5 }}>
-                Try checking parameter names, using a PEM key, or selecting a specific attack from the sidebar
-              </Typography>
-            </Box>
+            <ErrorInsightBox insights={errorInsights} />
           )}
 
           {jobs.length > 0 && (
@@ -638,52 +749,13 @@ export function MagicPanel() {
               <Divider sx={{ borderColor: draculaColors.comment, my: 2 }} />
               <List dense>
                 {jobs.map(job => (
-                  <ListItem key={job.attackId} sx={{ px: 0, flexDirection: 'column', alignItems: 'stretch' }}>
-                    <Box
-                      onClick={() => { if (job.result || job.error) setExpandedJob(expandedJob === job.attackId ? null : job.attackId); }}
-                      sx={{ display: 'flex', alignItems: 'center', cursor: (job.result || job.error) ? 'pointer' : 'default', width: '100%' }}
-                    >
-                      <ListItemText
-                        primary={
-                          <Typography sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            fontFamily: "'JetBrains Mono', monospace",
-                            fontSize: '0.8rem',
-                            color: job.status === 'success' ? draculaColors.green : job.status === 'error' ? draculaColors.red : job.status === 'cancelled' ? draculaColors.orange : draculaColors.orange,
-                          }}>
-                            {statusIcon(job.status)} {job.attackName}
-                          </Typography>
-                        }
-                        secondary={job.error && !(expandedJob === job.attackId) && (
-                          <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>
-                            {job.error.length > 80 ? `${job.error.slice(0, 77)}...` : job.error}
-                          </Typography>
-                        )}
-                      />
-                      {(job.result || job.error) && (
-                        <Typography sx={{ color: draculaColors.comment, display: 'flex', alignItems: 'center', mr: 1 }}>
-                          {expandedJob === job.attackId ? <ExpandLess sx={{ fontSize: '1rem' }} /> : <ExpandMore sx={{ fontSize: '1rem' }} />}
-                        </Typography>
-                      )}
-                    </Box>
-                    <Collapse in={expandedJob === job.attackId}>
-                      <Box sx={{ ml: 2, mt: 0.5, p: 1, borderRadius: 1, backgroundColor: draculaColors.background, maxHeight: 200, overflow: 'auto', position: 'relative' }}>
-                        {(job.result || job.error) && (
-                          <IconButton
-                            size="small"
-                            onClick={() => { void navigator.clipboard.writeText(job.result || job.error || ''); }}
-                            sx={{ position: 'absolute', top: 2, right: 2, color: draculaColors.comment, zIndex: 1 }}
-                          >
-                            <ContentCopy sx={{ fontSize: '0.8rem' }} />
-                          </IconButton>
-                        )}
-                        <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-                          {job.result || job.error || ''}
-                        </Typography>
-                      </Box>
-                    </Collapse>
-                  </ListItem>
+                  <JobListItem
+                    key={job.attackId}
+                    job={job}
+                    expanded={expandedJob === job.attackId}
+                    onToggle={handleToggleJob}
+                    attackId={job.attackId}
+                  />
                 ))}
               </List>
             </>

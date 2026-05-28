@@ -3,7 +3,6 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { Box, Typography } from '@mui/material';
 import { draculaColors } from '../theme/dracula';
-
 interface ProofSegment {
   type: 'text' | 'displayMath' | 'list';
   content: string;
@@ -166,7 +165,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
             },
           }}
         >
-          {segments.map((segment, i) => {
+          {segments.map((segment) => {
             if (segment.type === 'displayMath') {
               // Re-wrap content in the original environment for proper alignment parsing
               // Track if \qed was present to append tombstone symbol
@@ -181,7 +180,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
                   displayMode: true,
                 });
                 return (
-                  <Box key={i} sx={{ my: 2 }}>
+                  <Box key={'dm-' + segment.content.slice(0, 20)} sx={{ my: 2 }}>
                     <Box component="div" dangerouslySetInnerHTML={{ __html: html }} />
                     {hasQed && (
                       <Box component="span" sx={{ float: 'right', mr: 2, fontSize: '1.2em' }}>
@@ -192,7 +191,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
                 );
               } catch {
                 return (
-                  <Box key={i} sx={{ my: 2, color: draculaColors.red, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.8rem' }}>
+                  <Box key={'dm-err-' + segment.content.slice(0, 20)} sx={{ my: 2, color: draculaColors.red, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.8rem' }}>
                     Math render error
                   </Box>
                 );
@@ -208,9 +207,9 @@ export function ProofRenderer({ latex }: { latex: string }) {
                   return cleaned;
                 });
               return (
-                <Box key={i} component="ul" sx={{ my: 1, pl: 2 }}>
-                  {items.map((item, j) => (
-                    <Box key={j} component="li" sx={{ mb: 0.5, color: draculaColors.foreground }}>
+                <Box key={'list-' + segment.content.slice(0, 20)} component="ul" sx={{ my: 1, pl: 2 }}>
+                  {items.map((item) => (
+                    <Box key={'li-' + item.slice(0, 20).replace(/\s+/g, '_')} component="li" sx={{ mb: 0.5, color: draculaColors.foreground }}>
                       <InlineMath text={item} />
                     </Box>
                   ))}
@@ -247,7 +246,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
                   );
                 }
               }
-              return skipRest && rendered.length === 0 ? null : <Box key={i}>{rendered}</Box>;
+              return skipRest && rendered.length === 0 ? null : <Box key={'text-' + segment.content.slice(0, 20)}>{rendered}</Box>;
             }
 
             return null;

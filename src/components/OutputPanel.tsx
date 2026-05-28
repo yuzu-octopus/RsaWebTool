@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -18,27 +18,38 @@ import { useAppContext } from '../hooks/useAppContext';
 import { useDragResize } from '../hooks/useDragResize';
 import { ghostBtnSx } from '../styles/shared';
 
+const notepadBaseStyle: React.CSSProperties = {
+  width: '100%',
+  resize: 'none',
+  marginTop: '8px',
+  padding: '8px 12px',
+  backgroundColor: draculaColors.currentLine,
+  color: draculaColors.foreground,
+  fontFamily: "'JetBrains Mono', monospace",
+  fontSize: '0.8rem',
+  border: `1px solid ${draculaColors.comment}`,
+  borderRadius: '4px',
+  outline: 'none',
+  boxShadow: 'none',
+  boxSizing: 'border-box',
+};
+
 export function OutputPanel() {
   const { outputResult, outputError, history } = useAppContext();
-  const [copyMessage, setCopyMessage] = useState<string | null>(null);
-  const [historyView, setHistoryView] = useState<HistoryEntry | null>(null);
-  const [historySelectedKey, setHistorySelectedKey] = useState<string | null>(null);
+  const [ui, setUi] = useState({ copyMessage: null as string | null, historySelectedKey: null as string | null, historyOpen: false });
   const mountedRef = useRef(true);
   useEffect(() => {
     mountedRef.current = true;
     return () => { mountedRef.current = false; };
   }, []);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    setHistoryView(null);
-    setHistorySelectedKey(null);
-  }, [outputResult]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+  const displayResult = ui.historySelectedKey
+    ? history.find(h => (h.timestamp.getTime() + '-' + h.attackId) === ui.historySelectedKey)?.result ?? null
+    : outputResult;
 
-  const displayResult = historyView ? historyView.result : outputResult;
-
-  const [historyOpen, setHistoryOpen] = useState(false);
+  const handleHistoryClick = useCallback((_entry: HistoryEntry, key: string) => {
+    setUi(prev => ({ ...prev, historySelectedKey: key }));
+  }, []);
   const [notepadOpen, setNotepadOpen] = useState(false);
   const [notepadText, setNotepadText] = useState(() => {
     try {
@@ -68,8 +79,8 @@ export function OutputPanel() {
   const handleCopy = () => {
     if (displayResult) {
       void navigator.clipboard.writeText(displayResult);
-      setCopyMessage('Copied to clipboard!');
-      setTimeout(() => { if (mountedRef.current) setCopyMessage(null); }, 2000);
+      setUi(prev => ({ ...prev, copyMessage: 'Copied to clipboard!' }));
+      setTimeout(() => { if (mountedRef.current) setUi(prev => ({ ...prev, copyMessage: null })); }, 2000);
     }
   };
 
@@ -120,16 +131,16 @@ export function OutputPanel() {
           Results
         </Typography>
 
-        {historyView && (
+        {ui.historySelectedKey && (
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
             <HistoryIcon sx={{ fontSize: '1rem', color: draculaColors.cyan }} />
             <Typography sx={{ color: draculaColors.cyan, fontSize: '0.75rem', fontFamily: "'JetBrains Mono', monospace", flex: 1 }}>
-              History: {historyView.attackName}
+              History: {history.find(h => (h.timestamp.getTime() + '-' + h.attackId) === ui.historySelectedKey)?.attackName ?? ''}
             </Typography>
             <Button
               size="small"
               variant="outlined"
-              onClick={() => { setHistoryView(null); setHistorySelectedKey(null); }}
+              onClick={() => { setUi(prev => ({ ...prev, historySelectedKey: null })); }}
               sx={{ borderColor: draculaColors.comment, color: draculaColors.comment, fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", '&:hover': { backgroundColor: draculaColors.currentLine }, py: 0, px: 1, minWidth: 0 }}
             >
               Back
@@ -158,9 +169,9 @@ export function OutputPanel() {
               <Button size="small" variant="outlined" onClick={handleCopy} sx={ghostBtnSx} startIcon={<ContentCopy />}>
                 Copy
               </Button>
-              {copyMessage && (
+              {ui.copyMessage && (
                 <Typography variant="caption" sx={{ color: draculaColors.green, fontSize: '0.7rem', alignSelf: 'center' }}>
-                  {copyMessage}
+                  {ui.copyMessage}
                 </Typography>
               )}
             </Box>
@@ -173,7 +184,7 @@ export function OutputPanel() {
           </Typography>
         )}
 
-        {!displayResult && !outputError && !historyView && (
+        {!displayResult && !outputError && !ui.historySelectedKey && (
           <Typography variant="body1" sx={{ color: draculaColors.comment, fontStyle: 'italic' }}>
             Run an attack to see results here
           </Typography>
@@ -215,22 +226,7 @@ export function OutputPanel() {
             onChange={e => handleNotepadChange(e.target.value)}
             placeholder="Take notes here..."
             aria-label="Notepad"
-            style={{
-              width: '100%',
-              height: `${notepadHeight}px`,
-              resize: 'none',
-              marginTop: '8px',
-              padding: '8px 12px',
-              backgroundColor: draculaColors.currentLine,
-              color: draculaColors.foreground,
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: '0.8rem',
-              border: `1px solid ${draculaColors.comment}`,
-              borderRadius: '4px',
-              outline: 'none',
-              boxShadow: 'none',
-              boxSizing: 'border-box',
-            }}
+            style={{ ...notepadBaseStyle, height: `${notepadHeight}px` }}
             onFocus={e => {
               e.target.style.borderColor = draculaColors.purple;
               e.target.style.boxShadow = `0 0 0 2px ${draculaColors.purple}40`;
@@ -248,18 +244,28 @@ export function OutputPanel() {
       <Box sx={{ px: 2, pb: 2 }}>
         <Button
           fullWidth
-          onClick={() => setHistoryOpen(!historyOpen)}
+          onClick={() => setUi(prev => ({ ...prev, historyOpen: !prev.historyOpen }))}
           sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', monospace", justifyContent: 'space-between' }}
-          endIcon={historyOpen ? <ExpandLess /> : <ExpandMore />}
+          endIcon={ui.historyOpen ? <ExpandLess /> : <ExpandMore />}
         >
           History ({history.length})
         </Button>
 
-        <Collapse in={historyOpen}>
+        <Collapse in={ui.historyOpen}>
           <List dense sx={{ maxHeight: '200px', overflow: 'auto' }}>
             {history.map((entry) => {
               const key = entry.timestamp.getTime() + '-' + entry.attackId;
-              const selected = historySelectedKey === key;
+              const selected = ui.historySelectedKey === key;
+              const primaryContent = (
+                <Typography sx={{ display: 'flex', alignItems: 'center', color: entry.success ? draculaColors.green : draculaColors.red, fontSize: '0.75rem', fontFamily: "'JetBrains Mono', monospace" }}>
+                  {entry.success ? <CheckCircle sx={{ fontSize: '1rem', mr: 0.5 }} /> : <Cancel sx={{ fontSize: '1rem', mr: 0.5 }} />} {entry.attackName}
+                </Typography>
+              );
+              const secondaryContent = (
+                <Typography sx={{ color: draculaColors.comment, fontSize: '0.65rem' }}>
+                  {entry.timestamp.toLocaleTimeString()}
+                </Typography>
+              );
               return (
                 <ListItem
                   key={key}
@@ -270,22 +276,11 @@ export function OutputPanel() {
                     border: `1px solid ${selected ? draculaColors.comment : 'transparent'}`,
                     '&:hover': { borderColor: draculaColors.comment },
                   }}
-                  onClick={() => {
-                    setHistoryView(entry);
-                    setHistorySelectedKey(key);
-                  }}
+                  onClick={() => handleHistoryClick(entry, key)}
                 >
                   <ListItemText
-                    primary={
-                      <Typography sx={{ display: 'flex', alignItems: 'center', color: entry.success ? draculaColors.green : draculaColors.red, fontSize: '0.75rem', fontFamily: "'JetBrains Mono', monospace" }}>
-                        {entry.success ? <CheckCircle sx={{ fontSize: '1rem', mr: 0.5 }} /> : <Cancel sx={{ fontSize: '1rem', mr: 0.5 }} />} {entry.attackName}
-                      </Typography>
-                    }
-                    secondary={
-                      <Typography sx={{ color: draculaColors.comment, fontSize: '0.65rem' }}>
-                        {entry.timestamp.toLocaleTimeString()}
-                      </Typography>
-                    }
+                    primary={primaryContent}
+                    secondary={secondaryContent}
                   />
                 </ListItem>
               );

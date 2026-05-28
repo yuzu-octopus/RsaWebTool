@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useReducer, useRef, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -27,12 +27,29 @@ export function InputPanel() {
   const { execute } = useSageMath();
   const [tab, setTab] = useState(0);
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(false);
+  type ProgressAction =
+    | { type: 'START' }
+    | { type: 'PROGRESS'; pct: number; detail?: string }
+    | { type: 'DONE' }
+    | { type: 'ERROR' };
+  type ProgressState = { loading: boolean; pct: number; detail: string };
+  const initialProgress: ProgressState = { loading: false, pct: 0, detail: '' };
+  function progressReducer(state: ProgressState, action: ProgressAction): ProgressState {
+    switch (action.type) {
+      case 'START': return { loading: true, pct: 0, detail: '' };
+      case 'PROGRESS': return { ...state, pct: action.pct, detail: action.detail ?? state.detail };
+      case 'DONE': return { loading: false, pct: 100, detail: '' };
+      case 'ERROR': return { loading: false, pct: 0, detail: '' };
+      default: return state;
+    }
+  }
+  const [progressState, dispatchProgress] = useReducer(progressReducer, initialProgress);
+  const loading = progressState.loading;
+  const progress = progressState.pct;
+  const progressDetail = progressState.detail;
   const abortControllerRef = useRef<AbortController | null>(null);
   const attackIdRef = useRef<string | null>(null);
   const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
-  const [progress, setProgress] = useState(0);
-  const [progressDetail, setProgressDetail] = useState('');
   const mountedRef = useRef(true);
   const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const timer = useTimer();
@@ -85,8 +102,7 @@ export function InputPanel() {
     abortControllerRef.current?.abort();
     const controller = new AbortController();
     abortControllerRef.current = controller;
-    setLoading(true);
-    setProgress(0);
+    dispatchProgress({ type: 'START' });
     timer.start();
     setOutputResult(null);
     setOutputError(null);
@@ -105,7 +121,7 @@ export function InputPanel() {
       const msg = `Missing required inputs:\n${missingFields.map(f => `- ${f}`).join('\n')}`;
       setOutputError(msg);
       addToHistory(selectedAttack.id, selectedAttack.name, msg, false);
-      setLoading(false);
+      dispatchProgress({ type: 'DONE' });
       timer.stop();
       return;
     }
@@ -113,8 +129,7 @@ export function InputPanel() {
     try {
       if (selectedAttack.frontendCheck) {
         const handleProgress = (pct: number, detail?: string) => {
-          setProgress(pct);
-          if (detail !== undefined) setProgressDetail(detail);
+          dispatchProgress({ type: 'PROGRESS', pct, detail });
         };
         const preResult = await runAttack(selectedAttack.id, vals, handleProgress);
         if (preResult !== null) {
@@ -128,7 +143,7 @@ export function InputPanel() {
           showNotification(`${selectedAttack.name}: ${preSuccess ? 'success' : 'failed'}`, preSuccess ? 'success' : 'error');
           if (preSuccess) submitToFactorDB(selectedAttack, preResult, vals.n, showNotification);
           timer.stop();
-          setLoading(false);
+          dispatchProgress({ type: 'DONE' });
           return;
         }
       }
@@ -157,7 +172,7 @@ export function InputPanel() {
     } finally {
       if (attackIdRef.current === currentAttackId) {
         timer.stop();
-        setLoading(false);
+        dispatchProgress({ type: 'DONE' });
         abortControllerRef.current = null;
       }
     }

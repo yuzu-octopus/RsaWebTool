@@ -3,10 +3,12 @@ import type { AppContextType, HistoryEntry, NotificationState } from '../types';
 import { AppContext } from './ctx';
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [selectedAttack, setSelectedAttack] = useState<AppContextType['selectedAttack']>(null);
-  const [viewMode, setViewMode] = useState<AppContextType['viewMode']>('attack');
-  const [outputResult, setOutputResult] = useState<string | null>(null);
-  const [outputError, setOutputError] = useState<string | null>(null);
+  const [app, setApp] = useState({
+    selectedAttack: null as AppContextType['selectedAttack'],
+    viewMode: 'attack' as AppContextType['viewMode'],
+    outputResult: null as string | null,
+    outputError: null as string | null,
+  });
   const [history, setHistory] = useState<HistoryEntry[]>(() => {
     try {
       const stored = localStorage.getItem('rsa-history:v1') ?? localStorage.getItem('rsa-history');
@@ -48,12 +50,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(() => ({
-    selectedAttack, setSelectedAttack, viewMode, setViewMode,
-    outputResult, setOutputResult, outputError, setOutputError,
+    selectedAttack: app.selectedAttack,
+    setSelectedAttack: (v: AppContextType['selectedAttack']) => setApp(prev => ({ ...prev, selectedAttack: v })),
+    viewMode: app.viewMode,
+    setViewMode: (v: AppContextType['viewMode']) => setApp(prev => ({ ...prev, viewMode: v })),
+    outputResult: app.outputResult,
+    setOutputResult: (v: string | null) => setApp(prev => ({ ...prev, outputResult: v })),
+    outputError: app.outputError,
+    setOutputError: (v: string | null) => setApp(prev => ({ ...prev, outputError: v })),
     history, addToHistory, notification, showNotification,
   }), [
-    selectedAttack, setSelectedAttack, viewMode, setViewMode,
-    outputResult, setOutputResult, outputError, setOutputError,
+    app.selectedAttack, app.viewMode, app.outputResult, app.outputError,
     history, addToHistory, notification, showNotification,
   ]);
 
