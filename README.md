@@ -13,7 +13,7 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 - **SageMathCell integration** — runs SageMath code for Coppersmith, lattice reduction, and complex math
 - **FactorDB lookup** — auto-queries FactorDB and auto-submits discovered factorizations
 - **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution with early-stop
-- **RSA Calculator** — standalone key generation, encryption, decryption (pure BigInt). e defaults to 65537; Decrypt accepts any 2 of (p, q, n) with auto-derivation
+- **RSA Calculator** — standalone key generation, encryption, decryption (pure BigInt). 3-tab interface with merged form state. e defaults to 65537; Decrypt accepts any 2 of (p, q, n) with auto-derivation
 - **Format Converter** — live Hex / Decimal / Base64 / Text conversion
 - **Proof Index** — searchable catalog of all 47 attack proofs with KaTeX rendering
 - **Dracula theme** — dark, developer-friendly UI
@@ -57,7 +57,7 @@ Open `http://localhost:5173` in your browser.
 | Attack | Description | Frontend |
 |--------|-------------|----------|
 | coppersmith-short-pad | Integer e-th root recovery of short-padded messages | ✓ |
-| dependent-prime | Dependent prime lattice | — |
+| dependent-prime | GCD-based recovery from related primes | ✓ |
 | dp-dq-leak | Decrypt from leaked dp + dq | ✓ |
 | implicit-key-exposure | Lattice GCD across related keys | ✓ |
 | linearly-related-primes | GCD across linearly related primes | ✓ |
@@ -73,7 +73,7 @@ Open `http://localhost:5173` in your browser.
 |--------|-------------|----------|
 | bleichenbacher-sig | Bleichenbacher signature forgery | — |
 | common-modulus | Extended GCD + Bezout recovery | ✓ |
-| franklin-reiter-related-message | Related message recovery | — |
+| franklin-reiter-related-message | Related message recovery (e=3) | ✓ |
 | hastad-broadcast | CRT recovery from e identical ciphertexts | ✓ |
 | hastad-linear-pad | Hastad's broadcast with linear padding | — |
 | homomorphic-forgery | RSA multiplicative homomorphism signature forge | ✓ |
@@ -137,14 +137,14 @@ Live conversion between hex, decimal, base64, and text.
 
 ```
 src/
-  attacks/    47 attack implementations + guard.ts (shared sage guard helper)
-  components/ UI components (Sidebar, InputPanel, MagicPanel, OutputPanel, etc.)
+  attacks/    47 attack implementations + guard.ts (shared sage guard helper), index.ts barrel
+  components/ 12 React components (Sidebar, InputPanel, MagicPanel, OutputPanel, etc.)
+  context/    AppContext provider + ctx.ts (createContext barrel)
   hooks/      useSageMath, useWorkerPool, useDragResize, useAppContext, useTimer
-  context/    AppContext (flat state, history cap 50)
-  utils/      bigint math, converters, FactorDB client, sage output parser, testcase generators
-  styles/     shared MUI sx style objects, FONT_FAMILY constant
-  theme/      Dracula MUI theme
-  types/      Attack, InputField, HistoryEntry, NotificationState interfaces
+  styles/     shared.ts (7 style objects, FONT_FAMILY constant), inputSx.ts
+  theme/      dracula.ts — full Dracula MUI palette
+  types/      index.ts — Attack, InputField, HistoryEntry, NotificationState interfaces
+  utils/      bigint.ts, converters.ts, factordb.ts, sageOutput.ts, testcases/core.ts
 workers/      Cloudflare Worker CORS proxy for FactorDB
 ```
 
