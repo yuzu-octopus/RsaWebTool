@@ -50,6 +50,8 @@ export interface AppContextType {
   setOutputResult: (result: string | null) => void;
   outputError: string | null;
   setOutputError: (error: string | null) => void;
+  outputSource: 'input' | 'magic' | null;
+  setOutputSource: (source: 'input' | 'magic' | null) => void;
   history: HistoryEntry[];
   addToHistory: (attackId: string, attackName: string, result: string, success: boolean) => void;
   notification: NotificationState | null;

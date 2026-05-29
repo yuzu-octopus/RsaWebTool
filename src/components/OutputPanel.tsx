@@ -95,6 +95,18 @@ export function OutputPanel() {
     return () => clearTimeout(timer);
   }, [notepadText, notepadOpen]);
 
+  // Flush notepad to localStorage before page unload
+  useEffect(() => {
+    if (!notepadOpen) return;
+    const handleBeforeUnload = () => {
+      try {
+        localStorage.setItem('notepad:v1', JSON.stringify({ text: notepadText, timestamp: Date.now() }));
+      } catch { /* ignore */ }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [notepadText, notepadOpen]);
+
   const handleNotepadChange = (text: string) => {
     setNotepadText(text);
   };

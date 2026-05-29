@@ -23,7 +23,7 @@ import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn } from '../styles/shar
 import { useTimer } from '../hooks/useTimer';
 
 export function InputPanel() {
-  const { selectedAttack, viewMode, setOutputResult, setOutputError, addToHistory, showNotification } = useAppContext();
+  const { selectedAttack, viewMode, setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification } = useAppContext();
   const { execute } = useSageMath();
   const [tab, setTab] = useState(0);
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
@@ -52,6 +52,7 @@ export function InputPanel() {
   const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
   const mountedRef = useRef(true);
   const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const ownershipRef = useRef<'input' | 'magic' | null>(null);
   const timer = useTimer();
   const { runAttack } = useWorkerPool();
   useEffect(() => {
@@ -62,6 +63,12 @@ export function InputPanel() {
       timeoutIdsRef.current = [];
     };
   }, []);
+
+  useEffect(() => {
+    if (viewMode !== 'attack') {
+      abortControllerRef.current?.abort();
+    }
+  }, [viewMode]);
 
   if (viewMode !== 'attack') return null;
 
@@ -106,6 +113,8 @@ export function InputPanel() {
     timer.start();
     setOutputResult(null);
     setOutputError(null);
+    ownershipRef.current = 'input';
+    setOutputSource('input');
     const currentAttackId = selectedAttack.id;
     attackIdRef.current = currentAttackId;
 
@@ -119,7 +128,10 @@ export function InputPanel() {
       .flatMap(f => (f.required !== false && !vals[f.name]?.trim()) ? [f.label || f.name] : []);
     if (missingFields.length > 0) {
       const msg = `Missing required inputs:\n${missingFields.map(f => `- ${f}`).join('\n')}`;
+      if (!mountedRef.current) return;
+      if (ownershipRef.current !== 'input') return;
       setOutputError(msg);
+      if (!mountedRef.current) return;
       addToHistory(selectedAttack.id, selectedAttack.name, msg, false);
       dispatchProgress({ type: 'DONE' });
       timer.stop();
@@ -137,13 +149,16 @@ export function InputPanel() {
           let displayPreResult = preResult;
           const decryptedPre = autoDecrypt(selectedAttack, vals, preResult);
           if (decryptedPre) displayPreResult += '\n\n## Decrypted message\n' + decryptedPre;
+          if (!mountedRef.current) return;
+          if (ownershipRef.current !== 'input') return;
           setOutputResult(displayPreResult);
+          if (!mountedRef.current) return;
           addToHistory(selectedAttack.id, selectedAttack.name, preResult, isActualSuccess(preResult));
           const preSuccess = isActualSuccess(preResult);
+          if (!mountedRef.current) return;
           showNotification(`${selectedAttack.name}: ${preSuccess ? 'success' : 'failed'}`, preSuccess ? 'success' : 'error');
           if (preSuccess) submitToFactorDB(selectedAttack, preResult, vals.n, showNotification);
           timer.stop();
-          dispatchProgress({ type: 'DONE' });
           return;
         }
       }
@@ -155,25 +170,37 @@ export function InputPanel() {
         let displayStdout = result.stdout;
         const decryptedSage = autoDecrypt(selectedAttack, vals, result.stdout);
         if (decryptedSage) displayStdout += '\n\n## Decrypted message\n' + decryptedSage;
+        if (!mountedRef.current) return;
+        if (ownershipRef.current !== 'input') return;
         setOutputResult(displayStdout);
+        if (!mountedRef.current) return;
         addToHistory(selectedAttack.id, selectedAttack.name, result.stdout, isActualSuccess(result.stdout));
         const runSuccess = isActualSuccess(result.stdout);
+        if (!mountedRef.current) return;
         showNotification(`${selectedAttack.name}: ${runSuccess ? 'success' : 'failed'}`, runSuccess ? 'success' : 'error');
         if (runSuccess) submitToFactorDB(selectedAttack, result.stdout, vals.n, showNotification);
       } else {
+        if (!mountedRef.current) return;
+        if (ownershipRef.current !== 'input') return;
         setOutputError(result.error || 'SageCell execution failed with no specific error. Check that all required inputs are filled.');
+        if (!mountedRef.current) return;
         addToHistory(selectedAttack.id, selectedAttack.name, result.error || 'SageCell execution failed with no specific error. Check that all required inputs are filled.', false);
       }
     } catch (err: unknown) {
       if (attackIdRef.current !== currentAttackId) { return; }
       const message = err instanceof Error ? err.message : 'Execution failed';
+      if (!mountedRef.current) return;
+      if (ownershipRef.current !== 'input') return;
       setOutputError(message);
+      if (!mountedRef.current) return;
       addToHistory(selectedAttack.id, selectedAttack.name, message, false);
     } finally {
-      if (attackIdRef.current === currentAttackId) {
+      if (attackIdRef.current === currentAttackId && ownershipRef.current === 'input') {
         timer.stop();
         dispatchProgress({ type: 'DONE' });
         abortControllerRef.current = null;
+        ownershipRef.current = null;
+        setOutputSource(null);
       }
     }
   };

@@ -73,7 +73,7 @@ Open `http://localhost:5173` in your browser.
 |--------|-------------|----------|
 | bleichenbacher-sig | Bleichenbacher signature forgery | — |
 | common-modulus | Extended GCD + Bezout recovery | ✓ |
-| franklin-reiter-related-message | Related message recovery (e=3) | ✓ |
+| related-message | Related message recovery (e=3) | ✓ |
 | hastad-broadcast | CRT recovery from e identical ciphertexts | ✓ |
 | hastad-linear-pad | Hastad's broadcast with linear padding | — |
 | homomorphic-forgery | RSA multiplicative homomorphism signature forge | ✓ |

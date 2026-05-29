@@ -310,9 +310,8 @@ export function MagicPanel() {
   const { runAttack, cancelCurrentRun } = useWorkerPool();
 
   useEffect(() => {
-    const timer = testcaseTimerRef.current;
     return () => {
-      if (timer) clearTimeout(timer);
+      if (testcaseTimerRef.current) clearTimeout(testcaseTimerRef.current);
     };
   }, []);
 
@@ -353,6 +352,7 @@ export function MagicPanel() {
   const handleCrack = async () => {
     abortControllerRef.current?.abort();
     const currentRunId = ++runIdRef.current;
+    stopRequestedRef.current = false;
     const controller = createController();
     abortControllerRef.current = controller;
     dispatchExec({ type: 'START_EXECUTION' });

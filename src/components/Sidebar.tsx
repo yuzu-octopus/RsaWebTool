@@ -83,7 +83,7 @@ export function Sidebar() {
       if (!window.sagecell) {
         setStatus(prev => ({ ...prev, sagecell: 'error' }));
       }
-    }, 8000);
+    }, 10000);
 
     return () => {
       clearInterval(timer);

@@ -3,7 +3,7 @@ import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { modInverse, modPow } from '../utils/bigint';
 
 export const attack: Attack = {
-  id: 'franklin-reiter-related-message',
+  id: 'related-message',
   name: 'Franklin-Reiter Related Message Attack',
   category: 'Message / Protocol',
   description: 'Recovers m from two ciphertexts with linearly related plaintexts via polynomial GCD. Use when c1 = m^e and c2 = (a·m + b)^e mod n with known a, b.',

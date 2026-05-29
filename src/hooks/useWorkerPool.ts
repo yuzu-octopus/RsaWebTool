@@ -116,14 +116,34 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
     return new Promise<string | null>((resolve, reject) => {
       // Fallback: Workers unavailable → run on main thread via dynamic import
       if (fallbackRef.current || workersRef.current.length === 0) {
+        const id = ++idCounterRef.current;
+        pendingRef.current.set(id, { resolve, reject, onProgress });
         import('../attacks/index').then(({ attacks }) => {
+          // Check if cancelled while import was loading
+          if (!pendingRef.current.has(id)) return;
           const attack = attacks.find(a => a.id === attackId);
           if (!attack?.frontendCheck) {
+            pendingRef.current.delete(id);
             resolve(null);
             return;
           }
-          attack.frontendCheck(vals, onProgress).then(resolve).catch(reject);
-        }).catch(reject);
+          attack.frontendCheck(vals, onProgress).then(result => {
+            if (pendingRef.current.has(id)) {
+              pendingRef.current.delete(id);
+              resolve(result);
+            }
+          }).catch(err => {
+            if (pendingRef.current.has(id)) {
+              pendingRef.current.delete(id);
+              reject(err instanceof Error ? err : new Error(String(err)));
+            }
+          });
+        }).catch(err => {
+          if (pendingRef.current.has(id)) {
+            pendingRef.current.delete(id);
+            reject(err instanceof Error ? err : new Error(String(err)));
+          }
+        });
         return;
       }
 

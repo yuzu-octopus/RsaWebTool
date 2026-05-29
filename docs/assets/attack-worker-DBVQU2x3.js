@@ -1764,7 +1764,7 @@ n \\bmod (2^k + \\delta) = 0 &\\implies p = 2^k + \\delta,\\; q = n/p \\\\
 
 \\textbf{Explanation:} CTF challenge authors sometimes construct primes from well-known numbers — $p = 2^k \\pm \\delta$ (near powers of two) or $p = \\lfloor \\pi \\times 10^m \\rfloor \\pm \\delta$ (from mathematical constants). This attack checks candidates in a window around each known value, testing divisibility of $n$.
 
-\\textbf{References:} Cryptopals; Cryptohack.org; various CTF writeups`,priority:`low`,applicableCheck:e=>!!e.n},J={id:`franklin-reiter-related-message`,name:`Franklin-Reiter Related Message Attack`,category:`Message / Protocol`,description:`Recovers m from two ciphertexts with linearly related plaintexts via polynomial GCD. Use when c1 = m^e and c2 = (a·m + b)^e mod n with known a, b.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c1`,label:`c1 (ciphertext of m)`,placeholder:`Enter c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (ciphertext of a·m + b)`,placeholder:`Enter c2...`,multiline:!0,rows:3},{name:`a`,label:`a (linear coefficient)`,placeholder:`2`,multiline:!1},{name:`b`,label:`b (linear offset)`,placeholder:`0`,multiline:!1}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Cryptopals; Cryptohack.org; various CTF writeups`,priority:`low`,applicableCheck:e=>!!e.n},J={id:`related-message`,name:`Franklin-Reiter Related Message Attack`,category:`Message / Protocol`,description:`Recovers m from two ciphertexts with linearly related plaintexts via polynomial GCD. Use when c1 = m^e and c2 = (a·m + b)^e mod n with known a, b.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c1`,label:`c1 (ciphertext of m)`,placeholder:`Enter c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (ciphertext of a·m + b)`,placeholder:`Enter c2...`,multiline:!0,rows:3},{name:`a`,label:`a (linear coefficient)`,placeholder:`2`,multiline:!1},{name:`b`,label:`b (linear offset)`,placeholder:`0`,multiline:!1}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -4906,12 +4906,13 @@ print("SMALL_PUBLIC_EXP=FAILED")`:`def _attack():
                 break
         if not out:
             out.append(f"No perfect {e}-th power found for k in 0..{k_bound} with e = {e}")
-        print("\\\\n".join(out))
-        print("SMALL_PUBLIC_EXP=SUCCESS" if out else "SMALL_PUBLIC_EXP=FAILED")
+            out.append("SMALL_PUBLIC_EXP=FAILED")
+        else:
+            out.append("SMALL_PUBLIC_EXP=SUCCESS")
+        print("\\n".join(out))
     except Exception as ex:
         print(f"ERROR: {ex}")
         print("SMALL_PUBLIC_EXP=FAILED")
-    #
 _attack()`,frontendCheck:(e,t)=>{let n=BigInt(e.n),r=BigInt(e.e||`3`),i=BigInt(e.c);if(r>1000n)return Promise.resolve(null);let a=BigInt(e.k_bound||`100000`);if(a<0n)return Promise.resolve(null);let o=0n,s=null;if(r===3n)o=9n,s=new Set([0n,1n,8n]);else if(r<=17n){for(let e=2n*r+1n;e<1000n;e+=2n){if(e%3n==0n||e%5n==0n||e%7n==0n||e%11n==0n||e%13n==0n)continue;let t=!1;for(let n=17n;n*n<=e;n+=2n)if(e%n===0n){t=!0;break}if(!t&&(e-1n)%r==0n){o=e;break}}if(o>0n){s=new Set;for(let e=0n;e<o;e++){let t=1n;for(let n=0n;n<r;n++)t=t*e%o;s.add(t)}}}let c=(e,t)=>{let n=t>1n&&t**r>=e?t:1n<<BigInt(Math.ceil(e.toString(2).length/Number(r)));for(;;){let t=n**(r-1n),i=((r-1n)*n*t+e)/(r*t);if(i>=n)break;n=i}return n},l=1n;for(let e=0n;e<=a;e++){t&&a>1000n&&e%1000n==0n&&t(Number(e*100n/a),`k = ${e.toString()} / ${a.toString()}`);let u=i+e*n;if(!(s&&!s.has(u%o))){if(l=e===0n?c(u,1n):c(u,l),l**r===u)return t?.(100),Promise.resolve(`m = ${l}\nk = ${e}\nSMALL_PUBLIC_EXP=SUCCESS`);if((l+1n)**r===u)return t?.(100),Promise.resolve(`m = ${l+1n}\nk = ${e}\nSMALL_PUBLIC_EXP=SUCCESS`);if(l>0n&&(l-1n)**r===u)return t?.(100),Promise.resolve(`m = ${l-1n}\nk = ${e}\nSMALL_PUBLIC_EXP=SUCCESS`)}}return Promise.resolve(null)},proof:`\\textbf{Theorem:} If $m^e \\geq n$, then $m^e = c + k \\cdot n$ for some $k \\geq 0$, and $m = \\sqrt[e]{c + k \\cdot n}$ when $k = \\lfloor m^e / n \\rfloor$.
 
 \\textbf{Setup:}

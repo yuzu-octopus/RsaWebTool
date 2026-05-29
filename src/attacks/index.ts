@@ -18,7 +18,7 @@ import { attack as multiPrime, generateTestcase as genMultiPrime } from './multi
 import { attack as gimmickyPrimes, generateTestcase as genGimmickyPrimes } from './gimmicky-primes';
 import { attack as closePrime, generateTestcase as genClosePrime } from './close-prime';
 import { attack as noveltyPrimes, generateTestcase as genNoveltyPrimes } from './novelty-primes';
-import { attack as franklinReiterRelatedMessage, generateTestcase as genFranklinReiterRelatedMessage } from './related-message';
+import { attack as relatedMessage, generateTestcase as genRelatedMessage } from './related-message';
 
 import { attack as simpleLattice, generateTestcase as genSimpleLattice } from './simple-lattice';
 import { attack as partialD, generateTestcase as genPartialD } from './partial-d';
@@ -74,7 +74,7 @@ export const attacks: Attack[] = [
   bleichenbacher, manger, biasedLsb,
   roca, nitros, factordbLookup, knownPlaintext, smallPublicExp,
   multiPrimeGcd, phiLeak,
-  partialKeyExposure,   implicitKeyExposure, franklinReiterRelatedMessage,
+  partialKeyExposure,   implicitKeyExposure, relatedMessage,
   commonPrimeRsa, hastadBroadcast,
 ];
 
@@ -106,7 +106,7 @@ export const testcaseGenerators: Record<string, () => Record<string, string>> = 
   'lsb-oracle': genLsbOracle,
   'rsa-crt-fault': genRsaCrtFault,
   'non-coprime-exp': genNonCoprimeExp,
-  'franklin-reiter-related-message': genFranklinReiterRelatedMessage,
+  'related-message': genRelatedMessage,
   'homomorphic-forgery': genHomomorphicForgery,
   'bleichenbacher-sig': genBleichenbacherSig,
   bleichenbacher: genBleichenbacher,

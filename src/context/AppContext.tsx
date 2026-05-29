@@ -8,6 +8,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     viewMode: 'attack' as AppContextType['viewMode'],
     outputResult: null as string | null,
     outputError: null as string | null,
+    outputSource: null as AppContextType['outputSource'],
   });
   const [history, setHistory] = useState<HistoryEntry[]>(() => {
     try {
@@ -58,9 +59,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setOutputResult: (v: string | null) => setApp(prev => ({ ...prev, outputResult: v })),
     outputError: app.outputError,
     setOutputError: (v: string | null) => setApp(prev => ({ ...prev, outputError: v })),
+    outputSource: app.outputSource,
+    setOutputSource: (v: AppContextType['outputSource']) => setApp(prev => ({ ...prev, outputSource: v })),
     history, addToHistory, notification, showNotification,
   }), [
-    app.selectedAttack, app.viewMode, app.outputResult, app.outputError,
+    app.selectedAttack, app.viewMode, app.outputResult, app.outputError, app.outputSource,
     history, addToHistory, notification, showNotification,
   ]);
 

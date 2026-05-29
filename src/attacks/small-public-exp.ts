@@ -60,12 +60,13 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
                 break
         if not out:
             out.append(f"No perfect {e}-th power found for k in 0..{k_bound} with e = {e}")
-        print("\\\\n".join(out))
-        print("SMALL_PUBLIC_EXP=SUCCESS" if out else "SMALL_PUBLIC_EXP=FAILED")
+            out.append("SMALL_PUBLIC_EXP=FAILED")
+        else:
+            out.append("SMALL_PUBLIC_EXP=SUCCESS")
+        print("\\n".join(out))
     except Exception as ex:
         print(f"ERROR: {ex}")
         print("SMALL_PUBLIC_EXP=FAILED")
-    #
 _attack()`;
   },
   frontendCheck: (vals: Record<string, string>, onProgress?: (pct: number, detail?: string) => void): Promise<string | null> => {
