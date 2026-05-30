@@ -57,10 +57,8 @@ export const attack: Attack = {
         }
       }
 
-      if (result.status === 'FF') {
-        lines.push(``);
-        lines.push(`FACTORDB_LOOKUP=SUCCESS`);
-      }
+      lines.push(``);
+      lines.push(`FACTORDB_LOOKUP=SUCCESS`);
 
       return lines.join('\n');
     } catch {
