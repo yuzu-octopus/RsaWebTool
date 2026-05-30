@@ -6,8 +6,6 @@ import {
   Button,
   Tabs,
   Tab,
-  ToggleButton,
-  ToggleButtonGroup,
   CircularProgress,
   LinearProgress,
   Divider,
@@ -87,7 +85,6 @@ export function InputPanel() {
     );
   }
 
-  const hasBoth = !!(selectedAttack.frontendCheck);
   const pythonCode = selectedAttack.sageTemplate(
     Object.fromEntries(selectedAttack.inputs.map(f => [f.name, f.name]))
   );
@@ -375,44 +372,50 @@ export function InputPanel() {
       {/* Source tab */}
       {tab === 2 && (
         <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
-          {hasBoth && (
-            <ToggleButtonGroup
-              value={sourceMode}
-              exclusive
-              onChange={(_, v) => { if (v !== null) setSourceMode(v as 'sage' | 'frontend'); }}
-              sx={{ mb: 2 }}
-            >
-              <ToggleButton value="sage" sx={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '0.75rem',
-                textTransform: 'none',
-                color: draculaColors.comment,
-                borderColor: draculaColors.comment,
-                '&.Mui-selected': {
-                  color: draculaColors.purple,
-                  backgroundColor: draculaColors.currentLine,
-                  '&:hover': { backgroundColor: draculaColors.currentLine },
-                },
-              }}>
-                SageMath
-              </ToggleButton>
-              <ToggleButton value="frontend" sx={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '0.75rem',
-                textTransform: 'none',
-                color: draculaColors.comment,
-                borderColor: draculaColors.comment,
-                '&.Mui-selected': {
-                  color: draculaColors.purple,
-                  backgroundColor: draculaColors.currentLine,
-                  '&:hover': { backgroundColor: draculaColors.currentLine },
-                },
-              }}>
-                Frontend
-              </ToggleButton>
-            </ToggleButtonGroup>
-          )}
-
+    <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+      <Button
+        size="small"
+        variant="outlined"
+        onClick={() => setSourceMode('sage')}
+        sx={{
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: '0.75rem',
+          textTransform: 'none',
+          color: sourceMode === 'sage' ? draculaColors.purple : draculaColors.comment,
+          borderColor: sourceMode === 'sage' ? draculaColors.purple : draculaColors.comment,
+          backgroundColor: sourceMode === 'sage' ? draculaColors.currentLine : 'transparent',
+          '&:hover': {
+            borderColor: draculaColors.purple,
+            color: draculaColors.purple,
+            backgroundColor: draculaColors.currentLine,
+          },
+        }}
+      >
+        SageMath (Python)
+      </Button>
+      {selectedAttack.frontendCheck && (
+        <Button
+          size="small"
+          variant="outlined"
+          onClick={() => setSourceMode('frontend')}
+          sx={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '0.75rem',
+            textTransform: 'none',
+            color: sourceMode === 'frontend' ? draculaColors.purple : draculaColors.comment,
+            borderColor: sourceMode === 'frontend' ? draculaColors.purple : draculaColors.comment,
+            backgroundColor: sourceMode === 'frontend' ? draculaColors.currentLine : 'transparent',
+            '&:hover': {
+              borderColor: draculaColors.purple,
+              color: draculaColors.purple,
+              backgroundColor: draculaColors.currentLine,
+            },
+          }}
+        >
+          Frontend (TypeScript)
+        </Button>
+      )}
+    </Box>
           <Box sx={{
             borderRadius: 1,
             border: `1px solid ${draculaColors.comment}`,
