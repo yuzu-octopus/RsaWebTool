@@ -19,10 +19,9 @@ import { ProofRenderer } from './ProofRenderer';
 import { testcaseGenerators, submitToFactorDB, autoDecrypt } from '../attacks';
 import { isActualSuccess } from '../utils/sageOutput';
 import { inputSx } from '../styles/inputSx';
-import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn } from '../styles/shared';
+import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, draculaSourceTheme, FONT_FAMILY } from '../styles/shared';
 import { useTimer } from '../hooks/useTimer';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { dracula as draculaStyle } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 /** Strip common leading whitespace from each line (for dedenting .toString() output) */
 function dedent(str: string): string {
@@ -449,11 +448,12 @@ export function InputPanel() {
           }}>
             <SyntaxHighlighter
               language={effectiveSourceMode === 'sage' ? 'python' : 'typescript'}
-              style={draculaStyle}
+              style={draculaSourceTheme}
               customStyle={{
                 margin: 0,
                 borderRadius: 'inherit',
                 fontSize: '0.8rem',
+                fontFamily: FONT_FAMILY,
                 maxHeight: '50vh',
               }}
             >
