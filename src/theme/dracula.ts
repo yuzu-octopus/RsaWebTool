@@ -63,6 +63,9 @@ export const draculaTheme = createTheme({
           border: '2px solid transparent',
           backgroundClip: 'padding-box',
         },
+        '::-webkit-scrollbar-corner': {
+          background: draculaColors.background,
+        },
       },
     },
   },
