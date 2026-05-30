@@ -50,7 +50,7 @@ export const draculaTheme = createTheme({
           backgroundColor: draculaColors.background,
           color: draculaColors.foreground,
         },
-        '::-webkit-scrollbar': { width: '12px' },
+        '::-webkit-scrollbar': { width: '12px', height: '12px' },
         '::-webkit-scrollbar-track': { background: draculaColors.background },
         '::-webkit-scrollbar-thumb': {
           background: draculaColors.currentLine,

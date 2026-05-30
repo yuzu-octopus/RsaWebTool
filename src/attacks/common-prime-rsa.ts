@@ -11,7 +11,6 @@ export const attack: Attack = {
     { name: 'n1', label: 'n1 (first modulus)', placeholder: 'Enter n1...', multiline: true, rows: 3 },
     { name: 'n2', label: 'n2 (second modulus)', placeholder: 'Enter n2...', multiline: true, rows: 3 },
   ],
-  sageTemplate: () => `print("Common Prime RSA requires multiple moduli — run in browser mode")`,
   proof: `\\textbf{Theorem:} If $n_1 = p \\cdot q_1$ and $n_2 = p \\cdot q_2$ share a prime $p$, then $\\gcd(n_1, n_2) = p$.
 
 \\textbf{Setup:}
