@@ -19,7 +19,7 @@ import { ProofRenderer } from './ProofRenderer';
 import { testcaseGenerators, submitToFactorDB, autoDecrypt } from '../attacks';
 import { isActualSuccess } from '../utils/sageOutput';
 import { inputSx } from '../styles/inputSx';
-import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, draculaSourceTheme, FONT_FAMILY } from '../styles/shared';
+import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, draculaSourceTheme, FONT_FAMILY } from '../styles/shared';
 import { useTimer } from '../hooks/useTimer';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 
@@ -466,14 +466,8 @@ export function InputPanel() {
               size="small"
               variant="outlined"
               onClick={handleCopySource}
-              sx={{
-                color: draculaColors.comment,
-                borderColor: draculaColors.comment,
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: '0.7rem',
-                '&:hover': { borderColor: draculaColors.purple, color: draculaColors.purple },
-              }}
-              startIcon={<ContentCopy sx={{ fontSize: '0.85rem' }} />}
+              sx={ghostBtnSx}
+              startIcon={<ContentCopy />}
             >
               Copy
             </Button>
