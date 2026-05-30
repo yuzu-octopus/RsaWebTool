@@ -167,10 +167,14 @@ export function InputPanel() {
     const currentAttackId = selectedAttack.id;
     attackIdRef.current = currentAttackId;
 
-    // Strip all whitespace from input values (e.g. spaces in numbers pasted from websites)
+    // Strip whitespace from input values (e.g. spaces in numbers pasted from websites).
+    // For multiline fields, preserve newlines — they're used as value separators.
     const vals: Record<string, string> = {};
     for (const [key, value] of Object.entries(inputValues)) {
-      vals[key] = value.replace(/\s/g, '');
+      const field = selectedAttack.inputs.find(f => f.name === key);
+      vals[key] = field?.multiline
+        ? value.replace(/[^\S\n]/g, '')  // strip horizontal whitespace only, preserve newlines
+        : value.replace(/\s/g, '');       // strip ALL whitespace for single-line inputs
     }
 
     const missingFields = selectedAttack.inputs
