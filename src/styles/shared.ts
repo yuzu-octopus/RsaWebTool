@@ -53,15 +53,15 @@ export const draculaSourceTheme: Record<string, React.CSSProperties> = {
   cdata: { color: draculaColors.comment },
 
   // === Punctuation & structure ===
-  punctuation: { color: draculaColors.foreground },
+  punctuation: { color: draculaColors.pink },
   namespace: { opacity: '.7' },
 
   // === Properties & tags (HTML) ===
-  property: { color: draculaColors.pink },
+  property: { color: draculaColors.cyan },
   tag: { color: draculaColors.pink },
 
   // === Booleans, numbers, constants ===
-  boolean: { color: draculaColors.purple },
+  boolean: { color: draculaColors.pink },
   number: { color: draculaColors.purple },
   constant: { color: draculaColors.purple },
   symbol: { color: draculaColors.purple },
@@ -71,15 +71,15 @@ export const draculaSourceTheme: Record<string, React.CSSProperties> = {
   'attr-name': { color: draculaColors.yellow },
 
   // === Strings & chars ===
-  string: { color: draculaColors.green },
-  char: { color: draculaColors.green },
-  builtin: { color: draculaColors.green },
+  string: { color: draculaColors.yellow },
+  char: { color: draculaColors.yellow },
+  builtin: { color: draculaColors.cyan },
   inserted: { color: draculaColors.green },
 
   // === Operators & entities ===
-  operator: { color: draculaColors.purple },
+  operator: { color: draculaColors.pink },
   entity: { color: draculaColors.foreground, cursor: 'help' },
-  url: { color: draculaColors.foreground },
+  url: { color: draculaColors.cyan },
   '.language-css .token.string': { color: draculaColors.foreground },
   '.style .token.string': { color: draculaColors.foreground },
 
@@ -87,15 +87,15 @@ export const draculaSourceTheme: Record<string, React.CSSProperties> = {
   variable: { color: draculaColors.foreground },
 
   // === Keywords, functions, classes ===
-  atrule: { color: draculaColors.yellow },
-  'attr-value': { color: draculaColors.yellow },
-  function: { color: draculaColors.cyan },
+  atrule: { color: draculaColors.pink },
+  'attr-value': { color: draculaColors.pink },
+  function: { color: draculaColors.green },
   'class-name': { color: draculaColors.cyan },
   keyword: { color: draculaColors.pink },
 
   // === Regex & importance ===
-  regex: { color: draculaColors.orange },
-  important: { color: draculaColors.orange, fontWeight: 'bold' },
+  regex: { color: draculaColors.red },
+  important: { color: draculaColors.pink, fontWeight: 'bold' },
 
   // === Text formatting ===
   bold: { fontWeight: 'bold' },
@@ -109,14 +109,14 @@ export const draculaSourceTheme: Record<string, React.CSSProperties> = {
   escape: { color: draculaColors.pink },
 
   // === Function parameters ===
-  parameter: { color: draculaColors.foreground },
+  parameter: { color: draculaColors.orange, fontStyle: 'italic' },
 
   // === Heuristic class references (Prism 1.24+) ===
   'maybe-class-name': { color: draculaColors.cyan },
 
   // === Template strings (JS/TS backticks) ===
-  'template-string': { color: draculaColors.green },
-  'template-punctuation': { color: draculaColors.green },
+  'template-string': { color: draculaColors.yellow },
+  'template-punctuation': { color: draculaColors.pink },
 };
 
 /**
