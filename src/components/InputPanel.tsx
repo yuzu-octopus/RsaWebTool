@@ -22,6 +22,7 @@ import { inputSx } from '../styles/inputSx';
 import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, draculaSourceTheme, FONT_FAMILY } from '../styles/shared';
 import { useTimer } from '../hooks/useTimer';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { getAttackSource } from '../attacks/rawSources';
 
 /** Strip common leading whitespace from each line (for dedenting .toString() output) */
 function dedent(str: string): string {
@@ -69,6 +70,7 @@ export function InputPanel() {
   const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const ownershipRef = useRef<'input' | 'magic' | null>(null);
   const timer = useTimer();
+  const [frontendCode, setFrontendCode] = useState('');
   const { runAttack } = useWorkerPool();
   useEffect(() => {
     mountedRef.current = true;
@@ -84,6 +86,28 @@ export function InputPanel() {
       abortControllerRef.current?.abort();
     }
   }, [viewMode]);
+
+  // Load raw source for the Source tab (avoids minified .toString() in production).
+  // All setState calls happen inside .then()/.catch() — never synchronously in the effect body.
+  useEffect(() => {
+    if (!selectedAttack?.frontendCheck) return;
+    let cancelled = false;
+    getAttackSource(selectedAttack.id)
+      .then(src => {
+        if (cancelled) return;
+        if (src) {
+          setFrontendCode(src);
+        } else {
+          // Fallback: use toString if raw source unavailable
+          setFrontendCode(dedent(selectedAttack.frontendCheck!.toString()));
+        }
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setFrontendCode(dedent(selectedAttack.frontendCheck!.toString()));
+      });
+    return () => { cancelled = true; };
+  }, [selectedAttack]);
 
   if (viewMode !== 'attack') return null;
 
@@ -107,9 +131,7 @@ export function InputPanel() {
   const pythonCode = hasSage
     ? selectedAttack.sageTemplate!(Object.fromEntries(selectedAttack.inputs.map(f => [f.name, f.name])))
     : '';
-  const frontendCode = hasFrontend
-    ? dedent(selectedAttack.frontendCheck!.toString())
-    : '';
+  // frontendCode is now loaded asynchronously via useEffect below
   const handleCopySource = () => {
     const code = effectiveSourceMode === 'sage' ? pythonCode : frontendCode;
     void navigator.clipboard.writeText(code);
