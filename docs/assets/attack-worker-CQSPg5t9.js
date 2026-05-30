@@ -1,5 +1,4 @@
-(function(){var e=class extends Error{status;constructor(e,t){super(e),this.name=`FactorDBError`,this.status=t}};let t=``;function n(e){t=e}function r(e,t,n=100){if(t>n)throw Error(`Exponent ${t} exceeds maximum ${n}`);let r=1n,i=typeof e==`bigint`?e:BigInt(e);for(let e=0;e<t;e++)r*=i;return r}async function i(n,r=t){let i=typeof n==`bigint`?n.toString():n;if(!i)throw new e(`queryFactorDB: n is empty`);let a=r?`${r}?query=${encodeURIComponent(i)}`:`https://factordb.com/api?query=${encodeURIComponent(i)}`,o=new AbortController,s=setTimeout(()=>o.abort(),2e4);try{let t=await fetch(a,{signal:o.signal});if(!t.ok)throw new e(`HTTP ${t.status}`,t.status);let n=await t.json();if(typeof n!=`object`||!n||![`string`,`number`].includes(typeof n.id))throw new e(`Invalid FactorDB response format`);return n}finally{clearTimeout(s)}}function a(e){let t=[];if(t.push(`FactorDB Status: ${e.status}`),e.status===`FF`&&e.factors){t.push(`Fully factored!`);for(let[n,r]of e.factors)t.push(r>1?`  ${n}^${r}`:`  ${n}`);if(e.factors.length===2){let n=r(e.factors[0][0],e.factors[0][1]),i=r(e.factors[1][0],e.factors[1][1]);t.push(`p = ${n}`),t.push(`q = ${i}`)}}else if(e.status===`CF`&&e.factors){t.push(`Partially factored:`);for(let[n,r]of e.factors)t.push(r>1?`  ${n}^${r}`:`  ${n}`)}else t.push(`No factors found`);return t.join(`
-`)}let o=0n,s=0,c=null,l=null,u=null,d=null;if(typeof WebAssembly<`u`){let e=new Uint8Array([0,97,115,109,1,0,0,0,1,20,3,96,0,1,126,96,2,126,126,1,126,96,5,126,126,126,126,127,1,127,3,8,7,1,1,2,0,0,0,0,6,21,4,126,1,66,0,11,126,1,66,0,11,126,1,66,0,11,126,1,66,0,11,7,47,7,6,117,54,52,103,99,100,0,0,9,117,54,52,103,99,100,101,120,116,0,1,6,104,101,108,112,101,114,0,2,1,65,0,3,1,66,0,4,1,67,0,5,1,68,0,6,10,141,4,7,37,1,1,126,32,1,66,0,82,4,64,3,64,32,0,32,1,130,33,2,32,1,33,0,32,2,34,1,66,0,82,13,0,11,11,32,0,11,97,1,6,126,66,1,33,6,66,1,33,3,32,1,66,0,82,4,64,3,64,32,0,32,0,32,1,128,34,7,32,1,126,125,33,4,32,1,33,0,32,6,32,2,32,7,126,125,33,1,32,5,32,3,32,7,126,125,33,7,32,2,33,6,32,3,33,5,32,1,33,2,32,7,33,3,32,4,34,1,66,0,82,13,0,11,11,32,6,36,0,32,5,36,1,32,0,11,238,2,2,7,126,2,127,66,1,33,9,66,1,33,7,32,0,66,127,82,32,2,66,127,82,113,4,64,3,64,32,0,32,6,124,33,8,32,0,32,9,124,33,6,32,2,32,5,124,33,5,32,2,32,7,124,33,7,32,12,65,1,113,4,64,32,8,33,9,32,6,33,8,32,9,33,6,32,5,33,9,32,7,33,5,32,9,33,7,11,3,64,32,5,32,6,32,8,32,7,128,34,11,32,5,126,125,34,9,86,4,64,32,12,65,1,106,33,12,32,8,32,7,32,11,126,125,33,10,32,0,32,2,32,11,126,125,33,11,32,5,33,8,32,7,33,6,32,2,33,0,32,10,33,5,32,9,33,7,32,11,33,2,12,1,11,11,32,6,32,0,125,33,9,32,8,32,0,125,33,6,32,5,32,2,125,33,5,32,7,32,2,125,33,7,32,12,65,1,113,4,64,32,9,33,8,32,6,33,9,32,8,33,6,32,5,33,8,32,7,33,5,32,8,33,7,11,32,4,32,0,32,9,124,34,8,32,0,32,6,124,34,10,32,8,32,10,86,27,121,167,34,13,32,4,32,13,72,27,34,13,4,64,32,1,32,1,32,4,32,13,107,34,4,172,34,8,136,34,10,32,8,134,125,33,1,32,3,32,3,32,8,136,34,11,32,8,134,125,33,3,32,9,32,10,126,32,6,32,11,126,124,32,0,32,13,172,34,8,134,124,33,0,32,5,32,10,126,32,7,32,11,126,124,32,2,32,8,134,124,33,2,11,32,13,13,0,11,11,32,9,36,0,32,6,36,1,32,5,36,2,32,7,36,3,65,0,11,4,0,35,0,11,4,0,35,1,11,4,0,35,2,11,4,0,35,3,11]);try{let t=new WebAssembly.Instance(new WebAssembly.Module(e)).exports;t.helper(1n,0n,1n,0n)!=null&&(u=function(e,n,r,i,a){return t.helper(e,n,r,i,a),[t.A(),t.B(),t.C(),t.D()]},s=64,o=BigInt.asUintN(64,-1n)),t.u64gcd(0n,0n)===0n&&(c=t.u64gcd),t.u64gcdext(0n,0n)===0n&&(l=function(e,n){let r=t.u64gcdext(e,n);return[t.A(),t.B(),r]})}catch(e){console.log(e)}}function f(e){"use asm";var t=e.Math.floor,n=e.Math.max,r=e.Math.clz32,i=-0,a=-0,o=-0,s=-0;function c(e,n){e=+e,n=+n;for(var r=-0,i=-0;n>-0;)i=+t(e/n),r=e-i*n,e=n,n=r;return+e}function l(e,n){e=+e,n=+n;for(var r=-0,o=-0,s=1,c=-0,l=-0,u=1,d=-0,f=-0;n>-0;)o=+t(e/n),r=e-o*n,e=n,n=r,d=s-o*l,f=c-o*u,s=l,c=u,l=d,u=f;return i=s,a=c,+e}function u(e){e=+e;for(var t=0;e>=4294967296;)e*=23283064365386963e-26,t=t+32|0;return t=t+(32-(r(~~e)|0))|0,t|0}function d(e){e|=0;for(var t=1;(e|0)<0;)e=e+32|0,t*=23283064365386963e-26;for(;(e|0)>=32;)e=e-32|0,t*=4294967296;return t*=+(1<<e>>>0),+t}function f(e,r,c,l,f){e=+e,r=+r,c=+c,l=+l,f|=0;var p=1,m=-0,h=-0,g=1,_=0,v=0,y=-0,b=-0,x=-0,S=-0,C=-0,w=-0,T=0,E=-0,D=-0,O=-0,k=-0,A=-0;if(c!=-0)do{do y=t(e/c),b=e-y*c,x=h,S=g,C=p-y*h,w=m-y*g,v=-0<=b+C&b+C<c+h&-0<=b+w&b+w<c+g,v&&(e=c,c=b,p=x,m=S,h=C,g=w);while(v);T=53-(u(e+n(p,m))|0)|0,_=(T|0)<0?T:(T|0)>(f|0)?f:T,T|0&&(E=+d(f-_|0),D=+d(_-f|0),O=+t(r*D),k=+t(l*D),r-=O*E,l-=k*E,f=f-_|0,A=+d(_),e=p*O+m*k+e*A,c=h*O+g*k+c*A)}while(_|0);return i=p,a=m,o=h,s=g,0}function p(){return i}function m(){return a}function h(){return o}function g(){return s}return{f64gcdext:l,f64gcd:c,helper:f,A:p,B:m,C:h,D:g}}if(s===0){let e=f(globalThis);d=function(t,n,r,i,a){return e.helper(t,n,r,i,a),[BigInt(e.A()),BigInt(e.B()),BigInt(e.C()),BigInt(e.D())]},s=53,o=BigInt.asUintN(53,-1n),c=function(t,n){return BigInt(e.f64gcd(Number(BigInt(t)),Number(BigInt(n))))},l=function(t,n){let r=e.f64gcdext(Number(BigInt(t)),Number(BigInt(n)));return[BigInt(e.A()),BigInt(e.B()),BigInt(r)]}}function p(e){let t=e.toString(16),n=t.charCodeAt(0)-0-48;if(n<=0)throw RangeError();return(t.length-1)*4+(32-Math.clz32(Math.min(n,8)))}let m=typeof Float64Array<`u`?new Float64Array(1):null,h=typeof Float64Array<`u`?new Int32Array(m.buffer):null,g=0;function _(e){if(g<=1024){let t=-0+Number(BigInt(e));if(m!=null){m[0]=t;let e=(h[1]>>20)-1023;if(e<1024&&h[0]!==0||h[1]&1048575)return g=e+1,g}let n=Math.log2(t)+1024*4-1024*4,r=Math.ceil(n);if(n!==r)return g=r,g}g<s&&(g=s);let t=-0+Number(e>>BigInt(g-s));if(t>=1&&t<=9007199254740992){let e=+t,n=0;for(;e>1073741824;)e=Math.floor(e/1073741824),n+=30;return n+=32-Math.clz32(e),g=g-s+n,g}return g=p(e),g}function v(e,t){if(typeof e!=`bigint`||typeof t!=`bigint`)throw TypeError();if(u!=null){if(s!==64)throw RangeError();let n=BigInt.asUintN(64,e>>64n),r=BigInt.asUintN(64,e),i=BigInt.asUintN(64,t>>64n),a=BigInt.asUintN(64,t);return u(n,r,i,a,64)}else{if(s!==53)throw RangeError();let n=-0+Number(e>>53n),r=-0+Number(BigInt.asUintN(53,e)),i=-0+Number(t>>53n),a=-0+Number(BigInt.asUintN(53,t));return d(n,r,i,a,53)}}function y(e){if(typeof e!=`bigint`)throw TypeError();return e<0n?-e:e}function b(e,t){if(typeof e!=`bigint`||typeof t!=`bigint`)throw TypeError();return e<t?t:e}function x(e,t,n=!0,r=!0,i=!1){if(typeof e!=`bigint`||typeof t!=`bigint`)throw TypeError();n||=r;let a=1n,c=0n,l=0n,u=1n,d=0;if(e<0n&&(e=-e,n&&(a=-a,c=-c,d+=1)),t<0n&&(t=-t,n&&(l=-l,u=-u,d+=1)),e<t){let r=e;if(e=t,t=r,n){let e=a;a=l,l=e;let t=c;c=u,u=t,d+=1}}let f=!1;r&&BigInt.asUintN(4096,e)===e&&(f=!0);let m=!1,h=0;for(;(r||e>o)&&t!==0n;){if(!f&&!r&&BigInt.asUintN(32768*(n?1/16:1),t)===t){f=!0;continue}if(d+=1,!f){r&&d===1&&(h=p(e));let i=r?p(b(y(l),y(u))):0,o=r?Math.max(0,Math.ceil((h-i-i)*(1/2))):n?0:Math.floor(p(e)*2/3),s=BigInt(o);if(d!==1&&r){if(o<256){f=!0;continue}let n=8;for(;e+a>>s!==e+c>>s||t+l>>s!==t+u>>s;)o+=n,s=BigInt(o),n+=n}let[m,g,_,v,S,C]=x(e>>s,t>>s),[w,T,E,D,O,k]=[BigInt(m),BigInt(g),BigInt(_),BigInt(v),BigInt(S),BigInt(C)];if(T!==0n){if(n)if(d===1)a=w,c=T,l=E,u=D;else{let e=w*c+T*u,t=E*c+D*u;if(c=e,u=t,r){let e=w*a+T*l,t=E*a+D*l;a=e,l=t}}let i=BigInt.asUintN(o,e),f=BigInt.asUintN(o,t),p=w*i+T*f+(O<<s),m=E*i+D*f+(k<<s);if(e=p,t=m,e<0n||t<0n)throw TypeError(`assertion`);continue}}if(f&&!m){let o=Math.max(0,_(e)-s*2),f=o===0?0n:BigInt(o);if(d!==1&&r&&(e+a>>f!==e+c>>f||t+l>>f!==t+u>>f)){if(!i)break;do o+=8,f=BigInt(o);while(e+a>>f!==e+c>>f||t+l>>f!==t+u>>f);if(t>>f===0n){m=!0;continue}}let[p,h,g,y]=v(o===0?e:e>>f,o===0?t:t>>f),[b,x,S,C]=[BigInt(p),BigInt(h),BigInt(g),BigInt(y)];if(x!==0n){if(n)if(d===1)a=b,c=x,l=S,u=C;else{let e=b*c+x*u,t=S*c+C*u;if(c=e,u=t,r){let e=b*a+x*l,t=S*a+C*l;a=e,l=t}}let i=b*e+x*t,o=S*e+C*t;if(e=i,t=o,e<0n||t<0n)throw TypeError(`assertion`);continue}}let o=e/t,g=e-o*t;if(n){let e=a-o*l,n=c-o*u;if(r&&!(0n<=g+e&&g+e<t+l&&0n<=g+n&&g+n<t+u))break;a=l,c=u,l=e,u=n}e=t,t=g}return[a,c,l,u,e,t]}function S(e,t){let[n,r,i,a,o,s]=x(e,t,!1,!1);return e=BigInt(o),t=BigInt(s),t!==0n&&(e=BigInt.asUintN(64,c(e,t))),e}function C(e,t){let[n,r,i,a,o,s]=x(e,t,!0,!1),c=e,u=t,d=BigInt(n),f=BigInt(r);BigInt(i);let p=BigInt(a);if(e=BigInt(o),t=BigInt(s),s!==0n){let[n,r,i]=l(e,t);e=BigInt.asUintN(64,i),t=0n,f=n*f+r*p}return d=c===0n?0n:(e-f*u)/c,[d,f,e]}function w(e,t){return S(BigInt(e),BigInt(t))}function T(e,t){return C(BigInt(e),BigInt(t))}function E(e,t){let[n,r,i,a,o,s]=x(t,e,!0,!1);if(BigInt(s)!==0n){let[e,n,i]=l(o,s);if(BigInt.asUintN(64,i)!==1n)return 0n;let c=e*BigInt(r)+n*BigInt(a);return c<0n?c+t:c}if(BigInt(o)!==1n)return 0n;let c=BigInt(r);return c<0n?c+t:c}function D(e,t){return x(e,t,!0,!0,!0)}w.halfgcd=D,w.gcdext=T,w.invmod=E;function O(e,t){return e=e<0n?-e:e,t=t<0n?-t:t,w(e,t)}function k(e){if(e<0n)throw RangeError(`isqrt: negative input`);if(e<2n)return e;let t=1n<<(BigInt(e.toString(16).length)*4n>>1n),n=t+e/t>>1n;for(;n<t;)t=n,n=t+e/t>>1n;return t}function A(e,t){let n=e<0n,r=t<0n;e=n?-e:e,t=r?-t:t;let[i,a,o]=w.gcdext(e,t);return{gcd:o,x:n?-i:i,y:r?-a:a}}function j(e,t){let{gcd:n,x:r}=A((e%t+t)%t,t);return n===1n?(r%t+t)%t:null}function M(e,t,n){if(t<0n)throw RangeError(`modPow: negative exponent not supported`);if(n<=0n)throw RangeError(`modPow: modulus must be positive`);if(n===1n)return 0n;let r=1n;for(e=(e%n+n)%n;t>0n;)t&1n&&(r=r*e%n),t>>=1n,e=e*e%n;return r}function N(e,t){if(e<0n)throw RangeError(`iroot: negative input`);if(e<2n||t<=1n)return e;if(t===2n)return k(e);let n=BigInt(e.toString(16).length)*4n;if(n<t)return 1n;let r=e=>{if(t===3n)return e*e*e;if(t===5n){let t=e*e;return t*t*e}return e**t},i=1n<<n/t;i<2n&&(i=2n);let a=t-1n,o=(i*a+e/i**a)/t;for(;o<i;)i=o,o=(i*a+e/i**a)/t;let s=i,c=o;for(;r(c)<=e;)s=c,c*=2n;for(;s+1n<c;){let t=(s+c)/2n;r(t)<=e?s=t:c=t}for(;r(s+1n)<=e;)s++;for(;r(s)>e;)s--;return s}let P={id:`boneh-durfee`,name:`Boneh-Durfee Attack`,category:`Factorization`,description:`Recovers d when d < n^0.292 via Wiener continued fractions (d < n^0.25) or Boneh-Durfee lattice (d < n^0.292). Use for unbalanced private exponents.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+(function(){var e=class extends Error{status;constructor(e,t){super(e),this.name=`FactorDBError`,this.status=t}};let t=``;function n(e){t=e}async function r(n,r=t){let i=typeof n==`bigint`?n.toString():n;if(!i)throw new e(`queryFactorDB: n is empty`);let a=r?`${r}?query=${encodeURIComponent(i)}`:`https://factordb.com/api?query=${encodeURIComponent(i)}`,o=new AbortController,s=setTimeout(()=>o.abort(),2e4);try{let t=await fetch(a,{signal:o.signal});if(!t.ok)throw new e(`HTTP ${t.status}`,t.status);let n=await t.json();if(typeof n!=`object`||!n||![`string`,`number`].includes(typeof n.id))throw new e(`Invalid FactorDB response format`);return n}finally{clearTimeout(s)}}let i=0n,a=0,o=null,s=null,c=null,l=null;if(typeof WebAssembly<`u`){let e=new Uint8Array([0,97,115,109,1,0,0,0,1,20,3,96,0,1,126,96,2,126,126,1,126,96,5,126,126,126,126,127,1,127,3,8,7,1,1,2,0,0,0,0,6,21,4,126,1,66,0,11,126,1,66,0,11,126,1,66,0,11,126,1,66,0,11,7,47,7,6,117,54,52,103,99,100,0,0,9,117,54,52,103,99,100,101,120,116,0,1,6,104,101,108,112,101,114,0,2,1,65,0,3,1,66,0,4,1,67,0,5,1,68,0,6,10,141,4,7,37,1,1,126,32,1,66,0,82,4,64,3,64,32,0,32,1,130,33,2,32,1,33,0,32,2,34,1,66,0,82,13,0,11,11,32,0,11,97,1,6,126,66,1,33,6,66,1,33,3,32,1,66,0,82,4,64,3,64,32,0,32,0,32,1,128,34,7,32,1,126,125,33,4,32,1,33,0,32,6,32,2,32,7,126,125,33,1,32,5,32,3,32,7,126,125,33,7,32,2,33,6,32,3,33,5,32,1,33,2,32,7,33,3,32,4,34,1,66,0,82,13,0,11,11,32,6,36,0,32,5,36,1,32,0,11,238,2,2,7,126,2,127,66,1,33,9,66,1,33,7,32,0,66,127,82,32,2,66,127,82,113,4,64,3,64,32,0,32,6,124,33,8,32,0,32,9,124,33,6,32,2,32,5,124,33,5,32,2,32,7,124,33,7,32,12,65,1,113,4,64,32,8,33,9,32,6,33,8,32,9,33,6,32,5,33,9,32,7,33,5,32,9,33,7,11,3,64,32,5,32,6,32,8,32,7,128,34,11,32,5,126,125,34,9,86,4,64,32,12,65,1,106,33,12,32,8,32,7,32,11,126,125,33,10,32,0,32,2,32,11,126,125,33,11,32,5,33,8,32,7,33,6,32,2,33,0,32,10,33,5,32,9,33,7,32,11,33,2,12,1,11,11,32,6,32,0,125,33,9,32,8,32,0,125,33,6,32,5,32,2,125,33,5,32,7,32,2,125,33,7,32,12,65,1,113,4,64,32,9,33,8,32,6,33,9,32,8,33,6,32,5,33,8,32,7,33,5,32,8,33,7,11,32,4,32,0,32,9,124,34,8,32,0,32,6,124,34,10,32,8,32,10,86,27,121,167,34,13,32,4,32,13,72,27,34,13,4,64,32,1,32,1,32,4,32,13,107,34,4,172,34,8,136,34,10,32,8,134,125,33,1,32,3,32,3,32,8,136,34,11,32,8,134,125,33,3,32,9,32,10,126,32,6,32,11,126,124,32,0,32,13,172,34,8,134,124,33,0,32,5,32,10,126,32,7,32,11,126,124,32,2,32,8,134,124,33,2,11,32,13,13,0,11,11,32,9,36,0,32,6,36,1,32,5,36,2,32,7,36,3,65,0,11,4,0,35,0,11,4,0,35,1,11,4,0,35,2,11,4,0,35,3,11]);try{let t=new WebAssembly.Instance(new WebAssembly.Module(e)).exports;t.helper(1n,0n,1n,0n)!=null&&(c=function(e,n,r,i,a){return t.helper(e,n,r,i,a),[t.A(),t.B(),t.C(),t.D()]},a=64,i=BigInt.asUintN(64,-1n)),t.u64gcd(0n,0n)===0n&&(o=t.u64gcd),t.u64gcdext(0n,0n)===0n&&(s=function(e,n){let r=t.u64gcdext(e,n);return[t.A(),t.B(),r]})}catch(e){console.log(e)}}function u(e){"use asm";var t=e.Math.floor,n=e.Math.max,r=e.Math.clz32,i=-0,a=-0,o=-0,s=-0;function c(e,n){e=+e,n=+n;for(var r=-0,i=-0;n>-0;)i=+t(e/n),r=e-i*n,e=n,n=r;return+e}function l(e,n){e=+e,n=+n;for(var r=-0,o=-0,s=1,c=-0,l=-0,u=1,d=-0,f=-0;n>-0;)o=+t(e/n),r=e-o*n,e=n,n=r,d=s-o*l,f=c-o*u,s=l,c=u,l=d,u=f;return i=s,a=c,+e}function u(e){e=+e;for(var t=0;e>=4294967296;)e*=23283064365386963e-26,t=t+32|0;return t=t+(32-(r(~~e)|0))|0,t|0}function d(e){e|=0;for(var t=1;(e|0)<0;)e=e+32|0,t*=23283064365386963e-26;for(;(e|0)>=32;)e=e-32|0,t*=4294967296;return t*=+(1<<e>>>0),+t}function f(e,r,c,l,f){e=+e,r=+r,c=+c,l=+l,f|=0;var p=1,m=-0,h=-0,g=1,_=0,v=0,y=-0,b=-0,x=-0,S=-0,C=-0,w=-0,T=0,E=-0,D=-0,O=-0,k=-0,A=-0;if(c!=-0)do{do y=t(e/c),b=e-y*c,x=h,S=g,C=p-y*h,w=m-y*g,v=-0<=b+C&b+C<c+h&-0<=b+w&b+w<c+g,v&&(e=c,c=b,p=x,m=S,h=C,g=w);while(v);T=53-(u(e+n(p,m))|0)|0,_=(T|0)<0?T:(T|0)>(f|0)?f:T,T|0&&(E=+d(f-_|0),D=+d(_-f|0),O=+t(r*D),k=+t(l*D),r-=O*E,l-=k*E,f=f-_|0,A=+d(_),e=p*O+m*k+e*A,c=h*O+g*k+c*A)}while(_|0);return i=p,a=m,o=h,s=g,0}function p(){return i}function m(){return a}function h(){return o}function g(){return s}return{f64gcdext:l,f64gcd:c,helper:f,A:p,B:m,C:h,D:g}}if(a===0){let e=u(globalThis);l=function(t,n,r,i,a){return e.helper(t,n,r,i,a),[BigInt(e.A()),BigInt(e.B()),BigInt(e.C()),BigInt(e.D())]},a=53,i=BigInt.asUintN(53,-1n),o=function(t,n){return BigInt(e.f64gcd(Number(BigInt(t)),Number(BigInt(n))))},s=function(t,n){let r=e.f64gcdext(Number(BigInt(t)),Number(BigInt(n)));return[BigInt(e.A()),BigInt(e.B()),BigInt(r)]}}function d(e){let t=e.toString(16),n=t.charCodeAt(0)-0-48;if(n<=0)throw RangeError();return(t.length-1)*4+(32-Math.clz32(Math.min(n,8)))}let f=typeof Float64Array<`u`?new Float64Array(1):null,p=typeof Float64Array<`u`?new Int32Array(f.buffer):null,m=0;function h(e){if(m<=1024){let t=-0+Number(BigInt(e));if(f!=null){f[0]=t;let e=(p[1]>>20)-1023;if(e<1024&&p[0]!==0||p[1]&1048575)return m=e+1,m}let n=Math.log2(t)+1024*4-1024*4,r=Math.ceil(n);if(n!==r)return m=r,m}m<a&&(m=a);let t=-0+Number(e>>BigInt(m-a));if(t>=1&&t<=9007199254740992){let e=+t,n=0;for(;e>1073741824;)e=Math.floor(e/1073741824),n+=30;return n+=32-Math.clz32(e),m=m-a+n,m}return m=d(e),m}function g(e,t){if(typeof e!=`bigint`||typeof t!=`bigint`)throw TypeError();if(c!=null){if(a!==64)throw RangeError();let n=BigInt.asUintN(64,e>>64n),r=BigInt.asUintN(64,e),i=BigInt.asUintN(64,t>>64n),o=BigInt.asUintN(64,t);return c(n,r,i,o,64)}else{if(a!==53)throw RangeError();let n=-0+Number(e>>53n),r=-0+Number(BigInt.asUintN(53,e)),i=-0+Number(t>>53n),o=-0+Number(BigInt.asUintN(53,t));return l(n,r,i,o,53)}}function _(e){if(typeof e!=`bigint`)throw TypeError();return e<0n?-e:e}function v(e,t){if(typeof e!=`bigint`||typeof t!=`bigint`)throw TypeError();return e<t?t:e}function y(e,t,n=!0,r=!0,o=!1){if(typeof e!=`bigint`||typeof t!=`bigint`)throw TypeError();n||=r;let s=1n,c=0n,l=0n,u=1n,f=0;if(e<0n&&(e=-e,n&&(s=-s,c=-c,f+=1)),t<0n&&(t=-t,n&&(l=-l,u=-u,f+=1)),e<t){let r=e;if(e=t,t=r,n){let e=s;s=l,l=e;let t=c;c=u,u=t,f+=1}}let p=!1;r&&BigInt.asUintN(4096,e)===e&&(p=!0);let m=!1,b=0;for(;(r||e>i)&&t!==0n;){if(!p&&!r&&BigInt.asUintN(32768*(n?1/16:1),t)===t){p=!0;continue}if(f+=1,!p){r&&f===1&&(b=d(e));let i=r?d(v(_(l),_(u))):0,a=r?Math.max(0,Math.ceil((b-i-i)*(1/2))):n?0:Math.floor(d(e)*2/3),o=BigInt(a);if(f!==1&&r){if(a<256){p=!0;continue}let n=8;for(;e+s>>o!==e+c>>o||t+l>>o!==t+u>>o;)a+=n,o=BigInt(a),n+=n}let[m,h,g,x,S,C]=y(e>>o,t>>o),[w,T,E,D,O,k]=[BigInt(m),BigInt(h),BigInt(g),BigInt(x),BigInt(S),BigInt(C)];if(T!==0n){if(n)if(f===1)s=w,c=T,l=E,u=D;else{let e=w*c+T*u,t=E*c+D*u;if(c=e,u=t,r){let e=w*s+T*l,t=E*s+D*l;s=e,l=t}}let i=BigInt.asUintN(a,e),d=BigInt.asUintN(a,t),p=w*i+T*d+(O<<o),m=E*i+D*d+(k<<o);if(e=p,t=m,e<0n||t<0n)throw TypeError(`assertion`);continue}}if(p&&!m){let i=Math.max(0,h(e)-a*2),d=i===0?0n:BigInt(i);if(f!==1&&r&&(e+s>>d!==e+c>>d||t+l>>d!==t+u>>d)){if(!o)break;do i+=8,d=BigInt(i);while(e+s>>d!==e+c>>d||t+l>>d!==t+u>>d);if(t>>d===0n){m=!0;continue}}let[p,_,v,y]=g(i===0?e:e>>d,i===0?t:t>>d),[b,x,S,C]=[BigInt(p),BigInt(_),BigInt(v),BigInt(y)];if(x!==0n){if(n)if(f===1)s=b,c=x,l=S,u=C;else{let e=b*c+x*u,t=S*c+C*u;if(c=e,u=t,r){let e=b*s+x*l,t=S*s+C*l;s=e,l=t}}let i=b*e+x*t,a=S*e+C*t;if(e=i,t=a,e<0n||t<0n)throw TypeError(`assertion`);continue}}let i=e/t,x=e-i*t;if(n){let e=s-i*l,n=c-i*u;if(r&&!(0n<=x+e&&x+e<t+l&&0n<=x+n&&x+n<t+u))break;s=l,c=u,l=e,u=n}e=t,t=x}return[s,c,l,u,e,t]}function b(e,t){let[n,r,i,a,s,c]=y(e,t,!1,!1);return e=BigInt(s),t=BigInt(c),t!==0n&&(e=BigInt.asUintN(64,o(e,t))),e}function x(e,t){let[n,r,i,a,o,c]=y(e,t,!0,!1),l=e,u=t,d=BigInt(n),f=BigInt(r);BigInt(i);let p=BigInt(a);if(e=BigInt(o),t=BigInt(c),c!==0n){let[n,r,i]=s(e,t);e=BigInt.asUintN(64,i),t=0n,f=n*f+r*p}return d=l===0n?0n:(e-f*u)/l,[d,f,e]}function S(e,t){return b(BigInt(e),BigInt(t))}function C(e,t){return x(BigInt(e),BigInt(t))}function w(e,t){let[n,r,i,a,o,c]=y(t,e,!0,!1);if(BigInt(c)!==0n){let[e,n,i]=s(o,c);if(BigInt.asUintN(64,i)!==1n)return 0n;let l=e*BigInt(r)+n*BigInt(a);return l<0n?l+t:l}if(BigInt(o)!==1n)return 0n;let l=BigInt(r);return l<0n?l+t:l}function T(e,t){return y(e,t,!0,!0,!0)}S.halfgcd=T,S.gcdext=C,S.invmod=w;function E(e,t){return e=e<0n?-e:e,t=t<0n?-t:t,S(e,t)}function D(e){if(e<0n)throw RangeError(`isqrt: negative input`);if(e<2n)return e;let t=1n<<(BigInt(e.toString(16).length)*4n>>1n),n=t+e/t>>1n;for(;n<t;)t=n,n=t+e/t>>1n;return t}function O(e,t){let n=e<0n,r=t<0n;e=n?-e:e,t=r?-t:t;let[i,a,o]=S.gcdext(e,t);return{gcd:o,x:n?-i:i,y:r?-a:a}}function k(e,t){let{gcd:n,x:r}=O((e%t+t)%t,t);return n===1n?(r%t+t)%t:null}function A(e,t,n){if(t<0n)throw RangeError(`modPow: negative exponent not supported`);if(n<=0n)throw RangeError(`modPow: modulus must be positive`);if(n===1n)return 0n;let r=1n;for(e=(e%n+n)%n;t>0n;)t&1n&&(r=r*e%n),t>>=1n,e=e*e%n;return r}function j(e,t){if(e<0n)throw RangeError(`iroot: negative input`);if(e<2n||t<=1n)return e;if(t===2n)return D(e);let n=BigInt(e.toString(16).length)*4n;if(n<t)return 1n;let r=e=>{if(t===3n)return e*e*e;if(t===5n){let t=e*e;return t*t*e}return e**t},i=1n<<n/t;i<2n&&(i=2n);let a=t-1n,o=(i*a+e/i**a)/t;for(;o<i;)i=o,o=(i*a+e/i**a)/t;let s=i,c=o;for(;r(c)<=e;)s=c,c*=2n;for(;s+1n<c;){let t=(s+c)/2n;r(t)<=e?s=t:c=t}for(;r(s+1n)<=e;)s++;for(;r(s)>e;)s--;return s}let M={id:`boneh-durfee`,name:`Boneh-Durfee Attack`,category:`Factorization`,description:`Recovers d when d < n^0.292 via Wiener continued fractions (d < n^0.25) or Boneh-Durfee lattice (d < n^0.292). Use for unbalanced private exponents.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         import sys
         #
@@ -208,7 +207,7 @@ p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2}
 \\item \\textbf{Two-phase execution:} Phase 1 runs Wiener's continued fraction attack ($d < n^{0.25}$) — a fast $O(\\log n)$ check using $e/n$ convergents that immediately succeeds for small $d$ without invoking lattice reduction. Phase 2 runs the Herrmann-May Coppersmith lattice ($d < n^{0.292}$) with sympy resultant for bivariate root recovery, only when Wiener fails.
 \\end{itemize}
 
-\\textbf{References:} M. Wiener, CRYPTO 1990; D. Boneh, G. Durfee, CRYPTO 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e},F={id:`ecm2`,name:`ECM Full Factorization`,category:`Factorization`,description:`Factors n completely via repeated ECM with recursive factor removal. Use when n may have multiple prime factors beyond two.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} M. Wiener, CRYPTO 1990; D. Boneh, G. Durfee, CRYPTO 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e},N={id:`ecm2`,name:`ECM Full Factorization`,category:`Factorization`,description:`Factors n completely via repeated ECM with recursive factor removal. Use when n may have multiple prime factors beyond two.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         out = []
         try:
@@ -332,7 +331,7 @@ n &= p_1^{e_1} p_2^{e_2} \\cdots p_k^{e_k} \\\\
 
 \\textbf{Explanation:} ECM finds a factor when the elliptic curve's group order divides a smooth bound $B$. By extracting one factor at a time and recursing on both the factor and the cofactor, the full factorization is recovered. The $B_1$ bound is gradually increased to handle larger factors.
 
-\\textbf{References:} H. W. Lenstra Jr., "Factoring Integers with Elliptic Curves", Annals of Mathematics, 1987`,priority:`medium`,applicableCheck:e=>!!e.n};function I(e,t=`        `){let n=`${t}    `;return`${t}if n < 2:
+\\textbf{References:} H. W. Lenstra Jr., "Factoring Integers with Elliptic Curves", Annals of Mathematics, 1987`,priority:`medium`,applicableCheck:e=>!!e.n};function P(e,t=`        `){let n=`${t}    `;return`${t}if n < 2:
 ${n}print(f"n = {n} is too small to factor")
 ${n}print("${e}=FAILED")
 ${n}return
@@ -373,7 +372,7 @@ def _attack():
             out.append(f"B2 = {B2}")
         out.append("")
         # Trivial checks
-        ${I(`POLLARD_P1`)}
+        ${P(`POLLARD_P1`)}
         # Use Python int for fast modular exponentiation
         n_int = int(n)
         # Sieve primes up to B1 (pure Python, no prime_range)
@@ -479,7 +478,7 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
 \\item \\textbf{Incremental Stage 2:} Updates $H_q$ incrementally as $H_q = H_q \\cdot a^{d} \\bmod n$ where $d = q_j - q_{j-1}$ is the gap between consecutive primes in $(B_1, B_2]$, then accumulates $\\prod (H_q - 1)$ for a single GCD per product batch.
 \\end{itemize}
 
-\\textbf{References:} J. M. Pollard, "Theorems on Factorization and Primality Testing", Proc. Cambridge Philos. Soc., 1974`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n),r=parseInt(e.B)||1e4,i=parseInt(e.B2)||0;if(r<2)return Promise.resolve(null);let a=Math.max(r,i),o=new Uint8Array(a+1),s=[];for(let e=2;e<=a;e++)if(!o[e]){s.push(e);for(let t=e*e;t<=a;t+=e)o[t]=1}let c=0;for(let e of s){if(e>r)break;c++}let l=i>r?s.length-c:0,u=c+l,d=0,f=2n;for(let e of s){if(e>r)break;let i=e;for(;i*e<=r;)i*=e;if(f=M(f,BigInt(i),n),d++,t&&u>0&&d%Math.max(1,Math.floor(u/10))===0){let e=Math.min(99,Math.round(d*100/u));t(e,`Stage 1: ${e}%`)}}let p=O(f-1n,n);if(p>1n&&p<n)return t?.(100),Promise.resolve(`Factor found!\np = ${p}\nq = ${n/p}\nPOLLARD_P1=SUCCESS`);if(i>r){for(let e of s)if(!(e<=r)){if(f=M(f,BigInt(e),n),d++,t&&u>0&&d%Math.max(1,Math.floor(u/10))===0){let e=Math.min(99,Math.round(d*100/u));t(e,`Stage 2: ${e}%`)}if(p=O(f-1n,n),p>1n&&p<n)return t?.(100),Promise.resolve(`Factor found!\np = ${p}\nq = ${n/p}\nPOLLARD_P1=SUCCESS`)}}return t?.(100),Promise.resolve(null)}catch{return Promise.resolve(null)}},priority:`medium`,applicableCheck:e=>!!e.n},te={id:`pollard-rho`,name:`Pollard's Rho (Brent variant)`,category:`Factorization`,description:`Factors n via birthday paradox with Brent's cycle detection and batched GCD reduction. Use for general-purpose factorization of medium-sized factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} J. M. Pollard, "Theorems on Factorization and Primality Testing", Proc. Cambridge Philos. Soc., 1974`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n),r=parseInt(e.B)||1e4,i=parseInt(e.B2)||0;if(r<2)return Promise.resolve(null);let a=Math.max(r,i),o=new Uint8Array(a+1),s=[];for(let e=2;e<=a;e++)if(!o[e]){s.push(e);for(let t=e*e;t<=a;t+=e)o[t]=1}let c=0;for(let e of s){if(e>r)break;c++}let l=i>r?s.length-c:0,u=c+l,d=0,f=2n;for(let e of s){if(e>r)break;let i=e;for(;i*e<=r;)i*=e;if(f=A(f,BigInt(i),n),d++,t&&u>0&&d%Math.max(1,Math.floor(u/10))===0){let e=Math.min(99,Math.round(d*100/u));t(e,`Stage 1: ${e}%`)}}let p=E(f-1n,n);if(p>1n&&p<n)return t?.(100),Promise.resolve(`Factor found!\np = ${p}\nq = ${n/p}\nPOLLARD_P1=SUCCESS`);if(i>r){for(let e of s)if(!(e<=r)){if(f=A(f,BigInt(e),n),d++,t&&u>0&&d%Math.max(1,Math.floor(u/10))===0){let e=Math.min(99,Math.round(d*100/u));t(e,`Stage 2: ${e}%`)}if(p=E(f-1n,n),p>1n&&p<n)return t?.(100),Promise.resolve(`Factor found!\np = ${p}\nq = ${n/p}\nPOLLARD_P1=SUCCESS`)}}return t?.(100),Promise.resolve(null)}catch{return Promise.resolve(null)}},priority:`medium`,applicableCheck:e=>!!e.n},te={id:`pollard-rho`,name:`Pollard's Rho (Brent variant)`,category:`Factorization`,description:`Factors n via birthday paradox with Brent's cycle detection and batched GCD reduction. Use for general-purpose factorization of medium-sized factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     import math
     try:
         try:
@@ -487,7 +486,7 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
             n = Integer(${e.n})
             out.append(f"Pollard's Rho (Brent variant) on n = {n}")
             out.append("")
-            ${I(`POLLARD_RHO`,`            `)}
+            ${P(`POLLARD_RHO`,`            `)}
             # Brent's cycle detection with batched GCD (primefac-style, BIT 1980)
             # Batched GCD reduces overhead: accumulate |x-y| products, one gcd per batch
             # Backtracking handles g == n case (when accumulated product contains all factors)
@@ -552,7 +551,7 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
         except:
             out = [f"ERROR: {ex}", "POLLARD_RHO=FAILED"]
         print("\\n".join(out))
-_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${n/2n}\nPOLLARD_RHO=SUCCESS`);let r=0;for(let e=1n;e<10n;e++){if(t){let n=Math.round(Number(e-1n)*100/9);n>r&&(r=n,t(n,`curve ${Number(e)} / 9`))}let i=n,a=BigInt(e),o=2n,s=2n,c=1n,l=1n,u=1n,d=0n,f=5e5,p=0;for(;l===1n&&p<f;){s=o;let e=0;for(;e<Number(u)&&p<f;)o=(o*o+a)%i,p++,e++;for(d=0n;d<u&&l===1n&&p<f;){let e=Math.min(100,Number(u-d));for(let t=0;t<e;t++){o=(o*o+a)%i;let e=o>s?o-s:s-o;c=c*e%i,p++}l=O(c,i),c=1n,d+=BigInt(100)}u*=2n}if(l>1n&&l<i){let n=i/l;return t?.(100),Promise.resolve(`Factor found!\np = ${l}\nq = ${n}\nc = ${e}\niterations = ${p}\nPOLLARD_RHO=SUCCESS`)}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Pollard's rho algorithm with Brent's cycle detection and batched GCD finds a non-trivial factor in expected $O(n^{1/4})$ time.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${n/2n}\nPOLLARD_RHO=SUCCESS`);let r=0;for(let e=1n;e<10n;e++){if(t){let n=Math.round(Number(e-1n)*100/9);n>r&&(r=n,t(n,`curve ${Number(e)} / 9`))}let i=n,a=BigInt(e),o=2n,s=2n,c=1n,l=1n,u=1n,d=0n,f=5e5,p=0;for(;l===1n&&p<f;){s=o;let e=0;for(;e<Number(u)&&p<f;)o=(o*o+a)%i,p++,e++;for(d=0n;d<u&&l===1n&&p<f;){let e=Math.min(100,Number(u-d));for(let t=0;t<e;t++){o=(o*o+a)%i;let e=o>s?o-s:s-o;c=c*e%i,p++}l=E(c,i),c=1n,d+=BigInt(100)}u*=2n}if(l>1n&&l<i){let n=i/l;return t?.(100),Promise.resolve(`Factor found!\np = ${l}\nq = ${n}\nc = ${e}\niterations = ${p}\nPOLLARD_RHO=SUCCESS`)}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Pollard's rho algorithm with Brent's cycle detection and batched GCD finds a non-trivial factor in expected $O(n^{1/4})$ time.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -772,7 +771,7 @@ V_M &= \\alpha^M + \\alpha^{-M} \\equiv 2 \\pmod{p} \\\\
 \\item \\textbf{Auto-escalating bounds:} Tries three increasing bound configurations $(B_1, B_2) \\in \\{(100, 1000), (1000, 10000), (10000, 50000)\\}$, with cached prime lists and P values, automatically escalating on failure.
 \\end{itemize}
 
-\\textbf{References:} H. C. Williams, "A p+1 Method of Factoring", Mathematics of Computation, 1982`,priority:`medium`,applicableCheck:e=>!!e.n},L={id:`quadratic-sieve`,name:`Quadratic Sieve`,category:`Factorization`,description:`Factors n by finding congruent squares via smoothness over a factor base. Use for medium-sized semiprimes (< 100 digits) with similar-sized factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} H. C. Williams, "A p+1 Method of Factoring", Mathematics of Computation, 1982`,priority:`medium`,applicableCheck:e=>!!e.n},F={id:`quadratic-sieve`,name:`Quadratic Sieve`,category:`Factorization`,description:`Factors n by finding congruent squares via smoothness over a factor base. Use for medium-sized semiprimes (< 100 digits) with similar-sized factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         n = Integer(${e.n})
         bits = n.nbits()
@@ -783,7 +782,7 @@ V_M &= \\alpha^M + \\alpha^{-M} \\equiv 2 \\pmod{p} \\\\
         print()
         #
         # Check for trivial cases
-        ${I(`QUADRATIC_SIEVE`)}
+        ${P(`QUADRATIC_SIEVE`)}
         #
         # Check size before attempting factorization
         if bits > 330:
@@ -897,14 +896,14 @@ X^2 &\\equiv Y^2 \\pmod{n} \\\\
 
 \\textbf{Explanation:} The QS finds many integers $x$ where $Q(x)$ factors completely over the factor base (a "smooth" number). Each smooth $Q(x)$ gives an exponent vector modulo 2. A linear dependency among these vectors means the product of the corresponding $Q(x_i)$ values is a perfect square. Since $Q(x) \\equiv (x+m)^2 \\pmod{n}$, we get $X^2 \\equiv Y^2 \\pmod{n}$ with $X \\not\\equiv \\pm Y \\pmod{n}$ about half the time, yielding a factor via GCD.
 
-\\textbf{References:} C. Pomerance, "The Quadratic Sieve Factoring Algorithm", Eurocrypt 1984`,priority:`high`,applicableCheck:e=>!!e.n},R={id:`squfof`,name:`SQUFOF`,category:`Factorization`,description:`Factors n by finding a square form in the cycle of reduced binary quadratic forms. Use for n < 10^14 (faster than trial division for medium-sized factors).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} C. Pomerance, "The Quadratic Sieve Factoring Algorithm", Eurocrypt 1984`,priority:`high`,applicableCheck:e=>!!e.n},I={id:`squfof`,name:`SQUFOF`,category:`Factorization`,description:`Factors n by finding a square form in the cycle of reduced binary quadratic forms. Use for n < 10^14 (faster than trial division for medium-sized factors).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
             import math
             print(f"SQUFOF on n = {n}")
             print()
-            ${I(`SQUFOF`,`            `)}
+            ${P(`SQUFOF`,`            `)}
             # SQUFOF works best for small factors; extract small factor first
             # Use batched GCD for ~1000x fewer GCD calls vs individual trial division
             n_int = int(n)
@@ -1050,11 +1049,11 @@ The algorithm searches the forward cycle for a square $c_i$, then starts a rever
 \\item \\textbf{Batched GCD trial division:} Before the main SQUFOF algorithm, extracts small factors by trial division against primes in batches of 1000. The product of each prime batch is accumulated modulo $n$ before a single GCD call, reducing GCD operations by $\\sim 1000\\times$ vs individual trial division.
 \\end{itemize}
 
-\\textbf{References:} Shanks, 1975; Gower & Wagstaff, Math. Comp., 2008`,priority:`medium`,applicableCheck:e=>!!e.n},z={id:`binary-poly-factor`,name:`Binary Polynomial Factoring`,category:`Factorization`,description:`Factors n by factoring its binary representation as a polynomial over Z[x] and evaluating at x=2. Use when the binary convolution of p and q has no carries.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Shanks, 1975; Gower & Wagstaff, Math. Comp., 2008`,priority:`medium`,applicableCheck:e=>!!e.n},L={id:`binary-poly-factor`,name:`Binary Polynomial Factoring`,category:`Factorization`,description:`Factors n by factoring its binary representation as a polynomial over Z[x] and evaluating at x=2. Use when the binary convolution of p and q has no carries.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
-            ${I(`BINARY_POLY_FACTOR`,`            `)}
+            ${P(`BINARY_POLY_FACTOR`,`            `)}
             if n > 0 and (n & (n - 1)) == 0:
                 print(f"n is a power of 2: n = 2^{n.nbits() - 1}")
                 print("No non-trivial factorization possible")
@@ -1136,12 +1135,12 @@ If the binary convolution of $p$ and $q$ produces no carries, then $f_{pq}(x) = 
 
 \\textbf{Explanation:} When multiplying two integers whose binary representations trigger no carries (i.e., every bit position gets at most one 1 from each factor), the binary polynomial of the product equals the product of the binary polynomials. Factoring this polynomial over $\\mathbb{Z}[x]$ and evaluating at $x = 2$ recovers the original integers. This is a rare special case but works instantly when applicable.
 
-\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen & Gerhard, "Modern Computer Algebra", Chapter 5`,priority:`low`,applicableCheck:e=>!!e.n},B=(e,t)=>{for(;t;)[e,t]=[t,e%t];return e},V=[];for(let e=-2e3;e<=2e3;e++)V.push(BigInt(e));let H={id:`small-fraction`,name:`Small Fraction Attack`,category:`Factorization`,description:`Factors n when p/q approximates a small rational a/b using parity-optimized trial division over the search window. Use when p/q is close to a simple fraction with denominator ≤ 100.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+\\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen & Gerhard, "Modern Computer Algebra", Chapter 5`,priority:`low`,applicableCheck:e=>!!e.n},R=(e,t)=>{for(;t;)[e,t]=[t,e%t];return e},z=[];for(let e=-2e3;e<=2e3;e++)z.push(BigInt(e));let B={id:`small-fraction`,name:`Small Fraction Attack`,category:`Factorization`,description:`Factors n when p/q approximates a small rational a/b using parity-optimized trial division over the search window. Use when p/q is close to a simple fraction with denominator ≤ 100.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
 def _attack():
     try:
         n = Integer(${e.n})
         #
-        ${I(`SMALL_FRACTION`)}
+        ${P(`SMALL_FRACTION`)}
         #
         # Small fraction attack: p/q ≈ a/b for small a, b
         # Use Python ints for fast trial division
@@ -1227,7 +1226,7 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("SMALL_FRACTION=FAILED")
-_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${n/2n}\nSMALL_FRACTION=SUCCESS`);let r=e=>(e&1n)!=0n;for(let e=1;e<=100;e++){t&&t(Math.round((e-1)*100/100),`b = ${e} / 100`);for(let i=1;i<=e;i++){if(B(i,e)!==1)continue;let a=k(n*BigInt(e)/BigInt(i));if(!(a<=1n))for(let o of V){let s=a+o;if(r(s)&&n%s===0n){let r=n/s;if(r>1n)return t?.(100),Promise.resolve(`Factor found!\np = ${r}\nq = ${s}\nUsing a=${i}, b=${e}\nSMALL_FRACTION=SUCCESS`)}}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},usageGuide:`This attack factors n when the ratio of its two prime factors p/q is close to a simple fraction a/b with small denominator (≤ 100).
+_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${n/2n}\nSMALL_FRACTION=SUCCESS`);let r=e=>(e&1n)!=0n;for(let e=1;e<=100;e++){t&&t(Math.round((e-1)*100/100),`b = ${e} / 100`);for(let i=1;i<=e;i++){if(R(i,e)!==1)continue;let a=D(n*BigInt(e)/BigInt(i));if(!(a<=1n))for(let o of z){let s=a+o;if(r(s)&&n%s===0n){let r=n/s;if(r>1n)return t?.(100),Promise.resolve(`Factor found!\np = ${r}\nq = ${s}\nUsing a=${i}, b=${e}\nSMALL_FRACTION=SUCCESS`)}}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},usageGuide:`This attack factors n when the ratio of its two prime factors p/q is close to a simple fraction a/b with small denominator (≤ 100).
 
 How it works:
 1. For each coprime pair (a,b) with 1 ≤ b ≤ 100 and 1 ≤ a ≤ b, estimate q₀ ≈ √(n·b/a)
@@ -1263,8 +1262,8 @@ q_0 &= \\left\\lfloor\\sqrt{\\frac{nb}{a}}\\right\\rfloor \\\\
 \\item \\textbf{Precomputed BigInt offsets:} Delta candidates are stored in a precomputed array as $BigInt$ values, avoiding per-iteration $BigInt(number)$ allocation overhead in the inner loop.
 \\end{itemize}
 
-\\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,priority:`medium`,applicableCheck:e=>!!e.n},U={id:`batch-gcd`,name:`Batch GCD`,category:`Factorization`,description:`Finds shared prime factors across a list of RSA moduli by computing gcd of each against the product of all others. Use when multiple moduli may share primes.`,inputs:[{name:`n_values`,label:`Moduli (one per line or comma-separated)`,placeholder:`n1\\nn2\\nn3...`,multiline:!0,rows:5}],frontendCheck:async e=>{try{let t=(e.n_values||``).trim();if(!t)return`ERROR: Missing required input: n_values (comma-separated moduli)
-BATCH_GCD=FAILED`;let n=t.split(/[\n,]+/).map(e=>e.trim()).filter(e=>e.length>0).map(e=>BigInt(e));if(n.length<2)return null;let r=1n;for(let e of n)r*=e;let i=[`Batch GCD Attack (browser-side, BigInt)`,`Processing ${n.length} moduli...`,``],a=!1;for(let e=0;e<n.length;e++){let t=n[e];if(t<=1n)continue;let o=O(t,r/t);if(o>1n&&o<t){a=!0;let n=o,r=t/o;i.push(`n[${e}] = ${t}`),i.push(`  Shared factor found: p = ${n}`),i.push(`  q = ${r}`),i.push(`  Verification: p * q = ${n*r}`),i.push(``)}else o===t&&(i.push(`n[${e}] = ${t}`),i.push(`  WARNING: n divides product of others (duplicate or fully shared)`),i.push(``))}return a?(i.push(`Batch GCD complete.`),i.push(`BATCH_GCD=SUCCESS`),i.join(`
+\\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,priority:`medium`,applicableCheck:e=>!!e.n},V={id:`batch-gcd`,name:`Batch GCD`,category:`Factorization`,description:`Finds shared prime factors across a list of RSA moduli by computing gcd of each against the product of all others. Use when multiple moduli may share primes.`,inputs:[{name:`n_values`,label:`Moduli (one per line or comma-separated)`,placeholder:`n1\\nn2\\nn3...`,multiline:!0,rows:5}],frontendCheck:async e=>{try{let t=(e.n_values||``).trim();if(!t)return`ERROR: Missing required input: n_values (comma-separated moduli)
+BATCH_GCD=FAILED`;let n=t.split(/[\n,]+/).map(e=>e.trim()).filter(e=>e.length>0).map(e=>BigInt(e));if(n.length<2)return null;let r=1n;for(let e of n)r*=e;let i=[`Batch GCD Attack (browser-side, BigInt)`,`Processing ${n.length} moduli...`,``],a=!1;for(let e=0;e<n.length;e++){let t=n[e];if(t<=1n)continue;let o=E(t,r/t);if(o>1n&&o<t){a=!0;let n=o,r=t/o;i.push(`n[${e}] = ${t}`),i.push(`  Shared factor found: p = ${n}`),i.push(`  q = ${r}`),i.push(`  Verification: p * q = ${n*r}`),i.push(``)}else o===t&&(i.push(`n[${e}] = ${t}`),i.push(`  WARNING: n divides product of others (duplicate or fully shared)`),i.push(``))}return a?(i.push(`Batch GCD complete.`),i.push(`BATCH_GCD=SUCCESS`),i.join(`
 `)):null}catch{return null}},proof:`\\textbf{Theorem:} Given moduli $\\{n_1, \\ldots, n_k\\}$, if any two share a prime, then $\\gcd(n_i, \\prod_{j \\neq i} n_j)$ reveals it.
 
 \\textbf{Setup:}
@@ -1289,7 +1288,7 @@ The product $\\prod_{j \\neq i} n_j$ can be computed efficiently using a product
 \\item \\textbf{Product tree algorithm:} Computes $\\prod_{j \\neq i} n_j$ for each modulus using a divide-and-conquer product tree, achieving $O(k \\log k)$ total time instead of $O(k^2)$ for pairwise GCDs. For $k = 1000$ moduli, this is $\\sim 100\\times$ faster than the naive pairwise approach.
 \\end{itemize}
 
-\\textbf{References:} Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012; Bernstein, "How to Find Small Factors of Products", 2004`,priority:`high`,applicableCheck:e=>{let t=(e.n_values||``).trim();return t?t.split(/[\n,]+/).filter(e=>e.trim()).length>=2:!1}},W={id:`multi-prime`,name:`Multi-Prime RSA`,category:`Factorization`,description:`Factors n with k >= 3 prime factors using trial division and Sage factor(). Use for multi-prime RSA moduli.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012; Bernstein, "How to Find Small Factors of Products", 2004`,priority:`high`,applicableCheck:e=>{let t=(e.n_values||``).trim();return t?t.split(/[\n,]+/).filter(e=>e.trim()).length>=2:!1}},H={id:`multi-prime`,name:`Multi-Prime RSA`,category:`Factorization`,description:`Factors n with k >= 3 prime factors using trial division and Sage factor(). Use for multi-prime RSA moduli.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             out = []
@@ -1420,13 +1419,13 @@ p_i &\\approx n^{1/k} \\text{ (each prime is smaller than in 2-prime RSA)} \\\\
 
 \\textbf{Explanation:} Multi-prime RSA (also called "RSA Multiprime") uses three or more primes for a fixed modulus size, making each prime factor smaller and easier to find via generic factorization algorithms. The attack uses trial division up to 10,000 followed by Sage's factor() for complete factorization.
 
-\\textbf{References:} G. J. Simmons and M. J. Norris, "Preliminary Comments on the MIT Public Key Cryptosystem", Cryptologia, 1976; D. Boneh, "Twenty Years of Attacks on RSA", Notices of the AMS, 1999`,priority:`medium`,applicableCheck:e=>!!e.n},G={id:`gimmicky-primes`,name:`Gimmicky Primes`,category:`Factorization`,description:`Detects special-form primes (Mersenne, primorial, Fermat, Fibonacci, repunit, and others) by trial division. Use for CTF moduli with crafted prime factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} G. J. Simmons and M. J. Norris, "Preliminary Comments on the MIT Public Key Cryptosystem", Cryptologia, 1976; D. Boneh, "Twenty Years of Attacks on RSA", Notices of the AMS, 1999`,priority:`medium`,applicableCheck:e=>!!e.n},U={id:`gimmicky-primes`,name:`Gimmicky Primes`,category:`Factorization`,description:`Detects special-form primes (Mersenne, primorial, Fermat, Fibonacci, repunit, and others) by trial division. Use for CTF moduli with crafted prime factors.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
             import math
             n_int = int(n)
-            ${I(`GIMMICKY_PRIMES`,`            `)}
+            ${P(`GIMMICKY_PRIMES`,`            `)}
             out = []
             fp = None
             fq = None
@@ -1559,13 +1558,13 @@ s \\mid n &\\implies p = s,\\; q = n/s \\\\
 
 \\textbf{Explanation:} In CTF challenges, primes are sometimes constructed from known sequences (Mersenne $2^p-1$, primorial $p\\#\\pm1$, Fermat $2^{2^k}+1$, etc.). This attack checks all small candidates from each family by trial division. The set size is a few hundred candidates, so the check completes nearly instantly.
 
-\\textbf{References:} C. Caldwell, "The Prime Pages" (https://t5k.org); P. Ribenboim, "The New Book of Prime Number Records", Springer 1996`,priority:`low`,applicableCheck:e=>!!e.n},K={id:`close-prime`,name:`Close-Prime`,category:`Factorization`,description:`Factors n when p and q are close via Fermat iteration and Londahl BSGS fallback. Use when primes are suspected close together.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} C. Caldwell, "The Prime Pages" (https://t5k.org); P. Ribenboim, "The New Book of Prime Number Records", Springer 1996`,priority:`low`,applicableCheck:e=>!!e.n},W={id:`close-prime`,name:`Close-Prime`,category:`Factorization`,description:`Factors n when p and q are close via Fermat iteration and Londahl BSGS fallback. Use when primes are suspected close together.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
             import math
             n_int = int(n)
-            ${I(`CLOSE_PRIME`,`            `)}
+            ${P(`CLOSE_PRIME`,`            `)}
             # Step 1: Fermat factorization (fast for close primes)
             print(f"Close-prime attack on n ({n.nbits()} bits): trying Fermat first...")
             a, rem = n.sqrtrem()
@@ -1643,7 +1642,7 @@ s \\mid n &\\implies p = s,\\; q = n/s \\\\
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("CLOSE_PRIME=FAILED")
-_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${n/2n}\nCLOSE_PRIME=SUCCESS`);let r=k(n);r*r<n&&r++;let i=r,a=r*r-n,o=r+1000000n;for(;r<o;){if(t&&r%50000n==0n){let e=Number(r-i),n=Number(o-i);t(Math.round(e*100/n),`a = ${e.toLocaleString()} / ${n.toLocaleString()}`)}let e=Number(a&15n);if(e===0||e===1||e===4||e===9){let e=k(a);if(e*e===a){let a=r-e,o=r+e;if(a>1n&&o>1n&&a*o===n)return t?.(100),Promise.resolve(`Factor found!\np = ${a}\nq = ${o}\n|p - q| = ${o-a}\niterations = ${r-i}\nCLOSE_PRIME=SUCCESS`)}}a+=2n*r+1n,r++}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Factor $n = pq$ when $|p-q|$ is small via Fermat's difference-of-squares iteration, extended by Londahl's BSGS to larger gaps.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${n/2n}\nCLOSE_PRIME=SUCCESS`);let r=D(n);r*r<n&&r++;let i=r,a=r*r-n,o=r+1000000n;for(;r<o;){if(t&&r%50000n==0n){let e=Number(r-i),n=Number(o-i);t(Math.round(e*100/n),`a = ${e.toLocaleString()} / ${n.toLocaleString()}`)}let e=Number(a&15n);if(e===0||e===1||e===4||e===9){let e=D(a);if(e*e===a){let a=r-e,o=r+e;if(a>1n&&o>1n&&a*o===n)return t?.(100),Promise.resolve(`Factor found!\np = ${a}\nq = ${o}\n|p - q| = ${o-a}\niterations = ${r-i}\nCLOSE_PRIME=SUCCESS`)}}a+=2n*r+1n,r++}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Factor $n = pq$ when $|p-q|$ is small via Fermat's difference-of-squares iteration, extended by Londahl's BSGS to larger gaps.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -1669,7 +1668,7 @@ a_i^2 - n \\text{ is square} &\\implies p = a_i - b_i,\\; q = a_i + b_i \\\\
 \\item \\textbf{Parity-optimized BSGS (Londahl fallback):} When Fermat's direct search exceeds $10^6$ steps, switches to Londahl's baby-step giant-step. Baby-step table construction skips entries where $(j \\& 1)$ mismatches $\\phi(n)$ parity, halving the table size.
 \\end{itemize}
 
-\\textbf{References:} Fermat (1643); C. L\\"ondahl, "Finding Close-Prime Factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,priority:`medium`,applicableCheck:e=>!!e.n},q={id:`novelty-primes`,name:`Novelty Primes`,category:`Factorization`,description:`Detects primes near powers of two or mathematical constants via windowed trial division. Use for CTF moduli with novelty-crafted primes.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+\\textbf{References:} Fermat (1643); C. L\\"ondahl, "Finding Close-Prime Factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,priority:`medium`,applicableCheck:e=>!!e.n},G={id:`novelty-primes`,name:`Novelty Primes`,category:`Factorization`,description:`Detects primes near powers of two or mathematical constants via windowed trial division. Use for CTF moduli with novelty-crafted primes.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
 def _attack():
     try:
         try:
@@ -1764,7 +1763,7 @@ n \\bmod (2^k + \\delta) = 0 &\\implies p = 2^k + \\delta,\\; q = n/p \\\\
 
 \\textbf{Explanation:} CTF challenge authors sometimes construct primes from well-known numbers — $p = 2^k \\pm \\delta$ (near powers of two) or $p = \\lfloor \\pi \\times 10^m \\rfloor \\pm \\delta$ (from mathematical constants). This attack checks candidates in a window around each known value, testing divisibility of $n$.
 
-\\textbf{References:} Cryptopals; Cryptohack.org; various CTF writeups`,priority:`low`,applicableCheck:e=>!!e.n},J={id:`related-message`,name:`Franklin-Reiter Related Message Attack`,category:`Message / Protocol`,description:`Recovers m from two ciphertexts with linearly related plaintexts via polynomial GCD. Use when c1 = m^e and c2 = (a·m + b)^e mod n with known a, b.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c1`,label:`c1 (ciphertext of m)`,placeholder:`Enter c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (ciphertext of a·m + b)`,placeholder:`Enter c2...`,multiline:!0,rows:3},{name:`a`,label:`a (linear coefficient)`,placeholder:`2`,multiline:!1},{name:`b`,label:`b (linear offset)`,placeholder:`0`,multiline:!1}],sageTemplate:e=>`def _attack():
+\\textbf{References:} Cryptopals; Cryptohack.org; various CTF writeups`,priority:`low`,applicableCheck:e=>!!e.n},K={id:`related-message`,name:`Franklin-Reiter Related Message Attack`,category:`Message / Protocol`,description:`Recovers m from two ciphertexts with linearly related plaintexts via polynomial GCD. Use when c1 = m^e and c2 = (a·m + b)^e mod n with known a, b.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c1`,label:`c1 (ciphertext of m)`,placeholder:`Enter c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (ciphertext of a·m + b)`,placeholder:`Enter c2...`,multiline:!0,rows:3},{name:`a`,label:`a (linear coefficient)`,placeholder:`2`,multiline:!1},{name:`b`,label:`b (linear offset)`,placeholder:`0`,multiline:!1}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -1901,7 +1900,7 @@ n \\bmod (2^k + \\delta) = 0 &\\implies p = 2^k + \\delta,\\; q = n/p \\\\
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=(e.e||``).trim(),r=n?BigInt(n):65537n,i=BigInt(e.c1),a=BigInt(e.c2),o=(e.a||``).trim(),s=o?BigInt(o):2n,c=(e.b||``).trim(),l=c?BigInt(c):0n;if(t<2n||r<2n||i<0n||a<0n||r!==3n)return Promise.resolve(null);let u=3n*s*s*l%t,d=3n*s*l*l%t,f=((l*l*l-a+s*s*s%t*i)%t%t+t)%t;if(u===0n&&d===0n)return Promise.resolve(null);if(u===0n){if(d===0n)return Promise.resolve(null);let e=j(d,t);if(e===null)return Promise.resolve(null);let n=(-f%t+t)%t*e%t;return M(n,r,t)===i?Promise.resolve(`Recovered m = ${n}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`):Promise.resolve(null)}let p=((u*f-d*d)%t+t)%t,m=((d*f-u*u%t*i)%t+t)%t;if(p===0n)return Promise.resolve(null);let h=j(p,t);if(h===null)return Promise.resolve(null);let g=m*h%t;return M(g,r,t)===i?Promise.resolve(`Recovered m = ${g}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`):Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given $c_1 \\equiv m^e \\pmod{n}$ and $c_2 \\equiv (am + b)^e \\pmod{n}$ with known $a, b$ and $\\gcd(a, n) = 1$, recover $m$ by computing $\\gcd(x^e - c_1, (ax + b)^e - c_2)$.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=(e.e||``).trim(),r=n?BigInt(n):65537n,i=BigInt(e.c1),a=BigInt(e.c2),o=(e.a||``).trim(),s=o?BigInt(o):2n,c=(e.b||``).trim(),l=c?BigInt(c):0n;if(t<2n||r<2n||i<0n||a<0n||r!==3n)return Promise.resolve(null);let u=3n*s*s*l%t,d=3n*s*l*l%t,f=((l*l*l-a+s*s*s%t*i)%t%t+t)%t;if(u===0n&&d===0n)return Promise.resolve(null);if(u===0n){if(d===0n)return Promise.resolve(null);let e=k(d,t);if(e===null)return Promise.resolve(null);let n=(-f%t+t)%t*e%t;return A(n,r,t)===i?Promise.resolve(`Recovered m = ${n}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`):Promise.resolve(null)}let p=((u*f-d*d)%t+t)%t,m=((d*f-u*u%t*i)%t+t)%t;if(p===0n)return Promise.resolve(null);let h=k(p,t);if(h===null)return Promise.resolve(null);let g=m*h%t;return A(g,r,t)===i?Promise.resolve(`Recovered m = ${g}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`):Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given $c_1 \\equiv m^e \\pmod{n}$ and $c_2 \\equiv (am + b)^e \\pmod{n}$ with known $a, b$ and $\\gcd(a, n) = 1$, recover $m$ by computing $\\gcd(x^e - c_1, (ax + b)^e - c_2)$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -1929,7 +1928,7 @@ How to use:
 3. Provide n, e, c1, c2, a, and b
 4. The attack computes gcd(m1^e - c1, (a*m1 + b)^e - c2) to recover m1
 
-Tip: The attack requires e = 3 for reliable algebraic recovery; e = 5 or 7 may work via polynomial GCD but can fail over composite moduli. For convenience, paste into Magic Mode which auto-detects the parameters.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.c1&&!!e.c2},Y={id:`simple-lattice`,name:`Simple Lattice`,category:`Partial Key / Lattice`,description:`Recovers p from an approximate value nearp using Coppersmith's lattice when |nearp - p| < n^(1/4). Use when a close approximation of p is known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`nearp`,label:`nearp (approximate p)`,placeholder:`Enter approximate p value...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+Tip: The attack requires e = 3 for reliable algebraic recovery; e = 5 or 7 may work via polynomial GCD but can fail over composite moduli. For convenience, paste into Magic Mode which auto-detects the parameters.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.c1&&!!e.c2},q={id:`simple-lattice`,name:`Simple Lattice`,category:`Partial Key / Lattice`,description:`Recovers p from an approximate value nearp using Coppersmith's lattice when |nearp - p| < n^(1/4). Use when a close approximation of p is known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`nearp`,label:`nearp (approximate p)`,placeholder:`Enter approximate p value...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -2030,7 +2029,7 @@ How to use:
 3. Provide n and nearp
 4. The attack constructs a lattice and uses LLL to find the exact p
 
-Tip: nearp can come from side-channel leaks, known bits of p, or approximations from other attacks. If |nearp - p| > n^(1/4) the attack may fail.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.nearp},X={id:`partial-d`,name:`Partial d Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers d from leaked low-order bits by iterating k in ed = k·φ(n)+1. Use when low-order bits of d are exposed via side-channel.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dLow`,label:`dLow (low bits of d)`,placeholder:`Enter known low bits of d...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+Tip: nearp can come from side-channel leaks, known bits of p, or approximations from other attacks. If |nearp - p| > n^(1/4) the attack may fail.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.nearp},J={id:`partial-d`,name:`Partial d Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers d from leaked low-order bits by iterating k in ed = k·φ(n)+1. Use when low-order bits of d are exposed via side-channel.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dLow`,label:`dLow (low bits of d)`,placeholder:`Enter known low bits of d...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
 def _attack():
     try:
         try:
@@ -2085,7 +2084,7 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("PARTIAL_D=FAILED")
-_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e||!e.dLow)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=BigInt(e.dLow),a=i.toString(2).length,o=1n<<BigInt(Math.min(a+2,24)),s=(1n<<BigInt(a))-1n,c=n/r,l=n%r,u=(n+1n)/r,d=(n+1n)%r;for(let e=1n;e<=o;e++){if(t&&o>10000n&&e%100000n==0n&&t(Number(e*100n/o),`k = ${e.toString()} / ${o.toString()}`),(u&s)===i){let i=n-(r*u-1n)/e+1n,a=i*i-4n*n;if(a>=0n){let r=k(a);if(r*r===a){let a=(i-r)/2n;if(a>0n&&n%a===0n){let r=n/a;return t?.(100),Promise.resolve(`Factor found!\np = ${a}\nq = ${r}\nk = ${e}\nPrivate key d = ${u}\nPARTIAL_D=SUCCESS`)}}}}u+=c,d+=l,d>=r&&(u+=1n,d-=r)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If low $m$ bits of $d$ are known, recover $d$ by iterating $k$ in the key equation $ed = k\\varphi(n)+1$.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e||!e.dLow)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=BigInt(e.dLow),a=i.toString(2).length,o=1n<<BigInt(Math.min(a+2,24)),s=(1n<<BigInt(a))-1n,c=n/r,l=n%r,u=(n+1n)/r,d=(n+1n)%r;for(let e=1n;e<=o;e++){if(t&&o>10000n&&e%100000n==0n&&t(Number(e*100n/o),`k = ${e.toString()} / ${o.toString()}`),(u&s)===i){let i=n-(r*u-1n)/e+1n,a=i*i-4n*n;if(a>=0n){let r=D(a);if(r*r===a){let a=(i-r)/2n;if(a>0n&&n%a===0n){let r=n/a;return t?.(100),Promise.resolve(`Factor found!\np = ${a}\nq = ${r}\nk = ${e}\nPrivate key d = ${u}\nPARTIAL_D=SUCCESS`)}}}}u+=c,d+=l,d>=r&&(u+=1n,d-=r)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If low $m$ bits of $d$ are known, recover $d$ by iterating $k$ in the key equation $ed = k\\varphi(n)+1$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2117,7 +2116,7 @@ How to use:
 3. The attack iterates k in ed = k\\phi(n) + 1, checking if d_approx has matching low bits
 4. For each matching candidate, it computes \\phi(n) and solves the quadratic for p,q
 
-Tip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~16M iterations). Uses incremental d_approx update (avoiding BigInt division per iteration) for performance.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.dLow},re={id:`partial-pq-bits`,name:`Partial p/q Bits`,category:`Partial Key / Lattice`,description:`Recovers p from known high (MSB) or low (LSB) bits using Coppersmith's lattice. Use when half or more of p's bits are known via side-channel.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`knownBits`,label:`knownBits (known bits of p)`,placeholder:`Enter known bits as integer...`,multiline:!0,rows:3},{name:`bitPosition`,label:`bitPosition`,placeholder:`msb or lsb`,multiline:!1}],sageTemplate:e=>`def _attack():
+Tip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~16M iterations). Uses incremental d_approx update (avoiding BigInt division per iteration) for performance.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.dLow},Y={id:`partial-pq-bits`,name:`Partial p/q Bits`,category:`Partial Key / Lattice`,description:`Recovers p from known high (MSB) or low (LSB) bits using Coppersmith's lattice. Use when half or more of p's bits are known via side-channel.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`knownBits`,label:`knownBits (known bits of p)`,placeholder:`Enter known bits as integer...`,multiline:!0,rows:3},{name:`bitPosition`,label:`bitPosition`,placeholder:`msb or lsb`,multiline:!1}],sageTemplate:e=>`def _attack():
     try:
         try:
             n = Integer(${e.n})
@@ -2252,287 +2251,7 @@ How to use:
 2. Provide n, knownBits, and bitPosition (\\"msb\\" or \\"lsb\\")
 3. The attack uses Coppersmith\\'s method to find the missing bits
 
-Tip: This is inherently probabilistic — the lattice may fail even with the right inputs. Try with more known bits if it fails. bitPosition=msb = known high bits, lsb = known low bits.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},Z=5000n,Q=[P,F,ee,te,ne,L,R,z,H,U,W,G,K,q,{id:`euler`,name:`Euler Factorization`,category:`Factorization`,description:`Factors n by finding two distinct representations as a sum of squares a^2+b^2 = c^2+d^2 = n. Use when both primes are ≡ 1 (mod 4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
-    try:
-        try:
-            n = Integer(${e.n})
-            print(f"Euler Factorization on n = {n}")
-            print()
-            import math
-            n_int = int(n)
-            ${I(`EULER`,`            `)}
-            end = math.isqrt(n_int)
-            solutions = []
-            a = 0
-            a_sq = 0
-            max_iter = 20000000
-            while a < end and len(solutions) < 2:
-                if a > max_iter:
-                    print(f"Euler factorization failed: exceeded {max_iter} iterations")
-                    print("EULER=FAILED")
-                    return
-                rem = n_int - a_sq
-                b = math.isqrt(rem)
-                if b*b == rem:
-                    distinct = True
-                    for sol in solutions:
-                        if sol[0] == b and sol[1] == a:
-                            distinct = False
-                            break
-                    if distinct:
-                        solutions.append([b, a])
-                a_sq += 2*a + 1
-                a += 1
-            if len(solutions) < 2:
-                print(f"Euler factorization failed: could not find two distinct sum-of-squares representations")
-                print("n may not have both primes ≡ 1 (mod 4)")
-                print("EULER=FAILED")
-                return
-            s0 = solutions[0]
-            s1 = solutions[1]
-            k = gcd(s0[0] - s1[0], s1[1] - s0[1])**2
-            h = gcd(s0[0] + s1[0], s1[1] + s0[1])**2
-            m = gcd(s0[0] + s1[0], s1[1] - s0[1])**2
-            lev = gcd(s0[0] - s1[0], s1[1] + s0[1])**2
-            p = gcd(k + h, n)
-            q = gcd(lev + m, n)
-            if p <= 1 or q >= n:
-                print(f"Found trivial factorization: {p} x {q} = {n}")
-                print("No non-trivial factors found via Euler")
-                print("EULER=FAILED")
-            else:
-                if p * q != n:
-                    q = n // p
-                print(f"Verification: p * q = {p * q}")
-                print(f"p is prime: {p.is_prime()}")
-                print(f"q is prime: {q.is_prime()}")
-                print(f"p = {p}")
-                print(f"q = {q}")
-                print()
-                print("EULER=SUCCESS")
-        except Exception as e:
-            print(f"ERROR: {e}")
-            print("EULER=FAILED")
-        #
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("EULER=FAILED")
-_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n<2n)return Promise.resolve(null);if(n%2n==0n)return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n/2n}\nEULER=SUCCESS`);let r=k(n),i=[],a=20000000n,o=0n;for(let e=0n;e<r&&i.length<2;e++){if(t&&e%100000n==0n){let n=e>a?100:Number(e*100n/(r<a?r:a)),i=r<a?r:a;t(n,`a = ${e.toString()} / ${i.toString()}`)}if(e>a)return t?.(100),Promise.resolve(null);let s=n-o;o+=2n*e+1n;let c=Number(s&15n);if(c===0||c===1||c===4||c===9){let t=k(s);if(t*t===s){let n=!0;for(let r of i)if(r[0]===t&&r[1]===e){n=!1;break}n&&i.push([t,e])}}}if(i.length<2)return Promise.resolve(null);let[s,c]=[i[0],i[1]],l=O(s[0]-c[0],c[1]-s[1])**2n,u=O(s[0]+c[0],c[1]+s[1])**2n,d=O(s[0]+c[0],c[1]-s[1])**2n,f=O(s[0]-c[0],c[1]+s[1])**2n,p=O(l+u,n),m=O(f+d,n);return p<=1n||m>=n?Promise.resolve(null):(p*m!==n&&(m=n/p),t?.(100),Promise.resolve(`Factor found!\nVerification: p * q = ${p*m}\np = ${p}\nq = ${m}\nn = ${s[0]}^2 + ${s[1]}^2 = ${c[0]}^2 + ${c[1]}^2\nEULER=SUCCESS`))}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Factor $n = pq$ using two distinct representations as a sum of squares. Requires $p \\equiv q \\equiv 1 \\pmod{4}$.
-
-\\textbf{Setup:}
-\\begin{itemize}
-\\item $n = pq$, with $p \\equiv q \\equiv 1 \\pmod{4}$
-\\item $n = a^2 + b^2 = c^2 + d^2$ (two distinct representations)
-\\end{itemize}
-
-\\textbf{Proof:}
-\\begin{align*}
-(a - c)(a + c) &= (d - b)(d + b) \\\\
-k &= \\gcd(a - c, d - b)^2,\\; h = \\gcd(a + c, d + b)^2 \\\\
-m &= \\gcd(a + c, d - b)^2,\\; \\ell = \\gcd(a - c, d + b)^2 \\\\
-p &= \\gcd(k + h, n),\\; q = \\gcd(\\ell + m, n)
-\\end{align*}
-From the identity $(a-c)(a+c) = (d-b)(d+b)$, the GCD combinations recover the prime factors.
-
-\\textbf{Explanation:} A theorem of Euler states that any prime $p \\equiv 1 \\pmod{4}$ has a unique representation as a sum of two squares (up to order and sign). A composite $n = pq$ where both primes are $\\equiv 1 \\pmod{4}$ therefore has two distinct representations, and these can be algebraically combined to recover $p$ and $q$. The method searches for the representations by iterating $a$ from $0$ to $\\sqrt{n}$.
-
-\\textbf{Optimizations:}
-\\begin{itemize}
-\\item \\textbf{Square recurrence:} Tracks $a^2$ incrementally via $(a+1)^2 = a^2 + 2a + 1$, replacing a full BigInt multiplication with addition each iteration — critical for the up to $20 \\times 10^6$ steps required.
-\\item \\textbf{Mod-16 perfect square pre-filter:} Checks $n - a^2 \\equiv 0, 1, 4, 9 \\pmod{16}$ before computing $\\sqrt{n - a^2}$, rejecting $\\sim 80\\%$ of candidates without an isqrt call.
-\\end{itemize}
-
-\\textbf{References:} Euler, 1749`,priority:`medium`,applicableCheck:e=>!!e.n},{id:`pollard-strassen`,name:`Pollard-Strassen's Algorithm`,category:`Factorization`,description:`Factors n in O(n^(1/4)) by computing GCD of interval products over [1, n^(1/4)] to find a small factor. Use when n has a factor ≤ n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
-def _attack():
-    try:
-        try:
-            n = Integer(${e.n})
-            print(f"Pollard-Strassen factorization on n = {n}")
-            print()
-            ${I(`POLLARD_STRASSEN`,`            `)}
-            c = int(floor(RR(n) ** (1/4))) + 1
-            if c > 50000:
-                print(f"n is too large for Strassen (n^(1/4) = {c} > 50000)")
-                print("POLLARD_STRASSEN=FAILED")
-                return
-            n_int = int(n)
-            # Single-pass Strassen: accumulate product incrementally with batched GCD
-            prod = 1
-            batch_size = 1000
-            for i in range(1, c + 1):
-                prod = (prod * i) % n_int
-                if i % batch_size == 0 or i == c:
-                    g = math.gcd(prod, n_int)
-                    if g > 1 and g < n_int:
-                        # Backtrack to find exact factor in this batch
-                        backtrack_start = max(1, i - batch_size + 1)
-                        backtrack_prod = 1
-                        for j in range(backtrack_start, i + 1):
-                            backtrack_prod = (backtrack_prod * j) % n_int
-                            g2 = math.gcd(backtrack_prod, n_int)
-                            if g2 > 1 and g2 < n_int:
-                                p_sage = Integer(g2)
-                                q_sage = n // p_sage
-                                print(f"Verification: p * q = {p_sage * q_sage}")
-                                print(f"p = {p_sage}")
-                                print(f"q = {q_sage}")
-                                print()
-                                print("POLLARD_STRASSEN=SUCCESS")
-                                return
-                        # If product GCD found but backtrack didn't (shouldn't happen)
-                        break
-            print("Pollard-Strassen failed: no factor found in intervals")
-            print("POLLARD_STRASSEN=FAILED")
-        except Exception as e:
-            print(f"ERROR: {e}")
-            print("POLLARD_STRASSEN=FAILED")
-        #
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("POLLARD_STRASSEN=FAILED")
-_attack()`,proof:`\\textbf{Theorem:} Pollard-Strassen factors n in $O(n^{1/4} \\log n)$ time by partitioning $[1, n^{1/4}]$ into intervals and testing each via GCD.
-
-\\textbf{Setup:}
-\\begin{itemize}
-\\item $n$ has a prime factor $p \\leq n^{1/4}$
-\\item Partition $[1, n^{1/4}]$ into $c = \\lceil n^{1/4} \\rceil$ intervals
-\\end{itemize}
-
-\\textbf{Proof:}
-\\begin{align*}
-\\text{Let } c &= \\lceil n^{1/4} \\rceil \\\\
-\\text{Interval } I_i &= \\{i c + 1, \\dots, (i+1) c\\} \\\\
-P_i &= \\prod_{j \\in I_i} j \\mod n \\\\
-\\gcd(P_i, n) &> 1 \\iff I_i \\text{ contains a factor of } n
-\\end{align*}
-Compute each $P_i$ incrementally and take $\\gcd(P_i, n)$. When a match is found, back-track within the interval to isolate the exact factor. The cost is $O(c) = O(n^{1/4})$ multiplications and GCDs.
-
-\\textbf{Explanation:} If $p \\mid n$ and $p \\leq n^{1/4}$, then $p$ lies in some interval $I_i$. Since every element of $I_i$ divides $P_i$, we have $p \\mid P_i$ and hence $\\gcd(P_i, n) \\geq p > 1$. The backtrack step finds $p$ within the winning interval by rebuilding the product one term at a time until the GCD becomes non-trivial.
-
-\\textbf{Optimizations:}
-\\begin{itemize}
-\\item \\textbf{Incremental product accumulation:} The factorial product $P_i$ is built incrementally as terms are iterated — each step multiplies the running product by the next integer, avoiding recomputation from scratch per batch.
-\\item \\textbf{Batched GCD with backtracking:} A GCD is computed only once per $batch\\_size = 1000$ terms. When a hit is found, the batch is re-scanned linearly to pinpoint the exact factor, reducing GCD calls by $\\sim 1000\\times$.
-\\end{itemize}
-
-\\textbf{References:} Strassen, 1977; Pollard, 1974`,priority:`medium`,applicableCheck:e=>!!e.n},{id:`pisano-period`,name:`Pisano Period Factorization`,category:`Factorization`,description:`Factors n via birthday collision on 2^x mod n using multiplicative period search. Use for small moduli under 64 bits.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
-    out = []
-    try:
-        try:
-            n = Integer(${e.n})
-            out.append("Pisano Period Factorization on n = " + str(n))
-            out.append("")
-            if n < 2:
-                out.append("n = " + str(n) + " is too small to factor")
-                out.append("PISANO_PERIOD=FAILED")
-                print("\\n".join(out))
-                return
-            if n % 2 == 0:
-                out.append("n is even: " + str(n))
-                out.append("Verification: p * q = " + str(2 * (n // 2)))
-                out.append("p = 2")
-                out.append("q = " + str(n // 2))
-                out.append("")
-                out.append("PISANO_PERIOD=SUCCESS")
-                print("\\n".join(out))
-                return
-            if n.is_prime():
-                out.append("n is prime: " + str(n))
-                out.append("PISANO_PERIOD=FAILED")
-                print("\\n".join(out))
-                return
-            if n.is_square():
-                p = isqrt(n)
-                out.append("n is a perfect square: " + str(p) + "^2 = " + str(n))
-                out.append("Verification: p * q = " + str(p * p))
-                out.append("p = " + str(p))
-                out.append("q = " + str(p))
-                out.append("")
-                out.append("PISANO_PERIOD=SUCCESS")
-                print("\\n".join(out))
-                return
-            limit = 200000
-            lookup = {}
-            found = False
-            n_int = int(n)
-            pow_val = 1  # 2^0 mod n
-            for i in range(limit):
-                pow_val = (pow_val * 2) % n_int  # recurrence instead of pow(2, i, n)
-                val = (pow_val - 1) % n_int
-                if val == 0:
-                    phi_guess = i
-                    if phi_guess % 2 == 0:
-                        s = n - phi_guess + 1
-                        disc = s*s - 4*n
-                        if disc > 0:
-                            t = isqrt(disc)
-                            if t*t == disc:
-                                p_factor = (s - t) // 2
-                                q_factor = (s + t) // 2
-                                if p_factor > 1 and p_factor * q_factor == n:
-                                    out.append("Verification: p * q = " + str(p_factor * q_factor))
-                                    out.append("p = " + str(p_factor))
-                                    out.append("q = " + str(q_factor))
-                                    out.append("")
-                                    out.append("PISANO_PERIOD=SUCCESS")
-                                    found = True
-                                    print("\\n".join(out))
-                                    return
-                if val in lookup:
-                    period = i - lookup[val]
-                    for mult in range(1, 200):
-                        phi_guess = period * mult
-                        if phi_guess >= n:
-                            break
-                        if phi_guess % 2 == 0:
-                            s = n - phi_guess + 1
-                            disc = s*s - 4*n
-                            if disc > 0:
-                                t = isqrt(disc)
-                                if t*t == disc:
-                                    p_factor = (s - t) // 2
-                                    q_factor = (s + t) // 2
-                                    if p_factor > 1 and p_factor * q_factor == n:
-                                        out.append("Verification: p * q = " + str(p_factor * q_factor))
-                                        out.append("p = " + str(p_factor))
-                                        out.append("q = " + str(q_factor))
-                                        out.append("")
-                                        out.append("PISANO_PERIOD=SUCCESS")
-                                        found = True
-                                        print("\\n".join(out))
-                                        return
-                lookup[val] = i
-            if not found:
-                out.append("Pisano period attack failed: no collision found")
-                out.append("PISANO_PERIOD=FAILED")
-        except Exception as e:
-            out.append("ERROR: " + str(e))
-            out.append("PISANO_PERIOD=FAILED")
-        #
-    except BaseException as ex:
-        out.append("ERROR: " + str(ex))
-        out.append("PISANO_PERIOD=FAILED")
-    print("\\n".join(out))
-_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${n/2n}\nPISANO_PERIOD=SUCCESS`);let r=new Map,i=1n,a=200000n;for(let e=0n;e<a;e++){t&&e%10000n==0n&&t(Number(e*100n/a),`i = ${e.toString()} / 200000`);let o=i===0n?n-1n:i-1n;if(o===0n&&e>0n){let r=n-e+1n,i=r*r-4n*n;if(i>=0n){let a=k(i);if(a*a===i){let i=(r-a)/2n,o=(r+a)/2n;if(i>1n&&o>1n&&i*o===n)return t?.(100),Promise.resolve(`Factor found!\nPeriod length: ${e}\np = ${i}\nq = ${o}\nPISANO_PERIOD=SUCCESS`)}}}if(r.has(o)){let i=r.get(o),a=e-i;for(let e=1n;e<200n;e++){let r=a*e;if(r>=n)break;if(r%2n!=0n)continue;let i=n-r+1n,o=i*i-4n*n;if(o<0n)continue;let s=k(o);if(s*s===o){let e=(i-s)/2n,r=(i+s)/2n;if(e>1n&&r>1n&&e*r===n)return t?.(100),Promise.resolve(`Factor found!\nPeriod length: ${a}\np = ${e}\nq = ${r}\nPISANO_PERIOD=SUCCESS`)}}}r.set(o,e),i=i*2n%n}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Factor $n = pq$ via birthday collision on the sequence $f(i) = 2^i - 1 \\pmod{n}$, revealing $\\lambda(n)$.
-
-\\textbf{Setup:}
-\\begin{itemize}
-\\item Let $f(x) = 2^x - 1 \\pmod{n}$ for $x = 0, 1, 2, \\ldots$
-\\item Birthday paradox: collision $f(i) = f(j)$ expected in $O(\\sqrt{\\operatorname{ord}_n(2)})$ steps
-\\end{itemize}
-
-\\textbf{Proof:}
-\\begin{align*}
-f(i) = f(j) &\\implies 2^i \\equiv 2^j \\pmod{n} \\\\
-&\\implies 2^{|j-i|} \\equiv 1 \\pmod{n} \\\\
-|j-i| &\\text{ is a multiple of } \\operatorname{ord}_n(2) \\mid \\lambda(n) \\\\
-\\phi &= k \\cdot |j-i| \\text{ as candidate for } \\phi(n) \\\\
-p,q &= \\frac{n - \\phi + 1 \\pm \\sqrt{(n - \\phi + 1)^2 - 4n}}{2} \\qed
-\\end{align*}
-
-\\textbf{Explanation:} The Pisano period attack tracks $2^i \\bmod n$ via recurrence ($v_{i+1} = 2 \\cdot v_i \\bmod n$). When a value repeats, the index difference is a multiple of the multiplicative order of 2 modulo $n$, which divides $\\lambda(n)$. Each candidate $\\phi$ is tested by checking whether the quadratic discriminant is a perfect square.
-
-\\textbf{References:} Wuliangshun, "Integer Factorization With Pisano Period", IEEE Access, 2019`,priority:`medium`,applicableCheck:e=>!!e.n},Y,X,re,{id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via FLT-based batch GCD search over small CRT exponent d_p. Use when d_p = d mod (p-1) is small (< bound, default 1,000,000).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 5000000`,required:!1,multiline:!1}],sageTemplate:e=>`import math
+Tip: This is inherently probabilistic — the lattice may fail even with the right inputs. Try with more known bits if it fails. bitPosition=msb = known high bits, lsb = known low bits.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},X=5000n,re={id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via FLT-based batch GCD search over small CRT exponent d_p. Use when d_p = d mod (p-1) is small (< bound, default 1,000,000).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 5000000`,required:!1,multiline:!1}],sageTemplate:e=>`import math
 def _attack():
     try:
         n = Integer(${e.n})
@@ -2580,7 +2299,7 @@ def _attack():
                 print("SMALL_CRT_EXP=FAILED")
     except Exception as ex:
         print(f"SMALL_CRT_EXP=FAILED: {ex}")
-_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=e.bound?BigInt(e.bound):5000000n,a=M(2n,r,n),o=1n,s=1n,c=0n;for(let e=0n;e<=i;e++){let l=(o-2n+n)%n;if(t&&i>10000n&&e%50000n==0n&&t(Number(e*100n/i),`dp = ${e.toString()} / ${i.toString()}`),s=s*l%n,e%Z==Z-1n||e===i){let i=O(s,n);if(i>1n&&i<n){let o=e,s=M(a,c,n);for(let e=c;e<=o;e++){if(O((s-2n+n)%n,n)>1n){let a=i,o=n/i,s=j(r,(a-1n)*(o-1n)),c=s?`\nPrivate exponent d = ${s}`:``;return t?.(100),Promise.resolve(`Factor found at dp = ${e}!\np = ${a}\nq = ${o}${c}\nSMALL_CRT_EXP=SUCCESS`)}s=s*a%n}}s=1n,c=e+1n}o=o*a%n}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small ($< \\text{bound}$), Fermat's Little Theorem with batched GCD recovers $p$ in $O(\\text{bound})$ time.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=e.bound?BigInt(e.bound):5000000n,a=A(2n,r,n),o=1n,s=1n,c=0n;for(let e=0n;e<=i;e++){let l=(o-2n+n)%n;if(t&&i>10000n&&e%50000n==0n&&t(Number(e*100n/i),`dp = ${e.toString()} / ${i.toString()}`),s=s*l%n,e%X==X-1n||e===i){let i=E(s,n);if(i>1n&&i<n){let o=e,s=A(a,c,n);for(let e=c;e<=o;e++){if(E((s-2n+n)%n,n)>1n){let a=i,o=n/i,s=k(r,(a-1n)*(o-1n)),c=s?`\nPrivate exponent d = ${s}`:``;return t?.(100),Promise.resolve(`Factor found at dp = ${e}!\np = ${a}\nq = ${o}${c}\nSMALL_CRT_EXP=SUCCESS`)}s=s*a%n}}s=1n,c=e+1n}o=o*a%n}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $d_p = d \\bmod (p-1)$ is small ($< \\text{bound}$), Fermat's Little Theorem with batched GCD recovers $p$ in $O(\\text{bound})$ time.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2614,7 +2333,7 @@ How to use:
 3. A batched GCD approach (product tree) accelerates the linear scan ~1000x by reducing gcd calls via product accumulation
 4. Provide n, e, and optionally bound         (max dp to try, default 50000000)
 
-Tip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 50000000 runs in ~900ms for 1024-bit n.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},{id:`dp-dq-leak`,name:`dp/dq Leak`,category:`Partial Key / Lattice`,description:`Recovers p from leaked d_p (or q from leaked d_q) via FLT-based GCD. Use when CRT exponents d_p or d_q are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dp`,label:`dp (d mod p-1)`,placeholder:`Enter dp value...`,multiline:!0,rows:3},{name:`dq`,label:`dq (d mod q-1, optional)`,placeholder:`Enter dq value...`,required:!1,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.e);if(t<=0n||n<=0n)return null;let r=2n;if(e.dp){let i=BigInt(e.dp);if(i>0n){let e=n*i-1n;if(e>0n){let n=O(M(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(n*e).toString()}\ndp = ${i.toString()}\np = ${n.toString()}\nq = ${e.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}if(e.dq){let i=BigInt(e.dq);if(i>0n){let e=n*i-1n;if(e>0n){let n=O(M(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(e*n).toString()}\ndq = ${i.toString()}\np = ${e.toString()}\nq = ${n.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}return null}catch{return null}},sageTemplate:e=>{let t=e.dp?`
+Tip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 50000000 runs in ~900ms for 1024-bit n.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},ie={id:`dp-dq-leak`,name:`dp/dq Leak`,category:`Partial Key / Lattice`,description:`Recovers p from leaked d_p (or q from leaked d_q) via FLT-based GCD. Use when CRT exponents d_p or d_q are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dp`,label:`dp (d mod p-1)`,placeholder:`Enter dp value...`,multiline:!0,rows:3},{name:`dq`,label:`dq (d mod q-1, optional)`,placeholder:`Enter dq value...`,required:!1,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.e);if(t<=0n||n<=0n)return null;let r=2n;if(e.dp){let i=BigInt(e.dp);if(i>0n){let e=n*i-1n;if(e>0n){let n=E(A(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(n*e).toString()}\ndp = ${i.toString()}\np = ${n.toString()}\nq = ${e.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}if(e.dq){let i=BigInt(e.dq);if(i>0n){let e=n*i-1n;if(e>0n){let n=E(A(r,e,t)-1n,t);if(n>1n&&n<t){let e=t/n;return`Verification: p * q = ${(e*n).toString()}\ndq = ${i.toString()}\np = ${e.toString()}\nq = ${n.toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}return null}catch{return null}},sageTemplate:e=>{let t=e.dp?`
         dp_val = int(Integer(${e.dp}))
         if dp_val > 0:
             num = dp_val * e_int - 1
@@ -2695,7 +2414,7 @@ How to use:
 3. The attack computes p from dp via gcd(pow(2, e*dp - 1, n) - 1, n)
 4. q = n / p gives the factorization
 
-Tip: dp and dq are often stored alongside the private key. This attack runs entirely in your browser — no server computation needed.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&(!!e.dp||!!e.dq)},{id:`linearly-related-primes`,name:`Linearly Related Primes`,category:`Partial Key / Lattice`,description:`Factors n when primes are linearly related (q = k·p + δ) via quadratic discriminant. Use when p and q share a known relationship with multiplier k.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`k`,label:`k (known multiplier)`,placeholder:`Enter k value...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+Tip: dp and dq are often stored alongside the private key. This attack runs entirely in your browser — no server computation needed.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&(!!e.dp||!!e.dq)},ae={id:`linearly-related-primes`,name:`Linearly Related Primes`,category:`Partial Key / Lattice`,description:`Factors n when primes are linearly related (q = k·p + δ) via quadratic discriminant. Use when p and q share a known relationship with multiplier k.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`k`,label:`k (known multiplier)`,placeholder:`Enter k value...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
 def _attack():
     try:
         try:
@@ -2759,7 +2478,7 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("LINEARLY_RELATED_PRIMES=FAILED")
-_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.k)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.k),i=4n*r*n;for(let e=-1000000n;e<=1000000n;e++){let a=e*e+i,o=Number(a&15n);if(o!==0&&o!==1&&o!==4&&o!==9)continue;t&&e%10000n==0n&&t(Number((e+1000000n)*100n/2000001n),`δ = ${e>=0n?`+${e.toString()}`:e.toString()}`);let s=k(a);if(s*s!==a)continue;let c=-e+s;if(c>0n&&c%(2n*r)==0n){let i=c/(2n*r);if(i>1n&&n%i===0n){let a=n/i;return t?.(100),Promise.resolve(`Factor found!\np = ${i}\nq = ${a}\nk = ${r}\ndelta = ${e}\nLINEARLY_RELATED_PRIMES=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta| < 10^6$, solve $kp^2 + \\delta p - n = 0$ to recover $p$.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.k)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.k),i=4n*r*n;for(let e=-1000000n;e<=1000000n;e++){let a=e*e+i,o=Number(a&15n);if(o!==0&&o!==1&&o!==4&&o!==9)continue;t&&e%10000n==0n&&t(Number((e+1000000n)*100n/2000001n),`δ = ${e>=0n?`+${e.toString()}`:e.toString()}`);let s=D(a);if(s*s!==a)continue;let c=-e+s;if(c>0n&&c%(2n*r)==0n){let i=c/(2n*r);if(i>1n&&n%i===0n){let a=n/i;return t?.(100),Promise.resolve(`Factor found!\np = ${i}\nq = ${a}\nk = ${r}\ndelta = ${e}\nLINEARLY_RELATED_PRIMES=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta| < 10^6$, solve $kp^2 + \\delta p - n = 0$ to recover $p$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2790,7 +2509,7 @@ How to use:
 2. Provide n and k
 3. The attack solves the quadratic equation k*p^2 + δ*p - n = 0 to recover p
 
-Tip: This is common in CTF challenges or badly generated keys. Setting k=1 gives the classic twin-prime case (p = q + δ). For p = a*q + b form, try inverting the relationship.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.k},{id:`dependent-prime`,name:`Dependent-Prime RSA`,category:`Partial Key / Lattice`,description:`Factors n when q is derived from e (q·e ≡ 1 mod p) via quadratic discriminant. Use when q = e^{-1} mod p as in some embedded RSA implementations.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+Tip: This is common in CTF challenges or badly generated keys. Setting k=1 gives the classic twin-prime case (p = q + δ). For p = a*q + b form, try inverting the relationship.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.k},oe={id:`dependent-prime`,name:`Dependent-Prime RSA`,category:`Partial Key / Lattice`,description:`Factors n when q is derived from e (q·e ≡ 1 mod p) via quadratic discriminant. Use when q = e^{-1} mod p as in some embedded RSA implementations.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
 def _attack():
     try:
         try:
@@ -2855,7 +2574,7 @@ def _attack():
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("DEPENDENT_PRIME=FAILED")
-_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=4n*n*r;for(let e=1n;e<=5000000n;e++){t&&e%500000n==0n&&t(Number(e*100n/5000000n),`k = ${e.toString()} / 5,000,000`);let r=1n+e*i,a=Number(r&15n);if(a!==1&&a!==9)continue;let o=k(r);if(o*o!==r)continue;let s=-1n+o;if(s>0n&&s%(2n*e)==0n){let r=s/(2n*e);if(r>1n&&n%r===0n){let i=n/r;return t?.(100),Promise.resolve(`Factor found!\np = ${r}\nq = ${i}\nk = ${e}\nDEPENDENT_PRIME=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $qe \\equiv 1 \\pmod{p}$, solve $kp^2 + p - ne = 0$ for $p$ by iterating $k$.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=4n*n*r;for(let e=1n;e<=5000000n;e++){t&&e%500000n==0n&&t(Number(e*100n/5000000n),`k = ${e.toString()} / 5,000,000`);let r=1n+e*i,a=Number(r&15n);if(a!==1&&a!==9)continue;let o=D(r);if(o*o!==r)continue;let s=-1n+o;if(s>0n&&s%(2n*e)==0n){let r=s/(2n*e);if(r>1n&&n%r===0n){let i=n/r;return t?.(100),Promise.resolve(`Factor found!\np = ${r}\nq = ${i}\nk = ${e}\nDEPENDENT_PRIME=SUCCESS`)}}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If $qe \\equiv 1 \\pmod{p}$, solve $kp^2 + p - ne = 0$ for $p$ by iterating $k$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2886,7 +2605,7 @@ How to use:
 2. Provide n and e
 3. The attack solves the equation k*p^2 + p - n*e = 0 to recover p
 
-Tip: This key generation pattern occurs in some embedded RSA implementations where q is derived from p to speed up CRT operations.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},{id:`common-modulus`,name:`Common Modulus Attack`,category:`Message / Protocol`,description:`Recovers m from two ciphertexts under the same n with coprime exponents via Bezout's identity. Use when same m encrypted with different e values under same modulus.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e1`,label:`e1 (first exponent)`,placeholder:`Enter first exponent e1...`,multiline:!0,rows:3},{name:`e2`,label:`e2 (second exponent)`,placeholder:`Enter second exponent e2...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e1||!e.e2||!e.c1||!e.c2?`print("ERROR: Missing required inputs (n, e1, e2, c1, c2)")
+Tip: This key generation pattern occurs in some embedded RSA implementations where q is derived from p to speed up CRT operations.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},se={id:`common-modulus`,name:`Common Modulus Attack`,category:`Message / Protocol`,description:`Recovers m from two ciphertexts under the same n with coprime exponents via Bezout's identity. Use when same m encrypted with different e values under same modulus.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e1`,label:`e1 (first exponent)`,placeholder:`Enter first exponent e1...`,multiline:!0,rows:3},{name:`e2`,label:`e2 (second exponent)`,placeholder:`Enter second exponent e2...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e1||!e.e2||!e.c1||!e.c2?`print("ERROR: Missing required inputs (n, e1, e2, c1, c2)")
 print("COMMON_MODULUS=FAILED")`:`def _attack():
     try:
         n = Integer(${e.n})
@@ -2924,7 +2643,7 @@ print("COMMON_MODULUS=FAILED")`:`def _attack():
         print(f"ERROR: {e}")
         print("COMMON_MODULUS=FAILED")
     #
-_attack()`,frontendCheck:e=>{if(!e.n||!e.e1||!e.e2||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e1),r=BigInt(e.e2),i=BigInt(e.c1),a=BigInt(e.c2);if(O(n,r)!==1n)return Promise.resolve(null);let{x:o,y:s}=A(n,r),c;if(o<0n){let e=j(i,t);if(!e)return Promise.resolve(null);c=M(e,-o,t)}else c=M(i,o,t);let l;if(s<0n){let e=j(a,t);if(!e)return Promise.resolve(null);l=M(e,-s,t)}else l=M(a,s,t);let u=c*l%t,d=M(u,n,t),f=M(u,r,t);return d===i&&f===a?Promise.resolve(`Recovered message: m = ${u}\nCOMMON_MODULUS=SUCCESS`):Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given two ciphertexts $c_1 \\equiv m^{e_1} \\pmod{n}$ and $c_2 \\equiv m^{e_2} \\pmod{n}$ with $\\gcd(e_1, e_2) = 1$, recover $m$ without factoring $n$.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.e1||!e.e2||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e1),r=BigInt(e.e2),i=BigInt(e.c1),a=BigInt(e.c2);if(E(n,r)!==1n)return Promise.resolve(null);let{x:o,y:s}=O(n,r),c;if(o<0n){let e=k(i,t);if(!e)return Promise.resolve(null);c=A(e,-o,t)}else c=A(i,o,t);let l;if(s<0n){let e=k(a,t);if(!e)return Promise.resolve(null);l=A(e,-s,t)}else l=A(a,s,t);let u=c*l%t,d=A(u,n,t),f=A(u,r,t);return d===i&&f===a?Promise.resolve(`Recovered message: m = ${u}\nCOMMON_MODULUS=SUCCESS`):Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given two ciphertexts $c_1 \\equiv m^{e_1} \\pmod{n}$ and $c_2 \\equiv m^{e_2} \\pmod{n}$ with $\\gcd(e_1, e_2) = 1$, recover $m$ without factoring $n$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2943,7 +2662,7 @@ When $a < 0$, compute $c_1^a = (c_1^{-1})^{|a|} \\pmod{n}$. Same for $b < 0$.
 
 \\textbf{Explanation:} Bezout's identity guarantees integers $a, b$ satisfying $a e_1 + b e_2 = 1$ because $\\gcd(e_1, e_2) = 1$. Multiplying $c_1^a \\cdot c_2^b$ yields $m^{a e_1 + b e_2} = m$. This is why coprime exponents are essential: if $\\gcd(e_1, e_2) > 1$, the GCD may directly factor $n$.
 
-\\textbf{References:} Simmons & Norris, 1977; Boneh, "Twenty Years of Attacks on RSA," 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e1&&!!e.e2&&!!e.c1&&!!e.c2},{id:`coppersmith-short-pad`,name:`Coppersmith Short Pad Attack`,category:`Partial Key / Lattice`,description:`Recovers messages m1, m2 from two ciphertexts with small padding differences via integer e-th root. Use when same message is encrypted twice with small random pads (e=3, no modular wrap-around).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.c1||!e.c2?`print("ERROR: Missing required inputs (n, e, c1, c2)")
+\\textbf{References:} Simmons & Norris, 1977; Boneh, "Twenty Years of Attacks on RSA," 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e1&&!!e.e2&&!!e.c1&&!!e.c2},ce={id:`coppersmith-short-pad`,name:`Coppersmith Short Pad Attack`,category:`Partial Key / Lattice`,description:`Recovers messages m1, m2 from two ciphertexts with small padding differences via integer e-th root. Use when same message is encrypted twice with small random pads (e=3, no modular wrap-around).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.c1||!e.c2?`print("ERROR: Missing required inputs (n, e, c1, c2)")
 print("COPPERSMITH_SHORT_PAD=FAILED")`:`def _attack():
     try:
         out = []
@@ -3017,7 +2736,7 @@ print("COPPERSMITH_SHORT_PAD=FAILED")`:`def _attack():
         out.append("ERROR: " + str(err))
         out.append("COPPERSMITH_SHORT_PAD=FAILED")
         print("\\n".join(out))
-_attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.c1),i=BigInt(e.c2),a=N(r,n),o=N(i,n),s=a**n===r?a:null,c=o**n===i?o:null;if(s===null&&c!==null){for(let e=1n;e<4096n;e++)if((c-e)**n===r){s=c-e;break}}if(c===null&&s!==null){for(let e=1n;e<4096n;e++)if((s+e)**n===i){c=s+e;break}}return s!==null&&c!==null&&M(s,n,t)===r&&M(c,n,t)===i?Promise.resolve(`Messages recovered!\nm1 = ${s}\nm2 = ${c}\ndelta = ${c-s}\nCOPPERSMITH_SHORT_PAD=SUCCESS`):Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given $c_1 \\equiv m_1^e \\pmod{n}$ and $c_2 \\equiv m_2^e \\pmod{n}$ where $m_1 = m + r_1$, $m_2 = m + r_2$ with small random pads, recover $m$ when $m^e < n$.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.c1),i=BigInt(e.c2),a=j(r,n),o=j(i,n),s=a**n===r?a:null,c=o**n===i?o:null;if(s===null&&c!==null){for(let e=1n;e<4096n;e++)if((c-e)**n===r){s=c-e;break}}if(c===null&&s!==null){for(let e=1n;e<4096n;e++)if((s+e)**n===i){c=s+e;break}}return s!==null&&c!==null&&A(s,n,t)===r&&A(c,n,t)===i?Promise.resolve(`Messages recovered!\nm1 = ${s}\nm2 = ${c}\ndelta = ${c-s}\nCOPPERSMITH_SHORT_PAD=SUCCESS`):Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given $c_1 \\equiv m_1^e \\pmod{n}$ and $c_2 \\equiv m_2^e \\pmod{n}$ where $m_1 = m + r_1$, $m_2 = m + r_2$ with small random pads, recover $m$ when $m^e < n$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -3045,7 +2764,7 @@ How to use:
 3. Provide n, e, c1, c2
 4. The attack uses integer e-th root to recover the messages and pads
 
-Tip: Works best with e=3 and small messages. For convenience, paste into Magic Mode which auto-detects.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c1&&!!e.c2},{id:`hastad-linear-pad`,name:`Hastad's Attack with Linear Padding`,category:`Message / Protocol`,description:`Recovers m from k >= e ciphertexts with affine padding under same exponent via CRT and Coppersmith. Use when c_i = (a_i·m + b_i)^e mod n_i.`,inputs:[{name:`triples`,label:`Triples (n,c,a,b per line)`,placeholder:`n1,c1,a1,b1\\nn2,c2,a2,b2...`,multiline:!0,rows:5},{name:`e`,label:`e (public exponent)`,placeholder:`Enter exponent e (e.g., 3)...`,multiline:!1}],sageTemplate:e=>!e.triples||!e.e?`print("ERROR: Missing required inputs (triples, e)")
+Tip: Works best with e=3 and small messages. For convenience, paste into Magic Mode which auto-detects.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c1&&!!e.c2},le={id:`hastad-linear-pad`,name:`Hastad's Attack with Linear Padding`,category:`Message / Protocol`,description:`Recovers m from k >= e ciphertexts with affine padding under same exponent via CRT and Coppersmith. Use when c_i = (a_i·m + b_i)^e mod n_i.`,inputs:[{name:`triples`,label:`Triples (n,c,a,b per line)`,placeholder:`n1,c1,a1,b1\\nn2,c2,a2,b2...`,multiline:!0,rows:5},{name:`e`,label:`e (public exponent)`,placeholder:`Enter exponent e (e.g., 3)...`,multiline:!1}],sageTemplate:e=>!e.triples||!e.e?`print("ERROR: Missing required inputs (triples, e)")
 print("HASTAD_LINEAR_PAD=FAILED")`:`def _attack():
     try:
         e = Integer(${e.e})
@@ -3214,7 +2933,7 @@ m &= \\text{small\\_roots}(F) \\quad \\text{(since $|m| < N^{1/e}$)}
 \\item \\textbf{Horner evaluation with precomputed coefficients:} For each modulus $n_i$ with $(a_i, b_i)$, precomputes the polynomial coefficients $A_i, B_i, C_i, D_i$ for $(a_i m + b_i)^3 - c_i$. Evaluates each candidate as $((A_i m + B_i)m + C_i)m + D_i \\bmod n_i$ — four operations per candidate per modulus instead of a full modular exponentiation.
 \\end{itemize}
 
-\\textbf{References:} J. Hastad, "Solving Low-Exponent RSA," Eurocrypt 1988; Coppersmith et al., 1996`,priority:`medium`,applicableCheck:e=>!!e.triples&&!!e.e},{id:`lsb-oracle`,name:`LSB Oracle Attack`,category:`Oracle`,description:`Recovers plaintext m using an exact LSB oracle in log2(n) queries via binary fraction accumulation. Use when a side channel reveals the LSB of the decrypted ciphertext.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated LSB bits)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+\\textbf{References:} J. Hastad, "Solving Low-Exponent RSA," Eurocrypt 1988; Coppersmith et al., 1996`,priority:`medium`,applicableCheck:e=>!!e.triples&&!!e.e},ue={id:`lsb-oracle`,name:`LSB Oracle Attack`,category:`Oracle`,description:`Recovers plaintext m using an exact LSB oracle in log2(n) queries via binary fraction accumulation. Use when a side channel reveals the LSB of the decrypted ciphertext.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated LSB bits)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         # LSB Oracle Attack — binary search via 2^e blinding
         if not "${e.n}".strip():
@@ -3286,7 +3005,7 @@ m &= \\text{small\\_roots}(F) \\quad \\text{(since $|m| < N^{1/e}$)}
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("LSB_ORACLE=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.c||!e.oracle_responses)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.c),i=e.oracle_responses.split(`,`).map(e=>e.trim()===`1`),a=BigInt(i.length),o=0n;for(let e of i)o=o<<1n|(e?1n:0n);let s=1n<<a,c=s>t?(o*t+s-1n)/s:o*t/s;for(let e=c-2n;e<=c+2n;e++)if(e>=0n&&M(e,n,t)===r)return Promise.resolve(`Message recovered: m = ${e}\nbits used = ${a}\nLSB_ORACLE=SUCCESS`);return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} An exact LSB oracle recovers $m$ in exactly $\\log_2 n$ queries via binary fraction accumulation.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.c||!e.oracle_responses)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.c),i=e.oracle_responses.split(`,`).map(e=>e.trim()===`1`),a=BigInt(i.length),o=0n;for(let e of i)o=o<<1n|(e?1n:0n);let s=1n<<a,c=s>t?(o*t+s-1n)/s:o*t/s;for(let e=c-2n;e<=c+2n;e++)if(e>=0n&&A(e,n,t)===r)return Promise.resolve(`Message recovered: m = ${e}\nbits used = ${a}\nLSB_ORACLE=SUCCESS`);return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} An exact LSB oracle recovers $m$ in exactly $\\log_2 n$ queries via binary fraction accumulation.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -3321,7 +3040,7 @@ How to use:
 3. Provide n, e, c, and the full list of oracle bits (from query 0 to query log2(n))
 4. The attack accumulates bits into a binary fraction to recover the message
 
-Tip: You need roughly n.bit_length() oracle responses for full recovery. Each bit halves the uncertainty.`,priority:`medium`,applicableCheck:e=>!!(e.n&&e.e&&e.c&&e.oracle_responses)},{id:`rsa-crt-fault`,name:`RSA-CRT Fault Attack (Bellcore)`,category:`Message / Protocol`,description:`Factors n from a single faulty CRT signature via gcd. Use when a transient fault corrupts one of two CRT exponentiations during signing.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`m`,label:`m (message)`,placeholder:`Enter message m...`,multiline:!0,rows:3},{name:`sig_valid`,label:`Valid signature`,placeholder:`Enter valid signature...`,multiline:!0,rows:3},{name:`sig_faulty`,label:`Faulty signature`,placeholder:`Enter faulty signature...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.m||!e.sig_faulty?`print("ERROR: Missing required inputs (n, e, m, sig_faulty)")
+Tip: You need roughly n.bit_length() oracle responses for full recovery. Each bit halves the uncertainty.`,priority:`medium`,applicableCheck:e=>!!(e.n&&e.e&&e.c&&e.oracle_responses)},de={id:`rsa-crt-fault`,name:`RSA-CRT Fault Attack (Bellcore)`,category:`Message / Protocol`,description:`Factors n from a single faulty CRT signature via gcd. Use when a transient fault corrupts one of two CRT exponentiations during signing.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`m`,label:`m (message)`,placeholder:`Enter message m...`,multiline:!0,rows:3},{name:`sig_valid`,label:`Valid signature`,placeholder:`Enter valid signature...`,multiline:!0,rows:3},{name:`sig_faulty`,label:`Faulty signature`,placeholder:`Enter faulty signature...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.m||!e.sig_faulty?`print("ERROR: Missing required inputs (n, e, m, sig_faulty)")
 print("RSA_CRT_FAULT=FAILED")`:`def _attack():
     try:
         out = []
@@ -3371,7 +3090,7 @@ print("RSA_CRT_FAULT=FAILED")`:`def _attack():
         out.append("RSA_CRT_FAULT=FAILED")
         print("\\n".join(out))
     #
-_attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.m||!e.sig_faulty)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.m),i=O(M(BigInt(e.sig_faulty),n,t)-r,t);if(i>1n&&i<t){let e=t/i,r=j(n,(i-1n)*(e-1n)),a=r?`\nPrivate exponent d = ${r}`:``;return Promise.resolve(`Factor found!\np = ${i}\nq = ${e}${a}\nRSA_CRT_FAULT=SUCCESS`)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} A single faulty CRT signature $s'$ on a known message $m$ reveals the factorization of $n = pq$ via $\\gcd(s'^e - m, n)$.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.m||!e.sig_faulty)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.m),i=E(A(BigInt(e.sig_faulty),n,t)-r,t);if(i>1n&&i<t){let e=t/i,r=k(n,(i-1n)*(e-1n)),a=r?`\nPrivate exponent d = ${r}`:``;return Promise.resolve(`Factor found!\np = ${i}\nq = ${e}${a}\nRSA_CRT_FAULT=SUCCESS`)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} A single faulty CRT signature $s'$ on a known message $m$ reveals the factorization of $n = pq$ via $\\gcd(s'^e - m, n)$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -3400,7 +3119,7 @@ How to use:
 
 Required: n, e, m (the signed message as an integer), sig_valid, sig_faulty
 
-Tip: The two signatures must be from the SAME message using the SAME key. The fault must affect only one of the two CRT exponentiations.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.m&&!!e.sig_faulty},{id:`non-coprime-exp`,name:`Non-Coprime Exponent Attack`,category:`Message / Protocol`,description:`Resolves multiple plaintexts when gcd(e, phi(n)) > 1 using known p and q factors. Use after factoring n, when public exponent shares a factor with phi(n).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`p`,label:`p (prime factor)`,placeholder:`Enter prime factor p...`,multiline:!0,rows:3,required:!1,tooltip:`Known prime factor of n. Required for e-th root disambiguation.`},{name:`q`,label:`q (prime factor)`,placeholder:`Enter prime factor q...`,multiline:!0,rows:3,required:!1,tooltip:`Known prime factor of n. Required for e-th root disambiguation.`}],sageTemplate:e=>!e.n||!e.e||!e.c?`print("ERROR: Missing required inputs (n, e, c)")
+Tip: The two signatures must be from the SAME message using the SAME key. The fault must affect only one of the two CRT exponentiations.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.m&&!!e.sig_faulty},fe={id:`non-coprime-exp`,name:`Non-Coprime Exponent Attack`,category:`Message / Protocol`,description:`Resolves multiple plaintexts when gcd(e, phi(n)) > 1 using known p and q factors. Use after factoring n, when public exponent shares a factor with phi(n).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`p`,label:`p (prime factor)`,placeholder:`Enter prime factor p...`,multiline:!0,rows:3,required:!1,tooltip:`Known prime factor of n. Required for e-th root disambiguation.`},{name:`q`,label:`q (prime factor)`,placeholder:`Enter prime factor q...`,multiline:!0,rows:3,required:!1,tooltip:`Known prime factor of n. Required for e-th root disambiguation.`}],sageTemplate:e=>!e.n||!e.e||!e.c?`print("ERROR: Missing required inputs (n, e, c)")
 print("NON_COPRIME_EXP=FAILED")`:!e.p||!e.q?`print("ERROR: This attack requires p and q to resolve multiple e-th roots. Use factorization attacks first to find p and q.")
 print("NON_COPRIME_EXP=FAILED")`:`def _attack():
     try:
@@ -3533,7 +3252,7 @@ m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\quad \\text{for each pair} \\\\
 \\item \\textbf{Three-level e-th root fallback:} Tries progressively slower methods: (1) Sage's $\\mathbb{F}_p.\\mathtt{nth\\_root}(e, all=True)$ for a complete root set, (2) manual iteration for small $e \\leq 10$ and small fields $p < 2 \\times 10^6$, (3) Tonelli-Shanks for $e = 2$ with $p \\equiv 3 \\pmod{4}$. CRT combines all cross-product root pairs from both primes.
 \\end{itemize}
 
-\\textbf{References:} Williams, 1980; May, "Attacks on RSA with Small Parameters," 2003`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c},{id:`homomorphic-forgery`,name:`Homomorphic Forgery Attack`,category:`Message / Protocol`,description:`Forges a valid RSA signature by exploiting textbook RSA's multiplicative homomorphism. Use when an oracle signs chosen messages and target is a product of signed messages.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`target_m`,label:`Target message to forge`,placeholder:`Enter target message...`,multiline:!0,rows:3},{name:`oracle_pairs`,label:`Oracle pairs (m,s semicolon-separated)`,placeholder:`m1,s1;m2,s2;m3,s3...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.target_m||!e.oracle_pairs?`print("ERROR: Missing required inputs (n, e, target_m, oracle_pairs)")
+\\textbf{References:} Williams, 1980; May, "Attacks on RSA with Small Parameters," 2003`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c},pe={id:`homomorphic-forgery`,name:`Homomorphic Forgery Attack`,category:`Message / Protocol`,description:`Forges a valid RSA signature by exploiting textbook RSA's multiplicative homomorphism. Use when an oracle signs chosen messages and target is a product of signed messages.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`target_m`,label:`Target message to forge`,placeholder:`Enter target message...`,multiline:!0,rows:3},{name:`oracle_pairs`,label:`Oracle pairs (m,s semicolon-separated)`,placeholder:`m1,s1;m2,s2;m3,s3...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.target_m||!e.oracle_pairs?`print("ERROR: Missing required inputs (n, e, target_m, oracle_pairs)")
 print("HOMOMORPHIC_FORGERY=FAILED")`:`def _attack():
     from itertools import combinations
     try:
@@ -3603,7 +3322,7 @@ print("HOMOMORPHIC_FORGERY=FAILED")`:`def _attack():
         print(f"ERROR: {ex}")
         print("HOMOMORPHIC_FORGERY=FAILED")
     #
-_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e||!e.target_m||!e.oracle_pairs)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=BigInt(e.target_m),a=e.oracle_pairs.split(`;`).map(e=>e.trim()).filter(e=>e.length>0).map(e=>{let[t,n]=e.split(`,`).map(e=>BigInt(e.trim()));return[t,n]});if(a.length===0)return Promise.resolve(null);for(let[e,t]of a)if(M(t,r,n)!==e)return Promise.resolve(null);if(a.length>30)return Promise.resolve(null);let o=Math.floor(a.length/2),s=a.slice(0,o),c=a.slice(o),l=new Map,u=1<<c.length;for(let e=1;e<u;e++){t&&e%500==0&&t(Math.round(e*50/u),`right mask ${e} / ${u}`);let r=1n,i=1n;for(let t=0;t<c.length;t++)e&1<<t&&(r=r*c[t][0]%n,i=i*c[t][1]%n);let a=r.toString();l.has(a)||l.set(a,[]),l.get(a).push({m:r,s:i})}let d=i%n,f=1<<s.length;for(let e=1;e<f;e++){t&&e%500==0&&t(50+Math.round(e*50/f),`left mask ${e} / ${f}`);let i=1n,a=1n;for(let t=0;t<s.length;t++)e&1<<t&&(i=i*s[t][0]%n,a=a*s[t][1]%n);let o=j(i,n);if(o===null)continue;let c=d*o%n,u=l.get(c.toString());if(u)for(let e of u){let o=i*e.m%n,s=a*e.s%n;if(o===d)return t?.(100),Promise.resolve(`Forged signature: s = ${s}\nVerification: s^e mod n = ${M(s,r,n)}\nHOMOMORPHIC_FORGERY=SUCCESS`)}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Textbook RSA signatures are multiplicatively homomorphic: the product of signatures signs the product of messages.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.e||!e.target_m||!e.oracle_pairs)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=BigInt(e.target_m),a=e.oracle_pairs.split(`;`).map(e=>e.trim()).filter(e=>e.length>0).map(e=>{let[t,n]=e.split(`,`).map(e=>BigInt(e.trim()));return[t,n]});if(a.length===0)return Promise.resolve(null);for(let[e,t]of a)if(A(t,r,n)!==e)return Promise.resolve(null);if(a.length>30)return Promise.resolve(null);let o=Math.floor(a.length/2),s=a.slice(0,o),c=a.slice(o),l=new Map,u=1<<c.length;for(let e=1;e<u;e++){t&&e%500==0&&t(Math.round(e*50/u),`right mask ${e} / ${u}`);let r=1n,i=1n;for(let t=0;t<c.length;t++)e&1<<t&&(r=r*c[t][0]%n,i=i*c[t][1]%n);let a=r.toString();l.has(a)||l.set(a,[]),l.get(a).push({m:r,s:i})}let d=i%n,f=1<<s.length;for(let e=1;e<f;e++){t&&e%500==0&&t(50+Math.round(e*50/f),`left mask ${e} / ${f}`);let i=1n,a=1n;for(let t=0;t<s.length;t++)e&1<<t&&(i=i*s[t][0]%n,a=a*s[t][1]%n);let o=k(i,n);if(o===null)continue;let c=d*o%n,u=l.get(c.toString());if(u)for(let e of u){let o=i*e.m%n,s=a*e.s%n;if(o===d)return t?.(100),Promise.resolve(`Forged signature: s = ${s}\nVerification: s^e mod n = ${A(s,r,n)}\nHOMOMORPHIC_FORGERY=SUCCESS`)}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Textbook RSA signatures are multiplicatively homomorphic: the product of signatures signs the product of messages.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -3635,7 +3354,7 @@ How to use:
 2. Provide n, e, target_m (message to forge), and oracle_pairs formatted as "m1,s1;m2,s2;..."
 3. The attack uses meet-in-the-middle: split oracle pairs into two halves, build a product hash map for the right half, then search the left half for matching complements. This reduces the 2^n search to 2^(n/2+1) operations.
 
-Tip: The more oracle pairs you have, the more likely you can factor target_m into a subset product. Up to 30 pairs supported (2^15 + 2^15 ≈ 65K operations). Modern RSA with OAEP/PSS padding prevents this attack.`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.target_m&&!!e.oracle_pairs},{id:`bleichenbacher-sig`,name:`Bleichenbacher Signature Forgery (e=3)`,category:`Message / Protocol`,description:`Forges RSA signature for any hash when e=3 and verifier accepts trailing garbage in PKCS#1 v1.5 padding. Use when verification skips strict padding checks.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`3`,multiline:!1},{name:`hash_hex`,label:`Hash (hex)`,placeholder:`Enter hash in hex (e.g., SHA256)...`,multiline:!1}],sageTemplate:e=>!e.n||!e.hash_hex?`print("ERROR: Missing required inputs (n, hash_hex)")
+Tip: The more oracle pairs you have, the more likely you can factor target_m into a subset product. Up to 30 pairs supported (2^15 + 2^15 ≈ 65K operations). Modern RSA with OAEP/PSS padding prevents this attack.`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.target_m&&!!e.oracle_pairs},me={id:`bleichenbacher-sig`,name:`Bleichenbacher Signature Forgery (e=3)`,category:`Message / Protocol`,description:`Forges RSA signature for any hash when e=3 and verifier accepts trailing garbage in PKCS#1 v1.5 padding. Use when verification skips strict padding checks.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`3`,multiline:!1},{name:`hash_hex`,label:`Hash (hex)`,placeholder:`Enter hash in hex (e.g., SHA256)...`,multiline:!1}],sageTemplate:e=>!e.n||!e.hash_hex?`print("ERROR: Missing required inputs (n, hash_hex)")
 print("BLEICHENBACHER_SIG=FAILED")`:`def _attack():
     try:
         n = Integer(${e.n})
@@ -3718,7 +3437,7 @@ How to use:
 3. The attack constructs an integer with PKCS#1 v1.5 padding + target hash, then takes its cube root
 4. The rounded cube root S satisfies S^3 = target + epsilon, where epsilon is absorbed by garbage bytes
 
-Tip: e must be exactly 3 for this attack. The modulus must be large enough to accommodate the hash plus 8 bytes of padding plus garbage bytes. RSA with OAEP/PSS padding is NOT vulnerable.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.hash_hex},{id:`bleichenbacher`,name:`Bleichenbacher PKCS#1 v1.5`,category:`Oracle`,description:`Decrypts a PKCS#1 v1.5 ciphertext using a padding oracle in ~2^17 queries. Use when a server reveals whether padding is valid.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+Tip: e must be exactly 3 for this attack. The modulus must be large enough to accommodate the hash plus 8 bytes of padding plus garbage bytes. RSA with OAEP/PSS padding is NOT vulnerable.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.hash_hex},he={id:`bleichenbacher`,name:`Bleichenbacher PKCS#1 v1.5`,category:`Oracle`,description:`Decrypts a PKCS#1 v1.5 ciphertext using a padding oracle in ~2^17 queries. Use when a server reveals whether padding is valid.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         # Bleichenbacher PKCS#1 v1.5 padding oracle attack
         if not "${e.n}".strip():
@@ -3844,7 +3563,7 @@ Tip: e must be exactly 3 for this attack. The modulus must be large enough to ac
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("BLEICHENBACHER=FAILED")
-_attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.c||!e.oracle_responses)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.c),i=e.oracle_responses.split(`,`).map(e=>e.trim()===`1`),a=t.toString(2).length,o=Math.ceil(a/8),s=1n<<BigInt(8*(o-2)),c=2n*s,l=3n*s,u=[];for(let e=0;e<i.length;e++)i[e]&&u.push(BigInt(e+1));if(u.length<2)return Promise.resolve(null);let d=c,f=l-1n;for(let e=1;e<u.length&&d<f;e++){let n=u[e],r=d*n-l+1n,i=r<=0n?0n:(r+t-1n)/t,a=f*n-c,o=a<0n?-1n:a/t;if(i>o)continue;let s=null,p=null;for(let e=i;e<=o;e++){let r=(c+e*t+n-1n)/n,i=(l-1n+e*t)/n,a=r>d?r:d,o=i<f?i:f;a<=o&&((s===null||a>s)&&(s=a),(p===null||o<p)&&(p=o))}s!==null&&p!==null&&(d=s,f=p)}for(let e=d;e<=f&&e<d+100n;e++)if(M(e,n,t)===r)return Promise.resolve(`Message recovered: m = ${e}\nvalid s values = ${u.length}\ninterval width = ${f-d+1n}\nBLEICHENBACHER=SUCCESS`);return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} A PKCS#1 v1.5 padding oracle decrypts any RSA ciphertext in approximately $2^{17}$ adaptive queries.
+_attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.c||!e.oracle_responses)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.c),i=e.oracle_responses.split(`,`).map(e=>e.trim()===`1`),a=t.toString(2).length,o=Math.ceil(a/8),s=1n<<BigInt(8*(o-2)),c=2n*s,l=3n*s,u=[];for(let e=0;e<i.length;e++)i[e]&&u.push(BigInt(e+1));if(u.length<2)return Promise.resolve(null);let d=c,f=l-1n;for(let e=1;e<u.length&&d<f;e++){let n=u[e],r=d*n-l+1n,i=r<=0n?0n:(r+t-1n)/t,a=f*n-c,o=a<0n?-1n:a/t;if(i>o)continue;let s=null,p=null;for(let e=i;e<=o;e++){let r=(c+e*t+n-1n)/n,i=(l-1n+e*t)/n,a=r>d?r:d,o=i<f?i:f;a<=o&&((s===null||a>s)&&(s=a),(p===null||o<p)&&(p=o))}s!==null&&p!==null&&(d=s,f=p)}for(let e=d;e<=f&&e<d+100n;e++)if(A(e,n,t)===r)return Promise.resolve(`Message recovered: m = ${e}\nvalid s values = ${u.length}\ninterval width = ${f-d+1n}\nBLEICHENBACHER=SUCCESS`);return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} A PKCS#1 v1.5 padding oracle decrypts any RSA ciphertext in approximately $2^{17}$ adaptive queries.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -3873,7 +3592,7 @@ How to use:
 3. Record the responses as comma-separated bits: 1,0,0,1,0,0,... (1 = valid padding)
 4. Provide n, e, c, and the full oracle_responses string
 
-Tip: s=1 always returns 1 (the original ciphertext has valid padding). You need roughly 20 valid responses to narrow the interval.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},{id:`manger`,name:`Manger's OAEP Attack`,category:`Oracle`,description:`Decrypts OAEP-encrypted messages using a first-byte oracle in O(log n) queries. Use when an oracle reveals whether the plaintext starts with 0x00.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+Tip: s=1 always returns 1 (the original ciphertext has valid padding). You need roughly 20 valid responses to narrow the interval.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Z={id:`manger`,name:`Manger's OAEP Attack`,category:`Oracle`,description:`Decrypts OAEP-encrypted messages using a first-byte oracle in O(log n) queries. Use when an oracle reveals whether the plaintext starts with 0x00.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
         # Manger's OAEP padding oracle attack (3-step algorithm)
         # Reference: J. Manger, CRYPTO 2001
@@ -4044,7 +3763,7 @@ How to use:
 3. Provide n, e, c, and oracle_responses as comma-separated bits
 4. The attack narrows the message interval with each query
 
-Tip: Manger's attack requires O(log n) oracle queries — significantly fewer than Bleichenbacher. The oracle boundary is B = 2^(8*(k-1)) ≈ n/256, NOT n/2.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},{id:`biased-lsb`,name:`Biased LSB Oracle`,category:`Oracle`,description:`Recovers plaintext m using a noisy LSB oracle with bias > 50% via majority voting and binary fraction accumulation. Use for error-prone side-channel LSB leaks.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_runs`,label:`Oracle runs (multiple response strings, newline-separated)`,placeholder:`0,1,0,1,1\\n1,0,1,1,0\\n0,1,1,1,0...`,multiline:!0,rows:6}],sageTemplate:e=>`def _attack():
+Tip: Manger's attack requires O(log n) oracle queries — significantly fewer than Bleichenbacher. The oracle boundary is B = 2^(8*(k-1)) ≈ n/256, NOT n/2.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},ge={id:`biased-lsb`,name:`Biased LSB Oracle`,category:`Oracle`,description:`Recovers plaintext m using a noisy LSB oracle with bias > 50% via majority voting and binary fraction accumulation. Use for error-prone side-channel LSB leaks.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_runs`,label:`Oracle runs (multiple response strings, newline-separated)`,placeholder:`0,1,0,1,1\\n1,0,1,1,0\\n0,1,1,1,0...`,multiline:!0,rows:6}],sageTemplate:e=>`def _attack():
     try:
         # Validate inputs
         if not "${e.n}".strip():
@@ -4158,7 +3877,7 @@ Tip: Manger's attack requires O(log n) oracle queries — significantly fewer th
         print(f"ERROR: {ex}")
         print("BIASED_LSB=FAILED")
 _attack()`,frontendCheck:e=>{if(!e.n||!e.e||!e.c||!e.oracle_runs)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.c),i=e.oracle_runs.split(`
-`).filter(e=>e.trim()).map(e=>e.split(`,`).map(e=>e.trim()===`1`));if(i.length===0)return Promise.resolve(null);let a=i[0].length,o=[];for(let e=0;e<a;e++){let t=0;for(let n of i)e<n.length&&(t+=n[e]?1:-1);o.push(t>=0)}let s=BigInt(o.length),c=0n;for(let e of o)c=c<<1n|(e?1n:0n);let l=1n<<s,u=l>t?(c*t+l-1n)/l:c*t/l;for(let e=u-2n;e<=u+2n;e++)if(e>=0n&&M(e,n,t)===r)return Promise.resolve(`Message recovered: m = ${e}\nbits = ${a}\nruns = ${i.length}\nBIASED_LSB=SUCCESS`);return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} A noisy LSB oracle with bias $p > 1/2$ recovers $m$ via majority voting and binary fraction accumulation.
+`).filter(e=>e.trim()).map(e=>e.split(`,`).map(e=>e.trim()===`1`));if(i.length===0)return Promise.resolve(null);let a=i[0].length,o=[];for(let e=0;e<a;e++){let t=0;for(let n of i)e<n.length&&(t+=n[e]?1:-1);o.push(t>=0)}let s=BigInt(o.length),c=0n;for(let e of o)c=c<<1n|(e?1n:0n);let l=1n<<s,u=l>t?(c*t+l-1n)/l:c*t/l;for(let e=u-2n;e<=u+2n;e++)if(e>=0n&&A(e,n,t)===r)return Promise.resolve(`Message recovered: m = ${e}\nbits = ${a}\nruns = ${i.length}\nBIASED_LSB=SUCCESS`);return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} A noisy LSB oracle with bias $p > 1/2$ recovers $m$ via majority voting and binary fraction accumulation.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -4187,7 +3906,7 @@ How to use:
 3. The attack uses majority voting per bit position, then accumulates voted bits into binary fraction m/n
 4. The final m is computed as ceil(q * n / 2^k) where q is the accumulated voted bits
 
-Tip: More runs per position increases accuracy. With 31 runs and 90% accuracy per bit, majority voting gives >99.9% confidence per bit position after 31 runs.`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_runs},{id:`roca`,name:`ROCA Vulnerability`,category:`Advanced`,description:`Factors ROCA-vulnerable (Infineon) RSA keys where p = k·M + (65537^i mod M) via discrete_log detection and Howgrave-Graham Coppersmith. For 512-bit keys SageCell may timeout; use FactorDB or local Sage for full factorization.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+Tip: More runs per position increases accuracy. With 31 runs and 90% accuracy per bit, majority voting gives >99.9% confidence per bit position after 31 runs.`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_runs},_e={id:`roca`,name:`ROCA Vulnerability`,category:`Advanced`,description:`Factors ROCA-vulnerable (Infineon) RSA keys where p = k·M + (65537^i mod M) via discrete_log detection and Howgrave-Graham Coppersmith. For 512-bit keys SageCell may timeout; use FactorDB or local Sage for full factorization.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     out = []
     try:
         R.<x> = PolynomialRing(ZZ)
@@ -4427,7 +4146,7 @@ p &= M \\cdot k_1 + r_1 \\qed
 
 \\textbf{Optimization:} The greedy M' search reduces the search space by removing prime factors from M that contribute the least order-reduction per M-reduction, yielding a smaller Coppersmith bound $X = 2\\sqrt{n}/M'$.
 
-\\textbf{References:} M. Nemec, M. Sys, P. Svenda, D. Klinec, V. Matyas, "The Return of Coppersmith's Attack: Practical Factorization of Widely Used RSA Moduli", CCS 2017`,priority:`high`,applicableCheck:e=>!!e.n},{id:`nitros`,name:`Nitros / ROCA Variant`,category:`Advanced`,description:`Factors RSA keys with generalized ROCA primes p = k·M + (a^i mod M) for arbitrary generator a. Use when prime generation follows a ROCA-like pattern with non-standard base.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`base`,label:`Base (default 65537)`,placeholder:`65537`,required:!1,multiline:!1}],sageTemplate:e=>`def _attack():
+\\textbf{References:} M. Nemec, M. Sys, P. Svenda, D. Klinec, V. Matyas, "The Return of Coppersmith's Attack: Practical Factorization of Widely Used RSA Moduli", CCS 2017`,priority:`high`,applicableCheck:e=>!!e.n},ve={id:`nitros`,name:`Nitros / ROCA Variant`,category:`Advanced`,description:`Factors RSA keys with generalized ROCA primes p = k·M + (a^i mod M) for arbitrary generator a. Use when prime generation follows a ROCA-like pattern with non-standard base.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`base`,label:`Base (default 65537)`,placeholder:`65537`,required:!1,multiline:!1}],sageTemplate:e=>`def _attack():
     try:
         try:
             out = []
@@ -4586,130 +4305,288 @@ f(x) &= Mx + r_1 \\equiv 0 \\pmod{p} \\quad\\text{with root } x = k_1 \\\\
 
 \\textbf{Explanation:} The Nitros attack extends ROCA to arbitrary generator bases. Instead of $65537$, any base $a$ can generate the remainder set. The key insight is that the subgroup generated by $a$ modulo $M$ has size $\\text{ord}_M(a)$, and this is typically small enough to enumerate. To test if $n$ is vulnerable, compute $n^{\\text{ord}_M(a)} \\bmod M$ -- if the result is 1, $n$ is in the subgroup and the primes are Nitros-form. The recovery then proceeds identically to ROCA: use Coppersmith to find $k_1$, the small root of $f(x) = Mx + r_1$ modulo $p$. However, this implementation uses a fixed $M$ (product of first 16 primes, $\\approx 2^{65}$). For $n > 256$-bit, the Coppersmith bound is capped at $100000$, so only keys with very small $k$ values ($< 2^{17}$) can be factored.
 
-\\textbf{References:} M. Nemec et al., "The Return of Coppersmith's Attack", CCS 2017; Nitros ROCA variant analysis, 2018`,priority:`medium`,applicableCheck:e=>!!e.n},{id:`factordb-lookup`,name:`FactorDB Lookup`,category:`Advanced`,description:`Looks up factorization of n in the FactorDB database with local fallbacks (trial division, ECM, Pollard's rho). Use as the first step for any unknown RSA modulus.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],frontendCheck:async e=>{let t=await i(e.n);return t.status===`FF`&&t.factors&&t.factors.length>=2?a(t)+`
-FACTORDB_LOOKUP=SUCCESS`:null},sageTemplate:e=>`def _attack():
+\\textbf{References:} M. Nemec et al., "The Return of Coppersmith's Attack", CCS 2017; Nitros ROCA variant analysis, 2018`,priority:`medium`,applicableCheck:e=>!!e.n},ye={FF:`Fully factored — all prime factors known`,CF:`Composite, factors known — partially factored, not all factors are prime`,CC:`Composite, composite factors — factors known but contain composites`,CP:`Composite, partially factored — some factors found`,C:`Composite, no factors known — confirmed composite but unfactored`,P:`Definitely prime — n is proven prime, not a valid RSA modulus`,Prp:`Probably prime — strong probable prime, not a valid RSA modulus`,U:`Unknown — status undetermined`,Unit:`Unit — the number is 1`,N:`Not in database — not yet queried`,"*":`Added to database during this request`},Q=[M,N,ee,te,ne,F,I,L,B,V,H,U,W,G,{id:`euler`,name:`Euler Factorization`,category:`Factorization`,description:`Factors n by finding two distinct representations as a sum of squares a^2+b^2 = c^2+d^2 = n. Use when both primes are ≡ 1 (mod 4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
     try:
-            try:
-                out = []
-                # Validate inputs
-                if not "${e.n}".strip():
-                    out.append("ERROR: n is required")
-                    out.append("FACTORDB_LOOKUP=FAILED")
-                    print("\\n".join(out))
-                    return
-            # Simple Floyd cycle Pollard's rho for fallback factorization
-            def pollard_rho_factor(n):
-                if n % 2 == 0:
-                    return 2
-                if n.is_prime():
-                    return None
-                for c in range(1, 20):
-                    x = 2
-                    y = 2
-                    d = 1
-                    while d == 1:
-                        x = (x * x + c) % n
-                        y = (y * y + c) % n
-                        y = (y * y + c) % n
-                        d = gcd(abs(x - y), n)
-                    if d != n:
-                        return d
-                return None
+        try:
             n = Integer(${e.n})
-            # Pre-checks
+            print(f"Euler Factorization on n = {n}")
+            print()
+            import math
+            n_int = int(n)
+            ${P(`EULER`,`            `)}
+            end = math.isqrt(n_int)
+            solutions = []
+            a = 0
+            a_sq = 0
+            max_iter = 20000000
+            while a < end and len(solutions) < 2:
+                if a > max_iter:
+                    print(f"Euler factorization failed: exceeded {max_iter} iterations")
+                    print("EULER=FAILED")
+                    return
+                rem = n_int - a_sq
+                b = math.isqrt(rem)
+                if b*b == rem:
+                    distinct = True
+                    for sol in solutions:
+                        if sol[0] == b and sol[1] == a:
+                            distinct = False
+                            break
+                    if distinct:
+                        solutions.append([b, a])
+                a_sq += 2*a + 1
+                a += 1
+            if len(solutions) < 2:
+                print(f"Euler factorization failed: could not find two distinct sum-of-squares representations")
+                print("n may not have both primes ≡ 1 (mod 4)")
+                print("EULER=FAILED")
+                return
+            s0 = solutions[0]
+            s1 = solutions[1]
+            k = gcd(s0[0] - s1[0], s1[1] - s0[1])**2
+            h = gcd(s0[0] + s1[0], s1[1] + s0[1])**2
+            m = gcd(s0[0] + s1[0], s1[1] - s0[1])**2
+            lev = gcd(s0[0] - s1[0], s1[1] + s0[1])**2
+            p = gcd(k + h, n)
+            q = gcd(lev + m, n)
+            if p <= 1 or q >= n:
+                print(f"Found trivial factorization: {p} x {q} = {n}")
+                print("No non-trivial factors found via Euler")
+                print("EULER=FAILED")
+            else:
+                if p * q != n:
+                    q = n // p
+                print(f"Verification: p * q = {p * q}")
+                print(f"p is prime: {p.is_prime()}")
+                print(f"q is prime: {q.is_prime()}")
+                print(f"p = {p}")
+                print(f"q = {q}")
+                print()
+                print("EULER=SUCCESS")
+        except Exception as e:
+            print(f"ERROR: {e}")
+            print("EULER=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("EULER=FAILED")
+_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n<2n)return Promise.resolve(null);if(n%2n==0n)return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n/2n}\nEULER=SUCCESS`);let r=D(n),i=[],a=20000000n,o=0n;for(let e=0n;e<r&&i.length<2;e++){if(t&&e%100000n==0n){let n=e>a?100:Number(e*100n/(r<a?r:a)),i=r<a?r:a;t(n,`a = ${e.toString()} / ${i.toString()}`)}if(e>a)return t?.(100),Promise.resolve(null);let s=n-o;o+=2n*e+1n;let c=Number(s&15n);if(c===0||c===1||c===4||c===9){let t=D(s);if(t*t===s){let n=!0;for(let r of i)if(r[0]===t&&r[1]===e){n=!1;break}n&&i.push([t,e])}}}if(i.length<2)return Promise.resolve(null);let[s,c]=[i[0],i[1]],l=E(s[0]-c[0],c[1]-s[1])**2n,u=E(s[0]+c[0],c[1]+s[1])**2n,d=E(s[0]+c[0],c[1]-s[1])**2n,f=E(s[0]-c[0],c[1]+s[1])**2n,p=E(l+u,n),m=E(f+d,n);return p<=1n||m>=n?Promise.resolve(null):(p*m!==n&&(m=n/p),t?.(100),Promise.resolve(`Factor found!\nVerification: p * q = ${p*m}\np = ${p}\nq = ${m}\nn = ${s[0]}^2 + ${s[1]}^2 = ${c[0]}^2 + ${c[1]}^2\nEULER=SUCCESS`))}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Factor $n = pq$ using two distinct representations as a sum of squares. Requires $p \\equiv q \\equiv 1 \\pmod{4}$.
+
+\\textbf{Setup:}
+\\begin{itemize}
+\\item $n = pq$, with $p \\equiv q \\equiv 1 \\pmod{4}$
+\\item $n = a^2 + b^2 = c^2 + d^2$ (two distinct representations)
+\\end{itemize}
+
+\\textbf{Proof:}
+\\begin{align*}
+(a - c)(a + c) &= (d - b)(d + b) \\\\
+k &= \\gcd(a - c, d - b)^2,\\; h = \\gcd(a + c, d + b)^2 \\\\
+m &= \\gcd(a + c, d - b)^2,\\; \\ell = \\gcd(a - c, d + b)^2 \\\\
+p &= \\gcd(k + h, n),\\; q = \\gcd(\\ell + m, n)
+\\end{align*}
+From the identity $(a-c)(a+c) = (d-b)(d+b)$, the GCD combinations recover the prime factors.
+
+\\textbf{Explanation:} A theorem of Euler states that any prime $p \\equiv 1 \\pmod{4}$ has a unique representation as a sum of two squares (up to order and sign). A composite $n = pq$ where both primes are $\\equiv 1 \\pmod{4}$ therefore has two distinct representations, and these can be algebraically combined to recover $p$ and $q$. The method searches for the representations by iterating $a$ from $0$ to $\\sqrt{n}$.
+
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Square recurrence:} Tracks $a^2$ incrementally via $(a+1)^2 = a^2 + 2a + 1$, replacing a full BigInt multiplication with addition each iteration — critical for the up to $20 \\times 10^6$ steps required.
+\\item \\textbf{Mod-16 perfect square pre-filter:} Checks $n - a^2 \\equiv 0, 1, 4, 9 \\pmod{16}$ before computing $\\sqrt{n - a^2}$, rejecting $\\sim 80\\%$ of candidates without an isqrt call.
+\\end{itemize}
+
+\\textbf{References:} Euler, 1749`,priority:`medium`,applicableCheck:e=>!!e.n},{id:`pollard-strassen`,name:`Pollard-Strassen's Algorithm`,category:`Factorization`,description:`Factors n in O(n^(1/4)) by computing GCD of interval products over [1, n^(1/4)] to find a small factor. Use when n has a factor ≤ n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`import math
+def _attack():
+    try:
+        try:
+            n = Integer(${e.n})
+            print(f"Pollard-Strassen factorization on n = {n}")
+            print()
+            ${P(`POLLARD_STRASSEN`,`            `)}
+            c = int(floor(RR(n) ** (1/4))) + 1
+            if c > 50000:
+                print(f"n is too large for Strassen (n^(1/4) = {c} > 50000)")
+                print("POLLARD_STRASSEN=FAILED")
+                return
+            n_int = int(n)
+            # Single-pass Strassen: accumulate product incrementally with batched GCD
+            prod = 1
+            batch_size = 1000
+            for i in range(1, c + 1):
+                prod = (prod * i) % n_int
+                if i % batch_size == 0 or i == c:
+                    g = math.gcd(prod, n_int)
+                    if g > 1 and g < n_int:
+                        # Backtrack to find exact factor in this batch
+                        backtrack_start = max(1, i - batch_size + 1)
+                        backtrack_prod = 1
+                        for j in range(backtrack_start, i + 1):
+                            backtrack_prod = (backtrack_prod * j) % n_int
+                            g2 = math.gcd(backtrack_prod, n_int)
+                            if g2 > 1 and g2 < n_int:
+                                p_sage = Integer(g2)
+                                q_sage = n // p_sage
+                                print(f"Verification: p * q = {p_sage * q_sage}")
+                                print(f"p = {p_sage}")
+                                print(f"q = {q_sage}")
+                                print()
+                                print("POLLARD_STRASSEN=SUCCESS")
+                                return
+                        # If product GCD found but backtrack didn't (shouldn't happen)
+                        break
+            print("Pollard-Strassen failed: no factor found in intervals")
+            print("POLLARD_STRASSEN=FAILED")
+        except Exception as e:
+            print(f"ERROR: {e}")
+            print("POLLARD_STRASSEN=FAILED")
+        #
+    except BaseException as ex:
+        print(f"ERROR: {ex}")
+        print("POLLARD_STRASSEN=FAILED")
+_attack()`,proof:`\\textbf{Theorem:} Pollard-Strassen factors n in $O(n^{1/4} \\log n)$ time by partitioning $[1, n^{1/4}]$ into intervals and testing each via GCD.
+
+\\textbf{Setup:}
+\\begin{itemize}
+\\item $n$ has a prime factor $p \\leq n^{1/4}$
+\\item Partition $[1, n^{1/4}]$ into $c = \\lceil n^{1/4} \\rceil$ intervals
+\\end{itemize}
+
+\\textbf{Proof:}
+\\begin{align*}
+\\text{Let } c &= \\lceil n^{1/4} \\rceil \\\\
+\\text{Interval } I_i &= \\{i c + 1, \\dots, (i+1) c\\} \\\\
+P_i &= \\prod_{j \\in I_i} j \\mod n \\\\
+\\gcd(P_i, n) &> 1 \\iff I_i \\text{ contains a factor of } n
+\\end{align*}
+Compute each $P_i$ incrementally and take $\\gcd(P_i, n)$. When a match is found, back-track within the interval to isolate the exact factor. The cost is $O(c) = O(n^{1/4})$ multiplications and GCDs.
+
+\\textbf{Explanation:} If $p \\mid n$ and $p \\leq n^{1/4}$, then $p$ lies in some interval $I_i$. Since every element of $I_i$ divides $P_i$, we have $p \\mid P_i$ and hence $\\gcd(P_i, n) \\geq p > 1$. The backtrack step finds $p$ within the winning interval by rebuilding the product one term at a time until the GCD becomes non-trivial.
+
+\\textbf{Optimizations:}
+\\begin{itemize}
+\\item \\textbf{Incremental product accumulation:} The factorial product $P_i$ is built incrementally as terms are iterated — each step multiplies the running product by the next integer, avoiding recomputation from scratch per batch.
+\\item \\textbf{Batched GCD with backtracking:} A GCD is computed only once per $batch\\_size = 1000$ terms. When a hit is found, the batch is re-scanned linearly to pinpoint the exact factor, reducing GCD calls by $\\sim 1000\\times$.
+\\end{itemize}
+
+\\textbf{References:} Strassen, 1977; Pollard, 1974`,priority:`medium`,applicableCheck:e=>!!e.n},{id:`pisano-period`,name:`Pisano Period Factorization`,category:`Factorization`,description:`Factors n via birthday collision on 2^x mod n using multiplicative period search. Use for small moduli under 64 bits.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>`def _attack():
+    out = []
+    try:
+        try:
+            n = Integer(${e.n})
+            out.append("Pisano Period Factorization on n = " + str(n))
+            out.append("")
             if n < 2:
-                out.append(f"n = {n} is too small to factor")
-                out.append("FACTORDB_LOOKUP=FAILED")
+                out.append("n = " + str(n) + " is too small to factor")
+                out.append("PISANO_PERIOD=FAILED")
                 print("\\n".join(out))
                 return
             if n % 2 == 0:
-                out.append(f"n is even. p = 2, q = {n // 2}")
-                out.append("FACTORDB_LOOKUP=SUCCESS")
+                out.append("n is even: " + str(n))
+                out.append("Verification: p * q = " + str(2 * (n // 2)))
+                out.append("p = 2")
+                out.append("q = " + str(n // 2))
+                out.append("")
+                out.append("PISANO_PERIOD=SUCCESS")
                 print("\\n".join(out))
                 return
             if n.is_prime():
-                out.append("n is prime. Not a valid RSA modulus.")
-                out.append("FACTORDB_LOOKUP=FAILED")
+                out.append("n is prime: " + str(n))
+                out.append("PISANO_PERIOD=FAILED")
                 print("\\n".join(out))
                 return
             if n.is_square():
                 p = isqrt(n)
-                out.append(f"n is a perfect square: {p}^2 = {n}")
-                out.append(f"Verification: p * q = {p * p}")
-                out.append(f"p = {p}")
-                out.append(f"q = {p}")
+                out.append("n is a perfect square: " + str(p) + "^2 = " + str(n))
+                out.append("Verification: p * q = " + str(p * p))
+                out.append("p = " + str(p))
+                out.append("q = " + str(p))
                 out.append("")
-                out.append("FACTORDB_LOOKUP=SUCCESS")
+                out.append("PISANO_PERIOD=SUCCESS")
                 print("\\n".join(out))
                 return
-            out.append(f"Checking if n = {n} has known factors")
-            out.append("")
-            # Step 1: Trial division with small primes
-            out.append("Step 1: Trial division with small primes...")
-            for p in primes(10000):
-                if n % p == 0:
-                    q = n // p
-                    out.append(f"Found small factor: p = {p}")
-                    out.append(f"q = {q}")
-                    if q.is_prime():
-                        out.append("q is prime. Factorization complete!")
-                    else:
-                        out.append("q is composite. Further factorization needed.")
-                        out.append(f"q factors: {factor(q)}")
-                    out.append("FACTORDB_LOOKUP=SUCCESS")
-                    print("\\n".join(out))
-                    return
-            out.append("No factors found below 10000.")
-            # Step 2: ECM factorization
-            out.append("")
-            out.append("Step 2: ECM factorization...")
-            try:
-                fac = n.factor(algorithm='ecm')
-                if fac:
-                    fac_p = None
-                    for fp, exp in fac:
-                        fac_p = fp
-                        break
-                    if fac_p is not None and 1 < fac_p < n:
-                        q = n // fac_p
-                        out.append(f"p = {fac_p}")
-                        out.append(f"q = {q}")
-                        out.append(f"Verification: p * q = {fac_p * q}")
-                        out.append("FACTORDB_LOOKUP=SUCCESS")
-                        print("\\n".join(out))
-                        return
-                    else:
-                        out.append("ECM found no non-trivial factors.")
-                else:
-                    out.append("ECM did not find factors.")
-            except Exception as ex:
-                out.append(f"ECM failed: {ex}")
-            # Step 3: Pollard's rho fallback
-            out.append("")
-            out.append("Step 3: Pollard's rho...")
-            try:
-                f = pollard_rho_factor(n)
-                if f is not None and f != n:
-                    out.append(f"Pollard's rho found: {f}")
-                    out.append(f"Other factor: {n // f}")
-                    out.append("FACTORDB_LOOKUP=SUCCESS")
-                    print("\\n".join(out))
-                    return
-                else:
-                    out.append("Pollard's rho did not find a factor.")
-            except Exception as ex:
-                out.append(f"Pollard's rho failed: {ex}")
-            out.append("FACTORDB_LOOKUP=FAILED")
-            print("\\n".join(out))
-        except Exception as ex:
-            out.append(f"ERROR: {ex}")
-            out.append("FACTORDB_LOOKUP=FAILED")
-            print("\\n".join(out))
+            limit = 200000
+            lookup = {}
+            found = False
+            n_int = int(n)
+            pow_val = 1  # 2^0 mod n
+            for i in range(limit):
+                pow_val = (pow_val * 2) % n_int  # recurrence instead of pow(2, i, n)
+                val = (pow_val - 1) % n_int
+                if val == 0:
+                    phi_guess = i
+                    if phi_guess % 2 == 0:
+                        s = n - phi_guess + 1
+                        disc = s*s - 4*n
+                        if disc > 0:
+                            t = isqrt(disc)
+                            if t*t == disc:
+                                p_factor = (s - t) // 2
+                                q_factor = (s + t) // 2
+                                if p_factor > 1 and p_factor * q_factor == n:
+                                    out.append("Verification: p * q = " + str(p_factor * q_factor))
+                                    out.append("p = " + str(p_factor))
+                                    out.append("q = " + str(q_factor))
+                                    out.append("")
+                                    out.append("PISANO_PERIOD=SUCCESS")
+                                    found = True
+                                    print("\\n".join(out))
+                                    return
+                if val in lookup:
+                    period = i - lookup[val]
+                    for mult in range(1, 200):
+                        phi_guess = period * mult
+                        if phi_guess >= n:
+                            break
+                        if phi_guess % 2 == 0:
+                            s = n - phi_guess + 1
+                            disc = s*s - 4*n
+                            if disc > 0:
+                                t = isqrt(disc)
+                                if t*t == disc:
+                                    p_factor = (s - t) // 2
+                                    q_factor = (s + t) // 2
+                                    if p_factor > 1 and p_factor * q_factor == n:
+                                        out.append("Verification: p * q = " + str(p_factor * q_factor))
+                                        out.append("p = " + str(p_factor))
+                                        out.append("q = " + str(q_factor))
+                                        out.append("")
+                                        out.append("PISANO_PERIOD=SUCCESS")
+                                        found = True
+                                        print("\\n".join(out))
+                                        return
+                lookup[val] = i
+            if not found:
+                out.append("Pisano period attack failed: no collision found")
+                out.append("PISANO_PERIOD=FAILED")
+        except Exception as e:
+            out.append("ERROR: " + str(e))
+            out.append("PISANO_PERIOD=FAILED")
         #
     except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("FACTORDB_LOOKUP=FAILED")
-_attack()`,proof:`\\textbf{Theorem:} FactorDB provides instant factorization for any previously factored modulus via a public API, with local fallbacks for unknown moduli.
+        out.append("ERROR: " + str(ex))
+        out.append("PISANO_PERIOD=FAILED")
+    print("\\n".join(out))
+_attack()`,frontendCheck:(e,t)=>{if(!e.n)return Promise.resolve(null);try{let n=BigInt(e.n);if(n%2n==0n)return Promise.resolve(`Factor found!\np = 2\nq = ${n/2n}\nPISANO_PERIOD=SUCCESS`);let r=new Map,i=1n,a=200000n;for(let e=0n;e<a;e++){t&&e%10000n==0n&&t(Number(e*100n/a),`i = ${e.toString()} / 200000`);let o=i===0n?n-1n:i-1n;if(o===0n&&e>0n){let r=n-e+1n,i=r*r-4n*n;if(i>=0n){let a=D(i);if(a*a===i){let i=(r-a)/2n,o=(r+a)/2n;if(i>1n&&o>1n&&i*o===n)return t?.(100),Promise.resolve(`Factor found!\nPeriod length: ${e}\np = ${i}\nq = ${o}\nPISANO_PERIOD=SUCCESS`)}}}if(r.has(o)){let i=r.get(o),a=e-i;for(let e=1n;e<200n;e++){let r=a*e;if(r>=n)break;if(r%2n!=0n)continue;let i=n-r+1n,o=i*i-4n*n;if(o<0n)continue;let s=D(o);if(s*s===o){let e=(i-s)/2n,r=(i+s)/2n;if(e>1n&&r>1n&&e*r===n)return t?.(100),Promise.resolve(`Factor found!\nPeriod length: ${a}\np = ${e}\nq = ${r}\nPISANO_PERIOD=SUCCESS`)}}}r.set(o,e),i=i*2n%n}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Factor $n = pq$ via birthday collision on the sequence $f(i) = 2^i - 1 \\pmod{n}$, revealing $\\lambda(n)$.
+
+\\textbf{Setup:}
+\\begin{itemize}
+\\item Let $f(x) = 2^x - 1 \\pmod{n}$ for $x = 0, 1, 2, \\ldots$
+\\item Birthday paradox: collision $f(i) = f(j)$ expected in $O(\\sqrt{\\operatorname{ord}_n(2)})$ steps
+\\end{itemize}
+
+\\textbf{Proof:}
+\\begin{align*}
+f(i) = f(j) &\\implies 2^i \\equiv 2^j \\pmod{n} \\\\
+&\\implies 2^{|j-i|} \\equiv 1 \\pmod{n} \\\\
+|j-i| &\\text{ is a multiple of } \\operatorname{ord}_n(2) \\mid \\lambda(n) \\\\
+\\phi &= k \\cdot |j-i| \\text{ as candidate for } \\phi(n) \\\\
+p,q &= \\frac{n - \\phi + 1 \\pm \\sqrt{(n - \\phi + 1)^2 - 4n}}{2} \\qed
+\\end{align*}
+
+\\textbf{Explanation:} The Pisano period attack tracks $2^i \\bmod n$ via recurrence ($v_{i+1} = 2 \\cdot v_i \\bmod n$). When a value repeats, the index difference is a multiple of the multiplicative order of 2 modulo $n$, which divides $\\lambda(n)$. Each candidate $\\phi$ is tested by checking whether the quadratic discriminant is a perfect square.
+
+\\textbf{References:} Wuliangshun, "Integer Factorization With Pisano Period", IEEE Access, 2019`,priority:`medium`,applicableCheck:e=>!!e.n},q,J,Y,re,ie,ae,oe,se,ce,le,ue,de,fe,pe,me,he,Z,ge,_e,ve,{id:`factordb-lookup`,name:`FactorDB Lookup`,category:`Advanced`,description:`Looks up factorization of n in the FactorDB database. Shows full status with factors when available. Use as the first step for any unknown RSA modulus.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],frontendCheck:async e=>{let t=(e.n||``).trim();if(!t)return null;try{let e=await r(t),n=ye[e.status]||e.status,i=[`FactorDB Lookup`,``,`n = ${t}`,`Status: ${e.status} — ${n}`];if(e.factors&&e.factors.length>0){i.push(``),i.push(`Factors:`);for(let[t,n]of e.factors)i.push(n>1?`  ${t}^${n}`:`  ${t}`);if(e.status===`FF`&&e.factors.length===2){let[t,n]=e.factors[0],[r,a]=e.factors[1],o=BigInt(t);for(let e=1;e<n;e++)o*=BigInt(t);let s=BigInt(r);for(let e=1;e<a;e++)s*=BigInt(r);i.push(``),i.push(`p = ${o}`),i.push(`q = ${s}`),i.push(`Verification: p * q = ${o*s}`)}}return e.status===`FF`&&(i.push(``),i.push(`FACTORDB_LOOKUP=SUCCESS`)),i.join(`
+`)}catch{return null}},proof:`\\textbf{Theorem:} FactorDB provides instant factorization for any previously factored modulus via a public API.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -4726,14 +4603,17 @@ _attack()`,proof:`\\textbf{Theorem:} FactorDB provides instant factorization for
 \\item Verification: $\\prod p_i^{e_i} = n$
 \\end{itemize}
 
-\\textbf{Fallback Chain (when n is not in FactorDB):}
-\\begin{align*}
-\\text{Fallback 1: } &\\text{Trial division up to } 10^4 \\\\
-\\text{Fallback 2: } &\\text{ECM factorisation via SageMath: } n.\\text{factor(algorithm='ecm')} \\\\
-\\text{Fallback 3: } &\\text{Pollard's rho: Floyd cycle detection} \\qed
-\\end{align*}
+\\textbf{Status Codes:}
+\\begin{itemize}
+\\item \\textbf{FF} — Fully factored (all prime factors known)
+\\item \\textbf{CF} — Composite, factors known (not all prime)
+\\item \\textbf{C} — Composite, no factors known
+\\item \\textbf{P} — Definitely prime
+\\item \\textbf{Prp} — Probably prime
+\\item \\textbf{U} — Unknown status
+\\end{itemize}
 
-\\textbf{Explanation:} FactorDB is the internet's largest database of integer factorizations, containing billions of entries. The attack first queries FactorDB via a CORS proxy. If the modulus has been factored before (common for CTF challenges), the result is instant. If not, SageMathCell falls back to local factorization methods: trial division for small factors, ECM for medium-sized factors, and Pollard's rho for larger ones. This makes FactorDB Lookup an excellent first diagnostic step for any unknown RSA modulus.
+\\textbf{Explanation:} FactorDB is the internet's largest database of integer factorizations, containing billions of entries. The attack queries FactorDB via a CORS proxy and returns the full status with factors when available. If the modulus has been factored before (common for CTF challenges), the result is instant. The status indicates whether the number is fully factored (FF), partially factored (CF/CP), or unfactored (C/U).
 
 \\textbf{References:} https://factordb.com`,priority:`low`,applicableCheck:e=>!!e.n},{id:`known-plaintext`,name:`Known Plaintext Attack`,category:`Message / Protocol`,description:`Recovers m via integer e-th root when m^e < n, or via known-prefix brute-force for up to 24 unknown bits. Use when plaintext is small or partially known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`known_prefix`,label:`Known plaintext prefix`,placeholder:`e.g., flag{`,multiline:!1},{name:`unknown_bits`,label:`Unknown bits after prefix`,placeholder:`24`,multiline:!1}],sageTemplate:e=>!e.n||!e.c?`print("ERROR: n and c are required")
 print("KNOWN_PLAINTEXT=FAILED")`:`def _attack():
@@ -4838,7 +4718,7 @@ print("KNOWN_PLAINTEXT=FAILED")`:`def _attack():
         out.append(f"Error: {ex}")
         out.append("KNOWN_PLAINTEXT=FAILED")
         print("\\n".join(out))
-_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.c)return Promise.resolve(null);try{let n=-1,r=BigInt(e.n),i=e.e?.trim()||`65537`,a=BigInt(i),o=BigInt(e.c),s=N(o,a);if(s**a===o&&M(s,a,r)===o){t?.(100);try{let e=s.toString(16),t=e.length%2?`0`+e:e,n=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),r=new TextDecoder().decode(n);return Promise.resolve(`RECOVERED via integer e-th root! m = ${s}\nm as bytes: ${r}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`RECOVERED via integer e-th root! m = ${s}\nKNOWN_PLAINTEXT=SUCCESS`)}}let c=e.known_prefix||``,l=(e.unknown_bits||`24`).trim(),u=parseInt(l,10);if(c&&u<=24){let e=new TextEncoder().encode(c),i=0n;for(let t of e)i=(i<<8n)+BigInt(t);let s=1n<<BigInt(u),l=Number(s);if(a===3n){let e=(i<<BigInt(u))%r,a=M(e,3n,r),s=3n*e*e%r,c=3n*e%r;for(let e=0;e<l;e++){if(t&&l>1e3){let r=Math.round(e*100/l);r!==n&&(n=r,t(r,`k = ${e.toLocaleString()} / ${l.toLocaleString()}`))}let d=BigInt(e)%r,f=d*d%r;if((((a+s*d)%r+c*f)%r+f*d)%r===o){let n=(i<<BigInt(u))+BigInt(e);t?.(100);try{let e=n.toString(16),t=e.length%2?`0`+e:e,r=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),i=new TextDecoder().decode(r);return Promise.resolve(`FOUND! m = ${n}\nm as bytes: ${i}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`FOUND! m = ${n}\nKNOWN_PLAINTEXT=SUCCESS`)}}}}else for(let e=0;e<l;e++){if(t&&l>1e3){let r=Math.round(e*100/l);r!==n&&(n=r,t(r,`k = ${e.toLocaleString()} / ${l.toLocaleString()}`))}let s=(i<<BigInt(u))+BigInt(e);if(M(s,a,r)===o){t?.(100);try{let e=s.toString(16),t=e.length%2?`0`+e:e,n=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),r=new TextDecoder().decode(n);return Promise.resolve(`FOUND! m = ${s}\nm as bytes: ${r}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`FOUND! m = ${s}\nKNOWN_PLAINTEXT=SUCCESS`)}}}return Promise.resolve(null)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} When $m^e < n$, the plaintext is recovered by taking the integer e-th root of $c$. When high-order bytes of $m$ are known, brute-force over the unknown low bits recovers the full plaintext.
+_attack()`,frontendCheck:(e,t)=>{if(!e.n||!e.c)return Promise.resolve(null);try{let n=-1,r=BigInt(e.n),i=e.e?.trim()||`65537`,a=BigInt(i),o=BigInt(e.c),s=j(o,a);if(s**a===o&&A(s,a,r)===o){t?.(100);try{let e=s.toString(16),t=e.length%2?`0`+e:e,n=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),r=new TextDecoder().decode(n);return Promise.resolve(`RECOVERED via integer e-th root! m = ${s}\nm as bytes: ${r}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`RECOVERED via integer e-th root! m = ${s}\nKNOWN_PLAINTEXT=SUCCESS`)}}let c=e.known_prefix||``,l=(e.unknown_bits||`24`).trim(),u=parseInt(l,10);if(c&&u<=24){let e=new TextEncoder().encode(c),i=0n;for(let t of e)i=(i<<8n)+BigInt(t);let s=1n<<BigInt(u),l=Number(s);if(a===3n){let e=(i<<BigInt(u))%r,a=A(e,3n,r),s=3n*e*e%r,c=3n*e%r;for(let e=0;e<l;e++){if(t&&l>1e3){let r=Math.round(e*100/l);r!==n&&(n=r,t(r,`k = ${e.toLocaleString()} / ${l.toLocaleString()}`))}let d=BigInt(e)%r,f=d*d%r;if((((a+s*d)%r+c*f)%r+f*d)%r===o){let n=(i<<BigInt(u))+BigInt(e);t?.(100);try{let e=n.toString(16),t=e.length%2?`0`+e:e,r=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),i=new TextDecoder().decode(r);return Promise.resolve(`FOUND! m = ${n}\nm as bytes: ${i}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`FOUND! m = ${n}\nKNOWN_PLAINTEXT=SUCCESS`)}}}}else for(let e=0;e<l;e++){if(t&&l>1e3){let r=Math.round(e*100/l);r!==n&&(n=r,t(r,`k = ${e.toLocaleString()} / ${l.toLocaleString()}`))}let s=(i<<BigInt(u))+BigInt(e);if(A(s,a,r)===o){t?.(100);try{let e=s.toString(16),t=e.length%2?`0`+e:e,n=new Uint8Array(t.match(/.{1,2}/g).map(e=>parseInt(e,16))),r=new TextDecoder().decode(n);return Promise.resolve(`FOUND! m = ${s}\nm as bytes: ${r}\nKNOWN_PLAINTEXT=SUCCESS`)}catch{return t?.(100),Promise.resolve(`FOUND! m = ${s}\nKNOWN_PLAINTEXT=SUCCESS`)}}}return Promise.resolve(null)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} When $m^e < n$, the plaintext is recovered by taking the integer e-th root of $c$. When high-order bytes of $m$ are known, brute-force over the unknown low bits recovers the full plaintext.
 
 \\textbf{Strategy 1: Integer e-th Root}
 \\begin{align*}
@@ -4964,7 +4844,7 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{
 \\textbf{References:} N. Heninger, Z. Durumeric, E. Wustrow, J. A. Halderman, "Mining Your Ps and Qs", USENIX Security Symposium, 2012`,priority:`high`,applicableCheck:e=>{let t=(e.moduli_list||``).trim();return t?t.split(`
 `).filter(e=>e.trim()).length>=2:!1},frontendCheck:async e=>{try{let t=(e.moduli_list||``).trim();if(!t)return`ERROR: Missing required input: moduli_list
 MULTI_PRIME_GCD=FAILED`;let n=t.split(`
-`).map(e=>e.trim()).filter(e=>e.length>0).map(e=>BigInt(e));if(n.length<2)return null;let r=[`Multi-Prime GCD Attack (browser-side, BigInt)`,`Running pairwise GCD on ${n.length} moduli...`,``],i=1n;for(let e of n)i*=e;let a=[];for(let e=0;e<n.length;e++)O(i/n[e],n[e])!==1n&&a.push(e);if(a.length<2)return null;let o=!1;for(let e=0;e<a.length;e++){let t=a[e],i=n[t];for(let e=t+1;e<n.length;e++){let a=n[e],s=O(i,a);s>1n&&s<i&&(o=!0,r.push(`SHARED FACTOR FOUND between moduli ${t+1} and ${e+1}!`),r.push(`gcd(n${t+1}, n${e+1}) = ${s}`),r.push(`n${t+1} = ${i}`),r.push(`  p = ${s}`),r.push(`  q = ${i/s}`),r.push(`n${e+1} = ${a}`),r.push(`  p' = ${s}`),r.push(`  q' = ${a/s}`),r.push(``))}}return o?(r.push(`MULTI_PRIME_GCD=SUCCESS`),r.join(`
+`).map(e=>e.trim()).filter(e=>e.length>0).map(e=>BigInt(e));if(n.length<2)return null;let r=[`Multi-Prime GCD Attack (browser-side, BigInt)`,`Running pairwise GCD on ${n.length} moduli...`,``],i=1n;for(let e of n)i*=e;let a=[];for(let e=0;e<n.length;e++)E(i/n[e],n[e])!==1n&&a.push(e);if(a.length<2)return null;let o=!1;for(let e=0;e<a.length;e++){let t=a[e],i=n[t];for(let e=t+1;e<n.length;e++){let a=n[e],s=E(i,a);s>1n&&s<i&&(o=!0,r.push(`SHARED FACTOR FOUND between moduli ${t+1} and ${e+1}!`),r.push(`gcd(n${t+1}, n${e+1}) = ${s}`),r.push(`n${t+1} = ${i}`),r.push(`  p = ${s}`),r.push(`  q = ${i/s}`),r.push(`n${e+1} = ${a}`),r.push(`  p' = ${s}`),r.push(`  q' = ${a/s}`),r.push(``))}}return o?(r.push(`MULTI_PRIME_GCD=SUCCESS`),r.join(`
 `)):null}catch{return null}}},{id:`phi-leak`,name:`Phi(n) Leak`,category:`Partial Key / Lattice`,description:`Factors n immediately when φ(n) has been leaked, via quadratic formula. Use when Euler's totient φ(n) is known from side-channel leakage.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`phi`,label:`phi(n) (Euler totient)`,placeholder:`Enter phi(n)...`,multiline:!0,rows:3,required:!1,tooltip:`Enter the leaked φ(n) value, if known from side-channel or other leakage`}],sageTemplate:e=>{let t=e.n??``,n=e.phi??``;return`def _attack():
     if not ${JSON.stringify(t)}.strip():
         print("Missing required input: n")
@@ -5028,7 +4908,7 @@ MULTI_PRIME_GCD=FAILED`;let n=t.split(`
     except BaseException as ex:
         out = [f"ERROR: {ex}", "PHI_LEAK=FAILED"]
         print("\\n".join(out))
-_attack()`},frontendCheck:async e=>{if(!e.n||!e.phi)return null;try{let t=BigInt(e.n),n=BigInt(e.phi),r=t-n+1n,i=r*r-4n*t;if(i<0n)return null;let a=k(i);if(a*a!==i)return null;let o=(r-a)/2n,s=(r+a)/2n;if(o*s!==t)return null;let c=(o-1n)*(s-1n);return[`Phi(n) Leak Attack (browser-side, BigInt)`,`n = ${t}`,`phi(n) = ${n}`,`p + q = ${r}`,`Discriminant = ${i}`,``,`Factors recovered:`,`Verification: p * q = ${o*s}`,`Verification: (p-1)*(q-1) = ${c}`,`p = ${o}`,`q = ${s}`,`phi(n) matches: ${c===n?`YES`:`NO`}`,``,`PHI_LEAK=SUCCESS`].join(`
+_attack()`},frontendCheck:async e=>{if(!e.n||!e.phi)return null;try{let t=BigInt(e.n),n=BigInt(e.phi),r=t-n+1n,i=r*r-4n*t;if(i<0n)return null;let a=D(i);if(a*a!==i)return null;let o=(r-a)/2n,s=(r+a)/2n;if(o*s!==t)return null;let c=(o-1n)*(s-1n);return[`Phi(n) Leak Attack (browser-side, BigInt)`,`n = ${t}`,`phi(n) = ${n}`,`p + q = ${r}`,`Discriminant = ${i}`,``,`Factors recovered:`,`Verification: p * q = ${o*s}`,`Verification: (p-1)*(q-1) = ${c}`,`p = ${o}`,`q = ${s}`,`phi(n) matches: ${c===n?`YES`:`NO`}`,``,`PHI_LEAK=SUCCESS`].join(`
 `)}catch{return null}},proof:`\\textbf{Theorem:} Knowing $\\phi(n)$ factors $n = pq$ in polynomial time by solving the quadratic $x^2 - (n - \\phi(n) + 1)x + n = 0$.
 
 \\textbf{Setup:}
@@ -5160,8 +5040,8 @@ p &= \\gcd(\\text{leak} - a, n) \\qed
 \\textbf{Explanation:} Fermat's Little Theorem states $a^p \\equiv a \\pmod{p}$. Since the leaked value $\\text{leak} \\equiv a^p \\pmod{n}$, it also satisfies $\\text{leak} \\equiv a^p \\pmod{p}$. Therefore $\\text{leak} \\equiv a \\pmod{p}$, meaning $p$ divides $(\\text{leak} - a)$. Computing $\\gcd(\\text{leak} - a, n)$ extracts $p$ directly. This is a simple single-shot attack requiring no iteration or lattice reduction.
 
 \\textbf{References:} Common CTF pattern; based on Fermat's Little Theorem`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.a&&!!e.leak,frontendCheck:async e=>{try{if(!e.n||!e.a||!e.leak)return`ERROR: Missing required input: n, a, or leak
-IMPLICIT_KEY_EXPOSURE=FAILED`;let t=BigInt(e.n),n=BigInt(e.a),r=BigInt(e.leak),i=O(r-n,t);if(i>1n&&i<t){let e=i,a=t/e;return[`Implicit Key Exposure Attack (browser-side, BigInt)`,`n = ${t}`,`a = ${n}`,`leak = ${r}`,``,`Factors recovered:`,`p = ${e}`,`q = ${a}`,`Verification: p * q = ${e*a}`,`Verification: a^p mod n = ${M(n,e,t)} == leak? ${M(n,e,t)===r}`,``,`IMPLICIT_KEY_EXPOSURE=SUCCESS`].join(`
-`)}return null}catch{return null}}},J,{id:`common-prime-rsa`,name:`Common Prime RSA`,category:`Factorization`,description:`Factors two RSA moduli n1, n2 that share a common prime by computing gcd(n1, n2). Use when two moduli may share a prime factor.`,inputs:[{name:`n1`,label:`n1 (first modulus)`,placeholder:`Enter n1...`,multiline:!0,rows:3},{name:`n2`,label:`n2 (second modulus)`,placeholder:`Enter n2...`,multiline:!0,rows:3}],proof:`\\textbf{Theorem:} If $n_1 = p \\cdot q_1$ and $n_2 = p \\cdot q_2$ share a prime $p$, then $\\gcd(n_1, n_2) = p$.
+IMPLICIT_KEY_EXPOSURE=FAILED`;let t=BigInt(e.n),n=BigInt(e.a),r=BigInt(e.leak),i=E(r-n,t);if(i>1n&&i<t){let e=i,a=t/e;return[`Implicit Key Exposure Attack (browser-side, BigInt)`,`n = ${t}`,`a = ${n}`,`leak = ${r}`,``,`Factors recovered:`,`p = ${e}`,`q = ${a}`,`Verification: p * q = ${e*a}`,`Verification: a^p mod n = ${A(n,e,t)} == leak? ${A(n,e,t)===r}`,``,`IMPLICIT_KEY_EXPOSURE=SUCCESS`].join(`
+`)}return null}catch{return null}}},K,{id:`common-prime-rsa`,name:`Common Prime RSA`,category:`Factorization`,description:`Factors two RSA moduli n1, n2 that share a common prime by computing gcd(n1, n2). Use when two moduli may share a prime factor.`,inputs:[{name:`n1`,label:`n1 (first modulus)`,placeholder:`Enter n1...`,multiline:!0,rows:3},{name:`n2`,label:`n2 (second modulus)`,placeholder:`Enter n2...`,multiline:!0,rows:3}],proof:`\\textbf{Theorem:} If $n_1 = p \\cdot q_1$ and $n_2 = p \\cdot q_2$ share a prime $p$, then $\\gcd(n_1, n_2) = p$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -5180,7 +5060,7 @@ The GCD extracts the shared prime directly — no factorization of either modulu
 \\textbf{Explanation:} This is a simpler, two-modulus variant of the Batch GCD attack. When two RSA keys were generated on the same machine or with a shared entropy source, they may share a prime factor. Computing the GCD of the two moduli instantly recovers the shared prime, fully factoring both keys.
 
 \\textbf{References:} A. K. Lenstra et al., "Ron was wrong, Whit is right" (2012) — found 0.2\\% of RSA keys shared factors`,priority:`high`,applicableCheck:e=>!!e.n1&&!!e.n2,frontendCheck:async e=>{try{if(!e.n1||!e.n2)return`ERROR: Missing required input: n1 and n2
-COMMON_PRIME_RSA=FAILED`;let t=BigInt(e.n1),n=BigInt(e.n2);if(t<2n||n<2n||t===n)return null;let r=O(t,n);if(r>1n&&r<t&&r<n){let e=t/r,i=n/r;return[`Common Prime RSA Attack (browser-side, BigInt)`,`n1 = ${t}`,`n2 = ${n}`,``,`gcd(n1, n2) = ${r}`,``,`Shared prime: p = ${r}`,`n1 = ${r} x ${e}`,`n2 = ${r} x ${i}`,`Verification: p * q1 = ${r*e} == n1? ${r*e===t}`,`Verification: p * q2 = ${r*i} == n2? ${r*i===n}`,`COMMON_PRIME_RSA=SUCCESS`].join(`
+COMMON_PRIME_RSA=FAILED`;let t=BigInt(e.n1),n=BigInt(e.n2);if(t<2n||n<2n||t===n)return null;let r=E(t,n);if(r>1n&&r<t&&r<n){let e=t/r,i=n/r;return[`Common Prime RSA Attack (browser-side, BigInt)`,`n1 = ${t}`,`n2 = ${n}`,``,`gcd(n1, n2) = ${r}`,``,`Shared prime: p = ${r}`,`n1 = ${r} x ${e}`,`n2 = ${r} x ${i}`,`Verification: p * q1 = ${r*e} == n1? ${r*e===t}`,`Verification: p * q2 = ${r*i} == n2? ${r*i===n}`,`COMMON_PRIME_RSA=SUCCESS`].join(`
 `)}return null}catch{return null}}},{id:`hastad-broadcast`,name:`Hastad's Broadcast Attack`,category:`Message / Protocol`,description:`Recovers m from e ciphertexts under distinct moduli with small e via CRT and integer e-th root. Use when same m encrypted with exponent e to e recipients.`,inputs:[{name:`e`,label:`e (public exponent / number of ciphertexts)`,placeholder:`3`,multiline:!1},{name:`ciphertexts`,label:`ciphertexts (one per line: c, n)`,placeholder:`c1, n1
 c2, n2
 c3, n3`,multiline:!0,rows:6}],sageTemplate:e=>!e.e||!e.ciphertexts?`print("ERROR: Missing required inputs (e, ciphertexts)")
@@ -5239,7 +5119,7 @@ print("HASTAD_BROADCAST=FAILED")`:`def _attack():
         print(f"ERROR: {ex}")
         print("HASTAD_BROADCAST=FAILED")
 _attack()`,frontendCheck:e=>{if(!e.e||!e.ciphertexts)return Promise.resolve(null);try{let t=BigInt(e.e),n=e.ciphertexts.split(`
-`).filter(e=>e.trim());if(n.length<Number(t))return Promise.resolve(null);let r=n.slice(0,Number(t)).map(e=>{let[t,n]=e.split(`,`).map(e=>BigInt(e.trim()));return{c:t,n}}),i=r.reduce((e,{n:t})=>e*t,1n),a=0n;for(let{c:e,n:t}of r){let n=i/t,r=j(n%t,t);if(r===null)return Promise.resolve(null);a=(a+e*n*r)%i}if(a<2n)return Promise.resolve(null);let o=N(a,t);if(o**t===a){for(let{c:e,n}of r)if(M(o,t,n)!==e)return Promise.resolve(null);return Promise.resolve(`Message recovered: m = ${o}\nHASTAD_BROADCAST=SUCCESS`)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If the same plaintext $m$ is encrypted under $e$ distinct moduli with the same exponent $e$, CRT recovers $m^e$ over $\\mathbb{Z}$ and $m = \\sqrt[e]{m^e}$.
+`).filter(e=>e.trim());if(n.length<Number(t))return Promise.resolve(null);let r=n.slice(0,Number(t)).map(e=>{let[t,n]=e.split(`,`).map(e=>BigInt(e.trim()));return{c:t,n}}),i=r.reduce((e,{n:t})=>e*t,1n),a=0n;for(let{c:e,n:t}of r){let n=i/t,r=k(n%t,t);if(r===null)return Promise.resolve(null);a=(a+e*n*r)%i}if(a<2n)return Promise.resolve(null);let o=j(a,t);if(o**t===a){for(let{c:e,n}of r)if(A(o,t,n)!==e)return Promise.resolve(null);return Promise.resolve(`Message recovered: m = ${o}\nHASTAD_BROADCAST=SUCCESS`)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If the same plaintext $m$ is encrypted under $e$ distinct moduli with the same exponent $e$, CRT recovers $m^e$ over $\\mathbb{Z}$ and $m = \\sqrt[e]{m^e}$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -5271,4 +5151,4 @@ c1, n1
 c2, n2
 c3, n3
 
-Tip: For convenience, paste this into Magic Mode which auto-detects the format. Works when m^e < n1*n2*...*ne.`,priority:`high`,applicableCheck:e=>!!e.e&&!!e.ciphertexts}],ie=[`Factorization`,`Partial Key / Lattice`,`Message / Protocol`,`Oracle`,`Advanced`],ae=new Map;for(let e of ie)ae.set(e,Q.filter(t=>t.category===e));n(`https://factordb-proxy.octopusyuzu.workers.dev`);let $=new Set;self.onmessage=e=>{let t=e.data;if(`type`in t&&t.type===`cancel`){for(let e of t.ids)$.add(e);return}let{id:n,attackId:r,params:i}=t;if($.has(n)){$.delete(n);return}let a=Q.find(e=>e.id===r);if(!a?.frontendCheck){$.has(n)||self.postMessage({id:n,result:null});return}(async()=>{try{let e=await a.frontendCheck(i,(e,t)=>{$.has(n)||self.postMessage({type:`progress`,id:n,pct:e,detail:t})});$.has(n)||self.postMessage({id:n,result:e})}catch(e){$.has(n)||self.postMessage({id:n,result:null,error:String(e)})}})()}})();
+Tip: For convenience, paste this into Magic Mode which auto-detects the format. Works when m^e < n1*n2*...*ne.`,priority:`high`,applicableCheck:e=>!!e.e&&!!e.ciphertexts}],be=[`Factorization`,`Partial Key / Lattice`,`Message / Protocol`,`Oracle`,`Advanced`],xe=new Map;for(let e of be)xe.set(e,Q.filter(t=>t.category===e));n(`https://factordb-proxy.octopusyuzu.workers.dev`);let $=new Set;self.onmessage=e=>{let t=e.data;if(`type`in t&&t.type===`cancel`){for(let e of t.ids)$.add(e);return}let{id:n,attackId:r,params:i}=t;if($.has(n)){$.delete(n);return}let a=Q.find(e=>e.id===r);if(!a?.frontendCheck){$.has(n)||self.postMessage({id:n,result:null});return}(async()=>{try{let e=await a.frontendCheck(i,(e,t)=>{$.has(n)||self.postMessage({type:`progress`,id:n,pct:e,detail:t})});$.has(n)||self.postMessage({id:n,result:e})}catch(e){$.has(n)||self.postMessage({id:n,result:null,error:String(e)})}})()}})();
