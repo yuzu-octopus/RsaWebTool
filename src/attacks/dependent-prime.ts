@@ -15,39 +15,45 @@ export const attack: Attack = {
 def _attack():
     try:
         try:
+            out = []
             n = Integer(${vals.n})
             e = Integer(${vals.e})
             if n < 2:
-                print("DEPENDENT_PRIME=FAILED: n is too small")
+                out.append("DEPENDENT_PRIME=FAILED: n is too small")
+                print("\\n".join(out))
                 return
             if e < 2:
-                print("DEPENDENT_PRIME=FAILED: e must be >= 2")
+                out.append("DEPENDENT_PRIME=FAILED: e must be >= 2")
+                print("\\n".join(out))
                 return
             if n % 2 == 0:
-                print(f"n is even: {n}")
-                print(f"p = 2")
-                print(f"q = {n // 2}")
-                print(f"Verification: 2 * {n // 2} = {n}")
-                print("DEPENDENT_PRIME=SUCCESS")
+                out.append(f"n is even: {n}")
+                out.append(f"p = 2")
+                out.append(f"q = {n // 2}")
+                out.append(f"Verification: 2 * {n // 2} = {n}")
+                out.append("DEPENDENT_PRIME=SUCCESS")
+                print("\\n".join(out))
                 return
             if n.is_prime():
-                print("DEPENDENT_PRIME=FAILED: n is prime")
+                out.append("DEPENDENT_PRIME=FAILED: n is prime")
+                print("\\n".join(out))
                 return
             if n.is_square():
                 p = isqrt(n)
-                print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"Verification: p * q = {p * p}")
-                print(f"p = {p}")
-                print(f"q = {p}")
-                print()
-                print("DEPENDENT_PRIME=SUCCESS")
+                out.append(f"n is a perfect square: {p}^2 = {n}")
+                out.append(f"Verification: p * q = {p * p}")
+                out.append(f"p = {p}")
+                out.append(f"q = {p}")
+                out.append("")
+                out.append("DEPENDENT_PRIME=SUCCESS")
+                print("\\n".join(out))
                 return
             # Use Python ints for fast iteration
             n_int = int(n)
             e_int = int(e)
             ne_int = n_int * e_int
             found = False
-            for k in range(1, 500001):
+            for k in range(1, 5000001):
                 disc = 1 + 4 * k * ne_int
                 # Valid squares mod 16 for disc ≡ 1 (mod 4): only 1 and 9
                 last_nibble = disc & 15
@@ -61,18 +67,23 @@ def _attack():
                         if p_candidate > 1 and n_int % p_candidate == 0:
                             p_sage = Integer(p_candidate)
                             q_sage = n // p_sage
-                            print(f"Verification: p * q = {p_sage * q_sage}")
-                            print(f"p = {p_sage}")
-                            print(f"q = {q_sage}")
-                            print(f"k = {k}")
-                            print()
-                            print("DEPENDENT_PRIME=SUCCESS")
+                            out.append(f"Verification: p * q = {p_sage * q_sage}")
+                            out.append(f"p = {p_sage}")
+                            out.append(f"q = {q_sage}")
+                            out.append(f"k = {k}")
+                            out.append("")
+                            out.append("DEPENDENT_PRIME=SUCCESS")
                             found = True
                             break
             if not found:
-                print("DEPENDENT_PRIME=FAILED: no valid factorization found")
+                out.append("DEPENDENT_PRIME=FAILED: no valid factorization found")
+            print("\\n".join(out))
         except Exception as ex:
-            print(f"DEPENDENT_PRIME=FAILED: {ex}")
+            try:
+                out.append(f"DEPENDENT_PRIME=FAILED: {ex}")
+                print("\\n".join(out))
+            except:
+                print(f"DEPENDENT_PRIME=FAILED: {ex}")
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("DEPENDENT_PRIME=FAILED")

@@ -13,15 +13,17 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => `import math
 def _attack():
     try:
+        out = []
         try:
             n = Integer(${vals.n})
-            print(f"Pollard-Strassen factorization on n = {n}")
-            print()
+            out.append(f"Pollard-Strassen factorization on n = {n}")
+            out.append("")
             ${sageGuardBlock("POLLARD_STRASSEN", '            ')}
             c = int(floor(RR(n) ** (1/4))) + 1
             if c > 50000:
-                print(f"n is too large for Strassen (n^(1/4) = {c} > 50000)")
-                print("POLLARD_STRASSEN=FAILED")
+                out.append(f"n is too large for Strassen (n^(1/4) = {c} > 50000)")
+                out.append("POLLARD_STRASSEN=FAILED")
+                print("\\n".join(out))
                 return
             n_int = int(n)
             # Single-pass Strassen: accumulate product incrementally with batched GCD
@@ -41,20 +43,21 @@ def _attack():
                             if g2 > 1 and g2 < n_int:
                                 p_sage = Integer(g2)
                                 q_sage = n // p_sage
-                                print(f"Verification: p * q = {p_sage * q_sage}")
-                                print(f"p = {p_sage}")
-                                print(f"q = {q_sage}")
-                                print()
-                                print("POLLARD_STRASSEN=SUCCESS")
+                                out.append(f"Verification: p * q = {p_sage * q_sage}")
+                                out.append(f"p = {p_sage}")
+                                out.append(f"q = {q_sage}")
+                                out.append("")
+                                out.append("POLLARD_STRASSEN=SUCCESS")
+                                print("\\n".join(out))
                                 return
                         # If product GCD found but backtrack didn't (shouldn't happen)
                         break
-            print("Pollard-Strassen failed: no factor found in intervals")
-            print("POLLARD_STRASSEN=FAILED")
+            out.append("Pollard-Strassen failed: no factor found in intervals")
+            out.append("POLLARD_STRASSEN=FAILED")
         except Exception as e:
-            print(f"ERROR: {e}")
-            print("POLLARD_STRASSEN=FAILED")
-        #
+            out.append(f"ERROR: {e}")
+            out.append("POLLARD_STRASSEN=FAILED")
+        print("\\n".join(out))
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("POLLARD_STRASSEN=FAILED")

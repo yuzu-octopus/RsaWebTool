@@ -17,6 +17,7 @@ export const attack: Attack = {
   ],
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
+        out = []
         try:
             n = Integer(${vals.n})
             e_val = "${vals.e}".strip()
@@ -28,27 +29,29 @@ export const attack: Attack = {
             b_val = "${vals.b}".strip()
             b = Integer(b_val) if b_val else Integer(0)
             if n < 2 or e < 2 or c1 < 0 or c2 < 0:
-                print("Invalid input")
-                print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
+                out.append("Invalid input")
+                out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
+                print("\\n".join(out))
                 return
-            print(f"Related Message Attack")
-            print(f"n = {n}, e = {e}")
-            print(f"c1 = m^e mod n = {c1}")
-            print(f"c2 = (a*m + b)^e mod n = {c2}")
-            print(f"a = {a}, b = {b}")
-            print()
+            out.append(f"Related Message Attack")
+            out.append(f"n = {n}, e = {e}")
+            out.append(f"c1 = m^e mod n = {c1}")
+            out.append(f"c2 = (a*m + b)^e mod n = {c2}")
+            out.append(f"a = {a}, b = {b}")
+            out.append("")
             # Diagnostic: if b = 0, check degenerate case c2 == a^e * c1
             if b == 0:
                 ratio_check = power_mod(a, e, n) * c1 % n
-                print(f"Diagnostic: a^e * c1 mod n = {ratio_check}")
-                print(f"Diagnostic: c2 = {c2}")
-                print(f"Diagnostic: match? {ratio_check == c2}")
+                out.append(f"Diagnostic: a^e * c1 mod n = {ratio_check}")
+                out.append(f"Diagnostic: c2 = {c2}")
+                out.append(f"Diagnostic: match? {ratio_check == c2}")
                 if ratio_check == c2:
-                    print("WARNING: b=0 and c2 == a^e*c1. Any m satisfies c2 = (am)^e mod n.")
-                    print("Cannot recover m uniquely. Try using b != 0.")
-                    print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
+                    out.append("WARNING: b=0 and c2 == a^e*c1. Any m satisfies c2 = (am)^e mod n.")
+                    out.append("Cannot recover m uniquely. Try using b != 0.")
+                    out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
+                    print("\\n".join(out))
                     return
-                print()
+                out.append("")
             # f1(x) = x^e - c1, f2(x) = (a*x + b)^e - c2
             # Both share root x = m over Zmod(n)
             R.<x> = PolynomialRing(Zmod(n))
@@ -65,11 +68,11 @@ export const attack: Attack = {
                         lc = q.leading_coefficient()
                         g = gcd(Integer(lc), Integer(n))
                         if 1 < g < n:
-                            print(f"GCD found factor of n: {g}")
+                            out.append(f"GCD found factor of n: {g}")
                         break
                 return p
             g = poly_gcd(f1, f2)
-            print(f"GCD degree: {g.degree()}")
+            out.append(f"GCD degree: {g.degree()}")
             m_int = None
             if g.degree() == 1:
                 a_coeff = Integer(g[1])
@@ -92,63 +95,64 @@ export const attack: Attack = {
             #   Multiply by (A*m - B) and use m^3 = c1 to eliminate m^2:
             #   (A*C - B^2)*m = B*C - A^2*c1
             if m_int is None and e == 3:
-                print("Trying e=3 closed-form fallback...")
+                out.append("Trying e=3 closed-form fallback...")
                 A = (3 * a^2 * b) % n
                 B = (3 * a * b^2) % n
                 C = (b^3 - c2 + a^3 * c1) % n
-                print(f"Algebraic elimination: {A}*m^2 + {B}*m + {C} = 0 (mod n)")
+                out.append(f"Algebraic elimination: {A}*m^2 + {B}*m + {C} = 0 (mod n)")
                 if A == 0 and B == 0 and C == 0:
-                    print("Degenerate: any m satisfies both equations (b=0 case).")
+                    out.append("Degenerate: any m satisfies both equations (b=0 case).")
                 elif A == 0 and B == 0:
-                    print(f"Contradiction: {C} != 0. a/b values are wrong.")
+                    out.append(f"Contradiction: {C} != 0. a/b values are wrong.")
                 elif A == 0:
                     # Linear case: B*m + C = 0
                     try:
                         m_int = Integer((-C) * inverse_mod(B, n) % n)
-                        print(f"Linear fallback recovered m = {m_int}")
+                        out.append(f"Linear fallback recovered m = {m_int}")
                     except (ZeroDivisionError, ValueError):
-                        print("Linear fallback failed (B not invertible).")
+                        out.append("Linear fallback failed (B not invertible).")
                 else:
                     # Quadratic case: use derived formula
                     denom = (A * C - B^2) % n
                     numer = (B * C - A^2 * c1) % n
-                    print(f"Denominator (A*C - B^2): {denom}")
+                    out.append(f"Denominator (A*C - B^2): {denom}")
                     gd = gcd(Integer(denom), Integer(n))
                     if 1 < gd < n:
-                        print(f"Denominator shares factor {gd} with n - trying CRT...")
+                        out.append(f"Denominator shares factor {gd} with n - trying CRT...")
                         try:
                             p1 = gd
                             q1 = n // p1
                             m_p = Integer(numer % p1 * inverse_mod(denom % p1, p1) % p1)
                             m_q = Integer(numer % q1 * inverse_mod(denom % q1, q1) % q1)
                             m_int = Integer(crt([m_p, m_q], [p1, q1]))
-                            print(f"CRT fallback recovered m = {m_int}")
+                            out.append(f"CRT fallback recovered m = {m_int}")
                         except Exception as ex2:
-                            print(f"CRT fallback failed: {ex2}")
+                            out.append(f"CRT fallback failed: {ex2}")
                     else:
                         try:
                             m_int = Integer(numer * inverse_mod(denom, n) % n)
-                            print(f"Quadratic fallback recovered m = {m_int}")
+                            out.append(f"Quadratic fallback recovered m = {m_int}")
                         except (ZeroDivisionError, ValueError):
-                            print("Quadratic fallback failed (denominator not invertible).")
+                            out.append("Quadratic fallback failed (denominator not invertible).")
             if m_int is None:
-                print("Could not recover message m.")
-                print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
+                out.append("Could not recover message m.")
+                out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
+                print("\\n".join(out))
                 return
-            print(f"Recovered m = {m_int}")
+            out.append(f"Recovered m = {m_int}")
             v1 = power_mod(m_int, e, n)
             v2 = power_mod(Integer(a * m_int + b), e, n)
-            print(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
-            print(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
+            out.append(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
+            out.append(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
             if v1 == c1 and v2 == c2:
-                print()
-                print("FRANKLIN_REITER_RELATED_MESSAGE=SUCCESS")
+                out.append("")
+                out.append("FRANKLIN_REITER_RELATED_MESSAGE=SUCCESS")
             else:
-                print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
+                out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
         except Exception as ex:
-            print(f"ERROR: {ex}")
-            print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
-        #
+            out.append(f"ERROR: {ex}")
+            out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
+        print("\\n".join(out))
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
@@ -179,7 +183,6 @@ _attack()`,
       const B = (3n * a * b * b) % n;
       const C = ((b * b * b) - c2 + (a * a * a % n) * c1) % n;
       const nMod = ((C % n) + n) % n;
-      const Cnorm = nMod;
 
       if (A === 0n && B === 0n) {
         // Degenerate or contradiction
@@ -190,7 +193,7 @@ _attack()`,
         if (B === 0n) return Promise.resolve(null);
         const invB = modInverse(B, n);
         if (invB === null) return Promise.resolve(null);
-        const m = ((-Cnorm % n) + n) % n * invB % n;
+        const m = ((-nMod % n) + n) % n * invB % n;
         if (modPow(m, e, n) === c1) {
           return Promise.resolve(`Recovered m = ${m}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
         }
@@ -199,8 +202,8 @@ _attack()`,
 
       // Quadratic case: A*m^2 + B*m + C = 0
       // From the derived formula: (A*C - B^2)*m = B*C - A^2*c1 (mod n)
-      const denom = ((A * Cnorm - B * B) % n + n) % n;
-      const numer = ((B * Cnorm - A * A % n * c1) % n + n) % n;
+      const denom = ((A * nMod - B * B) % n + n) % n;
+      const numer = ((B * nMod - A * A % n * c1) % n + n) % n;
 
       if (denom === 0n) return Promise.resolve(null);
       const invDenom = modInverse(denom, n);

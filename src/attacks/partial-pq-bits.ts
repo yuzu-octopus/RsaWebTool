@@ -13,18 +13,19 @@ export const attack: Attack = {
   ],
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
+        out = []
         try:
             n = Integer(${vals.n})
             knownBits = Integer(${vals.knownBits})
             bitPosition = "${vals.bitPosition}"
             if n <= 0 or knownBits < 0:
-                print("PARTIAL_PQ_BITS=FAILED: invalid input values")
+                out.append("PARTIAL_PQ_BITS=FAILED: invalid input values")
             elif bitPosition not in ("msb", "lsb"):
-                print("PARTIAL_PQ_BITS=FAILED: bitPosition must be 'msb' or 'lsb'")
+                out.append("PARTIAL_PQ_BITS=FAILED: bitPosition must be 'msb' or 'lsb'")
             elif bitPosition == "msb":
                 k = n.nbits() // 2 - knownBits.nbits()
                 if k <= 0:
-                    print("PARTIAL_PQ_BITS=FAILED: not enough unknown bits for Coppersmith")
+                    out.append("PARTIAL_PQ_BITS=FAILED: not enough unknown bits for Coppersmith")
                 else:
                     # Manual Coppersmith lattice for degree-1, checking ALL LLL rows.
                     # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
@@ -60,17 +61,17 @@ export const attack: Attack = {
                             break
                     if found_p:
                         q = n // found_p
-                        print(f"Verification: p * q = {found_p * q}")
-                        print(f"p = {found_p}")
-                        print(f"q = {q}")
-                        print()
-                        print("PARTIAL_PQ_BITS=SUCCESS")
+                        out.append(f"Verification: p * q = {found_p * q}")
+                        out.append(f"p = {found_p}")
+                        out.append(f"q = {q}")
+                        out.append("")
+                        out.append("PARTIAL_PQ_BITS=SUCCESS")
                     else:
-                        print("PARTIAL_PQ_BITS=FAILED: no roots found")
+                        out.append("PARTIAL_PQ_BITS=FAILED: no roots found")
             elif bitPosition == "lsb":
                 m = knownBits.nbits()
                 if m <= 0:
-                    print("PARTIAL_PQ_BITS=FAILED: knownBits is zero")
+                    out.append("PARTIAL_PQ_BITS=FAILED: knownBits is zero")
                 else:
                     # Manual Coppersmith lattice for degree-1, checking ALL LLL rows.
                     # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
@@ -106,15 +107,16 @@ export const attack: Attack = {
                             break
                     if found_p:
                         q = n // found_p
-                        print(f"Verification: p * q = {found_p * q}")
-                        print(f"p = {found_p}")
-                        print(f"q = {q}")
-                        print()
-                        print("PARTIAL_PQ_BITS=SUCCESS")
+                        out.append(f"Verification: p * q = {found_p * q}")
+                        out.append(f"p = {found_p}")
+                        out.append(f"q = {q}")
+                        out.append("")
+                        out.append("PARTIAL_PQ_BITS=SUCCESS")
                     else:
-                        print("PARTIAL_PQ_BITS=FAILED: no roots found")
+                        out.append("PARTIAL_PQ_BITS=FAILED: no roots found")
         except Exception as ex:
-            print(f"PARTIAL_PQ_BITS=FAILED: {ex}")
+            out.append(f"PARTIAL_PQ_BITS=FAILED: {ex}")
+        print("\\n".join(out))
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("PARTIAL_PQ_BITS=FAILED")

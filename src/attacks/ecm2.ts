@@ -30,7 +30,7 @@ export const attack: Attack = {
                         try:
                             result = ecmfactor(m, B1_cur)
                             if result[0]:
-                                p = result[1]
+                                p = result[0]
                                 if p != 1 and p != m and m % p == 0:
                                     found_p = p
                                     break

@@ -14,12 +14,13 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
         try:
+            out = []
             n = Integer(${vals.n})
             import math
             n_int = int(n)
             ${sageGuardBlock("CLOSE_PRIME", '            ')}
             # Step 1: Fermat factorization (fast for close primes)
-            print(f"Close-prime attack on n ({n.nbits()} bits): trying Fermat first...")
+            out.append(f"Close-prime attack on n ({n.nbits()} bits): trying Fermat first...")
             a, rem = n.sqrtrem()
             b2 = -rem
             c = 2*a + 1
@@ -37,20 +38,21 @@ export const attack: Attack = {
                 p = a_final - b
                 q = a_final + b
                 if p > 1 and q < n and p*q == n:
-                    print(f"Fermat factorization succeeded!")
-                    print(f"Verification: p * q = {p * q}")
-                    print(f"p = {p}")
-                    print(f"q = {q}")
-                    print(f"|p - q| = {q - p}")
-                    print(f"Iterations: {iterations}")
-                    print()
-                    print("CLOSE_PRIME=SUCCESS")
+                    out.append(f"Fermat factorization succeeded!")
+                    out.append(f"Verification: p * q = {p * q}")
+                    out.append(f"p = {p}")
+                    out.append(f"q = {q}")
+                    out.append(f"|p - q| = {q - p}")
+                    out.append(f"Iterations: {iterations}")
+                    out.append("")
+                    out.append("CLOSE_PRIME=SUCCESS")
+                    print("\\n".join(out))
                     return
             # Step 2: Londahl BSGS fallback (for larger prime gaps)
-            print(f"Fermat did not converge in {max_iter} iterations, trying Londahl BSGS...")
+            out.append(f"Fermat did not converge in {max_iter} iterations, trying Londahl BSGS...")
             b = 50000
             phi_approx = n_int - 2*math.isqrt(n_int) + 1
-            print(f"Building baby-step table (b={b})...")
+            out.append(f"Building baby-step table (b={b})...")
             look_up = {}
             z = 1
             parity = int(phi_approx & 1)
@@ -58,7 +60,7 @@ export const attack: Attack = {
                 if (j & 1) == parity:
                     look_up[z] = j
                 z = (z * 2) % n_int
-            print(f"Searching ({b + 1} giant steps)...")
+            out.append(f"Searching ({b + 1} giant steps)...")
             mu = int(inverse_mod(power_mod(2, Integer(phi_approx), n), n))
             step = int(power_mod(2, b, n))
             found = False
@@ -74,24 +76,30 @@ export const attack: Attack = {
                             p_candidate = (m - sqrt_disc) // 2
                             q_candidate = (m + sqrt_disc) // 2
                             if p_candidate * q_candidate == n_int and p_candidate > 1 and q_candidate > 1:
-                                print(f"Londahl BSGS factor found!")
-                                print(f"Verification: p * q = {p_candidate * q_candidate}")
-                                print(f"p = {p_candidate}")
-                                print(f"q = {q_candidate}")
-                                print(f"|p - q| = {abs(q_candidate - p_candidate)}")
-                                print(f"Baby steps: {b+1}, Giant steps: {i+1}")
+                                out.append(f"Londahl BSGS factor found!")
+                                out.append(f"Verification: p * q = {p_candidate * q_candidate}")
+                                out.append(f"p = {p_candidate}")
+                                out.append(f"q = {q_candidate}")
+                                out.append(f"|p - q| = {abs(q_candidate - p_candidate)}")
+                                out.append(f"Baby steps: {b+1}, Giant steps: {i+1}")
                                 found = True
                                 break
                 mu = (mu * step) % n_int
             if found:
-                print()
-                print("CLOSE_PRIME=SUCCESS")
+                out.append("")
+                out.append("CLOSE_PRIME=SUCCESS")
             else:
-                print("Both Fermat and Londahl BSGS failed to factor n.")
-                print("CLOSE_PRIME=FAILED")
+                out.append("Both Fermat and Londahl BSGS failed to factor n.")
+                out.append("CLOSE_PRIME=FAILED")
+            print("\\n".join(out))
         except Exception as e:
-            print(f"Error: {e}")
-            print("CLOSE_PRIME=FAILED")
+            try:
+                out.append(f"Error: {e}")
+                out.append("CLOSE_PRIME=FAILED")
+                print("\\n".join(out))
+            except:
+                print(f"Error: {e}")
+                print("CLOSE_PRIME=FAILED")
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("CLOSE_PRIME=FAILED")

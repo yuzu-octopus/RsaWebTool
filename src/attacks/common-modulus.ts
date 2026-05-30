@@ -21,6 +21,7 @@ print("COMMON_MODULUS=FAILED")`;
     }
     return `def _attack():
     try:
+        out = []
         n = Integer(${vals.n})
         e1 = Integer(${vals.e1})
         e2 = Integer(${vals.e2})
@@ -28,33 +29,39 @@ print("COMMON_MODULUS=FAILED")`;
         c2 = Integer(${vals.c2})
         # Check gcd(e1, e2) first
         g = gcd(e1, e2)
-        print(f"gcd(e1, e2) = {g}")
+        out.append(f"gcd(e1, e2) = {g}")
         if g != 1:
-            print(f"ERROR: gcd(e1, e2) = {g} != 1. Exponents must be coprime.")
-            print("COMMON_MODULUS=FAILED")
+            out.append(f"ERROR: gcd(e1, e2) = {g} != 1. Exponents must be coprime.")
+            out.append("COMMON_MODULUS=FAILED")
         else:
             # Extended GCD to find a, b such that a*e1 + b*e2 = 1
             _, a, b = xgcd(e1, e2)
-            print(f"Bezout coefficients: a = {a}, b = {b}")
-            print(f"Verification: a*e1 + b*e2 = {a*e1 + b*e2}")
+            out.append(f"Bezout coefficients: a = {a}, b = {b}")
+            out.append(f"Verification: a*e1 + b*e2 = {a*e1 + b*e2}")
             # Compute m = c1^a * c2^b mod n (power_mod handles negative exponents)
             part1 = power_mod(c1, a, n)
             part2 = power_mod(c2, b, n)
             m = (part1 * part2) % n
-            print(f"Recovered message: m = {m}")
+            out.append(f"Recovered message: m = {m}")
             # Verify
             v1 = power_mod(m, e1, n)
             v2 = power_mod(m, e2, n)
-            print(f"Verification: m^e1 mod n = {v1} (should equal c1 = {c1})")
-            print(f"Verification: m^e2 mod n = {v2} (should equal c2 = {c2})")
+            out.append(f"Verification: m^e1 mod n = {v1} (should equal c1 = {c1})")
+            out.append(f"Verification: m^e2 mod n = {v2} (should equal c2 = {c2})")
             if v1 == c1 and v2 == c2:
-                print()
-                print("COMMON_MODULUS=SUCCESS")
+                out.append("")
+                out.append("COMMON_MODULUS=SUCCESS")
             else:
-                print("COMMON_MODULUS=FAILED")
+                out.append("COMMON_MODULUS=FAILED")
+        print("\\n".join(out))
     except Exception as e:
-        print(f"ERROR: {e}")
-        print("COMMON_MODULUS=FAILED")
+        try:
+            out.append(f"ERROR: {e}")
+            out.append("COMMON_MODULUS=FAILED")
+            print("\\n".join(out))
+        except:
+            print(f"ERROR: {e}")
+            print("COMMON_MODULUS=FAILED")
     #
 _attack()`;
   },

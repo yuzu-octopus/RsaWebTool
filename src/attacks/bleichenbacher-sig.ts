@@ -18,23 +18,27 @@ print("BLEICHENBACHER_SIG=FAILED")`;
     }
     return `def _attack():
     try:
+        out = []
         n = Integer(${vals.n})
         e = Integer(${vals.e || '3'})
         hash_hex = "${vals.hash_hex}".strip()
         if not hash_hex:
-            print("ERROR: hash_hex is empty")
-            print("BLEICHENBACHER_SIG=FAILED")
+            out.append("ERROR: hash_hex is empty")
+            out.append("BLEICHENBACHER_SIG=FAILED")
+            print("\\n".join(out))
             return
         if e != 3:
-            print("This attack requires e=3.")
-            print(f"Got e={e}.")
-            print("BLEICHENBACHER_SIG=FAILED")
+            out.append("This attack requires e=3.")
+            out.append(f"Got e={e}.")
+            out.append("BLEICHENBACHER_SIG=FAILED")
+            print("\\n".join(out))
             return
         n_bytes = (n.nbits() + 7) // 8
         hash_bytes = len(hash_hex) // 2
         if hash_bytes == 0:
-            print("ERROR: hash_hex is too short (need at least 2 hex chars)")
-            print("BLEICHENBACHER_SIG=FAILED")
+            out.append("ERROR: hash_hex is too short (need at least 2 hex chars)")
+            out.append("BLEICHENBACHER_SIG=FAILED")
+            print("\\n".join(out))
             return
         hash_int = Integer("0x" + hash_hex)
         # PKCS#1 v1.5: 0x00 || 0x01 || 0xFF*min_padding || 0x00 || hash || garbage
@@ -43,8 +47,9 @@ print("BLEICHENBACHER_SIG=FAILED")`;
         fixed_overhead = 3 + min_padding
         garbage_len = n_bytes - fixed_overhead - hash_bytes
         if garbage_len < 0:
-            print("ERROR: Hash too large for this modulus (need more garbage bytes)")
-            print("BLEICHENBACHER_SIG=FAILED")
+            out.append("ERROR: Hash too large for this modulus (need more garbage bytes)")
+            out.append("BLEICHENBACHER_SIG=FAILED")
+            print("\\n".join(out))
             return
         # Construct target with garbage = 0
         # Structure (LSB end): garbage | hash | 0x00 | 0xFF*min_padding | 0x01 | 0x00
@@ -54,23 +59,29 @@ print("BLEICHENBACHER_SIG=FAILED")`;
         if not exact:
             sig += 1
         cube = sig ** 3
-        print(f"Bleichenbacher Signature Forgery (e={e})")
-        print(f"n bytes = {n_bytes}")
-        print(f"Target hash: {hash_hex}")
-        print(f"Forged signature S = {sig}")
-        print(f"S^3 = {cube}")
+        out.append(f"Bleichenbacher Signature Forgery (e={e})")
+        out.append(f"n bytes = {n_bytes}")
+        out.append(f"Target hash: {hash_hex}")
+        out.append(f"Forged signature S = {sig}")
+        out.append(f"S^3 = {cube}")
         # Verify PKCS#1 leading bytes 0x0001 are preserved
         top_two = cube >> (8 * (n_bytes - 2))
         if top_two == Integer(0x0001):
-            print("PKCS#1 structure preserved — forged signature valid against lax verifier")
-            print()
-            print("BLEICHENBACHER_SIG=SUCCESS")
+            out.append("PKCS#1 structure preserved — forged signature valid against lax verifier")
+            out.append("")
+            out.append("BLEICHENBACHER_SIG=SUCCESS")
         else:
-            print("Signature forgery failed — garbage area too small for this hash and modulus")
-            print("BLEICHENBACHER_SIG=FAILED")
+            out.append("Signature forgery failed — garbage area too small for this hash and modulus")
+            out.append("BLEICHENBACHER_SIG=FAILED")
+        print("\\n".join(out))
     except Exception as ex:
-        print(f"ERROR: {ex}")
-        print("BLEICHENBACHER_SIG=FAILED")
+        try:
+            out.append(f"ERROR: {ex}")
+            out.append("BLEICHENBACHER_SIG=FAILED")
+            print("\\n".join(out))
+        except:
+            print(f"ERROR: {ex}")
+            print("BLEICHENBACHER_SIG=FAILED")
     #
 _attack()`;
   },

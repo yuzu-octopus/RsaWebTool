@@ -14,12 +14,13 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
         try:
+            out = []
             n = Integer(${vals.n})
-            print(f"Euler Factorization on n = {n}")
-            print()
             import math
             n_int = int(n)
             ${sageGuardBlock("EULER", '            ')}
+            out.append(f"Euler Factorization on n = {n}")
+            out.append("")
             end = math.isqrt(n_int)
             solutions = []
             a = 0
@@ -27,8 +28,9 @@ export const attack: Attack = {
             max_iter = 20000000
             while a < end and len(solutions) < 2:
                 if a > max_iter:
-                    print(f"Euler factorization failed: exceeded {max_iter} iterations")
-                    print("EULER=FAILED")
+                    out.append(f"Euler factorization failed: exceeded {max_iter} iterations")
+                    out.append("EULER=FAILED")
+                    print("\\n".join(out))
                     return
                 rem = n_int - a_sq
                 b = math.isqrt(rem)
@@ -43,9 +45,10 @@ export const attack: Attack = {
                 a_sq += 2*a + 1
                 a += 1
             if len(solutions) < 2:
-                print(f"Euler factorization failed: could not find two distinct sum-of-squares representations")
-                print("n may not have both primes ≡ 1 (mod 4)")
-                print("EULER=FAILED")
+                out.append(f"Euler factorization failed: could not find two distinct sum-of-squares representations")
+                out.append("n may not have both primes ≡ 1 (mod 4)")
+                out.append("EULER=FAILED")
+                print("\\n".join(out))
                 return
             s0 = solutions[0]
             s1 = solutions[1]
@@ -56,22 +59,28 @@ export const attack: Attack = {
             p = gcd(k + h, n)
             q = gcd(lev + m, n)
             if p <= 1 or q >= n:
-                print(f"Found trivial factorization: {p} x {q} = {n}")
-                print("No non-trivial factors found via Euler")
-                print("EULER=FAILED")
+                out.append(f"Found trivial factorization: {p} x {q} = {n}")
+                out.append("No non-trivial factors found via Euler")
+                out.append("EULER=FAILED")
             else:
                 if p * q != n:
                     q = n // p
-                print(f"Verification: p * q = {p * q}")
-                print(f"p is prime: {p.is_prime()}")
-                print(f"q is prime: {q.is_prime()}")
-                print(f"p = {p}")
-                print(f"q = {q}")
-                print()
-                print("EULER=SUCCESS")
+                out.append(f"Verification: p * q = {p * q}")
+                out.append(f"p is prime: {p.is_prime()}")
+                out.append(f"q is prime: {q.is_prime()}")
+                out.append(f"p = {p}")
+                out.append(f"q = {q}")
+                out.append("")
+                out.append("EULER=SUCCESS")
+            print("\\n".join(out))
         except Exception as e:
-            print(f"ERROR: {e}")
-            print("EULER=FAILED")
+            try:
+                out.append(f"ERROR: {e}")
+                out.append("EULER=FAILED")
+                print("\\n".join(out))
+            except:
+                print(f"ERROR: {e}")
+                print("EULER=FAILED")
         #
     except BaseException as ex:
         print(f"ERROR: {ex}")

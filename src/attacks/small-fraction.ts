@@ -33,9 +33,10 @@ def _attack():
         # Small fraction attack: p/q ≈ a/b for small a, b
         # Use Python ints for fast trial division
         try:
-            print(f"Searching for small fraction approximation of p/q...")
-            print(f"n = {n}")
-            print()
+            out = []
+            out.append("Searching for small fraction approximation of p/q...")
+            out.append(f"n = {n}")
+            out.append("")
             found = False
             max_den = 100
             trial_window = 10000
@@ -56,12 +57,12 @@ def _attack():
                         q_sage = Integer(q0)
                         p_sage = n // q_sage
                         if p_sage > 1 and p_sage * q_sage == n:
-                            print(f"Found! a/b = {a}/{b}")
-                            print(f"Verification: p * q = {p_sage * q_sage}")
-                            print(f"p = {p_sage}")
-                            print(f"q = {q_sage}")
-                            print(f"p/q = {float(p_sage)/float(q_sage):.10f}")
-                            print(f"a/b = {float(a)/float(b):.10f}")
+                            out.append(f"Found! a/b = {a}/{b}")
+                            out.append(f"Verification: p * q = {p_sage * q_sage}")
+                            out.append(f"p = {p_sage}")
+                            out.append(f"q = {q_sage}")
+                            out.append(f"p/q = {float(p_sage)/float(q_sage):.10f}")
+                            out.append(f"a/b = {float(a)/float(b):.10f}")
                             found = True
                             break
                     # Near-exact: try q0 ± delta
@@ -72,12 +73,12 @@ def _attack():
                             q_sage = Integer(q_candidate)
                             p_sage = n // q_sage
                             if p_sage > 1 and p_sage * q_sage == n:
-                                print(f"Found! a/b = {a}/{b} (delta = +{delta})")
-                                print(f"Verification: p * q = {p_sage * q_sage}")
-                                print(f"p = {p_sage}")
-                                print(f"q = {q_sage}")
-                                print(f"p/q = {float(p_sage)/float(q_sage):.10f}")
-                                print(f"a/b = {float(a)/float(b):.10f}")
+                                out.append(f"Found! a/b = {a}/{b} (delta = +{delta})")
+                                out.append(f"Verification: p * q = {p_sage * q_sage}")
+                                out.append(f"p = {p_sage}")
+                                out.append(f"q = {q_sage}")
+                                out.append(f"p/q = {float(p_sage)/float(q_sage):.10f}")
+                                out.append(f"a/b = {float(a)/float(b):.10f}")
                                 found = True
                                 break
                         q_candidate = q0 - delta
@@ -85,28 +86,29 @@ def _attack():
                             q_sage = Integer(q_candidate)
                             p_sage = n // q_sage
                             if p_sage > 1 and p_sage * q_sage == n:
-                                print(f"Found! a/b = {a}/{b} (delta = -{delta})")
-                                print(f"Verification: p * q = {p_sage * q_sage}")
-                                print(f"p = {p_sage}")
-                                print(f"q = {q_sage}")
-                                print(f"p/q = {float(p_sage)/float(q_sage):.10f}")
-                                print(f"a/b = {float(a)/float(b):.10f}")
+                                out.append(f"Found! a/b = {a}/{b} (delta = -{delta})")
+                                out.append(f"Verification: p * q = {p_sage * q_sage}")
+                                out.append(f"p = {p_sage}")
+                                out.append(f"q = {q_sage}")
+                                out.append(f"p/q = {float(p_sage)/float(q_sage):.10f}")
+                                out.append(f"a/b = {float(a)/float(b):.10f}")
                                 found = True
                                 break
                     if found:
                         break
                 if found:
                     break
-            print()
-            print(f"Pairs tested: {pairs_tried}, trial divisions: {divs_tried}")
+            out.append("")
+            out.append(f"Pairs tested: {pairs_tried}, trial divisions: {divs_tried}")
             if found:
-                print()
-                print("SMALL_FRACTION=SUCCESS")
+                out.append("")
+                out.append("SMALL_FRACTION=SUCCESS")
             else:
-                print(f"No small fraction found with denominator up to {max_den}.")
-                print("p/q may not be close to a small rational.")
-                print()
-                print("SMALL_FRACTION=FAILED")
+                out.append(f"No small fraction found with denominator up to {max_den}.")
+                out.append("p/q may not be close to a small rational.")
+                out.append("")
+                out.append("SMALL_FRACTION=FAILED")
+            print("\\n".join(out))
         except Exception as e:
             print(f"Error in Small Fraction Attack: {e}")
             print("SMALL_FRACTION=FAILED")

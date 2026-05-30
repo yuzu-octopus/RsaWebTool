@@ -159,7 +159,7 @@ export const generateTestcase = (): Record<string, string> => {
   const q = randomPrime(256);
   const n = p * q;
   const m = BigInt(Math.floor(Math.random() * 10000) + 42);
-  // Use 12-bit padding for fast brute-force delta search (max delta = 125)
+  // Use 12-bit padding for fast brute-force delta search (max delta = 4095)
   const maxPad = 2 ** 12;
   const r1 = BigInt(Math.floor(Math.random() * maxPad));
   const r2 = BigInt(Math.floor(Math.random() * maxPad));

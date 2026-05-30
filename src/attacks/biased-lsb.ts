@@ -142,7 +142,7 @@ _attack()`,
       for (let i = 0; i < numBits; i++) {
         let sum = 0;
         for (const run of runs) { if (i < run.length) sum += run[i] ? 1 : -1; }
-        votes.push(sum >= 0);
+        votes.push(sum > 0);
       }
 
       // Accumulate majority-voted bits into quotient q (binary fraction m/n)

@@ -12,30 +12,34 @@ export const attack: Attack = {
   ],
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
+        out = []
         try:
             n = Integer(${vals.n})
             p_msb = Integer(${vals.p_msb})
             if n < 2 or p_msb < 2:
-                print("PARTIAL_KEY_EXPOSURE=FAILED: invalid input values")
+                out.append("PARTIAL_KEY_EXPOSURE=FAILED: invalid input values")
+                print("\\n".join(out))
                 return
             if p_msb >= n:
-                print("PARTIAL_KEY_EXPOSURE=FAILED: p_msb must be less than n")
+                out.append("PARTIAL_KEY_EXPOSURE=FAILED: p_msb must be less than n")
+                print("\\n".join(out))
                 return
             if n % p_msb == 0:
                 p = p_msb
                 q = n // p
-                print(f"Verification: p * q = {p * q}")
-                print(f"p = {p}")
-                print(f"q = {q}")
-                print()
-                print("PARTIAL_KEY_EXPOSURE=SUCCESS")
+                out.append(f"Verification: p * q = {p * q}")
+                out.append(f"p = {p}")
+                out.append(f"q = {q}")
+                out.append("")
+                out.append("PARTIAL_KEY_EXPOSURE=SUCCESS")
+                print("\\n".join(out))
                 return
             # p = p_msb + x, where x is unknown low bits (trailing zeros = bit count of x)
             k = p_msb.trailing_zero_bits()
-            print(f"Partial Key Exposure Attack")
-            print(f"n = {n}")
-            print(f"p_msb = {p_msb}")
-            print(f"Unknown low bits = {k}")
+            out.append(f"Partial Key Exposure Attack")
+            out.append(f"n = {n}")
+            out.append(f"p_msb = {p_msb}")
+            out.append(f"Unknown low bits = {k}")
             # Manual Coppersmith lattice for degree-1, checking ALL LLL rows.
             # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
             x = ZZ['x'].gen()
@@ -70,16 +74,17 @@ export const attack: Attack = {
                     break
             if found_p:
                 q = n // found_p
-                print(f"Verification: p * q = {found_p * q}")
-                print(f"p = {found_p}")
-                print(f"q = {q}")
-                print()
-                print("PARTIAL_KEY_EXPOSURE=SUCCESS")
+                out.append(f"Verification: p * q = {found_p * q}")
+                out.append(f"p = {found_p}")
+                out.append(f"q = {q}")
+                out.append("")
+                out.append("PARTIAL_KEY_EXPOSURE=SUCCESS")
             else:
-                print("Need approximately half the bits of p for Coppersmith to work.")
-                print("PARTIAL_KEY_EXPOSURE=FAILED")
+                out.append("Need approximately half the bits of p for Coppersmith to work.")
+                out.append("PARTIAL_KEY_EXPOSURE=FAILED")
         except Exception as ex:
-            print(f"PARTIAL_KEY_EXPOSURE=FAILED: {ex}")
+            out.append(f"PARTIAL_KEY_EXPOSURE=FAILED: {ex}")
+        print("\\n".join(out))
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("PARTIAL_KEY_EXPOSURE=FAILED")

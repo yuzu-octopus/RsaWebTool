@@ -18,12 +18,13 @@ print("HASTAD_BROADCAST=FAILED")`;
     }
     return `def _attack():
     try:
+        out = []
         e = Integer(${vals.e})
-        print(f"Hastad's Broadcast Attack")
-        print(f"Public exponent: e = {e}")
+        out.append(f"Hastad's Broadcast Attack")
+        out.append(f"Public exponent: e = {e}")
         if e < 2:
-            print(f"ERROR: e must be >= 2, got e = {e}")
-            print("HASTAD_BROADCAST=FAILED")
+            out.append(f"ERROR: e must be >= 2, got e = {e}")
+            out.append("HASTAD_BROADCAST=FAILED")
         else:
             lines_str = """${vals.ciphertexts}""".strip()
             pairs = []
@@ -37,39 +38,45 @@ print("HASTAD_BROADCAST=FAILED")`;
                 c = Integer(parts[0].strip())
                 n = Integer(parts[1].strip())
                 pairs.append((c, n))
-            print(f"Number of ciphertexts: {len(pairs)}")
+            out.append(f"Number of ciphertexts: {len(pairs)}")
             if len(pairs) < e:
-                print(f"ERROR: Need at least {e} ciphertexts for e = {e}, got {len(pairs)}")
-                print("HASTAD_BROADCAST=FAILED")
+                out.append(f"ERROR: Need at least {e} ciphertexts for e = {e}, got {len(pairs)}")
+                out.append("HASTAD_BROADCAST=FAILED")
             else:
                 moduli = [p[1] for p in pairs[:e]]
                 remainders = [p[0] for p in pairs[:e]]
                 N = prod(moduli)
                 M = crt(remainders, moduli)
-                print(f"CRT combined m^e = {M}")
-                print(f"Modulus product bits: {N.nbits()}")
+                out.append(f"CRT combined m^e = {M}")
+                out.append(f"Modulus product bits: {N.nbits()}")
                 m, exact = M.nth_root(e, truncate_mode=True)
                 if exact:
-                    print(f"Recovered message: m = {m}")
+                    out.append(f"Recovered message: m = {m}")
                     all_ok = True
                     for i, (c_i, n_i) in enumerate(pairs):
                         v = power_mod(m, e, n_i)
                         ok = v == c_i
                         if not ok:
                             all_ok = False
-                        print(f"  Verify {i+1}: m^{e} mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
+                        out.append(f"  Verify {i+1}: m^{e} mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
                     if all_ok:
-                        print()
-                        print("HASTAD_BROADCAST=SUCCESS")
+                        out.append("")
+                        out.append("HASTAD_BROADCAST=SUCCESS")
                     else:
-                        print("HASTAD_BROADCAST=FAILED")
+                        out.append("HASTAD_BROADCAST=FAILED")
                 else:
-                    print(f"Approximate root: m = {m}")
-                    print("Warning: m^e was not a perfect e-th power")
-                    print("HASTAD_BROADCAST=FAILED")
+                    out.append(f"Approximate root: m = {m}")
+                    out.append("Warning: m^e was not a perfect e-th power")
+                    out.append("HASTAD_BROADCAST=FAILED")
+        print("\\n".join(out))
     except Exception as ex:
-        print(f"ERROR: {ex}")
-        print("HASTAD_BROADCAST=FAILED")
+        try:
+            out.append(f"ERROR: {ex}")
+            out.append("HASTAD_BROADCAST=FAILED")
+            print("\\n".join(out))
+        except:
+            print(f"ERROR: {ex}")
+            print("HASTAD_BROADCAST=FAILED")
 _attack()`;
   },
   frontendCheck: (vals: Record<string, string>) => {

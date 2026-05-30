@@ -117,6 +117,7 @@ _attack()`,
           k = 0n;
           while (k < r && g === 1n && iter < maxIter) {
             const batchSize = Math.min(batchM, Number(r - k));
+            const ySave = y;
             for (let i = 0; i < batchSize; i++) {
               y = (y * y + c_i) % n_i;
               const diff = y > x ? y - x : x - y;
@@ -125,6 +126,17 @@ _attack()`,
             }
             g = gcd(qProd, n_i);
             qProd = 1n;
+            // Backtrack when accumulated product contains all of n
+            if (g === n_i) {
+              g = 1n;
+              let ys = ySave;
+              for (let i = 0; i < batchSize && g === 1n && iter < maxIter; i++) {
+                ys = (ys * ys + c_i) % n_i;
+                const diff = ys > x ? ys - x : x - ys;
+                g = gcd(diff, n_i);
+                iter++;
+              }
+            }
             k += BigInt(batchM);
           }
           r *= 2n;

@@ -11,37 +11,42 @@ export const attack: Attack = {
   ],
   sageTemplate: (vals: Record<string, string>) => `import math
 def _attack():
+    out = []
     try:
         try:
             n = Integer(${vals.n})
             if n < 2:
-                print(f"n = {n} is too small to factor")
-                print("NOVELTY_PRIMES=FAILED")
+                out.append(f"n = {n} is too small to factor")
+                out.append("NOVELTY_PRIMES=FAILED")
+                print("\\n".join(out))
                 return
             if n % 2 == 0:
-                print(f"n is even: {n}")
-                print(f"p = 2")
-                print(f"q = {n // 2}")
-                print(f"Verification: 2 * {n // 2} = {n}")
-                print("NOVELTY_PRIMES=SUCCESS")
+                out.append(f"n is even: {n}")
+                out.append(f"p = 2")
+                out.append(f"q = {n // 2}")
+                out.append(f"Verification: 2 * {n // 2} = {n}")
+                out.append("NOVELTY_PRIMES=SUCCESS")
+                print("\\n".join(out))
                 return
             if n.is_prime():
-                print(f"n is prime: {n}")
-                print("No factorization possible")
-                print("NOVELTY_PRIMES=FAILED")
+                out.append(f"n is prime: {n}")
+                out.append("No factorization possible")
+                out.append("NOVELTY_PRIMES=FAILED")
+                print("\\n".join(out))
                 return
             if n.is_square():
                 p = isqrt(n)
-                print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"Verification: p * q = {p * p}")
-                print(f"p = {p}")
-                print(f"q = {p}")
-                print()
-                print("NOVELTY_PRIMES=SUCCESS")
+                out.append(f"n is a perfect square: {p}^2 = {n}")
+                out.append(f"Verification: p * q = {p * p}")
+                out.append(f"p = {p}")
+                out.append(f"q = {p}")
+                out.append("")
+                out.append("NOVELTY_PRIMES=SUCCESS")
+                print("\\n".join(out))
                 return
-            print(f"Checking n = {n} against known CTF primes...")
+            out.append(f"Checking n = {n} against known CTF primes...")
             found = False
-            print("Checking primes near powers of 2...")
+            out.append("Checking primes near powers of 2...")
             n_int = int(n)
             for bits in [64, 128, 256, 512]:
                 target = 1 << bits
@@ -50,13 +55,13 @@ def _attack():
                     if candidate > 1 and n_int % candidate == 0:
                         if is_prime(candidate):
                             p_sage = Integer(candidate)
-                            print(f"  Found prime near 2^{bits}: {p_sage}")
-                            print(f"  Cofactor: {n // p_sage}")
-                            print(f"  Verification: {p_sage} * {n // p_sage} = {n}")
-                            print(f"p = {p_sage}")
-                            print(f"q = {n // p_sage}")
+                            out.append(f"  Found prime near 2^{bits}: {p_sage}")
+                            out.append(f"  Cofactor: {n // p_sage}")
+                            out.append(f"  Verification: {p_sage} * {n // p_sage} = {n}")
+                            out.append(f"p = {p_sage}")
+                            out.append(f"q = {n // p_sage}")
                             found = True
-            print("\\nChecking primes near common constants...")
+            out.append("\\nChecking primes near common constants...")
             constants = [
                 ("pi", 3141592653589793238462643383279502884197169399375105820974),
                 ("e", 2718281828459045235360287471352662497757247093699959574966),
@@ -69,23 +74,24 @@ def _attack():
                     if candidate > 1 and n_int % candidate == 0:
                         if is_prime(candidate):
                             p_sage = Integer(candidate)
-                            print(f"  Found prime near {name}: {p_sage}")
-                            print(f"  Cofactor: {n // p_sage}")
-                            print(f"p = {p_sage}")
-                            print(f"q = {n // p_sage}")
+                            out.append(f"  Found prime near {name}: {p_sage}")
+                            out.append(f"  Cofactor: {n // p_sage}")
+                            out.append(f"p = {p_sage}")
+                            out.append(f"q = {n // p_sage}")
                             found = True
             if found:
-                print("NOVELTY_PRIMES=SUCCESS")
+                out.append("NOVELTY_PRIMES=SUCCESS")
             else:
-                print("\\nNo novelty primes found.")
-                print("NOVELTY_PRIMES=FAILED")
+                out.append("\\nNo novelty primes found.")
+                out.append("NOVELTY_PRIMES=FAILED")
         except Exception as e:
-            print(f"Error in Novelty Primes check: {e}")
-            print("NOVELTY_PRIMES=FAILED")
+            out.append(f"Error in Novelty Primes check: {e}")
+            out.append("NOVELTY_PRIMES=FAILED")
         #
     except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("NOVELTY_PRIMES=FAILED")
+        out.append(f"ERROR: {ex}")
+        out.append("NOVELTY_PRIMES=FAILED")
+    print("\\n".join(out))
 _attack()`,
   frontendCheck: (vals) => {
     if (!vals.n) return Promise.resolve(null);
@@ -99,7 +105,7 @@ _attack()`,
         for (let delta = -1000; delta <= 1000; delta++) {
           const candidate = target + BigInt(delta);
           if ((candidate & 1n) === 0n) continue;
-          if (candidate > 1n && n % candidate === 0n) {
+          if (candidate > 1n && n % candidate === 0n && isPrimeMR(candidate)) {
             return Promise.resolve(`Found prime near 2^${bits}: ${candidate}\nCofactor: ${n / candidate}\nVerification: ${candidate} * ${n / candidate} = ${n}\nNOVELTY_PRIMES=SUCCESS`);
           }
         }
@@ -114,7 +120,7 @@ _attack()`,
         for (let delta = -100; delta <= 100; delta++) {
           const candidate = digits + BigInt(delta);
           if ((candidate & 1n) === 0n) continue;
-          if (candidate > 1n && n % candidate === 0n) {
+          if (candidate > 1n && n % candidate === 0n && isPrimeMR(candidate)) {
             return Promise.resolve(`Found prime near ${name}: ${candidate}\nCofactor: ${n / candidate}\nNOVELTY_PRIMES=SUCCESS`);
           }
         }

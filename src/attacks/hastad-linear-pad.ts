@@ -17,6 +17,7 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
     }
     return `def _attack():
     try:
+        out = []
         e = Integer(${vals.e})
         # Parse triples
         triples_str = """${vals.triples}""".strip()
@@ -33,16 +34,16 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
             a_i = Integer(parts[2].strip())
             b_i = Integer(parts[3].strip())
             triples.append((n_i, c_i, a_i, b_i))
-        print(f"Number of ciphertexts: {len(triples)}")
-        print(f"Public exponent: e = {e}")
+        out.append(f"Number of ciphertexts: {len(triples)}")
+        out.append(f"Public exponent: e = {e}")
         if len(triples) < e:
-            print(f"ERROR: Need at least {e} ciphertexts for e = {e}, got {len(triples)}")
-            print("HASTAD_LINEAR_PAD=FAILED")
+            out.append(f"ERROR: Need at least {e} ciphertexts for e = {e}, got {len(triples)}")
+            out.append("HASTAD_LINEAR_PAD=FAILED")
         else:
             # General Hastad with linear padding: c_i = (a_i * m + b_i)^e mod n_i
             # Combined modulus N = prod(n_i)
             N = prod([t[0] for t in triples])
-            print(f"Combined modulus N has {N.nbits()} bits")
+            out.append(f"Combined modulus N has {N.nbits()} bits")
             # Build CRT-combined polynomial F(x) = sum_i coeff_i * f_i(x) mod N
             R.<x> = PolynomialRing(Zmod(N))
             F = 0
@@ -51,27 +52,28 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                 coeff = Ni * inverse_mod(Ni, n_i)
                 fi = (a_i*x + b_i)**e - c_i
                 F += coeff * fi
-            print(f"Combined polynomial degree: {F.degree()}")
+            out.append(f"Combined polynomial degree: {F.degree()}")
             # Make polynomial monic (required by small_roots).
             # The leading coefficient should be invertible modulo N because
             # each a_i is coprime to n_i — but guard against the rare case.
             try:
                 F = F.monic()
             except Exception as ex:
-                print(f"Cannot make monic directly: {ex}")
+                out.append(f"Cannot make monic directly: {ex}")
                 lc = Integer(F.leading_coefficient())
                 g = gcd(lc, Integer(N))
                 if g > 1 and g < N:
-                    print(f"Lead coeff shares factor g={g} with N — can factor directly")
+                    out.append(f"Lead coeff shares factor g={g} with N — can factor directly")
                 elif g == N:
-                    print("Lead coeff is a multiple of N")
+                    out.append("Lead coeff is a multiple of N")
                 else:
                     # lc is coprime to N, try manual inversion
                     try:
                         F = F * inverse_mod(lc, N)
                     except Exception as ex2:
-                        print(f"Cannot invert lead coeff: {ex2}")
-                print("HASTAD_LINEAR_PAD=FAILED")
+                        out.append(f"Cannot invert lead coeff: {ex2}")
+                out.append("HASTAD_LINEAR_PAD=FAILED")
+                print("\\n".join(out))
                 return
             # Coppersmith: find small root m < N^(1/e)
             # Wrapped in try/except: small_roots over Zmod(N) may throw
@@ -82,28 +84,27 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                 roots = F.small_roots(beta=1.0, epsilon=0.05)
                 if roots:
                     found_m = roots[0]
-                    print(f"Coppersmith recovered message: m = {found_m}")
+                    out.append(f"Coppersmith recovered message: m = {found_m}")
             except Exception as sr_ex:
-                print(f"Coppersmith small_roots failed (composite modulus): {sr_ex}")
+                out.append(f"Coppersmith small_roots failed (composite modulus): {sr_ex}")
             if found_m is None:
-                print("No small roots found. The message may be too large for the Coppersmith bound.")
-                print("Try: smaller epsilon (e.g., 0.01) for larger lattice, or ensure m is sufficiently small.")
+                out.append("No small roots found. The message may be too large for the Coppersmith bound.")
+                out.append("Try: smaller epsilon (e.g., 0.01) for larger lattice, or ensure m is sufficiently small.")
                 # Fallback 1: standard Hastad CRT if all a_i=1, b_i=0
                 all_simple = all(t[2] == 1 and t[3] == 0 for t in triples)
                 if all_simple:
-                    print("All a_i=1, b_i=0. Using standard Hastad CRT approach...")
+                    out.append("All a_i=1, b_i=0. Using standard Hastad CRT approach...")
                     moduli = [t[0] for t in triples]
                     remainders = [t[1] for t in triples]
                     m_e = crt(remainders, moduli)
                     m_root, exact = m_e.nth_root(e, truncate_mode=True)
                     if exact:
                         found_m = m_root
-                        print(f"Standard Hastad recovered message: m = {found_m}")
+                        out.append(f"Standard Hastad recovered message: m = {found_m}")
                 # Fallback 2: brute-force search for small messages
                 # Uses Horner evaluation for fast modular arithmetic
                 # (avoid power_mod which is slow in SageCell loops).
                 if found_m is None:
-                    out = []
                     out.append("Attempting brute-force search for small m...")
                     a_int = [int(t[2]) for t in triples]
                     b_int = [int(t[3]) for t in triples]
@@ -136,28 +137,32 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                             break
                         if m_candidate % 200000 == 0 and m_candidate > 0:
                             out.append(f"  Searched up to m = {m_candidate}...")
-                    print("\\n".join(out))
             if found_m is not None:
                 m = Integer(found_m)
-                print("Verifying recovered message...")
+                out.append("Verifying recovered message...")
                 all_ok = True
                 for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
                     v = pow(int(a_i) * int(m) + int(b_i), int(e), int(n_i))
                     ok = v == c_i
                     if not ok:
                         all_ok = False
-                    print(f"  Verify {i+1}: (a*m+b)^e mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
+                    out.append(f"  Verify {i+1}: (a*m+b)^e mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
                 if all_ok:
-                    print()
-                    print("HASTAD_LINEAR_PAD=SUCCESS")
+                    out.append("")
+                    out.append("HASTAD_LINEAR_PAD=SUCCESS")
                 else:
-                    print("HASTAD_LINEAR_PAD=FAILED")
+                    out.append("HASTAD_LINEAR_PAD=FAILED")
             else:
-                print("Brute-force search did not find the message (up to 2M). It may be larger.")
-                print("HASTAD_LINEAR_PAD=FAILED")
+                out.append("Brute-force search did not find the message (up to 500K). It may be larger.")
+                out.append("HASTAD_LINEAR_PAD=FAILED")
+        print("\\n".join(out))
     except Exception as ex:
-        print(f"ERROR: {ex}")
-        print("HASTAD_LINEAR_PAD=FAILED")
+        try:
+            out.append(f"ERROR: {ex}")
+            out.append("HASTAD_LINEAR_PAD=FAILED")
+        except:
+            out = [f"ERROR: {ex}", "HASTAD_LINEAR_PAD=FAILED"]
+        print("\\n".join(out))
 _attack()`;
   },
   proof: `\\textbf{Theorem:} Given $k \\geq e$ ciphertexts $c_i \\equiv (a_i m + b_i)^e \\pmod{n_i}$ with pairwise coprime moduli, recover $m$ by CRT-combining the polynomials and applying Coppersmith small roots.

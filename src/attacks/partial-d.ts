@@ -15,12 +15,13 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => `import math
 def _attack():
     try:
+        out = []
         try:
             n = Integer(${vals.n})
             e = Integer(${vals.e})
             dLow = Integer(${vals.dLow})
             if n <= 0 or e <= 0 or dLow < 0:
-                print("PARTIAL_D=FAILED: invalid input values")
+                out.append("PARTIAL_D=FAILED: invalid input values")
             else:
                 # Use Python ints for fast iteration
                 n_int = int(n)
@@ -46,12 +47,12 @@ def _attack():
                                 if p_candidate > 1 and n_int % p_candidate == 0:
                                     p_sage = Integer(p_candidate)
                                     q_sage = n // p_sage
-                                    print(f"Verification: p * q = {p_sage * q_sage}")
-                                    print(f"d = {d_approx}")
-                                    print(f"p = {p_sage}")
-                                    print(f"q = {q_sage}")
-                                    print()
-                                    print("PARTIAL_D=SUCCESS")
+                                    out.append(f"Verification: p * q = {p_sage * q_sage}")
+                                    out.append(f"d = {d_approx}")
+                                    out.append(f"p = {p_sage}")
+                                    out.append(f"q = {q_sage}")
+                                    out.append("")
+                                    out.append("PARTIAL_D=SUCCESS")
                                     found = True
                                     break
                     # Increment d_approx for next iteration
@@ -61,9 +62,10 @@ def _attack():
                         d_approx += 1
                         rem -= e_int
                 if not found:
-                    print("PARTIAL_D=FAILED: no valid d found")
+                    out.append("PARTIAL_D=FAILED: no valid d found")
         except Exception as ex:
-            print(f"PARTIAL_D=FAILED: {ex}")
+            out.append(f"PARTIAL_D=FAILED: {ex}")
+        print("\\n".join(out))
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("PARTIAL_D=FAILED")

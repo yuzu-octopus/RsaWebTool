@@ -20,8 +20,9 @@ def _attack():
         n = Integer(${vals.n})
         e = Integer(${vals.e})
         bound = ${vals.bound ? `Integer(${vals.bound})` : 'Integer(5000000)'}
+        out = []
         if n <= 0 or e <= 0 or bound <= 0:
-            print("SMALL_CRT_EXP=FAILED: invalid input values")
+            out.append("SMALL_CRT_EXP=FAILED: invalid input values")
         else:
             n_int = int(n)
             e_int = int(e)
@@ -45,10 +46,10 @@ def _attack():
                             if math.gcd(x_scan, n_int) > 1:
                                 p_sage = Integer(g)
                                 q_sage = n // p_sage
-                                print(f"Factor found at dp = {d}!")
-                                print(f"p = {p_sage}")
-                                print(f"q = {q_sage}")
-                                print("SMALL_CRT_EXP=SUCCESS")
+                                out.append(f"Factor found at dp = {d}!")
+                                out.append(f"p = {p_sage}")
+                                out.append(f"q = {q_sage}")
+                                out.append("SMALL_CRT_EXP=SUCCESS")
                                 found = True
                                 break
                             cur_scan = (cur_scan * step_int) % n_int
@@ -58,8 +59,9 @@ def _attack():
                     batch_start = dp + 1
                 current_int = (current_int * step_int) % n_int
             if not found:
-                print("No small dp found within bound.")
-                print("SMALL_CRT_EXP=FAILED")
+                out.append("No small dp found within bound.")
+                out.append("SMALL_CRT_EXP=FAILED")
+        print("\\n".join(out))
     except Exception as ex:
         print(f"SMALL_CRT_EXP=FAILED: {ex}")
 _attack()`,
@@ -153,7 +155,7 @@ _attack()`,
 \\end{itemize}
 
 \\textbf{References:} Boneh \\textit{et al.}, "Cryptanalysis of RSA with Small CRT Exponents", CRYPTO 1998; Cohn & Heninger, ePrint 2011/436`,
-   usageGuide: 'This attack recovers the private key when either dp or dq (the CRT exponents) is small.\n\nHow to use:\n1. You have n, e, and know that dp (d mod p-1) is small (< bound)\n2. The attack uses Fermat\'s Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p\n3. A batched GCD approach (product tree) accelerates the linear scan ~1000x by reducing gcd calls via product accumulation\n4. Provide n, e, and optionally bound         (max dp to try, default 50000000)\n\nTip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 50000000 runs in ~900ms for 1024-bit n.',
+   usageGuide: 'This attack recovers the private key when either dp or dq (the CRT exponents) is small.\n\nHow to use:\n1. You have n, e, and know that dp (d mod p-1) is small (< bound)\n2. The attack uses Fermat\'s Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p\n3. A batched GCD approach (product tree) accelerates the linear scan ~1000x by reducing gcd calls via product accumulation\n4. Provide n, e, and optionally bound         (max dp to try, default 50000000)\n\nTip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 5000000 runs in ~900ms for 1024-bit n.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e,
 };

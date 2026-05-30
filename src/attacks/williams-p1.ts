@@ -110,13 +110,17 @@ export const attack: Attack = {
                 for k in range(2, B1 + 1):
                     V_next = (V_curr * VM - V_prev) % n
                     V_prev, V_curr = V_curr, V_next
-                # Now check primes in Stage 2
-                for k in range(B1 + 1, B2 + 1):
-                    V_next = (V_curr * VM - V_prev) % n
-                    V_prev, V_curr = V_curr, V_next
+                # Now check primes in Stage 2 (iterate pre-computed prime list,
+                # advancing recurrence between non-consecutive primes)
+                prev_k = B1
+                for q in stage2_primes:
+                    for _ in range(q - prev_k):
+                        V_next = (V_curr * VM - V_prev) % n
+                        V_prev, V_curr = V_curr, V_next
                     g = gcd(V_curr - 2, n)
                     if 1 < g < n:
                         return Integer(g)
+                    prev_k = q
             return None
         #
         # Build bound configurations: original + auto-escalation

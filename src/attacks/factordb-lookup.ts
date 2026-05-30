@@ -61,8 +61,8 @@ export const attack: Attack = {
       lines.push(`FACTORDB_LOOKUP=SUCCESS`);
 
       return lines.join('\n');
-    } catch {
-      return null;
+    } catch (e) {
+      return `ERROR: ${e instanceof Error ? e.message : String(e)}\nFACTORDB_LOOKUP=FAILED`;
     }
   },
   proof: `\\textbf{Theorem:} FactorDB provides instant factorization for any previously factored modulus via a public API.

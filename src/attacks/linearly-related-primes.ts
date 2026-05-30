@@ -13,34 +13,40 @@ export const attack: Attack = {
   ],
   sageTemplate: (vals: Record<string, string>) => `import math
 def _attack():
+    out = []
     try:
         try:
             n = Integer(${vals.n})
             k = Integer(${vals.k})
             if n < 2:
-                print("LINEARLY_RELATED_PRIMES=FAILED: n is too small")
+                out.append("LINEARLY_RELATED_PRIMES=FAILED: n is too small")
+                print("\\n".join(out))
                 return
             if k <= 0:
-                print("LINEARLY_RELATED_PRIMES=FAILED: k must be positive")
+                out.append("LINEARLY_RELATED_PRIMES=FAILED: k must be positive")
+                print("\\n".join(out))
                 return
             if n % 2 == 0:
-                print(f"n is even: {n}")
-                print(f"p = 2")
-                print(f"q = {n // 2}")
-                print(f"Verification: 2 * {n // 2} = {n}")
-                print("LINEARLY_RELATED_PRIMES=SUCCESS")
+                out.append(f"n is even: {n}")
+                out.append(f"p = 2")
+                out.append(f"q = {n // 2}")
+                out.append(f"Verification: 2 * {n // 2} = {n}")
+                out.append("LINEARLY_RELATED_PRIMES=SUCCESS")
+                print("\\n".join(out))
                 return
             if n.is_prime():
-                print("LINEARLY_RELATED_PRIMES=FAILED: n is prime")
+                out.append("LINEARLY_RELATED_PRIMES=FAILED: n is prime")
+                print("\\n".join(out))
                 return
             if n.is_square():
                 p = isqrt(n)
-                print(f"n is a perfect square: {p}^2 = {n}")
-                print(f"Verification: p * q = {p * p}")
-                print(f"p = {p}")
-                print(f"q = {p}")
-                print()
-                print("LINEARLY_RELATED_PRIMES=SUCCESS")
+                out.append(f"n is a perfect square: {p}^2 = {n}")
+                out.append(f"Verification: p * q = {p * p}")
+                out.append(f"p = {p}")
+                out.append(f"q = {p}")
+                out.append("")
+                out.append("LINEARLY_RELATED_PRIMES=SUCCESS")
+                print("\\n".join(out))
                 return
             # Use Python ints for fast iteration
             n_int = int(n)
@@ -60,21 +66,22 @@ def _attack():
                         if p_candidate > 1 and n_int % p_candidate == 0:
                             p_sage = Integer(p_candidate)
                             q_sage = n // p_sage
-                            print(f"Verification: p * q = {p_sage * q_sage}")
-                            print(f"p = {p_sage}")
-                            print(f"q = {q_sage}")
-                            print(f"delta = {delta}")
-                            print()
-                            print("LINEARLY_RELATED_PRIMES=SUCCESS")
+                            out.append(f"Verification: p * q = {p_sage * q_sage}")
+                            out.append(f"p = {p_sage}")
+                            out.append(f"q = {q_sage}")
+                            out.append(f"delta = {delta}")
+                            out.append("")
+                            out.append("LINEARLY_RELATED_PRIMES=SUCCESS")
                             found = True
                             break
             if not found:
-                print("LINEARLY_RELATED_PRIMES=FAILED: no valid factorization found")
+                out.append("LINEARLY_RELATED_PRIMES=FAILED: no valid factorization found")
         except Exception as ex:
-            print(f"LINEARLY_RELATED_PRIMES=FAILED: {ex}")
+            out.append(f"LINEARLY_RELATED_PRIMES=FAILED: {ex}")
     except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("LINEARLY_RELATED_PRIMES=FAILED")
+        out.append(f"ERROR: {ex}")
+        out.append("LINEARLY_RELATED_PRIMES=FAILED")
+    print("\\n".join(out))
 _attack()`,
   frontendCheck: (vals, onProgress) => {
     if (!vals.n || !vals.k) return Promise.resolve(null);

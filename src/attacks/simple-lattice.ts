@@ -13,27 +13,32 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
         try:
+            out = []
             n = Integer(${vals.n})
             nearp = Integer(${vals.nearp})
             if n <= 0 or nearp <= 0:
-                print("SIMPLE_LATTICE=FAILED: invalid input values")
+                out.append("SIMPLE_LATTICE=FAILED: invalid input values")
+                print("\\n".join(out))
                 return
             if nearp >= n:
-                print("nearp must be less than n (modulus)")
-                print("SIMPLE_LATTICE=FAILED: nearp >= n")
+                out.append("nearp must be less than n (modulus)")
+                out.append("SIMPLE_LATTICE=FAILED: nearp >= n")
+                print("\\n".join(out))
                 return
             if n % nearp == 0:
                 p = nearp
                 q = n // p
-                print(f"Verification: p * q = {p * q}")
-                print(f"p = {p}")
-                print(f"q = {q}")
-                print()
-                print("SIMPLE_LATTICE=SUCCESS")
+                out.append(f"Verification: p * q = {p * q}")
+                out.append(f"p = {p}")
+                out.append(f"q = {q}")
+                out.append("")
+                out.append("SIMPLE_LATTICE=SUCCESS")
+                print("\\n".join(out))
                 return
             if n % 2 == 0:
-                print("n is even — cannot apply lattice attack")
-                print("SIMPLE_LATTICE=FAILED: even modulus")
+                out.append("n is even — cannot apply lattice attack")
+                out.append("SIMPLE_LATTICE=FAILED: even modulus")
+                print("\\n".join(out))
                 return
             # Manual Coppersmith lattice (same shifts as Sage's small_roots).
             # Checks ALL LLL rows to bypass Sage's Row-0 (degree-1) bug.
@@ -72,15 +77,17 @@ export const attack: Attack = {
                     break
             if found_p:
                 q = n // found_p
-                print(f"Verification: p * q = {found_p * q}")
-                print(f"p = {found_p}")
-                print(f"q = {q}")
-                print()
-                print("SIMPLE_LATTICE=SUCCESS")
+                out.append(f"Verification: p * q = {found_p * q}")
+                out.append(f"p = {found_p}")
+                out.append(f"q = {q}")
+                out.append("")
+                out.append("SIMPLE_LATTICE=SUCCESS")
             else:
-                print("SIMPLE_LATTICE=FAILED: no roots found in any LLL row")
+                out.append("SIMPLE_LATTICE=FAILED: no roots found in any LLL row")
+            print("\\n".join(out))
         except Exception as ex:
-            print(f"SIMPLE_LATTICE=FAILED: {ex}")
+            out.append(f"SIMPLE_LATTICE=FAILED: {ex}")
+            print("\\n".join(out))
     except BaseException as ex:
         print(f"ERROR: {ex}")
         print("SIMPLE_LATTICE=FAILED")

@@ -12,12 +12,12 @@ export const attack: Attack = {
   ],
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
+        out = []
         try:
             n = Integer(${vals.n})
             import math
             n_int = int(n)
             ${sageGuardBlock("GIMMICKY_PRIMES", '            ')}
-            out = []
             fp = None
             fq = None
             ftype = None

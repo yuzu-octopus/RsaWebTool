@@ -12,66 +12,75 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
         try:
+            out = []
             n = Integer(${vals.n})
             ${sageGuardBlock("BINARY_POLY_FACTOR", '            ')}
             if n > 0 and (n & (n - 1)) == 0:
-                print(f"n is a power of 2: n = 2^{n.nbits() - 1}")
-                print("No non-trivial factorization possible")
-                print("BINARY_POLY_FACTOR=FAILED")
+                out.append(f"n is a power of 2: n = 2^{n.nbits() - 1}")
+                out.append("No non-trivial factorization possible")
+                out.append("BINARY_POLY_FACTOR=FAILED")
+                print("\\n".join(out))
                 return
             coeffs = n.digits(2)
             R.<x> = PolynomialRing(ZZ)
             f = sum(c * x**i for i, c in enumerate(coeffs))
-            print(f"Polynomial: f(x) = {f}")
-            print(f"Degree: {f.degree()}")
-            print(f"f(2) = {f(2)}")
-            print(f"f(2) == n: {f(2) == n}")
-            print()
+            out.append(f"Polynomial: f(x) = {f}")
+            out.append(f"Degree: {f.degree()}")
+            out.append(f"f(2) = {f(2)}")
+            out.append(f"f(2) == n: {f(2) == n}")
+            out.append("")
             if f.is_irreducible():
-                print(f"Polynomial f(x) = {f} is irreducible over ZZ[x]")
-                print("No nontrivial polynomial factorization exists.")
-                print("BINARY_POLY_FACTOR=FAILED")
+                out.append(f"Polynomial f(x) = {f} is irreducible over ZZ[x]")
+                out.append("No nontrivial polynomial factorization exists.")
+                out.append("BINARY_POLY_FACTOR=FAILED")
+                print("\\n".join(out))
                 return
             factors = f.factor()
-            print(f"Factorization of f(x): {factors}")
-            print()
-            print("Evaluating factors at x=2:")
+            out.append(f"Factorization of f(x): {factors}")
+            out.append("")
+            out.append("Evaluating factors at x=2:")
             for factor, mult in factors:
                 val = factor(2)
-                print(f"  {factor}(2) = {val}")
+                out.append(f"  {factor}(2) = {val}")
                 if mult > 1:
-                    print(f"    multiplicity: {mult}")
+                    out.append(f"    multiplicity: {mult}")
             product = 1
             for factor, mult in factors:
                 product *= factor(2)**mult
-            print(f"\\nProduct of evaluations: {product}")
-            print(f"Original n: {n}")
-            print(f"Match: {product == n}")
+            out.append(f"\\nProduct of evaluations: {product}")
+            out.append(f"Original n: {n}")
+            out.append(f"Match: {product == n}")
             if product == n:
                 proper_vals = [factor(2) for factor, _ in factors if 1 < factor(2) < n]
                 if proper_vals:
-                    print("\\nPotential factors found:")
+                    out.append("\\nPotential factors found:")
                     for factor, mult in factors:
                         val = factor(2)
                         if val > 1:
-                            print(f"  {val} (is prime: {val.is_prime()})")
+                            out.append(f"  {val} (is prime: {val.is_prime()})")
                     if len(proper_vals) >= 2:
                         p_factor = Integer(proper_vals[0])
                         q_factor = Integer(proper_vals[1])
                         if p_factor > 1 and q_factor > 1 and p_factor * q_factor == n:
-                            print(f"p = {p_factor}")
-                            print(f"q = {q_factor}")
-                    print()
-                    print("BINARY_POLY_FACTOR=SUCCESS")
+                            out.append(f"p = {p_factor}")
+                            out.append(f"q = {q_factor}")
+                    out.append("")
+                    out.append("BINARY_POLY_FACTOR=SUCCESS")
                 else:
-                    print("No proper factors: polynomial factorization is trivial (irreducible f(x)).")
-                    print("BINARY_POLY_FACTOR=FAILED")
+                    out.append("No proper factors: polynomial factorization is trivial (irreducible f(x)).")
+                    out.append("BINARY_POLY_FACTOR=FAILED")
             else:
-                print("Polynomial factorization does not yield integer factors.")
-                print("BINARY_POLY_FACTOR=FAILED")
+                out.append("Polynomial factorization does not yield integer factors.")
+                out.append("BINARY_POLY_FACTOR=FAILED")
+            print("\\n".join(out))
         except Exception as e:
-            print(f"Error in Binary Polynomial Factoring: {e}")
-            print("BINARY_POLY_FACTOR=FAILED")
+            try:
+                out.append(f"Error in Binary Polynomial Factoring: {e}")
+                out.append("BINARY_POLY_FACTOR=FAILED")
+                print("\\n".join(out))
+            except:
+                print(f"Error in Binary Polynomial Factoring: {e}")
+                print("BINARY_POLY_FACTOR=FAILED")
         #
     except BaseException as ex:
         print(f"ERROR: {ex}")

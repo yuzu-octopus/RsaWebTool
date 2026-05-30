@@ -23,38 +23,39 @@ print("NON_COPRIME_EXP=FAILED")`;
 print("NON_COPRIME_EXP=FAILED")`;
     }
     return `def _attack():
+    out = []
     try:
         n = Integer(${vals.n})
         e = Integer(${vals.e})
         c = Integer(${vals.c})
         p = Integer(${vals.p})
         q = Integer(${vals.q})
-        print(f"Non-Coprime Exponent Attack")
-        print(f"n = {n}, e = {e}")
-        print(f"p = {p}")
-        print(f"q = {q}")
-        print()
+        out.append(f"Non-Coprime Exponent Attack")
+        out.append(f"n = {n}, e = {e}")
+        out.append(f"p = {p}")
+        out.append(f"q = {q}")
+        out.append("")
         phi = (p - 1) * (q - 1)
         g = gcd(e, phi)
-        print(f"gcd(e, phi(n)) = gcd({e}, {phi}) = {g}")
+        out.append(f"gcd(e, phi(n)) = gcd({e}, {phi}) = {g}")
         if g == 1:
-            print("gcd(e, phi) = 1. Standard RSA applies. Use extended Euclidean algorithm.")
+            out.append("gcd(e, phi) = 1. Standard RSA applies. Use extended Euclidean algorithm.")
             d = inverse_mod(e, phi)
             m = power_mod(c, d, n)
-            print(f"Private exponent: d = {d}")
-            print(f"Recovered message: m = {m}")
+            out.append(f"Private exponent: d = {d}")
+            out.append(f"Recovered message: m = {m}")
             # Verify
             v = power_mod(m, e, n)
             if v == c:
-                print("NON_COPRIME_EXP=SUCCESS")
+                out.append("NON_COPRIME_EXP=SUCCESS")
             else:
-                print("NON_COPRIME_EXP=FAILED")
+                out.append("NON_COPRIME_EXP=FAILED")
         else:
-            print(f"gcd(e, phi) = {g} > 1. Multiple plaintexts map to same ciphertext.")
-            print()
+            out.append(f"gcd(e, phi) = {g} > 1. Multiple plaintexts map to same ciphertext.")
+            out.append("")
             # mod p
             gp = gcd(e, p - 1)
-            print(f"gcd(e, p-1) = {gp}")
+            out.append(f"gcd(e, p-1) = {gp}")
             roots_p = []
             if gp == 1:
                 dp = inverse_mod(e, p - 1)
@@ -79,11 +80,11 @@ print("NON_COPRIME_EXP=FAILED")`;
                         r = cp ** ((p + 1) // 4)
                         if r**2 == cp:
                             roots_p = [r, -r]
-                            print("  (found via Tonelli-Shanks fallback)")
-            print(f"e-th roots mod p: {[Integer(r) for r in roots_p]}")
+                            out.append("  (found via Tonelli-Shanks fallback)")
+            out.append(f"e-th roots mod p: {[Integer(r) for r in roots_p]}")
             # mod q
             gq = gcd(e, q - 1)
-            print(f"gcd(e, q-1) = {gq}")
+            out.append(f"gcd(e, q-1) = {gq}")
             roots_q = []
             if gq == 1:
                 dq = inverse_mod(e, q - 1)
@@ -105,29 +106,34 @@ print("NON_COPRIME_EXP=FAILED")`;
                         r = cq ** ((q + 1) // 4)
                         if r**2 == cq:
                             roots_q = [r, -r]
-                            print("  (found via Tonelli-Shanks fallback)")
-            print(f"e-th roots mod q: {[Integer(r) for r in roots_q]}")
+                            out.append("  (found via Tonelli-Shanks fallback)")
+            out.append(f"e-th roots mod q: {[Integer(r) for r in roots_q]}")
             # CRT combine all pairs
-            print(f"\\nAll possible plaintexts ({len(roots_p) * len(roots_q)} total):")
+            out.append(f"\\nAll possible plaintexts ({len(roots_p) * len(roots_q)} total):")
             found_valid = False
             for rp in roots_p:
                 for rq in roots_q:
                     m = crt([Integer(rp), Integer(rq)], [p, q])
-                    print(f"  m = {m}")
+                    out.append(f"  m = {m}")
                     # Verify
                     v = power_mod(m, e, n)
                     ok = v == c
                     if ok:
                         found_valid = True
-                    print(f"    m^e mod n = {v} (c = {c}) {'OK' if ok else 'FAIL'}")
+                    out.append(f"    m^e mod n = {v} (c = {c}) {'OK' if ok else 'FAIL'}")
             if found_valid:
-                print()
-                print("NON_COPRIME_EXP=SUCCESS")
+                out.append("")
+                out.append("NON_COPRIME_EXP=SUCCESS")
             else:
-                print("NON_COPRIME_EXP=FAILED")
+                out.append("NON_COPRIME_EXP=FAILED")
+        print("\\n".join(out))
     except Exception as ex:
-        print(f"ERROR: {ex}")
-        print("NON_COPRIME_EXP=FAILED")
+        try:
+            out.append(f"ERROR: {ex}")
+            out.append("NON_COPRIME_EXP=FAILED")
+        except:
+            out = [f"ERROR: {ex}", "NON_COPRIME_EXP=FAILED"]
+        print("\\n".join(out))
     #
 _attack()`;
   },

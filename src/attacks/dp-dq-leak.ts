@@ -67,12 +67,12 @@ export const attack: Attack = {
                     if p_candidate > 1 and n_int % p_candidate == 0:
                         p_sage = Integer(p_candidate)
                         q_val = n // p_sage
-                        print(f"Verification: p * q = {p_sage * q_val}")
-                        print(f"dp = {dp_val}")
-                        print(f"p = {p_sage}")
-                        print(f"q = {q_val}")
-                        print()
-                        print("DP_DQ_LEAK=SUCCESS")
+                        out.append(f"Verification: p * q = {p_sage * q_val}")
+                        out.append(f"dp = {dp_val}")
+                        out.append(f"p = {p_sage}")
+                        out.append(f"q = {q_val}")
+                        out.append("")
+                        out.append("DP_DQ_LEAK=SUCCESS")
                         found = True
                         break` : '';
 
@@ -87,30 +87,32 @@ export const attack: Attack = {
                         if q_candidate > 1 and n_int % q_candidate == 0:
                             p_val = n // Integer(q_candidate)
                             q_sage = Integer(q_candidate)
-                            print(f"Verification: p * q = {p_val * q_sage}")
-                            print(f"dq = {dq_val}")
-                            print(f"p = {p_val}")
-                            print(f"q = {q_sage}")
-                            print()
-                            print("DP_DQ_LEAK=SUCCESS")
+                            out.append(f"Verification: p * q = {p_val * q_sage}")
+                            out.append(f"dq = {dq_val}")
+                            out.append(f"p = {p_val}")
+                            out.append(f"q = {q_sage}")
+                            out.append("")
+                            out.append("DP_DQ_LEAK=SUCCESS")
                             found = True
                             break` : '';
 
-    return `import math
-def _attack():
+    return `def _attack():
     try:
+        out = []
         n = Integer(${vals.n})
         e = Integer(${vals.e})
         if n <= 0 or e <= 0:
-            print("DP_DQ_LEAK=FAILED: invalid input values")
+            out.append("DP_DQ_LEAK=FAILED: invalid input values")
         else:
             n_int = int(n)
             e_int = int(e)
             found = False${dpBlock}${dqBlock}
             if not found:
-                print("DP_DQ_LEAK=FAILED: no valid factor found")
+                out.append("DP_DQ_LEAK=FAILED: no valid factor found")
+        print("\\n".join(out))
     except Exception as ex:
-        print(f"DP_DQ_LEAK=FAILED: {ex}")
+        out.append(f"DP_DQ_LEAK=FAILED: {ex}")
+        print("\\n".join(out))
 _attack()`;
   },
   proof: `\\textbf{Theorem:} Given $d_p = d \\bmod (p-1)$, factor $n$ by iterating $k$ in $d_p \\cdot e - 1 = k(p-1)$.

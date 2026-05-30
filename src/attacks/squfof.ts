@@ -13,10 +13,11 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => `def _attack():
     try:
         try:
+            out = []
             n = Integer(${vals.n})
             import math
-            print(f"SQUFOF on n = {n}")
-            print()
+            out.append(f"SQUFOF on n = {n}")
+            out.append("")
             ${sageGuardBlock("SQUFOF", '            ')}
             # SQUFOF works best for small factors; extract small factor first
             # Use batched GCD for ~1000x fewer GCD calls vs individual trial division
@@ -34,12 +35,12 @@ export const attack: Attack = {
                             if n_int % trial_t == 0:
                                 p = Integer(trial_t)
                                 q = n // p
-                                print(f"Small factor found: p = {p}")
-                                print(f"Verification: p * q = {p * q}")
-                                print(f"p = {p}")
-                                print(f"q = {q}")
-                                print()
-                                print("SQUFOF=SUCCESS")
+                                out.append(f"Small factor found: p = {p}")
+                                out.append(f"Verification: p * q = {p * q}")
+                                out.append(f"p = {p}")
+                                out.append(f"q = {q}")
+                                out.append("")
+                                out.append("SQUFOF=SUCCESS")
                                 found_small = True
                                 break
                         break
@@ -54,15 +55,16 @@ export const attack: Attack = {
                         if n_int % trial_t == 0:
                             p = Integer(trial_t)
                             q = n // p
-                            print(f"Small factor found: p = {p}")
-                            print(f"Verification: p * q = {p * q}")
-                            print(f"p = {p}")
-                            print(f"q = {q}")
-                            print()
-                            print("SQUFOF=SUCCESS")
+                            out.append(f"Small factor found: p = {p}")
+                            out.append(f"Verification: p * q = {p * q}")
+                            out.append(f"p = {p}")
+                            out.append(f"q = {q}")
+                            out.append("")
+                            out.append("SQUFOF=SUCCESS")
                             found_small = True
                             break
             if found_small:
+                print("\\n".join(out))
                 return
             # Shanks' Square Forms Factorization (SQUFOF)
             def squfof(n_val):
@@ -123,17 +125,19 @@ export const attack: Attack = {
             result = squfof(n)
             if result:
                 p, q = result
-                print(f"Verification: p * q = {p * q}")
-                print(f"p = {p}")
-                print(f"q = {q}")
-                print()
-                print("SQUFOF=SUCCESS")
+                out.append(f"Verification: p * q = {p * q}")
+                out.append(f"p = {p}")
+                out.append(f"q = {q}")
+                out.append("")
+                out.append("SQUFOF=SUCCESS")
             else:
-                print("SQUFOF did not find a factor. Try a different method.")
-                print("SQUFOF=FAILED")
+                out.append("SQUFOF did not find a factor. Try a different method.")
+                out.append("SQUFOF=FAILED")
+            print("\\n".join(out))
         except Exception as e:
-            print(f"ERROR: {e}")
-            print("SQUFOF=FAILED")
+            out.append(f"ERROR: {e}")
+            out.append("SQUFOF=FAILED")
+            print("\\n".join(out))
         #
     except BaseException as ex:
         print(f"ERROR: {ex}")

@@ -6,7 +6,7 @@ export const attack: Attack = {
   id: 'manger',
   name: "Manger's OAEP Attack",
   category: 'Oracle',
-  description: 'Decrypts OAEP-encrypted messages using a first-byte oracle in O(log n) queries. Use when an oracle reveals whether the plaintext starts with 0x00.',
+  description: 'Decrypts OAEP-encrypted messages using a first-byte oracle in O(log n) queries. Use when an oracle returns 1 if the plaintext\'s first byte is NOT 0x00 (i.e., plaintext >= B).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -160,7 +160,7 @@ _attack()`,
 \\textbf{Setup:}
 \\begin{itemize}
 \\item $c = m^e \\bmod n$ with OAEP padding; first byte must be $0x00$
-\\item Oracle $\\mathcal{O}(c') = 1$ iff plaintext's first byte is $0x00$ (i.e., $m < n/256$)
+\\item Oracle $\\mathcal{O}(c') = 1$ iff plaintext's first byte is NOT $0x00$ (i.e., $m \\geq B$)
 \\item $B = 2^{8(k-1)} \\approx n/256$, where $k = \\lceil n/8 \\rceil$
 \\end{itemize}
 
@@ -178,7 +178,7 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{rn+B}{s} \\right) \\\
 \\textbf{Explanation:} Manger's attack has three phases. Step 1 doubles a multiplier $f$ until the blinded message $f \\cdot m \\bmod n$ exceeds $B$ (first byte nonzero). Step 2 adds $f/2$ increments until the value wraps past $n$ and falls below $B$ again. Step 3 performs a binary search, narrowing the interval by checking whether $f \\cdot m \\bmod n \\geq B$. The key insight is that the boundary $B$ partitions $[0, n)$ into exactly two contiguous segments, making this a textbook binary search problem. Unlike Bleichenbacher's attack which requires ~$2^{17}$ queries, Manger needs only O(\\log n) queries.
 
 \\textbf{References:} J. Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP) as Standardized in PKCS#1 v2.0", CRYPTO 2001`,
-  usageGuide: 'This requires oracle_responses \u2014 a comma-separated list from an oracle that reveals whether the decrypted plaintext\'s first byte is 0x00 (i.e., plaintext < B where B = 2^(8*(k-1)), k = ceil(n.nbits()/8)).\n\nHow to use:\n1. Set up an oracle that returns 1 if decrypt(c\') has first byte 0x00 (plaintext < B), 0 otherwise\n2. Query the oracle for successive blinding values\n3. Provide n, e, c, and oracle_responses as comma-separated bits\n4. The attack narrows the message interval with each query\n\nTip: Manger\'s attack requires O(log n) oracle queries \u2014 significantly fewer than Bleichenbacher. The oracle boundary is B = 2^(8*(k-1)) \u2248 n/256, NOT n/2.',
+  usageGuide: 'This requires oracle_responses \u2014 a comma-separated list from an oracle that reveals whether the decrypted plaintext\'s first byte is NOT 0x00 (i.e., plaintext >= B where B = 2^(8*(k-1)), k = ceil(n.nbits()/8)).\n\nHow to use:\n1. Set up an oracle that returns 1 if decrypt(c\') has first byte NOT 0x00 (plaintext >= B), 0 otherwise\n2. Query the oracle for successive blinding values\n3. Provide n, e, c, and oracle_responses as comma-separated bits\n4. The attack narrows the message interval with each query\n\nTip: Manger\'s attack requires O(log n) oracle queries \u2014 significantly fewer than Bleichenbacher. The oracle boundary is B = 2^(8*(k-1)) \u2248 n/256, NOT n/2.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_responses,
 };
