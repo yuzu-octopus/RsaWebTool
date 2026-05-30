@@ -22,19 +22,7 @@ import { inputSx } from '../styles/inputSx';
 import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, draculaSourceTheme, FONT_FAMILY } from '../styles/shared';
 import { useTimer } from '../hooks/useTimer';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { getAttackSource } from '../attacks/rawSources';
-
-/** Strip common leading whitespace from each line (for dedenting .toString() output) */
-function dedent(str: string): string {
-  const lines = str.split('\n');
-  const minIndent = lines.reduce((min, line) => {
-    if (line.trim().length === 0) return min;
-    const match = line.match(/^(\s*)/);
-    return Math.min(min, match ? match[1].length : 0);
-  }, Infinity);
-  if (minIndent === Infinity || minIndent === 0) return str;
-  return lines.map(line => line.slice(minIndent)).join('\n');
-}
+import { getAttackSource, extractFrontendCheck, dedent } from '../attacks/rawSources';
 
 type ProgressAction =
   | { type: 'START' }
@@ -87,7 +75,7 @@ export function InputPanel() {
     }
   }, [viewMode]);
 
-  // Load raw source for the Source tab (avoids minified .toString() in production).
+  // Load raw source for the Source tab, extracting only the frontendCheck function.
   // All setState calls happen inside .then()/.catch() — never synchronously in the effect body.
   useEffect(() => {
     if (!selectedAttack?.frontendCheck) return;
@@ -96,7 +84,13 @@ export function InputPanel() {
       .then(src => {
         if (cancelled) return;
         if (src) {
-          setFrontendCode(src);
+          const extracted = extractFrontendCheck(src);
+          if (extracted) {
+            setFrontendCode(extracted);
+          } else {
+            // Fallback: use toString if extraction fails
+            setFrontendCode(dedent(selectedAttack.frontendCheck!.toString()));
+          }
         } else {
           // Fallback: use toString if raw source unavailable
           setFrontendCode(dedent(selectedAttack.frontendCheck!.toString()));
@@ -221,7 +215,11 @@ export function InputPanel() {
       const code = selectedAttack.sageTemplate?.(vals);
       if (!code) {
         if (!mountedRef.current) return;
-        setOutputError('No SageMath template available for this attack');
+        if (selectedAttack.frontendCheck) {
+          setOutputError('Frontend check returned no result — no SageMath fallback available for this attack');
+        } else {
+          setOutputError('No SageMath template available for this attack');
+        }
         return;
       }
       if (attackIdRef.current !== currentAttackId) return;
