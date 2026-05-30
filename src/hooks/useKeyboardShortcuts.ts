@@ -18,15 +18,15 @@ export function useKeyboardShortcuts() {
           break;
         case '1':
           e.preventDefault();
-          setViewMode('attack');
+          window.dispatchEvent(new CustomEvent('rsa-switch-tab', { detail: 0 }));
           break;
         case '2':
           e.preventDefault();
-          setViewMode('magic');
+          window.dispatchEvent(new CustomEvent('rsa-switch-tab', { detail: 1 }));
           break;
         case '3':
           e.preventDefault();
-          setViewMode('proofs');
+          window.dispatchEvent(new CustomEvent('rsa-switch-tab', { detail: 2 }));
           break;
         case 'enter':
           e.preventDefault();

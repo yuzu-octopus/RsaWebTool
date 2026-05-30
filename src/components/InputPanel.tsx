@@ -83,6 +83,18 @@ export function InputPanel() {
     }
   }, [viewMode]);
 
+  // Keyboard shortcut: ⌘/Ctrl+1/2/3 switches tabs within the attack view
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<number>).detail;
+      if (typeof detail === 'number' && detail >= 0 && detail <= 2) {
+        setTab(detail);
+      }
+    };
+    window.addEventListener('rsa-switch-tab', handler);
+    return () => window.removeEventListener('rsa-switch-tab', handler);
+  }, []);
+
   // Load raw source for the Source tab, extracting only the frontendCheck function.
   // All setState calls happen inside .then()/.catch() — never synchronously in the effect body.
   useEffect(() => {
