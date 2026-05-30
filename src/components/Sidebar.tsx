@@ -25,7 +25,7 @@ interface ServiceStatus {
 }
 
 export function Sidebar() {
-  const { selectedAttack, setSelectedAttack, setViewMode } = useAppContext();
+  const { selectedAttack, setSelectedAttack, setViewMode, viewMode } = useAppContext();
   const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set(CATEGORIES));
   const [status, setStatus] = useState<ServiceStatus>({
     factordb: 'checking',
@@ -108,6 +108,9 @@ export function Sidebar() {
     setViewMode('attack');
   };
 
+  const isAttackActive = (id: string) => viewMode === 'attack' && selectedAttack?.id === id;
+  const isViewActive = (mode: string) => viewMode === mode;
+
   return (
     <Drawer
       variant="permanent"
@@ -153,8 +156,8 @@ export function Sidebar() {
                     data-testid={`attack-${attack.id}`}
                     sx={{
                       pl: 4,
-                      borderLeft: selectedAttack?.id === attack.id ? `3px solid ${draculaColors.purple}` : '3px solid transparent',
-                      backgroundColor: selectedAttack?.id === attack.id ? draculaColors.background : 'transparent',
+                      borderLeft: isAttackActive(attack.id) ? `3px solid ${draculaColors.purple}` : '3px solid transparent',
+                      backgroundColor: isAttackActive(attack.id) ? draculaColors.background : 'transparent',
                       '&:hover': { backgroundColor: draculaColors.background },
                     }}
                   >
@@ -174,7 +177,9 @@ export function Sidebar() {
         <ListItemButton
           onClick={() => setViewMode('instructions')}
           sx={{
-            mx: 1,
+            pl: 4,
+            borderLeft: isViewActive('instructions') ? `3px solid ${draculaColors.purple}` : '3px solid transparent',
+            backgroundColor: isViewActive('instructions') ? draculaColors.background : 'transparent',
             '&:hover': { backgroundColor: draculaColors.background },
           }}
         >
@@ -188,7 +193,9 @@ export function Sidebar() {
         <ListItemButton
           onClick={() => setViewMode('magic')}
           sx={{
-            mx: 1,
+            pl: 4,
+            borderLeft: isViewActive('magic') ? `3px solid ${draculaColors.purple}` : '3px solid transparent',
+            backgroundColor: isViewActive('magic') ? draculaColors.background : 'transparent',
             '&:hover': { backgroundColor: draculaColors.background },
           }}
         >
@@ -202,8 +209,10 @@ export function Sidebar() {
         <ListItemButton
           onClick={() => setViewMode('proofs')}
           sx={{
-            mx: 1,
+            pl: 4,
             mt: 0.5,
+            borderLeft: isViewActive('proofs') ? `3px solid ${draculaColors.purple}` : '3px solid transparent',
+            backgroundColor: isViewActive('proofs') ? draculaColors.background : 'transparent',
             '&:hover': { backgroundColor: draculaColors.background },
           }}
         >
@@ -217,8 +226,10 @@ export function Sidebar() {
         <ListItemButton
           onClick={() => setViewMode('calculator')}
           sx={{
-            mx: 1,
+            pl: 4,
             mt: 0.5,
+            borderLeft: isViewActive('calculator') ? `3px solid ${draculaColors.purple}` : '3px solid transparent',
+            backgroundColor: isViewActive('calculator') ? draculaColors.background : 'transparent',
             '&:hover': { backgroundColor: draculaColors.background },
           }}
         >
@@ -232,8 +243,10 @@ export function Sidebar() {
         <ListItemButton
           onClick={() => setViewMode('format-converter')}
           sx={{
-            mx: 1,
+            pl: 4,
             mt: 0.5,
+            borderLeft: isViewActive('format-converter') ? `3px solid ${draculaColors.purple}` : '3px solid transparent',
+            backgroundColor: isViewActive('format-converter') ? draculaColors.background : 'transparent',
             '&:hover': { backgroundColor: draculaColors.background },
           }}
         >
@@ -247,8 +260,10 @@ export function Sidebar() {
         <ListItemButton
           onClick={() => setViewMode('pem')}
           sx={{
-            mx: 1,
+            pl: 4,
             mt: 0.5,
+            borderLeft: isViewActive('pem') ? `3px solid ${draculaColors.purple}` : '3px solid transparent',
+            backgroundColor: isViewActive('pem') ? draculaColors.background : 'transparent',
             '&:hover': { backgroundColor: draculaColors.background },
           }}
         >

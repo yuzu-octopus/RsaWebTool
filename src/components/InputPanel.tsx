@@ -23,6 +23,7 @@ import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, draculaSo
 import { useTimer } from '../hooks/useTimer';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { getAttackSource, extractFrontendCheck, dedent } from '../attacks/rawSources';
+import { ProgressEstimator } from '../utils/progressEstimator';
 
 type ProgressAction =
   | { type: 'START' }
@@ -64,10 +65,13 @@ export function InputPanel() {
   const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
   const mountedRef = useRef(true);
   const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const estimatorRef = useRef(new ProgressEstimator());
+  const lastEtaUpdate = useRef(0);
   const ownershipRef = useRef<'input' | 'magic' | null>(null);
   const timer = useTimer();
   const [frontendCode, setFrontendCode] = useState('');
-  const { runAttack } = useWorkerPool();
+  const [eta, setEta] = useState<string | null>(null);
+  const { runAttack, cancelCurrentRun } = useWorkerPool();
   useEffect(() => {
     mountedRef.current = true;
     return () => {
@@ -157,6 +161,9 @@ export function InputPanel() {
 
   const handleStop = () => {
     abortControllerRef.current?.abort();
+    cancelCurrentRun();
+    dispatchProgress({ type: 'DONE' });
+    timer.stop();
   };
 
   const handleGenerateTestcase = () => {
@@ -175,10 +182,13 @@ export function InputPanel() {
   };
 
   const handleRun = async () => {
+    setTestcaseMsg(null);
     abortControllerRef.current?.abort();
     const controller = new AbortController();
     abortControllerRef.current = controller;
     dispatchProgress({ type: 'START' });
+    estimatorRef.current.reset();
+    setEta(null);
     timer.start();
     setOutputResult(null);
     setOutputError(null);
@@ -215,6 +225,12 @@ export function InputPanel() {
       if (selectedAttack.frontendCheck) {
         const handleProgress = (pct: number, detail?: string) => {
           dispatchProgress({ type: 'PROGRESS', pct, detail });
+          const est = estimatorRef.current.update(pct);
+          const now = Date.now();
+          if (now - lastEtaUpdate.current > 500) {
+            lastEtaUpdate.current = now;
+            setEta(est.formattedEta);
+          }
         };
         const preResult = await runAttack(selectedAttack.id, vals, handleProgress);
         if (preResult !== null) {
@@ -280,6 +296,7 @@ export function InputPanel() {
       if (attackIdRef.current === currentAttackId && ownershipRef.current === 'input') {
         timer.stop();
         dispatchProgress({ type: 'DONE' });
+        setEta(null);
         abortControllerRef.current = null;
         ownershipRef.current = null;
         setOutputSource(null);
@@ -405,7 +422,7 @@ export function InputPanel() {
               </Typography>
             ) : null}
 
-            {loading && progress > 0 && (
+            {loading && progress > 0 && progress < 100 && (
               <Box sx={{ mt: 1.5, width: '100%', maxWidth: 300, mx: 'auto' }}>
                 <LinearProgress
                   variant="determinate"
@@ -414,12 +431,17 @@ export function InputPanel() {
                     height: 6,
                     borderRadius: 3,
                     bgcolor: draculaColors.currentLine,
-                    '& .MuiLinearProgress-bar': { bgcolor: draculaColors.cyan, borderRadius: 3 },
+                    '& .MuiLinearProgress-bar': { bgcolor: draculaColors.orange, borderRadius: 3 },
                   }}
                 />
-                <Typography variant="caption" sx={{ color: draculaColors.comment, mt: 0.5, textAlign: 'center', display: 'block' }}>
+                <Typography variant="caption" sx={{ color: draculaColors.orange, mt: 0.5, textAlign: 'center', display: 'block' }}>
                   {progress}%{progressDetail ? ` — ${progressDetail}` : ''}
                 </Typography>
+                {eta && (
+                  <Typography variant="caption" sx={{ color: draculaColors.comment, textAlign: 'center', display: 'block' }}>
+                    ~{eta} remaining
+                  </Typography>
+                )}
               </Box>
             )}
           </Box>
