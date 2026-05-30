@@ -21,14 +21,6 @@ export function setFactorDBProxy(url: string) {
   proxyUrl = url
 }
 
-function powWithBound(base: string | bigint, exp: number, maxExp = 100): bigint {
-  if (exp > maxExp) throw new Error(`Exponent ${exp} exceeds maximum ${maxExp}`)
-  let result = 1n
-  const b = typeof base === 'bigint' ? base : BigInt(base)
-  for (let i = 0; i < exp; i++) result *= b
-  return result
-}
-
 export async function queryFactorDB(
   n: string | bigint,
   corsProxy = proxyUrl,
@@ -53,33 +45,6 @@ export async function queryFactorDB(
   } finally {
     clearTimeout(timeout)
   }
-}
-
-export function formatFactorDBResult(result: FactorDBResult): string {
-  const lines: string[] = []
-  lines.push(`FactorDB Status: ${result.status}`)
-
-  if (result.status === "FF" && result.factors) {
-    lines.push("Fully factored!")
-    for (const [factor, exp] of result.factors) {
-      lines.push(exp > 1 ? `  ${factor}^${exp}` : `  ${factor}`)
-    }
-    if (result.factors.length === 2) {
-      const p = powWithBound(result.factors[0][0], result.factors[0][1])
-      const q = powWithBound(result.factors[1][0], result.factors[1][1])
-      lines.push(`p = ${p}`)
-      lines.push(`q = ${q}`)
-    }
-  } else if (result.status === "CF" && result.factors) {
-    lines.push("Partially factored:")
-    for (const [factor, exp] of result.factors) {
-      lines.push(exp > 1 ? `  ${factor}^${exp}` : `  ${factor}`)
-    }
-  } else {
-    lines.push("No factors found")
-  }
-
-  return lines.join("\n")
 }
 
 /**

@@ -25,7 +25,9 @@ interface QueuedTask {
 export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
   const workersRef = useRef<Worker[]>([]);
   const busyRef = useRef<boolean[]>([]);
-  const pendingRef = useRef<Map<number, PendingTask>>(new Map());
+  const pendingRef = useRef<Map<number, PendingTask> | null>(null);
+  if (pendingRef.current === null) pendingRef.current = new Map();
+  const pending = pendingRef.current;
   const queueRef = useRef<QueuedTask[]>([]);
   const idCounterRef = useRef(0);
   const fallbackRef = useRef(false);
@@ -63,18 +65,18 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
           const data = e.data as { type: 'progress'; id: number; pct: number; detail?: string } | { id: number; result: string | null; error?: string };
           if ('type' in data) {
             const { id, pct, detail } = data;
-            const pending = pendingRef.current.get(id);
-            if (pending?.onProgress) {
-              pending.onProgress(pct, detail);
+            const pt = pending.get(id);
+            if (pt?.onProgress) {
+              pt.onProgress(pct, detail);
             }
             return;
           }
           const { id, result, error } = data;
-          const pending = pendingRef.current.get(id);
-          if (pending) {
-            pendingRef.current.delete(id);
-            if (error) pending.reject(new Error(error));
-            else pending.resolve(result);
+          const pt = pending.get(id);
+          if (pt) {
+            pending.delete(id);
+            if (error) pt.reject(new Error(error));
+            else pt.resolve(result);
           }
           freeRef.current.push(i);
           busyRef.current[i] = false;
@@ -94,7 +96,6 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
       fallbackRef.current = true;
     }
 
-    const pending = pendingRef.current;
     const queue = queueRef.current;
     return () => {
       for (const w of workers) {
@@ -106,6 +107,7 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
       pending.clear();
       queue.length = 0;
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poolSize]);
 
   const runAttack = useCallback((
@@ -117,30 +119,30 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
       // Fallback: Workers unavailable → run on main thread via dynamic import
       if (fallbackRef.current || workersRef.current.length === 0) {
         const id = ++idCounterRef.current;
-        pendingRef.current.set(id, { resolve, reject, onProgress });
+        pending.set(id, { resolve, reject, onProgress });
         import('../attacks/index').then(({ attacks }) => {
           // Check if cancelled while import was loading
-          if (!pendingRef.current.has(id)) return;
+          if (!pending.has(id)) return;
           const attack = attacks.find(a => a.id === attackId);
           if (!attack?.frontendCheck) {
-            pendingRef.current.delete(id);
+            pending.delete(id);
             resolve(null);
             return;
           }
           attack.frontendCheck(vals, onProgress).then(result => {
-            if (pendingRef.current.has(id)) {
-              pendingRef.current.delete(id);
+            if (pending.has(id)) {
+              pending.delete(id);
               resolve(result);
             }
           }).catch(err => {
-            if (pendingRef.current.has(id)) {
-              pendingRef.current.delete(id);
+            if (pending.has(id)) {
+              pending.delete(id);
               reject(err instanceof Error ? err : new Error(String(err)));
             }
           });
         }).catch(err => {
-          if (pendingRef.current.has(id)) {
-            pendingRef.current.delete(id);
+          if (pending.has(id)) {
+            pending.delete(id);
             reject(err instanceof Error ? err : new Error(String(err)));
           }
         });
@@ -148,7 +150,7 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
       }
 
       const id = ++idCounterRef.current;
-      pendingRef.current.set(id, { resolve, reject, onProgress });
+      pending.set(id, { resolve, reject, onProgress });
 
       const freeIndex = freeRef.current.shift();
       if (freeIndex !== undefined) {
@@ -162,16 +164,17 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
         queueRef.current.push({ id, attackId, vals });
       }
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const cancelCurrentRun = useCallback(() => {
-    const cancelledIds = Array.from(pendingRef.current.keys());
+    const cancelledIds = Array.from(pending.keys());
 
     // Resolve all pending with null — caller will discard cancelled results
-    for (const [, pending] of pendingRef.current) {
-      pending.resolve(null);
+    for (const [, task] of pending) {
+      task.resolve(null);
     }
-    pendingRef.current.clear();
+    pending.clear();
 
     // Clear the queue so no queued tasks start
     queueRef.current = [];
@@ -181,6 +184,7 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
     for (const worker of workersRef.current) {
       worker.postMessage({ type: 'cancel', ids: cancelledIds });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { runAttack, cancelCurrentRun };

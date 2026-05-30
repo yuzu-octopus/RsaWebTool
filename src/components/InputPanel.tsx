@@ -35,28 +35,29 @@ function dedent(str: string): string {
   return lines.map(line => line.slice(minIndent)).join('\n');
 }
 
+type ProgressAction =
+  | { type: 'START' }
+  | { type: 'PROGRESS'; pct: number; detail?: string }
+  | { type: 'DONE' }
+  | { type: 'ERROR' };
+type ProgressState = { loading: boolean; pct: number; detail: string };
+const initialProgress: ProgressState = { loading: false, pct: 0, detail: '' };
+function progressReducer(state: ProgressState, action: ProgressAction): ProgressState {
+  switch (action.type) {
+    case 'START': return { loading: true, pct: 0, detail: '' };
+    case 'PROGRESS': return { ...state, pct: action.pct, detail: action.detail ?? state.detail };
+    case 'DONE': return { loading: false, pct: 100, detail: '' };
+    case 'ERROR': return { loading: false, pct: 0, detail: '' };
+    default: return state;
+  }
+}
+
 export function InputPanel() {
   const { selectedAttack, viewMode, setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification } = useAppContext();
   const { execute } = useSageMath();
   const [tab, setTab] = useState(0);
   const [sourceMode, setSourceMode] = useState<'sage' | 'frontend'>('sage');
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
-  type ProgressAction =
-    | { type: 'START' }
-    | { type: 'PROGRESS'; pct: number; detail?: string }
-    | { type: 'DONE' }
-    | { type: 'ERROR' };
-  type ProgressState = { loading: boolean; pct: number; detail: string };
-  const initialProgress: ProgressState = { loading: false, pct: 0, detail: '' };
-  function progressReducer(state: ProgressState, action: ProgressAction): ProgressState {
-    switch (action.type) {
-      case 'START': return { loading: true, pct: 0, detail: '' };
-      case 'PROGRESS': return { ...state, pct: action.pct, detail: action.detail ?? state.detail };
-      case 'DONE': return { loading: false, pct: 100, detail: '' };
-      case 'ERROR': return { loading: false, pct: 0, detail: '' };
-      default: return state;
-    }
-  }
   const [progressState, dispatchProgress] = useReducer(progressReducer, initialProgress);
   const loading = progressState.loading;
   const progress = progressState.pct;

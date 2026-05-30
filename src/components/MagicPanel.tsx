@@ -267,32 +267,32 @@ const ErrorInsightBox = memo(function ErrorInsightBox({ insights }: { insights: 
   );
 });
 
+type ExecutionAction =
+  | { type: 'START_EXECUTION' }
+  | { type: 'SET_EARLY_STOP' }
+  | { type: 'SET_ERROR_INSIGHTS'; insights: string | null }
+  | { type: 'FINISH' };
+type ExecutionState = {
+  running: boolean;
+  earlyStop: boolean;
+  errorInsights: string | null;
+};
+const initialExecState: ExecutionState = { running: false, earlyStop: false, errorInsights: null };
+function execReducer(state: ExecutionState, action: ExecutionAction): ExecutionState {
+  switch (action.type) {
+    case 'START_EXECUTION': return { ...initialExecState, running: true };
+    case 'SET_EARLY_STOP': return { ...state, earlyStop: true };
+    case 'SET_ERROR_INSIGHTS': return { ...state, errorInsights: action.insights };
+    case 'FINISH': return { ...state, running: false };
+    default: return state;
+  }
+}
+
 export function MagicPanel() {
   const { viewMode, setOutputResult, setOutputError, addToHistory, showNotification } = useAppContext();
   const { executeAll, createController } = useSageMathParallel();
   const [rawInput, setRawInput] = useState('');
   const [jobs, setJobs] = useState<MagicJob[]>([]);
-
-  type ExecutionAction =
-    | { type: 'START_EXECUTION' }
-    | { type: 'SET_EARLY_STOP' }
-    | { type: 'SET_ERROR_INSIGHTS'; insights: string | null }
-    | { type: 'FINISH' };
-  type ExecutionState = {
-    running: boolean;
-    earlyStop: boolean;
-    errorInsights: string | null;
-  };
-  const initialExecState: ExecutionState = { running: false, earlyStop: false, errorInsights: null };
-  function execReducer(state: ExecutionState, action: ExecutionAction): ExecutionState {
-    switch (action.type) {
-      case 'START_EXECUTION': return { ...initialExecState, running: true };
-      case 'SET_EARLY_STOP': return { ...state, earlyStop: true };
-      case 'SET_ERROR_INSIGHTS': return { ...state, errorInsights: action.insights };
-      case 'FINISH': return { ...state, running: false };
-      default: return state;
-    }
-  }
   const [execState, dispatchExec] = useReducer(execReducer, initialExecState);
   const { running, earlyStop, errorInsights } = execState;
 
@@ -492,7 +492,10 @@ export function MagicPanel() {
       return;
     }
 
-    const codes = remaining.map(r => r.attack.sageTemplate?.(params) ?? '').filter(Boolean);
+    const codes = remaining.flatMap(r => {
+      const code = r.attack.sageTemplate?.(params);
+      return code ? [code] : [];
+    });
 
     try {
       if (currentRunId !== runIdRef.current) return;
