@@ -9,11 +9,15 @@ import { MagicPanel } from './components/MagicPanel';
 import { ProofIndex } from './components/ProofIndex';
 import { RsaCalculator } from './components/RsaCalculator';
 import { FormatConverter } from './components/FormatConverter';
+import { InstructionsPanel } from './components/InstructionsPanel';
+import { PemDecryptor } from './components/PemDecryptor';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { CommandPalette } from './components/CommandPalette';
 import { flexPanelSx, FONT_FAMILY } from './styles/shared';
 import { setFactorDBProxy } from './utils/factordb';
 import { FACTORDB_PROXY_URL } from './config';
 import { useAppContext } from './hooks/useAppContext';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 
 const severityBorder: Record<string, string> = {
   success: draculaColors.green,
@@ -31,8 +35,11 @@ function AppContent() {
     }
   }, []);
 
+  useKeyboardShortcuts();
+
   return (
     <>
+      <CommandPalette />
       <Box sx={{ display: 'flex', height: '100vh' }}>
         <Sidebar />
         <Box sx={flexPanelSx}>
@@ -43,6 +50,8 @@ function AppContent() {
               <ProofIndex />
               <RsaCalculator />
               <FormatConverter />
+              <InstructionsPanel />
+              <PemDecryptor />
             </Box>
           </ErrorBoundary>
           <OutputPanel />

@@ -43,8 +43,8 @@ export interface NotificationState {
 export interface AppContextType {
   selectedAttack: Attack | null;
   setSelectedAttack: (attack: Attack | null) => void;
-  viewMode: 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter';
-  setViewMode: (mode: 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter') => void;
+  viewMode: 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter' | 'instructions' | 'pem';
+  setViewMode: (mode: 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter' | 'instructions' | 'pem') => void;
   outputResult: string | null;
   setOutputResult: (result: string | null) => void;
   outputError: string | null;
@@ -55,4 +55,6 @@ export interface AppContextType {
   addToHistory: (attackId: string, attackName: string, result: string, success: boolean) => void;
   notification: NotificationState | null;
   showNotification: (message: string, severity?: 'success' | 'error' | 'info') => void;
+  commandPaletteOpen: boolean;
+  setCommandPaletteOpen: (open: boolean) => void;
 }

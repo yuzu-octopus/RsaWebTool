@@ -10,7 +10,7 @@ import {
   Divider,
   Link,
 } from '@mui/material';
-import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, Calculate, SwapHoriz, CheckCircle, ErrorOutlined } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, Calculate, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { CATEGORIES, attacksByCategory } from '../attacks';
 import type { Attack } from '../types';
@@ -172,6 +172,20 @@ export function Sidebar() {
         <Divider sx={{ borderColor: draculaColors.comment, my: 1 }} />
 
         <ListItemButton
+          onClick={() => setViewMode('instructions')}
+          sx={{
+            mx: 1,
+            '&:hover': { backgroundColor: draculaColors.background },
+          }}
+        >
+          <MenuBook sx={{ color: draculaColors.foreground, mr: 1, fontSize: '1.1rem' }} />
+          <ListItemText
+            primary="Instructions"
+            slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.85rem' } } }}
+          />
+        </ListItemButton>
+
+        <ListItemButton
           onClick={() => setViewMode('magic')}
           sx={{
             mx: 1,
@@ -227,6 +241,21 @@ export function Sidebar() {
           <ListItemText
             primary="Converter"
             slotProps={{ primary: { sx: { color: draculaColors.orange, fontSize: '0.85rem' } } }}
+          />
+        </ListItemButton>
+
+        <ListItemButton
+          onClick={() => setViewMode('pem')}
+          sx={{
+            mx: 1,
+            mt: 0.5,
+            '&:hover': { backgroundColor: draculaColors.background },
+          }}
+        >
+          <VpnKey sx={{ color: draculaColors.yellow, mr: 1, fontSize: '1.1rem' }} />
+          <ListItemText
+            primary="PEM Decryptor"
+            slotProps={{ primary: { sx: { color: draculaColors.yellow, fontSize: '0.85rem' } } }}
           />
         </ListItemButton>
 

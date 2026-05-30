@@ -1,4 +1,5 @@
 import { useState, useReducer, useRef, useEffect } from 'react';
+import { keyframes } from '@mui/material/styles';
 import {
   Box,
   Typography,
@@ -6,11 +7,10 @@ import {
   Button,
   Tabs,
   Tab,
-  CircularProgress,
   LinearProgress,
   Divider,
 } from '@mui/material';
-import { Stop, Casino, ContentCopy } from '@mui/icons-material';
+import { Stop, Casino, ContentCopy, HourglassEmpty } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useSageMath, DEFAULT_SAGE_TIMEOUT } from '../hooks/useSageMath';
@@ -40,6 +40,14 @@ function progressReducer(state: ProgressState, action: ProgressAction): Progress
     default: return state;
   }
 }
+
+const hourglassSpin = keyframes`
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(180deg); }
+  50% { transform: rotate(180deg); }
+  75% { transform: rotate(360deg); }
+  100% { transform: rotate(360deg); }
+`;
 
 export function InputPanel() {
   const { selectedAttack, viewMode, setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification } = useAppContext();
@@ -360,9 +368,32 @@ export function InputPanel() {
                 sx={colorGhostBtn(draculaColors.cyan)}
                 startIcon={<Casino sx={{ fontSize: '1rem' }} />}
               >
-                Generate Testcase
+                Generate
               </Button>
+              {!loading && (
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  onClick={() => { void handleRun(); }}
+                  data-testid="run-attack"
+                  sx={colorGhostBtn(draculaColors.purple)}
+                >
+                  Run
+                </Button>
+              )}
             </Box>
+
+            {loading && (
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={handleStop}
+                sx={colorGhostBtn(draculaColors.red)}
+                startIcon={<Stop />}
+              >
+                Stop
+              </Button>
+            )}
 
             {testcaseMsg && (
               <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, mb: 2, textAlign: 'center' }}>
@@ -370,48 +401,29 @@ export function InputPanel() {
               </Typography>
             )}
 
-            {loading ? (
-              <>
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  onClick={handleStop}
-                  sx={colorGhostBtn(draculaColors.red)}
-                >
-                  <Stop sx={{ mr: 1 }} /> Stop
-                </Button>
-                <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 2, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                  <CircularProgress size={16} data-testid="loading-spinner" sx={{ color: draculaColors.orange }} />
-                    Running… {timer.formatted}
+            {loading && (
+              <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 2, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                <HourglassEmpty data-testid="loading-spinner" sx={{ color: draculaColors.orange, fontSize: '1rem', animation: `${hourglassSpin} 3s ease-in-out infinite` }} />
+                  Running… {timer.formatted}
+              </Typography>
+            )}
+
+            {progress > 0 && (
+              <Box sx={{ mt: 1.5, width: '100%', maxWidth: 300, mx: 'auto' }}>
+                <LinearProgress
+                  variant="determinate"
+                  value={progress}
+                  sx={{
+                    height: 6,
+                    borderRadius: 3,
+                    bgcolor: draculaColors.currentLine,
+                    '& .MuiLinearProgress-bar': { bgcolor: draculaColors.cyan, borderRadius: 3 },
+                  }}
+                />
+                <Typography variant="caption" sx={{ color: draculaColors.comment, mt: 0.5, textAlign: 'center', display: 'block' }}>
+                  {progress}%{progressDetail ? ` — ${progressDetail}` : ''}
                 </Typography>
-                {progress > 0 && (
-                  <Box sx={{ mt: 1.5, width: '100%', maxWidth: 300, mx: 'auto' }}>
-                    <LinearProgress
-                      variant="determinate"
-                      value={progress}
-                      sx={{
-                        height: 6,
-                        borderRadius: 3,
-                        bgcolor: draculaColors.currentLine,
-                        '& .MuiLinearProgress-bar': { bgcolor: draculaColors.cyan, borderRadius: 3 },
-                      }}
-                    />
-                    <Typography variant="caption" sx={{ color: draculaColors.comment, mt: 0.5, textAlign: 'center', display: 'block' }}>
-                      {progress}%{progressDetail ? ` — ${progressDetail}` : ''}
-                    </Typography>
-                  </Box>
-                )}
-              </>
-            ) : (
-              <Button
-                fullWidth
-                variant="outlined"
-                onClick={() => { void handleRun(); }}
-                data-testid="run-attack"
-                sx={colorGhostBtn(draculaColors.purple)}
-              >
-                Run
-              </Button>
+              </Box>
             )}
           </Box>
         </Box>
