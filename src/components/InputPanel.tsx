@@ -6,11 +6,13 @@ import {
   Button,
   Tabs,
   Tab,
+  ToggleButton,
+  ToggleButtonGroup,
   CircularProgress,
   LinearProgress,
   Divider,
 } from '@mui/material';
-import { Stop, Casino } from '@mui/icons-material';
+import { Stop, Casino, ContentCopy } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useSageMath, DEFAULT_SAGE_TIMEOUT } from '../hooks/useSageMath';
@@ -21,11 +23,14 @@ import { isActualSuccess } from '../utils/sageOutput';
 import { inputSx } from '../styles/inputSx';
 import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn } from '../styles/shared';
 import { useTimer } from '../hooks/useTimer';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { dracula as draculaStyle } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 export function InputPanel() {
   const { selectedAttack, viewMode, setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification } = useAppContext();
   const { execute } = useSageMath();
   const [tab, setTab] = useState(0);
+  const [sourceMode, setSourceMode] = useState<'sage' | 'frontend'>('sage');
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
   type ProgressAction =
     | { type: 'START' }
@@ -81,6 +86,18 @@ export function InputPanel() {
       </Box>
     );
   }
+
+  const hasBoth = !!(selectedAttack.frontendCheck);
+  const pythonCode = selectedAttack.sageTemplate(
+    Object.fromEntries(selectedAttack.inputs.map(f => [f.name, f.name]))
+  );
+  const frontendCode = selectedAttack.frontendCheck
+    ? selectedAttack.frontendCheck.toString()
+    : '';
+  const handleCopySource = () => {
+    const code = sourceMode === 'sage' ? pythonCode : frontendCode;
+    void navigator.clipboard.writeText(code);
+  };
 
   const handleInputChange = (name: string, value: string) => {
     setInputValues(prev => ({ ...prev, [name]: value }));
@@ -223,6 +240,7 @@ export function InputPanel() {
       >
         <Tab label="Explanation" />
         <Tab label="Input" data-testid="input-tab" />
+        <Tab label="Source" data-testid="source-tab" />
       </Tabs>
 
       {/* Explanation tab - left aligned */}
@@ -350,6 +368,86 @@ export function InputPanel() {
                 Run
               </Button>
             )}
+          </Box>
+        </Box>
+      )}
+
+      {/* Source tab */}
+      {tab === 2 && (
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+          {hasBoth && (
+            <ToggleButtonGroup
+              value={sourceMode}
+              exclusive
+              onChange={(_, v) => { if (v !== null) setSourceMode(v as 'sage' | 'frontend'); }}
+              sx={{ mb: 2 }}
+            >
+              <ToggleButton value="sage" sx={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '0.75rem',
+                textTransform: 'none',
+                color: draculaColors.comment,
+                borderColor: draculaColors.comment,
+                '&.Mui-selected': {
+                  color: draculaColors.purple,
+                  backgroundColor: draculaColors.currentLine,
+                  '&:hover': { backgroundColor: draculaColors.currentLine },
+                },
+              }}>
+                SageMath
+              </ToggleButton>
+              <ToggleButton value="frontend" sx={{
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '0.75rem',
+                textTransform: 'none',
+                color: draculaColors.comment,
+                borderColor: draculaColors.comment,
+                '&.Mui-selected': {
+                  color: draculaColors.purple,
+                  backgroundColor: draculaColors.currentLine,
+                  '&:hover': { backgroundColor: draculaColors.currentLine },
+                },
+              }}>
+                Frontend
+              </ToggleButton>
+            </ToggleButtonGroup>
+          )}
+
+          <Box sx={{
+            borderRadius: 1,
+            border: `1px solid ${draculaColors.comment}`,
+            overflow: 'hidden',
+          }}>
+            <SyntaxHighlighter
+              language={sourceMode === 'sage' ? 'python' : 'typescript'}
+              style={draculaStyle}
+              customStyle={{
+                margin: 0,
+                borderRadius: 'inherit',
+                fontSize: '0.8rem',
+                maxHeight: '50vh',
+              }}
+            >
+              {sourceMode === 'sage' ? pythonCode : frontendCode}
+            </SyntaxHighlighter>
+          </Box>
+
+          <Box sx={{ mt: 1.5 }}>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={handleCopySource}
+              sx={{
+                color: draculaColors.comment,
+                borderColor: draculaColors.comment,
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: '0.7rem',
+                '&:hover': { borderColor: draculaColors.purple, color: draculaColors.purple },
+              }}
+              startIcon={<ContentCopy sx={{ fontSize: '0.85rem' }} />}
+            >
+              Copy
+            </Button>
           </Box>
         </Box>
       )}
