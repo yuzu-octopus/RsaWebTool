@@ -22,7 +22,19 @@ import { inputSx } from '../styles/inputSx';
 import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn } from '../styles/shared';
 import { useTimer } from '../hooks/useTimer';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { dracula as draculaStyle } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { dracula as draculaStyle } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+/** Strip common leading whitespace from each line (for dedenting .toString() output) */
+function dedent(str: string): string {
+  const lines = str.split('\n');
+  const minIndent = lines.reduce((min, line) => {
+    if (line.trim().length === 0) return min;
+    const match = line.match(/^(\s*)/);
+    return Math.min(min, match ? match[1].length : 0);
+  }, Infinity);
+  if (minIndent === Infinity || minIndent === 0) return str;
+  return lines.map(line => line.slice(minIndent)).join('\n');
+}
 
 export function InputPanel() {
   const { selectedAttack, viewMode, setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification } = useAppContext();
@@ -96,7 +108,7 @@ export function InputPanel() {
     ? selectedAttack.sageTemplate!(Object.fromEntries(selectedAttack.inputs.map(f => [f.name, f.name])))
     : '';
   const frontendCode = hasFrontend
-    ? selectedAttack.frontendCheck!.toString()
+    ? dedent(selectedAttack.frontendCheck!.toString())
     : '';
   const handleCopySource = () => {
     const code = effectiveSourceMode === 'sage' ? pythonCode : frontendCode;
