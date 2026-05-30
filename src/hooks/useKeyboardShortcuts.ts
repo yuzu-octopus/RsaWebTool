@@ -1,14 +1,35 @@
 import { useEffect } from 'react';
 import { useAppContext } from './useAppContext';
 import { useCommandPalette } from './useCommandPalette';
+import { attacks } from '../attacks';
 
 export function useKeyboardShortcuts() {
-  const { setViewMode } = useAppContext();
+  const { selectedAttack, setSelectedAttack, setViewMode } = useAppContext();
   const { toggle } = useCommandPalette();
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
+
+      // Tab/Shift+Tab to switch attacks — only when not in a text input
+      if (e.key === 'Tab') {
+        const tag = document.activeElement?.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+        e.preventDefault();
+        const currentIdx = selectedAttack
+          ? attacks.findIndex(a => a.id === selectedAttack.id)
+          : -1;
+        let nextIdx: number;
+        if (e.shiftKey) {
+          nextIdx = currentIdx <= 0 ? attacks.length - 1 : currentIdx - 1;
+        } else {
+          nextIdx = currentIdx >= attacks.length - 1 ? 0 : currentIdx + 1;
+        }
+        setSelectedAttack(attacks[nextIdx]);
+        setViewMode('attack');
+        return;
+      }
+
       if (!mod) return;
 
       switch (e.key.toLowerCase()) {
@@ -45,5 +66,5 @@ export function useKeyboardShortcuts() {
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [setViewMode, toggle]);
+  }, [setViewMode, toggle, selectedAttack, setSelectedAttack]);
 }

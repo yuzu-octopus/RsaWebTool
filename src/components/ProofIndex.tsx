@@ -83,7 +83,7 @@ export function ProofIndex() {
       <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
           <Typography variant="h3" sx={{ color: draculaColors.purple, mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <MenuBook sx={{ fontSize: 'inherit' }} /> Proofs Index
+            <MenuBook sx={{ fontSize: 'inherit' }} /> Attack Index
           </Typography>
 
           <TextField
@@ -104,7 +104,7 @@ export function ProofIndex() {
 
       <Divider sx={{ borderColor: draculaColors.comment }} />
 
-      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center' }}>
+      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center', pb: '30vh' }}>
         <List sx={{ width: '100%', maxWidth: 640, px: 2 }}>
           {attackItems}
         </List>

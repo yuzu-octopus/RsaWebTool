@@ -382,45 +382,30 @@ export function InputPanel() {
               >
                 Generate
               </Button>
-              {!loading && (
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  onClick={() => { void handleRun(); }}
-                  data-testid="run-attack"
-                  sx={colorGhostBtn(draculaColors.purple)}
-                >
-                  Run
-                </Button>
-              )}
-            </Box>
-
-            {loading && (
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={handleStop}
-                sx={colorGhostBtn(draculaColors.red)}
-                startIcon={<Stop />}
+                onClick={loading ? handleStop : () => { void handleRun(); }}
+                data-testid={loading ? 'stop-attack' : 'run-attack'}
+                sx={colorGhostBtn(loading ? draculaColors.red : draculaColors.purple)}
+                startIcon={loading ? <Stop /> : undefined}
               >
-                Stop
+                {loading ? 'Stop' : 'Run'}
               </Button>
-            )}
+            </Box>
 
-            {testcaseMsg && (
+            {loading ? (
+              <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, mb: 2, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                <HourglassEmpty data-testid="loading-spinner" sx={{ color: draculaColors.orange, fontSize: '1rem', animation: `${hourglassSpin} 3s ease-in-out infinite` }} />
+                Running… {timer.formatted}
+              </Typography>
+            ) : testcaseMsg ? (
               <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, mb: 2, textAlign: 'center' }}>
                 {testcaseMsg}
               </Typography>
-            )}
+            ) : null}
 
-            {loading && (
-              <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 2, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                <HourglassEmpty data-testid="loading-spinner" sx={{ color: draculaColors.orange, fontSize: '1rem', animation: `${hourglassSpin} 3s ease-in-out infinite` }} />
-                  Running… {timer.formatted}
-              </Typography>
-            )}
-
-            {progress > 0 && (
+            {loading && progress > 0 && (
               <Box sx={{ mt: 1.5, width: '100%', maxWidth: 300, mx: 'auto' }}>
                 <LinearProgress
                   variant="determinate"

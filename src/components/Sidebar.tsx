@@ -209,7 +209,7 @@ export function Sidebar() {
         >
           <MenuBook sx={{ color: draculaColors.foreground, mr: 1, fontSize: '1.1rem' }} />
           <ListItemText
-            primary="Proofs Index"
+            primary="Attack Index"
             slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.85rem' } } }}
           />
         </ListItemButton>
