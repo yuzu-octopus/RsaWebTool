@@ -492,7 +492,7 @@ export function MagicPanel() {
       return;
     }
 
-    const codes = remaining.map(r => r.attack.sageTemplate(params));
+    const codes = remaining.map(r => r.attack.sageTemplate?.(params) ?? '').filter(Boolean);
 
     try {
       if (currentRunId !== runIdRef.current) return;

@@ -18,7 +18,7 @@ export interface Attack {
   description: string;
   category: AttackCategory;
   inputs: InputField[];
-  sageTemplate: (vals: Record<string, string>) => string;
+  sageTemplate?: (vals: Record<string, string>) => string;
   proof: string;
   usageGuide?: string;
   priority: 'high' | 'medium' | 'low';

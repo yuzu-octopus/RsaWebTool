@@ -85,14 +85,21 @@ export function InputPanel() {
     );
   }
 
-  const pythonCode = selectedAttack.sageTemplate(
-    Object.fromEntries(selectedAttack.inputs.map(f => [f.name, f.name]))
-  );
-  const frontendCode = selectedAttack.frontendCheck
-    ? selectedAttack.frontendCheck.toString()
+  // Auto-select source mode based on what's available
+  const hasSage = !!selectedAttack.sageTemplate;
+  const hasFrontend = !!selectedAttack.frontendCheck;
+  if (tab === 2 && sourceMode === 'sage' && !hasSage && hasFrontend) {
+    // Can't use setSourceMode here (render phase), so derive it inline
+  }
+  const effectiveSourceMode = !hasSage ? 'frontend' : !hasFrontend ? 'sage' : sourceMode;
+  const pythonCode = hasSage
+    ? selectedAttack.sageTemplate!(Object.fromEntries(selectedAttack.inputs.map(f => [f.name, f.name])))
+    : '';
+  const frontendCode = hasFrontend
+    ? selectedAttack.frontendCheck!.toString()
     : '';
   const handleCopySource = () => {
-    const code = sourceMode === 'sage' ? pythonCode : frontendCode;
+    const code = effectiveSourceMode === 'sage' ? pythonCode : frontendCode;
     void navigator.clipboard.writeText(code);
   };
 
@@ -177,7 +184,12 @@ export function InputPanel() {
         }
       }
 
-      const code = selectedAttack.sageTemplate(vals);
+      const code = selectedAttack.sageTemplate?.(vals);
+      if (!code) {
+        if (!mountedRef.current) return;
+        setOutputError('No SageMath template available for this attack');
+        return;
+      }
       if (attackIdRef.current !== currentAttackId) return;
       const result = await execute(code, DEFAULT_SAGE_TIMEOUT, controller.signal);
       if (result.success) {
@@ -373,27 +385,29 @@ export function InputPanel() {
       {tab === 2 && (
         <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
     <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-      <Button
-        size="small"
-        variant="outlined"
-        onClick={() => setSourceMode('sage')}
-        sx={{
-          fontFamily: "'JetBrains Mono', monospace",
-          fontSize: '0.75rem',
-          textTransform: 'none',
-          color: sourceMode === 'sage' ? draculaColors.purple : draculaColors.comment,
-          borderColor: sourceMode === 'sage' ? draculaColors.purple : draculaColors.comment,
-          backgroundColor: sourceMode === 'sage' ? draculaColors.currentLine : 'transparent',
-          '&:hover': {
-            borderColor: draculaColors.purple,
-            color: draculaColors.purple,
-            backgroundColor: draculaColors.currentLine,
-          },
-        }}
-      >
-        SageMath (Python)
-      </Button>
-      {selectedAttack.frontendCheck && (
+      {hasSage && (
+        <Button
+          size="small"
+          variant="outlined"
+          onClick={() => setSourceMode('sage')}
+          sx={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '0.75rem',
+            textTransform: 'none',
+            color: effectiveSourceMode === 'sage' ? draculaColors.purple : draculaColors.comment,
+            borderColor: effectiveSourceMode === 'sage' ? draculaColors.purple : draculaColors.comment,
+            backgroundColor: effectiveSourceMode === 'sage' ? draculaColors.currentLine : 'transparent',
+            '&:hover': {
+              borderColor: draculaColors.purple,
+              color: draculaColors.purple,
+              backgroundColor: draculaColors.currentLine,
+            },
+          }}
+        >
+          SageMath (Python)
+        </Button>
+      )}
+      {hasFrontend && (
         <Button
           size="small"
           variant="outlined"
@@ -402,9 +416,9 @@ export function InputPanel() {
             fontFamily: "'JetBrains Mono', monospace",
             fontSize: '0.75rem',
             textTransform: 'none',
-            color: sourceMode === 'frontend' ? draculaColors.purple : draculaColors.comment,
-            borderColor: sourceMode === 'frontend' ? draculaColors.purple : draculaColors.comment,
-            backgroundColor: sourceMode === 'frontend' ? draculaColors.currentLine : 'transparent',
+            color: effectiveSourceMode === 'frontend' ? draculaColors.purple : draculaColors.comment,
+            borderColor: effectiveSourceMode === 'frontend' ? draculaColors.purple : draculaColors.comment,
+            backgroundColor: effectiveSourceMode === 'frontend' ? draculaColors.currentLine : 'transparent',
             '&:hover': {
               borderColor: draculaColors.purple,
               color: draculaColors.purple,
@@ -422,7 +436,7 @@ export function InputPanel() {
             overflow: 'hidden',
           }}>
             <SyntaxHighlighter
-              language={sourceMode === 'sage' ? 'python' : 'typescript'}
+              language={effectiveSourceMode === 'sage' ? 'python' : 'typescript'}
               style={draculaStyle}
               customStyle={{
                 margin: 0,
@@ -431,7 +445,7 @@ export function InputPanel() {
                 maxHeight: '50vh',
               }}
             >
-              {sourceMode === 'sage' ? pythonCode : frontendCode}
+              {effectiveSourceMode === 'sage' ? pythonCode : frontendCode}
             </SyntaxHighlighter>
           </Box>
 
