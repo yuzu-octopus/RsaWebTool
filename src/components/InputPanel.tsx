@@ -274,6 +274,7 @@ export function InputPanel() {
       }
       if (attackIdRef.current !== currentAttackId) return;
       const result = await execute(code, DEFAULT_SAGE_TIMEOUT, controller.signal);
+      if (attackIdRef.current !== currentAttackId) return;
       if (result.success) {
         let displayStdout = result.stdout;
         const decryptedSage = autoDecrypt(selectedAttack, vals, result.stdout);
