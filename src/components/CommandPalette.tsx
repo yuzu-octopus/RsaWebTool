@@ -185,10 +185,11 @@ export function CommandPalette() {
                 color: draculaColors.foreground,
                 fontSize: '1rem',
                 fontFamily: "'JetBrains Mono', monospace",
-                bgcolor: draculaColors.currentLine,
+                bgcolor: '#282a36',
                 borderRadius: '8px',
                 px: 1.5,
                 py: 0.75,
+                border: `1px solid ${draculaColors.currentLine}`,
               },
             },
           }}
