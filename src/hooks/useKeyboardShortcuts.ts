@@ -1,10 +1,13 @@
 import { useEffect } from 'react';
 import { useAppContext } from './useAppContext';
 import { useCommandPalette } from './useCommandPalette';
-import { attacks } from '../attacks';
+import { attacks, CATEGORIES, attacksByCategory } from '../attacks';
 
+// Match sidebar rendering order: attacks grouped by category, then modules
 const ALL_SIDEBAR_ITEMS = [
-  ...attacks.map(a => ({ type: 'attack' as const, id: a.id })),
+  ...CATEGORIES.flatMap(cat =>
+    (attacksByCategory.get(cat) ?? []).map(a => ({ type: 'attack' as const, id: a.id })),
+  ),
   { type: 'module' as const, id: 'instructions', mode: 'instructions' as const },
   { type: 'module' as const, id: 'magic', mode: 'magic' as const },
   { type: 'module' as const, id: 'proofs', mode: 'proofs' as const },
