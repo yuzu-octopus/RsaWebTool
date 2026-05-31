@@ -111,13 +111,16 @@ export function Sidebar() {
   const isAttackActive = (id: string) => viewMode === 'attack' && selectedAttack?.id === id;
   const isViewActive = (mode: string) => viewMode === mode;
 
-  // Scroll sidebar to selected attack when selectedAttack changes
+  // Scroll sidebar to center the active item
   useEffect(() => {
-    if (selectedAttack && viewMode === 'attack') {
-      const el = document.getElementById(`sidebar-attack-${selectedAttack.id}`);
-      if (el) {
-        el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      }
+    let el: HTMLElement | null = null;
+    if (viewMode === 'attack' && selectedAttack) {
+      el = document.getElementById(`sidebar-attack-${selectedAttack.id}`);
+    } else if (viewMode !== 'attack') {
+      el = document.getElementById(`sidebar-view-${viewMode}`);
+    }
+    if (el) {
+      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
   }, [selectedAttack, viewMode]);
 
@@ -186,6 +189,7 @@ export function Sidebar() {
         <Divider sx={{ borderColor: draculaColors.comment, my: 1 }} />
 
         <ListItemButton
+          id="sidebar-view-instructions"
           onClick={() => setViewMode('instructions')}
           sx={{
             pl: 4,
@@ -202,6 +206,7 @@ export function Sidebar() {
         </ListItemButton>
 
         <ListItemButton
+          id="sidebar-view-magic"
           onClick={() => setViewMode('magic')}
           sx={{
             pl: 4,
@@ -218,6 +223,7 @@ export function Sidebar() {
         </ListItemButton>
 
         <ListItemButton
+          id="sidebar-view-proofs"
           onClick={() => setViewMode('proofs')}
           sx={{
             pl: 4,
@@ -235,6 +241,7 @@ export function Sidebar() {
         </ListItemButton>
 
         <ListItemButton
+          id="sidebar-view-calculator"
           onClick={() => setViewMode('calculator')}
           sx={{
             pl: 4,
@@ -252,6 +259,7 @@ export function Sidebar() {
         </ListItemButton>
 
         <ListItemButton
+          id="sidebar-view-format-converter"
           onClick={() => setViewMode('format-converter')}
           sx={{
             pl: 4,
@@ -269,6 +277,7 @@ export function Sidebar() {
         </ListItemButton>
 
         <ListItemButton
+          id="sidebar-view-pem"
           onClick={() => setViewMode('pem')}
           sx={{
             pl: 4,

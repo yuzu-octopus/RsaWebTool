@@ -9,18 +9,21 @@ import AutoFixHigh from '@mui/icons-material/AutoFixHigh';
 import Calculate from '@mui/icons-material/Calculate';
 import SwapHoriz from '@mui/icons-material/SwapHoriz';
 import HourglassEmpty from '@mui/icons-material/HourglassEmpty';
+import VpnKey from '@mui/icons-material/VpnKey';
 import { useAppContext } from '../hooks/useAppContext';
 import { attacks } from '../attacks';
+import { SIDEBAR_MODULES, ALL_SIDEBAR_ITEMS } from '../config/sidebarItems';
 import { draculaColors } from '../theme/dracula';
 import type { Attack, AttackCategory } from '../types';
 
-const VIEWS = [
-  { label: 'Instructions', icon: MenuBook, mode: 'instructions' as const },
-  { label: 'Magic Panel', icon: AutoFixHigh, mode: 'magic' as const },
-  { label: 'RSA Calculator', icon: Calculate, mode: 'calculator' as const },
-  { label: 'Format Converter', icon: SwapHoriz, mode: 'format-converter' as const },
-  { label: 'Proof Index', icon: MenuBook, mode: 'proofs' as const },
-];
+const MODULE_ICONS: Record<string, React.ElementType> = {
+  instructions: MenuBook,
+  magic: AutoFixHigh,
+  proofs: MenuBook,
+  calculator: Calculate,
+  'format-converter': SwapHoriz,
+  pem: VpnKey,
+};
 
 const CATEGORY_COLORS: Record<AttackCategory, string> = {
   Factorization: draculaColors.green,
@@ -50,48 +53,45 @@ export function CommandPalette() {
     }
   }, [commandPaletteOpen]);
 
-  const filteredAttacks = useMemo(() => {
-    if (!query.trim()) return attacks;
-    const q = query.toLowerCase().trim();
-    return attacks
-      .filter(a =>
-        a.name.toLowerCase().includes(q) ||
-        a.category.toLowerCase().includes(q) ||
-        a.id.toLowerCase().includes(q),
-      )
-      .sort((a, b) => {
-        const aStarts = a.name.toLowerCase().startsWith(q) ? 1 : 0;
-        const bStarts = b.name.toLowerCase().startsWith(q) ? 1 : 0;
-        return bStarts - aStarts;
-      });
-  }, [query]);
-
   // Combine views and attacks into a single list, views at the bottom
   const allItems = useMemo(() => {
     const items: Array<
-      | { type: 'view'; view: typeof VIEWS[number]; index: number }
+      | { type: 'view'; module: typeof SIDEBAR_MODULES[number]; index: number }
       | { type: 'attack'; attack: Attack; index: number }
     > = [];
     let idx = 0;
 
-    // Attacks first
-    for (const attack of filteredAttacks) {
-      items.push({ type: 'attack', attack, index: idx++ });
-    }
-    // Views at the bottom
-    for (const view of VIEWS) {
-      items.push({ type: 'view', view, index: idx++ });
+    // Filter attacks by query using shared sidebar ordering
+    const filteredSidebarItems = ALL_SIDEBAR_ITEMS.filter(item => {
+      if (item.type !== 'attack') return true;
+      const attack = attacks.find(a => a.id === item.id);
+      if (!attack) return false;
+      if (!query.trim()) return true;
+      const q = query.toLowerCase().trim();
+      return attack.name.toLowerCase().includes(q) ||
+        attack.category.toLowerCase().includes(q) ||
+        attack.id.toLowerCase().includes(q);
+    });
+
+    for (const item of filteredSidebarItems) {
+      if (item.type === 'attack') {
+        const attack = attacks.find(a => a.id === item.id);
+        if (attack) items.push({ type: 'attack', attack, index: idx++ });
+      } else {
+        const mod = SIDEBAR_MODULES.find(m => m.id === item.id);
+        if (mod) items.push({ type: 'view', module: mod, index: idx++ });
+      }
     }
     return items;
-  }, [filteredAttacks]);
+  }, [query]);
 
   const close = useCallback(() => {
     setCommandPaletteOpen(false);
   }, [setCommandPaletteOpen]);
 
   const selectView = useCallback(
-    (mode: 'instructions' | 'magic' | 'calculator' | 'format-converter' | 'proofs') => {
-      setViewMode(mode);
+    (mode: string) => {
+      (setViewMode as (mode: string) => void)(mode);
       close();
     },
     [setViewMode, close],
@@ -123,7 +123,7 @@ export function CommandPalette() {
           e.preventDefault();
           if (selectedIndex < allItems.length) {
             const item = allItems[selectedIndex];
-            if (item.type === 'view') selectView(item.view.mode);
+            if (item.type === 'view') selectView(item.module.mode);
             else selectAttack(item.attack);
           }
           break;
@@ -200,12 +200,12 @@ export function CommandPalette() {
           {allItems.map((item) => {
             const isSelected = item.index === selectedIndex;
             if (item.type === 'view') {
-              const Icon = item.view.icon;
+              const Icon = MODULE_ICONS[item.module.mode] ?? MenuBook;
               return (
                 <ListItemButton
-                  key={`view-${item.view.label}`}
+                  key={`view-${item.module.id}`}
                   selected={isSelected}
-                  onClick={() => selectView(item.view.mode)}
+                  onClick={() => selectView(item.module.mode)}
                   onMouseEnter={() => setSelectedIndex(item.index)}
                   sx={{
                     px: 2,
@@ -217,7 +217,7 @@ export function CommandPalette() {
                 >
                   <Icon sx={{ color: draculaColors.comment, mr: 1.5, fontSize: 20 }} />
                   <ListItemText
-                    primary={item.view.label}
+                    primary={item.module.label}
                     slotProps={{
                       primary: {
                         sx: {

@@ -1,20 +1,8 @@
 import { useEffect } from 'react';
 import { useAppContext } from './useAppContext';
 import { useCommandPalette } from './useCommandPalette';
-import { attacks, CATEGORIES, attacksByCategory } from '../attacks';
-
-// Match sidebar rendering order: attacks grouped by category, then modules
-const ALL_SIDEBAR_ITEMS = [
-  ...CATEGORIES.flatMap(cat =>
-    (attacksByCategory.get(cat) ?? []).map(a => ({ type: 'attack' as const, id: a.id })),
-  ),
-  { type: 'module' as const, id: 'instructions', mode: 'instructions' as const },
-  { type: 'module' as const, id: 'magic', mode: 'magic' as const },
-  { type: 'module' as const, id: 'proofs', mode: 'proofs' as const },
-  { type: 'module' as const, id: 'calculator', mode: 'calculator' as const },
-  { type: 'module' as const, id: 'format-converter', mode: 'format-converter' as const },
-  { type: 'module' as const, id: 'pem', mode: 'pem' as const },
-];
+import { attacks } from '../attacks';
+import { ALL_SIDEBAR_ITEMS } from '../config/sidebarItems';
 
 export function useKeyboardShortcuts() {
   const { selectedAttack, setSelectedAttack, setViewMode, viewMode } = useAppContext();
@@ -61,7 +49,7 @@ export function useKeyboardShortcuts() {
             setViewMode('attack');
           }
         } else {
-          setViewMode(nextItem.mode);
+          setViewMode(nextItem.mode as 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter' | 'instructions' | 'pem');
         }
         return;
       }
