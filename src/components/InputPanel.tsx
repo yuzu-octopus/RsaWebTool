@@ -60,6 +60,7 @@ export function InputPanel() {
   const loading = progressState.loading;
   const progress = progressState.pct;
   const progressDetail = progressState.detail;
+  const isRunning = loading && progress < 100;
   const abortControllerRef = useRef<AbortController | null>(null);
   const attackIdRef = useRef<string | null>(null);
   const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
@@ -416,16 +417,16 @@ export function InputPanel() {
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={loading ? handleStop : () => { void handleRun(); }}
-                data-testid={loading ? 'stop-attack' : 'run-attack'}
-                sx={colorGhostBtn(loading ? draculaColors.red : draculaColors.purple)}
-                startIcon={loading ? <Stop /> : undefined}
+                onClick={isRunning ? handleStop : () => { void handleRun(); }}
+                data-testid={isRunning ? 'stop-attack' : 'run-attack'}
+                sx={colorGhostBtn(isRunning ? draculaColors.red : draculaColors.purple)}
+                startIcon={isRunning ? <Stop /> : undefined}
               >
-                {loading ? 'Stop' : 'Run'}
+                {isRunning ? 'Stop' : 'Run'}
               </Button>
             </Box>
 
-            {loading && progress < 100 ? (
+            {isRunning ? (
               <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, mb: 2, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
                 <HourglassEmpty data-testid="loading-spinner" sx={{ color: draculaColors.orange, fontSize: '1rem', animation: `${hourglassSpin} 3s ease-in-out infinite` }} />
                 Running… {timer.formatted}
@@ -436,7 +437,7 @@ export function InputPanel() {
               </Typography>
             ) : null}
 
-            {loading && progress > 0 && progress < 100 && (
+            {isRunning && progress > 0 && (
               <Box sx={{ mt: 1.5, width: '100%', maxWidth: 300, mx: 'auto' }}>
                 <LinearProgress
                   variant="determinate"
