@@ -163,7 +163,7 @@ export function CommandPalette() {
         },
       }}
     >
-      <Box sx={{ p: 1.5, pb: 0 }}>
+      <Box sx={{ p: 1.5, pb: 0, bgcolor: '#282a36' }}>
         <TextField
           fullWidth
           autoFocus
@@ -185,7 +185,7 @@ export function CommandPalette() {
                 color: draculaColors.foreground,
                 fontSize: '1rem',
                 fontFamily: "'JetBrains Mono', monospace",
-                bgcolor: '#282a36',
+                bgcolor: draculaColors.currentLine,
                 borderRadius: '8px',
                 px: 1.5,
                 py: 0.75,
