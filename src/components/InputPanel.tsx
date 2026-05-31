@@ -299,10 +299,12 @@ export function InputPanel() {
       if (!mountedRef.current) return;
       addToHistory(selectedAttack.id, selectedAttack.name, message, false);
     } finally {
+      // ALWAYS reset loading state — button must revert to "Run" on every exit path
+      dispatchProgress({ type: 'DONE' });
+      setEta(null);
+      timer.stop();
+      // Only reset output state if this is still the current active run
       if (attackIdRef.current === currentAttackId && ownershipRef.current === 'input') {
-        timer.stop();
-        dispatchProgress({ type: 'DONE' });
-        setEta(null);
         abortControllerRef.current = null;
         ownershipRef.current = null;
         setOutputSource(null);
