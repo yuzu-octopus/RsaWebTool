@@ -241,6 +241,9 @@ export function InputPanel() {
           if (!mountedRef.current) return;
           if (ownershipRef.current !== 'input') return;
           setOutputResult(displayPreResult);
+          dispatchProgress({ type: 'DONE' });
+          setEta(null);
+          timer.stop();
           if (!mountedRef.current) return;
           addToHistory(selectedAttack.id, selectedAttack.name, preResult, isActualSuccess(preResult));
           const preSuccess = isActualSuccess(preResult);
@@ -271,6 +274,9 @@ export function InputPanel() {
         if (!mountedRef.current) return;
         if (ownershipRef.current !== 'input') return;
         setOutputResult(displayStdout);
+        dispatchProgress({ type: 'DONE' });
+        setEta(null);
+        timer.stop();
         if (!mountedRef.current) return;
         addToHistory(selectedAttack.id, selectedAttack.name, result.stdout, isActualSuccess(result.stdout));
         const runSuccess = isActualSuccess(result.stdout);
@@ -438,8 +444,8 @@ export function InputPanel() {
                   {progress}%{progressDetail ? ` — ${progressDetail}` : ''}
                 </Typography>
                 {eta && (
-                  <Typography variant="caption" sx={{ color: draculaColors.comment, textAlign: 'center', display: 'block' }}>
-                    ~{eta} remaining
+                  <Typography variant="caption" sx={{ color: draculaColors.orange, mt: 0.5, textAlign: 'center', display: 'block' }}>
+                    {eta} remaining
                   </Typography>
                 )}
               </Box>

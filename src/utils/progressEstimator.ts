@@ -68,16 +68,16 @@ function formatEta(remainingMs: number): string {
   }
 
   if (totalSeconds < 60) {
-    return `~${totalSeconds}s`;
+    return `${totalSeconds}s`;
   }
 
   if (totalSeconds < 3600) {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return `~${minutes}m ${seconds}s`;
+    return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
   }
 
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
-  return `~${hours}h ${minutes}m`;
+  return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
 }

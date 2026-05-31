@@ -66,8 +66,24 @@ export function CommandPalette() {
       });
   }, [query]);
 
-  const totalViews = VIEWS.length;
-  const totalItems = totalViews + filteredAttacks.length;
+  // Combine views and attacks into a single list, views at the bottom
+  const allItems = useMemo(() => {
+    const items: Array<
+      | { type: 'view'; view: typeof VIEWS[number]; index: number }
+      | { type: 'attack'; attack: Attack; index: number }
+    > = [];
+    let idx = 0;
+
+    // Attacks first
+    for (const attack of filteredAttacks) {
+      items.push({ type: 'attack', attack, index: idx++ });
+    }
+    // Views at the bottom
+    for (const view of VIEWS) {
+      items.push({ type: 'view', view, index: idx++ });
+    }
+    return items;
+  }, [filteredAttacks]);
 
   const close = useCallback(() => {
     setCommandPaletteOpen(false);
@@ -92,26 +108,23 @@ export function CommandPalette() {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (totalItems === 0) return;
+      if (allItems.length === 0) return;
 
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          setSelectedIndex(prev => (prev + 1) % totalItems);
+          setSelectedIndex(prev => (prev + 1) % allItems.length);
           break;
         case 'ArrowUp':
           e.preventDefault();
-          setSelectedIndex(prev => (prev - 1 + totalItems) % totalItems);
+          setSelectedIndex(prev => (prev - 1 + allItems.length) % allItems.length);
           break;
         case 'Enter':
           e.preventDefault();
-          if (selectedIndex < totalViews) {
-            selectView(VIEWS[selectedIndex].mode);
-          } else {
-            const attackIndex = selectedIndex - totalViews;
-            if (attackIndex < filteredAttacks.length) {
-              selectAttack(filteredAttacks[attackIndex]);
-            }
+          if (selectedIndex < allItems.length) {
+            const item = allItems[selectedIndex];
+            if (item.type === 'view') selectView(item.view.mode);
+            else selectAttack(item.attack);
           }
           break;
         case 'Escape':
@@ -120,7 +133,7 @@ export function CommandPalette() {
           break;
       }
     },
-    [totalItems, totalViews, filteredAttacks, selectedIndex, selectView, selectAttack, close],
+    [allItems, selectedIndex, selectView, selectAttack, close],
   );
 
   return (
@@ -137,7 +150,8 @@ export function CommandPalette() {
         },
         paper: {
           sx: {
-            bgcolor: draculaColors.background,
+            bgcolor: '#282a36',
+            color: draculaColors.foreground,
             width: 480,
             maxHeight: 400,
             borderRadius: '12px',
@@ -181,56 +195,52 @@ export function CommandPalette() {
       </Box>
       <DialogContent sx={{ p: 0, overflow: 'auto' }}>
         <List dense>
-          {VIEWS.map((view, i) => {
-            const Icon = view.icon;
-            const isSelected = i === selectedIndex;
-            return (
-              <ListItemButton
-                key={view.label}
-                selected={isSelected}
-                onClick={() => selectView(view.mode)}
-                onMouseEnter={() => setSelectedIndex(i)}
-                sx={{
-                  px: 2,
-                  py: 1,
-                  backgroundColor: isSelected ? draculaColors.currentLine : 'transparent',
-                  '&:hover': { backgroundColor: draculaColors.currentLine },
-                  borderLeft: `3px solid ${isSelected ? draculaColors.purple : 'transparent'}`,
-                }}
-              >
-                <Icon sx={{ color: draculaColors.comment, mr: 1.5, fontSize: 20 }} />
-                <ListItemText
-                  primary={view.label}
-                  slotProps={{
-                    primary: {
-                      sx: {
-                        color: draculaColors.foreground,
-                        fontFamily: "'JetBrains Mono', monospace",
-                        fontSize: '0.85rem',
-                      },
-                    },
-                  }}
-                />
-                <Chip
-                  label="View"
-                  size="small"
+          {allItems.map((item) => {
+            const isSelected = item.index === selectedIndex;
+            if (item.type === 'view') {
+              const Icon = item.view.icon;
+              return (
+                <ListItemButton
+                  key={`view-${item.view.label}`}
+                  selected={isSelected}
+                  onClick={() => selectView(item.view.mode)}
+                  onMouseEnter={() => setSelectedIndex(item.index)}
                   sx={{
-                    color: draculaColors.comment,
-                    fontSize: '0.65rem',
-                    height: 20,
-                    bgcolor: 'transparent',
-                    border: `1px solid ${draculaColors.comment}`,
+                    px: 2,
+                    py: 0.75,
+                    backgroundColor: isSelected ? draculaColors.currentLine : 'transparent',
+                    '&:hover': { backgroundColor: draculaColors.currentLine },
+                    borderLeft: `3px solid ${isSelected ? draculaColors.purple : 'transparent'}`,
                   }}
-                />
-              </ListItemButton>
-            );
-          })}
-        </List>
-        <Box sx={{ borderTop: `1px solid ${draculaColors.currentLine}`, mx: 2 }} />
-        <List dense>
-          {filteredAttacks.map((attack, i) => {
-            const listIndex = totalViews + i;
-            const isSelected = listIndex === selectedIndex;
+                >
+                  <Icon sx={{ color: draculaColors.comment, mr: 1.5, fontSize: 20 }} />
+                  <ListItemText
+                    primary={item.view.label}
+                    slotProps={{
+                      primary: {
+                        sx: {
+                          color: draculaColors.foreground,
+                          fontFamily: "'JetBrains Mono', monospace",
+                          fontSize: '0.8rem',
+                        },
+                      },
+                    }}
+                  />
+                  <Chip
+                    label="View"
+                    size="small"
+                    sx={{
+                      color: draculaColors.comment,
+                      fontSize: '0.6rem',
+                      height: 18,
+                      bgcolor: 'transparent',
+                      border: `1px solid ${draculaColors.comment}`,
+                    }}
+                  />
+                </ListItemButton>
+              );
+            }
+            const attack = item.attack;
             const categoryColor = CATEGORY_COLORS[attack.category];
             const hasFrontendCheck = !!attack.frontendCheck;
             return (
@@ -238,7 +248,7 @@ export function CommandPalette() {
                 key={attack.id}
                 selected={isSelected}
                 onClick={() => selectAttack(attack)}
-                onMouseEnter={() => setSelectedIndex(listIndex)}
+                onMouseEnter={() => setSelectedIndex(item.index)}
                 sx={{
                   px: 2,
                   py: 0.75,
@@ -268,7 +278,7 @@ export function CommandPalette() {
                     },
                   }}
                 />
-                <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                   <Chip
                     label={attack.category}
                     size="small"
@@ -295,7 +305,7 @@ export function CommandPalette() {
               </ListItemButton>
             );
           })}
-          {query.trim() && filteredAttacks.length === 0 && (
+          {query.trim() && allItems.length === 0 && (
             <Box sx={{ p: 3, textAlign: 'center' }}>
               <Typography
                 sx={{
@@ -304,7 +314,7 @@ export function CommandPalette() {
                   fontSize: '0.8rem',
                 }}
               >
-                No attacks match &quot;{query}&quot;
+                No matches for &quot;{query}&quot;
               </Typography>
             </Box>
           )}

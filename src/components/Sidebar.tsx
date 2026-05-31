@@ -111,6 +111,16 @@ export function Sidebar() {
   const isAttackActive = (id: string) => viewMode === 'attack' && selectedAttack?.id === id;
   const isViewActive = (mode: string) => viewMode === mode;
 
+  // Scroll sidebar to selected attack when selectedAttack changes
+  useEffect(() => {
+    if (selectedAttack && viewMode === 'attack') {
+      const el = document.getElementById(`sidebar-attack-${selectedAttack.id}`);
+      if (el) {
+        el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }
+  }, [selectedAttack, viewMode]);
+
   return (
     <Drawer
       variant="permanent"
@@ -152,6 +162,7 @@ export function Sidebar() {
                 {(attacksByCategory.get(cat) || []).map(attack => (
                   <ListItemButton
                     key={attack.id}
+                    id={`sidebar-attack-${attack.id}`}
                     onClick={() => handleAttackClick(attack)}
                     data-testid={`attack-${attack.id}`}
                     sx={{
