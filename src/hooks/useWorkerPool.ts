@@ -47,47 +47,50 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
     }
   };
 
-  useEffect(() => {
-    const workers = workersRef.current;
+  // Factory: creates a single worker with the proper onmessage/onerror handlers
+  const createWorker = (i: number): Worker => {
+    const worker = new Worker(
+      new URL('../workers/attack-worker.ts', import.meta.url),
+      { type: 'module' },
+    );
+    worker.onmessage = (e: MessageEvent) => {
+      const data = e.data as { type: 'progress'; id: number; pct: number; detail?: string } | { id: number; result: string | null; error?: string };
+      if ('type' in data) {
+        const { id, pct, detail } = data;
+        const pt = pending.get(id);
+        if (pt?.onProgress) {
+          pt.onProgress(pct, detail);
+        }
+        return;
+      }
+      const { id, result, error } = data;
+      const pt = pending.get(id);
+      if (pt) {
+        pending.delete(id);
+        if (error) pt.reject(new Error(error));
+        else pt.resolve(result);
+      }
+      freeRef.current.push(i);
+      busyRef.current[i] = false;
+      processQueue();
+    };
+    worker.onerror = () => {
+      freeRef.current.push(i);
+      busyRef.current[i] = false;
+      processQueue();
+    };
+    return worker;
+  };
 
+  // Init: creates the full worker pool — called from useEffect and after termination
+  const initWorkers = () => {
     if (typeof Worker === 'undefined') {
       fallbackRef.current = true;
       return;
     }
-
     try {
       for (let i = 0; i < poolSize; i++) {
-        const worker = new Worker(
-          new URL('../workers/attack-worker.ts', import.meta.url),
-          { type: 'module' },
-        );
-        worker.onmessage = (e: MessageEvent) => {
-          const data = e.data as { type: 'progress'; id: number; pct: number; detail?: string } | { id: number; result: string | null; error?: string };
-          if ('type' in data) {
-            const { id, pct, detail } = data;
-            const pt = pending.get(id);
-            if (pt?.onProgress) {
-              pt.onProgress(pct, detail);
-            }
-            return;
-          }
-          const { id, result, error } = data;
-          const pt = pending.get(id);
-          if (pt) {
-            pending.delete(id);
-            if (error) pt.reject(new Error(error));
-            else pt.resolve(result);
-          }
-          freeRef.current.push(i);
-          busyRef.current[i] = false;
-          processQueue();
-        };
-        worker.onerror = () => {
-          freeRef.current.push(i);
-          busyRef.current[i] = false;
-          processQueue();
-        };
-        workers.push(worker);
+        workersRef.current.push(createWorker(i));
         busyRef.current.push(false);
       }
       freeRef.current = Array.from({ length: poolSize }, (_, i) => i);
@@ -95,10 +98,14 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
       console.warn('useWorkerPool: failed to create Workers, falling back to main thread:', e);
       fallbackRef.current = true;
     }
+  };
+
+  useEffect(() => {
+    initWorkers();
 
     const queue = queueRef.current;
     return () => {
-      for (const w of workers) {
+      for (const w of workersRef.current) {
         w.terminate();
       }
       workersRef.current = [];
@@ -116,6 +123,11 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
     onProgress?: (pct: number, detail?: string) => void,
   ): Promise<string | null> => {
     return new Promise<string | null>((resolve, reject) => {
+      // Lazily re-create workers if they were terminated by cancelCurrentRun
+      if (workersRef.current.length === 0 && !fallbackRef.current) {
+        initWorkers();
+      }
+
       // Fallback: Workers unavailable → run on main thread via dynamic import
       if (fallbackRef.current || workersRef.current.length === 0) {
         const id = ++idCounterRef.current;
@@ -168,8 +180,6 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
   }, []);
 
   const cancelCurrentRun = useCallback(() => {
-    const cancelledIds = Array.from(pending.keys());
-
     // Resolve all pending with null — caller will discard cancelled results
     for (const [, task] of pending) {
       task.resolve(null);
@@ -179,11 +189,14 @@ export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
     // Clear the queue so no queued tasks start
     queueRef.current = [];
 
-    // Send cancel signal to all workers
-    // Workers that receive this before posting results will discard them
+    // Terminate all workers immediately — kills any hung computation
+    // Workers will be lazily re-created on next runAttack call
     for (const worker of workersRef.current) {
-      worker.postMessage({ type: 'cancel', ids: cancelledIds });
+      worker.terminate();
     }
+    workersRef.current = [];
+    busyRef.current = [];
+    freeRef.current = [];
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

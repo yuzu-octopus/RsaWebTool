@@ -150,7 +150,7 @@ export function CommandPalette() {
         },
         paper: {
           sx: {
-            bgcolor: '#282a36',
+            bgcolor: '#282a36 !important',
             color: draculaColors.foreground,
             width: 480,
             maxHeight: 400,
@@ -158,6 +158,7 @@ export function CommandPalette() {
             overflow: 'hidden',
             margin: 0,
             border: `1px solid ${draculaColors.currentLine}`,
+            boxShadow: 'none',
           },
         },
       }}
@@ -193,7 +194,7 @@ export function CommandPalette() {
           }}
         />
       </Box>
-      <DialogContent sx={{ p: 0, overflow: 'auto' }}>
+      <DialogContent sx={{ p: 0, overflow: 'auto', bgcolor: '#282a36' }}>
         <List dense>
           {allItems.map((item) => {
             const isSelected = item.index === selectedIndex;
