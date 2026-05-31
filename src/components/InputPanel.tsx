@@ -231,6 +231,12 @@ export function InputPanel() {
             lastEtaUpdate.current = now;
             setEta(est.formattedEta);
           }
+          // Progress hit 100% — attack is essentially done, revert button immediately
+          if (pct >= 100) {
+            dispatchProgress({ type: 'DONE' });
+            setEta(null);
+            timer.stop();
+          }
         };
         const preResult = await runAttack(selectedAttack.id, vals, handleProgress);
         if (preResult !== null) {
