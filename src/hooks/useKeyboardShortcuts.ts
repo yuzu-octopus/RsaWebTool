@@ -3,30 +3,63 @@ import { useAppContext } from './useAppContext';
 import { useCommandPalette } from './useCommandPalette';
 import { attacks } from '../attacks';
 
+const ALL_SIDEBAR_ITEMS = [
+  ...attacks.map(a => ({ type: 'attack' as const, id: a.id })),
+  { type: 'module' as const, id: 'instructions', mode: 'instructions' as const },
+  { type: 'module' as const, id: 'magic', mode: 'magic' as const },
+  { type: 'module' as const, id: 'proofs', mode: 'proofs' as const },
+  { type: 'module' as const, id: 'calculator', mode: 'calculator' as const },
+  { type: 'module' as const, id: 'format-converter', mode: 'format-converter' as const },
+  { type: 'module' as const, id: 'pem', mode: 'pem' as const },
+];
+
 export function useKeyboardShortcuts() {
-  const { selectedAttack, setSelectedAttack, setViewMode } = useAppContext();
+  const { selectedAttack, setSelectedAttack, setViewMode, viewMode } = useAppContext();
   const { toggle } = useCommandPalette();
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
 
-      // Tab/Shift+Tab to switch attacks — only when not in a text input
+      // Tab/Shift+Tab to cycle through all sidebar items (attacks + modules)
       if (e.key === 'Tab') {
         const tag = document.activeElement?.tagName;
         if (tag === 'INPUT' || tag === 'TEXTAREA') return;
         e.preventDefault();
-        const currentIdx = selectedAttack
-          ? attacks.findIndex(a => a.id === selectedAttack.id)
-          : -1;
-        let nextIdx: number;
-        if (e.shiftKey) {
-          nextIdx = currentIdx <= 0 ? attacks.length - 1 : currentIdx - 1;
+
+        // Find current position in the combined list
+        let currentIdx: number;
+        if (selectedAttack && viewMode === 'attack') {
+          currentIdx = ALL_SIDEBAR_ITEMS.findIndex(
+            item => item.type === 'attack' && item.id === selectedAttack.id,
+          );
         } else {
-          nextIdx = currentIdx >= attacks.length - 1 ? 0 : currentIdx + 1;
+          currentIdx = ALL_SIDEBAR_ITEMS.findIndex(
+            item => item.type === 'module' && item.mode === viewMode,
+          );
         }
-        setSelectedAttack(attacks[nextIdx]);
-        setViewMode('attack');
+
+        // If not found (e.g., unknown viewMode), wrap from start
+        if (currentIdx === -1) {
+          currentIdx = e.shiftKey ? ALL_SIDEBAR_ITEMS.length : -1;
+        }
+
+        // Calculate next index
+        const nextIdx = e.shiftKey
+          ? (currentIdx <= 0 ? ALL_SIDEBAR_ITEMS.length - 1 : currentIdx - 1)
+          : (currentIdx >= ALL_SIDEBAR_ITEMS.length - 1 ? 0 : currentIdx + 1);
+
+        // Navigate to the item
+        const nextItem = ALL_SIDEBAR_ITEMS[nextIdx];
+        if (nextItem.type === 'attack') {
+          const attack = attacks.find(a => a.id === nextItem.id);
+          if (attack) {
+            setSelectedAttack(attack);
+            setViewMode('attack');
+          }
+        } else {
+          setViewMode(nextItem.mode);
+        }
         return;
       }
 
@@ -66,5 +99,5 @@ export function useKeyboardShortcuts() {
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [setViewMode, toggle, selectedAttack, setSelectedAttack]);
+  }, [setViewMode, toggle, selectedAttack, setSelectedAttack, viewMode]);
 }
