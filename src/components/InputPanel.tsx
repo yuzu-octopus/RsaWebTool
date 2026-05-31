@@ -164,6 +164,7 @@ export function InputPanel() {
     abortControllerRef.current?.abort();
     cancelCurrentRun();
     dispatchProgress({ type: 'DONE' });
+    setEta(null);
     timer.stop();
   };
 
@@ -217,8 +218,6 @@ export function InputPanel() {
       setOutputError(msg);
       if (!mountedRef.current) return;
       addToHistory(selectedAttack.id, selectedAttack.name, msg, false);
-      dispatchProgress({ type: 'DONE' });
-      timer.stop();
       return;
     }
 
@@ -232,12 +231,6 @@ export function InputPanel() {
             lastEtaUpdate.current = now;
             setEta(est.formattedEta);
           }
-          // Progress hit 100% — attack is essentially done, revert button immediately
-          if (pct >= 100) {
-            dispatchProgress({ type: 'DONE' });
-            setEta(null);
-            timer.stop();
-          }
         };
         const preResult = await runAttack(selectedAttack.id, vals, handleProgress);
         if (preResult !== null) {
@@ -248,16 +241,12 @@ export function InputPanel() {
           if (!mountedRef.current) return;
           if (ownershipRef.current !== 'input') return;
           setOutputResult(displayPreResult);
-          dispatchProgress({ type: 'DONE' });
-          setEta(null);
-          timer.stop();
           if (!mountedRef.current) return;
           addToHistory(selectedAttack.id, selectedAttack.name, preResult, isActualSuccess(preResult));
           const preSuccess = isActualSuccess(preResult);
           if (!mountedRef.current) return;
           showNotification(`${selectedAttack.name}: ${preSuccess ? 'success' : 'failed'}`, preSuccess ? 'success' : 'error');
           if (preSuccess) submitToFactorDB(selectedAttack, preResult, vals.n, showNotification);
-          timer.stop();
           return;
         }
       }
@@ -282,9 +271,6 @@ export function InputPanel() {
         if (!mountedRef.current) return;
         if (ownershipRef.current !== 'input') return;
         setOutputResult(displayStdout);
-        dispatchProgress({ type: 'DONE' });
-        setEta(null);
-        timer.stop();
         if (!mountedRef.current) return;
         addToHistory(selectedAttack.id, selectedAttack.name, result.stdout, isActualSuccess(result.stdout));
         const runSuccess = isActualSuccess(result.stdout);
@@ -307,11 +293,9 @@ export function InputPanel() {
       if (!mountedRef.current) return;
       addToHistory(selectedAttack.id, selectedAttack.name, message, false);
     } finally {
-      // Only reset state if this is still the current active run
+      // Same cleanup as manual Stop — single code path for all exits
+      handleStop();
       if (attackIdRef.current === currentAttackId && ownershipRef.current === 'input') {
-        dispatchProgress({ type: 'DONE' });
-        setEta(null);
-        timer.stop();
         abortControllerRef.current = null;
         ownershipRef.current = null;
         setOutputSource(null);
