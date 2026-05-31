@@ -417,7 +417,7 @@ export function InputPanel() {
               </Button>
             </Box>
 
-            {loading ? (
+            {loading && progress < 100 ? (
               <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, mb: 2, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
                 <HourglassEmpty data-testid="loading-spinner" sx={{ color: draculaColors.orange, fontSize: '1rem', animation: `${hourglassSpin} 3s ease-in-out infinite` }} />
                 Running… {timer.formatted}
