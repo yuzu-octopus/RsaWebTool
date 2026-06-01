@@ -9,13 +9,17 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 ## Features
 
 - **47 attacks** — Factorization, Lattice, Protocol, Oracle, and Advanced categories
-- **30 browser-side checks** — instant results via native BigInt (no SageCell needed), with live progress bars showing iteration variable + count on longer-running attacks
+- **34 browser-side checks** — instant results via native BigInt (no SageCell needed), with live progress bars showing iteration variable + count on longer-running attacks
 - **SageMathCell integration** — runs SageMath code for Coppersmith, lattice reduction, and complex math
 - **FactorDB lookup** — auto-queries FactorDB and auto-submits discovered factorizations
 - **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution with early-stop
 - **RSA Calculator** — standalone key generation, encryption, decryption (pure BigInt). 3-tab interface with merged form state. e defaults to 65537; Decrypt accepts any 2 of (p, q, n) with auto-derivation
 - **Format Converter** — live Hex / Decimal / Base64 / Text conversion
-- **Proof Index** — searchable catalog of all 47 attack proofs with KaTeX rendering
+- **Attack Index** — searchable catalog of all 47 attack proofs with KaTeX rendering
+- **Command Palette** — ⌘/Ctrl+K fuzzy search across all 47 attacks + views
+- **Keyboard Shortcuts** — ⌘Enter (run), ⌘1/2/3 (tabs), ⌘Shift+C (copy), Tab/Shift+Tab (cycle attacks)
+- **PEM Decryptor** — Parse and decrypt PKCS#1/PKCS#8/encrypted PEM keys, feed params to Calculator or Attacks
+- **Instructions** — Collapsible reference guide for using the tool
 - **Dracula theme** — dark, developer-friendly UI
 - **Notepad** — drag-resizeable scratchpad with localStorage persistence
 
@@ -123,6 +127,21 @@ Standalone BigInt operations: key generation, encryption, and decryption. Smart 
 ### Format Converter
 Live conversion between hex, decimal, base64, and text.
 
+### Command Palette
+Press `⌘K` (Mac) or `Ctrl+K` (Windows/Linux) to open. Fuzzy-search across all attacks and views. Arrow keys to navigate, Enter to select.
+
+### PEM Decryptor
+Paste a PEM private key (PKCS#1, PKCS#8, or encrypted). The tool parses the key, extracts n/e/d/p/q parameters, and offers "Feed to Calculator" or "Feed to Attacks" buttons. Supports passphrase-protected keys via Web Crypto API.
+
+### Keyboard Shortcuts
+| Shortcut | Action |
+|----------|--------|
+| ⌘/Ctrl+K | Open command palette |
+| ⌘/Ctrl+Enter | Run current attack |
+| ⌘/Ctrl+1/2/3 | Switch Explanation/Input/Source tabs |
+| ⌘/Ctrl+Shift+C | Copy output |
+| Tab/Shift+Tab | Cycle through attacks |
+
 ## Tech Stack
 
 | Layer | Technology |
@@ -137,15 +156,16 @@ Live conversion between hex, decimal, base64, and text.
 
 ```
 src/
-  attacks/    47 attack implementations + guard.ts (shared sage guard helper), index.ts barrel
-  components/ 12 React components (Sidebar, InputPanel, MagicPanel, OutputPanel, etc.)
-  context/    AppContext provider + ctx.ts (createContext barrel)
-  hooks/      useSageMath, useWorkerPool, useDragResize, useAppContext, useTimer
-  styles/     shared.ts (7 style objects, FONT_FAMILY constant), inputSx.ts
-  theme/      dracula.ts — full Dracula MUI palette
-  types/      index.ts — Attack, InputField, HistoryEntry, NotificationState interfaces
-  utils/      bigint.ts, converters.ts, factordb.ts, sageOutput.ts, testcases/core.ts
-workers/      Cloudflare Worker CORS proxy for FactorDB
+  attacks/          47 individual .ts files + guard.ts + index.ts + rawSources.ts
+  components/       16 React components (CommandPalette, InstructionsPanel, PemDecryptor, etc.)
+  config/           sidebarItems.ts — shared sidebar item definitions
+  context/          AppContext provider, ctx.ts
+  hooks/            useSageMath, useWorkerPool, useDragResize, useAppContext, useTimer, useCommandPalette, useKeyboardShortcuts
+  styles/           shared.ts, inputSx.ts
+  theme/            dracula.ts
+  types/            index.ts
+  utils/            bigint.ts, converters.ts, factordb.ts, sageOutput.ts, testcases/core.ts, attackSource.ts, pemParser.ts, asn1.ts, progressEstimator.ts
+workers/            Cloudflare Worker CORS proxy for FactorDB
 ```
 
 ## External Services
