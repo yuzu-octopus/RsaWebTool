@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { isqrt, gcd } from '../utils/bigint';
 import { randomPrime } from '../utils/testcases/core';
-import { sageGuardBlock } from './guard';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'euler',
@@ -11,45 +11,37 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
-    try:
-        try:
-            out = []
-            n = Integer(${vals.n})
-            import math
-            n_int = int(n)
-            ${sageGuardBlock("EULER", '            ')}
-            out.append(f"Euler Factorization on n = {n}")
-            out.append("")
-            end = math.isqrt(n_int)
-            solutions = []
-            a = 0
-            a_sq = 0
-            max_iter = 20000000
-            while a < end and len(solutions) < 2:
-                if a > max_iter:
-                    out.append(f"Euler factorization failed: exceeded {max_iter} iterations")
-                    out.append("EULER=FAILED")
-                    print("\\n".join(out))
-                    return
-                rem = n_int - a_sq
-                b = math.isqrt(rem)
-                if b*b == rem:
-                    distinct = True
-                    for sol in solutions:
-                        if sol[0] == b and sol[1] == a:
-                            distinct = False
-                            break
-                    if distinct:
-                        solutions.append([b, a])
-                a_sq += 2*a + 1
-                a += 1
-            if len(solutions) < 2:
-                out.append(f"Euler factorization failed: could not find two distinct sum-of-squares representations")
-                out.append("n may not have both primes ≡ 1 (mod 4)")
-                out.append("EULER=FAILED")
-                print("\\n".join(out))
-                return
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'EULER',
+    n: vals.n,
+    imports: ['import math'],
+    body: `        n_int = int(n)
+        out.append("Euler Factorization")
+        out.append(f"n = {n}")
+        out.append("")
+        end = math.isqrt(n_int)
+        solutions = []
+        a = 0
+        a_sq = 0
+        max_iter = 20000000
+        found = False
+        while a < end and len(solutions) < 2:
+            if a > max_iter:
+                out.append(f"Euler factorization failed: exceeded {max_iter} iterations")
+                break
+            rem = n_int - a_sq
+            b = math.isqrt(rem)
+            if b*b == rem:
+                distinct = True
+                for sol in solutions:
+                    if sol[0] == b and sol[1] == a:
+                        distinct = False
+                        break
+                if distinct:
+                    solutions.append([b, a])
+            a_sq += 2*a + 1
+            a += 1
+        if len(solutions) >= 2:
             s0 = solutions[0]
             s1 = solutions[1]
             k = gcd(s0[0] - s1[0], s1[1] - s0[1])**2
@@ -57,41 +49,36 @@ export const attack: Attack = {
             m = gcd(s0[0] + s1[0], s1[1] - s0[1])**2
             lev = gcd(s0[0] - s1[0], s1[1] + s0[1])**2
             p = gcd(k + h, n)
-            q = gcd(lev + m, n)
-            if p <= 1 or q >= n:
-                out.append(f"Found trivial factorization: {p} x {q} = {n}")
-                out.append("No non-trivial factors found via Euler")
-                out.append("EULER=FAILED")
-            else:
-                if p * q != n:
-                    q = n // p
-                out.append(f"Verification: p * q = {p * q}")
-                out.append(f"p is prime: {p.is_prime()}")
-                out.append(f"q is prime: {q.is_prime()}")
+            q_val = gcd(lev + m, n)
+            if p > 1 and q_val < n:
+                if p * q_val != n:
+                    q_val = n // p
+                out.append("Results:")
                 out.append(f"p = {p}")
-                out.append(f"q = {q}")
+                out.append(f"q = {q_val}")
+                out.append("")
+                out.append(f"Verification: p * q = {p * q_val}")
                 out.append("")
                 out.append("EULER=SUCCESS")
-            print("\\n".join(out))
-        except Exception as e:
-            try:
-                out.append(f"ERROR: {e}")
-                out.append("EULER=FAILED")
-                print("\\n".join(out))
-            except:
-                print(f"ERROR: {e}")
-                print("EULER=FAILED")
-        #
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("EULER=FAILED")
-_attack()`,
+                found = True
+            else:
+                out.append(f"Found trivial factorization: {p} x {q_val} = {n}")
+                out.append("No non-trivial factors found via Euler")
+        else:
+            out.append("Euler factorization failed: could not find two distinct sum-of-squares representations")
+            out.append("n may not have both primes ≡ 1 (mod 4)")
+        if not found:
+            out.append("")
+            out.append("EULER=FAILED")`,
+  }),
   frontendCheck: (vals, onProgress) => {
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
       if (n < 2n) return Promise.resolve(null);
-      if (n % 2n === 0n) return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n / 2n}\nEULER=SUCCESS`);
+      if (n % 2n === 0n) {
+        return Promise.resolve(`Euler Factorization\nn = ${n}\n\nResults:\np = 2\nq = ${n / 2n}\n\nVerification: p * q = ${n}\n\nEULER=SUCCESS`);
+      }
       const end = isqrt(n);
       const solutions: bigint[][] = [];
       const maxIter = 20000000n;
@@ -135,7 +122,7 @@ _attack()`,
       if (p <= 1n || q >= n) return Promise.resolve(null);
       if (p * q !== n) q = n / p;
       onProgress?.(100);
-      return Promise.resolve(`Factor found!\nVerification: p * q = ${p * q}\np = ${p}\nq = ${q}\nn = ${s0[0]}^2 + ${s0[1]}^2 = ${s1[0]}^2 + ${s1[1]}^2\nEULER=SUCCESS`);
+      return Promise.resolve(`Euler Factorization\nn = ${n}\n\nResults:\np = ${p}\nq = ${q}\n\nVerification: p * q = ${p * q}\n\nEULER=SUCCESS`);
     } catch {
       return Promise.resolve(null);
     }

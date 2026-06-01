@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'bleichenbacher',
@@ -13,133 +14,104 @@ export const attack: Attack = {
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
     { name: 'oracle_responses', label: 'Oracle responses (comma-separated 0/1)', placeholder: '1,0,1,1,0,...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
-    try:
-        # Bleichenbacher PKCS#1 v1.5 padding oracle attack
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+      token: 'BLEICHENBACHER',
+      useGuard: false,
+      body: `        valid = True
         if not "${vals.n}".strip():
-            print("ERROR: n is required")
-            print("BLEICHENBACHER=FAILED")
-            return
+            out.append("ERROR: n is required")
+            valid = False
         if not "${vals.e}".strip():
-            print("ERROR: e is required")
-            print("BLEICHENBACHER=FAILED")
-            return
+            out.append("ERROR: e is required")
+            valid = False
         if not "${vals.c}".strip():
-            print("ERROR: c is required")
-            print("BLEICHENBACHER=FAILED")
-            return
+            out.append("ERROR: c is required")
+            valid = False
         responses_raw = """${vals.oracle_responses || ''}""".strip()
         if not responses_raw:
-            print("ERROR: oracle_responses is required")
-            print("BLEICHENBACHER=FAILED")
-            return
-        try:
-            out = []
+            out.append("ERROR: oracle_responses is required")
+            valid = False
+        if valid:
             n = Integer(${vals.n})
             e = Integer(${vals.e})
             c = Integer(${vals.c})
             orig_c = Integer(${vals.c})
             oracle_bits = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
-            out.append(f"Bleichenbacher PKCS#1 v1.5 Attack")
-            out.append(f"n = {n} ({n.nbits()} bits)")
+            out.append("Bleichenbacher PKCS#1 v1.5")
+            out.append(f"n = {n}")
             out.append(f"e = {e}")
             out.append(f"c = {c}")
-            out.append(f"Oracle responses: {len(oracle_bits)}")
-            out.append("")
-            # PKCS#1 v1.5: EM = 0x00 || 0x02 || PS || 0x00 || M
-            # Valid padding: 2B <= m < 3B where B = 2^(8*(k-2)), k = byte length
+            out.append(f"oracle_responses = {len(oracle_bits)}")
             k = (n.nbits() + 7) // 8
             B = Integer(2)**(8 * (k - 2))
-            out.append(f"Block size: {k} bytes, B = 2^(8*{k-2})")
-            out.append(f"Valid padding range: [2B, 3B) = [{2*B}, {3*B})")
+
             out.append("")
-            # Collect valid s values from oracle responses
             valid_s = [Integer(i + 1) for i, r in enumerate(oracle_bits) if r == 1]
             out.append(f"Valid padding responses: {len(valid_s)}")
             if len(valid_s) < 2:
-                out.append("Need at least 2 valid responses for interval narrowing")
+                out.append("")
                 out.append("BLEICHENBACHER=FAILED")
-                print("\\n".join(out))
-                return
-            s1 = valid_s[0]
-            out.append(f"s1 = {s1}")
-            # Initial interval from s1
-            if s1 == 1:
-                a = 2 * B
-                b = 3 * B - 1
             else:
-                # Find r such that interval overlaps with [2B, 3B)
-                a = 2 * B
-                b = 3 * B - 1
-                r_min = ceil((a * s1 - 3 * B + 1) / n)
-                r_max = floor((b * s1 - 2 * B) / n)
-                for r in range(int(r_min), int(r_max) + 1):
-                    r_int = r
-                    ca = ceil((2 * B + r_int * n) / s1)
-                    cb = floor((3 * B - 1 + r_int * n) / s1)
-                    inter_a = max(2 * B, ca)
-                    inter_b = min(3 * B - 1, cb)
-                    if inter_a <= inter_b:
-                        a = inter_a
-                        b = inter_b
-                        break
-            out.append(f"Initial interval: [{a}, {b}], size={(b-a+1).nbits()} bits")
-            out.append("")
-            # Narrow using remaining valid s values
-            for idx in range(1, min(len(valid_s), 50)):
-                s = valid_s[idx]
-                # Find r range
-                r_min = ceil((a * s - 3 * B + 1) / n)
-                r_max = floor((b * s - 2 * B) / n)
-                new_a = None
-                new_b = None
-                for r in range(int(r_min), int(r_max) + 1):
-                    r_int = r
-                    ca = ceil((2 * B + r_int * n) / s)
-                    cb = floor((3 * B - 1 + r_int * n) / s)
-                    inter_a = max(a, ca)
-                    inter_b = min(b, cb)
-                    if inter_a <= inter_b:
-                        if new_a is None or inter_a > new_a:
-                            new_a = inter_a
-                        if new_b is None or inter_b < new_b:
-                            new_b = inter_b
-                if new_a is not None and new_b is not None:
-                    a = new_a
-                    b = new_b
-                    if idx < 5 or b - a < (B) // 10:
-                        out.append(f"Step {idx}: s={s}, interval=[{a}, {b}], size={(b-a+1).nbits()} bits")
+                s1 = valid_s[0]
+                out.append(f"s1 = {s1}")
+                if s1 == 1:
+                    a = 2 * B
+                    b = 3 * B - 1
                 else:
-                    out.append(f"Step {idx}: s={s}, no valid interval intersection")
-            out.append("")
-            if a == b:
-                m = a
-                out.append(f"Exact message recovered: m = {m}")
-            else:
-                m = (a + b) // 2
-                out.append(f"Estimated message: m = {m}")
-                out.append(f"Final interval: [{a}, {b}]")
-                out.append(f"Uncertainty: {(b-a+1).nbits()} bits")
-            # Verify
-            v = Integer(pow(int(m), int(e), int(n)))
-            out.append(f"Verification: m^e mod n = {v}")
-            out.append(f"Original c = {orig_c}")
-            if v == orig_c:
-                out.append("VERIFICATION PASSED!")
-                out.append("BLEICHENBACHER=SUCCESS")
-            else:
-                out.append("Verification failed - may need more oracle responses")
-                out.append("BLEICHENBACHER=FAILED")
-            print("\\n".join(out))
-        except Exception as ex:
-            out.append(f"ERROR: {ex}")
-            out.append("BLEICHENBACHER=FAILED")
-            print("\\n".join(out))
-        #
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("BLEICHENBACHER=FAILED")
-_attack()`,
+                    a = 2 * B
+                    b = 3 * B - 1
+                    r_min = ceil((a * s1 - 3 * B + 1) / n)
+                    r_max = floor((b * s1 - 2 * B) / n)
+                    for r in range(int(r_min), int(r_max) + 1):
+                        r_int = r
+                        ca = ceil((2 * B + r_int * n) / s1)
+                        cb = floor((3 * B - 1 + r_int * n) / s1)
+                        inter_a = max(2 * B, ca)
+                        inter_b = min(3 * B - 1, cb)
+                        if inter_a <= inter_b:
+                            a = inter_a
+                            b = inter_b
+                            break
+
+                for idx in range(1, min(len(valid_s), 50)):
+                    s = valid_s[idx]
+                    r_min = ceil((a * s - 3 * B + 1) / n)
+                    r_max = floor((b * s - 2 * B) / n)
+                    new_a = None
+                    new_b = None
+                    for r in range(int(r_min), int(r_max) + 1):
+                        r_int = r
+                        ca = ceil((2 * B + r_int * n) / s)
+                        cb = floor((3 * B - 1 + r_int * n) / s)
+                        inter_a = max(a, ca)
+                        inter_b = min(b, cb)
+                        if inter_a <= inter_b:
+                            if new_a is None or inter_a > new_a:
+                                new_a = inter_a
+                            if new_b is None or inter_b < new_b:
+                                new_b = inter_b
+                    if new_a is not None and new_b is not None:
+                        a = new_a
+                        b = new_b
+
+                    if a == b:
+                    m = a
+                else:
+                    m = (a + b) // 2
+                v = Integer(pow(int(m), int(e), int(n)))
+                out.append("")
+                out.append("Results:")
+                out.append(f"m = {m}")
+                out.append("")
+                out.append(f"Verification: m^e mod n = {v}")
+                out.append("")
+                if v == orig_c:
+                    out.append("BLEICHENBACHER=SUCCESS")
+                else:
+                    out.append("BLEICHENBACHER=FAILED")
+        else:
+            out.append("BLEICHENBACHER=FAILED")`,
+    }),
   frontendCheck: (vals) => {
     if (!vals.n || !vals.e || !vals.c || !vals.oracle_responses) return Promise.resolve(null);
     try {
@@ -201,8 +173,10 @@ _attack()`,
       }
 
       // Verify
-      for (let m = a; m <= b && m < a + 100n; m++) {
-        if (modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}\nvalid s values = ${validS.length}\ninterval width = ${b - a + 1n}\nBLEICHENBACHER=SUCCESS`);
+      for (let mVal = a; mVal <= b && mVal < a + 100n; mVal++) {
+        if (modPow(mVal, e, n) === c) {
+          return Promise.resolve(`Bleichenbacher PKCS#1 v1.5\nn = ${n}\ne = ${e}\nc = ${c}\noracle_responses = ${responses.length}\n\nResults:\nm = ${mVal}\n\nVerification: m^e mod n = ${modPow(mVal, e, n)}\n\nBLEICHENBACHER=SUCCESS`);
+        }
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }

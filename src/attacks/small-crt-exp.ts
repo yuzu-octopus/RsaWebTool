@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
-import { modInverse, gcd, modPow } from '../utils/bigint';
+import { gcd, modPow } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 const BATCH_SIZE = 5000n;
 
@@ -14,13 +15,13 @@ export const attack: Attack = {
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
     { name: 'bound', label: 'bound (max d_p, optional)', placeholder: 'Default 5000000', required: false, multiline: false },
   ],
-  sageTemplate: (vals: Record<string, string>) => `import math
-def _attack():
-    try:
-        n = Integer(${vals.n})
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'SMALL_CRT_EXP',
+    imports: ['import math'],
+    useGuard: false,
+    body: `        n = Integer(${vals.n})
         e = Integer(${vals.e})
         bound = ${vals.bound ? `Integer(${vals.bound})` : 'Integer(5000000)'}
-        out = []
         if n <= 0 or e <= 0 or bound <= 0:
             out.append("SMALL_CRT_EXP=FAILED: invalid input values")
         else:
@@ -46,9 +47,17 @@ def _attack():
                             if math.gcd(x_scan, n_int) > 1:
                                 p_sage = Integer(g)
                                 q_sage = n // p_sage
-                                out.append(f"Factor found at dp = {d}!")
+                                out.append("Small CRT Exponent")
+                                out.append(f"n = {n}")
+                                out.append(f"e = {e}")
+                                out.append(f"bound = {bound}")
+                                out.append("")
+                                out.append("Results:")
                                 out.append(f"p = {p_sage}")
                                 out.append(f"q = {q_sage}")
+                                out.append("")
+                                out.append(f"Verification: p * q = {p_sage * q_sage}")
+                                out.append("")
                                 out.append("SMALL_CRT_EXP=SUCCESS")
                                 found = True
                                 break
@@ -60,11 +69,8 @@ def _attack():
                 current_int = (current_int * step_int) % n_int
             if not found:
                 out.append("No small dp found within bound.")
-                out.append("SMALL_CRT_EXP=FAILED")
-        print("\\n".join(out))
-    except Exception as ex:
-        print(f"SMALL_CRT_EXP=FAILED: {ex}")
-_attack()`,
+                out.append("SMALL_CRT_EXP=FAILED")`,
+  }),
   frontendCheck: (vals, onProgress) => {
     if (!vals.n || !vals.e) return Promise.resolve(null);
     try {
@@ -105,11 +111,8 @@ _attack()`,
               if (gcd(xScan, n) > 1n) {
                 const p0 = g;
                 const q0 = n / g;
-                const phi = (p0 - 1n) * (q0 - 1n);
-                const privateExp = modInverse(e, phi);
-                const dLine = privateExp ? `\nPrivate exponent d = ${privateExp}` : '';
                 onProgress?.(100);
-                return Promise.resolve(`Factor found at dp = ${dpScan}!\np = ${p0}\nq = ${q0}${dLine}\nSMALL_CRT_EXP=SUCCESS`);
+                return Promise.resolve(`Small CRT Exponent\nn = ${n}\ne = ${e}\nbound = ${bound}\n\nResults:\np = ${p0}\nq = ${q0}\ndp = ${dpScan}\n\nVerification: p * q = ${p0 * q0}\n\nSMALL_CRT_EXP=SUCCESS`);
               }
               curScan = (curScan * step) % n;
             }

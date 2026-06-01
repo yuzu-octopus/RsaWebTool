@@ -49,17 +49,18 @@ The GCD extracts the shared prime directly — no factorization of either modulu
         const q1 = n1 / p;
         const q2 = n2 / p;
         return [
-          'Common Prime RSA Attack (browser-side, BigInt)',
+          'Common Prime RSA',
           `n1 = ${n1}`,
           `n2 = ${n2}`,
           '',
-          `gcd(n1, n2) = ${p}`,
+          'Results:',
+          `p = ${p}`,
+          `q1 = ${q1}`,
+          `q2 = ${q2}`,
           '',
-          `Shared prime: p = ${p}`,
-          `n1 = ${p} x ${q1}`,
-          `n2 = ${p} x ${q2}`,
-          `Verification: p * q1 = ${p * q1} == n1? ${p * q1 === n1}`,
-          `Verification: p * q2 = ${p * q2} == n2? ${p * q2 === n2}`,
+          `Verification: p * q1 = ${p * q1}`,
+          `Verification: p * q2 = ${p * q2}`,
+          '',
           'COMMON_PRIME_RSA=SUCCESS',
         ].join('\n');
       }

@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
 import { iroot } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'small-public-exp',
@@ -18,15 +19,20 @@ export const attack: Attack = {
       return `print("ERROR: Missing required inputs (n, c)")
 print("SMALL_PUBLIC_EXP=FAILED")`;
     }
-    return `def _attack():
-    try:
-        n = Integer(${vals.n})
+    return wrapSageTemplate({
+      token: 'SMALL_PUBLIC_EXP',
+      useGuard: false,
+      body: `        n = Integer(${vals.n})
         e_val = "${vals.e}".strip()
         e = Integer(e_val) if e_val else Integer(3)
         c = Integer(${vals.c})
         k_bound_val = "${vals.k_bound}".strip() if "${vals.k_bound}" else "100000"
         k_bound = Integer(k_bound_val) if k_bound_val else Integer(100000)
-        out = []
+        out.append("Small Public Exponent")
+        out.append(f"n = {n}")
+        out.append(f"c = {c}")
+        out.append("")
+        out.append("Results:")
         # Modular residue pre-filter for e-th powers
         if e <= 100:
             p = Integer(e + 1)
@@ -41,33 +47,37 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
         else:
             filter_mod = 0
             residues = set()
+        found = False
         for k in range(int(k_bound) + 1):
             candidate = c + k * n
             if filter_mod and candidate % filter_mod not in residues:
                 continue
             m, exact = candidate.nth_root(e, truncate_mode=True)
             if exact:
-                out.append(f"SUCCESS! k = {k}")
                 out.append(f"m = {m}")
+                out.append(f"k = {k}")
+                m_hex_val = hex(m)[2:]
+                if len(m_hex_val) % 2 != 0:
+                    m_hex_val = '0' + m_hex_val
+                out.append(f"m as hex: {m_hex_val}")
                 try:
-                    m_hex = hex(m)[2:]
-                    if len(m_hex) % 2 != 0:
-                        m_hex = '0' + m_hex
-                    m_bytes = bytes.fromhex(m_hex)
+                    m_bytes = bytes.fromhex(m_hex_val)
                     out.append(f"m as text: {m_bytes.decode('utf-8', errors='replace')}")
                 except Exception:
-                    out.append(f"m as hex: {hex(m)}")
+                    out.append("m as text: <not decodable>")
+                out.append("")
+                out.append(f"Verification: m^e mod n = {pow(m, int(e), int(n))}")
+                found = True
                 break
-        if not out:
-            out.append(f"No perfect {e}-th power found for k in 0..{k_bound} with e = {e}")
+        if not found:
+            out.append(f"Reason: No perfect {e}-th power found for k in 0..{k_bound} with e = {e}")
+            out.append("")
             out.append("SMALL_PUBLIC_EXP=FAILED")
         else:
+            out.append("")
             out.append("SMALL_PUBLIC_EXP=SUCCESS")
-        print("\\n".join(out))
-    except Exception as ex:
-        print(f"ERROR: {ex}")
-        print("SMALL_PUBLIC_EXP=FAILED")
-_attack()`;
+`,
+    });
   },
   frontendCheck: (vals: Record<string, string>, onProgress?: (pct: number, detail?: string) => void): Promise<string | null> => {
     const n = BigInt(vals.n);
@@ -124,6 +134,19 @@ _attack()`;
       return x;
     };
 
+    const fmtResult = (m: bigint, k: bigint): string => {
+      const mHex = m.toString(16);
+      const mHexPadded = mHex.length % 2 ? '0' + mHex : mHex;
+      let mText = '<not decodable>';
+      try {
+        const bytes = new Uint8Array(mHexPadded.length / 2);
+        for (let i = 0; i < bytes.length; i++) {
+          bytes[i] = parseInt(mHexPadded.substring(i * 2, i * 2 + 2), 16);
+        }
+        mText = new TextDecoder().decode(bytes);
+      } catch { /* keep default */ }
+      return `Small Public Exponent\nn = ${n}\nc = ${c}\n\nResults:\nm = ${m}\nk = ${k}\nm as hex: ${mHexPadded}\nm as text: ${mText}\n\nVerification: m^e mod n = ${c}\n\nSMALL_PUBLIC_EXP=SUCCESS`;
+    };
     let root = 1n;
     for (let k = 0n; k <= kBound; k++) {
       if (onProgress && kBound > 1000n && k % 1000n === 0n) {
@@ -138,9 +161,18 @@ _attack()`;
       } else {
         root = rootOf(candidate, root);
       }
-      if (root ** e === candidate) { onProgress?.(100); return Promise.resolve(`m = ${root}\nk = ${k}\nSMALL_PUBLIC_EXP=SUCCESS`); }
-      if ((root + 1n) ** e === candidate) { onProgress?.(100); return Promise.resolve(`m = ${root + 1n}\nk = ${k}\nSMALL_PUBLIC_EXP=SUCCESS`); }
-      if (root > 0n && (root - 1n) ** e === candidate) { onProgress?.(100); return Promise.resolve(`m = ${root - 1n}\nk = ${k}\nSMALL_PUBLIC_EXP=SUCCESS`); }
+      if (root ** e === candidate) {
+        onProgress?.(100);
+        return Promise.resolve(fmtResult(root, k));
+      }
+      if ((root + 1n) ** e === candidate) {
+        onProgress?.(100);
+        return Promise.resolve(fmtResult(root + 1n, k));
+      }
+      if (root > 0n && (root - 1n) ** e === candidate) {
+        onProgress?.(100);
+        return Promise.resolve(fmtResult(root - 1n, k));
+      }
     }
     return Promise.resolve(null);
   },

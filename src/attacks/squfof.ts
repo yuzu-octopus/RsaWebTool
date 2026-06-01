@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
-import { sageGuardBlock } from './guard';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'squfof',
@@ -10,66 +10,60 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
-    try:
-        try:
-            out = []
-            n = Integer(${vals.n})
-            import math
-            out.append(f"SQUFOF on n = {n}")
-            out.append("")
-            ${sageGuardBlock("SQUFOF", '            ')}
-            # SQUFOF works best for small factors; extract small factor first
-            # Use batched GCD for ~1000x fewer GCD calls vs individual trial division
-            n_int = int(n)
-            found_small = False
-            primes_list = prime_range(3, 200000)
-            prod = 1
-            for i, trial in enumerate(primes_list):
-                prod = (prod * int(trial)) % n_int
-                if (i + 1) % 1000 == 0:
-                    g = math.gcd(prod, n_int)
-                    if 1 < g < n_int:
-                        for t in range(i - 999, i + 1):
-                            trial_t = primes_list[t]
-                            if n_int % trial_t == 0:
-                                p = Integer(trial_t)
-                                q = n // p
-                                out.append(f"Small factor found: p = {p}")
-                                out.append(f"Verification: p * q = {p * q}")
-                                out.append(f"p = {p}")
-                                out.append(f"q = {q}")
-                                out.append("")
-                                out.append("SQUFOF=SUCCESS")
-                                found_small = True
-                                break
-                        break
-                    prod = 1
-            # Final partial batch
-            if not found_small and prod != 1:
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'SQUFOF',
+    n: vals.n,
+    imports: ['import math'],
+    useGuard: true,
+    body: `        out.append("SQUFOF")
+        out.append(f"n = {n}")
+        out.append("")
+        n_int = int(n)
+        found = False
+        primes_list = prime_range(3, 200000)
+        prod = 1
+        for i, trial in enumerate(primes_list):
+            prod = (prod * int(trial)) % n_int
+            if (i + 1) % 1000 == 0:
                 g = math.gcd(prod, n_int)
                 if 1 < g < n_int:
-                    start = (len(primes_list) // 1000) * 1000
-                    for t in range(start, len(primes_list)):
+                    for t in range(i - 999, i + 1):
                         trial_t = primes_list[t]
                         if n_int % trial_t == 0:
                             p = Integer(trial_t)
                             q = n // p
-                            out.append(f"Small factor found: p = {p}")
-                            out.append(f"Verification: p * q = {p * q}")
+                            out.append("Results:")
                             out.append(f"p = {p}")
                             out.append(f"q = {q}")
                             out.append("")
+                            out.append(f"Verification: p * q = {p * q}")
+                            out.append("")
                             out.append("SQUFOF=SUCCESS")
-                            found_small = True
+                            found = True
                             break
-            if found_small:
-                print("\\n".join(out))
-                return
-            # Shanks' Square Forms Factorization (SQUFOF)
+                    break
+                prod = 1
+        if not found and prod != 1:
+            g = math.gcd(prod, n_int)
+            if 1 < g < n_int:
+                start = (len(primes_list) // 1000) * 1000
+                for t in range(start, len(primes_list)):
+                    trial_t = primes_list[t]
+                    if n_int % trial_t == 0:
+                        p = Integer(trial_t)
+                        q = n // p
+                        out.append("Results:")
+                        out.append(f"p = {p}")
+                        out.append(f"q = {q}")
+                        out.append("")
+                        out.append(f"Verification: p * q = {p * q}")
+                        out.append("")
+                        out.append("SQUFOF=SUCCESS")
+                        found = True
+                        break
+        if not found:
             def squfof(n_val):
                 n_int = int(n_val)
-                # Find non-residue
                 D = 0
                 for k in [1, 3, 5, 7, -1, -3, -5, -7]:
                     if kronecker(k, n_val) == -1:
@@ -84,7 +78,6 @@ export const attack: Attack = {
                 if Q <= 0:
                     return None
                 Qprev = 1
-                # Step 1: forward cycle — find a square form
                 limit = 2 * math.isqrt(math.isqrt(n_int)) + 10
                 for i in range(limit):
                     if Q == 0:
@@ -98,12 +91,10 @@ export const attack: Attack = {
                     if i % 2 == 0 and Qnew > 0:
                         r = math.isqrt(Qnew)
                         if r * r == Qnew and (sqrtD - Pnew) % r == 0:
-                            # Step 2: inverse square root → start reverse cycle
                             b = (sqrtD - Pnew) // r
                             P = b * r + Pnew
                             Qprev = r
                             Q = (D - P**2) // Qprev
-                            # Step 3: reverse cycle — find symmetry
                             for _ in range(limit):
                                 if Q == 0:
                                     break
@@ -113,9 +104,9 @@ export const attack: Attack = {
                                 Q_old = Q
                                 Q = (D - P**2) // Q_old
                                 if P == P_old:
-                                    g = math.gcd(Q_old, n_int)
-                                    if 1 < g < n_int:
-                                        return Integer(g), Integer(n_int // g)
+                                    g_val = math.gcd(Q_old, n_int)
+                                    if 1 < g_val < n_int:
+                                        return Integer(g_val), Integer(n_int // g_val)
                                     break
                             break
                     Qprev = Q
@@ -125,24 +116,20 @@ export const attack: Attack = {
             result = squfof(n)
             if result:
                 p, q = result
-                out.append(f"Verification: p * q = {p * q}")
+                out.append("Results:")
                 out.append(f"p = {p}")
                 out.append(f"q = {q}")
                 out.append("")
+                out.append(f"Verification: p * q = {p * q}")
+                out.append("")
                 out.append("SQUFOF=SUCCESS")
+                found = True
             else:
-                out.append("SQUFOF did not find a factor. Try a different method.")
+                out.append("Results:")
+                out.append("")
                 out.append("SQUFOF=FAILED")
-            print("\\n".join(out))
-        except Exception as e:
-            out.append(f"ERROR: {e}")
-            out.append("SQUFOF=FAILED")
-            print("\\n".join(out))
-        #
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("SQUFOF=FAILED")
-_attack()`,
+`,
+  }),
   proof: `\\textbf{Theorem:} SQUFOF factors $n$ by finding a square form in the cycle of reduced binary quadratic forms of discriminant $D = kn$ where $(k/n) = -1$.
 
 \\textbf{Setup:}

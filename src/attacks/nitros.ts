@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { isPrimeMR, generateKeyPair } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'nitros',
@@ -11,46 +12,33 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'base', label: 'Base (default 65537)', placeholder: '65537', required: false, multiline: false },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
-    try:
-        try:
-            out = []
-            n_input = "${vals.n}".strip()
-            if not n_input:
-                out.append("ERROR: n is required")
-                out.append("NITROS=FAILED")
-                print("\\n".join(out))
-                return
-            n = Integer(n_input)
-            base_val = "${vals.base}".strip()
-            base = Integer(base_val) if base_val else Integer(65537)
-            # Even check
-            if n % 2 == 0:
-                out.append("n is even.")
-                out.append(f"p = 2")
-                out.append(f"q = {n // 2}")
-                out.append("NITROS=SUCCESS")
-                print("\\n".join(out))
-                return
-            # Prime check
-            if is_prime(n):
-                out.append("n is prime. Not a valid RSA modulus.")
-                out.append("NITROS=FAILED")
-                print("\\n".join(out))
-                return
-            out.append("Nitros / Extended ROCA attack")
-            out.append(f"n = {n}")
-            out.append(f"base = {base}")
-            out.append("")
-            # Use a single well-chosen M (product of first 16 primes ≈ 2^53)
-            # This keeps Coppersmith fast while covering typical Nitros/ROCA primes
-            primes_subset = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53]
-            M = prod(primes_subset)
-            if gcd(base, M) != 1:
-                out.append(f"M = {M}: gcd(base, M) = {gcd(base, M)} != 1, skipping...")
-                out.append("NITROS=FAILED")
-                print("\\n".join(out))
-                return
+  sageTemplate: (vals: Record<string, string>) => {
+    const nStr = vals.n ?? '';
+    const baseStr = vals.base ?? '';
+    if (!nStr.trim()) {
+      return 'print("ERROR: n is required")\nprint("NITROS=FAILED")';
+    }
+    return wrapSageTemplate({
+      token: 'NITROS',
+      n: nStr,
+      body: `        base_val = "${baseStr}".strip()
+        base = Integer(base_val) if base_val else Integer(65537)
+        found = False
+        # Guard handles n<2, n%2, n.is_prime(), n.is_square()
+        # Check gcd(base, M) before building M
+        out.append("Nitros / Extended ROCA attack")
+        out.append("")
+        out.append(f"n = {n}")
+        out.append(f"base = {base}")
+        out.append("")
+        out.append("Results:")
+        # Use a single well-chosen M (product of first 16 primes ≈ 2^53)
+        # This keeps Coppersmith fast while covering typical Nitros/ROCA primes
+        primes_subset = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53]
+        M = prod(primes_subset)
+        if gcd(base, M) != 1:
+            out.append("NITROS=FAILED")
+        else:
             # Compute multiplicative order of base modulo M
             ord_val = Mod(base, M).multiplicative_order()
             n_mod = n % M
@@ -58,97 +46,82 @@ export const attack: Attack = {
             # n_mod^ord_val == 1 mod M if and only if n_mod is a power of base mod M.
             # This avoids enumerating all 8M+ remainders.
             if pow(Integer(n_mod), ord_val, Integer(M)) != 1:
-                out.append("n_mod not in remainder subgroup — primes are not Nitros-form for this M.")
                 out.append("NITROS=FAILED")
-                print("\\n".join(out))
-                return
-            # Build the set of all possible remainders {base^i mod M}
-            r_set = set()
-            r_cur = Integer(1)
-            MAX_SET = 10000
-            out.append(f"Order = {ord_val}" + (f", scanning up to {MAX_SET} remainders (capped)" if ord_val > MAX_SET else ""))
-            for _ in range(min(ord_val, MAX_SET)):
-                r_set.add(r_cur)
-                r_cur = ZZ(Mod(r_cur * base, M))
-            # Find candidate remainder pairs (r1, r2) where r1*r2 ≡ n mod M
-            candidates = set()
-            candidates.add(Integer(1))
-            candidates.add(Integer(n_mod % M))
-            for r1 in list(r_set):
-                if len(candidates) >= 20:
-                    break
-                if r1 in candidates:
-                    continue
-                try:
-                    r2 = (Integer(n_mod) * inverse_mod(ZZ(r1), Integer(M))) % Integer(M)
-                    if r2 in r_set:
-                        candidates.add(ZZ(r1))
-                except (ZeroDivisionError, TypeError, ValueError, ArithmeticError):
-                    continue
-            out.append(f"Found {len(candidates)} candidate remainder(s)")
-            out.append(f"M = {M} (product of first {len(primes_subset)} primes, ~{M.nbits()} bits)")
-            # Coppersmith path (fast lattice reduction)
-            bound = min(int(ceil(Integer(isqrt(n)) / M)), 100000)
-            out.append(f"Direct search bound = {bound} (k has ~{Integer(bound).nbits()} bits)")
-            factored = False
-            MAX_COPPER = min(len(candidates), 15)
-            try:
-                R.<x> = PolynomialRing(ZZ)
-                for r_candidate in list(candidates)[:MAX_COPPER]:
-                    f = M*x + r_candidate
-                    f_mod = f.change_ring(Zmod(n))
-                    f_monic = f_mod.monic()
-                    roots = f_monic.small_roots(X=bound, beta=0.5, epsilon=0.05)
-                    if roots:
-                        k = int(roots[0])
-                        p_candidate = int(M * k + r_candidate)
-                        if p_candidate > 1 and n % p_candidate == 0:
-                            q = n // p_candidate
-                            out.append(f"Factor found via Coppersmith! r={r_candidate}, k={k}")
-                            out.append(f"Verification: p * q = {p_candidate * q}")
-                            out.append(f"p = {p_candidate}")
-                            out.append(f"q = {q}")
-                            out.append("")
-                            out.append("NITROS=SUCCESS")
-                            print("\\n".join(out))
-                            factored = True
-                            break
-            except Exception:
-                pass
-            if not factored:
-                out.append("Coppersmith did not find root. Falling back to direct search...")
-                max_total_ops = 20000
-                per_r = min(int(bound) + 1, max(1, max_total_ops // max(1, len(candidates))))
-                out.append(f"Direct search: {len(candidates)} remainder(s), up to {per_r} k-values each")
-                for r_candidate in list(candidates):
-                    if factored:
+            else:
+                # Build the set of all possible remainders {base^i mod M}
+                r_set = set()
+                r_cur = Integer(1)
+                MAX_SET = 10000
+                for _ in range(min(ord_val, MAX_SET)):
+                    r_set.add(r_cur)
+                    r_cur = ZZ(Mod(r_cur * base, M))
+                # Find candidate remainder pairs (r1, r2) where r1*r2 ≡ n mod M
+                candidates = set()
+                candidates.add(Integer(1))
+                candidates.add(Integer(n_mod % M))
+                for r1 in list(r_set):
+                    if len(candidates) >= 20:
                         break
-                    for k in range(per_r):
-                        p_candidate = int(M * k + r_candidate)
-                        if p_candidate > 1 and n % p_candidate == 0:
-                            q = n // p_candidate
-                            out.append(f"Factor found via direct search! r={r_candidate}, k={k}")
-                            out.append(f"Verification: p * q = {p_candidate * q}")
-                            out.append(f"p = {p_candidate}")
-                            out.append(f"q = {q}")
-                            out.append("")
-                            out.append("NITROS=SUCCESS")
-                            print("\\n".join(out))
-                            factored = True
-                            break
+                    if r1 in candidates:
+                        continue
+                    try:
+                        r2 = (Integer(n_mod) * inverse_mod(ZZ(r1), Integer(M))) % Integer(M)
+                        if r2 in r_set:
+                            candidates.add(ZZ(r1))
+                    except (ZeroDivisionError, TypeError, ValueError, ArithmeticError):
+                        continue
+                out.append(f"Found {len(candidates)} candidate remainder(s)")
+                # Coppersmith path (fast lattice reduction)
+                bound = min(int(ceil(Integer(isqrt(n)) / M)), 100000)
+                factored = False
+                MAX_COPPER = min(len(candidates), 15)
+                try:
+                    R.<x> = PolynomialRing(ZZ)
+                    for r_candidate in list(candidates)[:MAX_COPPER]:
+                        f = M*x + r_candidate
+                        f_mod = f.change_ring(Zmod(n))
+                        f_monic = f_mod.monic()
+                        roots = f_monic.small_roots(X=bound, beta=0.5, epsilon=0.05)
+                        if roots:
+                            k = int(roots[0])
+                            p_candidate = int(M * k + r_candidate)
+                            if p_candidate > 1 and n % p_candidate == 0:
+                                q = n // p_candidate
+                                out.append(f"p = {p_candidate}")
+                                out.append(f"q = {q}")
+                                out.append(f"Verification: p * q = {p_candidate * q}")
+                                out.append("")
+                                out.append("NITROS=SUCCESS")
+                                found = True
+                                factored = True
+                                break
+                except Exception:
+                    pass
                 if not factored:
-                    out.append("No ROCA/Nitros pattern detected. Searched up to k-bound = " + str(bound))
-                    out.append("NITROS=FAILED")
-                    print("\\n".join(out))
-        except Exception as ex:
-            out.append(f"ERROR: {ex}")
-            out.append("NITROS=FAILED")
-            print("\\n".join(out))
-        #
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("NITROS=FAILED")
-_attack()`,
+                    max_total_ops = 20000
+                    per_r = min(int(bound) + 1, max(1, max_total_ops // max(1, len(candidates))))
+                    for r_candidate in list(candidates):
+                        if factored:
+                            break
+                        for k in range(per_r):
+                            p_candidate = int(M * k + r_candidate)
+                            if p_candidate > 1 and n % p_candidate == 0:
+                                q = n // p_candidate
+                                out.append(f"p = {p_candidate}")
+                                out.append(f"q = {q}")
+                                out.append(f"Verification: p * q = {p_candidate * q}")
+                                out.append("")
+                                out.append("NITROS=SUCCESS")
+                                found = True
+                                factored = True
+                                break
+                    if not factored:
+                        out.append("NITROS=FAILED")
+        if not found:
+            out.append("NITROS=FAILED")`,
+      useGuard: true,
+    });
+  },
   proof: `\\textbf{Theorem:} Generalized ROCA primes have the form $p = k \\cdot M + (a^i \\bmod M)$ for an arbitrary generator $a$, and are factorable when $M > n^{1/4}$.
 
 \\textbf{Setup:}

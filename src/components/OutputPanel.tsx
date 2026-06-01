@@ -11,12 +11,10 @@ import {
 } from '@mui/material';
 import { ExpandLess, ExpandMore, ContentCopy, CheckCircle, Cancel, History as HistoryIcon } from '@mui/icons-material';
 import type { HistoryEntry } from '../types';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { dracula as draculaStyle } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useDragResize } from '../hooks/useDragResize';
-import { ghostBtnSx } from '../styles/shared';
+import { ghostBtnSx, FONT_FAMILY } from '../styles/shared';
 
 const notepadBaseStyle: React.CSSProperties = {
   width: '100%',
@@ -175,13 +173,23 @@ export function OutputPanel() {
               borderRadius: 1,
               border: `1px solid ${draculaColors.comment}`,
             }}>
-              <SyntaxHighlighter
-                language="text"
-                style={draculaStyle}
-                customStyle={{ margin: 0, borderRadius: 'inherit', fontSize: '0.8rem' }}
+              <Box
+                component="pre"
+                sx={{
+                  margin: 0,
+                  borderRadius: 'inherit',
+                  fontSize: '0.8rem',
+                  fontFamily: FONT_FAMILY,
+                  backgroundColor: draculaColors.background,
+                  color: draculaColors.foreground,
+                  p: 1.5,
+                  overflow: 'auto',
+                  lineHeight: '1.5',
+                  whiteSpace: 'pre',
+                }}
               >
                 {displayResult}
-              </SyntaxHighlighter>
+              </Box>
             </Box>
 
             <Box sx={{ display: 'flex', gap: 1, mt: 2, flexWrap: 'wrap' }}>

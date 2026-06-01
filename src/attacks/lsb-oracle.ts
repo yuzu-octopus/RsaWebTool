@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'lsb-oracle',
@@ -13,24 +14,21 @@ export const attack: Attack = {
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
     { name: 'oracle_responses', label: 'Oracle responses (comma-separated LSB bits)', placeholder: '1,0,1,1,0,...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
-    try:
-        # LSB Oracle Attack — binary search via 2^e blinding
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+      token: 'LSB_ORACLE',
+      useGuard: false,
+      body: `        valid = True
         if not "${vals.n}".strip():
-            print("ERROR: n is required")
-            print("LSB_ORACLE=FAILED")
-            return
+            out.append("ERROR: n is required")
+            valid = False
         if not "${vals.c}".strip():
-            print("ERROR: c is required")
-            print("LSB_ORACLE=FAILED")
-            return
+            out.append("ERROR: c is required")
+            valid = False
         responses_raw = """${vals.oracle_responses || ''}""".strip()
         if not responses_raw:
-            print("ERROR: oracle_responses is required")
-            print("LSB_ORACLE=FAILED")
-            return
-        try:
-            out = []
+            out.append("ERROR: oracle_responses is required")
+            valid = False
+        if valid:
             n = Integer(${vals.n})
             e_val = "${vals.e}".strip()
             e = Integer(e_val) if e_val else Integer(65537)
@@ -39,20 +37,12 @@ export const attack: Attack = {
             oracle_bits = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
             two_e = pow(2, int(e), int(n))
             two_e_sage = Integer(two_e)
-            out.append("LSB Oracle Attack on RSA")
-            out.append(f"n = {n} ({n.nbits()} bits)")
+            out.append("LSB Oracle")
+            out.append(f"n = {n}")
             out.append(f"e = {e}")
-            out.append(f"Oracle responses: {len(oracle_bits)} bits")
-            out.append("")
-            if len(oracle_bits) < n.nbits():
-                out.append(f"WARNING: Need {n.nbits()} responses for full recovery, got {len(oracle_bits)}.")
-                out.append("Result may be approximate.")
-                out.append("")
-            # Binary search using LSB oracle with 2^e blinding
-            # Use QQ (rational) arithmetic to avoid integer-division convergence errors.
-            # LSB(2^(i+1) * m mod n) = 1 iff current m >= midpoint of [lower, upper]
-            # where midpoint = ceil((lower + upper) / 2); then halve interval
-            # Compute midpoint using (lower + upper) / 2 (QQ rational, exact)
+            out.append(f"c = {orig_c}")
+            out.append(f"oracle_responses = {len(oracle_bits)} bits")
+
             lower = QQ(0)
             upper = QQ(n)
             for i, bit in enumerate(oracle_bits):
@@ -62,30 +52,28 @@ export const attack: Attack = {
                     upper = mid
                 else:
                     lower = mid
-                if i < 5 or i % 50 == 0:
-                    remaining = n.nbits() - i - 1
-                    out.append(f"  Step {i+1}: LSB={bit}, interval ~ [{lower.numerator()}/{lower.denominator()}, {upper.numerator()}/{upper.denominator()}], remaining ~ {max(0, remaining)} bits")
+
             out.append("")
-            # Scan exact candidates from integer hull of rational interval
             lo_int = floor(lower)
             hi_int = ceil(upper)
+            found_m = None
             for m_candidate in range(lo_int, hi_int + 1):
                 m = Integer(m_candidate)
                 if pow(int(m), int(e), int(n)) == int(orig_c):
-                    out.append(f"Recovered message: m = {m}")
+                    found_m = m_candidate
+                    out.append("")
+                    out.append("Results:")
+                    out.append(f"m = {m}")
+                    out.append("")
+                    out.append(f"Verification: m^e mod n = {Integer(pow(int(m), int(e), int(n)))}")
+                    out.append("")
                     out.append("LSB_ORACLE=SUCCESS")
                     break
-            else:
-                out.append(f"LSB_ORACLE=FAILED (scanned {lo_int}..{hi_int})")
-            print("\\n".join(out))
-        except Exception as ex:
-            out.append(f"ERROR: {ex}")
-            out.append("LSB_ORACLE=FAILED")
-            print("\\n".join(out))
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("LSB_ORACLE=FAILED")
-_attack()`,
+            if found_m is None:
+                out.append("LSB_ORACLE=FAILED")
+        else:
+            out.append("LSB_ORACLE=FAILED")`,
+    }),
   frontendCheck: (vals) => {
     if (!vals.n || !vals.e || !vals.c || !vals.oracle_responses) return Promise.resolve(null);
     try {
@@ -109,8 +97,10 @@ _attack()`,
       const mCeil = divisor > n ? (q * n + divisor - 1n) / divisor : q * n / divisor;
 
       // Scan ±2 around candidate for safety (handles edge rounding)
-      for (let m = mCeil - 2n; m <= mCeil + 2n; m++) {
-        if (m >= 0n && modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}\nbits used = ${k}\nLSB_ORACLE=SUCCESS`);
+      for (let mVal = mCeil - 2n; mVal <= mCeil + 2n; mVal++) {
+        if (mVal >= 0n && modPow(mVal, e, n) === c) {
+          return Promise.resolve(`LSB Oracle\nn = ${n}\ne = ${e}\nc = ${c}\noracle_responses = ${k} bits\n\nResults:\nm = ${mVal}\n\nVerification: m^e mod n = ${modPow(mVal, e, n)}\n\nLSB_ORACLE=SUCCESS`);
+        }
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }

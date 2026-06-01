@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd, modPow } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'dp-dq-leak',
@@ -30,7 +31,7 @@ export const attack: Attack = {
             const p = gcd(x - 1n, n);
             if (p > 1n && p < n) {
               const q = n / p;
-              return `Verification: p * q = ${(p * q).toString()}\ndp = ${dp.toString()}\np = ${p.toString()}\nq = ${q.toString()}\n\nDP_DQ_LEAK=SUCCESS`;
+              return `DP-DQ Leak\nn = ${n.toString()}\ne = ${e.toString()}\ndp = ${dp.toString()}\n\nResults:\np = ${p.toString()}\nq = ${q.toString()}\n\nVerification: p * q = ${(p * q).toString()}\n\nDP_DQ_LEAK=SUCCESS`;
             }
           }
         }
@@ -45,7 +46,7 @@ export const attack: Attack = {
             const q = gcd(x - 1n, n);
             if (q > 1n && q < n) {
               const p = n / q;
-              return `Verification: p * q = ${(p * q).toString()}\ndq = ${dq.toString()}\np = ${p.toString()}\nq = ${q.toString()}\n\nDP_DQ_LEAK=SUCCESS`;
+              return `DP-DQ Leak\nn = ${n.toString()}\ne = ${e.toString()}\ndq = ${dq.toString()}\n\nResults:\np = ${p.toString()}\nq = ${q.toString()}\n\nVerification: p * q = ${(p * q).toString()}\n\nDP_DQ_LEAK=SUCCESS`;
             }
           }
         }
@@ -67,10 +68,16 @@ export const attack: Attack = {
                     if p_candidate > 1 and n_int % p_candidate == 0:
                         p_sage = Integer(p_candidate)
                         q_val = n // p_sage
-                        out.append(f"Verification: p * q = {p_sage * q_val}")
+                        out.append("DP-DQ Leak")
+                        out.append(f"n = {n}")
+                        out.append(f"e = {e}")
                         out.append(f"dp = {dp_val}")
+                        out.append("")
+                        out.append("Results:")
                         out.append(f"p = {p_sage}")
                         out.append(f"q = {q_val}")
+                        out.append("")
+                        out.append(f"Verification: p * q = {p_sage * q_val}")
                         out.append("")
                         out.append("DP_DQ_LEAK=SUCCESS")
                         found = True
@@ -87,33 +94,38 @@ export const attack: Attack = {
                         if q_candidate > 1 and n_int % q_candidate == 0:
                             p_val = n // Integer(q_candidate)
                             q_sage = Integer(q_candidate)
-                            out.append(f"Verification: p * q = {p_val * q_sage}")
+                            out.append("DP-DQ Leak")
+                            out.append(f"n = {n}")
+                            out.append(f"e = {e}")
                             out.append(f"dq = {dq_val}")
+                            out.append("")
+                            out.append("Results:")
                             out.append(f"p = {p_val}")
                             out.append(f"q = {q_sage}")
+                            out.append("")
+                            out.append(f"Verification: p * q = {p_val * q_sage}")
                             out.append("")
                             out.append("DP_DQ_LEAK=SUCCESS")
                             found = True
                             break` : '';
 
-    return `def _attack():
-    try:
-        out = []
-        n = Integer(${vals.n})
-        e = Integer(${vals.e})
+    return wrapSageTemplate({
+      token: 'DP_DQ_LEAK',
+      n: vals.n,
+      body: `        e = Integer(${vals.e})
         if n <= 0 or e <= 0:
             out.append("DP_DQ_LEAK=FAILED: invalid input values")
+            out.append("DP_DQ_LEAK=FAILED")
         else:
             n_int = int(n)
             e_int = int(e)
             found = False${dpBlock}${dqBlock}
             if not found:
                 out.append("DP_DQ_LEAK=FAILED: no valid factor found")
-        print("\\n".join(out))
-    except Exception as ex:
-        out.append(f"DP_DQ_LEAK=FAILED: {ex}")
-        print("\\n".join(out))
-_attack()`;
+        if not found:
+            out.append("DP_DQ_LEAK=FAILED")`,
+      useGuard: true,
+    });
   },
   proof: `\\textbf{Theorem:} Given $d_p = d \\bmod (p-1)$, factor $n$ by iterating $k$ in $d_p \\cdot e - 1 = k(p-1)$.
 

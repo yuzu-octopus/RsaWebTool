@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { isqrt } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'linearly-related-primes',
@@ -11,43 +12,15 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'k', label: 'k (known multiplier)', placeholder: 'Enter k value...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `import math
-def _attack():
-    out = []
-    try:
-        try:
-            n = Integer(${vals.n})
-            k = Integer(${vals.k})
-            if n < 2:
-                out.append("LINEARLY_RELATED_PRIMES=FAILED: n is too small")
-                print("\\n".join(out))
-                return
-            if k <= 0:
-                out.append("LINEARLY_RELATED_PRIMES=FAILED: k must be positive")
-                print("\\n".join(out))
-                return
-            if n % 2 == 0:
-                out.append(f"n is even: {n}")
-                out.append(f"p = 2")
-                out.append(f"q = {n // 2}")
-                out.append(f"Verification: 2 * {n // 2} = {n}")
-                out.append("LINEARLY_RELATED_PRIMES=SUCCESS")
-                print("\\n".join(out))
-                return
-            if n.is_prime():
-                out.append("LINEARLY_RELATED_PRIMES=FAILED: n is prime")
-                print("\\n".join(out))
-                return
-            if n.is_square():
-                p = isqrt(n)
-                out.append(f"n is a perfect square: {p}^2 = {n}")
-                out.append(f"Verification: p * q = {p * p}")
-                out.append(f"p = {p}")
-                out.append(f"q = {p}")
-                out.append("")
-                out.append("LINEARLY_RELATED_PRIMES=SUCCESS")
-                print("\\n".join(out))
-                return
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'LINEARLY_RELATED_PRIMES',
+    n: vals.n,
+    imports: ['import math'],
+    useGuard: true,
+    body: `        k = Integer(${vals.k})
+        if k <= 0:
+            out.append("LINEARLY_RELATED_PRIMES=FAILED: k must be positive")
+        else:
             # Use Python ints for fast iteration
             n_int = int(n)
             k_int = int(k)
@@ -66,23 +39,22 @@ def _attack():
                         if p_candidate > 1 and n_int % p_candidate == 0:
                             p_sage = Integer(p_candidate)
                             q_sage = n // p_sage
-                            out.append(f"Verification: p * q = {p_sage * q_sage}")
+                            out.append("Linearly Related Primes")
+                            out.append(f"n = {n}")
+                            out.append(f"k = {k}")
+                            out.append("")
+                            out.append("Results:")
                             out.append(f"p = {p_sage}")
                             out.append(f"q = {q_sage}")
-                            out.append(f"delta = {delta}")
+                            out.append("")
+                            out.append(f"Verification: p * q = {p_sage * q_sage}")
                             out.append("")
                             out.append("LINEARLY_RELATED_PRIMES=SUCCESS")
                             found = True
                             break
             if not found:
-                out.append("LINEARLY_RELATED_PRIMES=FAILED: no valid factorization found")
-        except Exception as ex:
-            out.append(f"LINEARLY_RELATED_PRIMES=FAILED: {ex}")
-    except BaseException as ex:
-        out.append(f"ERROR: {ex}")
-        out.append("LINEARLY_RELATED_PRIMES=FAILED")
-    print("\\n".join(out))
-_attack()`,
+                out.append("LINEARLY_RELATED_PRIMES=FAILED: no valid factorization found")`,
+  }),
   frontendCheck: (vals, onProgress) => {
     if (!vals.n || !vals.k) return Promise.resolve(null);
     try {
@@ -107,7 +79,8 @@ _attack()`,
           if (p > 1n && n % p === 0n) {
             const q = n / p;
             onProgress?.(100);
-            return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nk = ${k}\ndelta = ${delta}\nLINEARLY_RELATED_PRIMES=SUCCESS`);
+            onProgress?.(100);
+            return Promise.resolve(`Linearly Related Primes\nn = ${n}\nk = ${k}\n\nResults:\np = ${p}\nq = ${q}\n\nVerification: p * q = ${p * q}\n\nLINEARLY_RELATED_PRIMES=SUCCESS`);
           }
         }
       }

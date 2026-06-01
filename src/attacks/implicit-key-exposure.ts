@@ -46,16 +46,16 @@ p &= \\gcd(\\text{leak} - a, n) \\qed
         const p = g;
         const q = n / p;
         return [
-          `Implicit Key Exposure Attack (browser-side, BigInt)`,
+          `Implicit Key Exposure`,
           `n = ${n}`,
           `a = ${a}`,
           `leak = ${leak}`,
           ``,
-          `Factors recovered:`,
+          `Results:`,
           `p = ${p}`,
           `q = ${q}`,
+          ``,
           `Verification: p * q = ${p * q}`,
-          `Verification: a^p mod n = ${modPow(a, p, n)} == leak? ${modPow(a, p, n) === leak}`,
           ``,
           `IMPLICIT_KEY_EXPOSURE=SUCCESS`,
         ].join('\n');

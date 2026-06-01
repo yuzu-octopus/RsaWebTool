@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 import { modInverse, isqrt } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'partial-d',
@@ -12,64 +13,65 @@ export const attack: Attack = {
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
     { name: 'dLow', label: 'dLow (low bits of d)', placeholder: 'Enter known low bits of d...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `import math
-def _attack():
-    try:
-        out = []
-        try:
-            n = Integer(${vals.n})
-            e = Integer(${vals.e})
-            dLow = Integer(${vals.dLow})
-            if n <= 0 or e <= 0 or dLow < 0:
-                out.append("PARTIAL_D=FAILED: invalid input values")
-            else:
-                # Use Python ints for fast iteration
-                n_int = int(n)
-                e_int = int(e)
-                dLow_int = int(dLow)
-                m = dLow_int.bit_length()
-                kBound = 1 << min(m + 2, 24)
-                # Incremental d_approx update (avoid BigInt division per iteration)
-                q = n_int // e_int
-                r = n_int % e_int
-                d_approx = (n_int + 1) // e_int
-                rem = (n_int + 1) % e_int
-                found = False
-                for k in range(1, kBound + 1):
-                    if (d_approx & ((1 << m) - 1)) == dLow_int:
-                        d_phi = (e_int * d_approx - 1) // k
-                        s = n_int - d_phi + 1
-                        disc = s * s - 4 * n_int
-                        if disc >= 0:
-                            sqrt_disc = math.isqrt(disc)
-                            if sqrt_disc * sqrt_disc == disc:
-                                p_candidate = (s + sqrt_disc) // 2
-                                if p_candidate > 1 and n_int % p_candidate == 0:
-                                    p_sage = Integer(p_candidate)
-                                    q_sage = n // p_sage
-                                    out.append(f"Verification: p * q = {p_sage * q_sage}")
-                                    out.append(f"d = {d_approx}")
-                                    out.append(f"p = {p_sage}")
-                                    out.append(f"q = {q_sage}")
-                                    out.append("")
-                                    out.append("PARTIAL_D=SUCCESS")
-                                    found = True
-                                    break
-                    # Increment d_approx for next iteration
-                    d_approx += q
-                    rem += r
-                    if rem >= e_int:
-                        d_approx += 1
-                        rem -= e_int
-                if not found:
-                    out.append("PARTIAL_D=FAILED: no valid d found")
-        except Exception as ex:
-            out.append(f"PARTIAL_D=FAILED: {ex}")
-        print("\\n".join(out))
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("PARTIAL_D=FAILED")
-_attack()`,
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'PARTIAL_D',
+    n: vals.n,
+    imports: ['import math'],
+    body: `        e = Integer(${vals.e})
+        dLow = Integer(${vals.dLow})
+        if n <= 0 or e <= 0 or dLow < 0:
+            out.append("PARTIAL_D=FAILED: invalid input values")
+        else:
+            # Use Python ints for fast iteration
+            n_int = int(n)
+            e_int = int(e)
+            dLow_int = int(dLow)
+            m = dLow_int.bit_length()
+            kBound = 1 << min(m + 2, 24)
+            # Incremental d_approx update (avoid BigInt division per iteration)
+            q = n_int // e_int
+            r = n_int % e_int
+            d_approx = (n_int + 1) // e_int
+            rem = (n_int + 1) % e_int
+            found = False
+            for k in range(1, kBound + 1):
+                if (d_approx & ((1 << m) - 1)) == dLow_int:
+                    d_phi = (e_int * d_approx - 1) // k
+                    s = n_int - d_phi + 1
+                    disc = s * s - 4 * n_int
+                    if disc >= 0:
+                        sqrt_disc = math.isqrt(disc)
+                        if sqrt_disc * sqrt_disc == disc:
+                            p_candidate = (s + sqrt_disc) // 2
+                            if p_candidate > 1 and n_int % p_candidate == 0:
+                                p_sage = Integer(p_candidate)
+                                q_sage = n // p_sage
+                                out.append("Partial d")
+                                out.append(f"n = {n}")
+                                out.append(f"e = {e}")
+                                out.append(f"dLow = {dLow}")
+                                out.append("")
+                                out.append("Results:")
+                                out.append(f"p = {p_sage}")
+                                out.append(f"q = {q_sage}")
+                                out.append("")
+                                out.append(f"Verification: p * q = {p_sage * q_sage}")
+                                out.append("")
+                                out.append("PARTIAL_D=SUCCESS")
+                                found = True
+                                break
+                # Increment d_approx for next iteration
+                d_approx += q
+                rem += r
+                if rem >= e_int:
+                    d_approx += 1
+                    rem -= e_int
+            if not found:
+                out.append("PARTIAL_D=FAILED: no valid d found")
+        if not found:
+            out.append("PARTIAL_D=FAILED")`,
+    useGuard: true,
+  }),
   frontendCheck: (vals: Record<string, string>, onProgress?: (pct: number, detail?: string) => void) => {
     if (!vals.n || !vals.e || !vals.dLow) return Promise.resolve(null);
     try {
@@ -107,7 +109,8 @@ _attack()`,
               if (p > 0n && n % p === 0n) {
                 const qVal = n / p;
                 onProgress?.(100);
-                return Promise.resolve(`Factor found!\np = ${p}\nq = ${qVal}\nk = ${k}\nPrivate key d = ${dApprox}\nPARTIAL_D=SUCCESS`);
+                onProgress?.(100);
+                return Promise.resolve(`Partial d Key Exposure\nn = ${n}\ne = ${e}\ndLow = ${dLow}\n\nResults:\np = ${p}\nq = ${qVal}\n\nVerification: p * q = ${p * qVal}\n\nPARTIAL_D=SUCCESS`);
               }
             }
           }

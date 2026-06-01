@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { modPow, iroot } from '../utils/bigint';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'known-plaintext',
@@ -19,52 +20,41 @@ export const attack: Attack = {
       return `print("ERROR: n and c are required")
 print("KNOWN_PLAINTEXT=FAILED")`;
     }
-    return `def _attack():
-    try:
-        out = []
-        n = Integer(${vals.n})
+    return wrapSageTemplate({
+      token: 'KNOWN_PLAINTEXT',
+      useGuard: false,
+      body: `        n = Integer(${vals.n})
         e_val = "${vals.e}".strip()
         e = Integer(e_val) if e_val else Integer(65537)
         c = Integer(${vals.c})
         known_prefix = "${vals.known_prefix || ''}"
         unknown_bits = Integer("${(vals.unknown_bits || '24').trim()}")
-        out.append(f"Known plaintext attack on RSA")
-        out.append(f"n = {n} ({n.nbits()} bits)")
+        out.append(f"Known Plaintext Attack")
+        out.append(f"n = {n}")
         out.append(f"e = {e}")
         out.append(f"c = {c}")
         # Strategy 1: Try direct integer e-th root of c
-        # Works when m^e < n (no modular wrap-around), which is common for e=3
+        found = False
         try:
             m_int_root, is_exact = c.nth_root(int(e), truncate_mode=True)
             if is_exact and pow(int(m_int_root), int(e), int(n)) == c:
-                out.append(f"RECOVERED via integer e-th root! m = {m_int_root}")
-                try:
-                    m_hex = hex(Integer(m_int_root))[2:]
-                    if len(m_hex) % 2 != 0:
-                        m_hex = '0' + m_hex
-                    out.append(f"m as bytes: {bytes.fromhex(m_hex)}")
-                except Exception:
-                    pass
+                out.append("")
+                out.append("Results:")
+                out.append(f"m = {m_int_root}")
+                out.append("")
+                out.append(f"Verification: m^e mod n = {pow(int(m_int_root), int(e), int(n))}")
+                out.append("")
                 out.append("KNOWN_PLAINTEXT=SUCCESS")
-                print("\\n".join(out))
-                return
+                found = True
         except Exception:
             pass
         # Strategy 2: Known prefix + brute-force for small unknown bits
-        if known_prefix:
-            out.append(f"Known prefix: '{known_prefix}'")
-            out.append(f"Unknown bits: {unknown_bits}")
+        if not found and known_prefix:
             prefix_bytes = known_prefix.encode('utf-8')
             prefix_int = Integer(int.from_bytes(prefix_bytes, 'big'))
-            out.append(f"Prefix as integer: {prefix_int}")
-            out.append(f"Prefix byte length: {len(prefix_bytes)}")
             shift = 1 << int(unknown_bits)
             if unknown_bits <= 24:
-                out.append(f"Brute forcing 2^{unknown_bits} possibilities...")
-                found = False
                 if e == 3:
-                    # Horner evaluation: (prefix*shift + k)^3 mod n
-                    # = A + B*k + C*k^2 + k^3 mod n (avoids modular exponentiation)
                     n_int_h = int(n)
                     c_int = int(c)
                     PS_int = int(prefix_int * shift)
@@ -79,14 +69,12 @@ print("KNOWN_PLAINTEXT=FAILED")`;
                         val = (val + k2 * k_mod) % n_int_h
                         if val == c_int:
                             m_try = prefix_int * shift + k
-                            out.append(f"FOUND! m = {m_try}")
-                            try:
-                                m_hex = hex(m_try)[2:]
-                                if len(m_hex) % 2 != 0:
-                                    m_hex = '0' + m_hex
-                                out.append(f"m as bytes: {bytes.fromhex(m_hex)}")
-                            except:
-                                pass
+                            out.append("")
+                            out.append("Results:")
+                            out.append(f"m = {m_try}")
+                            out.append("")
+                            out.append(f"Verification: m^e mod n = {pow(int(m_try), int(e), int(n))}")
+                            out.append("")
                             out.append("KNOWN_PLAINTEXT=SUCCESS")
                             found = True
                             break
@@ -94,14 +82,12 @@ print("KNOWN_PLAINTEXT=FAILED")`;
                     for k in range(shift):
                         m_try = prefix_int * shift + k
                         if pow(int(m_try), int(e), int(n)) == c:
-                            out.append(f"FOUND! m = {m_try}")
-                            try:
-                                m_hex = hex(m_try)[2:]
-                                if len(m_hex) % 2 != 0:
-                                    m_hex = '0' + m_hex
-                                out.append(f"m as bytes: {bytes.fromhex(m_hex)}")
-                            except:
-                                pass
+                            out.append("")
+                            out.append("Results:")
+                            out.append(f"m = {m_try}")
+                            out.append("")
+                            out.append(f"Verification: m^e mod n = {pow(int(m_try), int(e), int(n))}")
+                            out.append("")
                             out.append("KNOWN_PLAINTEXT=SUCCESS")
                             found = True
                             break
@@ -112,16 +98,11 @@ print("KNOWN_PLAINTEXT=FAILED")`;
                 out.append(f"Unknown portion ({unknown_bits} bits) too large for brute force.")
                 out.append(f"Brute-force limit is 24 bits (found {unknown_bits}) — try Coppersmith's method or a different approach.")
                 out.append("KNOWN_PLAINTEXT=FAILED")
-        else:
+        elif not found:
             out.append("No known prefix provided.")
             out.append("Provide the known portion of the plaintext to attempt recovery.")
-            out.append("KNOWN_PLAINTEXT=FAILED")
-        print("\\n".join(out))
-    except Exception as ex:
-        out.append(f"Error: {ex}")
-        out.append("KNOWN_PLAINTEXT=FAILED")
-        print("\\n".join(out))
-_attack()`;
+            out.append("KNOWN_PLAINTEXT=FAILED")`,
+    });
   },
   frontendCheck: (vals, onProgress) => {
     if (!vals.n || !vals.c) return Promise.resolve(null);
@@ -136,14 +117,10 @@ _attack()`;
       if (root ** e === c && modPow(root, e, n) === c) {
         onProgress?.(100);
         try {
-          const hexStr = root.toString(16);
-          const padded = hexStr.length % 2 ? '0' + hexStr : hexStr;
-          const bytes = new Uint8Array(padded.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
-          const text = new TextDecoder().decode(bytes);
-          return Promise.resolve(`RECOVERED via integer e-th root! m = ${root}\nm as bytes: ${text}\nKNOWN_PLAINTEXT=SUCCESS`);
+          return Promise.resolve(`Known Plaintext Attack\nn = ${n}\ne = ${e}\nc = ${c}\n\nResults:\nm = ${root}\n\nVerification: m^e mod n = ${modPow(root, e, n)}\n\nKNOWN_PLAINTEXT=SUCCESS`);
         } catch {
           onProgress?.(100);
-          return Promise.resolve(`RECOVERED via integer e-th root! m = ${root}\nKNOWN_PLAINTEXT=SUCCESS`);
+          return Promise.resolve(`Known Plaintext Attack\nn = ${n}\ne = ${e}\nc = ${c}\n\nResults:\nm = ${root}\n\nVerification: m^e mod n = ${modPow(root, e, n)}\n\nKNOWN_PLAINTEXT=SUCCESS`);
         }
       }
       // Strategy 2: Known prefix + brute-force
@@ -179,14 +156,10 @@ _attack()`;
               const mTry = (prefixInt << BigInt(unknownBits)) + BigInt(k);
               onProgress?.(100);
               try {
-                const hexStr = mTry.toString(16);
-                const padded = hexStr.length % 2 ? '0' + hexStr : hexStr;
-                const bytes = new Uint8Array(padded.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
-                const text = new TextDecoder().decode(bytes);
-                return Promise.resolve(`FOUND! m = ${mTry}\nm as bytes: ${text}\nKNOWN_PLAINTEXT=SUCCESS`);
+                return Promise.resolve(`Known Plaintext Attack\nn = ${n}\ne = ${e}\nc = ${c}\nknown_prefix = ${knownPrefix}\nunknown_bits = ${unknownBits}\n\nResults:\nm = ${mTry}\n\nVerification: m^e mod n = ${modPow(mTry, e, n)}\n\nKNOWN_PLAINTEXT=SUCCESS`);
               } catch {
                 onProgress?.(100);
-                return Promise.resolve(`FOUND! m = ${mTry}\nKNOWN_PLAINTEXT=SUCCESS`);
+                return Promise.resolve(`Known Plaintext Attack\nn = ${n}\ne = ${e}\nc = ${c}\nknown_prefix = ${knownPrefix}\nunknown_bits = ${unknownBits}\n\nResults:\nm = ${mTry}\n\nVerification: m^e mod n = ${modPow(mTry, e, n)}\n\nKNOWN_PLAINTEXT=SUCCESS`);
               }
             }
           }
@@ -205,14 +178,10 @@ _attack()`;
             if (modPow(mTry, e, n) === c) {
               onProgress?.(100);
               try {
-                const hexStr = mTry.toString(16);
-                const padded = hexStr.length % 2 ? '0' + hexStr : hexStr;
-                const bytes = new Uint8Array(padded.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
-                const text = new TextDecoder().decode(bytes);
-                return Promise.resolve(`FOUND! m = ${mTry}\nm as bytes: ${text}\nKNOWN_PLAINTEXT=SUCCESS`);
+                return Promise.resolve(`Known Plaintext Attack\nn = ${n}\ne = ${e}\nc = ${c}\nknown_prefix = ${knownPrefix}\nunknown_bits = ${unknownBits}\n\nResults:\nm = ${mTry}\n\nVerification: m^e mod n = ${modPow(mTry, e, n)}\n\nKNOWN_PLAINTEXT=SUCCESS`);
               } catch {
                 onProgress?.(100);
-                return Promise.resolve(`FOUND! m = ${mTry}\nKNOWN_PLAINTEXT=SUCCESS`);
+                return Promise.resolve(`Known Plaintext Attack\nn = ${n}\ne = ${e}\nc = ${c}\nknown_prefix = ${knownPrefix}\nunknown_bits = ${unknownBits}\n\nResults:\nm = ${mTry}\n\nVerification: m^e mod n = ${modPow(mTry, e, n)}\n\nKNOWN_PLAINTEXT=SUCCESS`);
               }
             }
           }

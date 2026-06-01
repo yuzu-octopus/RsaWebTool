@@ -1,5 +1,6 @@
 import type { Attack } from '../types';
 import { randomPrime, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'non-coprime-exp',
@@ -22,120 +23,96 @@ print("NON_COPRIME_EXP=FAILED")`;
       return `print("ERROR: This attack requires p and q to resolve multiple e-th roots. Use factorization attacks first to find p and q.")
 print("NON_COPRIME_EXP=FAILED")`;
     }
-    return `def _attack():
-    out = []
-    try:
-        n = Integer(${vals.n})
+    return wrapSageTemplate({
+      token: 'NON_COPRIME_EXP',
+      useGuard: false,
+      body: `        n = Integer(${vals.n})
         e = Integer(${vals.e})
         c = Integer(${vals.c})
         p = Integer(${vals.p})
         q = Integer(${vals.q})
-        out.append(f"Non-Coprime Exponent Attack")
-        out.append(f"n = {n}, e = {e}")
-        out.append(f"p = {p}")
-        out.append(f"q = {q}")
-        out.append("")
-        phi = (p - 1) * (q - 1)
-        g = gcd(e, phi)
-        out.append(f"gcd(e, phi(n)) = gcd({e}, {phi}) = {g}")
-        if g == 1:
-            out.append("gcd(e, phi) = 1. Standard RSA applies. Use extended Euclidean algorithm.")
-            d = inverse_mod(e, phi)
-            m = power_mod(c, d, n)
-            out.append(f"Private exponent: d = {d}")
-            out.append(f"Recovered message: m = {m}")
-            # Verify
-            v = power_mod(m, e, n)
-            if v == c:
-                out.append("NON_COPRIME_EXP=SUCCESS")
-            else:
-                out.append("NON_COPRIME_EXP=FAILED")
-        else:
-            out.append(f"gcd(e, phi) = {g} > 1. Multiple plaintexts map to same ciphertext.")
+            out.append("Non-Coprime Exponent Attack")
+            out.append(f"n = {n}")
+            out.append(f"e = {e}")
+            out.append(f"c = {c}")
+            out.append(f"p = {p}")
+            out.append(f"q = {q}")
             out.append("")
-            # mod p
-            gp = gcd(e, p - 1)
-            out.append(f"gcd(e, p-1) = {gp}")
-            roots_p = []
-            if gp == 1:
-                dp = inverse_mod(e, p - 1)
-                mp = power_mod(c, dp, p)
-                roots_p = [mp]
+            out.append("Results:")
+            phi = (p - 1) * (q - 1)
+            g = gcd(e, phi)
+            if g == 1:
+                d = inverse_mod(e, phi)
+                m = power_mod(c, d, n)
+                out.append(f"m = {m}")
+                v = power_mod(m, e, n)
+                if v == c:
+                    out.append("")
+                    out.append("NON_COPRIME_EXP=SUCCESS")
+                else:
+                    out.append("")
+                    out.append("NON_COPRIME_EXP=FAILED")
             else:
-                # Find all e-th roots mod p
-                Fp = GF(p)
-                cp = Fp(c)
-                try:
-                    roots_p = cp.nth_root(e, all=True)
-                except (NotImplementedError, TypeError, AttributeError):
-                    roots_p = []
-                    # Manual fallback for small e: iterate candidates
-                    if e <= 10 and p < 2000000:
-                        for x in range(p):
-                            if power_mod(x, e, p) == cp:
-                                roots_p.append(Fp(x))
-                if not roots_p:
-                    # Manual Tonelli-Shanks fallback for e=2, p ≡ 3 mod 4
-                    if e == 2 and p % 4 == 3:
-                        r = cp ** ((p + 1) // 4)
-                        if r**2 == cp:
-                            roots_p = [r, -r]
-                            out.append("  (found via Tonelli-Shanks fallback)")
-            out.append(f"e-th roots mod p: {[Integer(r) for r in roots_p]}")
-            # mod q
-            gq = gcd(e, q - 1)
-            out.append(f"gcd(e, q-1) = {gq}")
-            roots_q = []
-            if gq == 1:
-                dq = inverse_mod(e, q - 1)
-                mq = power_mod(c, dq, q)
-                roots_q = [mq]
-            else:
-                Fq = GF(q)
-                cq = Fq(c)
-                try:
-                    roots_q = cq.nth_root(e, all=True)
-                except (NotImplementedError, TypeError, AttributeError):
-                    roots_q = []
-                    if e <= 10 and q < 2000000:
-                        for x in range(q):
-                            if power_mod(x, e, q) == cq:
-                                roots_q.append(Fq(x))
-                if not roots_q:
-                    if e == 2 and q % 4 == 3:
-                        r = cq ** ((q + 1) // 4)
-                        if r**2 == cq:
-                            roots_q = [r, -r]
-                            out.append("  (found via Tonelli-Shanks fallback)")
-            out.append(f"e-th roots mod q: {[Integer(r) for r in roots_q]}")
-            # CRT combine all pairs
-            out.append(f"\\nAll possible plaintexts ({len(roots_p) * len(roots_q)} total):")
-            found_valid = False
-            for rp in roots_p:
-                for rq in roots_q:
-                    m = crt([Integer(rp), Integer(rq)], [p, q])
-                    out.append(f"  m = {m}")
-                    # Verify
-                    v = power_mod(m, e, n)
-                    ok = v == c
-                    if ok:
-                        found_valid = True
-                    out.append(f"    m^e mod n = {v} (c = {c}) {'OK' if ok else 'FAIL'}")
-            if found_valid:
-                out.append("")
-                out.append("NON_COPRIME_EXP=SUCCESS")
-            else:
-                out.append("NON_COPRIME_EXP=FAILED")
-        print("\\n".join(out))
-    except Exception as ex:
-        try:
-            out.append(f"ERROR: {ex}")
-            out.append("NON_COPRIME_EXP=FAILED")
-        except:
-            out = [f"ERROR: {ex}", "NON_COPRIME_EXP=FAILED"]
-        print("\\n".join(out))
-    #
-_attack()`;
+                gp = gcd(e, p - 1)
+                roots_p = []
+                if gp == 1:
+                    dp = inverse_mod(e, p - 1)
+                    mp = power_mod(c, dp, p)
+                    roots_p = [mp]
+                else:
+                    Fp = GF(p)
+                    cp = Fp(c)
+                    try:
+                        roots_p = cp.nth_root(e, all=True)
+                    except (NotImplementedError, TypeError, AttributeError):
+                        roots_p = []
+                        if e <= 10 and p < 2000000:
+                            for x in range(p):
+                                if power_mod(x, e, p) == cp:
+                                    roots_p.append(Fp(x))
+                    if not roots_p:
+                        if e == 2 and p % 4 == 3:
+                            r = cp ** ((p + 1) // 4)
+                            if r**2 == cp:
+                                roots_p = [r, -r]
+                gq = gcd(e, q - 1)
+                roots_q = []
+                if gq == 1:
+                    dq = inverse_mod(e, q - 1)
+                    mq = power_mod(c, dq, q)
+                    roots_q = [mq]
+                else:
+                    Fq = GF(q)
+                    cq = Fq(c)
+                    try:
+                        roots_q = cq.nth_root(e, all=True)
+                    except (NotImplementedError, TypeError, AttributeError):
+                        roots_q = []
+                        if e <= 10 and q < 2000000:
+                            for x in range(q):
+                                if power_mod(x, e, q) == cq:
+                                    roots_q.append(Fq(x))
+                    if not roots_q:
+                        if e == 2 and q % 4 == 3:
+                            r = cq ** ((q + 1) // 4)
+                            if r**2 == cq:
+                                roots_q = [r, -r]
+                found_valid = False
+                for rp in roots_p:
+                    for rq in roots_q:
+                        m = crt([Integer(rp), Integer(rq)], [p, q])
+                        out.append(f"m = {m}")
+                        v = power_mod(m, e, n)
+                        ok = v == c
+                        if ok:
+                            found_valid = True
+                if found_valid:
+                    out.append("")
+                    out.append("NON_COPRIME_EXP=SUCCESS")
+                else:
+                    out.append("")
+                    out.append("NON_COPRIME_EXP=FAILED")`,
+    });
   },
   proof: `\\textbf{Theorem:} When $\\gcd(e, \\varphi(n)) > 1$, the ciphertext $c = m^e \\bmod n$ has multiple preimages. All are recovered by finding e-th roots modulo $p$ and $q$ separately, then CRT-combining.
 

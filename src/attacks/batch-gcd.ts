@@ -31,9 +31,10 @@ export const attack: Attack = {
       }
 
       const lines: string[] = [
-        `Batch GCD Attack (browser-side, BigInt)`,
-        `Processing ${moduli.length} moduli...`,
+        `Batch GCD`,
+        `n_values = ${raw}`,
         ``,
+        `Results:`,
       ];
 
       let foundAny = false;
@@ -49,14 +50,14 @@ export const attack: Attack = {
           foundAny = true;
           const p = g;
           const q = n / g;
-          lines.push(`n[${i}] = ${n}`);
-          lines.push(`  Shared factor found: p = ${p}`);
-          lines.push(`  q = ${q}`);
-          lines.push(`  Verification: p * q = ${p * q}`);
+          lines.push(`n[${i}]:`);
+          lines.push(`p = ${p}`);
+          lines.push(`q = ${q}`);
+          lines.push(`Verification: p * q = ${p * q}`);
           lines.push('');
         } else if (g === n) {
-          lines.push(`n[${i}] = ${n}`);
-          lines.push(`  WARNING: n divides product of others (duplicate or fully shared)`);
+          lines.push(`n[${i}]: ${n}`);
+          lines.push(`WARNING: n divides product of others (duplicate or fully shared)`);
           lines.push('');
         }
       }
@@ -65,7 +66,6 @@ export const attack: Attack = {
         return null;
       }
 
-      lines.push('Batch GCD complete.');
       lines.push('BATCH_GCD=SUCCESS');
       return lines.join('\n');
     } catch {

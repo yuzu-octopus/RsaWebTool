@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
-import { sageGuardBlock } from './guard';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'gimmicky-primes',
@@ -10,14 +10,12 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
-    try:
-        out = []
-        try:
-            n = Integer(${vals.n})
-            import math
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'GIMMICKY_PRIMES',
+    n: vals.n,
+    imports: ['import math'],
+    body: `        try:
             n_int = int(n)
-            ${sageGuardBlock("GIMMICKY_PRIMES", '            ')}
             fp = None
             fq = None
             ftype = None
@@ -113,31 +111,36 @@ export const attack: Attack = {
                     if fp is not None:
                         break
             if fp is not None and fp > 1:
-                out.append(f"p is {ftype} ({fdetail})")
+                out.append("Gimmicky Primes")
+                out.append(f"n = {n}")
+                out.append("")
+                out.append("Results:")
                 out.append(f"p = {fp}")
                 out.append(f"q = {fq}")
+                out.append(f"type = {ftype}")
+                out.append(f"detail = {fdetail}")
+                out.append("")
+                out.append(f"Verification: p * q = {fp * fq}")
                 out.append("")
                 out.append("GIMMICKY_PRIMES=SUCCESS")
             else:
+                out.append("Gimmicky Primes")
+                out.append(f"n = {n}")
+                out.append("")
                 out.append("No gimmicky prime factors found.")
                 out.append("The factors are likely standard randomly-generated primes.")
                 out.append("")
                 out.append("GIMMICKY_PRIMES=FAILED")
         except Exception as e:
             out.append(f"Error in gimmicky primes check: {e}")
-            out.append("GIMMICKY_PRIMES=FAILED")
-        #
-    except BaseException as ex:
-        out.append(f"ERROR: {ex}")
-        out.append("GIMMICKY_PRIMES=FAILED")
-    print("\\n".join(out))
-_attack()`,
+            out.append("GIMMICKY_PRIMES=FAILED")`
+  }),
   frontendCheck: (vals) => {
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
       if (n < 2n) return Promise.resolve(null);
-      if (n % 2n === 0n) return Promise.resolve(`n is even: ${n}\np = 2\nq = ${n / 2n}\nGIMMICKY_PRIMES=SUCCESS`);
+      if (n % 2n === 0n) return Promise.resolve(`Gimmicky Primes\nn = ${n}\n\nResults:\np = 2\nq = ${n / 2n}\n\nVerification: p * q = ${n}\n\nGIMMICKY_PRIMES=SUCCESS`);
 
       type Found = { type: string; detail: string; p: bigint } | null;
       let found: Found = null;
@@ -243,7 +246,7 @@ _attack()`,
       if (found) {
         const q = n / found.p;
         return Promise.resolve(
-          `p is ${found.type} (${found.detail})\np = ${found.p}\nq = ${q}\n\nGIMMICKY_PRIMES=SUCCESS`
+          `Gimmicky Primes\nn = ${n}\n\nResults:\np = ${found.p}\nq = ${q}\ntype = ${found.type}\ndetail = ${found.detail}\n\nVerification: p * q = ${found.p * q}\n\nGIMMICKY_PRIMES=SUCCESS`
         );
       }
       return Promise.resolve(null);

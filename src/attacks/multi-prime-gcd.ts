@@ -56,9 +56,10 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{
       }
 
       const lines: string[] = [
-        `Multi-Prime GCD Attack (browser-side, BigInt)`,
-        `Running pairwise GCD on ${moduli.length} moduli...`,
+        `Multi-Prime GCD`,
+        `moduli_list = ${raw}`,
         ``,
+        `Results:`,
       ];
 
       // Fast path: batch GCD pre-filter
@@ -88,14 +89,12 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{
           const g = gcd(ni, nj);
           if (g > 1n && g < ni) {
             foundAny = true;
-            lines.push(`SHARED FACTOR FOUND between moduli ${i + 1} and ${j + 1}!`);
-            lines.push(`gcd(n${i + 1}, n${j + 1}) = ${g}`);
-            lines.push(`n${i + 1} = ${ni}`);
-            lines.push(`  p = ${g}`);
-            lines.push(`  q = ${ni / g}`);
-            lines.push(`n${j + 1} = ${nj}`);
-            lines.push(`  p' = ${g}`);
-            lines.push(`  q' = ${nj / g}`);
+            lines.push(`Moduli ${i + 1} and ${j + 1}:`);
+            lines.push(`p = ${g}`);
+            lines.push(`q1 = ${ni / g}`);
+            lines.push(`q2 = ${nj / g}`);
+            lines.push(`Verification: p * q1 = ${g * (ni / g)}`);
+            lines.push(`Verification: p * q2 = ${g * (nj / g)}`);
             lines.push('');
           }
         }
@@ -105,6 +104,7 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{
         return null;
       }
 
+      lines.push('');
       lines.push('MULTI_PRIME_GCD=SUCCESS');
       return lines.join('\n');
     } catch {

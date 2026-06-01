@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { modPow, modInverse } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'homomorphic-forgery',
@@ -18,86 +19,73 @@ export const attack: Attack = {
       return `print("ERROR: Missing required inputs (n, e, target_m, oracle_pairs)")
 print("HOMOMORPHIC_FORGERY=FAILED")`;
     }
-    return `def _attack():
-    from itertools import combinations
-    out = []
-    try:
+    return wrapSageTemplate({
+      token: 'HOMOMORPHIC_FORGERY',
+      useGuard: false,
+      body: `        from itertools import combinations
         n = Integer(${vals.n})
         e = Integer(${vals.e})
         target_m = Integer(${vals.target_m})
+        found = True
         if n < 3 or e < 2:
             out.append("ERROR: Invalid n or e")
-            out.append("HOMOMORPHIC_FORGERY=FAILED")
-            print("\\n".join(out))
-            return
-        # Parse oracle pairs
-        pairs_str = "${vals.oracle_pairs}".strip()
-        if not pairs_str:
-            out.append("ERROR: Empty oracle_pairs")
-            out.append("HOMOMORPHIC_FORGERY=FAILED")
-            print("\\n".join(out))
-            return
-        oracle_pairs = []
-        for pair in pairs_str.split(';'):
-            pair = pair.strip()
-            if not pair:
-                continue
-            parts = pair.split(',')
-            if len(parts) < 2:
-                continue
-            m_i = Integer(parts[0].strip())
-            s_i = Integer(parts[1].strip())
-            oracle_pairs.append((m_i, s_i))
-        if len(oracle_pairs) < 1:
-            out.append("ERROR: No valid oracle pairs parsed")
-            out.append("HOMOMORPHIC_FORGERY=FAILED")
-            print("\\n".join(out))
-            return
-        out.append("Homomorphic Forgery Attack")
-        out.append(f"Target message: {target_m}")
-        out.append(f"Oracle pairs: {len(oracle_pairs)}")
-        # Verify oracle pairs
-        for i, (m_i, s_i) in enumerate(oracle_pairs):
-            v = Integer(pow(int(s_i), int(e), int(n)))
-            valid = "OK" if v == m_i else "FAIL"
-            out.append(f"Pair {i+1}: s_i^e mod n = {v}, m_i = {m_i} [{valid}]")
-        # Multiplicative forgery: compute product of all oracle signatures
-        # If target_m = product of oracle messages (mod n), then
-        # forged_sig = product of oracle signatures (mod n)
-        found = False
-        for r in range(1, len(oracle_pairs) + 1):
-            for combo in combinations(range(len(oracle_pairs)), r):
-                prod_m = 1
-                prod_s = 1
-                for idx in combo:
-                    m_i, s_i = oracle_pairs[idx]
-                    prod_m = (prod_m * m_i) % n
-                    prod_s = (prod_s * s_i) % n
-                if prod_m == target_m % n:
-                    v = Integer(pow(int(prod_s), int(e), int(n)))
-                    if v == target_m % n:
-                        out.append(f"Forged signature from pairs {[i+1 for i in combo]}: {prod_s}")
-                        out.append(f"Verification: sig^e mod n = {v}")
-                        out.append("")
-                        out.append("HOMOMORPHIC_FORGERY=SUCCESS")
-                        found = True
-                        print("\\n".join(out))
-                        return
-        if not found:
-            out.append("Could not factor target_m from oracle pairs using multiplication.")
-            out.append("Try more oracle queries or different combination patterns.")
+            found = False
+        else:
+            pairs_str = "${vals.oracle_pairs}".strip()
+            if not pairs_str:
+                out.append("ERROR: Empty oracle_pairs")
+                found = False
+            else:
+                oracle_pairs = []
+                for pair in pairs_str.split(';'):
+                    pair = pair.strip()
+                    if not pair:
+                        continue
+                    parts = pair.split(',')
+                    if len(parts) < 2:
+                        continue
+                    m_i = Integer(parts[0].strip())
+                    s_i = Integer(parts[1].strip())
+                    oracle_pairs.append((m_i, s_i))
+                if len(oracle_pairs) < 1:
+                    out.append("ERROR: No valid oracle pairs parsed")
+                    found = False
+        if found:
+            out.append("Homomorphic Forgery")
+            out.append(f"n = {n}")
+            out.append(f"e = {e}")
+            out.append(f"target_m = {target_m}")
+            out.append(f"oracle_pairs = {pairs_str}")
             out.append("")
-            out.append("HOMOMORPHIC_FORGERY=FAILED")
-        print("\\n".join(out))
-    except Exception as ex:
-        try:
-            out.append(f"ERROR: {ex}")
-            out.append("HOMOMORPHIC_FORGERY=FAILED")
-        except:
-            out = [f"ERROR: {ex}", "HOMOMORPHIC_FORGERY=FAILED"]
-        print("\\n".join(out))
-    #
-_attack()`;
+            out.append("Results:")
+            found_sig = False
+            for r in range(1, len(oracle_pairs) + 1):
+                for combo in combinations(range(len(oracle_pairs)), r):
+                    prod_m = 1
+                    prod_s = 1
+                    for idx in combo:
+                        m_i, s_i = oracle_pairs[idx]
+                        prod_m = (prod_m * m_i) % n
+                        prod_s = (prod_s * s_i) % n
+                    if prod_m == target_m % n:
+                        v = Integer(pow(int(prod_s), int(e), int(n)))
+                        if v == target_m % n:
+                            out.append(f"s = {prod_s}")
+                            out.append("")
+                            out.append(f"Verification: s^e mod n = {v}")
+                            out.append("")
+                            out.append("HOMOMORPHIC_FORGERY=SUCCESS")
+                            found_sig = True
+                            break
+                if found_sig:
+                    break
+            if not found_sig:
+                out.append("Could not factor target_m from oracle pairs using multiplication.")
+                out.append("")
+                out.append("HOMOMORPHIC_FORGERY=FAILED")
+        else:
+            out.append("HOMOMORPHIC_FORGERY=FAILED")`,
+    });
   },
   frontendCheck: (vals: Record<string, string>, onProgress?: (pct: number, detail?: string) => void) => {
     if (!vals.n || !vals.e || !vals.target_m || !vals.oracle_pairs) return Promise.resolve(null);
@@ -172,7 +160,7 @@ _attack()`;
             const finalS = (prodS * entry.s) % n;
             if (finalM === targetM_mod) {
               onProgress?.(100);
-              return Promise.resolve(`Forged signature: s = ${finalS}\nVerification: s^e mod n = ${modPow(finalS, e, n)}\nHOMOMORPHIC_FORGERY=SUCCESS`);
+              return Promise.resolve(`Homomorphic Forgery\nn = ${n}\ne = ${e}\ntarget_m = ${targetM}\noracle_pairs = ${vals.oracle_pairs}\n\nResults:\ns = ${finalS}\n\nVerification: s^e mod n = ${modPow(finalS, e, n)}\n\nHOMOMORPHIC_FORGERY=SUCCESS`);
             }
           }
         }

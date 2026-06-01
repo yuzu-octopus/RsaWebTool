@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 import { modPow, modInverse, iroot } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'hastad-broadcast',
@@ -16,10 +17,10 @@ export const attack: Attack = {
       return `print("ERROR: Missing required inputs (e, ciphertexts)")
 print("HASTAD_BROADCAST=FAILED")`;
     }
-    return `def _attack():
-    try:
-        out = []
-        e = Integer(${vals.e})
+    return wrapSageTemplate({
+      token: 'HASTAD_BROADCAST',
+      useGuard: false,
+      body: `        e = Integer(${vals.e})
         out.append(f"Hastad's Broadcast Attack")
         out.append(f"Public exponent: e = {e}")
         if e < 2:
@@ -47,18 +48,19 @@ print("HASTAD_BROADCAST=FAILED")`;
                 remainders = [p[0] for p in pairs[:e]]
                 N = prod(moduli)
                 M = crt(remainders, moduli)
-                out.append(f"CRT combined m^e = {M}")
-                out.append(f"Modulus product bits: {N.nbits()}")
                 m, exact = M.nth_root(e, truncate_mode=True)
                 if exact:
-                    out.append(f"Recovered message: m = {m}")
+                    out.append("")
+                    out.append("Results:")
+                    out.append(f"m = {m}")
+                    out.append("")
+                    out.append(f"Verification: m^e mod product(n_i) = CRT(c_i)")
                     all_ok = True
                     for i, (c_i, n_i) in enumerate(pairs):
                         v = power_mod(m, e, n_i)
                         ok = v == c_i
                         if not ok:
                             all_ok = False
-                        out.append(f"  Verify {i+1}: m^{e} mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
                     if all_ok:
                         out.append("")
                         out.append("HASTAD_BROADCAST=SUCCESS")
@@ -67,17 +69,8 @@ print("HASTAD_BROADCAST=FAILED")`;
                 else:
                     out.append(f"Approximate root: m = {m}")
                     out.append("Warning: m^e was not a perfect e-th power")
-                    out.append("HASTAD_BROADCAST=FAILED")
-        print("\\n".join(out))
-    except Exception as ex:
-        try:
-            out.append(f"ERROR: {ex}")
-            out.append("HASTAD_BROADCAST=FAILED")
-            print("\\n".join(out))
-        except:
-            print(f"ERROR: {ex}")
-            print("HASTAD_BROADCAST=FAILED")
-_attack()`;
+                    out.append("HASTAD_BROADCAST=FAILED")`,
+    });
   },
   frontendCheck: (vals: Record<string, string>) => {
     if (!vals.e || !vals.ciphertexts) return Promise.resolve(null);
@@ -103,7 +96,7 @@ _attack()`;
         for (const {c, n} of pairs) {
           if (modPow(lo, e, n) !== c) return Promise.resolve(null);
         }
-        return Promise.resolve(`Message recovered: m = ${lo}\nHASTAD_BROADCAST=SUCCESS`);
+        return Promise.resolve(`Hastad's Broadcast Attack\nPublic exponent: e = ${e}\nNumber of ciphertexts: ${pairs.length}\n\nResults:\nm = ${lo}\n\nVerification: m^e mod product(n_i) = CRT(c_i)\n\nHASTAD_BROADCAST=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }

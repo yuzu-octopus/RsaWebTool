@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 import { modInverse } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'boneh-durfee',
@@ -11,78 +12,52 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
-    try:
-        import sys
-        #
-        def _bd_attack():
-            try:
-                n = Integer(${vals.n})
-                e = Integer(${vals.e})
-                out = []
-                out.append(f"Boneh-Durfee Attack on n = {n}")
-                if n < 2 or e < 2:
-                    out.append("Invalid input: n and e must be >= 2")
-                    print("\\n".join(out))
-                    print("BONEH_DURFEE=FAILED")
-                    return
-                if n % 2 == 0:
-                    out.append(f"n is even: {n}")
-                    out.append(f"Verification: 2 * {n // 2} = {n}")
-                    out.append(f"p = 2")
-                    out.append(f"q = {n // 2}")
-                    out.append("")
-                    print("\\n".join(out))
-                    print("BONEH_DURFEE=SUCCESS")
-                    return
-                if n.is_prime():
-                    out.append(f"n is prime: {n}")
-                    print("\\n".join(out))
-                    print("BONEH_DURFEE=FAILED")
-                    return
-                if n.is_square():
-                    p = isqrt(n)
-                    out.append(f"n is a perfect square: {p}^2 = {n}")
-                    out.append(f"Verification: p * q = {p * p}")
-                    out.append(f"p = {p}")
-                    out.append(f"q = {p}")
-                    out.append("")
-                    print("\\n".join(out))
-                    print("BONEH_DURFEE=SUCCESS")
-                    return
-                # Phase 1: Wiener's attack via continued fraction convergents of e/n
-                cf = continued_fraction(QQ(e)/QQ(n))
-                found = False
-                for conv in cf.convergents():
-                    k, d = conv.numerator(), conv.denominator()
-                    if k == 0:
-                        continue
-                    if (e * d - 1) % k == 0:
-                        phi = (e * d - 1) // k
-                        s = n - phi + 1
-                        disc = s ** 2 - 4 * n
-                        if disc > 0 and disc.is_square():
-                            t = isqrt(disc)
-                            if (s + t) % 2 == 0:
-                                p = (s - t) // 2
-                                q = (s + t) // 2
-                                if p * q == n and p > 1:
-                                    out.append(f"Wiener's attack succeeded:")
-                                    out.append(f"Verification: p * q = {p * q}")
-                                    out.append(f"d = {d}")
-                                    out.append(f"p = {p}")
-                                    out.append(f"q = {q}")
-                                    out.append("")
-                                    found = True
-                                    break
-                if found:
-                    print("\\n".join(out))
-                    print("BONEH_DURFEE=SUCCESS")
-                    return
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'BONEH_DURFEE',
+    n: vals.n,
+    body: `        e = Integer(${vals.e})
+        found = False
+        if e < 2:
+            out.append("Boneh-Durfee Attack")
+            out.append(f"n = {n}")
+            out.append(f"e = {e}")
+            out.append("")
+            out.append("Results:")
+            out.append("")
+            out.append("BONEH_DURFEE=FAILED")
+        else:
+            out.append("Boneh-Durfee Attack")
+            out.append(f"n = {n}")
+            out.append(f"e = {e}")
+            out.append("")
+            # Phase 1: Wiener's attack via continued fraction convergents of e/n
+            cf = continued_fraction(QQ(e)/QQ(n))
+            for conv in cf.convergents():
+                k, d = conv.numerator(), conv.denominator()
+                if k == 0:
+                    continue
+                if (e * d - 1) % k == 0:
+                    phi = (e * d - 1) // k
+                    s = n - phi + 1
+                    disc = s ** 2 - 4 * n
+                    if disc > 0 and disc.is_square():
+                        t = isqrt(disc)
+                        if (s + t) % 2 == 0:
+                            p = (s - t) // 2
+                            q = (s + t) // 2
+                            if p * q == n and p > 1:
+                                out.append("Results:")
+                                out.append(f"p = {p}")
+                                out.append(f"q = {q}")
+                                out.append("")
+                                out.append(f"Verification: p * q = {p * q}")
+                                out.append(f"d = {d}")
+                                out.append("")
+                                out.append("BONEH_DURFEE=SUCCESS")
+                                found = True
+                                break
+            if not found:
                 # Phase 2: Boneh-Durfee lattice attack (Herrmann-May simplification)
-                # f(x,y) = 1 + x*(A + y) with root (2k, -(p+q)/2) where ed = 1 + k*phi(n)
-                # Theoretical bound: d < n^delta with delta < 1 - 1/sqrt(2) ≈ 0.292
-                out.append("Wiener failed (d >= n^0.25). Attempting Boneh-Durfee lattice attack...")
                 A = (n + 1) // 2
                 delta = 0.260
                 m = 3
@@ -172,33 +147,28 @@ export const attack: Attack = {
                                             p_val = ZZ((p_plus_q + sqrt_disc2) // 2)
                                             q_val = ZZ((p_plus_q - sqrt_disc2) // 2)
                                             if p_val * q_val == n and p_val > 1:
-                                                out.append("Boneh-Durfee lattice attack succeeded!")
-                                                out.append(f"Verification: p * q = {p_val * q_val}")
-                                                out.append(f"d = {d_val}")
+                                                out.append("Results:")
                                                 out.append(f"p = {p_val}")
                                                 out.append(f"q = {q_val}")
                                                 out.append("")
-                                                print("\\n".join(out))
-                                                print("BONEH_DURFEE=SUCCESS")
+                                                out.append(f"Verification: p * q = {p_val * q_val}")
+                                                out.append(f"d = {d_val}")
+                                                out.append("")
                                                 found2 = True
                                                 break
                             if found2:
                                 break
+                    if found2:
+                        out.append("BONEH_DURFEE=SUCCESS")
+                        found = True
                 if not found2:
-                    out.append("Boneh-Durfee lattice attack failed: d >= n^0.292 or parameters insufficient.")
-                    print("\\n".join(out))
-                    print("BONEH_DURFEE=FAILED")
-            except BaseException as ex:
-                out.append(f"ERROR: Boneh-Durfee computation failed: {ex}")
-                print("\\n".join(out))
-                print("BONEH_DURFEE=FAILED")
-        #
-        _bd_attack()
-        #
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("BONEH_DURFEE=FAILED")
-_attack()`,
+                    out.append("Results:")
+                    out.append("")
+                    out.append("BONEH_DURFEE=FAILED")
+        if not found:
+            out.append("BONEH_DURFEE=FAILED")`,
+    useGuard: true,
+  }),
   proof: `\\textbf{Theorem:} Find $d$ when $d < n^{0.292}$ using Wiener's continued fractions ($d < n^{0.25}$) or Boneh-Durfee's lattice ($d < n^{0.292}$).
 
 \\textbf{Setup:}

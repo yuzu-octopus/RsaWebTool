@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'manger',
@@ -13,39 +14,30 @@ export const attack: Attack = {
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
     { name: 'oracle_responses', label: 'Oracle responses (comma-separated 0/1)', placeholder: '1,0,1,1,0,...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
-    try:
-        # Manger's OAEP padding oracle attack (3-step algorithm)
-        # Reference: J. Manger, CRYPTO 2001
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+      token: 'MANGER',
+      useGuard: false,
+      body: `        valid = True
         if not "${vals.n}".strip():
-            print("ERROR: n is required")
-            print("MANGER=FAILED")
-            return
+            out.append("ERROR: n is required")
+            valid = False
         if not "${vals.e}".strip():
-            print("ERROR: e is required")
-            print("MANGER=FAILED")
-            return
+            out.append("ERROR: e is required")
+            valid = False
         if not "${vals.c}".strip():
-            print("ERROR: c is required")
-            print("MANGER=FAILED")
-            return
+            out.append("ERROR: c is required")
+            valid = False
         responses_raw = """${vals.oracle_responses || ''}""".strip()
         if not responses_raw:
-            print("ERROR: oracle_responses is required")
-            print("MANGER=FAILED")
-            return
-        try:
-            out = []
+            out.append("ERROR: oracle_responses is required")
+            valid = False
+        if valid:
             n = Integer(${vals.n})
             e = Integer(${vals.e})
             c = Integer(${vals.c})
-            # Parse oracle responses into a list
             oracle_list = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
             oracle_idx = [0]
-        #
             def oracle():
-                """Simulate oracle using pre-computed responses.
-                Returns True (1) if decrypted value >= B, False (0) if < B."""
                 if oracle_idx[0] >= len(oracle_list):
                     out.append(f"WARNING: ran out of oracle responses at index {oracle_idx[0]}")
                     return False
@@ -56,52 +48,27 @@ export const attack: Attack = {
                 return (a + b - 1) // b
             def floor_div(a, b):
                 return a // b
-            out.append(f"Manger's OAEP Attack (3-step algorithm)")
-            out.append(f"n = {n} ({n.nbits()} bits)")
+            out.append("Manger's OAEP Attack")
+            out.append(f"n = {n}")
             out.append(f"e = {e}")
             out.append(f"c = {c}")
-            #
-            # k = byte length of n, B = 2^(8*(k-1))
+            out.append(f"oracle_responses = {len(oracle_list)}")
             k = ceil_div(n.nbits(), 8)
             B = Integer(2) ** (8 * (k - 1))
-            out.append(f"k = {k}, B = 2^(8*{k-1}) = {B}")
-            out.append(f"2*B = {2*B}, 2*B < n: {2*B < n}")
-            out.append("")
-            #
             queries_used = [0]
-            #
-            # Step 1: Find f1 such that f1*m mod n >= B
-            # Start with f1=2, double until oracle returns True (>= B)
-            out.append("=== Step 1: Finding f1 ===")
             f1 = Integer(2)
             while not oracle():
                 queries_used[0] += 1
                 f1 *= 2
             queries_used[0] += 1
-            out.append(f"f1 = {f1} (f1*m mod n >= B confirmed)")
-            out.append("")
-            #
-            # Step 2: Find f2 such that f2*m mod n < B (wrapped around)
-            # Start: f2 = floor((n+B)/B) * f1/2
-            # Increment by f1/2 until oracle returns False (< B)
-            out.append("=== Step 2: Finding f2 ===")
             f1_half = f1 // 2
             f2 = floor_div(n + B, B) * f1_half
             while oracle():
                 queries_used[0] += 1
                 f2 += f1_half
             queries_used[0] += 1
-            out.append(f"f2 = {f2} (f2*m mod n < B, wrapped to [n, n+B))")
-            out.append("")
-            #
-            # Step 3: Binary search to narrow [mmin, mmax] to single value
-            out.append("=== Step 3: Binary search ===")
             mmin = ceil_div(n, f2)
             mmax = floor_div(n + B, f2)
-            out.append(f"Initial: mmin={mmin}, mmax={mmax}")
-            out.append(f"Range size: {(mmax - mmin).nbits()} bits")
-            out.append("")
-            #
             step_count = 0
             twoB = Integer(2) * B
             while mmin < mmax:
@@ -111,50 +78,28 @@ export const attack: Attack = {
                 f3 = ceil_div(i_val * n, mmin)
                 if f3 == 0:
                     f3 = Integer(1)
-                # Query oracle with f3
                 oracle_result = oracle()
                 queries_used[0] += 1
                 iNB = i_val * n + B
                 if oracle_result:
-                    # f3*m mod n >= B => mmin = ceil((i*n + B) / f3)
                     mmin = ceil_div(iNB, f3)
                 else:
-                    # f3*m mod n < B => mmax = floor((i*n + B) / f3)
                     mmax = floor_div(iNB, f3)
-                if step_count <= 5 or (mmax - mmin) <= Integer(2):
-                    out.append(f"Step {step_count}: f3={f3}, oracle={oracle_result}, mmin={mmin}, mmax={mmax}, range={(mmax-mmin).nbits()} bits")
-        #
-            #
             m = mmin
-            out.append(f"Recovered message: m = {m}")
-            out.append(f"Total oracle queries: {queries_used[0]}")
-            out.append(f"Total binary search steps: {step_count}")
-            #
-            # Verify
             v = Integer(pow(int(m), int(e), int(n)))
+            out.append("")
+            out.append("Results:")
+            out.append(f"m = {m}")
+            out.append("")
             out.append(f"Verification: m^e mod n = {v}")
-            out.append(f"Original c = {c}")
+            out.append("")
             if v == c:
-                out.append("VERIFICATION PASSED!")
-                out.append("")
                 out.append("MANGER=SUCCESS")
             else:
-                out.append("Verification failed - may need more oracle responses")
-                out.append(f"m^e mod n = {v}")
-                out.append(f"c = {c}")
-                out.append("")
                 out.append("MANGER=FAILED")
-            print("\\n".join(out))
-        #
-        except Exception as ex:
-            out.append(f"ERROR: {ex}")
-            out.append("MANGER=FAILED")
-            print("\\n".join(out))
-        #
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("MANGER=FAILED")
-_attack()`,
+        else:
+            out.append("MANGER=FAILED")`,
+    }),
   proof: `\\textbf{Theorem:} An OAEP first-byte oracle recovers the full plaintext in O(\\log n) oracle queries.
 
 \\textbf{Setup:}

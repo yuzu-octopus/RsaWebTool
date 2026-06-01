@@ -1,5 +1,6 @@
 import type { Attack } from '../types';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'hastad-linear-pad',
@@ -15,11 +16,10 @@ export const attack: Attack = {
       return `print("ERROR: Missing required inputs (triples, e)")
 print("HASTAD_LINEAR_PAD=FAILED")`;
     }
-    return `def _attack():
-    try:
-        out = []
-        e = Integer(${vals.e})
-        # Parse triples
+    return wrapSageTemplate({
+      token: 'HASTAD_LINEAR_PAD',
+      useGuard: false,
+      body: `        e = Integer(${vals.e})
         triples_str = """${vals.triples}""".strip()
         triples = []
         for line in triples_str.split('\\n'):
@@ -40,11 +40,8 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
             out.append(f"ERROR: Need at least {e} ciphertexts for e = {e}, got {len(triples)}")
             out.append("HASTAD_LINEAR_PAD=FAILED")
         else:
-            # General Hastad with linear padding: c_i = (a_i * m + b_i)^e mod n_i
-            # Combined modulus N = prod(n_i)
             N = prod([t[0] for t in triples])
             out.append(f"Combined modulus N has {N.nbits()} bits")
-            # Build CRT-combined polynomial F(x) = sum_i coeff_i * f_i(x) mod N
             R.<x> = PolynomialRing(Zmod(N))
             F = 0
             for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
@@ -53,9 +50,6 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                 fi = (a_i*x + b_i)**e - c_i
                 F += coeff * fi
             out.append(f"Combined polynomial degree: {F.degree()}")
-            # Make polynomial monic (required by small_roots).
-            # The leading coefficient should be invertible modulo N because
-            # each a_i is coprime to n_i — but guard against the rare case.
             try:
                 F = F.monic()
             except Exception as ex:
@@ -67,103 +61,79 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                 elif g == N:
                     out.append("Lead coeff is a multiple of N")
                 else:
-                    # lc is coprime to N, try manual inversion
                     try:
                         F = F * inverse_mod(lc, N)
                     except Exception as ex2:
                         out.append(f"Cannot invert lead coeff: {ex2}")
+            if F.leading_coefficient() != 1:
                 out.append("HASTAD_LINEAR_PAD=FAILED")
-                print("\\n".join(out))
-                return
-            # Coppersmith: find small root m < N^(1/e)
-            # Wrapped in try/except: small_roots over Zmod(N) may throw
-            # for composite N under SageMathCell (Rosetta emulation bug).
-            # On failure, fall through to brute-force fallback.
-            found_m = None
-            try:
-                roots = F.small_roots(beta=1.0, epsilon=0.05)
-                if roots:
-                    found_m = roots[0]
-                    out.append(f"Coppersmith recovered message: m = {found_m}")
-            except Exception as sr_ex:
-                out.append(f"Coppersmith small_roots failed (composite modulus): {sr_ex}")
-            if found_m is None:
-                out.append("No small roots found. The message may be too large for the Coppersmith bound.")
-                out.append("Try: smaller epsilon (e.g., 0.01) for larger lattice, or ensure m is sufficiently small.")
-                # Fallback 1: standard Hastad CRT if all a_i=1, b_i=0
-                all_simple = all(t[2] == 1 and t[3] == 0 for t in triples)
-                if all_simple:
-                    out.append("All a_i=1, b_i=0. Using standard Hastad CRT approach...")
-                    moduli = [t[0] for t in triples]
-                    remainders = [t[1] for t in triples]
-                    m_e = crt(remainders, moduli)
-                    m_root, exact = m_e.nth_root(e, truncate_mode=True)
-                    if exact:
-                        found_m = m_root
-                        out.append(f"Standard Hastad recovered message: m = {found_m}")
-                # Fallback 2: brute-force search for small messages
-                # Uses Horner evaluation for fast modular arithmetic
-                # (avoid power_mod which is slow in SageCell loops).
-                if found_m is None:
-                    out.append("Attempting brute-force search for small m...")
-                    a_int = [int(t[2]) for t in triples]
-                    b_int = [int(t[3]) for t in triples]
-                    n_int = [int(t[0]) for t in triples]
-                    c_int = [int(t[1]) for t in triples]
-                    # Precompute Horner coefficients for (a*m+b)^3 - c:
-                    # ai^3*m^3 + 3*ai^2*bi*m^2 + 3*ai*bi^2*m + (bi^3-ci)
-                    coeffs = []
-                    for i in range(len(triples)):
-                        ai = a_int[i]; bi = b_int[i]; ni = n_int[i]
-                        A = pow(ai, 3, ni)
-                        B = (3 * ai * ai * bi) % ni
-                        C = (3 * ai * bi * bi) % ni
-                        D = (bi * bi * bi - c_int[i]) % ni
-                        coeffs.append((ni, A, B, C, D))
-                    limit = 5 * 10**5
-                    for m_candidate in range(limit):
-                        ok = True
-                        for ni, A, B, C, D in coeffs:
-                            # Horner: ((A*m + B)*m + C)*m + D mod ni
-                            val = (A * m_candidate + B) % ni
-                            val = (val * m_candidate + C) % ni
-                            val = (val * m_candidate + D) % ni
-                            if val != 0:
-                                ok = False
-                                break
-                        if ok:
-                            found_m = m_candidate
-                            out.append(f"Brute-force recovered message: m = {found_m}")
-                            break
-                        if m_candidate % 200000 == 0 and m_candidate > 0:
-                            out.append(f"  Searched up to m = {m_candidate}...")
-            if found_m is not None:
-                m = Integer(found_m)
-                out.append("Verifying recovered message...")
-                all_ok = True
-                for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
-                    v = pow(int(a_i) * int(m) + int(b_i), int(e), int(n_i))
-                    ok = v == c_i
-                    if not ok:
-                        all_ok = False
-                    out.append(f"  Verify {i+1}: (a*m+b)^e mod n{i+1} = {v} (c{i+1} = {c_i}) {'OK' if ok else 'FAIL'}")
-                if all_ok:
-                    out.append("")
-                    out.append("HASTAD_LINEAR_PAD=SUCCESS")
-                else:
-                    out.append("HASTAD_LINEAR_PAD=FAILED")
             else:
-                out.append("Brute-force search did not find the message (up to 500K). It may be larger.")
-                out.append("HASTAD_LINEAR_PAD=FAILED")
-        print("\\n".join(out))
-    except Exception as ex:
-        try:
-            out.append(f"ERROR: {ex}")
-            out.append("HASTAD_LINEAR_PAD=FAILED")
-        except:
-            out = [f"ERROR: {ex}", "HASTAD_LINEAR_PAD=FAILED"]
-        print("\\n".join(out))
-_attack()`;
+                found_m = None
+                try:
+                    roots = F.small_roots(beta=1.0, epsilon=0.05)
+                    if roots:
+                        found_m = roots[0]
+                        out.append(f"m = {found_m}")
+                except Exception as sr_ex:
+
+                if found_m is None:
+                    all_simple = all(t[2] == 1 and t[3] == 0 for t in triples)
+                    if all_simple:
+                        moduli = [t[0] for t in triples]
+                        remainders = [t[1] for t in triples]
+                        m_e = crt(remainders, moduli)
+                        m_root, exact = m_e.nth_root(e, truncate_mode=True)
+                        if exact:
+                            found_m = m_root
+                            out.append(f"m = {found_m}")
+                    if found_m is None:
+                        a_int = [int(t[2]) for t in triples]
+                        b_int = [int(t[3]) for t in triples]
+                        n_int = [int(t[0]) for t in triples]
+                        c_int = [int(t[1]) for t in triples]
+                        coeffs = []
+                        for i in range(len(triples)):
+                            ai = a_int[i]; bi = b_int[i]; ni = n_int[i]
+                            A = pow(ai, 3, ni)
+                            B = (3 * ai * ai * bi) % ni
+                            C = (3 * ai * bi * bi) % ni
+                            D = (bi * bi * bi - c_int[i]) % ni
+                            coeffs.append((ni, A, B, C, D))
+                        limit = 5 * 10**5
+                        for m_candidate in range(limit):
+                            ok = True
+                            for ni, A, B, C, D in coeffs:
+                                val = (A * m_candidate + B) % ni
+                                val = (val * m_candidate + C) % ni
+                                val = (val * m_candidate + D) % ni
+                                if val != 0:
+                                    ok = False
+                                    break
+                            if ok:
+                                found_m = m_candidate
+                                out.append(f"m = {found_m}")
+                                break
+                if found_m is not None:
+                    m = Integer(found_m)
+                    out.append("")
+                    out.append("Results:")
+                    out.append(f"m = {m}")
+                    out.append("")
+                    all_ok = True
+                    for i, (n_i, c_i, a_i, b_i) in enumerate(triples):
+                        v = pow(int(a_i) * int(m) + int(b_i), int(e), int(n_i))
+                        ok = v == c_i
+                        if not ok:
+                            all_ok = False
+                    if all_ok:
+                        out.append(f"Verification: (a*m+b)^e mod n = c")
+                        out.append("")
+                        out.append("HASTAD_LINEAR_PAD=SUCCESS")
+                    else:
+                        out.append("HASTAD_LINEAR_PAD=FAILED")
+                else:
+                    out.append("HASTAD_LINEAR_PAD=FAILED")`,
+    });
   },
   proof: `\\textbf{Theorem:} Given $k \\geq e$ ciphertexts $c_i \\equiv (a_i m + b_i)^e \\pmod{n_i}$ with pairwise coprime moduli, recover $m$ by CRT-combining the polynomials and applying Coppersmith small roots.
 

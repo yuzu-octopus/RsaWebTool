@@ -460,6 +460,7 @@ export function MagicPanel() {
       dispatchExec({ type: 'FINISH' });
       abortControllerRef.current = null;
       let displayResult = success.result;
+      displayResult += '\nMETHOD=TYPESCRIPT';
       const decrypted = autoDecrypt(success.attack, params, success.result);
       if (decrypted) displayResult += '\n\n## Decrypted message\n' + decrypted;
       setOutputResult(displayResult);
@@ -499,7 +500,7 @@ export function MagicPanel() {
 
     try {
       if (currentRunId !== runIdRef.current) return;
-      const results = await executeAll(codes, 6, DEFAULT_SAGE_TIMEOUT, (remainingIndex, result) => {
+      const results = await executeAll(codes, 3, DEFAULT_SAGE_TIMEOUT, (remainingIndex, result) => {
         if (currentRunId !== runIdRef.current) return true;
         const originalIndex = remaining[remainingIndex].originalIndex;
         const jobStatus: MagicJob['status'] = result.success && isActualSuccess(result.stdout) ? 'success' : 'error';
@@ -527,6 +528,7 @@ export function MagicPanel() {
         const attack = attacks.find(a => a.id === applicable[ri.originalIndex].id);
         if (attack) {
           let displayResult = firstSuccessResult.stdout;
+          displayResult += '\nMETHOD=SAGEMATHCELL';
           const decrypted = autoDecrypt(attack, params, firstSuccessResult.stdout);
           if (decrypted) displayResult += '\n\n## Decrypted message\n' + decrypted;
           setOutputResult(displayResult);

@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { isqrt } from '../utils/bigint';
-import { sageGuardBlock } from './guard';
+import { wrapSageTemplate } from './guard';
 
 const numGcd = (a: number, b: number): number => {
   while (b) { [a, b] = [b, a % b]; }
@@ -23,105 +23,94 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `import math
-def _attack():
-    try:
-        n = Integer(${vals.n})
-        #
-        ${sageGuardBlock("SMALL_FRACTION")}
-        #
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'SMALL_FRACTION',
+    n: vals.n,
+    useGuard: true,
+    body: `        #
         # Small fraction attack: p/q ≈ a/b for small a, b
         # Use Python ints for fast trial division
-        try:
-            out = []
-            out.append("Searching for small fraction approximation of p/q...")
-            out.append(f"n = {n}")
-            out.append("")
-            found = False
-            max_den = 100
-            trial_window = 10000
-            pairs_tried = 0
-            divs_tried = 0
-            n_int = int(n)
-            for b in range(1, max_den + 1):
-                for a in range(1, b + 1):
-                    if math.gcd(a, b) != 1:
-                        continue
-                    pairs_tried += 1
-                    # q approx sqrt(n*b/a): p/q ≈ a/b => n = p*q ≈ a*q²/b
-                    q0 = math.isqrt(n_int * b // a)
-                    if q0 <= 1:
-                        continue
-                    # Exact rational match: q0 divides n
-                    if n_int % q0 == 0:
-                        q_sage = Integer(q0)
+        out.append("Small Fraction Attack")
+        out.append(f"n = {n}")
+        out.append("")
+        found = False
+        max_den = 100
+        trial_window = 10000
+        pairs_tried = 0
+        divs_tried = 0
+        n_int = int(n)
+        for b in range(1, max_den + 1):
+            for a in range(1, b + 1):
+                if math.gcd(a, b) != 1:
+                    continue
+                pairs_tried += 1
+                q0 = math.isqrt(n_int * b // a)
+                if q0 <= 1:
+                    continue
+                if n_int % q0 == 0:
+                    q_sage = Integer(q0)
+                    p_sage = n // q_sage
+                    if p_sage > 1 and p_sage * q_sage == n:
+                        out.append("Results:")
+                        out.append(f"p = {p_sage}")
+                        out.append(f"q = {q_sage}")
+                        out.append("")
+                        out.append(f"Verification: p * q = {p_sage * q_sage}")
+                        out.append(f"a/b = {a}/{b}")
+                        out.append("")
+                        out.append("SMALL_FRACTION=SUCCESS")
+                        found = True
+                        break
+                for delta in range(1, trial_window + 1):
+                    divs_tried += 1
+                    q_candidate = q0 + delta
+                    if q_candidate > 1 and (q_candidate & 1) and n_int % q_candidate == 0:
+                        q_sage = Integer(q_candidate)
                         p_sage = n // q_sage
                         if p_sage > 1 and p_sage * q_sage == n:
-                            out.append(f"Found! a/b = {a}/{b}")
-                            out.append(f"Verification: p * q = {p_sage * q_sage}")
+                            out.append("Results:")
                             out.append(f"p = {p_sage}")
                             out.append(f"q = {q_sage}")
-                            out.append(f"p/q = {float(p_sage)/float(q_sage):.10f}")
-                            out.append(f"a/b = {float(a)/float(b):.10f}")
+                            out.append("")
+                            out.append(f"Verification: p * q = {p_sage * q_sage}")
+                            out.append(f"a/b = {a}/{b}")
+                            out.append("")
+                            out.append("SMALL_FRACTION=SUCCESS")
                             found = True
                             break
-                    # Near-exact: try q0 ± delta
-                    for delta in range(1, trial_window + 1):
-                        divs_tried += 1
-                        q_candidate = q0 + delta
-                        if q_candidate > 1 and (q_candidate & 1) and n_int % q_candidate == 0:
-                            q_sage = Integer(q_candidate)
-                            p_sage = n // q_sage
-                            if p_sage > 1 and p_sage * q_sage == n:
-                                out.append(f"Found! a/b = {a}/{b} (delta = +{delta})")
-                                out.append(f"Verification: p * q = {p_sage * q_sage}")
-                                out.append(f"p = {p_sage}")
-                                out.append(f"q = {q_sage}")
-                                out.append(f"p/q = {float(p_sage)/float(q_sage):.10f}")
-                                out.append(f"a/b = {float(a)/float(b):.10f}")
-                                found = True
-                                break
-                        q_candidate = q0 - delta
-                        if q_candidate > 1 and (q_candidate & 1) and n_int % q_candidate == 0:
-                            q_sage = Integer(q_candidate)
-                            p_sage = n // q_sage
-                            if p_sage > 1 and p_sage * q_sage == n:
-                                out.append(f"Found! a/b = {a}/{b} (delta = -{delta})")
-                                out.append(f"Verification: p * q = {p_sage * q_sage}")
-                                out.append(f"p = {p_sage}")
-                                out.append(f"q = {q_sage}")
-                                out.append(f"p/q = {float(p_sage)/float(q_sage):.10f}")
-                                out.append(f"a/b = {float(a)/float(b):.10f}")
-                                found = True
-                                break
-                    if found:
-                        break
+                    q_candidate = q0 - delta
+                    if q_candidate > 1 and (q_candidate & 1) and n_int % q_candidate == 0:
+                        q_sage = Integer(q_candidate)
+                        p_sage = n // q_sage
+                        if p_sage > 1 and p_sage * q_sage == n:
+                            out.append("Results:")
+                            out.append(f"p = {p_sage}")
+                            out.append(f"q = {q_sage}")
+                            out.append("")
+                            out.append(f"Verification: p * q = {p_sage * q_sage}")
+                            out.append(f"a/b = {a}/{b}")
+                            out.append("")
+                            out.append("SMALL_FRACTION=SUCCESS")
+                            found = True
+                            break
                 if found:
                     break
-            out.append("")
-            out.append(f"Pairs tested: {pairs_tried}, trial divisions: {divs_tried}")
             if found:
-                out.append("")
-                out.append("SMALL_FRACTION=SUCCESS")
-            else:
-                out.append(f"No small fraction found with denominator up to {max_den}.")
-                out.append("p/q may not be close to a small rational.")
-                out.append("")
-                out.append("SMALL_FRACTION=FAILED")
-            print("\\n".join(out))
-        except Exception as e:
-            print(f"Error in Small Fraction Attack: {e}")
-            print("SMALL_FRACTION=FAILED")
-        #
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("SMALL_FRACTION=FAILED")
-_attack()`,
+                break
+        if not found:
+            out.append("Results:")
+            out.append("")
+            out.append("SMALL_FRACTION=FAILED")
+`,
+    imports: ['import math'],
+  }),
   frontendCheck: (vals, onProgress) => {
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
-      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}\nSMALL_FRACTION=SUCCESS`);
+      if (n % 2n === 0n) {
+        return Promise.resolve(`Small Fraction Attack\nn = ${n}\n\nResults:\np = 2\nq = ${n / 2n}\n\nVerification: p * q = ${n}\n\nSMALL_FRACTION=SUCCESS`);
+      }
 
       // n is odd (product of odd primes) — skip even q candidates
       const isOdd = (x: bigint): boolean => (x & 1n) !== 0n;
@@ -142,7 +131,8 @@ _attack()`,
               const p = n / q;
               if (p > 1n) {
                 onProgress?.(100);
-                return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nUsing a=${a}, b=${b}\nSMALL_FRACTION=SUCCESS`);
+                onProgress?.(100);
+                return Promise.resolve(`Small Fraction Attack\nn = ${n}\n\nResults:\np = ${p}\nq = ${q}\n\nVerification: p * q = ${p * q}\na/b = ${a}/${b}\n\nSMALL_FRACTION=SUCCESS`);
               }
             }
           }

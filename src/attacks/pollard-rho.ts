@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { gcd } from '../utils/bigint';
 import { randomPrime } from '../utils/testcases/core';
-import { sageGuardBlock } from './guard';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'pollard-rho',
@@ -11,85 +11,76 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
-    import math
-    try:
-        try:
-            out = []
-            n = Integer(${vals.n})
-            out.append(f"Pollard's Rho (Brent variant) on n = {n}")
-            out.append("")
-            ${sageGuardBlock("POLLARD_RHO", '            ')}
-            # Brent's cycle detection with batched GCD (primefac-style, BIT 1980)
-            # Batched GCD reduces overhead: accumulate |x-y| products, one gcd per batch
-            # Backtracking handles g == n case (when accumulated product contains all factors)
-            def brent_rho_batch(n_val, c_val):
-                n_i = int(n_val)
-                c_i = int(c_val)
-                y = 2
-                r = 1
-                q = 1
-                g = 1
-                m = 100
-                while g == 1:
-                    x = y
-                    for _ in range(r):
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'POLLARD_RHO',
+    n: vals.n,
+    imports: ['import math'],
+    useGuard: true,
+    body: `        out.append("Pollard's Rho (Brent variant)")
+        out.append(f"n = {n}")
+        out.append("")
+        # Brent's cycle detection with batched GCD (primefac-style, BIT 1980)
+        # Batched GCD reduces overhead: accumulate |x-y| products, one gcd per batch
+        # Backtracking handles g == n case (when accumulated product contains all factors)
+        def brent_rho_batch(n_val, c_val):
+            n_i = int(n_val)
+            c_i = int(c_val)
+            y = 2
+            r = 1
+            q = 1
+            g = 1
+            m = 100
+            while g == 1:
+                x = y
+                for _ in range(r):
+                    y = (y * y + c_i) % n_i
+                k = 0
+                while k < r and g == 1:
+                    ys = y
+                    batch = min(m, r - k)
+                    for _ in range(batch):
                         y = (y * y + c_i) % n_i
-                    k = 0
-                    while k < r and g == 1:
-                        ys = y
-                        batch = min(m, r - k)
-                        for _ in range(batch):
-                            y = (y * y + c_i) % n_i
-                            q = (q * abs(x - y)) % n_i
-                        g = math.gcd(q, n_i)
-                        q = 1
-                        k += m
-                    r *= 2
-                if g == n_i:
-                    while True:
-                        ys = (ys * ys + c_i) % n_i
-                        g = math.gcd(abs(x - ys), n_i)
-                        if g > 1:
-                            break
-                return Integer(g) if 1 < g < n_i else None
-            found = False
-            for c_val in range(1, 10):
-                d = brent_rho_batch(n, c_val)
-                if d is not None:
-                    p = d
-                    q = n // p
-                    out.append(f"Verification: p * q = {p * q}")
-                    out.append(f"p = {p}")
-                    out.append(f"q = {q}")
-                    out.append(f"c value: {c_val}")
-                    out.append("")
-                    out.append("POLLARD_RHO=SUCCESS")
-                    found = True
-                    break
-            if not found:
-                out.append("Pollard's rho (Brent variant) failed: no factor found")
-                out.append("Try ECM or other methods")
-                out.append("POLLARD_RHO=FAILED")
-            print("\\n".join(out))
-        except Exception as e:
-            out.append(f"ERROR: {e}")
+                        q = (q * abs(x - y)) % n_i
+                    g = math.gcd(q, n_i)
+                    q = 1
+                    k += m
+                r *= 2
+            if g == n_i:
+                while True:
+                    ys = (ys * ys + c_i) % n_i
+                    g = math.gcd(abs(x - ys), n_i)
+                    if g > 1:
+                        break
+            return Integer(g) if 1 < g < n_i else None
+        found = False
+        for c_val in range(1, 10):
+            d = brent_rho_batch(n, c_val)
+            if d is not None:
+                p = d
+                q = n // p
+                out.append("Results:")
+                out.append(f"p = {p}")
+                out.append(f"q = {q}")
+                out.append("")
+                out.append(f"Verification: p * q = {p * q}")
+                out.append(f"c value: {c_val}")
+                out.append("")
+                out.append("POLLARD_RHO=SUCCESS")
+                found = True
+                break
+        if not found:
+            out.append("Results:")
+            out.append("")
             out.append("POLLARD_RHO=FAILED")
-            print("\\n".join(out))
-        #
-    except BaseException as ex:
-        try:
-            out.append(f"ERROR: {ex}")
-            out.append("POLLARD_RHO=FAILED")
-        except:
-            out = [f"ERROR: {ex}", "POLLARD_RHO=FAILED"]
-        print("\\n".join(out))
-_attack()`,
+`,
+  }),
   frontendCheck: (vals, onProgress) => {
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
-      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}\nPOLLARD_RHO=SUCCESS`);
+      if (n % 2n === 0n) {
+        return Promise.resolve(`Pollard's Rho (Brent variant)\nn = ${n}\n\nResults:\np = 2\nq = ${n / 2n}\n\nVerification: p * q = ${n}\n\nPOLLARD_RHO=SUCCESS`);
+      }
       let totalProgressCalls = 0;
       for (let c = 1n; c < 10n; c++) {
         if (onProgress) {
@@ -144,7 +135,7 @@ _attack()`,
         if (g > 1n && g < n_i) {
           const q = n_i / g;
           onProgress?.(100);
-          return Promise.resolve(`Factor found!\np = ${g}\nq = ${q}\nc = ${c}\niterations = ${iter}\nPOLLARD_RHO=SUCCESS`);
+          return Promise.resolve(`Pollard's Rho (Brent variant)\nn = ${n}\n\nResults:\np = ${g}\nq = ${q}\n\nVerification: p * q = ${g * q}\nc value: ${c}\n\nPOLLARD_RHO=SUCCESS`);
         }
       }
       return Promise.resolve(null);

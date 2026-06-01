@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
 import { gcd, extendedGcd, modPow, modInverse } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'common-modulus',
@@ -19,51 +20,46 @@ export const attack: Attack = {
       return `print("ERROR: Missing required inputs (n, e1, e2, c1, c2)")
 print("COMMON_MODULUS=FAILED")`;
     }
-    return `def _attack():
-    try:
-        out = []
-        n = Integer(${vals.n})
+    return wrapSageTemplate({
+      token: 'COMMON_MODULUS',
+      useGuard: false,
+      body: `        n = Integer(${vals.n})
         e1 = Integer(${vals.e1})
         e2 = Integer(${vals.e2})
         c1 = Integer(${vals.c1})
         c2 = Integer(${vals.c2})
         # Check gcd(e1, e2) first
+        out.append("Common Modulus Attack")
+        out.append(f"n = {n}")
+        out.append(f"e1 = {e1}")
+        out.append(f"e2 = {e2}")
+        out.append(f"c1 = {c1}")
+        out.append(f"c2 = {c2}")
         g = gcd(e1, e2)
-        out.append(f"gcd(e1, e2) = {g}")
         if g != 1:
             out.append(f"ERROR: gcd(e1, e2) = {g} != 1. Exponents must be coprime.")
             out.append("COMMON_MODULUS=FAILED")
         else:
             # Extended GCD to find a, b such that a*e1 + b*e2 = 1
             _, a, b = xgcd(e1, e2)
-            out.append(f"Bezout coefficients: a = {a}, b = {b}")
-            out.append(f"Verification: a*e1 + b*e2 = {a*e1 + b*e2}")
             # Compute m = c1^a * c2^b mod n (power_mod handles negative exponents)
             part1 = power_mod(c1, a, n)
             part2 = power_mod(c2, b, n)
             m = (part1 * part2) % n
-            out.append(f"Recovered message: m = {m}")
             # Verify
             v1 = power_mod(m, e1, n)
             v2 = power_mod(m, e2, n)
-            out.append(f"Verification: m^e1 mod n = {v1} (should equal c1 = {c1})")
-            out.append(f"Verification: m^e2 mod n = {v2} (should equal c2 = {c2})")
+            out.append("")
+            out.append("Results:")
+            out.append(f"m = {m}")
+            out.append("")
+            out.append(f"Verification: a*e1 + b*e2 = {a*e1 + b*e2}")
             if v1 == c1 and v2 == c2:
                 out.append("")
                 out.append("COMMON_MODULUS=SUCCESS")
             else:
-                out.append("COMMON_MODULUS=FAILED")
-        print("\\n".join(out))
-    except Exception as e:
-        try:
-            out.append(f"ERROR: {e}")
-            out.append("COMMON_MODULUS=FAILED")
-            print("\\n".join(out))
-        except:
-            print(f"ERROR: {e}")
-            print("COMMON_MODULUS=FAILED")
-    #
-_attack()`;
+                out.append("COMMON_MODULUS=FAILED")`,
+    });
   },
   frontendCheck: (vals) => {
     if (!vals.n || !vals.e1 || !vals.e2 || !vals.c1 || !vals.c2) return Promise.resolve(null);
@@ -96,7 +92,7 @@ _attack()`;
       const v1 = modPow(m, e1, n);
       const v2 = modPow(m, e2, n);
       if (v1 === c1 && v2 === c2) {
-        return Promise.resolve(`Recovered message: m = ${m}\nCOMMON_MODULUS=SUCCESS`);
+        return Promise.resolve(`Common Modulus Attack\nn = ${n}\ne1 = ${e1}\ne2 = ${e2}\nc1 = ${c1}\nc2 = ${c2}\n\nResults:\nm = ${m}\n\nVerification: a*e1 + b*e2 = ${x * e1 + y * e2}\n\nCOMMON_MODULUS=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch {

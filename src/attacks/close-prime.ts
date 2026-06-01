@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { isqrt } from '../utils/bigint';
 import { randomPrime, isPrimeMR } from '../utils/testcases/core';
-import { sageGuardBlock } from './guard';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'close-prime',
@@ -11,77 +11,75 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
-    try:
-        try:
-            out = []
-            n = Integer(${vals.n})
-            import math
-            n_int = int(n)
-            ${sageGuardBlock("CLOSE_PRIME", '            ')}
-            # Step 1: Fermat factorization (fast for close primes)
-            out.append(f"Close-prime attack on n ({n.nbits()} bits): trying Fermat first...")
-            a, rem = n.sqrtrem()
-            b2 = -rem
-            c = 2*a + 1
-            max_iter = 100000
-            iterations = 0
-            while not b2.is_square():
-                iterations += 1
-                if iterations > max_iter:
-                    break
-                b2 += c
-                c += 2
-            if b2.is_square():
-                a_final = (c - 1) // 2
-                b = isqrt(b2)
-                p = a_final - b
-                q = a_final + b
-                if p > 1 and q < n and p*q == n:
-                    out.append(f"Fermat factorization succeeded!")
-                    out.append(f"Verification: p * q = {p * q}")
-                    out.append(f"p = {p}")
-                    out.append(f"q = {q}")
-                    out.append(f"|p - q| = {q - p}")
-                    out.append(f"Iterations: {iterations}")
-                    out.append("")
-                    out.append("CLOSE_PRIME=SUCCESS")
-                    print("\\n".join(out))
-                    return
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'CLOSE_PRIME',
+    n: vals.n,
+    imports: ['import math'],
+    body: `        n_int = int(n)
+        found = False
+        # Step 1: Fermat factorization (fast for close primes)
+        out.append("Close-prime")
+        out.append(f"n = {n}")
+        out.append("")
+        a, rem = n.sqrtrem()
+        b2 = -rem
+        c = 2*a + 1
+        max_iter = 100000
+        iterations = 0
+        while not b2.is_square():
+            iterations += 1
+            if iterations > max_iter:
+                break
+            b2 += c
+            c += 2
+        if b2.is_square():
+            a_final = (c - 1) // 2
+            b = isqrt(b2)
+            p = a_final - b
+            q = a_final + b
+            if p > 1 and q < n and p*q == n:
+                out.append("Results:")
+                out.append(f"p = {p}")
+                out.append(f"q = {q}")
+                out.append("")
+                out.append(f"Verification: p * q = {p * q}")
+                out.append(f"|p - q| = {q - p}")
+                out.append(f"Iterations: {iterations}")
+                out.append("")
+                out.append("CLOSE_PRIME=SUCCESS")
+                found = True
+        if not found:
             # Step 2: Londahl BSGS fallback (for larger prime gaps)
-            out.append(f"Fermat did not converge in {max_iter} iterations, trying Londahl BSGS...")
-            b = 50000
+            b_val = 50000
             phi_approx = n_int - 2*math.isqrt(n_int) + 1
-            out.append(f"Building baby-step table (b={b})...")
             look_up = {}
             z = 1
             parity = int(phi_approx & 1)
-            for j in range(b + 1):
+            for j in range(b_val + 1):
                 if (j & 1) == parity:
                     look_up[z] = j
                 z = (z * 2) % n_int
-            out.append(f"Searching ({b + 1} giant steps)...")
             mu = int(inverse_mod(power_mod(2, Integer(phi_approx), n), n))
-            step = int(power_mod(2, b, n))
-            found = False
-            for i in range(b + 1):
+            step = int(power_mod(2, b_val, n))
+            for i in range(b_val + 1):
                 if mu in look_up:
                     j = look_up[mu]
-                    phi = phi_approx + j - i*b
-                    m = n_int - phi + 1
-                    disc = m*m - 4*n_int
+                    phi = phi_approx + j - i*b_val
+                    m_val = n_int - phi + 1
+                    disc = m_val*m_val - 4*n_int
                     if disc > 0:
                         sqrt_disc = math.isqrt(disc)
                         if sqrt_disc*sqrt_disc == disc:
-                            p_candidate = (m - sqrt_disc) // 2
-                            q_candidate = (m + sqrt_disc) // 2
+                            p_candidate = (m_val - sqrt_disc) // 2
+                            q_candidate = (m_val + sqrt_disc) // 2
                             if p_candidate * q_candidate == n_int and p_candidate > 1 and q_candidate > 1:
-                                out.append(f"Londahl BSGS factor found!")
-                                out.append(f"Verification: p * q = {p_candidate * q_candidate}")
+                                out.append("Results:")
                                 out.append(f"p = {p_candidate}")
                                 out.append(f"q = {q_candidate}")
+                                out.append("")
+                                out.append(f"Verification: p * q = {p_candidate * q_candidate}")
                                 out.append(f"|p - q| = {abs(q_candidate - p_candidate)}")
-                                out.append(f"Baby steps: {b+1}, Giant steps: {i+1}")
+                                out.append(f"Baby steps: {b_val+1}, Giant steps: {i+1}")
                                 found = True
                                 break
                 mu = (mu * step) % n_int
@@ -89,26 +87,19 @@ export const attack: Attack = {
                 out.append("")
                 out.append("CLOSE_PRIME=SUCCESS")
             else:
+                out.append("")
                 out.append("Both Fermat and Londahl BSGS failed to factor n.")
-                out.append("CLOSE_PRIME=FAILED")
-            print("\\n".join(out))
-        except Exception as e:
-            try:
-                out.append(f"Error: {e}")
-                out.append("CLOSE_PRIME=FAILED")
-                print("\\n".join(out))
-            except:
-                print(f"Error: {e}")
-                print("CLOSE_PRIME=FAILED")
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("CLOSE_PRIME=FAILED")
-_attack()`,
+                out.append("")
+                out.append("CLOSE_PRIME=FAILED")`,
+  }),
   frontendCheck: (vals, onProgress) => {
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
-      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}\nCLOSE_PRIME=SUCCESS`);
+      if (n % 2n === 0n) {
+        const half = n / 2n;
+        return Promise.resolve(`Close-prime\nn = ${n}\n\nResults:\np = 2\nq = ${half}\n\nVerification: p * q = ${n}\n|p - q| = ${half - 2n}\nIterations: 0\n\nCLOSE_PRIME=SUCCESS`);
+      }
       // Incremental Fermat: b2 = a^2 - n, updated as b2 += 2*a + 1 each step
       // This avoids repeated a*a - n (a BigInt multiplication)
       let a = isqrt(n);
@@ -131,7 +122,8 @@ _attack()`,
             const q = a + b;
             if (p > 1n && q > 1n && p * q === n) {
               onProgress?.(100);
-              return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\n|p - q| = ${q - p}\niterations = ${a - initialA}\nCLOSE_PRIME=SUCCESS`);
+              const iterations = a - initialA;
+              return Promise.resolve(`Close-prime\nn = ${n}\n\nResults:\np = ${p}\nq = ${q}\n\nVerification: p * q = ${p * q}\n|p - q| = ${q - p}\nIterations: ${iterations}\n\nCLOSE_PRIME=SUCCESS`);
             }
           }
         }

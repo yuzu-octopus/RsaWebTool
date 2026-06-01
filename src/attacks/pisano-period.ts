@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { modPow, gcd, isqrt } from '../utils/bigint';
 import { randomPrime } from '../utils/testcases/core';
+import { wrapSageTemplate } from './guard';
 
 function multiplicativeOrder2(p: bigint): bigint {
   const trialPrimes = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n];
@@ -48,52 +49,48 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
-    out = []
-    try:
-        try:
-            n = Integer(${vals.n})
-            out.append("Pisano Period Factorization on n = " + str(n))
-            out.append("")
-            if n < 2:
-                out.append("n = " + str(n) + " is too small to factor")
-                out.append("PISANO_PERIOD=FAILED")
-                print("\\n".join(out))
-                return
-            if n % 2 == 0:
-                out.append("n is even: " + str(n))
-                out.append("Verification: p * q = " + str(2 * (n // 2)))
-                out.append("p = 2")
-                out.append("q = " + str(n // 2))
-                out.append("")
-                out.append("PISANO_PERIOD=SUCCESS")
-                print("\\n".join(out))
-                return
-            if n.is_prime():
-                out.append("n is prime: " + str(n))
-                out.append("PISANO_PERIOD=FAILED")
-                print("\\n".join(out))
-                return
-            if n.is_square():
-                p = isqrt(n)
-                out.append("n is a perfect square: " + str(p) + "^2 = " + str(n))
-                out.append("Verification: p * q = " + str(p * p))
-                out.append("p = " + str(p))
-                out.append("q = " + str(p))
-                out.append("")
-                out.append("PISANO_PERIOD=SUCCESS")
-                print("\\n".join(out))
-                return
-            limit = 200000
-            lookup = {}
-            found = False
-            n_int = int(n)
-            pow_val = 1  # 2^0 mod n
-            for i in range(limit):
-                pow_val = (pow_val * 2) % n_int  # recurrence instead of pow(2, i, n)
-                val = (pow_val - 1) % n_int
-                if val == 0:
-                    phi_guess = i
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'PISANO_PERIOD',
+    n: vals.n,
+    useGuard: true,
+    body: `        out.append("Pisano Period Factorization")
+        out.append(f"n = {n}")
+        out.append("")
+        limit = 200000
+        lookup = {}
+        found = False
+        n_int = int(n)
+        pow_val = 1  # 2^0 mod n
+        for i in range(limit):
+            pow_val = (pow_val * 2) % n_int  # recurrence instead of pow(2, i, n)
+            val = (pow_val - 1) % n_int
+            if val == 0:
+                phi_guess = i
+                if phi_guess % 2 == 0:
+                    s = n - phi_guess + 1
+                    disc = s*s - 4*n
+                    if disc > 0:
+                        t = isqrt(disc)
+                        if t*t == disc:
+                            p_factor = (s - t) // 2
+                            q_factor = (s + t) // 2
+                            if p_factor > 1 and p_factor * q_factor == n:
+                                out.append("Results:")
+                                out.append(f"p = {p_factor}")
+                                out.append(f"q = {q_factor}")
+                                out.append("")
+                                out.append(f"Verification: p * q = {p_factor * q_factor}")
+                                out.append(f"Period length: {i}")
+                                out.append("")
+                                out.append("PISANO_PERIOD=SUCCESS")
+                                found = True
+                                break
+            if val in lookup:
+                period = i - lookup[val]
+                for mult in range(1, 200):
+                    phi_guess = period * mult
+                    if phi_guess >= n:
+                        break
                     if phi_guess % 2 == 0:
                         s = n - phi_guess + 1
                         disc = s*s - 4*n
@@ -103,55 +100,32 @@ export const attack: Attack = {
                                 p_factor = (s - t) // 2
                                 q_factor = (s + t) // 2
                                 if p_factor > 1 and p_factor * q_factor == n:
-                                    out.append("Verification: p * q = " + str(p_factor * q_factor))
-                                    out.append("p = " + str(p_factor))
-                                    out.append("q = " + str(q_factor))
+                                    out.append("Results:")
+                                    out.append(f"p = {p_factor}")
+                                    out.append(f"q = {q_factor}")
+                                    out.append("")
+                                    out.append(f"Verification: p * q = {p_factor * q_factor}")
+                                    out.append(f"Period length: {period}")
                                     out.append("")
                                     out.append("PISANO_PERIOD=SUCCESS")
                                     found = True
-                                    print("\\n".join(out))
-                                    return
-                if val in lookup:
-                    period = i - lookup[val]
-                    for mult in range(1, 200):
-                        phi_guess = period * mult
-                        if phi_guess >= n:
-                            break
-                        if phi_guess % 2 == 0:
-                            s = n - phi_guess + 1
-                            disc = s*s - 4*n
-                            if disc > 0:
-                                t = isqrt(disc)
-                                if t*t == disc:
-                                    p_factor = (s - t) // 2
-                                    q_factor = (s + t) // 2
-                                    if p_factor > 1 and p_factor * q_factor == n:
-                                        out.append("Verification: p * q = " + str(p_factor * q_factor))
-                                        out.append("p = " + str(p_factor))
-                                        out.append("q = " + str(q_factor))
-                                        out.append("")
-                                        out.append("PISANO_PERIOD=SUCCESS")
-                                        found = True
-                                        print("\\n".join(out))
-                                        return
-                lookup[val] = i
-            if not found:
-                out.append("Pisano period attack failed: no collision found")
-                out.append("PISANO_PERIOD=FAILED")
-        except Exception as e:
-            out.append("ERROR: " + str(e))
+                                    break
+                if found:
+                    break
+            lookup[val] = i
+        if not found:
+            out.append("Results:")
+            out.append("")
             out.append("PISANO_PERIOD=FAILED")
-        #
-    except BaseException as ex:
-        out.append("ERROR: " + str(ex))
-        out.append("PISANO_PERIOD=FAILED")
-    print("\\n".join(out))
-_attack()`,
+`,
+  }),
   frontendCheck: (vals, onProgress) => {
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
-      if (n % 2n === 0n) return Promise.resolve(`Factor found!\np = 2\nq = ${n / 2n}\nPISANO_PERIOD=SUCCESS`);
+      if (n % 2n === 0n) {
+        return Promise.resolve(`Pisano Period Factorization\nn = ${n}\n\nResults:\np = 2\nq = ${n / 2n}\n\nVerification: p * q = ${n}\n\nPISANO_PERIOD=SUCCESS`);
+      }
       const seen = new Map<bigint, bigint>();
       let pow_val = 1n;
       const limit = 200000n;
@@ -171,7 +145,7 @@ _attack()`,
               const q = (s + t) / 2n;
               if (p > 1n && q > 1n && p * q === n) {
                 onProgress?.(100);
-                return Promise.resolve(`Factor found!\nPeriod length: ${i}\np = ${p}\nq = ${q}\nPISANO_PERIOD=SUCCESS`);
+                return Promise.resolve(`Pisano Period Factorization\nn = ${n}\n\nResults:\np = ${p}\nq = ${q}\n\nVerification: p * q = ${p * q}\nPeriod length: ${i}\n\nPISANO_PERIOD=SUCCESS`);
               }
             }
           }
@@ -192,7 +166,7 @@ _attack()`,
               const q = (s + t) / 2n;
               if (p > 1n && q > 1n && p * q === n) {
                 onProgress?.(100);
-                return Promise.resolve(`Factor found!\nPeriod length: ${period}\np = ${p}\nq = ${q}\nPISANO_PERIOD=SUCCESS`);
+                return Promise.resolve(`Pisano Period Factorization\nn = ${n}\n\nResults:\np = ${p}\nq = ${q}\n\nVerification: p * q = ${p * q}\nPeriod length: ${period}\n\nPISANO_PERIOD=SUCCESS`);
               }
             }
           }

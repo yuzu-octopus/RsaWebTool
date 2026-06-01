@@ -10,17 +10,21 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 
 - **47 attacks** — Factorization, Lattice, Protocol, Oracle, and Advanced categories
 - **34 browser-side checks** — instant results via native BigInt (no SageCell needed), with live progress bars showing iteration variable + count on longer-running attacks
-- **SageMathCell integration** — runs SageMath code for Coppersmith, lattice reduction, and complex math
+- **3 concurrent Web Workers** — parallel frontendCheck execution across attacks
+- **SageMathCell integration** — 3 concurrent slots with 30s stall detection and immediate error element reporting
 - **FactorDB lookup** — auto-queries FactorDB and auto-submits discovered factorizations
-- **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution with early-stop
+- **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution (3 concurrent) with early-stop
 - **RSA Calculator** — standalone key generation, encryption, decryption (pure BigInt). 3-tab interface with merged form state. e defaults to 65537; Decrypt accepts any 2 of (p, q, n) with auto-derivation
 - **Format Converter** — live Hex / Decimal / Base64 / Text conversion
 - **Attack Index** — searchable catalog of all 47 attack proofs with KaTeX rendering
+- **METHOD indicator** — every output shows `METHOD=TYPESCRIPT` or `METHOD=SAGEMATHCELL`
+- **Standardized output format** — all 47 attacks produce consistent `Attack Name → Inputs → Results → Verification → TOKEN → METHOD` output
 - **Command Palette** — ⌘/Ctrl+K fuzzy search across all 47 attacks + views
 - **Keyboard Shortcuts** — ⌘Enter (run), ⌘1/2/3 (tabs), ⌘Shift+C (copy), Tab/Shift+Tab (cycle attacks)
 - **PEM Decryptor** — Parse and decrypt PKCS#1/PKCS#8/encrypted PEM keys, feed params to Calculator or Attacks
 - **Instructions** — Collapsible reference guide for using the tool
 - **Dracula theme** — dark, developer-friendly UI
+- **Prismjs syntax highlighting** — replaces react-syntax-highlighter, 33% smaller bundle (1.22MB)
 - **Notepad** — drag-resizeable scratchpad with localStorage persistence
 
 ## Quick Start
@@ -109,7 +113,7 @@ Select an attack from the sidebar. The Input Panel shows:
 - **Input tab** — form fields for RSA parameters. Fill in values (manually or via "Generate Testcase") and click **Run**.
 
 ### Magic Panel
-Click the wand icon in the sidebar. Paste all known RSA parameters — the tool auto-detects values via regex, shows which attacks apply, and runs them all in parallel (up to 6 at a time). Stops at first success.
+Click the wand icon in the sidebar. Paste all known RSA parameters — the tool auto-detects values via regex, shows which attacks apply, and runs them all in parallel (up to 3 at a time) via Web Workers and SageCell slots. Stops at first success.
 
 ### Progress Bars
 Iterative frontendCheck attacks (close-prime, euler, pollard-p1, small-crt-exp, dependent-prime, etc.) show a determinate progress bar with live iteration variable and count below the Run button. Works through both Web Workers and main-thread fallback.
@@ -120,6 +124,26 @@ Results appear in the Output Panel on the right. Features:
 - Copy button
 - Clickable history (last 50 results)
 - Resizable notepad (drag from bottom)
+
+### Attack Output Format
+Every attack produces a standardized output:
+
+```
+Attack Name
+n = [value]
+e = [value]
+
+Results:
+p = [value]
+q = [value]
+
+Verification: p * q = [product]
+
+TOKEN=SUCCESS
+METHOD=TYPESCRIPT
+```
+
+The `METHOD=` line indicates whether the result came from the browser (`TYPESCRIPT`) or SageMathCell (`SAGEMATHCELL`). `TOKEN=` is one of `SUCCESS`, `PARTIAL`, or `FAILURE`.
 
 ### RSA Calculator
 Standalone BigInt operations: key generation, encryption, and decryption. Smart defaults: `e` defaults to 65537 in Key Gen and Encrypt when left empty. Decrypt accepts any 2 of (p, q, n) and auto-derives the third.
@@ -148,6 +172,7 @@ Paste a PEM private key (PKCS#1, PKCS#8, or encrypted). The tool parses the key,
 |-------|------------|
 | UI | React 19.2 + TypeScript 6.0 + Material UI 9.0 |
 | Build | Vite 8.0 + Rolldown |
+| Syntax Highlighting | Prismjs (replaces react-syntax-highlighter) |
 | Math | SageMathCell (embedded JS), KaTeX 0.17 |
 | External | FactorDB (via Cloudflare Worker CORS proxy) |
 | Hosting | GitHub Pages |
@@ -157,7 +182,7 @@ Paste a PEM private key (PKCS#1, PKCS#8, or encrypted). The tool parses the key,
 ```
 src/
   attacks/          47 individual .ts files + guard.ts + index.ts + rawSources.ts
-  components/       16 React components (CommandPalette, InstructionsPanel, PemDecryptor, etc.)
+  components/       15 React components (Sidebar, InputPanel, OutputPanel, MagicPanel, CommandPalette, InstructionsPanel, PemDecryptor, etc.)
   config/           sidebarItems.ts — shared sidebar item definitions
   context/          AppContext provider, ctx.ts
   hooks/            useSageMath, useWorkerPool, useDragResize, useAppContext, useTimer, useCommandPalette, useKeyboardShortcuts
@@ -171,7 +196,7 @@ workers/            Cloudflare Worker CORS proxy for FactorDB
 ## External Services
 
 ### SageMathCell
-SageMathCell runs in an offscreen DOM container. 120s timeout (10s load + 110s exec). No internet access (firewalled since 2021) — all attack templates must be self-contained math.
+SageMathCell runs in an offscreen DOM container, with 3 concurrent execution slots. Includes 30s stall detection — kernel crashes that stop producing output are detected and reported early. Immediate error element detection surfaces SageMath errors as soon as they appear. 120s hard timeout (10s load + 110s exec). No internet access (firewalled since 2021) — all attack templates must be self-contained math.
 
 ### FactorDB
 Auto-lookup via Cloudflare Worker CORS proxy (20s timeout). When a Factorization-category attack succeeds, discovered p,q are auto-submitted to FactorDB. Network errors propagate immediately to the user rather than silently falling through to SageCell.

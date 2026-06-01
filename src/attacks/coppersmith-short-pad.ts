@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { randomPrime } from '../utils/testcases/core';
 import { modPow, iroot } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'coppersmith-short-pad',
@@ -17,11 +18,10 @@ export const attack: Attack = {
     if (!vals.n || !vals.e || !vals.c1 || !vals.c2) {
       return 'print("ERROR: Missing required inputs (n, e, c1, c2)")\nprint("COPPERSMITH_SHORT_PAD=FAILED")';
     }
-    return `def _attack():
-    try:
-        out = []
-        n = Integer(${vals.n})
-        e = Integer(${vals.e})
+    return wrapSageTemplate({
+      token: 'COPPERSMITH_SHORT_PAD',
+      n: vals.n,
+      body: `        e = Integer(${vals.e})
         e_int = int(e)
         c1 = Integer(${vals.c1})
         c2 = Integer(${vals.c2})
@@ -39,12 +39,9 @@ export const attack: Attack = {
                 else:
                     high = mid - 1
             return low
-        out.append("Coppersmith Short Pad Attack")
-        out.append(f"n = {n}")
-        out.append(f"e = {e}")
-        out.append("Recovering messages via integer e-th root...")
         m1_val = None
         m2_val = None
+        found = False
         # Method 1: Sage's built-in nth_root
         try:
             m1_t, exact1 = c1.nth_root(e_int, truncate_mode=True)
@@ -77,20 +74,26 @@ export const attack: Attack = {
         if m1_val is not None and m2_val is not None:
             if pow(int(m1_val), e_int, int(n)) == c1 and pow(int(m2_val), e_int, int(n)) == c2:
                 delta_val = m2_val - m1_val
-                out.append(f"Found messages: m1 = {m1_val}, m2 = {m2_val}, delta = {delta_val}")
+                out.append("Coppersmith Short Pad")
+                out.append(f"n = {n}")
+                out.append(f"e = {e}")
+                out.append(f"c1 = {c1}")
+                out.append(f"c2 = {c2}")
+                out.append("")
+                out.append("Results:")
+                out.append(f"m1 = {m1_val}")
+                out.append(f"m2 = {m2_val}")
+                out.append(f"delta = {delta_val}")
+                out.append("")
+                out.append("Verification: messages recovered via integer e-th root")
                 out.append("")
                 out.append("COPPERSMITH_SHORT_PAD=SUCCESS")
-                print("\\n".join(out))
-                return
-        out.append("Could not recover messages.")
-        out.append("COPPERSMITH_SHORT_PAD=FAILED")
-        print("\\n".join(out))
-        return
-    except Exception as err:
-        out.append("ERROR: " + str(err))
-        out.append("COPPERSMITH_SHORT_PAD=FAILED")
-        print("\\n".join(out))
-_attack()`;
+                found = True
+        if not found:
+            out.append("Could not recover messages.")
+            out.append("COPPERSMITH_SHORT_PAD=FAILED")`,
+      useGuard: true,
+    });
   },
   frontendCheck: (vals: Record<string, string>) => {
     if (!vals.n || !vals.e || !vals.c1 || !vals.c2) return Promise.resolve(null);
@@ -121,7 +124,7 @@ _attack()`;
       }
       if (m1 !== null && m2 !== null) {
         if (modPow(m1, e, n) === c1 && modPow(m2, e, n) === c2) {
-          return Promise.resolve(`Messages recovered!\nm1 = ${m1}\nm2 = ${m2}\ndelta = ${m2 - m1}\nCOPPERSMITH_SHORT_PAD=SUCCESS`);
+          return Promise.resolve(`Coppersmith Short Pad Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\n\nResults:\nm1 = ${m1}\nm2 = ${m2}\ndelta = ${m2 - m1}\n\nVerification: messages recovered via integer e-th root\n\nCOPPERSMITH_SHORT_PAD=SUCCESS`);
         }
       }
       return Promise.resolve(null);

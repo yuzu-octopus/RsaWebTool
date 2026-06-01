@@ -31,18 +31,13 @@ export const attack: Attack = {
       const statusDesc = STATUS_DESCRIPTIONS[result.status] || result.status;
       const lines: string[] = [
         `FactorDB Lookup`,
-        ``,
         `n = ${n}`,
+        ``,
+        `Results:`,
         `Status: ${result.status} — ${statusDesc}`,
       ];
 
       if (result.factors && result.factors.length > 0) {
-        lines.push(``);
-        lines.push(`Factors:`);
-        for (const [factor, exp] of result.factors) {
-          lines.push(exp > 1 ? `  ${factor}^${exp}` : `  ${factor}`);
-        }
-
         if (result.status === 'FF' && result.factors.length === 2) {
           const [f0, e0] = result.factors[0];
           const [f1, e1] = result.factors[1];
@@ -50,10 +45,14 @@ export const attack: Attack = {
           for (let i = 1; i < e0; i++) p *= BigInt(f0);
           let q = BigInt(f1);
           for (let i = 1; i < e1; i++) q *= BigInt(f1);
-          lines.push(``);
           lines.push(`p = ${p}`);
           lines.push(`q = ${q}`);
           lines.push(`Verification: p * q = ${p * q}`);
+        } else {
+          lines.push(`Factors:`);
+          for (const [factor, exp] of result.factors) {
+            lines.push(exp > 1 ? `  ${factor}^${exp}` : `  ${factor}`);
+          }
         }
       }
 
@@ -62,7 +61,7 @@ export const attack: Attack = {
 
       return lines.join('\n');
     } catch (e) {
-      return `ERROR: ${e instanceof Error ? e.message : String(e)}\nFACTORDB_LOOKUP=FAILED`;
+      return `FactorDB Lookup\n\nERROR: ${e instanceof Error ? e.message : String(e)}\n\nFACTORDB_LOOKUP=FAILED`;
     }
   },
   proof: `\\textbf{Theorem:} FactorDB provides instant factorization for any previously factored modulus via a public API.

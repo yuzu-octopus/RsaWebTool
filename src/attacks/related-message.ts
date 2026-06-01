@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { modInverse, modPow } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'related-message',
@@ -15,31 +16,31 @@ export const attack: Attack = {
     { name: 'a', label: 'a (linear coefficient)', placeholder: '2', multiline: false },
     { name: 'b', label: 'b (linear offset)', placeholder: '0', multiline: false },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
-    try:
-        out = []
-        try:
-            n = Integer(${vals.n})
-            e_val = "${vals.e}".strip()
-            e = Integer(e_val) if e_val else Integer(65537)
-            c1 = Integer(${vals.c1})
-            c2 = Integer(${vals.c2})
-            a_val = "${vals.a}".strip()
-            a = Integer(a_val) if a_val else Integer(2)
-            b_val = "${vals.b}".strip()
-            b = Integer(b_val) if b_val else Integer(0)
-            if n < 2 or e < 2 or c1 < 0 or c2 < 0:
-                out.append("Invalid input")
-                out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
-                print("\\n".join(out))
-                return
-            out.append(f"Related Message Attack")
-            out.append(f"n = {n}, e = {e}")
-            out.append(f"c1 = m^e mod n = {c1}")
-            out.append(f"c2 = (a*m + b)^e mod n = {c2}")
-            out.append(f"a = {a}, b = {b}")
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+      token: 'FRANKLIN_REITER_RELATED_MESSAGE',
+      useGuard: false,
+      body: `        n = Integer(${vals.n})
+        e_val = "${vals.e}".strip()
+        e = Integer(e_val) if e_val else Integer(65537)
+        c1 = Integer(${vals.c1})
+        c2 = Integer(${vals.c2})
+        a_val = "${vals.a}".strip()
+        a = Integer(a_val) if a_val else Integer(2)
+        b_val = "${vals.b}".strip()
+        b = Integer(b_val) if b_val else Integer(0)
+        found = True
+        if n < 2 or e < 2 or c1 < 0 or c2 < 0:
+            out.append("Invalid input")
+            found = False
+        if found:
+            out.append("Franklin-Reiter Related Message Attack")
+            out.append(f"n = {n}")
+            out.append(f"e = {e}")
+            out.append(f"c1 = {c1}")
+            out.append(f"c2 = {c2}")
+            out.append(f"a = {a}")
+            out.append(f"b = {b}")
             out.append("")
-            # Diagnostic: if b = 0, check degenerate case c2 == a^e * c1
             if b == 0:
                 ratio_check = power_mod(a, e, n) * c1 % n
                 out.append(f"Diagnostic: a^e * c1 mod n = {ratio_check}")
@@ -48,18 +49,13 @@ export const attack: Attack = {
                 if ratio_check == c2:
                     out.append("WARNING: b=0 and c2 == a^e*c1. Any m satisfies c2 = (am)^e mod n.")
                     out.append("Cannot recover m uniquely. Try using b != 0.")
-                    out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
-                    print("\\n".join(out))
-                    return
-                out.append("")
-            # f1(x) = x^e - c1, f2(x) = (a*x + b)^e - c2
-            # Both share root x = m over Zmod(n)
+                    found = False
+                else:
+                    out.append("")
+        if found:
             R.<x> = PolynomialRing(Zmod(n))
             f1 = x**e - c1
             f2 = (a * x + b)**e - c2
-            # Custom GCD for polynomials over Zmod(n) with composite n.
-            # Use try/except around p %% q since pseudo-remainder can fail
-            # when leading coefficient shares a factor with n.
             def poly_gcd(p, q):
                 while q != 0:
                     try:
@@ -87,13 +83,6 @@ export const attack: Attack = {
                 for r, _ in g.roots():
                     m_int = Integer(r)
                     break
-            # Fallback: if GCD failed and e == 3, use closed-form elimination.
-            # Derivation:
-            #   (am+b)^3 = a^3*m^3 + 3a^2*b*m^2 + 3a*b^2*m + b^3 = c2
-            #   m^3 = c1
-            #   Substitute: 3a^2*b*m^2 + 3a*b^2*m + (b^3 - c2 + a^3*c1) = 0
-            #   Multiply by (A*m - B) and use m^3 = c1 to eliminate m^2:
-            #   (A*C - B^2)*m = B*C - A^2*c1
             if m_int is None and e == 3:
                 out.append("Trying e=3 closed-form fallback...")
                 A = (3 * a^2 * b) % n
@@ -105,14 +94,12 @@ export const attack: Attack = {
                 elif A == 0 and B == 0:
                     out.append(f"Contradiction: {C} != 0. a/b values are wrong.")
                 elif A == 0:
-                    # Linear case: B*m + C = 0
                     try:
                         m_int = Integer((-C) * inverse_mod(B, n) % n)
                         out.append(f"Linear fallback recovered m = {m_int}")
                     except (ZeroDivisionError, ValueError):
                         out.append("Linear fallback failed (B not invertible).")
                 else:
-                    # Quadratic case: use derived formula
                     denom = (A * C - B^2) % n
                     numer = (B * C - A^2 * c1) % n
                     out.append(f"Denominator (A*C - B^2): {denom}")
@@ -136,27 +123,24 @@ export const attack: Attack = {
                             out.append("Quadratic fallback failed (denominator not invertible).")
             if m_int is None:
                 out.append("Could not recover message m.")
-                out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
-                print("\\n".join(out))
-                return
-            out.append(f"Recovered m = {m_int}")
-            v1 = power_mod(m_int, e, n)
-            v2 = power_mod(Integer(a * m_int + b), e, n)
-            out.append(f"Verification: m^e mod n = {v1} == c1? {v1 == c1}")
-            out.append(f"Verification: (a*m+b)^e mod n = {v2} == c2? {v2 == c2}")
-            if v1 == c1 and v2 == c2:
                 out.append("")
-                out.append("FRANKLIN_REITER_RELATED_MESSAGE=SUCCESS")
-            else:
                 out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
-        except Exception as ex:
-            out.append(f"ERROR: {ex}")
-            out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
-        print("\\n".join(out))
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")
-_attack()`,
+            else:
+                out.append("Results:")
+                out.append(f"m = {m_int}")
+                v1 = power_mod(m_int, e, n)
+                v2 = power_mod(Integer(a * m_int + b), e, n)
+                if v1 == c1 and v2 == c2:
+                    out.append("")
+                    out.append(f"Verification: m^e mod n = {v1}")
+                    out.append("")
+                    out.append("FRANKLIN_REITER_RELATED_MESSAGE=SUCCESS")
+                else:
+                    out.append("")
+                    out.append(f"Verification: m^e mod n = {v1}")
+                    out.append("")
+                    out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")`,
+    }),
   frontendCheck: (vals) => {
     if (!vals.n || !vals.c1 || !vals.c2) return Promise.resolve(null);
     try {
@@ -195,7 +179,8 @@ _attack()`,
         if (invB === null) return Promise.resolve(null);
         const m = ((-nMod % n) + n) % n * invB % n;
         if (modPow(m, e, n) === c1) {
-          return Promise.resolve(`Recovered m = ${m}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
+          const v1 = modPow(m, e, n);
+          return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na = ${a}\nb = ${b}\n\nResults:\nm = ${m}\n\nVerification: m^e mod n = ${v1}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
         }
         return Promise.resolve(null);
       }
@@ -211,7 +196,8 @@ _attack()`,
       const m = (numer * invDenom) % n;
 
       if (modPow(m, e, n) === c1) {
-        return Promise.resolve(`Recovered m = ${m}\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
+        const v1 = modPow(m, e, n);
+        return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na = ${a}\nb = ${b}\n\nResults:\nm = ${m}\n\nVerification: m^e mod n = ${v1}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }

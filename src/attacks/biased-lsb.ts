@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'biased-lsb',
@@ -13,27 +14,23 @@ export const attack: Attack = {
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
     { name: 'oracle_runs', label: 'Oracle runs (multiple response strings, newline-separated)', placeholder: '0,1,0,1,1\\n1,0,1,1,0\\n0,1,1,1,0...', multiline: true, rows: 6 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
-    try:
-        # Validate inputs
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+      token: 'BIASED_LSB',
+      useGuard: false,
+      body: `        valid = True
         if not "${vals.n}".strip():
-            print("ERROR: n is required")
-            print("BIASED_LSB=FAILED")
-            return
+            out.append("ERROR: n is required")
+            valid = False
         if not "${vals.e}".strip():
-            print("ERROR: e is required")
-            print("BIASED_LSB=FAILED")
-            return
+            out.append("ERROR: e is required")
+            valid = False
         if not "${vals.c}".strip():
-            print("ERROR: c is required")
-            print("BIASED_LSB=FAILED")
-            return
+            out.append("ERROR: c is required")
+            valid = False
         if not """${vals.oracle_runs}""".strip():
-            print("ERROR: oracle_runs is required")
-            print("BIASED_LSB=FAILED")
-            return
-        try:
-            out = []
+            out.append("ERROR: oracle_runs is required")
+            valid = False
+        if valid:
             n = Integer(${vals.n})
             e_val = "${vals.e}".strip()
             e = Integer(e_val) if e_val else Integer(65537)
@@ -41,7 +38,6 @@ export const attack: Attack = {
             two_e = pow(2, int(e), int(n))
             two_e_sage = Integer(two_e)
             c = (Integer(${vals.c}) * Integer(two_e)) % n
-            # Parse oracle runs (multiple response strings, newline-separated)
             runs_str = """${vals.oracle_runs}""".strip()
             runs = []
             for line in runs_str.split('\\n'):
@@ -51,82 +47,63 @@ export const attack: Attack = {
                 bits = [int(x.strip()) for x in line.split(',') if x.strip()]
                 runs.append(bits)
             if not runs:
-                print("ERROR: No valid oracle runs parsed")
-                print("BIASED_LSB=FAILED")
-                return
-            out.append(f"Biased LSB Oracle Attack")
-            out.append(f"n = {n}")
-            out.append(f"e = {e}")
-            out.append(f"c = {c}")
-            out.append(f"Number of oracle runs: {len(runs)}")
-            out.append("")
-            # Per-bit majority voting, then binary fraction accumulation
-            num_bits = min(len(r) for r in runs)
-            n_bits = n.nbits()
-            out.append(f"Using {num_bits} bit positions (n has {n_bits} bits)")
-            # Majority voting
-            voted_bits = []
-            for i in range(num_bits):
-                votes = sum(runs[j][i] for j in range(len(runs)))
-                majority = 1 if votes > len(runs) / 2 else 0
-                voted_bits.append(majority)
-            out.append(f"Majority-voted bits: {voted_bits[:20]}{'...' if num_bits > 20 else ''}")
-            out.append("")
-            # Binary search with voted bits using exact rational division
-            # NOTE: Must use /2 (Rational) not //2 (floor division) to avoid
-            # accumulated truncation errors that exclude m from the interval.
-            lower = Integer(0)
-            upper = Integer(n)
-            for i, bit in enumerate(voted_bits):
-                mid = (lower + upper) / 2  # Rational — exact midpoint
-                if bit == 0:
-                    upper = mid
-                else:
-                    lower = mid
-                c = (c * two_e_sage) % n
-                if i < 5 or i >= len(voted_bits) - 3:
-                    out.append(f"Step {i+1}: bit={bit}, lower={lower}, upper={upper}")
-            # Scan candidates near the rational interval [lower, upper)
-            # After log2(n) steps, interval should contain exactly one integer
-            candidate_start = Integer(ceil(lower))
-            candidate_end = Integer(floor(upper)) + 1
-            found_m = None
-            for m_candidate in range(candidate_start, candidate_end + 1):
-                m_test = Integer(m_candidate)
-                if pow(int(m_test), int(e), int(n)) == int(orig_c):
-                    found_m = m_test
-                    break
-            if found_m is None:
-                # Fallback: wider scan around midpoint estimate (noisy oracle may have wrong bits)
-                mid_est = Integer(floor((lower + upper) / 2))
-                for m_candidate in range(max(0, mid_est - 500), mid_est + 501):
+                out.append("ERROR: No valid oracle runs parsed")
+                out.append("BIASED_LSB=FAILED")
+            else:
+                out.append("Biased LSB Oracle")
+                out.append(f"n = {n}")
+                out.append(f"e = {e}")
+                out.append(f"c = {c}")
+                out.append(f"oracle_runs = {len(runs)}")
+                num_bits = min(len(r) for r in runs)
+                n_bits = n.nbits()
+                out.append(f"Using {num_bits} bit positions (n has {n_bits} bits)")
+                voted_bits = []
+                for i in range(num_bits):
+                    votes = sum(runs[j][i] for j in range(len(runs)))
+                    majority = 1 if votes > len(runs) / 2 else 0
+                    voted_bits.append(majority)
+
+                lower = Integer(0)
+                upper = Integer(n)
+                for i, bit in enumerate(voted_bits):
+                    mid = (lower + upper) / 2
+                    if bit == 0:
+                        upper = mid
+                    else:
+                        lower = mid
+                    c = (c * two_e_sage) % n
+
+                candidate_start = Integer(ceil(lower))
+                candidate_end = Integer(floor(upper)) + 1
+                found_m = None
+                for m_candidate in range(candidate_start, candidate_end + 1):
                     m_test = Integer(m_candidate)
                     if pow(int(m_test), int(e), int(n)) == int(orig_c):
                         found_m = m_test
                         break
-            if found_m is not None:
-                out.append(f"\\nRecovered message: m = {found_m}")
-                v = Integer(pow(int(found_m), int(e), int(n)))
-                out.append(f"Verification: m^e mod n = {v}")
-                out.append(f"Original c = {orig_c}")
-                out.append("VERIFICATION PASSED!")
-                out.append("")
-                out.append("BIASED_LSB=SUCCESS")
-            else:
-                out.append(f"\\nCandidate scan failed to find m in range [{candidate_start}, {candidate_end}]")
-                out.append("Verification failed - may need more oracle runs or higher bias")
-                out.append("")
-                out.append("BIASED_LSB=FAILED")
-            print("\\n".join(out))
-        except Exception as ex:
-            out.append(f"ERROR: {ex}")
-            out.append("BIASED_LSB=FAILED")
-            print("\\n".join(out))
-        #
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("BIASED_LSB=FAILED")
-_attack()`,
+                if found_m is None:
+                    mid_est = Integer(floor((lower + upper) / 2))
+                    for m_candidate in range(max(0, mid_est - 500), mid_est + 501):
+                        m_test = Integer(m_candidate)
+                        if pow(int(m_test), int(e), int(n)) == int(orig_c):
+                            found_m = m_test
+                            break
+                if found_m is not None:
+                    v = Integer(pow(int(found_m), int(e), int(n)))
+                    out.append("")
+                    out.append("Results:")
+                    out.append(f"m = {found_m}")
+                    out.append("")
+                    out.append(f"Verification: m^e mod n = {v}")
+                    out.append("")
+                    out.append("BIASED_LSB=SUCCESS")
+                else:
+                    out.append("")
+                    out.append("BIASED_LSB=FAILED")
+        else:
+            out.append("BIASED_LSB=FAILED")`,
+    }),
   frontendCheck: (vals) => {
     if (!vals.n || !vals.e || !vals.c || !vals.oracle_runs) return Promise.resolve(null);
     try {
@@ -156,8 +133,10 @@ _attack()`,
       const divisor = 1n << k;
       const mCeil = divisor > n ? (q * n + divisor - 1n) / divisor : q * n / divisor;
 
-      for (let m = mCeil - 2n; m <= mCeil + 2n; m++) {
-        if (m >= 0n && modPow(m, e, n) === c) return Promise.resolve(`Message recovered: m = ${m}\nbits = ${numBits}\nruns = ${runs.length}\nBIASED_LSB=SUCCESS`);
+      for (let mVal = mCeil - 2n; mVal <= mCeil + 2n; mVal++) {
+        if (mVal >= 0n && modPow(mVal, e, n) === c) {
+          return Promise.resolve(`Biased LSB Oracle\nn = ${n}\ne = ${e}\nc = ${c}\noracle_runs = ${runs.length}\n\nResults:\nm = ${mVal}\n\nVerification: m^e mod n = ${modPow(mVal, e, n)}\n\nBIASED_LSB=SUCCESS`);
+        }
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }

@@ -1,5 +1,6 @@
 import type { Attack } from '../types';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'williams-p1',
@@ -11,10 +12,11 @@ export const attack: Attack = {
     { name: 'B', label: 'B1 (stage 1 bound, optional)', placeholder: '10000', required: false, multiline: false },
     { name: 'B2', label: 'B2 (stage 2 bound, optional)', placeholder: '0 (disabled)', required: false, multiline: false },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
-    try:
-        n = Integer(${vals.n})
-        #
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'WILLIAMS_P1',
+    n: vals.n,
+    useGuard: true,
+    body: `        #
         # Handle B1 parameter: default to 10000 if not provided or invalid
         try:
             B1 = Integer(${vals.B || '10000'})
@@ -31,67 +33,29 @@ export const attack: Attack = {
         except:
             B2 = 0
         #
-        out = []
-        out.append(f"Williams' p+1 method on n = {n}")
-        out.append(f"Initial B1 = {B1}")
-        out.append(f"Initial B2 = {B2}")
+        out.append("Williams' p+1 Method")
+        out.append(f"n = {n}")
+        out.append(f"B = {B1}")
+        if B2 > 0:
+            out.append(f"B2 = {B2}")
         out.append("")
-        #
-        # Check for trivial cases
-        if n < 2:
-            out.append(f"n = {n} is too small to factor")
-            out.append("WILLIAMS_P1=FAILED")
-            print("\\n".join(out))
-            return
-        if n % 2 == 0:
-            out.append(f"n is even: {n}")
-            out.append(f"p = 2")
-            out.append(f"q = {n // 2}")
-            out.append(f"Verification: 2 * {n // 2} = {n}")
-            out.append("WILLIAMS_P1=SUCCESS")
-            print("\\n".join(out))
-            return
-        if n.is_prime():
-            out.append(f"n is prime: {n}")
-            out.append("No factorization possible")
-            out.append("WILLIAMS_P1=FAILED")
-            print("\\n".join(out))
-            return
-        if n.is_square():
-            p = isqrt(n)
-            out.append(f"n is a perfect square: {p}^2 = {n}")
-            out.append(f"Verification: p * q = {p * p}")
-            out.append(f"p = {p}")
-            out.append(f"q = {p}")
-            out.append("")
-            out.append("WILLIAMS_P1=SUCCESS")
-            print("\\n".join(out))
-            return
-        #
-        # Williams' p+1 using Lucas sequences with two-stage
-        # V_k(P, Q) where Q = 1, V_0 = 2, V_1 = P, V_k = P * V_{k-1} - V_{k-2}
-        # Stage 1: compute V_M(P, 1) where M = lcm(1..B1) using binary exponentiation
-        # Stage 2: iterate V_{k*M} for k=B1..B2 using recurrence V_{(k+1)*M} = V_{k*M} * V_M - V_{(k-1)*M}
+        # (... keep algorithm code same ...)
         def lucas_V(k, P, n):
             if k == 0:
                 return 2 % n
             if k == 1:
                 return P % n
-            result = 2 % n   # V_0
-            result1 = P % n  # V_1
-            bits = k.digits(2)  # LSB-first list of binary digits
-            # Binary ladder: maintain (V_j, V_{j+1}) invariant, process MSB first
+            result = 2 % n
+            result1 = P % n
+            bits = k.digits(2)
             for bit in reversed(bits):
-                V2j = (result**2 - 2) % n          # V_{2j} = V_j**2 - 2 (Q=1)
-                V2j1 = (result * result1 - P) % n   # V_{2j+1} = V_j * V_{j+1} - P (Q=1)
+                V2j = (result**2 - 2) % n
+                V2j1 = (result * result1 - P) % n
                 result, result1 = V2j, V2j1
                 if bit == 1:
-                    # Advance: (V_{2j}, V_{2j+1}) → (V_{2j+1}, V_{2j+2})
-                    # V_{2j+2} = P * V_{2j+1} - V_{2j} via recurrence V_k = P*V_{k-1} - V_{k-2}
                     V2j2 = (P * result1 - result) % n
                     result, result1 = result1, V2j2
             return result
-        #
         def williams_p1_stage(n, B1, B2, P, stage1_primes, stage2_primes):
             M = 1
             for p in stage1_primes:
@@ -106,12 +70,9 @@ export const attack: Attack = {
             if B2 > B1:
                 V_curr = VM
                 V_prev = 2
-                # Advance from k=2 to k=B1 (no GCD checks — pure recurrence)
                 for k in range(2, B1 + 1):
                     V_next = (V_curr * VM - V_prev) % n
                     V_prev, V_curr = V_curr, V_next
-                # Now check primes in Stage 2 (iterate pre-computed prime list,
-                # advancing recurrence between non-consecutive primes)
                 prev_k = B1
                 for q in stage2_primes:
                     for _ in range(q - prev_k):
@@ -122,15 +83,13 @@ export const attack: Attack = {
                         return Integer(g)
                     prev_k = q
             return None
-        #
-        # Build bound configurations: original + auto-escalation
         B1_orig = B1
         B2_orig = B2
         if B1_orig == 10000 and B2_orig == 0:
             configs = [
                 (100, 1000),
                 (1000, 10000),
-                (10000, 50000)     # capped at 50k to avoid SageMathCell timeout
+                (10000, 50000)
             ]
         else:
             configs = [(B1_orig, B2_orig)]
@@ -139,16 +98,9 @@ export const attack: Attack = {
             else:
                 configs.append((B1_orig * 10, 0))
                 configs.append((B1_orig * 10, B1_orig * 100))
-        #
         try:
             found = False
             for attempt, (B1_cur, B2_cur) in enumerate(configs):
-                if attempt > 0:
-                    retry_msg = f"Retry #{attempt}: B1 = {B1_cur}"
-                    if B2_cur > 0:
-                        retry_msg += f", B2 = {B2_cur}"
-                    out.append(retry_msg)
-                # Cache prime lists per config (avoid recomputation per P value)
                 stage1_primes = prime_range(B1_cur + 1)
                 stage2_primes = prime_range(max(3, B1_cur+1), B2_cur + 1) if B2_cur > B1_cur else []
                 for P in range(3, 8):
@@ -156,33 +108,26 @@ export const attack: Attack = {
                     if g is not None:
                         p = Integer(g)
                         q = n // g
-                        out.append(f"Factor found with P = {P}!")
-                        out.append(f"Verification: p * q = {p * q}")
+                        out.append("Results:")
                         out.append(f"p = {p}")
                         out.append(f"q = {q}")
+                        out.append("")
+                        out.append(f"Verification: p * q = {p * q}")
+                        out.append("")
+                        out.append("WILLIAMS_P1=SUCCESS")
                         found = True
                         break
                 if found:
                     break
             if not found:
-                out.append("Williams' p+1 failed. p+1 may not be B1-smooth for tested P values.")
-                out.append("Try increasing B1, enabling stage 2 with B2 > B1, or using a different method.")
+                out.append("Results:")
                 out.append("")
                 out.append("WILLIAMS_P1=FAILED")
-            else:
-                out.append("")
-                out.append("WILLIAMS_P1=SUCCESS")
-            print("\\n".join(out))
         except Exception as ex:
-            out.append(f"Williams' p+1 error: {ex}")
-            out.append("WILLIAMS_P1=FAILED")
-            print("\\n".join(out))
-        #
-    except BaseException as ex:
-        out.append(f"ERROR: {ex}")
-        out.append("WILLIAMS_P1=FAILED")
-        print("\\n".join(out))
-_attack()`,
+            out.append("Results:")
+            out.append("")
+            out.append("WILLIAMS_P1=FAILED")`,
+  }),
   proof: `\\textbf{Theorem:} If $p+1$ is $B1$-smooth, then $p$ can be found via Lucas sequences $V_k(P,1)$. Stage 2 extends the smoothness bound to $B2$.
 
 \\textbf{Setup:}

@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { modInverse, isqrt } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'dependent-prime',
@@ -11,43 +12,15 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `import math
-def _attack():
-    try:
-        try:
-            out = []
-            n = Integer(${vals.n})
-            e = Integer(${vals.e})
-            if n < 2:
-                out.append("DEPENDENT_PRIME=FAILED: n is too small")
-                print("\\n".join(out))
-                return
-            if e < 2:
-                out.append("DEPENDENT_PRIME=FAILED: e must be >= 2")
-                print("\\n".join(out))
-                return
-            if n % 2 == 0:
-                out.append(f"n is even: {n}")
-                out.append(f"p = 2")
-                out.append(f"q = {n // 2}")
-                out.append(f"Verification: 2 * {n // 2} = {n}")
-                out.append("DEPENDENT_PRIME=SUCCESS")
-                print("\\n".join(out))
-                return
-            if n.is_prime():
-                out.append("DEPENDENT_PRIME=FAILED: n is prime")
-                print("\\n".join(out))
-                return
-            if n.is_square():
-                p = isqrt(n)
-                out.append(f"n is a perfect square: {p}^2 = {n}")
-                out.append(f"Verification: p * q = {p * p}")
-                out.append(f"p = {p}")
-                out.append(f"q = {p}")
-                out.append("")
-                out.append("DEPENDENT_PRIME=SUCCESS")
-                print("\\n".join(out))
-                return
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'DEPENDENT_PRIME',
+    n: vals.n,
+    imports: ['import math'],
+    useGuard: true,
+    body: `        e = Integer(${vals.e})
+        if e < 2:
+            out.append("DEPENDENT_PRIME=FAILED: e must be >= 2")
+        else:
             # Use Python ints for fast iteration
             n_int = int(n)
             e_int = int(e)
@@ -67,27 +40,22 @@ def _attack():
                         if p_candidate > 1 and n_int % p_candidate == 0:
                             p_sage = Integer(p_candidate)
                             q_sage = n // p_sage
-                            out.append(f"Verification: p * q = {p_sage * q_sage}")
+                            out.append("Dependent-Prime")
+                            out.append(f"n = {n}")
+                            out.append(f"e = {e}")
+                            out.append("")
+                            out.append("Results:")
                             out.append(f"p = {p_sage}")
                             out.append(f"q = {q_sage}")
-                            out.append(f"k = {k}")
+                            out.append("")
+                            out.append(f"Verification: p * q = {p_sage * q_sage}")
                             out.append("")
                             out.append("DEPENDENT_PRIME=SUCCESS")
                             found = True
                             break
             if not found:
-                out.append("DEPENDENT_PRIME=FAILED: no valid factorization found")
-            print("\\n".join(out))
-        except Exception as ex:
-            try:
-                out.append(f"DEPENDENT_PRIME=FAILED: {ex}")
-                print("\\n".join(out))
-            except:
-                print(f"DEPENDENT_PRIME=FAILED: {ex}")
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("DEPENDENT_PRIME=FAILED")
-_attack()`,
+                out.append("DEPENDENT_PRIME=FAILED: no valid factorization found")`,
+  }),
   frontendCheck: (vals, onProgress) => {
     if (!vals.n || !vals.e) return Promise.resolve(null);
     try {
@@ -112,7 +80,7 @@ _attack()`,
           if (p > 1n && n % p === 0n) {
             const q = n / p;
             onProgress?.(100);
-            return Promise.resolve(`Factor found!\np = ${p}\nq = ${q}\nk = ${k}\nDEPENDENT_PRIME=SUCCESS`);
+            return Promise.resolve(`Dependent-Prime RSA\nn = ${n}\ne = ${e}\n\nResults:\np = ${p}\nq = ${q}\n\nVerification: p * q = ${p * q}\n\nDEPENDENT_PRIME=SUCCESS`);
           }
         }
       }

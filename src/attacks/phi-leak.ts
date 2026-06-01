@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { isqrt } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'phi-leak',
@@ -14,70 +15,55 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => {
     const nStr = vals.n ?? '';
     const phiStr = vals.phi ?? '';
-    return `def _attack():
-    if not ${JSON.stringify(nStr)}.strip():
-        print("Missing required input: n")
-        print("PHI_LEAK=FAILED")
-        return
-    if not ${JSON.stringify(phiStr)}.strip():
-        print("This attack requires a leaked φ(n) value.")
-        print("Found n: ${vals.n} but φ(n) is missing.")
-        print("With n alone, the modulus cannot be factored. The φ(n) value must be provided as a second input.")
-        print("PHI_LEAK=FAILED")
-        return
-    try:
-        out = []
-        try:
-            n = Integer(${vals.n})
-            phi = Integer(${vals.phi})
-            out.append("Phi(n) leak attack")
-            out.append(f"n = {n}")
-            out.append(f"phi(n) = {phi}")
-            out.append("")
-            # For n = p*q: phi(n) = (p-1)(q-1) = pq - p - q + 1 = n - p - q + 1
-            # So: p + q = n - phi + 1
-            # And: p * q = n
-            # We solve: x^2 - (p+q)x + pq = 0
-            # i.e.: x^2 - (n - phi + 1)x + n = 0
-            sum_pq = n - phi + 1
-            out.append(f"p + q = {sum_pq}")
-            out.append(f"p * q = {n}")
-            out.append("")
-            # Solve quadratic: x^2 - sum_pq * x + n = 0
-            discriminant = sum_pq**2 - 4*n
-            out.append(f"Discriminant = {discriminant}")
-            if discriminant < 0:
-                out.append("ERROR: Negative discriminant. phi(n) is inconsistent with n.")
-                out.append("PHI_LEAK=FAILED")
-            elif discriminant == 0:
-                out.append("ERROR: p = q. n is a perfect square (not valid RSA).")
-                out.append("PHI_LEAK=FAILED")
-            else:
-                sqrt_disc = isqrt(discriminant)
-                if sqrt_disc**2 == discriminant:
-                    p = (sum_pq - sqrt_disc) // 2
-                    q = (sum_pq + sqrt_disc) // 2
-                    out.append(f"SUCCESS! Factors recovered:")
-                    out.append(f"Verification: p * q = {p * q}")
-                    out.append(f"Verification: (p-1)*(q-1) = {(p-1)*(q-1)}")
-                    out.append(f"p = {p}")
-                    out.append(f"q = {q}")
-                    out.append("")
-                    out.append("PHI_LEAK=SUCCESS")
-                else:
-                    out.append(f"Discriminant is not a perfect square: {discriminant}")
-                    out.append("phi(n) may be incorrect, or n has more than 2 prime factors.")
-                    out.append("PHI_LEAK=FAILED")
-            print("\\n".join(out))
-        except Exception as ex:
-            out.append(f"ERROR: {ex}")
+    if (!nStr.trim()) {
+      return 'print("ERROR: Missing required input: n")\nprint("PHI_LEAK=FAILED")';
+    }
+    if (!phiStr.trim()) {
+      return `print("This attack requires a leaked φ(n) value.")\nprint("Found n: ${vals.n} but φ(n) is missing.")\nprint("With n alone, the modulus cannot be factored. The φ(n) value must be provided as a second input.")\nprint("PHI_LEAK=FAILED")`;
+    }
+    return wrapSageTemplate({
+      token: 'PHI_LEAK',
+      n: vals.n,
+      body: `        phi = Integer(${vals.phi})
+        found = False
+        # For n = p*q: phi(n) = (p-1)(q-1) = pq - p - q + 1 = n - p - q + 1
+        # So: p + q = n - phi + 1
+        # And: p * q = n
+        # We solve: x^2 - (p+q)x + pq = 0
+        # i.e.: x^2 - (n - phi + 1)x + n = 0
+        sum_pq = n - phi + 1
+        out.append(f"p + q = {sum_pq}")
+        # Solve quadratic: x^2 - sum_pq * x + n = 0
+        discriminant = sum_pq**2 - 4*n
+        if discriminant < 0:
+            out.append("PHI_LEAK=FAILED: Negative discriminant. phi(n) is inconsistent with n.")
             out.append("PHI_LEAK=FAILED")
-            print("\\n".join(out))
-        #
-    except BaseException as ex:
-        out = [f"ERROR: {ex}", "PHI_LEAK=FAILED"]
-        print("\\n".join(out))
-_attack()`;
+        elif discriminant == 0:
+            out.append("PHI_LEAK=FAILED: p = q. n is a perfect square (not valid RSA).")
+            out.append("PHI_LEAK=FAILED")
+        else:
+            sqrt_disc = isqrt(discriminant)
+            if sqrt_disc**2 == discriminant:
+                p = (sum_pq - sqrt_disc) // 2
+                q = (sum_pq + sqrt_disc) // 2
+                out.append(f"n = {n}")
+                out.append(f"phi = {phi}")
+                out.append("")
+                out.append("Results:")
+                out.append(f"p = {p}")
+                out.append(f"q = {q}")
+                out.append("")
+                out.append(f"Verification: p * q = {p * q}")
+                out.append("")
+                out.append("PHI_LEAK=SUCCESS")
+                found = True
+            else:
+                out.append(f"PHI_LEAK=FAILED: discriminant is not a perfect square")
+                out.append("PHI_LEAK=FAILED")
+        if not found:
+            out.append("PHI_LEAK=FAILED")`,
+      useGuard: true,
+    });
   },
   // eslint-disable-next-line @typescript-eslint/require-await
   frontendCheck: async (vals: Record<string, string>) => {
@@ -105,21 +91,16 @@ _attack()`;
         return null;
       }
 
-      const phi_check = (p - 1n) * (q - 1n);
-
       return [
-        `Phi(n) Leak Attack (browser-side, BigInt)`,
+        `Phi(n) Leak`,
         `n = ${n}`,
-        `phi(n) = ${phi}`,
-        `p + q = ${sum_pq}`,
-        `Discriminant = ${discriminant}`,
+        `phi = ${phi}`,
         ``,
-        `Factors recovered:`,
-        `Verification: p * q = ${p * q}`,
-        `Verification: (p-1)*(q-1) = ${phi_check}`,
+        `Results:`,
         `p = ${p}`,
         `q = ${q}`,
-        `phi(n) matches: ${phi_check === phi ? 'YES' : 'NO'}`,
+        ``,
+        `Verification: p * q = ${p * q}`,
         ``,
         `PHI_LEAK=SUCCESS`,
       ].join('\n');

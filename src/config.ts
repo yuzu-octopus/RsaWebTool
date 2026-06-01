@@ -7,4 +7,4 @@ export const FACTORDB_PROXY_URL =
 // Web Worker pool size for frontendCheck computation offloading.
 // Fallback to main-thread execution if Workers are unavailable.
 // Increase for MagicPanel's parallel frontendCheck execution.
-export const WORKER_POOL_SIZE = 1;
+export const WORKER_POOL_SIZE = 3;

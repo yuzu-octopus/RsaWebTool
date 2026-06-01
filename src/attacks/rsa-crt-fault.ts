@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { modPow, modInverse, gcd } from '../utils/bigint';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'rsa-crt-fault',
@@ -19,56 +20,39 @@ export const attack: Attack = {
       return `print("ERROR: Missing required inputs (n, e, m, sig_faulty)")
 print("RSA_CRT_FAULT=FAILED")`;
     }
-    return `def _attack():
-    try:
-        out = []
-        n = Integer(${vals.n})
+    return wrapSageTemplate({
+      token: 'RSA_CRT_FAULT',
+      useGuard: false,
+      body: `        n = Integer(${vals.n})
         e = Integer(${vals.e})
         m = Integer(${vals.m})
         sig_faulty = Integer(${vals.sig_faulty})
         sig_valid_str = "${(vals.sig_valid || '').trim()}"
         if sig_valid_str:
             sig_valid = Integer(sig_valid_str)
-        out.append("RSA-CRT Fault Attack (Bellcore Attack)")
+        out.append("RSA-CRT Fault Attack (Bellcore)")
         out.append(f"n = {n}")
-        if sig_valid_str:
-            out.append(f"Valid sig: {sig_valid}")
-            v_valid = power_mod(sig_valid, e, n)
-            out.append(f"sig_valid^e mod n = {v_valid}")
-            out.append(f"Expected m = {m}")
-            out.append(f"Valid sig check: {v_valid == m}")
+        out.append(f"e = {e}")
+        out.append(f"m = {m}")
+        out.append(f"sig_faulty = {sig_faulty}")
+        out.append("")
+        out.append("Results:")
         sig_faulty_e = power_mod(sig_faulty, e, n)
-        out.append(f"sig_faulty^e mod n = {sig_faulty_e}")
         g = gcd(sig_faulty_e - m, n)
-        out.append(f"gcd(sig_faulty^e - m, n) = {g}")
         if 1 < g < n:
             p = g
             q = n // g
-            out.append(f"\\nFactorization found!")
-            out.append(f"Verification: p * q = {p * q}")
-            out.append(f"p is prime: {p.is_prime()}")
-            out.append(f"q is prime: {q.is_prime()}")
             out.append(f"p = {p}")
             out.append(f"q = {q}")
-            phi = (p - 1) * (q - 1)
-            d = inverse_mod(e, phi)
-            out.append(f"\\nPrivate exponent d = {d}")
-            sig_recovered = power_mod(m, d, n)
-            out.append(f"Recovered sig: {sig_recovered}")
-            if sig_valid_str:
-                out.append(f"Matches valid sig: {sig_recovered == sig_valid}")
+            out.append("")
+            out.append(f"Verification: p * q = {p * q}")
             out.append("")
             out.append("RSA_CRT_FAULT=SUCCESS")
         else:
             out.append("GCD did not reveal a factor. The fault may not be a CRT fault.")
-            out.append("RSA_CRT_FAULT=FAILED")
-        print("\\n".join(out))
-    except Exception as e:
-        out.append(f"ERROR: {e}")
-        out.append("RSA_CRT_FAULT=FAILED")
-        print("\\n".join(out))
-    #
-_attack()`;
+            out.append("")
+            out.append("RSA_CRT_FAULT=FAILED")`,
+    });
   },
   frontendCheck: (vals) => {
     if (!vals.n || !vals.e || !vals.m || !vals.sig_faulty) return Promise.resolve(null);
@@ -81,10 +65,7 @@ _attack()`;
       const g_ = gcd(v - m, n);
       if (g_ > 1n && g_ < n) {
         const qq = n / g_;
-        const phi = (g_ - 1n) * (qq - 1n);
-        const d = modInverse(e, phi);
-        const dLine = d ? `\nPrivate exponent d = ${d}` : '';
-        return Promise.resolve(`Factor found!\np = ${g_}\nq = ${qq}${dLine}\nRSA_CRT_FAULT=SUCCESS`);
+        return Promise.resolve(`RSA-CRT Fault Attack (Bellcore)\nn = ${n}\ne = ${e}\nm = ${m}\nsig_faulty = ${vals.sig_faulty}\n\nResults:\np = ${g_}\nq = ${qq}\n\nVerification: p * q = ${g_ * qq}\n\nRSA_CRT_FAULT=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch {

@@ -70,6 +70,37 @@ function injectSageScript(container: HTMLElement, code: string): void {
   container.appendChild(script);
 }
 
+function detectError(container: HTMLElement): string | null {
+  // Check .sagecell_error elements
+  const errorDiv = container.querySelector('.sagecell_error');
+  if (errorDiv && errorDiv.textContent?.trim()) {
+    return errorDiv.textContent.trim();
+  }
+
+  // Check .sagecell_computation for red-colored error content
+  const compDiv = container.querySelector('.sagecell_computation');
+  if (compDiv) {
+    const redEl = compDiv.querySelector('[style*="color: red"], [style*="color:red"]');
+    if (redEl && redEl.textContent?.trim()) {
+      return redEl.textContent.trim();
+    }
+    const errorClassEl = compDiv.querySelector('[class*="error"], [class*="Error"]');
+    if (errorClassEl && errorClassEl.textContent?.trim()) {
+      return errorClassEl.textContent.trim();
+    }
+  }
+
+  // Check any element with style.color === 'red' in the container
+  const allRed = container.querySelectorAll('[style*="color: red"], [style*="color:red"]');
+  for (const el of allRed) {
+    if (el.textContent?.trim()) {
+      return el.textContent.trim();
+    }
+  }
+
+  return null;
+}
+
 function waitForSageCell(timeoutMs = 10000, signal?: AbortSignal): Promise<void> {
   if (window.sagecell) return Promise.resolve();
   if (signal?.aborted) return Promise.reject(new Error('Aborted'));
@@ -106,14 +137,18 @@ function createSageMathExecutor() {
 
     const container = createOffscreenContainer();
     injectSageScript(container, code);
+    console.warn('[SageCell]', 'Script injected, container id:', container.id);
 
     return new Promise<SageResult>((resolve) => {
       let resolved = false;
       let pollTimer: ReturnType<typeof setInterval> | null = null;
+      let kernelAliveTimer: ReturnType<typeof setTimeout> | null = null;
+      let hasSeenStdout = false;
 
       const cleanup = () => {
         signal?.removeEventListener('abort', onAbort);
         if (pollTimer) clearInterval(pollTimer);
+        if (kernelAliveTimer) clearTimeout(kernelAliveTimer);
         try { document.body.removeChild(container); } catch { /* already removed */ }
       };
 
@@ -131,27 +166,77 @@ function createSageMathExecutor() {
       };
 
       const timeout = setTimeout(() => {
-        finish({ success: false, stdout: '', error: `Execution timed out after ${timeoutMs / 1000}s` });
+        console.warn('[SageCell]', 'Timeout fired after', timeoutMs, 'ms');
+        // Before finishing with timeout, check if error DOM elements exist
+        const errorText = detectError(container);
+        if (errorText) {
+          finish({ success: false, stdout: '', error: errorText });
+        } else if (hasSeenStdout) {
+          finish({ success: false, stdout: '', error: `SageCell execution timed out after ${timeoutMs / 1000}s. The attack may be too computationally expensive for browser execution.` });
+        } else {
+          finish({ success: false, stdout: '', error: 'SageCell produced no output. The kernel may have crashed. Check that all required inputs are filled.' });
+        }
       }, timeoutMs);
 
       const observer = new MutationObserver(() => {
         if (resolved) return;
+
+        // Check for error indicators first (kernel crash, red error boxes)
+        const errorText = detectError(container);
+        if (errorText) {
+          console.warn('[SageCell]', 'Error element detected:', errorText);
+          finish({ success: false, stdout: '', error: errorText });
+          return;
+        }
+
+        // Check for stdout
         const stdoutDiv = container.querySelector('.sagecell_stdout');
-        if (!stdoutDiv) return;
-
-        // Start polling stdout for completion markers (once)
-        if (pollTimer) return;
-        pollTimer = setInterval(() => {
-          if (resolved) return;
-          const text = stdoutDiv.textContent || '';
-          if (!text.trim()) return;
-
-          // Detect completion markers
-          if (text.includes('=SUCCESS') || text.includes('=FAILED')) {
-            finish({ success: text.includes('=SUCCESS'), stdout: text.trim() });
-            return;
+        if (stdoutDiv) {
+          if (!hasSeenStdout) {
+            hasSeenStdout = true;
+            console.warn('[SageCell]', 'stdout element detected');
           }
-        }, 200);
+
+          // Start polling stdout for completion markers (once)
+          if (pollTimer) return;
+          let lastStdoutText = '';
+          let lastChangeTime = Date.now();
+          pollTimer = setInterval(() => {
+            if (resolved) return;
+            const text = stdoutDiv.textContent || '';
+
+            // Detect completion markers — highest priority
+            if (text.includes('=SUCCESS') || text.includes('=FAILED')) {
+              finish({ success: text.includes('=SUCCESS'), stdout: text.trim() });
+              return;
+            }
+
+            // Track stdout changes for stall detection
+            if (text !== lastStdoutText) {
+              lastStdoutText = text;
+              lastChangeTime = Date.now();
+            }
+
+            // Stall detection: if stdout hasn't changed in 30s, kernel likely died
+            // 30s avoids false positives on slow lattice/LLL computations
+            if (Date.now() - lastChangeTime > 30000) {
+              if (text.trim()) {
+                finish({
+                  success: false,
+                  stdout: text.trim(),
+                  error: `SageCell kernel stalled — no output for 30s.\n\nOutput before stall:\n${text.trim()}`,
+                });
+              } else {
+                finish({
+                  success: false,
+                  stdout: '',
+                  error: 'SageCell produced no output for 30s. The kernel may have crashed or the computation is too slow for remote execution.',
+                });
+              }
+              return;
+            }
+          }, 200);
+        }
       });
 
       observer.observe(container, { childList: true, subtree: true, characterData: true });
@@ -159,21 +244,40 @@ function createSageMathExecutor() {
       signal?.addEventListener('abort', onAbort, { once: true });
 
       try {
+        console.warn('[SageCell]', 'Initializing SageCell...');
         window.sagecell.makeSagecell({
           inputLocation: `#${container.id}`,
           template: window.sagecell.templates.minimal,
           evalButtonText: 'Evaluate',
           autoeval: true,
           callback: () => {
-            // Callback fires when evaluation is queued, output still needs polling
+            console.warn('[SageCell]', 'SageCell evaluation queued');
+            // Startup detection: if no stdout or error after 10s, kernel likely failed to start
+            kernelAliveTimer = setTimeout(() => {
+              if (resolved) return;
+              const hasAnyOutput = container.querySelector('.sagecell_output, .sagecell_stdout, .sagecell_files, .sagecell_computation');
+              if (!hasAnyOutput) {
+                const lateError = detectError(container);
+                if (lateError) {
+                  console.warn('[SageCell]', 'Kernel error via startup check:', lateError);
+                  finish({ success: false, stdout: '', error: lateError });
+                } else {
+                  console.warn('[SageCell]', 'No output after 10s, kernel may have crashed');
+                  finish({ success: false, stdout: '', error: 'SageCell kernel produced no output after 10s. The kernel may have crashed during startup. Check your network connection and try again.' });
+                }
+              }
+            }, 10000);
           },
         });
+        console.warn('[SageCell]', 'SageCell initialized successfully');
       } catch (err: unknown) {
         if (!resolved) {
           clearTimeout(timeout);
           observer.disconnect();
           if (pollTimer) clearInterval(pollTimer);
+          if (kernelAliveTimer) clearTimeout(kernelAliveTimer);
           const message = err instanceof Error ? err.message : 'Failed to execute Sage code';
+          console.warn('[SageCell]', 'makeSagecell threw:', message);
           finish({ success: false, stdout: '', error: message });
         }
       }

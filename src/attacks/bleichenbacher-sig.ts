@@ -1,5 +1,6 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'bleichenbacher-sig',
@@ -16,74 +17,59 @@ export const attack: Attack = {
       return `print("ERROR: Missing required inputs (n, hash_hex)")
 print("BLEICHENBACHER_SIG=FAILED")`;
     }
-    return `def _attack():
-    try:
-        out = []
-        n = Integer(${vals.n})
+    return wrapSageTemplate({
+      token: 'BLEICHENBACHER_SIG',
+      useGuard: false,
+      body: `        n = Integer(${vals.n})
         e = Integer(${vals.e || '3'})
         hash_hex = "${vals.hash_hex}".strip()
+        found = True
         if not hash_hex:
             out.append("ERROR: hash_hex is empty")
-            out.append("BLEICHENBACHER_SIG=FAILED")
-            print("\\n".join(out))
-            return
-        if e != 3:
+            found = False
+        elif e != 3:
             out.append("This attack requires e=3.")
             out.append(f"Got e={e}.")
-            out.append("BLEICHENBACHER_SIG=FAILED")
-            print("\\n".join(out))
-            return
-        n_bytes = (n.nbits() + 7) // 8
-        hash_bytes = len(hash_hex) // 2
-        if hash_bytes == 0:
-            out.append("ERROR: hash_hex is too short (need at least 2 hex chars)")
-            out.append("BLEICHENBACHER_SIG=FAILED")
-            print("\\n".join(out))
-            return
-        hash_int = Integer("0x" + hash_hex)
-        # PKCS#1 v1.5: 0x00 || 0x01 || 0xFF*min_padding || 0x00 || hash || garbage
-        # Garbage bytes absorb the error from ceil(cuberoot(target))
-        min_padding = 8
-        fixed_overhead = 3 + min_padding
-        garbage_len = n_bytes - fixed_overhead - hash_bytes
-        if garbage_len < 0:
-            out.append("ERROR: Hash too large for this modulus (need more garbage bytes)")
-            out.append("BLEICHENBACHER_SIG=FAILED")
-            print("\\n".join(out))
-            return
-        # Construct target with garbage = 0
-        # Structure (LSB end): garbage | hash | 0x00 | 0xFF*min_padding | 0x01 | 0x00
-        target = (Integer(1) << (8 * (garbage_len + hash_bytes + 1 + min_padding))) + ((Integer(1) << (8 * min_padding)) - 1) * (Integer(1) << (8 * (garbage_len + hash_bytes + 1))) + hash_int * (Integer(1) << (8 * garbage_len))
-        # Forge S = ceil(cuberoot(target)) over the integers (no mod n needed)
-        sig, exact = target.nth_root(3, truncate_mode=True)
-        if not exact:
-            sig += 1
-        cube = sig ** 3
-        out.append(f"Bleichenbacher Signature Forgery (e={e})")
-        out.append(f"n bytes = {n_bytes}")
-        out.append(f"Target hash: {hash_hex}")
-        out.append(f"Forged signature S = {sig}")
-        out.append(f"S^3 = {cube}")
-        # Verify PKCS#1 leading bytes 0x0001 are preserved
-        top_two = cube >> (8 * (n_bytes - 2))
-        if top_two == Integer(0x0001):
-            out.append("PKCS#1 structure preserved — forged signature valid against lax verifier")
-            out.append("")
-            out.append("BLEICHENBACHER_SIG=SUCCESS")
+            found = False
         else:
-            out.append("Signature forgery failed — garbage area too small for this hash and modulus")
-            out.append("BLEICHENBACHER_SIG=FAILED")
-        print("\\n".join(out))
-    except Exception as ex:
-        try:
-            out.append(f"ERROR: {ex}")
-            out.append("BLEICHENBACHER_SIG=FAILED")
-            print("\\n".join(out))
-        except:
-            print(f"ERROR: {ex}")
-            print("BLEICHENBACHER_SIG=FAILED")
-    #
-_attack()`;
+            n_bytes = (n.nbits() + 7) // 8
+            hash_bytes = len(hash_hex) // 2
+            if hash_bytes == 0:
+                out.append("ERROR: hash_hex is too short (need at least 2 hex chars)")
+                found = False
+            else:
+                garbage_len = n_bytes - 3 - 8 - hash_bytes
+                if garbage_len < 0:
+                    out.append("ERROR: Hash too large for this modulus (need more garbage bytes)")
+                    found = False
+        if found:
+            hash_int = Integer("0x" + hash_hex)
+            target = (Integer(1) << (8 * (garbage_len + hash_bytes + 1 + 8))) + ((Integer(1) << (8 * 8)) - 1) * (Integer(1) << (8 * (garbage_len + hash_bytes + 1))) + hash_int * (Integer(1) << (8 * garbage_len))
+            sig, exact = target.nth_root(3, truncate_mode=True)
+            if not exact:
+                sig += 1
+            cube = sig ** 3
+            out.append("Bleichenbacher Signature Forgery (e=3)")
+            out.append(f"n = {n}")
+            out.append(f"e = {e}")
+            out.append(f"hash_hex = {hash_hex}")
+            out.append("")
+            out.append("Results:")
+            out.append(f"s = {sig}")
+            top_two = cube >> (8 * (n_bytes - 2))
+            if top_two == Integer(0x0001):
+                out.append("")
+                out.append(f"Verification: s^3 = {cube} (PKCS#1 0x0001 prefix)")
+                out.append("")
+                out.append("BLEICHENBACHER_SIG=SUCCESS")
+            else:
+                out.append("")
+                out.append("Verification: signature forgery failed — garbage area too small")
+                out.append("")
+                out.append("BLEICHENBACHER_SIG=FAILED")
+        else:
+            out.append("BLEICHENBACHER_SIG=FAILED")`,
+    });
   },
   proof: `\\textbf{Theorem:} When $e = 3$ and the verifier accepts trailing garbage bytes after the hash, a valid PKCS#1 v1.5 signature can be forged by taking the integer cube root of a crafted padding structure.
 

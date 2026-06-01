@@ -19,9 +19,12 @@ import { ProofRenderer } from './ProofRenderer';
 import { testcaseGenerators, submitToFactorDB, autoDecrypt } from '../attacks';
 import { isActualSuccess } from '../utils/sageOutput';
 import { inputSx } from '../styles/inputSx';
-import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, draculaSourceTheme, FONT_FAMILY } from '../styles/shared';
+import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, FONT_FAMILY } from '../styles/shared';
 import { useTimer } from '../hooks/useTimer';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import Prism from 'prismjs';
+import '../styles/draculaPrism.css';
+import 'prismjs/components/prism-typescript';
+import 'prismjs/components/prism-python';
 import { getAttackSource, extractFrontendCheck, dedent } from '../attacks/rawSources';
 import { ProgressEstimator } from '../utils/progressEstimator';
 
@@ -238,6 +241,7 @@ export function InputPanel() {
         if (preResult !== null) {
           if (attackIdRef.current !== currentAttackId) return;
           let displayPreResult = preResult;
+          displayPreResult += '\nMETHOD=TYPESCRIPT';
           const decryptedPre = autoDecrypt(selectedAttack, vals, preResult);
           if (decryptedPre) displayPreResult += '\n\n## Decrypted message\n' + decryptedPre;
           if (!mountedRef.current) return;
@@ -268,6 +272,7 @@ export function InputPanel() {
       if (attackIdRef.current !== currentAttackId) return;
       if (result.success) {
         let displayStdout = result.stdout;
+        displayStdout += '\nMETHOD=SAGEMATHCELL';
         const decryptedSage = autoDecrypt(selectedAttack, vals, result.stdout);
         if (decryptedSage) displayStdout += '\n\n## Decrypted message\n' + decryptedSage;
         if (!mountedRef.current) return;
@@ -503,19 +508,26 @@ export function InputPanel() {
             border: `1px solid ${draculaColors.comment}`,
             overflow: 'hidden',
           }}>
-            <SyntaxHighlighter
-              language={effectiveSourceMode === 'sage' ? 'python' : 'typescript'}
-              style={draculaSourceTheme}
-              customStyle={{
+            <Box
+              component="pre"
+              sx={{
                 margin: 0,
                 borderRadius: 'inherit',
                 fontSize: '0.8rem',
                 fontFamily: FONT_FAMILY,
                 maxHeight: '50vh',
+                overflow: 'auto',
+                p: 1.5,
+                lineHeight: '1.5',
               }}
-            >
-              {effectiveSourceMode === 'sage' ? pythonCode : frontendCode}
-            </SyntaxHighlighter>
+              dangerouslySetInnerHTML={{
+                __html: Prism.highlight(
+                  effectiveSourceMode === 'sage' ? pythonCode : frontendCode,
+                  effectiveSourceMode === 'sage' ? Prism.languages.python : Prism.languages.typescript,
+                  effectiveSourceMode === 'sage' ? 'python' : 'typescript'
+                ),
+              }}
+            />
           </Box>
 
           <Box sx={{ mt: 1.5 }}>

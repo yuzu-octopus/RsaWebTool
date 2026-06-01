@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { sageGuardBlock } from './guard';
+import { wrapSageTemplate } from './guard';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd, modPow } from '../utils/bigint';
 
@@ -13,27 +13,23 @@ export const attack: Attack = {
     { name: 'B', label: 'B1 (stage 1 bound, optional)', placeholder: '10000', required: false, multiline: false },
     { name: 'B2', label: 'B2 (stage 2 bound, optional)', placeholder: '0 (disabled)', required: false, multiline: false },
   ],
-  sageTemplate: (vals: Record<string, string>) => `import math
-def _attack():
-    try:
-        out = []
-        n = Integer(${vals.n})
-        B1 = int(Integer(${vals.B || '10000'}))
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'POLLARD_P1',
+    n: vals.n,
+    imports: ['import math'],
+    body: `        B1 = int(Integer(${vals.B || '10000'}))
         if B1 < 2:
             B1 = 10000
         B2 = int(Integer(${vals.B2 || '0'}))
         if B2 < 0:
             B2 = 0
-        out.append(f"Pollard's p-1 on n = {n} ({n.nbits()} bits)")
-        out.append(f"B1 = {B1}")
+        out.append("Pollard's p-1 Method")
+        out.append(f"n = {n}")
+        out.append(f"B = {B1}")
         if B2 > B1:
             out.append(f"B2 = {B2}")
         out.append("")
-        # Trivial checks
-        ${sageGuardBlock("POLLARD_P1")}
-        # Use Python int for fast modular exponentiation
         n_int = int(n)
-        # Sieve primes up to B1 (pure Python, no prime_range)
         limit = B1
         sieve = [True] * (limit + 1)
         if limit >= 0:
@@ -47,8 +43,6 @@ def _attack():
                     sieve[j] = False
             i += 1
         primes = [i for i in range(limit + 1) if sieve[i]]
-        # Stage 1: compute 2^lcm(1..B1) mod n
-        out.append(f"Stage 1: {len(primes)} primes up to B1={B1}...")
         a = 2
         for p in primes:
             pp = p
@@ -56,20 +50,20 @@ def _attack():
                 pp *= p
             a = pow(a, pp, n_int)
         g = math.gcd(a - 1, n_int)
+        found = False
         if 1 < g < n_int:
             g_sage = Integer(g)
             q_val = n // g_sage
-            out.append(f"Verification: p * q = {g_sage * q_val}")
+            out.append("Results:")
             out.append(f"p = {g_sage}")
             out.append(f"q = {q_val}")
             out.append("")
+            out.append(f"Verification: p * q = {g_sage * q_val}")
+            out.append("")
             out.append("POLLARD_P1=SUCCESS")
-            print("\\n".join(out))
-            return
-        # Stage 2 (optional, only if B2 > B1 and Stage 1 failed)
-        if B2 > B1:
+            found = True
+        if not found and B2 > B1:
             limit2 = B2
-            out.append(f"Stage 2: checking primes in ({limit}, {limit2}]...")
             sieve2 = [True] * (limit2 + 1)
             if limit2 >= 0:
                 sieve2[0] = False
@@ -94,23 +88,19 @@ def _attack():
                 if 1 < g < n_int:
                     g_sage = Integer(g)
                     q_val = n // g_sage
-                    out.append(f"Verified: p * q = {g_sage * q_val}")
+                    out.append("Results:")
                     out.append(f"p = {g_sage}")
                     out.append(f"q = {q_val}")
                     out.append("")
+                    out.append(f"Verification: p * q = {g_sage * q_val}")
+                    out.append("")
                     out.append("POLLARD_P1=SUCCESS")
-                    print("\\n".join(out))
-                    return
-        out.append(f"Pollard p-1 failed: p-1 is not {B1}-smooth")
-        if B2 > B1:
-            out.append(f"(also not {B2}-smooth with one large factor)")
-        out.append("POLLARD_P1=FAILED")
-        print("\\n".join(out))
-    except Exception as e:
-        out.append(f"ERROR: {e}")
-        out.append("POLLARD_P1=FAILED")
-        print("\\n".join(out))
-_attack()`,
+                    found = True
+        if not found:
+            out.append("Results:")
+            out.append("")
+            out.append("POLLARD_P1=FAILED")`,
+  }),
   proof: `\\textbf{Theorem:} If $p-1$ is $B_1$-smooth, compute $a^M \\bmod n$ with $M = \\operatorname{lcm}(1,\\ldots,B_1)$ to reveal $p$ via $\\gcd(a^M-1, n)$.
 
 \\textbf{Setup:}
@@ -163,6 +153,10 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
       }
       const stage2Count = B2 > B1 ? primes.length - stage1Count : 0;
       const totalOps = stage1Count + stage2Count;
+
+      let output = `Pollard's p-1 Method\nn = ${n}\nB = ${B1}`;
+      if (B2 > B1) output += `\nB2 = ${B2}`;
+      output += `\n\n`;
       let opsDone = 0;
 
       let a = 2n;
@@ -181,7 +175,7 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
       let g = gcd(a - 1n, n);
       if (g > 1n && g < n) {
         onProgress?.(100);
-        return Promise.resolve(`Factor found!\np = ${g}\nq = ${n / g}\nPOLLARD_P1=SUCCESS`);
+        return Promise.resolve(`${output}Results:\np = ${g}\nq = ${n / g}\n\nVerification: p * q = ${g * (n / g)}\n\nPOLLARD_P1=SUCCESS`);
       }
 
       if (B2 > B1) {
@@ -196,7 +190,7 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
           g = gcd(a - 1n, n);
           if (g > 1n && g < n) {
             onProgress?.(100);
-            return Promise.resolve(`Factor found!\np = ${g}\nq = ${n / g}\nPOLLARD_P1=SUCCESS`);
+            return Promise.resolve(`${output}Results:\np = ${g}\nq = ${n / g}\n\nVerification: p * q = ${g * (n / g)}\n\nPOLLARD_P1=SUCCESS`);
           }
         }
       }

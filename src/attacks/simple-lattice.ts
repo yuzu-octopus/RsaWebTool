@@ -1,5 +1,6 @@
 import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'simple-lattice',
@@ -10,36 +11,36 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'nearp', label: 'nearp (approximate p)', placeholder: 'Enter approximate p value...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `def _attack():
-    try:
-        try:
-            out = []
-            n = Integer(${vals.n})
-            nearp = Integer(${vals.nearp})
-            if n <= 0 or nearp <= 0:
-                out.append("SIMPLE_LATTICE=FAILED: invalid input values")
-                print("\\n".join(out))
-                return
-            if nearp >= n:
-                out.append("nearp must be less than n (modulus)")
-                out.append("SIMPLE_LATTICE=FAILED: nearp >= n")
-                print("\\n".join(out))
-                return
-            if n % nearp == 0:
-                p = nearp
-                q = n // p
-                out.append(f"Verification: p * q = {p * q}")
-                out.append(f"p = {p}")
-                out.append(f"q = {q}")
-                out.append("")
-                out.append("SIMPLE_LATTICE=SUCCESS")
-                print("\\n".join(out))
-                return
-            if n % 2 == 0:
-                out.append("n is even — cannot apply lattice attack")
-                out.append("SIMPLE_LATTICE=FAILED: even modulus")
-                print("\\n".join(out))
-                return
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'SIMPLE_LATTICE',
+    useGuard: false,
+    body: `        n = Integer(${vals.n})
+        nearp = Integer(${vals.nearp})
+        found = False
+        if n <= 0 or nearp <= 0:
+            out.append("SIMPLE_LATTICE=FAILED: invalid input values")
+        elif nearp >= n:
+            out.append("nearp must be less than n (modulus)")
+            out.append("SIMPLE_LATTICE=FAILED: nearp >= n")
+        elif n % nearp == 0:
+            p = nearp
+            q = n // p
+            out.append("Simple Lattice")
+            out.append(f"n = {n}")
+            out.append(f"nearp = {nearp}")
+            out.append("")
+            out.append("Results:")
+            out.append(f"p = {p}")
+            out.append(f"q = {q}")
+            out.append("")
+            out.append(f"Verification: p * q = {p * q}")
+            out.append("")
+            out.append("SIMPLE_LATTICE=SUCCESS")
+            found = True
+        elif n % 2 == 0:
+            out.append("n is even — cannot apply lattice attack")
+            out.append("SIMPLE_LATTICE=FAILED: even modulus")
+        else:
             # Manual Coppersmith lattice (same shifts as Sage's small_roots).
             # Checks ALL LLL rows to bypass Sage's Row-0 (degree-1) bug.
             x = ZZ['x'].gen()
@@ -51,11 +52,11 @@ export const attack: Attack = {
                 shifts.append(n^(m - i) * f_ZZ^i)
             for k in range(t):
                 shifts.append(f_ZZ^m * x^k)
-            M = matrix(ZZ, dim, dim)
+            M_mat = matrix(ZZ, dim, dim)
             for i, shift in enumerate(shifts):
                 for j, c in enumerate(shift.list()):
-                    M[i, j] = c * X^j
-            B = M.LLL()
+                    M_mat[i, j] = c * X^j
+            B = M_mat.LLL()
             found_p = None
             for k in range(dim):
                 row = B[k]
@@ -77,21 +78,24 @@ export const attack: Attack = {
                     break
             if found_p:
                 q = n // found_p
-                out.append(f"Verification: p * q = {found_p * q}")
+                out.append("Simple Lattice")
+                out.append(f"n = {n}")
+                out.append(f"nearp = {nearp}")
+                out.append("")
+                out.append("Results:")
                 out.append(f"p = {found_p}")
                 out.append(f"q = {q}")
                 out.append("")
+                out.append(f"Verification: p * q = {found_p * q}")
+                out.append("")
                 out.append("SIMPLE_LATTICE=SUCCESS")
+                found = True
             else:
                 out.append("SIMPLE_LATTICE=FAILED: no roots found in any LLL row")
-            print("\\n".join(out))
-        except Exception as ex:
-            out.append(f"SIMPLE_LATTICE=FAILED: {ex}")
-            print("\\n".join(out))
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("SIMPLE_LATTICE=FAILED")
-_attack()`,
+        if not found:
+            out.append("SIMPLE_LATTICE=FAILED")
+`,
+  }),
   proof: `\\textbf{Theorem:} If $|p-p_0| < n^{1/4}$, Coppersmith's method recovers $p$ from approximation $p_0$ via lattice reduction.
 
 \\textbf{Setup:}

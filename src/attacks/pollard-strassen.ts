@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { randomPrime } from '../utils/testcases/core';
-import { sageGuardBlock } from './guard';
+import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'pollard-strassen',
@@ -10,23 +10,22 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  sageTemplate: (vals: Record<string, string>) => `import math
-def _attack():
-    try:
-        out = []
-        try:
-            n = Integer(${vals.n})
-            out.append(f"Pollard-Strassen factorization on n = {n}")
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'POLLARD_STRASSEN',
+    n: vals.n,
+    imports: ['import math'],
+    useGuard: true,
+    body: `        out.append("Pollard-Strassen's Algorithm")
+        out.append(f"n = {n}")
+        out.append("")
+        c = int(floor(RR(n) ** (1/4))) + 1
+        found = False
+        if c > 50000:
+            out.append("Results:")
             out.append("")
-            ${sageGuardBlock("POLLARD_STRASSEN", '            ')}
-            c = int(floor(RR(n) ** (1/4))) + 1
-            if c > 50000:
-                out.append(f"n is too large for Strassen (n^(1/4) = {c} > 50000)")
-                out.append("POLLARD_STRASSEN=FAILED")
-                print("\\n".join(out))
-                return
+            out.append("POLLARD_STRASSEN=FAILED")
+        else:
             n_int = int(n)
-            # Single-pass Strassen: accumulate product incrementally with batched GCD
             prod = 1
             batch_size = 1000
             for i in range(1, c + 1):
@@ -34,7 +33,6 @@ def _attack():
                 if i % batch_size == 0 or i == c:
                     g = math.gcd(prod, n_int)
                     if g > 1 and g < n_int:
-                        # Backtrack to find exact factor in this batch
                         backtrack_start = max(1, i - batch_size + 1)
                         backtrack_prod = 1
                         for j in range(backtrack_start, i + 1):
@@ -43,25 +41,22 @@ def _attack():
                             if g2 > 1 and g2 < n_int:
                                 p_sage = Integer(g2)
                                 q_sage = n // p_sage
-                                out.append(f"Verification: p * q = {p_sage * q_sage}")
+                                out.append("Results:")
                                 out.append(f"p = {p_sage}")
                                 out.append(f"q = {q_sage}")
                                 out.append("")
+                                out.append(f"Verification: p * q = {p_sage * q_sage}")
+                                out.append("")
                                 out.append("POLLARD_STRASSEN=SUCCESS")
-                                print("\\n".join(out))
-                                return
-                        # If product GCD found but backtrack didn't (shouldn't happen)
+                                found = True
+                                break
                         break
-            out.append("Pollard-Strassen failed: no factor found in intervals")
-            out.append("POLLARD_STRASSEN=FAILED")
-        except Exception as e:
-            out.append(f"ERROR: {e}")
-            out.append("POLLARD_STRASSEN=FAILED")
-        print("\\n".join(out))
-    except BaseException as ex:
-        print(f"ERROR: {ex}")
-        print("POLLARD_STRASSEN=FAILED")
-_attack()`,
+            if not found:
+                out.append("Results:")
+                out.append("")
+                out.append("POLLARD_STRASSEN=FAILED")
+`,
+  }),
   proof: `\\textbf{Theorem:} Pollard-Strassen factors n in $O(n^{1/4} \\log n)$ time by partitioning $[1, n^{1/4}]$ into intervals and testing each via GCD.
 
 \\textbf{Setup:}
