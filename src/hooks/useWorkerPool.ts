@@ -1,5 +1,5 @@
 import { useRef, useCallback, useEffect } from 'react';
-import { WORKER_POOL_SIZE } from '../config';
+import env from '../config/env';
 
 interface PendingTask {
   resolve: (value: string | null) => void;
@@ -18,11 +18,11 @@ interface QueuedTask {
  * computations off the main thread. Falls back to main-thread execution
  * when Workers are unavailable (old browser, extension blocking).
  *
- * Worker pool size is configurable via WORKER_POOL_SIZE in config.ts.
+ * Worker pool size is configurable via env.workerPoolSize (console: env.workers = N).
  * Tasks are distributed round-robin to the first available worker.
  * If all workers are busy, the task is queued and processed as workers free up.
  */
-export function useWorkerPool(poolSize: number = WORKER_POOL_SIZE) {
+export function useWorkerPool(poolSize: number = env.workerPoolSize) {
   const workersRef = useRef<Worker[]>([]);
   const busyRef = useRef<boolean[]>([]);
   const pendingRef = useRef<Map<number, PendingTask> | null>(null);

@@ -1,4 +1,5 @@
 import { useMemo, useEffect, useRef, useCallback } from 'react';
+import env from '../config/env';
 
 export interface SageResult {
   success: boolean;
@@ -26,7 +27,7 @@ declare global {
 }
 
 // Default timeout: 10s for SageCell script load + 110s for execution
-export const DEFAULT_SAGE_TIMEOUT = 120000;
+export const DEFAULT_SAGE_TIMEOUT = env.sagecellTimeout * 1000;
 
 // Feature-detect AbortSignal.any() — available in Chrome 93+, Firefox 97+, Safari 15.4+
 const supportsAbortSignalAny = typeof AbortSignal !== 'undefined' && typeof AbortSignal.any === 'function';
@@ -219,7 +220,7 @@ function createSageMathExecutor() {
 
             // Stall detection: if stdout hasn't changed in 30s, kernel likely died
             // 30s avoids false positives on slow lattice/LLL computations
-            if (Date.now() - lastChangeTime > 30000) {
+            if (Date.now() - lastChangeTime > env.stallTimeout * 1000) {
               if (text.trim()) {
                 finish({
                   success: false,
@@ -343,7 +344,7 @@ export function useSageMathParallel() {
 
   const executeAll = useCallback(async (
     codes: string[],
-    concurrency = 3,
+    concurrency = env.sagecellSlots,
     timeoutMs = DEFAULT_SAGE_TIMEOUT,
     onResult?: (index: number, result: SageResult) => boolean,
     externalController?: AbortController

@@ -23,6 +23,7 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 - **Keyboard Shortcuts** — ⌘Enter (run), ⌘1/2/3 (tabs), ⌘Shift+C (copy), Tab/Shift+Tab (cycle attacks)
 - **PEM Decryptor** — Parse and decrypt PKCS#1/PKCS#8/encrypted PEM keys, feed params to Calculator or Attacks
 - **Instructions** — Collapsible reference guide for using the tool
+- **Console Configuration** — `env` object exposed on `window` for runtime config (proxy URL, worker pool, timeouts). Persisted to localStorage, `env.reset()` clears all stored data.
 - **Dracula theme** — dark, developer-friendly UI
 - **Prismjs syntax highlighting** — replaces react-syntax-highlighter, 33% smaller bundle (1.22MB)
 - **Notepad** — drag-resizeable scratchpad with localStorage persistence
@@ -166,6 +167,26 @@ Paste a PEM private key (PKCS#1, PKCS#8, or encrypted). The tool parses the key,
 | ⌘/Ctrl+Shift+C | Copy output |
 | Tab/Shift+Tab | Cycle through attacks |
 
+### Console Configuration
+
+All runtime settings are accessible via the `env` object in the browser console. Settings persist to localStorage across page loads.
+
+```js
+env.workerPoolSize       // 3
+env.workerPoolSize = 5   // persisted, takes effect on next page load
+env.DOCS                 // descriptions of all properties
+env.reset()              // clears ALL localStorage + reloads
+```
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `factordbProxyUrl` | `"...octopusyuzu.workers.dev"` | FactorDB CORS proxy URL |
+| `workerPoolSize` | `3` | Web Worker pool size for frontendCheck |
+| `sagecellSlots` | `3` | Max concurrent SageCell executions |
+| `sagecellTimeout` | `120` | SageCell timeout (seconds) |
+| `stallTimeout` | `30` | Kernel stall detection threshold (seconds) |
+| `reportFactors` | `true` | Report factors to FactorDB (false for competitive CTF) |
+
 ## Tech Stack
 
 | Layer | Technology |
@@ -183,7 +204,7 @@ Paste a PEM private key (PKCS#1, PKCS#8, or encrypted). The tool parses the key,
 src/
   attacks/          47 individual .ts files + guard.ts + index.ts + rawSources.ts
   components/       15 React components (Sidebar, InputPanel, OutputPanel, MagicPanel, CommandPalette, InstructionsPanel, PemDecryptor, etc.)
-  config/           sidebarItems.ts — shared sidebar item definitions
+  config/           env.ts (console-accessible Env class), sidebarItems.ts
   context/          AppContext provider, ctx.ts
   hooks/            useSageMath, useWorkerPool, useDragResize, useAppContext, useTimer, useCommandPalette, useKeyboardShortcuts
   styles/           shared.ts, inputSx.ts

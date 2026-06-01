@@ -15,7 +15,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { CommandPalette } from './components/CommandPalette';
 import { flexPanelSx, FONT_FAMILY } from './styles/shared';
 import { setFactorDBProxy } from './utils/factordb';
-import { FACTORDB_PROXY_URL } from './config';
+import env from './config/env';
 import { useAppContext } from './hooks/useAppContext';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 
@@ -30,8 +30,8 @@ function AppContent() {
   const borderColor = notification?.severity ? severityBorder[notification.severity] : draculaColors.currentLine;
 
   useEffect(() => {
-    if (FACTORDB_PROXY_URL) {
-      setFactorDBProxy(FACTORDB_PROXY_URL);
+    if (env.factordbProxyUrl) {
+      setFactorDBProxy(env.factordbProxyUrl);
     }
   }, []);
 

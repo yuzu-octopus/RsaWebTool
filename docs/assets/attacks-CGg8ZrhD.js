@@ -1,5 +1,6 @@
 var e=`import type { Attack, AttackCategory } from '../types';
 import { extractPQ, reportFactor } from '../utils/factordb';
+import env from '../config/env';
 import { modInverse, modPow } from '../utils/bigint';
 import { bigIntToBytes } from '../utils/converters';
 
@@ -155,7 +156,7 @@ export function submitToFactorDB(
 ) {
   const pq = extractPQ(result);
   if (pq && n) {
-    reportFactor(n, [pq.p, pq.q]).then(
+    if (env.reportFactors) reportFactor(n, [pq.p, pq.q]).then(
       resp => notify(resp === 'Already fully factored' ? 'Already known to FactorDB' : 'Submitted to FactorDB', 'info'),
       () => notify('Failed to submit to FactorDB', 'error'),
     );

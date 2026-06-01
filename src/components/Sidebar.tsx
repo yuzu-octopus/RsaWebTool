@@ -15,7 +15,7 @@ import { draculaColors } from '../theme/dracula';
 import { CATEGORIES, attacksByCategory } from '../attacks';
 import type { Attack } from '../types';
 import { useAppContext } from '../hooks/useAppContext';
-import { FACTORDB_PROXY_URL } from '../config';
+import env from '../config/env';
 
 const drawerWidth = 220;
 
@@ -37,8 +37,8 @@ export function Sidebar() {
     const abortController = new AbortController();
     let factorDbTimeout: ReturnType<typeof setTimeout> | undefined;
 
-    if (FACTORDB_PROXY_URL) {
-      fetch(`${FACTORDB_PROXY_URL}?query=15`, { signal: abortController.signal })
+    if (env.factordbProxyUrl) {
+      fetch(`${env.factordbProxyUrl}?query=15`, { signal: abortController.signal })
         .then(r => r.json())
         .then(() => {
           if (factorDbTimeout) clearTimeout(factorDbTimeout);
