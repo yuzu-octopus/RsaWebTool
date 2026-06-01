@@ -112,7 +112,7 @@ _attack()\`;
       // Only warm-start from prevRoot if it's >= the true root (prevRoot^e >= value).
       // Starting below the root causes Newton's first jump to overshoot and immediately
       // trigger the convergence break (next >= x), returning the wrong root.
-      let x = (prevRoot > 1n && prevRoot ** e >= value)
+      let x = (prevRoot > 1n && (prevRoot + 2n) ** e >= value)
         ? prevRoot
         : 1n << BigInt(Math.ceil(value.toString(2).length / Number(e)));
       while (true) {

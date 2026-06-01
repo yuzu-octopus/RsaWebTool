@@ -89,6 +89,7 @@ _attack()\`,
       const n = BigInt(vals.n);
       const k = BigInt(vals.k);
       const fourKN = 4n * k * n;
+      const twoK = 2n * k;
       for (let delta = -1000000n; delta <= 1000000n; delta++) {
         const disc = delta * delta + fourKN;
         const discNybble = Number(disc & 15n);
@@ -101,8 +102,8 @@ _attack()\`,
         const sqrt_disc = isqrt(disc);
         if (sqrt_disc * sqrt_disc !== disc) continue;
         const num = -delta + sqrt_disc;
-        if (num > 0n && num % (2n * k) === 0n) {
-          const p = num / (2n * k);
+        if (num > 0n && num % twoK === 0n) {
+          const p = num / twoK;
           if (p > 1n && n % p === 0n) {
             const q = n / p;
             onProgress?.(100);

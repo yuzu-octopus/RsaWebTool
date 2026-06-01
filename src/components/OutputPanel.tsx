@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -43,9 +43,10 @@ export function OutputPanel() {
     return () => { mountedRef.current = false; };
   }, []);
 
-  const displayResult = ui.historySelectedKey
-    ? history.find(h => (h.timestamp.getTime() + '-' + h.attackId) === ui.historySelectedKey)?.result ?? null
-    : outputResult;
+  const displayResult = useMemo(() => {
+    if (!ui.historySelectedKey) return outputResult;
+    return history.find(h => (h.timestamp.getTime() + '-' + h.attackId) === ui.historySelectedKey)?.result ?? null;
+  }, [ui.historySelectedKey, history, outputResult]);
 
   const handleHistoryClick = useCallback((_entry: HistoryEntry, key: string) => {
     setUi(prev => ({ ...prev, historySelectedKey: key }));
@@ -61,6 +62,7 @@ export function OutputPanel() {
     } catch { /* ignore */ }
     return '';
   });
+  const notepadTextRef = useRef(notepadText);
   const [notepadHeight, handleNotepadResizeMouseDown] = useDragResize({
     axis: 'y',
     min: 80,
@@ -95,17 +97,22 @@ export function OutputPanel() {
     return () => clearTimeout(timer);
   }, [notepadText, notepadOpen]);
 
+  // Keep ref in sync with notepadText
+  useEffect(() => {
+    notepadTextRef.current = notepadText;
+  }, [notepadText]);
+
   // Flush notepad to localStorage before page unload
   useEffect(() => {
     if (!notepadOpen) return;
     const handleBeforeUnload = () => {
       try {
-        localStorage.setItem('notepad:v1', JSON.stringify({ text: notepadText, timestamp: Date.now() }));
+        localStorage.setItem('notepad:v1', JSON.stringify({ text: notepadTextRef.current, timestamp: Date.now() }));
       } catch { /* ignore */ }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [notepadText, notepadOpen]);
+  }, [notepadOpen]);
 
   const handleNotepadChange = (text: string) => {
     setNotepadText(text);

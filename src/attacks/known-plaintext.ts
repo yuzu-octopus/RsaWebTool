@@ -191,6 +191,8 @@ _attack()`;
             }
           }
         } else {
+          // Non-e=3 brute-force with large unknown bits would take too long in browser
+          if (unknownBits > 16) return Promise.resolve(null);
           for (let k = 0; k < limit; k++) {
             if (onProgress && limit > 1000) {
               const pct = Math.round(k * 100 / limit);

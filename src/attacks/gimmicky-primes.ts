@@ -195,6 +195,7 @@ _attack()`,
         let factorial = 1n;
         for (let k = 1; k <= 1000; k++) {
           factorial *= BigInt(k);
+          if (factorial > n) break;
           for (const sign of [1n, -1n]) {
             const candidate = factorial + sign;
             if (candidate > 1n && n % candidate === 0n) {
@@ -209,6 +210,7 @@ _attack()`,
       if (!found) {
         for (let k = 1; k <= 1000; k++) {
           const twoK = 1n << BigInt(k);
+          if (twoK > n) break;
           for (const sign of [-1n, 1n]) {
             const candidate = (twoK + sign) ** 2n - 2n;
             if (candidate > 1n && n % candidate === 0n) {
@@ -224,6 +226,7 @@ _attack()`,
       if (!found) {
         for (let k = 1; k <= 1000; k++) {
           const twoK = 1n << BigInt(k);
+          if (twoK > n) break;
           const kBig = BigInt(k);
           for (const sign of [1n, -1n]) {
             const candidate = kBig * twoK + sign;

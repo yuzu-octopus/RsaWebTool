@@ -1,4 +1,4 @@
-import { useState, useReducer, useRef, useEffect } from 'react';
+import { useState, useReducer, useRef, useEffect, useMemo } from 'react';
 import { keyframes } from '@mui/material/styles';
 import {
   Box,
@@ -128,6 +128,13 @@ export function InputPanel() {
     return () => { cancelled = true; };
   }, [selectedAttack]);
 
+  const hasSage = !!selectedAttack?.sageTemplate;
+  const hasFrontend = !!selectedAttack?.frontendCheck;
+  const pythonCode = useMemo(() => {
+    if (!hasSage) return '';
+    return selectedAttack.sageTemplate!(Object.fromEntries(selectedAttack.inputs.map(f => [f.name, f.name])));
+  }, [hasSage, selectedAttack]);
+
   if (viewMode !== 'attack') return null;
 
   if (!selectedAttack) {
@@ -141,15 +148,10 @@ export function InputPanel() {
   }
 
   // Auto-select source mode based on what's available
-  const hasSage = !!selectedAttack.sageTemplate;
-  const hasFrontend = !!selectedAttack.frontendCheck;
   if (tab === 2 && sourceMode === 'sage' && !hasSage && hasFrontend) {
     // Can't use setSourceMode here (render phase), so derive it inline
   }
   const effectiveSourceMode = !hasSage ? 'frontend' : !hasFrontend ? 'sage' : sourceMode;
-  const pythonCode = hasSage
-    ? selectedAttack.sageTemplate!(Object.fromEntries(selectedAttack.inputs.map(f => [f.name, f.name])))
-    : '';
   // frontendCode is now loaded asynchronously via useEffect below
   const handleCopySource = () => {
     const code = effectiveSourceMode === 'sage' ? pythonCode : frontendCode;
