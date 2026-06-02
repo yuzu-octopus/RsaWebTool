@@ -1,6 +1,6 @@
 var e=`import type { Attack } from '../types';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
-import { modPow, modInverse, iroot } from '../utils/bigint';
+import { modPow, modInverse, iroot, gcd } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
@@ -46,30 +46,55 @@ print("HASTAD_BROADCAST=FAILED")\`;
             else:
                 moduli = [p[1] for p in pairs[:e]]
                 remainders = [p[0] for p in pairs[:e]]
-                N = prod(moduli)
-                M = crt(remainders, moduli)
-                m, exact = M.nth_root(e, truncate_mode=True)
-                if exact:
+                # Check pairwise GCD of moduli — if any share a factor, that's even better
+                shared_info = None
+                for i in range(len(moduli)):
+                    for j in range(i+1, len(moduli)):
+                        g = gcd(moduli[i], moduli[j])
+                        if g > 1:
+                            shared_info = (i, j, g)
+                            break
+                    if shared_info is not None:
+                        break
+                if shared_info is not None:
+                    i, j, g = shared_info
                     out.append("")
-                    out.append("Results:")
-                    out.append(f"m = {m}")
+                    out.append("Shared prime factor found via pairwise GCD!")
+                    p = g
+                    q_i = moduli[i] // g
+                    q_j = moduli[j] // g
+                    out.append(f"gcd(n_{i}, n_{j}) = {g}")
+                    out.append(f"n_{i} factors: {p} * {q_i}")
+                    out.append(f"  Verification: {p} * {q_i} = {moduli[i]}")
+                    out.append(f"n_{j} factors: {p} * {q_j}")
+                    out.append(f"  Verification: {p} * {q_j} = {moduli[j]}")
                     out.append("")
-                    out.append(f"Verification: m^e mod product(n_i) = CRT(c_i)")
-                    all_ok = True
-                    for i, (c_i, n_i) in enumerate(pairs):
-                        v = power_mod(m, e, n_i)
-                        ok = v == c_i
-                        if not ok:
-                            all_ok = False
-                    if all_ok:
-                        out.append("")
-                        out.append("HASTAD_BROADCAST=SUCCESS")
-                    else:
-                        out.append("HASTAD_BROADCAST=FAILED")
+                    out.append("HASTAD_BROADCAST=SUCCESS")
                 else:
-                    out.append(f"Approximate root: m = {m}")
-                    out.append("Warning: m^e was not a perfect e-th power")
-                    out.append("HASTAD_BROADCAST=FAILED")\`,
+                    N = prod(moduli)
+                    M = crt(remainders, moduli)
+                    m, exact = M.nth_root(e, truncate_mode=True)
+                    if exact:
+                        out.append("")
+                        out.append("Results:")
+                        out.append(f"m = {m}")
+                        out.append("")
+                        out.append(f"Verification: m^e mod product(n_i) = CRT(c_i)")
+                        all_ok = True
+                        for i, (c_i, n_i) in enumerate(pairs):
+                            v = power_mod(m, e, n_i)
+                            ok = v == c_i
+                            if not ok:
+                                all_ok = False
+                        if all_ok:
+                            out.append("")
+                            out.append("HASTAD_BROADCAST=SUCCESS")
+                        else:
+                            out.append("HASTAD_BROADCAST=FAILED")
+                    else:
+                        out.append(f"Approximate root: m = {m}")
+                        out.append("Warning: m^e was not a perfect e-th power")
+                        out.append("HASTAD_BROADCAST=FAILED")\`,
     });
   },
   frontendCheck: (vals: Record<string, string>) => {
@@ -82,6 +107,18 @@ print("HASTAD_BROADCAST=FAILED")\`;
         const [c, n] = l.split(',').map(x => BigInt(x.trim()));
         return { c, n };
       });
+      // Check pairwise GCD — if moduli share a factor, report factorization directly
+      for (let i = 0; i < pairs.length; i++) {
+        for (let j = i + 1; j < pairs.length; j++) {
+          const g = gcd(pairs[i].n, pairs[j].n);
+          if (g > 1n && g < pairs[i].n) {
+            const qi = pairs[i].n / g;
+            const qj = pairs[j].n / g;
+            return Promise.resolve(\`Hastad's Broadcast Attack\\nShared prime factor found via pairwise GCD!\\ngcd(n_\${i}, n_\${j}) = \${g}\\nn_\${i} factors: \${g} * \${qi}\\n  Verification: \${g} * \${qi} = \${pairs[i].n}\\nn_\${j} factors: \${g} * \${qj}\\n  Verification: \${g} * \${qj} = \${pairs[j].n}\\n\\nHASTAD_BROADCAST=SUCCESS\`);
+          }
+        }
+      }
+
       const N = pairs.reduce((acc, {n}) => acc * n, 1n);
       let M = 0n;
       for (const {c, n} of pairs) {

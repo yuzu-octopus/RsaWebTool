@@ -35,7 +35,7 @@ export const attack: Attack = {
         out.append("")
         found = False
         max_den = 100
-        trial_window = 10000
+        trial_window = 2000
         pairs_tried = 0
         divs_tried = 0
         n_int = int(n)

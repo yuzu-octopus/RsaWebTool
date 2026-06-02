@@ -22,8 +22,7 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
     return wrapSageTemplate({
       token: 'HOMOMORPHIC_FORGERY',
       useGuard: false,
-      body: `        from itertools import combinations
-        n = Integer(${vals.n})
+      body: `        n = Integer(${vals.n})
         e = Integer(${vals.e})
         target_m = Integer(${vals.target_m})
         found = True
@@ -58,19 +57,57 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
             out.append(f"oracle_pairs = {pairs_str}")
             out.append("")
             out.append("Results:")
-            found_sig = False
-            for r in range(1, len(oracle_pairs) + 1):
-                for combo in combinations(range(len(oracle_pairs)), r):
-                    prod_m = 1
-                    prod_s = 1
-                    for idx in combo:
-                        m_i, s_i = oracle_pairs[idx]
+            # Meet-in-the-middle: split oracle pairs into two halves
+            # Reduces 2^n search to 2^(n/2+1) operations
+            mid = len(oracle_pairs) // 2
+            left = oracle_pairs[:mid]
+            right = oracle_pairs[mid:]
+            target_mod = target_m % n
+            # Build hash map for right half products
+            right_map = {}
+            right_count = 1 << len(right)
+            for mask in range(1, right_count):
+                prod_m = 1
+                prod_s = 1
+                for j in range(len(right)):
+                    if mask & (1 << j):
+                        m_i, s_i = right[j]
                         prod_m = (prod_m * m_i) % n
                         prod_s = (prod_s * s_i) % n
-                    if prod_m == target_m % n:
-                        v = Integer(pow(int(prod_s), int(e), int(n)))
-                        if v == target_m % n:
-                            out.append(f"s = {prod_s}")
+                key = prod_m
+                if key not in right_map:
+                    right_map[key] = []
+                right_map[key].append(prod_s)
+            # Include empty right subset for left-only solutions
+            if 1 not in right_map:
+                right_map[1] = []
+            right_map[1].append(1)
+            # Search left half for matching complement
+            found_sig = False
+            left_count = 1 << len(left)
+            for mask in range(left_count):
+                prod_m = 1
+                prod_s = 1
+                for j in range(len(left)):
+                    if mask & (1 << j):
+                        m_i, s_i = left[j]
+                        prod_m = (prod_m * m_i) % n
+                        prod_s = (prod_s * s_i) % n
+                if prod_m == 0:
+                    continue
+                try:
+                    inv = inverse_mod(prod_m, n)
+                except Exception:
+                    continue
+                need = (target_mod * inv) % n
+                if need in right_map:
+                    for r_prod_s in right_map[need]:
+                        final_s = (prod_s * r_prod_s) % n
+                        if final_s == 0:
+                            continue
+                        v = Integer(pow(int(final_s), int(e), int(n)))
+                        if v == target_mod:
+                            out.append(f"s = {final_s}")
                             out.append("")
                             out.append(f"Verification: s^e mod n = {v}")
                             out.append("")

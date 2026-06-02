@@ -85,15 +85,15 @@ export const attack: Attack = {
 p \\mid n_i,\\; p \\mid n_j &\\implies p \\mid \\gcd(n_i, n_j) \\\\
 \\text{For each } i: \\quad g_i &= \\gcd\\left(n_i, \\prod_{j \\neq i} n_j\\right) \\\\
 g_i > 1 &\\implies g_i \\text{ is a shared prime factor} \\\\
-\\text{Product tree: } O(k \\log k) &\\text{ vs } O(k^2) \\text{ for pairwise GCD}
+\\text{Naive product: } O(k) &\\text{ vs } O(k^2) \\text{ for pairwise GCD}
 \\end{align*}
-The product $\\prod_{j \\neq i} n_j$ can be computed efficiently using a product tree (divide-and-conquer), achieving $O(k \\log k)$ complexity rather than $O(k^2)$ pairwise GCDs.
+The product $\\prod_{j \\neq i} n_j$ is computed by first multiplying all moduli together, then dividing each out: $\\prod_{j \\neq i} n_j = (\\prod_j n_j) / n_i$, giving $O(k)$ total time rather than $O(k^2)$ pairwise GCDs.
 
 \\textbf{Explanation:} When RSA keys are generated with insufficient randomness, two moduli may share a common prime factor. Computing the GCD of each modulus against the product of all others efficiently catches this. In practice, this attack found real-world weak keys — the 2012 "Mining Your Ps and Qs" study found 0.2\\% of TLS certificates shared factors.
 
 \\textbf{Optimizations:}
 \\begin{itemize}
-\\item \\textbf{Product tree algorithm:} Computes $\\prod_{j \\neq i} n_j$ for each modulus using a divide-and-conquer product tree, achieving $O(k \\log k)$ total time instead of $O(k^2)$ for pairwise GCDs. For $k = 1000$ moduli, this is $\\sim 100\\times$ faster than the naive pairwise approach.
+\\item \\textbf{Product method:} Multiplying all $k$ moduli together then dividing each back out computes $\\prod_{j \\neq i} n_j$ in $O(k)$ total time — much faster than $O(k^2)$ pairwise GCDs.
 \\end{itemize}
 
 \\textbf{References:} Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012; Bernstein, "How to Find Small Factors of Products", 2004`,

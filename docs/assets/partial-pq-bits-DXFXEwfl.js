@@ -166,6 +166,13 @@ export const generateTestcase = (): Record<string, string> => {
   const bitLen = p.toString(2).length;
   // Keep ≥ 86% of bits for degree-2 lattice (needs unknown < n^0.075 ≈ 2^38)
   const keepBits = Math.ceil(bitLen * 0.9);
+  const isLsb = Math.random() < 0.5;
+  if (isLsb) {
+    // LSB: low bits of p
+    const knownBits = p & ((1n << BigInt(keepBits)) - 1n);
+    return { n: n.toString(), knownBits: knownBits.toString(), bitPosition: 'lsb' };
+  }
+  // MSB: high bits of p
   const knownBits = p >> BigInt(bitLen - keepBits);
   return { n: n.toString(), knownBits: knownBits.toString(), bitPosition: 'msb' };
 };

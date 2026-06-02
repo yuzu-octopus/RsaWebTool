@@ -7,7 +7,7 @@ export const attack: Attack = {
   id: 'boneh-durfee',
   name: 'Boneh-Durfee Attack',
   category: 'Factorization',
-  description: 'Recovers d when d < n^0.292 via Wiener continued fractions (d < n^0.25) or Boneh-Durfee lattice (d < n^0.292). Use for unbalanced private exponents.',
+  description: 'Recovers d when d < n^0.260 via Wiener continued fractions (d < n^0.25) or Boneh-Durfee lattice (d < n^0.260). Use for unbalanced private exponents.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -97,79 +97,83 @@ export const attack: Attack = {
                     for jj in range(1, ii + 1):
                         if monomials[jj] in gg[ii].monomials():
                             BB[ii, jj] = gg[ii].monomial_coefficient(monomials[jj]) * monomials[jj](UU, XX, YY)
-                BB = BB.LLL()
-                import sympy
-                w_sym, z_sym = sympy.symbols('w z')
-                u_sym, x_sym, y_sym = sympy.symbols('u x y')
-                def to_sympy(poly):
-                    expr = sympy.sympify(str(poly))
-                    return expr.subs({u_sym: w_sym*z_sym + 1, x_sym: w_sym, y_sym: z_sym})
-                mon_syms = [to_sympy(m) for m in monomials]
-                found2 = False
-                for i1 in range(nn - 1):
-                    if found2:
-                        break
-                    for i2 in range(i1 + 1, nn):
-                        p1 = sum(sympy.Rational(int(BB[i1, j]), int(monomials[j](UU, XX, YY))) * mon_syms[j] for j in range(nn))
-                        p2 = sum(sympy.Rational(int(BB[i2, j]), int(monomials[j](UU, XX, YY))) * mon_syms[j] for j in range(nn))
-                        try:
-                            rr = sympy.resultant(p1, p2, w_sym)
-                        except Exception:
-                            continue
-                        if rr == 0 or rr == 1:
-                            continue
-                        try:
-                            roots_dict = sympy.roots(rr, z_sym)
-                        except Exception:
-                            continue
-                        for z0_sym in roots_dict:
+                if BB.det() == 0:
+                    out.append("BONEH_DURFEE=FAILED: singular lattice")
+                else:
+                    BB = BB.LLL()
+                    # Use Sage's native polynomial resultant (replaces slow sympy)
+                    S = PolynomialRing(QQ, 'w, z')
+                    w_var, z_var = S.gens()
+                    def mon_to_sage(mon):
+                        exp_vec = mon.exponents()[0]
+                        # mon = u^a * x^b * y^c, substitute u=w*z+1, x=w, y=z
+                        a, b, c = exp_vec
+                        return (w_var*z_var + 1)**a * w_var**b * z_var**c
+                    mon_sage = [mon_to_sage(m) for m in monomials]
+                    found2 = False
+                    for i1 in range(nn - 1):
+                        if found2:
+                            break
+                        for i2 in range(i1 + 1, nn):
+                            p1 = sum(QQ(BB[i1, j]) / QQ(monomials[j](UU, XX, YY)) * mon_sage[j] for j in range(nn))
+                            p2 = sum(QQ(BB[i2, j]) / QQ(monomials[j](UU, XX, YY)) * mon_sage[j] for j in range(nn))
                             try:
-                                y0_int = Integer(int(z0_sym))
+                                rr = p1.resultant(p2, w_var)
                             except Exception:
                                 continue
+                            if rr == 0 or rr == 1:
+                                continue
                             try:
-                                p1_y0 = p1.subs({z_sym: y0_int})
-                                w_roots = sympy.solve(p1_y0, w_sym)
+                                z_roots = rr.roots(ring=ZZ)
                             except Exception:
                                 continue
-                            for x0_sym in w_roots:
+                            for z_root, _ in z_roots:
+                                y0_int = z_root
                                 try:
-                                    x0_int = Integer(int(x0_sym))
+                                    p1_at_z = p1.subs({z_var: QQ(z_root)})
+                                    Rw = PolynomialRing(QQ, 'ww')
+                                    w_root_var = Rw.gen()
+                                    p1_w_uni = sum(c * w_root_var**e[0] for (e, c) in p1_at_z.dict().items())
+                                    w_roots = p1_w_uni.roots(ring=ZZ)
                                 except Exception:
                                     continue
-                                if f(x0_int, y0_int) % e == 0:
-                                    d_val = (1 + x0_int * (A + y0_int)) // e
-                                    if d_val > 0:
-                                        p_plus_q = -2 * y0_int
-                                        disc2 = p_plus_q ** 2 - 4 * n
-                                        if disc2 > 0 and disc2.is_square():
-                                            sqrt_disc2 = isqrt(disc2)
-                                            p_val = ZZ((p_plus_q + sqrt_disc2) // 2)
-                                            q_val = ZZ((p_plus_q - sqrt_disc2) // 2)
-                                            if p_val * q_val == n and p_val > 1:
-                                                out.append("Results:")
-                                                out.append(f"p = {p_val}")
-                                                out.append(f"q = {q_val}")
-                                                out.append("")
-                                                out.append(f"Verification: p * q = {p_val * q_val}")
-                                                out.append(f"d = {d_val}")
-                                                out.append("")
-                                                found2 = True
-                                                break
+                                for w_root, _ in w_roots:
+                                    x0_int = w_root
+                                    if f(x0_int, y0_int) % e == 0:
+                                        d_val = (1 + x0_int * (A + y0_int)) // e
+                                        if d_val > 0:
+                                            p_plus_q = -2 * y0_int
+                                            disc2 = p_plus_q ** 2 - 4 * n
+                                            if disc2 > 0 and disc2.is_square():
+                                                sqrt_disc2 = isqrt(disc2)
+                                                p_val = ZZ((p_plus_q + sqrt_disc2) // 2)
+                                                q_val = ZZ((p_plus_q - sqrt_disc2) // 2)
+                                                if p_val * q_val == n and p_val > 1:
+                                                    out.append("Results:")
+                                                    out.append(f"p = {p_val}")
+                                                    out.append(f"q = {q_val}")
+                                                    out.append("")
+                                                    out.append(f"Verification: p * q = {p_val * q_val}")
+                                                    out.append(f"d = {d_val}")
+                                                    out.append("")
+                                                    found2 = True
+                                                    break
+                                    if found2:
+                                        break
                             if found2:
                                 break
                     if found2:
                         out.append("BONEH_DURFEE=SUCCESS")
                         found = True
-                if not found2:
-                    out.append("Results:")
-                    out.append("")
-                    out.append("BONEH_DURFEE=FAILED")
+                    else:
+                        out.append("Results:")
+                        out.append("")
+                        out.append("BONEH_DURFEE=FAILED")
         if not found:
             out.append("BONEH_DURFEE=FAILED")`,
     useGuard: true,
   }),
-  proof: `\\textbf{Theorem:} Find $d$ when $d < n^{0.292}$ using Wiener's continued fractions ($d < n^{0.25}$) or Boneh-Durfee's lattice ($d < n^{0.292}$).
+  proof: `\\textbf{Theorem:} Find $d$ when $d < n^{0.260}$ using Wiener's continued fractions ($d < n^{0.25}$) or Boneh-Durfee's lattice ($d < n^{0.260}$).
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -184,11 +188,11 @@ export const attack: Attack = {
 p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2}
 \\end{align*}
 
-\\textbf{Explanation:} Wiener's attack exploits the fact that when $d$ is small, $e/n$ approximates $k/d$ so closely that $k/d$ appears as a convergent in the continued fraction expansion of $e/n$. The Boneh-Durfee lattice uses Coppersmith's method with a bivariate polynomial $f(x,y) = x(A+y)-1$ to extend the bound to $d < n^{0.292}$ by finding short vectors via LLL.
+\\textbf{Explanation:} Wiener's attack exploits the fact that when $d$ is small, $e/n$ approximates $k/d$ so closely that $k/d$ appears as a convergent in the continued fraction expansion of $e/n$. The Boneh-Durfee lattice uses Coppersmith's method with a bivariate polynomial $f(x,y) = x(A+y)-1$ to extend the bound to $d < n^{0.260}$ by finding short vectors via LLL.
 
 \\textbf{Optimizations:}
 \\begin{itemize}
-\\item \\textbf{Two-phase execution:} Phase 1 runs Wiener's continued fraction attack ($d < n^{0.25}$) — a fast $O(\\log n)$ check using $e/n$ convergents that immediately succeeds for small $d$ without invoking lattice reduction. Phase 2 runs the Herrmann-May Coppersmith lattice ($d < n^{0.292}$) with sympy resultant for bivariate root recovery, only when Wiener fails.
+\\item \\textbf{Two-phase execution:} Phase 1 runs Wiener's continued fraction attack ($d < n^{0.25}$) — a fast $O(\\log n)$ check using $e/n$ convergents that immediately succeeds for small $d$ without invoking lattice reduction. Phase 2 runs the Herrmann-May Coppersmith lattice ($d < n^{0.260}$) with Sage native resultant for bivariate root recovery, only when Wiener fails.
 \\end{itemize}
 
 \\textbf{References:} M. Wiener, CRYPTO 1990; D. Boneh, G. Durfee, CRYPTO 1999`,

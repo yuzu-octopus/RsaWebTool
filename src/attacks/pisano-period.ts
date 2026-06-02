@@ -65,7 +65,7 @@ export const attack: Attack = {
             pow_val = (pow_val * 2) % n_int  # recurrence instead of pow(2, i, n)
             val = (pow_val - 1) % n_int
             if val == 0:
-                phi_guess = i
+                phi_guess = i + 1
                 if phi_guess % 2 == 0:
                     s = n - phi_guess + 1
                     disc = s*s - 4*n

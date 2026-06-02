@@ -31,7 +31,7 @@ export const attack: Attack = {
             step_int = pow(2, e_int, n_int)
             current_int = 1
             product_int = 1
-            batch_size = 1000
+            batch_size = 5000
             batch_start = 0
             found = False
             for dp in range(bound_int + 1):
@@ -145,11 +145,11 @@ export const attack: Attack = {
 \\\\texttt{step} &= 2^e \\\\bmod n \\\\\\\\
 \\\\text{For } d_p = 0\\\\ldots\\\\text{bound}:\\\\quad &\\\\texttt{current} = \\\\texttt{step}^{d_p} \\\\bmod n = 2^{e d_p} \\\\bmod n \\\\\\\\
 \\\\text{Accumulate } \\\\Pi &= \\\\Pi \\\\cdot (\\\\texttt{current} - 2) \\\\bmod n \\\\\\\\
-\\\\text{Every } 1000 \\\\text{ steps:}\\\\quad &g = \\\\gcd(\\\\Pi, n) \\\\\\\\
+\\\\text{Every } 5000 \\\\text{ steps:}\\\\quad &g = \\\\gcd(\\\\Pi, n) \\\\\\\\
 1 < g < n &\\\\implies \\\\text{scan batch for exact } d_p \\\\qed
 \\\\end{align*}
 
-\\\\textbf{Explanation:} Fermat's Little Theorem guarantees $2^{ed_p} \\\\equiv 2 \\\\pmod{p}$ when $d_p$ is the correct CRT exponent. The attack linearly scans candidate $d_p$ values, accumulating a product of $(2^{ed_p} - 2)$ values in batches of 1000. A single GCD per batch detects whether any candidate in the batch is correct, reducing GCD calls by $1000\\\\times$. Once a hit is found, a linear scan of just that batch identifies the exact $d_p$. This works for any $e$ (no $e$-size limit) since the iteration count depends only on the bound.
+\\\\textbf{Explanation:} Fermat's Little Theorem guarantees $2^{ed_p} \\\\equiv 2 \\\\pmod{p}$ when $d_p$ is the correct CRT exponent. The attack linearly scans candidate $d_p$ values, accumulating a product of $(2^{ed_p} - 2)$ values in batches of 5000. A single GCD per batch detects whether any candidate in the batch is correct, reducing GCD calls by $5000\\\\times$. Once a hit is found, a linear scan of just that batch identifies the exact $d_p$. This works for any $e$ (no $e$-size limit) since the iteration count depends only on the bound.
 
 \\\\textbf{Optimizations:}
 \\\\begin{itemize}
@@ -158,7 +158,7 @@ export const attack: Attack = {
 \\\\end{itemize}
 
 \\\\textbf{References:} Boneh \\\\textit{et al.}, "Cryptanalysis of RSA with Small CRT Exponents", CRYPTO 1998; Cohn & Heninger, ePrint 2011/436\`,
-   usageGuide: 'This attack recovers the private key when either dp or dq (the CRT exponents) is small.\\n\\nHow to use:\\n1. You have n, e, and know that dp (d mod p-1) is small (< bound)\\n2. The attack uses Fermat\\'s Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p\\n3. A batched GCD approach (product tree) accelerates the linear scan ~1000x by reducing gcd calls via product accumulation\\n4. Provide n, e, and optionally bound         (max dp to try, default 5000000)\\n\\nTip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 5000000 runs in ~900ms for 1024-bit n.',
+   usageGuide: 'This attack recovers the private key when either dp or dq (the CRT exponents) is small.\\n\\nHow to use:\\n1. You have n, e, and know that dp (d mod p-1) is small (< bound)\\n2. The attack uses Fermat\\'s Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p\\n3. A batched GCD approach (product tree) accelerates the linear scan ~5000x by reducing gcd calls via product accumulation\\n4. Provide n, e, and optionally bound         (max dp to try, default 5000000)\\n\\nTip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 5000000 runs in ~900ms for 1024-bit n.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e,
 };
@@ -167,10 +167,12 @@ export const generateTestcase = (): Record<string, string> => {
   const e = 65537n;
   // Backward construction: pick a small d_p, then derive p from the CRT equation
   // d_p * e - 1 = k * (p-1) → p = (d_p * e - 1) / k + 1
-  // For each candidate d_p (starting at 3), iterate over divisors k of (d_p * e - 1)
-  // that yield a prime p. The resulting p is typically small (≈ 16-30 bits).
-  // This ensures the attack's brute-force search finds d_p within the bound.
-  for (let dp = 3n; dp < 10000n; dp++) {
+  // Using dp in 40M-50M range produces p ≈ (dp*e+1)/2 ≈ 1.6T (~41 bits, k=2).
+  // Previous dp range [3, 10000] produced only p ≈ 16-30 bits. q is a full
+  // 256-bit prime, giving n ≈ 297 bits — still small enough for the attack
+  // to find dp (searches up to bound=50M) but much larger than before.
+  const startDp = 40000000n;
+  for (let dp = startDp; dp < startDp + 1000000n; dp++) {
     const num = dp * e - 1n;
     for (let k = 1n; k <= e; k++) {
       if (num % k !== 0n) continue;

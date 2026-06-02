@@ -75,6 +75,7 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                         found_m = roots[0]
                         out.append(f"m = {found_m}")
                 except Exception as sr_ex:
+                    pass
 
                 if found_m is None:
                     all_simple = all(t[2] == 1 and t[3] == 0 for t in triples)
@@ -87,18 +88,19 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                             found_m = m_root
                             out.append(f"m = {found_m}")
                     if found_m is None:
-                        a_int = [int(t[2]) for t in triples]
-                        b_int = [int(t[3]) for t in triples]
-                        n_int = [int(t[0]) for t in triples]
-                        c_int = [int(t[1]) for t in triples]
-                        coeffs = []
-                        for i in range(len(triples)):
-                            ai = a_int[i]; bi = b_int[i]; ni = n_int[i]
-                            A = pow(ai, 3, ni)
-                            B = (3 * ai * ai * bi) % ni
-                            C = (3 * ai * bi * bi) % ni
-                            D = (bi * bi * bi - c_int[i]) % ni
-                            coeffs.append((ni, A, B, C, D))
+                        if e == 3:
+                            a_int = [int(t[2]) for t in triples]
+                            b_int = [int(t[3]) for t in triples]
+                            n_int = [int(t[0]) for t in triples]
+                            c_int = [int(t[1]) for t in triples]
+                            coeffs = []
+                            for i in range(len(triples)):
+                                ai = a_int[i]; bi = b_int[i]; ni = n_int[i]
+                                A = pow(ai, 3, ni)
+                                B = (3 * ai * ai * bi) % ni
+                                C = (3 * ai * bi * bi) % ni
+                                D = (bi * bi * bi - c_int[i]) % ni
+                                coeffs.append((ni, A, B, C, D))
                         limit = 5 * 10**5
                         for m_candidate in range(limit):
                             ok = True

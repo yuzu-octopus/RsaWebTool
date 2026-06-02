@@ -70,7 +70,7 @@ print("SMALL_PUBLIC_EXP=FAILED")\`;
                 found = True
                 break
         if not found:
-            out.append(f"Reason: No perfect {e}-th power found for k in 0..{k_bound} with e = {e}")
+            out.append(f"Reason: No perfect {e} power found for k in 0..{k_bound} with e = {e}")
             out.append("")
             out.append("SMALL_PUBLIC_EXP=FAILED")
         else:

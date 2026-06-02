@@ -44,7 +44,13 @@ print("BLEICHENBACHER_SIG=FAILED")`;
                     found = False
         if found:
             hash_int = Integer("0x" + hash_hex)
-            target = (Integer(1) << (8 * (garbage_len + hash_bytes + 1 + 8))) + ((Integer(1) << (8 * 8)) - 1) * (Integer(1) << (8 * (garbage_len + hash_bytes + 1))) + hash_int * (Integer(1) << (8 * garbage_len))
+            # Craft PKCS#1 v1.5 signature padding: 0x00 0x01 FF..FF 0x00 HASH GARBAGE
+            ff_block = (Integer(1) << (8 * 8)) - 1  # 8 bytes of 0xFF
+            ff_shift = 8 * (garbage_len + hash_bytes + 1)  # byte position of FF block from LSB
+            hash_shift = 8 * garbage_len  # byte position of hash from LSB
+            target = (Integer(1) << (8 * (garbage_len + hash_bytes + 1 + 8)))  # 0x01 marker
+            target += ff_block << ff_shift  # 8 bytes of 0xFF padding
+            target += hash_int << hash_shift  # hash followed by garbage
             sig, exact = target.nth_root(3, truncate_mode=True)
             if not exact:
                 sig += 1

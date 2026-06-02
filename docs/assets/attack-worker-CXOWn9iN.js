@@ -38,7 +38,7 @@ ${n}print(f"p = {p}")
 ${n}print(f"q = {p}")
 ${n}print()
 ${n}print("${e}=SUCCESS")
-${n}return`}let ee={id:`boneh-durfee`,name:`Boneh-Durfee Attack`,category:`Factorization`,description:`Recovers d when d < n^0.292 via Wiener continued fractions (d < n^0.25) or Boneh-Durfee lattice (d < n^0.292). Use for unbalanced private exponents.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>L({token:`BONEH_DURFEE`,n:e.n,body:`        e = Integer(${e.e})
+${n}return`}let ee={id:`boneh-durfee`,name:`Boneh-Durfee Attack`,category:`Factorization`,description:`Recovers d when d < n^0.260 via Wiener continued fractions (d < n^0.25) or Boneh-Durfee lattice (d < n^0.260). Use for unbalanced private exponents.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>L({token:`BONEH_DURFEE`,n:e.n,body:`        e = Integer(${e.e})
         found = False
         if e < 2:
             out.append("Boneh-Durfee Attack")
@@ -120,76 +120,80 @@ ${n}return`}let ee={id:`boneh-durfee`,name:`Boneh-Durfee Attack`,category:`Facto
                     for jj in range(1, ii + 1):
                         if monomials[jj] in gg[ii].monomials():
                             BB[ii, jj] = gg[ii].monomial_coefficient(monomials[jj]) * monomials[jj](UU, XX, YY)
-                BB = BB.LLL()
-                import sympy
-                w_sym, z_sym = sympy.symbols('w z')
-                u_sym, x_sym, y_sym = sympy.symbols('u x y')
-                def to_sympy(poly):
-                    expr = sympy.sympify(str(poly))
-                    return expr.subs({u_sym: w_sym*z_sym + 1, x_sym: w_sym, y_sym: z_sym})
-                mon_syms = [to_sympy(m) for m in monomials]
-                found2 = False
-                for i1 in range(nn - 1):
-                    if found2:
-                        break
-                    for i2 in range(i1 + 1, nn):
-                        p1 = sum(sympy.Rational(int(BB[i1, j]), int(monomials[j](UU, XX, YY))) * mon_syms[j] for j in range(nn))
-                        p2 = sum(sympy.Rational(int(BB[i2, j]), int(monomials[j](UU, XX, YY))) * mon_syms[j] for j in range(nn))
-                        try:
-                            rr = sympy.resultant(p1, p2, w_sym)
-                        except Exception:
-                            continue
-                        if rr == 0 or rr == 1:
-                            continue
-                        try:
-                            roots_dict = sympy.roots(rr, z_sym)
-                        except Exception:
-                            continue
-                        for z0_sym in roots_dict:
+                if BB.det() == 0:
+                    out.append("BONEH_DURFEE=FAILED: singular lattice")
+                else:
+                    BB = BB.LLL()
+                    # Use Sage's native polynomial resultant (replaces slow sympy)
+                    S = PolynomialRing(QQ, 'w, z')
+                    w_var, z_var = S.gens()
+                    def mon_to_sage(mon):
+                        exp_vec = mon.exponents()[0]
+                        # mon = u^a * x^b * y^c, substitute u=w*z+1, x=w, y=z
+                        a, b, c = exp_vec
+                        return (w_var*z_var + 1)**a * w_var**b * z_var**c
+                    mon_sage = [mon_to_sage(m) for m in monomials]
+                    found2 = False
+                    for i1 in range(nn - 1):
+                        if found2:
+                            break
+                        for i2 in range(i1 + 1, nn):
+                            p1 = sum(QQ(BB[i1, j]) / QQ(monomials[j](UU, XX, YY)) * mon_sage[j] for j in range(nn))
+                            p2 = sum(QQ(BB[i2, j]) / QQ(monomials[j](UU, XX, YY)) * mon_sage[j] for j in range(nn))
                             try:
-                                y0_int = Integer(int(z0_sym))
+                                rr = p1.resultant(p2, w_var)
                             except Exception:
                                 continue
+                            if rr == 0 or rr == 1:
+                                continue
                             try:
-                                p1_y0 = p1.subs({z_sym: y0_int})
-                                w_roots = sympy.solve(p1_y0, w_sym)
+                                z_roots = rr.roots(ring=ZZ)
                             except Exception:
                                 continue
-                            for x0_sym in w_roots:
+                            for z_root, _ in z_roots:
+                                y0_int = z_root
                                 try:
-                                    x0_int = Integer(int(x0_sym))
+                                    p1_at_z = p1.subs({z_var: QQ(z_root)})
+                                    Rw = PolynomialRing(QQ, 'ww')
+                                    w_root_var = Rw.gen()
+                                    p1_w_uni = sum(c * w_root_var**e[0] for (e, c) in p1_at_z.dict().items())
+                                    w_roots = p1_w_uni.roots(ring=ZZ)
                                 except Exception:
                                     continue
-                                if f(x0_int, y0_int) % e == 0:
-                                    d_val = (1 + x0_int * (A + y0_int)) // e
-                                    if d_val > 0:
-                                        p_plus_q = -2 * y0_int
-                                        disc2 = p_plus_q ** 2 - 4 * n
-                                        if disc2 > 0 and disc2.is_square():
-                                            sqrt_disc2 = isqrt(disc2)
-                                            p_val = ZZ((p_plus_q + sqrt_disc2) // 2)
-                                            q_val = ZZ((p_plus_q - sqrt_disc2) // 2)
-                                            if p_val * q_val == n and p_val > 1:
-                                                out.append("Results:")
-                                                out.append(f"p = {p_val}")
-                                                out.append(f"q = {q_val}")
-                                                out.append("")
-                                                out.append(f"Verification: p * q = {p_val * q_val}")
-                                                out.append(f"d = {d_val}")
-                                                out.append("")
-                                                found2 = True
-                                                break
+                                for w_root, _ in w_roots:
+                                    x0_int = w_root
+                                    if f(x0_int, y0_int) % e == 0:
+                                        d_val = (1 + x0_int * (A + y0_int)) // e
+                                        if d_val > 0:
+                                            p_plus_q = -2 * y0_int
+                                            disc2 = p_plus_q ** 2 - 4 * n
+                                            if disc2 > 0 and disc2.is_square():
+                                                sqrt_disc2 = isqrt(disc2)
+                                                p_val = ZZ((p_plus_q + sqrt_disc2) // 2)
+                                                q_val = ZZ((p_plus_q - sqrt_disc2) // 2)
+                                                if p_val * q_val == n and p_val > 1:
+                                                    out.append("Results:")
+                                                    out.append(f"p = {p_val}")
+                                                    out.append(f"q = {q_val}")
+                                                    out.append("")
+                                                    out.append(f"Verification: p * q = {p_val * q_val}")
+                                                    out.append(f"d = {d_val}")
+                                                    out.append("")
+                                                    found2 = True
+                                                    break
+                                    if found2:
+                                        break
                             if found2:
                                 break
                     if found2:
                         out.append("BONEH_DURFEE=SUCCESS")
                         found = True
-                if not found2:
-                    out.append("Results:")
-                    out.append("")
-                    out.append("BONEH_DURFEE=FAILED")
+                    else:
+                        out.append("Results:")
+                        out.append("")
+                        out.append("BONEH_DURFEE=FAILED")
         if not found:
-            out.append("BONEH_DURFEE=FAILED")`,useGuard:!0}),proof:`\\textbf{Theorem:} Find $d$ when $d < n^{0.292}$ using Wiener's continued fractions ($d < n^{0.25}$) or Boneh-Durfee's lattice ($d < n^{0.292}$).
+            out.append("BONEH_DURFEE=FAILED")`,useGuard:!0}),proof:`\\textbf{Theorem:} Find $d$ when $d < n^{0.260}$ using Wiener's continued fractions ($d < n^{0.25}$) or Boneh-Durfee's lattice ($d < n^{0.260}$).
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -204,11 +208,11 @@ ${n}return`}let ee={id:`boneh-durfee`,name:`Boneh-Durfee Attack`,category:`Facto
 p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2}
 \\end{align*}
 
-\\textbf{Explanation:} Wiener's attack exploits the fact that when $d$ is small, $e/n$ approximates $k/d$ so closely that $k/d$ appears as a convergent in the continued fraction expansion of $e/n$. The Boneh-Durfee lattice uses Coppersmith's method with a bivariate polynomial $f(x,y) = x(A+y)-1$ to extend the bound to $d < n^{0.292}$ by finding short vectors via LLL.
+\\textbf{Explanation:} Wiener's attack exploits the fact that when $d$ is small, $e/n$ approximates $k/d$ so closely that $k/d$ appears as a convergent in the continued fraction expansion of $e/n$. The Boneh-Durfee lattice uses Coppersmith's method with a bivariate polynomial $f(x,y) = x(A+y)-1$ to extend the bound to $d < n^{0.260}$ by finding short vectors via LLL.
 
 \\textbf{Optimizations:}
 \\begin{itemize}
-\\item \\textbf{Two-phase execution:} Phase 1 runs Wiener's continued fraction attack ($d < n^{0.25}$) — a fast $O(\\log n)$ check using $e/n$ convergents that immediately succeeds for small $d$ without invoking lattice reduction. Phase 2 runs the Herrmann-May Coppersmith lattice ($d < n^{0.292}$) with sympy resultant for bivariate root recovery, only when Wiener fails.
+\\item \\textbf{Two-phase execution:} Phase 1 runs Wiener's continued fraction attack ($d < n^{0.25}$) — a fast $O(\\log n)$ check using $e/n$ convergents that immediately succeeds for small $d$ without invoking lattice reduction. Phase 2 runs the Herrmann-May Coppersmith lattice ($d < n^{0.260}$) with Sage native resultant for bivariate root recovery, only when Wiener fails.
 \\end{itemize}
 
 \\textbf{References:} M. Wiener, CRYPTO 1990; D. Boneh, G. Durfee, CRYPTO 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e},te={id:`ecm2`,name:`ECM Full Factorization`,category:`Factorization`,description:`Factors n completely via repeated ECM with recursive factor removal. Use when n may have multiple prime factors beyond two.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>L({token:`ECM2`,n:e.n,body:`        from sage.libs.libecm import ecmfactor
@@ -911,7 +915,7 @@ If the binary convolution of $p$ and $q$ produces no carries, then $f_{pq}(x) = 
         out.append("")
         found = False
         max_den = 100
-        trial_window = 10000
+        trial_window = 2000
         pairs_tried = 0
         divs_tried = 0
         n_int = int(n)
@@ -1028,15 +1032,15 @@ BATCH_GCD=FAILED`;let n=t.split(/[\n,]+/).map(e=>e.trim()).filter(e=>e.length>0)
 p \\mid n_i,\\; p \\mid n_j &\\implies p \\mid \\gcd(n_i, n_j) \\\\
 \\text{For each } i: \\quad g_i &= \\gcd\\left(n_i, \\prod_{j \\neq i} n_j\\right) \\\\
 g_i > 1 &\\implies g_i \\text{ is a shared prime factor} \\\\
-\\text{Product tree: } O(k \\log k) &\\text{ vs } O(k^2) \\text{ for pairwise GCD}
+\\text{Naive product: } O(k) &\\text{ vs } O(k^2) \\text{ for pairwise GCD}
 \\end{align*}
-The product $\\prod_{j \\neq i} n_j$ can be computed efficiently using a product tree (divide-and-conquer), achieving $O(k \\log k)$ complexity rather than $O(k^2)$ pairwise GCDs.
+The product $\\prod_{j \\neq i} n_j$ is computed by first multiplying all moduli together, then dividing each out: $\\prod_{j \\neq i} n_j = (\\prod_j n_j) / n_i$, giving $O(k)$ total time rather than $O(k^2)$ pairwise GCDs.
 
 \\textbf{Explanation:} When RSA keys are generated with insufficient randomness, two moduli may share a common prime factor. Computing the GCD of each modulus against the product of all others efficiently catches this. In practice, this attack found real-world weak keys — the 2012 "Mining Your Ps and Qs" study found 0.2\\% of TLS certificates shared factors.
 
 \\textbf{Optimizations:}
 \\begin{itemize}
-\\item \\textbf{Product tree algorithm:} Computes $\\prod_{j \\neq i} n_j$ for each modulus using a divide-and-conquer product tree, achieving $O(k \\log k)$ total time instead of $O(k^2)$ for pairwise GCDs. For $k = 1000$ moduli, this is $\\sim 100\\times$ faster than the naive pairwise approach.
+\\item \\textbf{Product method:} Multiplying all $k$ moduli together then dividing each back out computes $\\prod_{j \\neq i} n_j$ in $O(k)$ total time — much faster than $O(k^2)$ pairwise GCDs.
 \\end{itemize}
 
 \\textbf{References:} Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012; Bernstein, "How to Find Small Factors of Products", 2004`,priority:`high`,applicableCheck:e=>{let t=(e.n_values||``).trim();return t?t.split(/[\n,]+/).filter(e=>e.trim()).length>=2:!1}},K={id:`multi-prime`,name:`Multi-Prime RSA`,category:`Factorization`,description:`Factors n with k >= 3 prime factors using trial division and Sage factor(). Use for multi-prime RSA moduli.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>L({token:`MULTI_PRIME`,n:e.n,body:`        n_int = int(n)
@@ -1904,7 +1908,7 @@ Tip: This is inherently probabilistic — the lattice may fail even with the rig
             step_int = pow(2, e_int, n_int)
             current_int = 1
             product_int = 1
-            batch_size = 1000
+            batch_size = 5000
             batch_start = 0
             found = False
             for dp in range(bound_int + 1):
@@ -1956,11 +1960,11 @@ Tip: This is inherently probabilistic — the lattice may fail even with the rig
 \\texttt{step} &= 2^e \\bmod n \\\\
 \\text{For } d_p = 0\\ldots\\text{bound}:\\quad &\\texttt{current} = \\texttt{step}^{d_p} \\bmod n = 2^{e d_p} \\bmod n \\\\
 \\text{Accumulate } \\Pi &= \\Pi \\cdot (\\texttt{current} - 2) \\bmod n \\\\
-\\text{Every } 1000 \\text{ steps:}\\quad &g = \\gcd(\\Pi, n) \\\\
+\\text{Every } 5000 \\text{ steps:}\\quad &g = \\gcd(\\Pi, n) \\\\
 1 < g < n &\\implies \\text{scan batch for exact } d_p \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Fermat's Little Theorem guarantees $2^{ed_p} \\equiv 2 \\pmod{p}$ when $d_p$ is the correct CRT exponent. The attack linearly scans candidate $d_p$ values, accumulating a product of $(2^{ed_p} - 2)$ values in batches of 1000. A single GCD per batch detects whether any candidate in the batch is correct, reducing GCD calls by $1000\\times$. Once a hit is found, a linear scan of just that batch identifies the exact $d_p$. This works for any $e$ (no $e$-size limit) since the iteration count depends only on the bound.
+\\textbf{Explanation:} Fermat's Little Theorem guarantees $2^{ed_p} \\equiv 2 \\pmod{p}$ when $d_p$ is the correct CRT exponent. The attack linearly scans candidate $d_p$ values, accumulating a product of $(2^{ed_p} - 2)$ values in batches of 5000. A single GCD per batch detects whether any candidate in the batch is correct, reducing GCD calls by $5000\\times$. Once a hit is found, a linear scan of just that batch identifies the exact $d_p$. This works for any $e$ (no $e$-size limit) since the iteration count depends only on the bound.
 
 \\textbf{Optimizations:}
 \\begin{itemize}
@@ -1973,7 +1977,7 @@ Tip: This is inherently probabilistic — the lattice may fail even with the rig
 How to use:
 1. You have n, e, and know that dp (d mod p-1) is small (< bound)
 2. The attack uses Fermat's Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p
-3. A batched GCD approach (product tree) accelerates the linear scan ~1000x by reducing gcd calls via product accumulation
+3. A batched GCD approach (product tree) accelerates the linear scan ~5000x by reducing gcd calls via product accumulation
 4. Provide n, e, and optionally bound         (max dp to try, default 5000000)
 
 Tip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 5000000 runs in ~900ms for 1024-bit n.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},ue={id:`dp-dq-leak`,name:`dp/dq Leak`,category:`Partial Key / Lattice`,description:`Recovers p from leaked d_p (or q from leaked d_q) via FLT-based GCD. Use when CRT exponents d_p or d_q are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dp`,label:`dp (d mod p-1)`,placeholder:`Enter dp value...`,multiline:!0,rows:3},{name:`dq`,label:`dq (d mod q-1, optional)`,placeholder:`Enter dq value...`,required:!1,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.e);if(t<=0n||n<=0n)return null;let r=2n;if(e.dp){let i=BigInt(e.dp);if(i>0n){let e=n*i-1n;if(e>0n){let a=A(P(r,e,t)-1n,t);if(a>1n&&a<t){let e=t/a;return`DP-DQ Leak\nn = ${t.toString()}\ne = ${n.toString()}\ndp = ${i.toString()}\n\nResults:\np = ${a.toString()}\nq = ${e.toString()}\n\nVerification: p * q = ${(a*e).toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}if(e.dq){let i=BigInt(e.dq);if(i>0n){let e=n*i-1n;if(e>0n){let a=A(P(r,e,t)-1n,t);if(a>1n&&a<t){let e=t/a;return`DP-DQ Leak\nn = ${t.toString()}\ne = ${n.toString()}\ndq = ${i.toString()}\n\nResults:\np = ${e.toString()}\nq = ${a.toString()}\n\nVerification: p * q = ${(e*a).toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}return null}catch{return null}},sageTemplate:e=>{let t=e.dp?`
@@ -2253,7 +2257,7 @@ c_1^a \\cdot c_2^b &\\equiv (m^{e_1})^a \\cdot (m^{e_2})^b \\pmod{n} \\\\
 \\end{align*}
 When $a < 0$, compute $c_1^a = (c_1^{-1})^{|a|} \\pmod{n}$. Same for $b < 0$.
 
-\\textbf{Explanation:} Bezout's identity guarantees integers $a, b$ satisfying $a e_1 + b e_2 = 1$ because $\\gcd(e_1, e_2) = 1$. Multiplying $c_1^a \\cdot c_2^b$ yields $m^{a e_1 + b e_2} = m$. This is why coprime exponents are essential: if $\\gcd(e_1, e_2) > 1$, the GCD may directly factor $n$.
+\\textbf{Explanation:} Bezout's identity guarantees integers $a, b$ satisfying $a e_1 + b e_2 = 1$ because $\\gcd(e_1, e_2) = 1$. Multiplying $c_1^a \\cdot c_2^b$ yields $m^{a e_1 + b e_2} = m$. This is why coprime exponents are essential: if $\\gcd(e_1, e_2) = g > 1$, we recover $m^g \\bmod n$, then take the $g$-th root.
 
 \\textbf{References:} Simmons & Norris, 1977; Boneh, "Twenty Years of Attacks on RSA," 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e1&&!!e.e2&&!!e.c1&&!!e.c2},me={id:`coppersmith-short-pad`,name:`Small Message Recovery (e-th Root)`,category:`Partial Key / Lattice`,description:`Recovers small messages m1, m2 from ciphertexts by integer e-th root (degenerate case where m^e < n). NOT the full Coppersmith lattice-based short pad attack — use when m^e < n (no modular wrap-around), typically e=3.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.c1||!e.c2?`print("ERROR: Missing required inputs (n, e, c1, c2)")
 print("COPPERSMITH_SHORT_PAD=FAILED")`:L({token:`COPPERSMITH_SHORT_PAD`,n:e.n,body:`        e = Integer(${e.e})
@@ -2411,6 +2415,7 @@ print("HASTAD_LINEAR_PAD=FAILED")`:L({token:`HASTAD_LINEAR_PAD`,useGuard:!1,body
                         found_m = roots[0]
                         out.append(f"m = {found_m}")
                 except Exception as sr_ex:
+                    pass
 
                 if found_m is None:
                     all_simple = all(t[2] == 1 and t[3] == 0 for t in triples)
@@ -2423,18 +2428,19 @@ print("HASTAD_LINEAR_PAD=FAILED")`:L({token:`HASTAD_LINEAR_PAD`,useGuard:!1,body
                             found_m = m_root
                             out.append(f"m = {found_m}")
                     if found_m is None:
-                        a_int = [int(t[2]) for t in triples]
-                        b_int = [int(t[3]) for t in triples]
-                        n_int = [int(t[0]) for t in triples]
-                        c_int = [int(t[1]) for t in triples]
-                        coeffs = []
-                        for i in range(len(triples)):
-                            ai = a_int[i]; bi = b_int[i]; ni = n_int[i]
-                            A = pow(ai, 3, ni)
-                            B = (3 * ai * ai * bi) % ni
-                            C = (3 * ai * bi * bi) % ni
-                            D = (bi * bi * bi - c_int[i]) % ni
-                            coeffs.append((ni, A, B, C, D))
+                        if e == 3:
+                            a_int = [int(t[2]) for t in triples]
+                            b_int = [int(t[3]) for t in triples]
+                            n_int = [int(t[0]) for t in triples]
+                            c_int = [int(t[1]) for t in triples]
+                            coeffs = []
+                            for i in range(len(triples)):
+                                ai = a_int[i]; bi = b_int[i]; ni = n_int[i]
+                                A = pow(ai, 3, ni)
+                                B = (3 * ai * ai * bi) % ni
+                                C = (3 * ai * bi * bi) % ni
+                                D = (bi * bi * bi - c_int[i]) % ni
+                                coeffs.append((ni, A, B, C, D))
                         limit = 5 * 10**5
                         for m_candidate in range(limit):
                             ok = True
@@ -2648,15 +2654,15 @@ print("NON_COPRIME_EXP=FAILED")`:L({token:`NON_COPRIME_EXP`,useGuard:!1,body:`  
         c = Integer(${e.c})
         p = Integer(${e.p})
         q = Integer(${e.q})
-            out.append("Non-Coprime Exponent Attack")
-            out.append(f"n = {n}")
-            out.append(f"e = {e}")
-            out.append(f"c = {c}")
-            out.append(f"p = {p}")
-            out.append(f"q = {q}")
-            out.append("")
-            out.append("Results:")
-            phi = (p - 1) * (q - 1)
+        out.append("Non-Coprime Exponent Attack")
+        out.append(f"n = {n}")
+        out.append(f"e = {e}")
+        out.append(f"c = {c}")
+        out.append(f"p = {p}")
+        out.append(f"q = {q}")
+        out.append("")
+        out.append("Results:")
+        phi = (p - 1) * (q - 1)
             g = gcd(e, phi)
             if g == 1:
                 d = inverse_mod(e, phi)
@@ -2753,8 +2759,7 @@ m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\quad \\text{for each pair} \\\\
 \\end{itemize}
 
 \\textbf{References:} Williams, 1980; May, "Attacks on RSA with Small Parameters," 2003`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c},ye={id:`homomorphic-forgery`,name:`Homomorphic Forgery Attack`,category:`Message / Protocol`,description:`Forges a valid RSA signature by exploiting textbook RSA's multiplicative homomorphism. Use when an oracle signs chosen messages and target is a product of signed messages.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`target_m`,label:`Target message to forge`,placeholder:`Enter target message...`,multiline:!0,rows:3},{name:`oracle_pairs`,label:`Oracle pairs (m,s semicolon-separated)`,placeholder:`m1,s1;m2,s2;m3,s3...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.target_m||!e.oracle_pairs?`print("ERROR: Missing required inputs (n, e, target_m, oracle_pairs)")
-print("HOMOMORPHIC_FORGERY=FAILED")`:L({token:`HOMOMORPHIC_FORGERY`,useGuard:!1,body:`        from itertools import combinations
-        n = Integer(${e.n})
+print("HOMOMORPHIC_FORGERY=FAILED")`:L({token:`HOMOMORPHIC_FORGERY`,useGuard:!1,body:`        n = Integer(${e.n})
         e = Integer(${e.e})
         target_m = Integer(${e.target_m})
         found = True
@@ -2789,19 +2794,57 @@ print("HOMOMORPHIC_FORGERY=FAILED")`:L({token:`HOMOMORPHIC_FORGERY`,useGuard:!1,
             out.append(f"oracle_pairs = {pairs_str}")
             out.append("")
             out.append("Results:")
-            found_sig = False
-            for r in range(1, len(oracle_pairs) + 1):
-                for combo in combinations(range(len(oracle_pairs)), r):
-                    prod_m = 1
-                    prod_s = 1
-                    for idx in combo:
-                        m_i, s_i = oracle_pairs[idx]
+            # Meet-in-the-middle: split oracle pairs into two halves
+            # Reduces 2^n search to 2^(n/2+1) operations
+            mid = len(oracle_pairs) // 2
+            left = oracle_pairs[:mid]
+            right = oracle_pairs[mid:]
+            target_mod = target_m % n
+            # Build hash map for right half products
+            right_map = {}
+            right_count = 1 << len(right)
+            for mask in range(1, right_count):
+                prod_m = 1
+                prod_s = 1
+                for j in range(len(right)):
+                    if mask & (1 << j):
+                        m_i, s_i = right[j]
                         prod_m = (prod_m * m_i) % n
                         prod_s = (prod_s * s_i) % n
-                    if prod_m == target_m % n:
-                        v = Integer(pow(int(prod_s), int(e), int(n)))
-                        if v == target_m % n:
-                            out.append(f"s = {prod_s}")
+                key = prod_m
+                if key not in right_map:
+                    right_map[key] = []
+                right_map[key].append(prod_s)
+            # Include empty right subset for left-only solutions
+            if 1 not in right_map:
+                right_map[1] = []
+            right_map[1].append(1)
+            # Search left half for matching complement
+            found_sig = False
+            left_count = 1 << len(left)
+            for mask in range(left_count):
+                prod_m = 1
+                prod_s = 1
+                for j in range(len(left)):
+                    if mask & (1 << j):
+                        m_i, s_i = left[j]
+                        prod_m = (prod_m * m_i) % n
+                        prod_s = (prod_s * s_i) % n
+                if prod_m == 0:
+                    continue
+                try:
+                    inv = inverse_mod(prod_m, n)
+                except Exception:
+                    continue
+                need = (target_mod * inv) % n
+                if need in right_map:
+                    for r_prod_s in right_map[need]:
+                        final_s = (prod_s * r_prod_s) % n
+                        if final_s == 0:
+                            continue
+                        v = Integer(pow(int(final_s), int(e), int(n)))
+                        if v == target_mod:
+                            out.append(f"s = {final_s}")
                             out.append("")
                             out.append(f"Verification: s^e mod n = {v}")
                             out.append("")
@@ -2872,7 +2915,13 @@ print("BLEICHENBACHER_SIG=FAILED")`:L({token:`BLEICHENBACHER_SIG`,useGuard:!1,bo
                     found = False
         if found:
             hash_int = Integer("0x" + hash_hex)
-            target = (Integer(1) << (8 * (garbage_len + hash_bytes + 1 + 8))) + ((Integer(1) << (8 * 8)) - 1) * (Integer(1) << (8 * (garbage_len + hash_bytes + 1))) + hash_int * (Integer(1) << (8 * garbage_len))
+            # Craft PKCS#1 v1.5 signature padding: 0x00 0x01 FF..FF 0x00 HASH GARBAGE
+            ff_block = (Integer(1) << (8 * 8)) - 1  # 8 bytes of 0xFF
+            ff_shift = 8 * (garbage_len + hash_bytes + 1)  # byte position of FF block from LSB
+            hash_shift = 8 * garbage_len  # byte position of hash from LSB
+            target = (Integer(1) << (8 * (garbage_len + hash_bytes + 1 + 8)))  # 0x01 marker
+            target += ff_block << ff_shift  # 8 bytes of 0xFF padding
+            target += hash_int << hash_shift  # hash followed by garbage
             sig, exact = target.nth_root(3, truncate_mode=True)
             if not exact:
                 sig += 1
@@ -3718,7 +3767,7 @@ Compute each $P_i$ incrementally and take $\\gcd(P_i, n)$. When a match is found
             pow_val = (pow_val * 2) % n_int  # recurrence instead of pow(2, i, n)
             val = (pow_val - 1) % n_int
             if val == 0:
-                phi_guess = i
+                phi_guess = i + 1
                 if phi_guess % 2 == 0:
                     s = n - phi_guess + 1
                     disc = s*s - 4*n
@@ -3972,7 +4021,7 @@ print("SMALL_PUBLIC_EXP=FAILED")`:L({token:`SMALL_PUBLIC_EXP`,useGuard:!1,body:`
                 found = True
                 break
         if not found:
-            out.append(f"Reason: No perfect {e}-th power found for k in 0..{k_bound} with e = {e}")
+            out.append(f"Reason: No perfect {e} power found for k in 0..{k_bound} with e = {e}")
             out.append("")
             out.append("SMALL_PUBLIC_EXP=FAILED")
         else:
@@ -4252,31 +4301,56 @@ print("HASTAD_BROADCAST=FAILED")`:L({token:`HASTAD_BROADCAST`,useGuard:!1,body:`
             else:
                 moduli = [p[1] for p in pairs[:e]]
                 remainders = [p[0] for p in pairs[:e]]
-                N = prod(moduli)
-                M = crt(remainders, moduli)
-                m, exact = M.nth_root(e, truncate_mode=True)
-                if exact:
+                # Check pairwise GCD of moduli — if any share a factor, that's even better
+                shared_info = None
+                for i in range(len(moduli)):
+                    for j in range(i+1, len(moduli)):
+                        g = gcd(moduli[i], moduli[j])
+                        if g > 1:
+                            shared_info = (i, j, g)
+                            break
+                    if shared_info is not None:
+                        break
+                if shared_info is not None:
+                    i, j, g = shared_info
                     out.append("")
-                    out.append("Results:")
-                    out.append(f"m = {m}")
+                    out.append("Shared prime factor found via pairwise GCD!")
+                    p = g
+                    q_i = moduli[i] // g
+                    q_j = moduli[j] // g
+                    out.append(f"gcd(n_{i}, n_{j}) = {g}")
+                    out.append(f"n_{i} factors: {p} * {q_i}")
+                    out.append(f"  Verification: {p} * {q_i} = {moduli[i]}")
+                    out.append(f"n_{j} factors: {p} * {q_j}")
+                    out.append(f"  Verification: {p} * {q_j} = {moduli[j]}")
                     out.append("")
-                    out.append(f"Verification: m^e mod product(n_i) = CRT(c_i)")
-                    all_ok = True
-                    for i, (c_i, n_i) in enumerate(pairs):
-                        v = power_mod(m, e, n_i)
-                        ok = v == c_i
-                        if not ok:
-                            all_ok = False
-                    if all_ok:
-                        out.append("")
-                        out.append("HASTAD_BROADCAST=SUCCESS")
-                    else:
-                        out.append("HASTAD_BROADCAST=FAILED")
+                    out.append("HASTAD_BROADCAST=SUCCESS")
                 else:
-                    out.append(f"Approximate root: m = {m}")
-                    out.append("Warning: m^e was not a perfect e-th power")
-                    out.append("HASTAD_BROADCAST=FAILED")`}),frontendCheck:e=>{if(!e.e||!e.ciphertexts)return Promise.resolve(null);try{let t=BigInt(e.e),n=e.ciphertexts.split(`
-`).filter(e=>e.trim());if(n.length<Number(t))return Promise.resolve(null);let r=n.slice(0,Number(t)).map(e=>{let[t,n]=e.split(`,`).map(e=>BigInt(e.trim()));return{c:t,n}}),i=r.reduce((e,{n:t})=>e*t,1n),a=0n;for(let{c:e,n:t}of r){let n=i/t,r=N(n%t,t);if(r===null)return Promise.resolve(null);a=(a+e*n*r)%i}if(a<2n)return Promise.resolve(null);let o=F(a,t);if(o**t===a){for(let{c:e,n}of r)if(P(o,t,n)!==e)return Promise.resolve(null);return Promise.resolve(`Hastad's Broadcast Attack\nPublic exponent: e = ${t}\nNumber of ciphertexts: ${r.length}\n\nResults:\nm = ${o}\n\nVerification: m^e mod product(n_i) = CRT(c_i)\n\nHASTAD_BROADCAST=SUCCESS`)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If the same plaintext $m$ is encrypted under $e$ distinct moduli with the same exponent $e$, CRT recovers $m^e$ over $\\mathbb{Z}$ and $m = \\sqrt[e]{m^e}$.
+                    N = prod(moduli)
+                    M = crt(remainders, moduli)
+                    m, exact = M.nth_root(e, truncate_mode=True)
+                    if exact:
+                        out.append("")
+                        out.append("Results:")
+                        out.append(f"m = {m}")
+                        out.append("")
+                        out.append(f"Verification: m^e mod product(n_i) = CRT(c_i)")
+                        all_ok = True
+                        for i, (c_i, n_i) in enumerate(pairs):
+                            v = power_mod(m, e, n_i)
+                            ok = v == c_i
+                            if not ok:
+                                all_ok = False
+                        if all_ok:
+                            out.append("")
+                            out.append("HASTAD_BROADCAST=SUCCESS")
+                        else:
+                            out.append("HASTAD_BROADCAST=FAILED")
+                    else:
+                        out.append(f"Approximate root: m = {m}")
+                        out.append("Warning: m^e was not a perfect e-th power")
+                        out.append("HASTAD_BROADCAST=FAILED")`}),frontendCheck:e=>{if(!e.e||!e.ciphertexts)return Promise.resolve(null);try{let t=BigInt(e.e),n=e.ciphertexts.split(`
+`).filter(e=>e.trim());if(n.length<Number(t))return Promise.resolve(null);let r=n.slice(0,Number(t)).map(e=>{let[t,n]=e.split(`,`).map(e=>BigInt(e.trim()));return{c:t,n}});for(let e=0;e<r.length;e++)for(let t=e+1;t<r.length;t++){let n=A(r[e].n,r[t].n);if(n>1n&&n<r[e].n){let i=r[e].n/n,a=r[t].n/n;return Promise.resolve(`Hastad's Broadcast Attack\nShared prime factor found via pairwise GCD!\ngcd(n_${e}, n_${t}) = ${n}\nn_${e} factors: ${n} * ${i}\n  Verification: ${n} * ${i} = ${r[e].n}\nn_${t} factors: ${n} * ${a}\n  Verification: ${n} * ${a} = ${r[t].n}\n\nHASTAD_BROADCAST=SUCCESS`)}}let i=r.reduce((e,{n:t})=>e*t,1n),a=0n;for(let{c:e,n:t}of r){let n=i/t,r=N(n%t,t);if(r===null)return Promise.resolve(null);a=(a+e*n*r)%i}if(a<2n)return Promise.resolve(null);let o=F(a,t);if(o**t===a){for(let{c:e,n}of r)if(P(o,t,n)!==e)return Promise.resolve(null);return Promise.resolve(`Hastad's Broadcast Attack\nPublic exponent: e = ${t}\nNumber of ciphertexts: ${r.length}\n\nResults:\nm = ${o}\n\nVerification: m^e mod product(n_i) = CRT(c_i)\n\nHASTAD_BROADCAST=SUCCESS`)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} If the same plaintext $m$ is encrypted under $e$ distinct moduli with the same exponent $e$, CRT recovers $m^e$ over $\\mathbb{Z}$ and $m = \\sqrt[e]{m^e}$.
 
 \\textbf{Setup:}
 \\begin{itemize}

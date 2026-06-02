@@ -116,7 +116,7 @@ c_1^a \\\\cdot c_2^b &\\\\equiv (m^{e_1})^a \\\\cdot (m^{e_2})^b \\\\pmod{n} \\\
 \\\\end{align*}
 When $a < 0$, compute $c_1^a = (c_1^{-1})^{|a|} \\\\pmod{n}$. Same for $b < 0$.
 
-\\\\textbf{Explanation:} Bezout's identity guarantees integers $a, b$ satisfying $a e_1 + b e_2 = 1$ because $\\\\gcd(e_1, e_2) = 1$. Multiplying $c_1^a \\\\cdot c_2^b$ yields $m^{a e_1 + b e_2} = m$. This is why coprime exponents are essential: if $\\\\gcd(e_1, e_2) > 1$, the GCD may directly factor $n$.
+\\\\textbf{Explanation:} Bezout's identity guarantees integers $a, b$ satisfying $a e_1 + b e_2 = 1$ because $\\\\gcd(e_1, e_2) = 1$. Multiplying $c_1^a \\\\cdot c_2^b$ yields $m^{a e_1 + b e_2} = m$. This is why coprime exponents are essential: if $\\\\gcd(e_1, e_2) = g > 1$, we recover $m^g \\\\bmod n$, then take the $g$-th root.
 
 \\\\textbf{References:} Simmons & Norris, 1977; Boneh, "Twenty Years of Attacks on RSA," 1999\`,
   priority: 'high',
