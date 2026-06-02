@@ -99,7 +99,9 @@ export const attack: Attack = {
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Use a known-factored 10-digit modulus (8089475587 = 97369 × 83083, status FF)
-  return { n: "8089475587" };
+  // Use a known-factored 11-digit semiprime confirmed in FactorDB with FF status.
+  // 10967535067 = 104729 × 104723 (the 10000th prime × another prime).
+  // Large enough for a realistic test, small enough for fast FactorDB lookup.
+  return { n: "10967535067" };
 };
 `;export{e as default};

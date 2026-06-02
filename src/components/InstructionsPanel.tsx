@@ -1,10 +1,19 @@
-import { Box, Typography, Divider } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Divider,
+} from '@mui/material';
 import { MenuBook } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { colFlexSx, FONT_FAMILY } from '../styles/shared';
 import { useAppContext } from '../hooks/useAppContext';
 
-const SECTIONS = [
+interface Section {
+  title: string;
+  content: string[];
+}
+
+const SECTIONS: Section[] = [
   {
     title: 'Getting Started',
     content: [
@@ -65,54 +74,51 @@ export function InstructionsPanel() {
 
   return (
     <Box sx={colFlexSx}>
-      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Typography
-            variant="h3"
-            sx={{
-              color: draculaColors.purple,
-              mb: 2,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 2,
-            }}
-          >
-            <MenuBook sx={{ fontSize: 'inherit' }} /> Instructions
-          </Typography>
-        </Box>
+      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Typography
+          variant="h3"
+          sx={{
+            color: draculaColors.purple,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
+          <MenuBook sx={{ fontSize: 'inherit' }} /> Instructions
+        </Typography>
       </Box>
 
       <Divider sx={{ borderColor: draculaColors.comment }} />
 
       <Box sx={{ flex: 1, overflow: 'auto', pb: '30vh' }}>
-        <Box sx={{ width: '100%', px: 2, py: 1 }}>
-          {SECTIONS.map((section, idx) => (
-            <Box key={section.title}>
+        {SECTIONS.map((section, idx) => (
+          <Box key={section.title}>
+            <Box sx={{ px: 2, pt: 2, pb: 1 }}>
               <Typography
                 sx={{
                   color: draculaColors.cyan,
                   fontWeight: 600,
                   fontSize: '0.85rem',
                   fontFamily: FONT_FAMILY,
-                  px: 1.5,
-                  py: 0.75,
                 }}
               >
                 {section.title}
               </Typography>
-              <Box sx={sectionContentSx}>
-                {section.content.map((line, i) => (
-                  <Typography key={i} sx={bulletSx}>
-                    {'\u2022'} {line}
-                  </Typography>
-                ))}
-              </Box>
-              {idx < SECTIONS.length - 1 && (
-                <Divider sx={{ borderColor: draculaColors.comment, my: 0.5 }} />
-              )}
             </Box>
-          ))}
-        </Box>
+
+            <Box sx={sectionContentSx}>
+              {section.content.map((line, i) => (
+                <Typography key={i} sx={bulletSx}>
+                  {'\u2022'} {line}
+                </Typography>
+              ))}
+            </Box>
+
+            {idx < SECTIONS.length - 1 && (
+              <Divider sx={{ borderColor: draculaColors.comment, my: 0.5 }} />
+            )}
+          </Box>
+        ))}
       </Box>
     </Box>
   );
