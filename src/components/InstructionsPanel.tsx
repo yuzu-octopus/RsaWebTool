@@ -56,14 +56,15 @@ const SECTIONS: Section[] = [
 
 const sectionContentSx = {
   px: 2,
-  pb: 1,
+  pb: 0.5,
 } as const;
 
 const bulletSx = {
   color: draculaColors.foreground,
   fontFamily: FONT_FAMILY,
+  fontSize: '0.85rem',
   lineHeight: 1.6,
-  mb: 0.5,
+  mb: 0.25,
 } as const;
 
 export function InstructionsPanel() {
@@ -73,49 +74,43 @@ export function InstructionsPanel() {
 
   return (
     <Box sx={colFlexSx}>
-      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Typography
-          variant="h3"
-          sx={{
-            color: draculaColors.purple,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
-          <MenuBook sx={{ fontSize: 'inherit' }} /> Instructions
-        </Typography>
+      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <Box sx={{ width: '100%', maxWidth: 640 }}>
+          <Typography variant="h3" sx={{ color: draculaColors.purple, mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <MenuBook sx={{ fontSize: 'inherit' }} /> Instructions
+          </Typography>
+        </Box>
       </Box>
 
       <Divider sx={{ borderColor: draculaColors.comment }} />
 
-      <Box sx={{ flex: 1, overflow: 'auto', pb: '30vh' }}>
-        {SECTIONS.map((section) => (
-          <Box key={section.title}>
-            <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
-              <Typography
-                variant="h5"
-                sx={{
-                  color: draculaColors.cyan,
-                  fontFamily: FONT_FAMILY,
-                  fontWeight: 700,
-                }}
-              >
-                {section.title}
-              </Typography>
-            </Box>
-
-            <Box sx={sectionContentSx}>
-              {section.content.map((line, i) => (
-                <Typography key={i} sx={bulletSx}>
-                  {'\u2022'} {line}
+      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center', pb: '30vh' }}>
+        <Box sx={{ width: '100%', maxWidth: 640 }}>
+          {SECTIONS.map((section) => (
+            <Box key={section.title} sx={{ mb: 1.5 }}>
+              <Box sx={{ px: 2, pt: 1, pb: 0.25 }}>
+                <Typography
+                  variant="h5"
+                  sx={{
+                    color: draculaColors.cyan,
+                    fontFamily: FONT_FAMILY,
+                    fontWeight: 700,
+                  }}
+                >
+                  {section.title}
                 </Typography>
-              ))}
+              </Box>
+
+              <Box sx={sectionContentSx}>
+                {section.content.map((line, i) => (
+                  <Typography key={i} sx={bulletSx}>
+                    {line}
+                  </Typography>
+                ))}
+              </Box>
             </Box>
-
-
-          </Box>
-        ))}
+          ))}
+        </Box>
       </Box>
     </Box>
   );
