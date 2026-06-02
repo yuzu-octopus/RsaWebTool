@@ -99,7 +99,6 @@ export const attack: Attack = {
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Use a known-factored modulus confirmed in FactorDB (143 = 11 * 13, status FF)
-  // so the frontendCheck L3 test can successfully query and verify the API works.
-  return { n: "143" };
+  // Use a known-factored 10-digit modulus (8089475587 = 97369 × 83083, status FF)
+  return { n: "8089475587" };
 };

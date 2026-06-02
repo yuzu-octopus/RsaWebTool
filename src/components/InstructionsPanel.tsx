@@ -1,23 +1,10 @@
-import { useState, useCallback } from 'react';
-import {
-  Box,
-  Typography,
-  Collapse,
-  ListItemButton,
-  ListItemText,
-  Divider,
-} from '@mui/material';
-import { ExpandLess, ExpandMore, MenuBook } from '@mui/icons-material';
+import { Box, Typography, Divider } from '@mui/material';
+import { MenuBook } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { colFlexSx, FONT_FAMILY } from '../styles/shared';
 import { useAppContext } from '../hooks/useAppContext';
 
-interface Section {
-  title: string;
-  content: string[];
-}
-
-const SECTIONS: Section[] = [
+const SECTIONS = [
   {
     title: 'Getting Started',
     content: [
@@ -73,19 +60,6 @@ const bulletSx = {
 
 export function InstructionsPanel() {
   const { viewMode } = useAppContext();
-  const [openSections, setOpenSections] = useState<Set<string>>(new Set(['Getting Started']));
-
-  const toggleSection = useCallback((title: string) => {
-    setOpenSections(prev => {
-      const next = new Set(prev);
-      if (next.has(title)) {
-        next.delete(title);
-      } else {
-        next.add(title);
-      }
-      return next;
-    });
-  }, []);
 
   if (viewMode !== 'instructions') return null;
 
@@ -110,50 +84,29 @@ export function InstructionsPanel() {
 
       <Divider sx={{ borderColor: draculaColors.comment }} />
 
-      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center', pb: '30vh' }}>
-        <Box sx={{ width: '100%', maxWidth: 640, px: 2, py: 1 }}>
+      <Box sx={{ flex: 1, overflow: 'auto', pb: '30vh' }}>
+        <Box sx={{ width: '100%', px: 2, py: 1 }}>
           {SECTIONS.map((section, idx) => (
             <Box key={section.title}>
-              <ListItemButton
-                onClick={() => toggleSection(section.title)}
+              <Typography
                 sx={{
-                  borderRadius: 1,
+                  color: draculaColors.cyan,
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  fontFamily: FONT_FAMILY,
                   px: 1.5,
                   py: 0.75,
-                  '&:hover': { backgroundColor: draculaColors.currentLine },
                 }}
               >
-                <ListItemText
-                  primary={
-                    <Typography
-                      sx={{
-                        color: draculaColors.cyan,
-                        fontWeight: 600,
-                        fontSize: '0.85rem',
-                        fontFamily: FONT_FAMILY,
-                      }}
-                    >
-                      {section.title}
-                    </Typography>
-                  }
-                />
-                {openSections.has(section.title) ? (
-                  <ExpandLess sx={{ color: draculaColors.cyan, fontSize: '1.25rem' }} />
-                ) : (
-                  <ExpandMore sx={{ color: draculaColors.cyan, fontSize: '1.25rem' }} />
-                )}
-              </ListItemButton>
-
-              <Collapse in={openSections.has(section.title)} timeout="auto" unmountOnExit>
-                <Box sx={sectionContentSx}>
-                  {section.content.map((line, i) => (
-                    <Typography key={i} sx={bulletSx}>
-                      {'\u2022'} {line}
-                    </Typography>
-                  ))}
-                </Box>
-              </Collapse>
-
+                {section.title}
+              </Typography>
+              <Box sx={sectionContentSx}>
+                {section.content.map((line, i) => (
+                  <Typography key={i} sx={bulletSx}>
+                    {'\u2022'} {line}
+                  </Typography>
+                ))}
+              </Box>
               {idx < SECTIONS.length - 1 && (
                 <Divider sx={{ borderColor: draculaColors.comment, my: 0.5 }} />
               )}
