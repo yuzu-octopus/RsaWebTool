@@ -94,7 +94,7 @@ export function InstructionsPanel() {
           <Box key={section.title}>
             <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
               <Typography
-                variant="h4"
+                variant="h5"
                 sx={{
                   color: draculaColors.cyan,
                   fontFamily: FONT_FAMILY,
