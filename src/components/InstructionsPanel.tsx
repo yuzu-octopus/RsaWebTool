@@ -98,6 +98,7 @@ export function InstructionsPanel() {
                 sx={{
                   color: draculaColors.cyan,
                   fontFamily: FONT_FAMILY,
+                  fontWeight: 700,
                 }}
               >
                 {section.title}
