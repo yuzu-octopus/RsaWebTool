@@ -69,7 +69,8 @@ export function InputPanel() {
   const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
   const mountedRef = useRef(true);
   const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const estimatorRef = useRef(new ProgressEstimator());
+  const estimatorRef = useRef<ProgressEstimator | null>(null);
+  if (estimatorRef.current === null) estimatorRef.current = new ProgressEstimator();
   const lastEtaUpdate = useRef(0);
   const ownershipRef = useRef<'input' | 'magic' | null>(null);
   const timer = useTimer();
@@ -194,7 +195,7 @@ export function InputPanel() {
     const controller = new AbortController();
     abortControllerRef.current = controller;
     dispatchProgress({ type: 'START' });
-    estimatorRef.current.reset();
+    estimatorRef.current!.reset();
     setEta(null);
     timer.start();
     setOutputResult(null);
@@ -230,7 +231,7 @@ export function InputPanel() {
       if (selectedAttack.frontendCheck) {
         const handleProgress = (pct: number, detail?: string) => {
           dispatchProgress({ type: 'PROGRESS', pct, detail });
-          const est = estimatorRef.current.update(pct);
+          const est = estimatorRef.current!.update(pct);
           const now = Date.now();
           if (now - lastEtaUpdate.current > 500) {
             lastEtaUpdate.current = now;
