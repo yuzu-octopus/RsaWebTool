@@ -99,8 +99,10 @@ export const attack: Attack = {
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Use a known-factored 11-digit semiprime confirmed in FactorDB with FF status.
-  // 10967535067 = 104729 × 104723 (the 10000th prime × another prime).
-  // Large enough for a realistic test, small enough for fast FactorDB lookup.
-  return { n: "10967535067" };
+  // Generate a random 10-digit number (not necessarily semiprime — FactorDB
+  // will return whatever status it has for it: FF, C, P, etc.)
+  const min = 10_000_000_000; // 10^10
+  const max = 99_999_999_999; // 10^11 - 1
+  const n = Math.floor(Math.random() * (max - min + 1)) + min;
+  return { n: String(n) };
 };

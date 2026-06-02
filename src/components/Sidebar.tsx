@@ -198,7 +198,7 @@ export function Sidebar() {
             '&:hover': { backgroundColor: draculaColors.background },
           }}
         >
-          <MenuBook sx={{ color: draculaColors.foreground, mr: 1, fontSize: '1.1rem' }} />
+          <MenuBook sx={{ color: draculaColors.green, mr: 1, fontSize: '1.1rem' }} />
           <ListItemText
             primary="Instructions"
             slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.85rem' } } }}

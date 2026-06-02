@@ -56,13 +56,12 @@ const SECTIONS: Section[] = [
 
 const sectionContentSx = {
   px: 2,
-  pb: 1.5,
+  pb: 1,
 } as const;
 
 const bulletSx = {
   color: draculaColors.foreground,
   fontFamily: FONT_FAMILY,
-  fontSize: '0.8rem',
   lineHeight: 1.6,
   mb: 0.5,
 } as const;
@@ -91,14 +90,13 @@ export function InstructionsPanel() {
       <Divider sx={{ borderColor: draculaColors.comment }} />
 
       <Box sx={{ flex: 1, overflow: 'auto', pb: '30vh' }}>
-        {SECTIONS.map((section, idx) => (
+        {SECTIONS.map((section) => (
           <Box key={section.title}>
-            <Box sx={{ px: 2, pt: 2, pb: 1 }}>
+            <Box sx={{ px: 2, pt: 1.5, pb: 0.5 }}>
               <Typography
+                variant="h4"
                 sx={{
                   color: draculaColors.cyan,
-                  fontWeight: 600,
-                  fontSize: '0.85rem',
                   fontFamily: FONT_FAMILY,
                 }}
               >
@@ -114,9 +112,7 @@ export function InstructionsPanel() {
               ))}
             </Box>
 
-            {idx < SECTIONS.length - 1 && (
-              <Divider sx={{ borderColor: draculaColors.comment, my: 0.5 }} />
-            )}
+
           </Box>
         ))}
       </Box>
