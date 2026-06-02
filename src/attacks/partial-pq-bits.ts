@@ -20,15 +20,12 @@ export const attack: Attack = {
         found = False
         if n <= 0 or knownBits < 0:
             out.append("PARTIAL_PQ_BITS=FAILED: invalid input values")
-            out.append("PARTIAL_PQ_BITS=FAILED")
         elif bitPosition not in ("msb", "lsb"):
             out.append("PARTIAL_PQ_BITS=FAILED: bitPosition must be 'msb' or 'lsb'")
-            out.append("PARTIAL_PQ_BITS=FAILED")
         elif bitPosition == "msb":
             k = n.nbits() // 2 - knownBits.nbits()
             if k <= 0:
                 out.append("PARTIAL_PQ_BITS=FAILED: not enough unknown bits for Coppersmith")
-                out.append("PARTIAL_PQ_BITS=FAILED")
             else:
                 # Manual Coppersmith lattice for degree-1, checking ALL LLL rows.
                 # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
@@ -79,12 +76,10 @@ export const attack: Attack = {
                     found = True
                 else:
                     out.append("PARTIAL_PQ_BITS=FAILED: no roots found")
-                    out.append("PARTIAL_PQ_BITS=FAILED")
         elif bitPosition == "lsb":
             m = knownBits.nbits()
             if m <= 0:
                 out.append("PARTIAL_PQ_BITS=FAILED: knownBits is zero")
-                out.append("PARTIAL_PQ_BITS=FAILED")
             else:
                 # Manual Coppersmith lattice for degree-1, checking ALL LLL rows.
                 # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
@@ -135,7 +130,6 @@ export const attack: Attack = {
                     found = True
                 else:
                     out.append("PARTIAL_PQ_BITS=FAILED: no roots found")
-                    out.append("PARTIAL_PQ_BITS=FAILED")
         if not found:
             out.append("PARTIAL_PQ_BITS=FAILED")`,
     useGuard: true,

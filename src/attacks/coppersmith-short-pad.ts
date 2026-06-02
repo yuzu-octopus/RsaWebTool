@@ -5,9 +5,9 @@ import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
   id: 'coppersmith-short-pad',
-  name: 'Coppersmith Short Pad Attack',
+  name: 'Small Message Recovery (e-th Root)',
   category: 'Partial Key / Lattice',
-  description: 'Recovers messages m1, m2 from two ciphertexts with small padding differences via integer e-th root. Use when same message is encrypted twice with small random pads (e=3, no modular wrap-around).',
+  description: 'Recovers small messages m1, m2 from ciphertexts by integer e-th root (degenerate case where m^e < n). NOT the full Coppersmith lattice-based short pad attack — use when m^e < n (no modular wrap-around), typically e=3.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -74,7 +74,7 @@ export const attack: Attack = {
         if m1_val is not None and m2_val is not None:
             if pow(int(m1_val), e_int, int(n)) == c1 and pow(int(m2_val), e_int, int(n)) == c2:
                 delta_val = m2_val - m1_val
-                out.append("Coppersmith Short Pad")
+                out.append("Small Message Recovery (e-th Root)")
                 out.append(f"n = {n}")
                 out.append(f"e = {e}")
                 out.append(f"c1 = {c1}")
@@ -92,7 +92,7 @@ export const attack: Attack = {
         if not found:
             out.append("Could not recover messages.")
             out.append("COPPERSMITH_SHORT_PAD=FAILED")`,
-      useGuard: true,
+      useGuard: false,
     });
   },
   frontendCheck: (vals: Record<string, string>) => {
@@ -124,7 +124,7 @@ export const attack: Attack = {
       }
       if (m1 !== null && m2 !== null) {
         if (modPow(m1, e, n) === c1 && modPow(m2, e, n) === c2) {
-          return Promise.resolve(`Coppersmith Short Pad Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\n\nResults:\nm1 = ${m1}\nm2 = ${m2}\ndelta = ${m2 - m1}\n\nVerification: messages recovered via integer e-th root\n\nCOPPERSMITH_SHORT_PAD=SUCCESS`);
+          return Promise.resolve(`Small Message Recovery (e-th Root)\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\n\nResults:\nm1 = ${m1}\nm2 = ${m2}\ndelta = ${m2 - m1}\n\nVerification: messages recovered via integer e-th root\n\nCOPPERSMITH_SHORT_PAD=SUCCESS`);
         }
       }
       return Promise.resolve(null);
@@ -151,7 +151,7 @@ m &= m_1 - r_1 = m_2 - r_2 \\qed
 \\textbf{Explanation:} When $m^e < n$, the ciphertext is an exact $e$-th power in the integers (no modular wrap-around). Integer $e$-th root directly recovers $m_1$ and $m_2$. If only one root is found, brute-force the small pad difference $\\Delta$ (at most 255). The full Coppersmith short-pad attack using polynomial resultants handles the general case where $m^e \\ge n$ and $|\\Delta| < n^{1/e^2}$, but requires lattice reduction not shown here.
 
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Bivariate Integer Equation", J. Cryptology, 1997; D. Boneh, "Twenty Years of Attacks on RSA", 1999`,
-  usageGuide: 'This attack recovers m when the same message is encrypted twice with the same public key but with a small random padding added.\n\nHow to use:\n1. You have two ciphertexts c1, c2 of the same plaintext m with small pads r1, r2\n2. The pads are small (|r1|, |r2| < n^(1/e)) so m^e < n (no modular wrap-around)\n3. Provide n, e, c1, c2\n4. The attack uses integer e-th root to recover the messages and pads\n\nTip: Works best with e=3 and small messages. For convenience, paste into Magic Mode which auto-detects.',
+  usageGuide: 'Recovers small messages via integer e-th root (degenerate case where m^e < n). NOT the full Coppersmith lattice attack.\n\nHow to use:\n1. You have two ciphertexts c1, c2 of the same plaintext m with small pads r1, r2\n2. The pads are small (|r1|, |r2| < n^(1/e)) so m^e < n (no modular wrap-around)\n3. Provide n, e, c1, c2\n4. The attack uses integer e-th root to recover the messages and pads\n\nTip: Works best with e=3 and small messages. For convenience, paste into Magic Mode which auto-detects.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c1 && !!p.c2,
 };

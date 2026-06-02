@@ -95,7 +95,8 @@ export const attack: Attack = {
                         b = new_b
 
                     if a == b:
-                    m = a
+                        m = a
+                        break
                 else:
                     m = (a + b) // 2
                 v = Integer(pow(int(m), int(e), int(n)))

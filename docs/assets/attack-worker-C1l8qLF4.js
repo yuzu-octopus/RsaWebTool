@@ -1753,15 +1753,12 @@ Tip: The attack works best when e is small (smaller k search space). The kBound 
         found = False
         if n <= 0 or knownBits < 0:
             out.append("PARTIAL_PQ_BITS=FAILED: invalid input values")
-            out.append("PARTIAL_PQ_BITS=FAILED")
         elif bitPosition not in ("msb", "lsb"):
             out.append("PARTIAL_PQ_BITS=FAILED: bitPosition must be 'msb' or 'lsb'")
-            out.append("PARTIAL_PQ_BITS=FAILED")
         elif bitPosition == "msb":
             k = n.nbits() // 2 - knownBits.nbits()
             if k <= 0:
                 out.append("PARTIAL_PQ_BITS=FAILED: not enough unknown bits for Coppersmith")
-                out.append("PARTIAL_PQ_BITS=FAILED")
             else:
                 # Manual Coppersmith lattice for degree-1, checking ALL LLL rows.
                 # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
@@ -1812,12 +1809,10 @@ Tip: The attack works best when e is small (smaller k search space). The kBound 
                     found = True
                 else:
                     out.append("PARTIAL_PQ_BITS=FAILED: no roots found")
-                    out.append("PARTIAL_PQ_BITS=FAILED")
         elif bitPosition == "lsb":
             m = knownBits.nbits()
             if m <= 0:
                 out.append("PARTIAL_PQ_BITS=FAILED: knownBits is zero")
-                out.append("PARTIAL_PQ_BITS=FAILED")
             else:
                 # Manual Coppersmith lattice for degree-1, checking ALL LLL rows.
                 # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
@@ -1868,7 +1863,6 @@ Tip: The attack works best when e is small (smaller k search space). The kBound 
                     found = True
                 else:
                     out.append("PARTIAL_PQ_BITS=FAILED: no roots found")
-                    out.append("PARTIAL_PQ_BITS=FAILED")
         if not found:
             out.append("PARTIAL_PQ_BITS=FAILED")`,useGuard:!0}),proof:`\\textbf{Theorem:} If at least half the bits of $p$ are known (as MSBs or LSBs), Coppersmith's method recovers the full factorization.
 
@@ -1898,7 +1892,7 @@ How to use:
 2. Provide n, knownBits, and bitPosition (\\"msb\\" or \\"lsb\\")
 3. The attack uses Coppersmith\\'s method to find the missing bits
 
-Tip: This is inherently probabilistic — the lattice may fail even with the right inputs. Try with more known bits if it fails. bitPosition=msb = known high bits, lsb = known low bits.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},X=5000n,le={id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via FLT-based batch GCD search over small CRT exponent d_p. Use when d_p = d mod (p-1) is small (< bound, default 1,000,000).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 5000000`,required:!1,multiline:!1}],sageTemplate:e=>L({token:`SMALL_CRT_EXP`,imports:[`import math`],useGuard:!1,body:`        n = Integer(${e.n})
+Tip: This is inherently probabilistic — the lattice may fail even with the right inputs. Try with more known bits if it fails. bitPosition=msb = known high bits, lsb = known low bits.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},X=5000n,le={id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via FLT-based batch GCD search over small CRT exponent d_p. Use when d_p = d mod (p-1) is small (< bound, default 5,000,000).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 5000000`,required:!1,multiline:!1}],sageTemplate:e=>L({token:`SMALL_CRT_EXP`,imports:[`import math`],useGuard:!1,body:`        n = Integer(${e.n})
         e = Integer(${e.e})
         bound = ${e.bound?`Integer(${e.bound})`:`Integer(5000000)`}
         if n <= 0 or e <= 0 or bound <= 0:
@@ -1954,7 +1948,7 @@ Tip: This is inherently probabilistic — the lattice may fail even with the rig
 \\begin{itemize}
 \\item $ed_p \\equiv 1 \\pmod{p-1}$, so $ed_p = 1 + k(p-1)$ for some $k$
 \\item By FLT: $2^{e \\cdot d_p} \\equiv 2 \\pmod{p}$, so $p \\mid (2^{e \\cdot d_p} - 2)$
-\\item $d_p$ is small ($< \\text{bound}$, default $10^7$)
+\\item $d_p$ is small ($< \\text{bound}$, default $5 	imes 10^6$)
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -1980,7 +1974,7 @@ How to use:
 1. You have n, e, and know that dp (d mod p-1) is small (< bound)
 2. The attack uses Fermat's Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p
 3. A batched GCD approach (product tree) accelerates the linear scan ~1000x by reducing gcd calls via product accumulation
-4. Provide n, e, and optionally bound         (max dp to try, default 50000000)
+4. Provide n, e, and optionally bound         (max dp to try, default 5000000)
 
 Tip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 5000000 runs in ~900ms for 1024-bit n.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e},ue={id:`dp-dq-leak`,name:`dp/dq Leak`,category:`Partial Key / Lattice`,description:`Recovers p from leaked d_p (or q from leaked d_q) via FLT-based GCD. Use when CRT exponents d_p or d_q are known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`dp`,label:`dp (d mod p-1)`,placeholder:`Enter dp value...`,multiline:!0,rows:3},{name:`dq`,label:`dq (d mod q-1, optional)`,placeholder:`Enter dq value...`,required:!1,multiline:!0,rows:3}],frontendCheck:async e=>{try{let t=BigInt(e.n),n=BigInt(e.e);if(t<=0n||n<=0n)return null;let r=2n;if(e.dp){let i=BigInt(e.dp);if(i>0n){let e=n*i-1n;if(e>0n){let a=A(P(r,e,t)-1n,t);if(a>1n&&a<t){let e=t/a;return`DP-DQ Leak\nn = ${t.toString()}\ne = ${n.toString()}\ndp = ${i.toString()}\n\nResults:\np = ${a.toString()}\nq = ${e.toString()}\n\nVerification: p * q = ${(a*e).toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}if(e.dq){let i=BigInt(e.dq);if(i>0n){let e=n*i-1n;if(e>0n){let a=A(P(r,e,t)-1n,t);if(a>1n&&a<t){let e=t/a;return`DP-DQ Leak\nn = ${t.toString()}\ne = ${n.toString()}\ndq = ${i.toString()}\n\nResults:\np = ${e.toString()}\nq = ${a.toString()}\n\nVerification: p * q = ${(e*a).toString()}\n\nDP_DQ_LEAK=SUCCESS`}}}}return null}catch{return null}},sageTemplate:e=>{let t=e.dp?`
         dp_val = int(Integer(${e.dp}))
@@ -2261,7 +2255,7 @@ When $a < 0$, compute $c_1^a = (c_1^{-1})^{|a|} \\pmod{n}$. Same for $b < 0$.
 
 \\textbf{Explanation:} Bezout's identity guarantees integers $a, b$ satisfying $a e_1 + b e_2 = 1$ because $\\gcd(e_1, e_2) = 1$. Multiplying $c_1^a \\cdot c_2^b$ yields $m^{a e_1 + b e_2} = m$. This is why coprime exponents are essential: if $\\gcd(e_1, e_2) > 1$, the GCD may directly factor $n$.
 
-\\textbf{References:} Simmons & Norris, 1977; Boneh, "Twenty Years of Attacks on RSA," 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e1&&!!e.e2&&!!e.c1&&!!e.c2},me={id:`coppersmith-short-pad`,name:`Coppersmith Short Pad Attack`,category:`Partial Key / Lattice`,description:`Recovers messages m1, m2 from two ciphertexts with small padding differences via integer e-th root. Use when same message is encrypted twice with small random pads (e=3, no modular wrap-around).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.c1||!e.c2?`print("ERROR: Missing required inputs (n, e, c1, c2)")
+\\textbf{References:} Simmons & Norris, 1977; Boneh, "Twenty Years of Attacks on RSA," 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e1&&!!e.e2&&!!e.c1&&!!e.c2},me={id:`coppersmith-short-pad`,name:`Small Message Recovery (e-th Root)`,category:`Partial Key / Lattice`,description:`Recovers small messages m1, m2 from ciphertexts by integer e-th root (degenerate case where m^e < n). NOT the full Coppersmith lattice-based short pad attack — use when m^e < n (no modular wrap-around), typically e=3.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.c1||!e.c2?`print("ERROR: Missing required inputs (n, e, c1, c2)")
 print("COPPERSMITH_SHORT_PAD=FAILED")`:L({token:`COPPERSMITH_SHORT_PAD`,n:e.n,body:`        e = Integer(${e.e})
         e_int = int(e)
         c1 = Integer(${e.c1})
@@ -2315,7 +2309,7 @@ print("COPPERSMITH_SHORT_PAD=FAILED")`:L({token:`COPPERSMITH_SHORT_PAD`,n:e.n,bo
         if m1_val is not None and m2_val is not None:
             if pow(int(m1_val), e_int, int(n)) == c1 and pow(int(m2_val), e_int, int(n)) == c2:
                 delta_val = m2_val - m1_val
-                out.append("Coppersmith Short Pad")
+                out.append("Small Message Recovery (e-th Root)")
                 out.append(f"n = {n}")
                 out.append(f"e = {e}")
                 out.append(f"c1 = {c1}")
@@ -2332,7 +2326,7 @@ print("COPPERSMITH_SHORT_PAD=FAILED")`:L({token:`COPPERSMITH_SHORT_PAD`,n:e.n,bo
                 found = True
         if not found:
             out.append("Could not recover messages.")
-            out.append("COPPERSMITH_SHORT_PAD=FAILED")`,useGuard:!0}),frontendCheck:e=>{if(!e.n||!e.e||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.c1),i=BigInt(e.c2),a=F(r,n),o=F(i,n),s=a**n===r?a:null,c=o**n===i?o:null;if(s===null&&c!==null){for(let e=1n;e<4096n;e++)if((c-e)**n===r){s=c-e;break}}if(c===null&&s!==null){for(let e=1n;e<4096n;e++)if((s+e)**n===i){c=s+e;break}}return s!==null&&c!==null&&P(s,n,t)===r&&P(c,n,t)===i?Promise.resolve(`Coppersmith Short Pad Attack\nn = ${t}\ne = ${n}\nc1 = ${r}\nc2 = ${i}\n\nResults:\nm1 = ${s}\nm2 = ${c}\ndelta = ${c-s}\n\nVerification: messages recovered via integer e-th root\n\nCOPPERSMITH_SHORT_PAD=SUCCESS`):Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given $c_1 \\equiv m_1^e \\pmod{n}$ and $c_2 \\equiv m_2^e \\pmod{n}$ where $m_1 = m + r_1$, $m_2 = m + r_2$ with small random pads, recover $m$ when $m^e < n$.
+            out.append("COPPERSMITH_SHORT_PAD=FAILED")`,useGuard:!1}),frontendCheck:e=>{if(!e.n||!e.e||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.c1),i=BigInt(e.c2),a=F(r,n),o=F(i,n),s=a**n===r?a:null,c=o**n===i?o:null;if(s===null&&c!==null){for(let e=1n;e<4096n;e++)if((c-e)**n===r){s=c-e;break}}if(c===null&&s!==null){for(let e=1n;e<4096n;e++)if((s+e)**n===i){c=s+e;break}}return s!==null&&c!==null&&P(s,n,t)===r&&P(c,n,t)===i?Promise.resolve(`Small Message Recovery (e-th Root)\nn = ${t}\ne = ${n}\nc1 = ${r}\nc2 = ${i}\n\nResults:\nm1 = ${s}\nm2 = ${c}\ndelta = ${c-s}\n\nVerification: messages recovered via integer e-th root\n\nCOPPERSMITH_SHORT_PAD=SUCCESS`):Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given $c_1 \\equiv m_1^e \\pmod{n}$ and $c_2 \\equiv m_2^e \\pmod{n}$ where $m_1 = m + r_1$, $m_2 = m + r_2$ with small random pads, recover $m$ when $m^e < n$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2352,7 +2346,7 @@ m &= m_1 - r_1 = m_2 - r_2 \\qed
 
 \\textbf{Explanation:} When $m^e < n$, the ciphertext is an exact $e$-th power in the integers (no modular wrap-around). Integer $e$-th root directly recovers $m_1$ and $m_2$. If only one root is found, brute-force the small pad difference $\\Delta$ (at most 255). The full Coppersmith short-pad attack using polynomial resultants handles the general case where $m^e \\ge n$ and $|\\Delta| < n^{1/e^2}$, but requires lattice reduction not shown here.
 
-\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Bivariate Integer Equation", J. Cryptology, 1997; D. Boneh, "Twenty Years of Attacks on RSA", 1999`,usageGuide:`This attack recovers m when the same message is encrypted twice with the same public key but with a small random padding added.
+\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Bivariate Integer Equation", J. Cryptology, 1997; D. Boneh, "Twenty Years of Attacks on RSA", 1999`,usageGuide:`Recovers small messages via integer e-th root (degenerate case where m^e < n). NOT the full Coppersmith lattice attack.
 
 How to use:
 1. You have two ciphertexts c1, c2 of the same plaintext m with small pads r1, r2
@@ -3006,7 +3000,8 @@ Tip: e must be exactly 3 for this attack. The modulus must be large enough to ac
                         b = new_b
 
                     if a == b:
-                    m = a
+                        m = a
+                        break
                 else:
                     m = (a + b) // 2
                 v = Integer(pow(int(m), int(e), int(n)))
@@ -4092,7 +4087,7 @@ p, q &= \\frac{s \\pm \\sqrt{\\Delta}}{2} \\qed
 
 \\textbf{Explanation:} Given both $n = pq$ and $\\phi(n) = (p-1)(q-1)$, we know both the sum $p+q = n - \\phi(n) + 1$ and the product $pq = n$. By Vieta's formulas, $p$ and $q$ are the roots of $x^2 - (p+q)x + pq = 0$. Computing the discriminant $\\Delta = (p+q)^2 - 4n = (p-q)^2$ and taking its square root yields $p$ and $q$ directly via the quadratic formula. This is a single-shot deterministic attack with no iteration.
 
-\\textbf{References:} Rivest, Shamir, Adleman, "A Method for Obtaining Digital Signatures and Public-Key Cryptosystems", 1978; Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2`,priority:`high`,applicableCheck:e=>!!e.n},{id:`partial-key-exposure`,name:`Partial Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from known high bits (MSBs) using Coppersmith's lattice. Use when at least half of p's bits are known via side-channel leakage.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`p_msb`,label:`p_msb (known MSBs of p)`,placeholder:`Enter known high bits of p...`,multiline:!0,rows:3}],sageTemplate:e=>L({token:`PARTIAL_KEY_EXPOSURE`,n:e.n,body:`        p_msb = Integer(${e.p_msb})
+\\textbf{References:} Rivest, Shamir, Adleman, "A Method for Obtaining Digital Signatures and Public-Key Cryptosystems", 1978; Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2`,priority:`high`,applicableCheck:e=>!!e.n},{id:`partial-key-exposure`,name:`Partial Key Exposure`,category:`Partial Key / Lattice`,description:`Recovers p from known high bits (MSBs) using Coppersmith's lattice. Use when at least half of p's bits are known via side-channel leakage.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`p_msb`,label:`p (known high bits)`,placeholder:`Enter known high bits of p...`,multiline:!0,rows:3}],sageTemplate:e=>L({token:`PARTIAL_KEY_EXPOSURE`,n:e.n,body:`        p_msb = Integer(${e.p_msb})
         found = False
         if n < 2 or p_msb < 2:
             out.append("PARTIAL_KEY_EXPOSURE=FAILED: invalid input values")
@@ -4116,8 +4111,8 @@ p, q &= \\frac{s \\pm \\sqrt{\\Delta}}{2} \\qed
             out.append("PARTIAL_KEY_EXPOSURE=SUCCESS")
             found = True
         else:
-            # p = p_msb + x, where x is unknown low bits (trailing zeros = bit count of x)
-            k = p_msb.trailing_zero_bits()
+            # p = p_msb + x, where x has unknown bits = nbits/2 - p_msb_bits
+            k = n.nbits() // 2 - p_msb.nbits()
             # Manual Coppersmith lattice for degree-1, checking ALL LLL rows.
             # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
             x = ZZ['x'].gen()

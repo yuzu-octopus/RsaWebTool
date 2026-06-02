@@ -9,7 +9,7 @@ export const attack: Attack = {
   description: 'Recovers p from known high bits (MSBs) using Coppersmith\'s lattice. Use when at least half of p\'s bits are known via side-channel leakage.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
-    { name: 'p_msb', label: 'p_msb (known MSBs of p)', placeholder: 'Enter known high bits of p...', multiline: true, rows: 3 },
+    { name: 'p_msb', label: 'p (known high bits)', placeholder: 'Enter known high bits of p...', multiline: true, rows: 3 },
   ],
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'PARTIAL_KEY_EXPOSURE',
@@ -38,8 +38,8 @@ export const attack: Attack = {
             out.append("PARTIAL_KEY_EXPOSURE=SUCCESS")
             found = True
         else:
-            # p = p_msb + x, where x is unknown low bits (trailing zeros = bit count of x)
-            k = p_msb.trailing_zero_bits()
+            # p = p_msb + x, where x has unknown bits = nbits/2 - p_msb_bits
+            k = n.nbits() // 2 - p_msb.nbits()
             # Manual Coppersmith lattice for degree-1, checking ALL LLL rows.
             # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
             x = ZZ['x'].gen()

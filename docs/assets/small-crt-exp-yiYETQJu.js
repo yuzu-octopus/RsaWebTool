@@ -9,7 +9,7 @@ export const attack: Attack = {
   id: 'small-crt-exp',
   name: 'Small CRT Exponent',
   category: 'Partial Key / Lattice',
-  description: 'Factors n via FLT-based batch GCD search over small CRT exponent d_p. Use when d_p = d mod (p-1) is small (< bound, default 1,000,000).',
+  description: 'Factors n via FLT-based batch GCD search over small CRT exponent d_p. Use when d_p = d mod (p-1) is small (< bound, default 5,000,000).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -137,7 +137,7 @@ export const attack: Attack = {
 \\\\begin{itemize}
 \\\\item $ed_p \\\\equiv 1 \\\\pmod{p-1}$, so $ed_p = 1 + k(p-1)$ for some $k$
 \\\\item By FLT: $2^{e \\\\cdot d_p} \\\\equiv 2 \\\\pmod{p}$, so $p \\\\mid (2^{e \\\\cdot d_p} - 2)$
-\\\\item $d_p$ is small ($< \\\\text{bound}$, default $10^7$)
+\\\\item $d_p$ is small ($< \\\\text{bound}$, default $5 \\times 10^6$)
 \\\\end{itemize}
 
 \\\\textbf{Proof:}
@@ -158,7 +158,7 @@ export const attack: Attack = {
 \\\\end{itemize}
 
 \\\\textbf{References:} Boneh \\\\textit{et al.}, "Cryptanalysis of RSA with Small CRT Exponents", CRYPTO 1998; Cohn & Heninger, ePrint 2011/436\`,
-   usageGuide: 'This attack recovers the private key when either dp or dq (the CRT exponents) is small.\\n\\nHow to use:\\n1. You have n, e, and know that dp (d mod p-1) is small (< bound)\\n2. The attack uses Fermat\\'s Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p\\n3. A batched GCD approach (product tree) accelerates the linear scan ~1000x by reducing gcd calls via product accumulation\\n4. Provide n, e, and optionally bound         (max dp to try, default 50000000)\\n\\nTip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 5000000 runs in ~900ms for 1024-bit n.',
+   usageGuide: 'This attack recovers the private key when either dp or dq (the CRT exponents) is small.\\n\\nHow to use:\\n1. You have n, e, and know that dp (d mod p-1) is small (< bound)\\n2. The attack uses Fermat\\'s Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p\\n3. A batched GCD approach (product tree) accelerates the linear scan ~1000x by reducing gcd calls via product accumulation\\n4. Provide n, e, and optionally bound         (max dp to try, default 5000000)\\n\\nTip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 5000000 runs in ~900ms for 1024-bit n.',
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e,
 };
