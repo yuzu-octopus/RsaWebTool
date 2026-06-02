@@ -111,7 +111,7 @@ export const attack: Attack = {
 
 \\\\textbf{Proof:}
 \\\\begin{align*}
-\\\\mathcal{O}(c) = 1 &\\\\iff m < B = n/256 \\\\\\\\
+\\\\mathcal{O}(c) = 1 &\\\\iff m \\\\ge B = n/256 \\\\\\\\
 \\\\mathcal{O}(c \\\\cdot s^e) = 1 &\\\\implies m \\\\cdot s - rn < B \\\\quad \\\\text{for some } r \\\\\\\\
 m &\\\\in \\\\bigcup_{r=0}^{s-1} \\\\left[ \\\\frac{rn}{s}, \\\\frac{rn+B}{s} \\\\right) \\\\\\\\
 \\\\text{Step 1: } &\\\\text{Find } f_1 = 2^t \\\\text{ with } \\\\mathcal{O}(c \\\\cdot f_1^e) = 1 \\\\\\\\

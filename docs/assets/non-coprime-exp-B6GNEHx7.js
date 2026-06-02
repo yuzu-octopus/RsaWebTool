@@ -40,78 +40,78 @@ print("NON_COPRIME_EXP=FAILED")\`;
         out.append("")
         out.append("Results:")
         phi = (p - 1) * (q - 1)
-            g = gcd(e, phi)
-            if g == 1:
-                d = inverse_mod(e, phi)
-                m = power_mod(c, d, n)
-                out.append(f"m = {m}")
-                v = power_mod(m, e, n)
-                if v == c:
-                    out.append("")
-                    out.append("NON_COPRIME_EXP=SUCCESS")
-                else:
-                    out.append("")
-                    out.append("NON_COPRIME_EXP=FAILED")
+        g = gcd(e, phi)
+        if g == 1:
+            d = inverse_mod(e, phi)
+            m = power_mod(c, d, n)
+            out.append(f"m = {m}")
+            v = power_mod(m, e, n)
+            if v == c:
+                out.append("")
+                out.append("NON_COPRIME_EXP=SUCCESS")
             else:
-                gp = gcd(e, p - 1)
-                roots_p = []
-                if gp == 1:
-                    dp = inverse_mod(e, p - 1)
-                    mp = power_mod(c, dp, p)
-                    roots_p = [mp]
-                else:
-                    Fp = GF(p)
-                    cp = Fp(c)
-                    try:
-                        roots_p = cp.nth_root(e, all=True)
-                    except (NotImplementedError, TypeError, AttributeError):
-                        roots_p = []
-                        if e <= 10 and p < 2000000:
-                            for x in range(p):
-                                if power_mod(x, e, p) == cp:
-                                    roots_p.append(Fp(x))
-                    if not roots_p:
-                        if e == 2 and p % 4 == 3:
-                            r = cp ** ((p + 1) // 4)
-                            if r**2 == cp:
-                                roots_p = [r, -r]
-                gq = gcd(e, q - 1)
-                roots_q = []
-                if gq == 1:
-                    dq = inverse_mod(e, q - 1)
-                    mq = power_mod(c, dq, q)
-                    roots_q = [mq]
-                else:
-                    Fq = GF(q)
-                    cq = Fq(c)
-                    try:
-                        roots_q = cq.nth_root(e, all=True)
-                    except (NotImplementedError, TypeError, AttributeError):
-                        roots_q = []
-                        if e <= 10 and q < 2000000:
-                            for x in range(q):
-                                if power_mod(x, e, q) == cq:
-                                    roots_q.append(Fq(x))
-                    if not roots_q:
-                        if e == 2 and q % 4 == 3:
-                            r = cq ** ((q + 1) // 4)
-                            if r**2 == cq:
-                                roots_q = [r, -r]
-                found_valid = False
-                for rp in roots_p:
-                    for rq in roots_q:
-                        m = crt([Integer(rp), Integer(rq)], [p, q])
-                        out.append(f"m = {m}")
-                        v = power_mod(m, e, n)
-                        ok = v == c
-                        if ok:
-                            found_valid = True
-                if found_valid:
-                    out.append("")
-                    out.append("NON_COPRIME_EXP=SUCCESS")
-                else:
-                    out.append("")
-                    out.append("NON_COPRIME_EXP=FAILED")\`,
+                out.append("")
+                out.append("NON_COPRIME_EXP=FAILED")
+        else:
+            gp = gcd(e, p - 1)
+            roots_p = []
+            if gp == 1:
+                dp = inverse_mod(e, p - 1)
+                mp = power_mod(c, dp, p)
+                roots_p = [mp]
+            else:
+                Fp = GF(p)
+                cp = Fp(c)
+                try:
+                    roots_p = cp.nth_root(e, all=True)
+                except (NotImplementedError, TypeError, AttributeError):
+                    roots_p = []
+                    if e <= 10 and p < 2000000:
+                        for x in range(p):
+                            if power_mod(x, e, p) == cp:
+                                roots_p.append(Fp(x))
+                if not roots_p:
+                    if e == 2 and p % 4 == 3:
+                        r = cp ** ((p + 1) // 4)
+                        if r**2 == cp:
+                            roots_p = [r, -r]
+            gq = gcd(e, q - 1)
+            roots_q = []
+            if gq == 1:
+                dq = inverse_mod(e, q - 1)
+                mq = power_mod(c, dq, q)
+                roots_q = [mq]
+            else:
+                Fq = GF(q)
+                cq = Fq(c)
+                try:
+                    roots_q = cq.nth_root(e, all=True)
+                except (NotImplementedError, TypeError, AttributeError):
+                    roots_q = []
+                    if e <= 10 and q < 2000000:
+                        for x in range(q):
+                            if power_mod(x, e, q) == cq:
+                                roots_q.append(Fq(x))
+                if not roots_q:
+                    if e == 2 and q % 4 == 3:
+                        r = cq ** ((q + 1) // 4)
+                        if r**2 == cq:
+                            roots_q = [r, -r]
+            found_valid = False
+            for rp in roots_p:
+                for rq in roots_q:
+                    m = crt([Integer(rp), Integer(rq)], [p, q])
+                    out.append(f"m = {m}")
+                    v = power_mod(m, e, n)
+                    ok = v == c
+                    if ok:
+                        found_valid = True
+            if found_valid:
+                out.append("")
+                out.append("NON_COPRIME_EXP=SUCCESS")
+            else:
+                out.append("")
+                out.append("NON_COPRIME_EXP=FAILED")\`,
     });
   },
   proof: \`\\\\textbf{Theorem:} When $\\\\gcd(e, \\\\varphi(n)) > 1$, the ciphertext $c = m^e \\\\bmod n$ has multiple preimages. All are recovered by finding e-th roots modulo $p$ and $q$ separately, then CRT-combining.

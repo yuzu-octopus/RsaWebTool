@@ -176,7 +176,7 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
       // Search left half for matching complement
       const targetM_mod = targetM % n;
       const leftCount = 1 << left.length;
-      for (let mask = 1; mask < leftCount; mask++) {
+      for (let mask = 0; mask < leftCount; mask++) {
         if (onProgress && mask % 500 === 0) {
           onProgress(50 + Math.round(mask * 50 / leftCount), `left mask ${mask} / ${leftCount}`);
         }

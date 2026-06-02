@@ -13,29 +13,34 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'ECM2',
     n: vals.n,
-    body: `        from sage.libs.libecm import ecmfactor
+    body: `        try:
+            from sage.libs.libecm import ecmfactor
+            _has_ecm = True
+        except ImportError:
+            _has_ecm = False
         def ecm_factor_all(m, depth):
             if m == 1:
                 return []
             if m.is_prime():
                 return [m]
-            B1_vals = [2000, 10000, 50000]
-            found_p = None
-            for B1_cur in B1_vals:
-                for attempt in range(10):
-                    try:
-                        result = ecmfactor(m, B1_cur)
-                        if result[0]:
-                            p = result[0]
-                            if p != 1 and p != m and m % p == 0:
-                                found_p = p
-                                break
-                    except Exception:
-                        continue
+            if _has_ecm:
+                B1_vals = [2000, 10000, 50000]
+                found_p = None
+                for B1_cur in B1_vals:
+                    for attempt in range(10):
+                        try:
+                            result = ecmfactor(m, B1_cur)
+                            if result[0]:
+                                p = result[0]
+                                if p != 1 and p != m and m % p == 0:
+                                    found_p = p
+                                    break
+                        except Exception:
+                            continue
+                    if found_p is not None:
+                        break
                 if found_p is not None:
-                    break
-            if found_p is not None:
-                return ecm_factor_all(found_p, depth + 1) + ecm_factor_all(m // found_p, depth + 1)
+                    return ecm_factor_all(found_p, depth + 1) + ecm_factor_all(m // found_p, depth + 1)
             fac = factor(m)
             result = []
             for prime, exp in fac:

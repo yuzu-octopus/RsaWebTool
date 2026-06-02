@@ -104,7 +104,7 @@ p &= \\\\frac{-1 + \\\\sqrt{1 + 4kne}}{2k} \\\\\\\\
 \\\\text{If so, } p &\\\\mid n \\\\implies \\\\text{factorization found} \\\\qed
 \\\\end{align*}
 
-\\\\textbf{Explanation:} Multiplying $n = pq$ by $e$ and substituting $qe = 1 + kp$ yields a quadratic in $p$. The discriminant $\\\\Delta = 1 + 4kne$ must be a perfect square. The attack iterates $k$ up to $10^5$, using a mod-16 perfect-square pre-filter (only residues 1 and 9 are valid squares mod 16) to reject $\\\\sim 50\\\\%$ of candidates without computing an integer square root. This key generation pattern occurs in some embedded RSA implementations that derive $q$ from $p$ to speed up CRT parameter computation.
+\\\\textbf{Explanation:} Multiplying $n = pq$ by $e$ and substituting $qe = 1 + kp$ yields a quadratic in $p$. The discriminant $\\\\Delta = 1 + 4kne$ must be a perfect square. The attack iterates $k$ up to $5 \\\\cdot 10^6$, using a mod-16 perfect-square pre-filter (only residues 1 and 9 are valid squares mod 16) to reject $\\\\sim 50\\\\%$ of candidates without computing an integer square root. This key generation pattern occurs in some embedded RSA implementations that derive $q$ from $p$ to speed up CRT parameter computation.
 
 \\\\textbf{Optimizations:}
 \\\\begin{itemize}

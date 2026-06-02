@@ -21,7 +21,7 @@ export const attack: Attack = {
         out.append("Checking primes near powers of 2...")
         for bits in [64, 128, 256, 512]:
             target = 1 << bits
-            for delta in range(-1000, 1000):
+            for delta in range(-1000, 1001):
                 candidate = target + delta
                 if candidate > 1 and n_int % candidate == 0:
                     if is_prime(candidate):
@@ -35,6 +35,7 @@ export const attack: Attack = {
                         out.append("")
                         out.append(f"Verification: p * q = {p_sage * q_sage}")
                         found = True
+                        break
         if not found:
             out.append("Checking primes near common constants...")
             constants = [
@@ -44,7 +45,7 @@ export const attack: Attack = {
             ]
             for name, const in constants:
                 const_int = int(const)
-                for delta in range(-100, 100):
+                for delta in range(-100, 101):
                     candidate = const_int + delta
                     if candidate > 1 and n_int % candidate == 0:
                         if is_prime(candidate):
@@ -58,6 +59,7 @@ export const attack: Attack = {
                             out.append("")
                             out.append(f"Verification: p * q = {p_sage * q_sage}")
                             found = True
+                            break
         if found:
             out.append("")
             out.append("NOVELTY_PRIMES=SUCCESS")

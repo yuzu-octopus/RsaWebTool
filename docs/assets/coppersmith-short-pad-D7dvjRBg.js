@@ -21,7 +21,8 @@ export const attack: Attack = {
     return wrapSageTemplate({
       token: 'COPPERSMITH_SHORT_PAD',
       n: vals.n,
-      body: \`        e = Integer(\${vals.e})
+      body: \`        n = Integer(\${vals.n})
+        e = Integer(\${vals.e})
         e_int = int(e)
         c1 = Integer(\${vals.c1})
         c2 = Integer(\${vals.c2})

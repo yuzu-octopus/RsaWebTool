@@ -220,29 +220,34 @@ p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2}
 \\item \\textbf{Two-phase execution:} Phase 1 runs Wiener's continued fraction attack ($d < n^{0.25}$) — a fast $O(\\log n)$ check using $e/n$ convergents that immediately succeeds for small $d$ without invoking lattice reduction. Phase 2 runs the Herrmann-May Coppersmith lattice ($d < n^{0.260}$) with Sage native resultant for bivariate root recovery, only when Wiener fails.
 \\end{itemize}
 
-\\textbf{References:} M. Wiener, CRYPTO 1990; D. Boneh, G. Durfee, CRYPTO 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e},te={id:`ecm2`,name:`ECM Full Factorization`,category:`Factorization`,description:`Factors n completely via repeated ECM with recursive factor removal. Use when n may have multiple prime factors beyond two.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>L({token:`ECM2`,n:e.n,body:`        from sage.libs.libecm import ecmfactor
+\\textbf{References:} M. Wiener, CRYPTO 1990; D. Boneh, G. Durfee, CRYPTO 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e},te={id:`ecm2`,name:`ECM Full Factorization`,category:`Factorization`,description:`Factors n completely via repeated ECM with recursive factor removal. Use when n may have multiple prime factors beyond two.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>L({token:`ECM2`,n:e.n,body:`        try:
+            from sage.libs.libecm import ecmfactor
+            _has_ecm = True
+        except ImportError:
+            _has_ecm = False
         def ecm_factor_all(m, depth):
             if m == 1:
                 return []
             if m.is_prime():
                 return [m]
-            B1_vals = [2000, 10000, 50000]
-            found_p = None
-            for B1_cur in B1_vals:
-                for attempt in range(10):
-                    try:
-                        result = ecmfactor(m, B1_cur)
-                        if result[0]:
-                            p = result[0]
-                            if p != 1 and p != m and m % p == 0:
-                                found_p = p
-                                break
-                    except Exception:
-                        continue
+            if _has_ecm:
+                B1_vals = [2000, 10000, 50000]
+                found_p = None
+                for B1_cur in B1_vals:
+                    for attempt in range(10):
+                        try:
+                            result = ecmfactor(m, B1_cur)
+                            if result[0]:
+                                p = result[0]
+                                if p != 1 and p != m and m % p == 0:
+                                    found_p = p
+                                    break
+                        except Exception:
+                            continue
+                    if found_p is not None:
+                        break
                 if found_p is not None:
-                    break
-            if found_p is not None:
-                return ecm_factor_all(found_p, depth + 1) + ecm_factor_all(m // found_p, depth + 1)
+                    return ecm_factor_all(found_p, depth + 1) + ecm_factor_all(m // found_p, depth + 1)
             fac = factor(m)
             result = []
             for prime, exp in fac:
@@ -1358,7 +1363,7 @@ a_i^2 - n \\text{ is square} &\\implies p = a_i - b_i,\\; q = a_i + b_i \\\\
         out.append("Checking primes near powers of 2...")
         for bits in [64, 128, 256, 512]:
             target = 1 << bits
-            for delta in range(-1000, 1000):
+            for delta in range(-1000, 1001):
                 candidate = target + delta
                 if candidate > 1 and n_int % candidate == 0:
                     if is_prime(candidate):
@@ -1372,6 +1377,7 @@ a_i^2 - n \\text{ is square} &\\implies p = a_i - b_i,\\; q = a_i + b_i \\\\
                         out.append("")
                         out.append(f"Verification: p * q = {p_sage * q_sage}")
                         found = True
+                        break
         if not found:
             out.append("Checking primes near common constants...")
             constants = [
@@ -1381,7 +1387,7 @@ a_i^2 - n \\text{ is square} &\\implies p = a_i - b_i,\\; q = a_i + b_i \\\\
             ]
             for name, const in constants:
                 const_int = int(const)
-                for delta in range(-100, 100):
+                for delta in range(-100, 101):
                     candidate = const_int + delta
                     if candidate > 1 and n_int % candidate == 0:
                         if is_prime(candidate):
@@ -1395,6 +1401,7 @@ a_i^2 - n \\text{ is square} &\\implies p = a_i - b_i,\\; q = a_i + b_i \\\\
                             out.append("")
                             out.append(f"Verification: p * q = {p_sage * q_sage}")
                             found = True
+                            break
         if found:
             out.append("")
             out.append("NOVELTY_PRIMES=SUCCESS")
@@ -2195,7 +2202,7 @@ p &= \\frac{-1 + \\sqrt{1 + 4kne}}{2k} \\\\
 \\text{If so, } p &\\mid n \\implies \\text{factorization found} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Multiplying $n = pq$ by $e$ and substituting $qe = 1 + kp$ yields a quadratic in $p$. The discriminant $\\Delta = 1 + 4kne$ must be a perfect square. The attack iterates $k$ up to $10^5$, using a mod-16 perfect-square pre-filter (only residues 1 and 9 are valid squares mod 16) to reject $\\sim 50\\%$ of candidates without computing an integer square root. This key generation pattern occurs in some embedded RSA implementations that derive $q$ from $p$ to speed up CRT parameter computation.
+\\textbf{Explanation:} Multiplying $n = pq$ by $e$ and substituting $qe = 1 + kp$ yields a quadratic in $p$. The discriminant $\\Delta = 1 + 4kne$ must be a perfect square. The attack iterates $k$ up to $5 \\cdot 10^6$, using a mod-16 perfect-square pre-filter (only residues 1 and 9 are valid squares mod 16) to reject $\\sim 50\\%$ of candidates without computing an integer square root. This key generation pattern occurs in some embedded RSA implementations that derive $q$ from $p$ to speed up CRT parameter computation.
 
 \\textbf{Optimizations:}
 \\begin{itemize}
@@ -2265,7 +2272,8 @@ When $a < 0$, compute $c_1^a = (c_1^{-1})^{|a|} \\pmod{n}$. Same for $b < 0$.
 \\textbf{Explanation:} Bezout's identity guarantees integers $a, b$ satisfying $a e_1 + b e_2 = 1$ because $\\gcd(e_1, e_2) = 1$. Multiplying $c_1^a \\cdot c_2^b$ yields $m^{a e_1 + b e_2} = m$. This is why coprime exponents are essential: if $\\gcd(e_1, e_2) = g > 1$, we recover $m^g \\bmod n$, then take the $g$-th root.
 
 \\textbf{References:} Simmons & Norris, 1977; Boneh, "Twenty Years of Attacks on RSA," 1999`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e1&&!!e.e2&&!!e.c1&&!!e.c2},me={id:`coppersmith-short-pad`,name:`Small Message Recovery (e-th Root)`,category:`Partial Key / Lattice`,description:`Recovers small messages m1, m2 from ciphertexts by integer e-th root (degenerate case where m^e < n). NOT the full Coppersmith lattice-based short pad attack — use when m^e < n (no modular wrap-around), typically e=3.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c1`,label:`c1 (first ciphertext)`,placeholder:`Enter ciphertext c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (second ciphertext)`,placeholder:`Enter ciphertext c2...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.c1||!e.c2?`print("ERROR: Missing required inputs (n, e, c1, c2)")
-print("COPPERSMITH_SHORT_PAD=FAILED")`:L({token:`COPPERSMITH_SHORT_PAD`,n:e.n,body:`        e = Integer(${e.e})
+print("COPPERSMITH_SHORT_PAD=FAILED")`:L({token:`COPPERSMITH_SHORT_PAD`,n:e.n,body:`        n = Integer(${e.n})
+        e = Integer(${e.e})
         e_int = int(e)
         c1 = Integer(${e.c1})
         c2 = Integer(${e.c2})
@@ -2668,78 +2676,78 @@ print("NON_COPRIME_EXP=FAILED")`:L({token:`NON_COPRIME_EXP`,useGuard:!1,body:`  
         out.append("")
         out.append("Results:")
         phi = (p - 1) * (q - 1)
-            g = gcd(e, phi)
-            if g == 1:
-                d = inverse_mod(e, phi)
-                m = power_mod(c, d, n)
-                out.append(f"m = {m}")
-                v = power_mod(m, e, n)
-                if v == c:
-                    out.append("")
-                    out.append("NON_COPRIME_EXP=SUCCESS")
-                else:
-                    out.append("")
-                    out.append("NON_COPRIME_EXP=FAILED")
+        g = gcd(e, phi)
+        if g == 1:
+            d = inverse_mod(e, phi)
+            m = power_mod(c, d, n)
+            out.append(f"m = {m}")
+            v = power_mod(m, e, n)
+            if v == c:
+                out.append("")
+                out.append("NON_COPRIME_EXP=SUCCESS")
             else:
-                gp = gcd(e, p - 1)
-                roots_p = []
-                if gp == 1:
-                    dp = inverse_mod(e, p - 1)
-                    mp = power_mod(c, dp, p)
-                    roots_p = [mp]
-                else:
-                    Fp = GF(p)
-                    cp = Fp(c)
-                    try:
-                        roots_p = cp.nth_root(e, all=True)
-                    except (NotImplementedError, TypeError, AttributeError):
-                        roots_p = []
-                        if e <= 10 and p < 2000000:
-                            for x in range(p):
-                                if power_mod(x, e, p) == cp:
-                                    roots_p.append(Fp(x))
-                    if not roots_p:
-                        if e == 2 and p % 4 == 3:
-                            r = cp ** ((p + 1) // 4)
-                            if r**2 == cp:
-                                roots_p = [r, -r]
-                gq = gcd(e, q - 1)
-                roots_q = []
-                if gq == 1:
-                    dq = inverse_mod(e, q - 1)
-                    mq = power_mod(c, dq, q)
-                    roots_q = [mq]
-                else:
-                    Fq = GF(q)
-                    cq = Fq(c)
-                    try:
-                        roots_q = cq.nth_root(e, all=True)
-                    except (NotImplementedError, TypeError, AttributeError):
-                        roots_q = []
-                        if e <= 10 and q < 2000000:
-                            for x in range(q):
-                                if power_mod(x, e, q) == cq:
-                                    roots_q.append(Fq(x))
-                    if not roots_q:
-                        if e == 2 and q % 4 == 3:
-                            r = cq ** ((q + 1) // 4)
-                            if r**2 == cq:
-                                roots_q = [r, -r]
-                found_valid = False
-                for rp in roots_p:
-                    for rq in roots_q:
-                        m = crt([Integer(rp), Integer(rq)], [p, q])
-                        out.append(f"m = {m}")
-                        v = power_mod(m, e, n)
-                        ok = v == c
-                        if ok:
-                            found_valid = True
-                if found_valid:
-                    out.append("")
-                    out.append("NON_COPRIME_EXP=SUCCESS")
-                else:
-                    out.append("")
-                    out.append("NON_COPRIME_EXP=FAILED")`}),proof:`\\textbf{Theorem:} When $\\gcd(e, \\varphi(n)) > 1$, the ciphertext $c = m^e \\bmod n$ has multiple preimages. All are recovered by finding e-th roots modulo $p$ and $q$ separately, then CRT-combining.
+                out.append("")
+                out.append("NON_COPRIME_EXP=FAILED")
+        else:
+            gp = gcd(e, p - 1)
+            roots_p = []
+            if gp == 1:
+                dp = inverse_mod(e, p - 1)
+                mp = power_mod(c, dp, p)
+                roots_p = [mp]
+            else:
+                Fp = GF(p)
+                cp = Fp(c)
+                try:
+                    roots_p = cp.nth_root(e, all=True)
+                except (NotImplementedError, TypeError, AttributeError):
+                    roots_p = []
+                    if e <= 10 and p < 2000000:
+                        for x in range(p):
+                            if power_mod(x, e, p) == cp:
+                                roots_p.append(Fp(x))
+                if not roots_p:
+                    if e == 2 and p % 4 == 3:
+                        r = cp ** ((p + 1) // 4)
+                        if r**2 == cp:
+                            roots_p = [r, -r]
+            gq = gcd(e, q - 1)
+            roots_q = []
+            if gq == 1:
+                dq = inverse_mod(e, q - 1)
+                mq = power_mod(c, dq, q)
+                roots_q = [mq]
+            else:
+                Fq = GF(q)
+                cq = Fq(c)
+                try:
+                    roots_q = cq.nth_root(e, all=True)
+                except (NotImplementedError, TypeError, AttributeError):
+                    roots_q = []
+                    if e <= 10 and q < 2000000:
+                        for x in range(q):
+                            if power_mod(x, e, q) == cq:
+                                roots_q.append(Fq(x))
+                if not roots_q:
+                    if e == 2 and q % 4 == 3:
+                        r = cq ** ((q + 1) // 4)
+                        if r**2 == cq:
+                            roots_q = [r, -r]
+            found_valid = False
+            for rp in roots_p:
+                for rq in roots_q:
+                    m = crt([Integer(rp), Integer(rq)], [p, q])
+                    out.append(f"m = {m}")
+                    v = power_mod(m, e, n)
+                    ok = v == c
+                    if ok:
+                        found_valid = True
+            if found_valid:
+                out.append("")
+                out.append("NON_COPRIME_EXP=SUCCESS")
+            else:
+                out.append("")
+                out.append("NON_COPRIME_EXP=FAILED")`}),proof:`\\textbf{Theorem:} When $\\gcd(e, \\varphi(n)) > 1$, the ciphertext $c = m^e \\bmod n$ has multiple preimages. All are recovered by finding e-th roots modulo $p$ and $q$ separately, then CRT-combining.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2863,7 +2871,7 @@ print("HOMOMORPHIC_FORGERY=FAILED")`:L({token:`HOMOMORPHIC_FORGERY`,useGuard:!1,
                 out.append("")
                 out.append("HOMOMORPHIC_FORGERY=FAILED")
         else:
-            out.append("HOMOMORPHIC_FORGERY=FAILED")`}),frontendCheck:(e,t)=>{if(!e.n||!e.e||!e.target_m||!e.oracle_pairs)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=BigInt(e.target_m),a=e.oracle_pairs.split(`;`).map(e=>e.trim()).filter(e=>e.length>0).map(e=>{let[t,n]=e.split(`,`).map(e=>BigInt(e.trim()));return[t,n]});if(a.length===0)return Promise.resolve(null);for(let[e,t]of a)if(P(t,r,n)!==e)return Promise.resolve(null);if(a.length>30)return Promise.resolve(null);let o=Math.floor(a.length/2),s=a.slice(0,o),c=a.slice(o),l=new Map,u=1<<c.length;for(let e=1;e<u;e++){t&&e%500==0&&t(Math.round(e*50/u),`right mask ${e} / ${u}`);let r=1n,i=1n;for(let t=0;t<c.length;t++)e&1<<t&&(r=r*c[t][0]%n,i=i*c[t][1]%n);let a=r.toString();l.has(a)||l.set(a,[]),l.get(a).push({m:r,s:i})}let d=i%n,f=1<<s.length;for(let a=1;a<f;a++){t&&a%500==0&&t(50+Math.round(a*50/f),`left mask ${a} / ${f}`);let o=1n,c=1n;for(let e=0;e<s.length;e++)a&1<<e&&(o=o*s[e][0]%n,c=c*s[e][1]%n);let u=N(o,n);if(u===null)continue;let p=d*u%n,m=l.get(p.toString());if(m)for(let a of m){let s=o*a.m%n,l=c*a.s%n;if(s===d)return t?.(100),Promise.resolve(`Homomorphic Forgery\nn = ${n}\ne = ${r}\ntarget_m = ${i}\noracle_pairs = ${e.oracle_pairs}\n\nResults:\ns = ${l}\n\nVerification: s^e mod n = ${P(l,r,n)}\n\nHOMOMORPHIC_FORGERY=SUCCESS`)}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Textbook RSA signatures are multiplicatively homomorphic: the product of signatures signs the product of messages.
+            out.append("HOMOMORPHIC_FORGERY=FAILED")`}),frontendCheck:(e,t)=>{if(!e.n||!e.e||!e.target_m||!e.oracle_pairs)return Promise.resolve(null);try{let n=BigInt(e.n),r=BigInt(e.e),i=BigInt(e.target_m),a=e.oracle_pairs.split(`;`).map(e=>e.trim()).filter(e=>e.length>0).map(e=>{let[t,n]=e.split(`,`).map(e=>BigInt(e.trim()));return[t,n]});if(a.length===0)return Promise.resolve(null);for(let[e,t]of a)if(P(t,r,n)!==e)return Promise.resolve(null);if(a.length>30)return Promise.resolve(null);let o=Math.floor(a.length/2),s=a.slice(0,o),c=a.slice(o),l=new Map,u=1<<c.length;for(let e=1;e<u;e++){t&&e%500==0&&t(Math.round(e*50/u),`right mask ${e} / ${u}`);let r=1n,i=1n;for(let t=0;t<c.length;t++)e&1<<t&&(r=r*c[t][0]%n,i=i*c[t][1]%n);let a=r.toString();l.has(a)||l.set(a,[]),l.get(a).push({m:r,s:i})}let d=i%n,f=1<<s.length;for(let a=0;a<f;a++){t&&a%500==0&&t(50+Math.round(a*50/f),`left mask ${a} / ${f}`);let o=1n,c=1n;for(let e=0;e<s.length;e++)a&1<<e&&(o=o*s[e][0]%n,c=c*s[e][1]%n);let u=N(o,n);if(u===null)continue;let p=d*u%n,m=l.get(p.toString());if(m)for(let a of m){let s=o*a.m%n,l=c*a.s%n;if(s===d)return t?.(100),Promise.resolve(`Homomorphic Forgery\nn = ${n}\ne = ${r}\ntarget_m = ${i}\noracle_pairs = ${e.oracle_pairs}\n\nResults:\ns = ${l}\n\nVerification: s^e mod n = ${P(l,r,n)}\n\nHOMOMORPHIC_FORGERY=SUCCESS`)}}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Textbook RSA signatures are multiplicatively homomorphic: the product of signatures signs the product of messages.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -3191,7 +3199,7 @@ Tip: s=1 always returns 1 (the original ciphertext has valid padding). You need 
 
 \\textbf{Proof:}
 \\begin{align*}
-\\mathcal{O}(c) = 1 &\\iff m < B = n/256 \\\\
+\\mathcal{O}(c) = 1 &\\iff m \\ge B = n/256 \\\\
 \\mathcal{O}(c \\cdot s^e) = 1 &\\implies m \\cdot s - rn < B \\quad \\text{for some } r \\\\
 m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{rn+B}{s} \\right) \\\\
 \\text{Step 1: } &\\text{Find } f_1 = 2^t \\text{ with } \\mathcal{O}(c \\cdot f_1^e) = 1 \\\\
