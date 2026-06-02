@@ -57,15 +57,10 @@ export const attack: Attack = {
                                 found = True
                                 break
             if not found:
-                # Phase 2: Boneh-Durfee lattice attack (Herrmann-May simplification)
+                # Phase 2: Boneh-Durfee lattice attack with auto-escalation
                 A = (n + 1) // 2
                 delta = 0.260
-                m = 3
-                t = int((1 - 2 * delta) * m)
-                if t < 0:
-                    t = 0
-                XX = Integer(floor(RR(n) ** delta))
-                YY = isqrt(n) + 1
+                escalation = [(3, 1), (4, 1), (4, 2), (5, 2), (6, 2), (7, 3), (8, 3)]
                 P = PolynomialRing(ZZ, 'x, y')
                 x, y = P.gens()
                 f = 1 + x * (A + y)
@@ -73,40 +68,53 @@ export const attack: Attack = {
                 u, x, y = PR.gens()
                 Q = PR.quotient(x * y + 1 - u)
                 fZ = Q(f).lift()
-                UU = XX * YY + 1
-                gg = []
-                for kk in range(m + 1):
-                    for ii in range(m - kk + 1):
-                        gg.append(x ** ii * e ** (m - kk) * fZ(u, x, y) ** kk)
-                gg.sort()
-                monomials = []
-                for poly in gg:
-                    for mon in poly.monomials():
-                        if mon not in monomials:
-                            monomials.append(mon)
-                monomials.sort()
-                if t > 0:
-                    for jj in range(1, t + 1):
-                        for kk in range((m // t) * jj, m + 1):
-                            gg.append(Q(y ** jj * fZ(u, x, y) ** kk * e ** (m - kk)).lift())
-                            monomials.append(u ** kk * y ** jj)
-                nn = len(monomials)
-                BB = Matrix(ZZ, nn)
-                for ii in range(nn):
-                    BB[ii, 0] = gg[ii](0, 0, 0)
-                    for jj in range(1, ii + 1):
-                        if monomials[jj] in gg[ii].monomials():
-                            BB[ii, jj] = gg[ii].monomial_coefficient(monomials[jj]) * monomials[jj](UU, XX, YY)
-                if BB.det() == 0:
-                    out.append("BONEH_DURFEE=FAILED: singular lattice")
-                else:
-                    BB = BB.LLL()
-                    # Use Sage's native polynomial resultant (replaces slow sympy)
+                for m_val, t_val in escalation:
+                    if found:
+                        break
+                    out.append(f"BONEH_DURFEE: trying m={m_val}, t={t_val}...")
+                    YY = isqrt(n) + 1
+                    XX = Integer(floor(RR(2 * n^delta)))
+                    UU = XX * YY + 1
+                    # Build x-shifts
+                    gg = []
+                    for kk in range(m_val + 1):
+                        for ii in range(m_val - kk + 1):
+                            gg.append(x**ii * e**(m_val - kk) * fZ(u, x, y)**kk)
+                    monomials = list(dict.fromkeys(m for g in gg for m in g.monomials()))
+                    monomials.sort()
+                    if t_val > 0:
+                        for jj in range(1, t_val + 1):
+                            start_k = (m_val // t_val) * jj
+                            for kk in range(start_k, m_val + 1):
+                                shifted = Q(y**jj * fZ(u, x, y)**kk * e**(m_val - kk)).lift()
+                                gg.append(shifted)
+                                for m_sh in shifted.monomials():
+                                    if m_sh not in monomials:
+                                        monomials.append(m_sh)
+                        monomials.sort()
+                    nn = len(monomials)
+                    if nn == 0:
+                        continue
+                    BB = Matrix(ZZ, nn)
+                    for ii in range(nn):
+                        BB[ii, 0] = gg[ii](0, 0, 0)
+                        for jj in range(1, ii + 1):
+                            if monomials[jj] in gg[ii].monomials():
+                                BB[ii, jj] = gg[ii].monomial_coefficient(monomials[jj]) * monomials[jj](UU, XX, YY)
+                    # Singular check + determinant bound
+                    if BB.det() == 0:
+                        continue
+                    if BB.det() >= e**(m_val * nn):
+                        continue
+                    try:
+                        BB = BB.LLL()
+                    except Exception:
+                        continue
+                    # Use Sage's native polynomial resultant
                     S = PolynomialRing(QQ, 'w, z')
                     w_var, z_var = S.gens()
                     def mon_to_sage(mon):
                         exp_vec = mon.exponents()[0]
-                        # mon = u^a * x^b * y^c, substitute u=w*z+1, x=w, y=z
                         a, b, c = exp_vec
                         return (w_var*z_var + 1)**a * w_var**b * z_var**c
                     mon_sage = [mon_to_sage(m) for m in monomials]
@@ -143,7 +151,7 @@ export const attack: Attack = {
                                         d_val = (1 + x0_int * (A + y0_int)) // e
                                         if d_val > 0:
                                             p_plus_q = -2 * y0_int
-                                            disc2 = p_plus_q ** 2 - 4 * n
+                                            disc2 = p_plus_q**2 - 4 * n
                                             if disc2 > 0 and disc2.is_square():
                                                 sqrt_disc2 = isqrt(disc2)
                                                 p_val = ZZ((p_plus_q + sqrt_disc2) // 2)
@@ -165,10 +173,7 @@ export const attack: Attack = {
                     if found2:
                         out.append("BONEH_DURFEE=SUCCESS")
                         found = True
-                    else:
-                        out.append("Results:")
-                        out.append("")
-                        out.append("BONEH_DURFEE=FAILED")
+                        break
         if not found:
             out.append("BONEH_DURFEE=FAILED")\`,
     useGuard: true,
