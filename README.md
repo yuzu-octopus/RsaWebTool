@@ -13,7 +13,8 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 - **3 concurrent Web Workers** — parallel frontendCheck execution across attacks
 - **SageMathCell integration** — 3 concurrent slots with 30s stall detection and immediate error element reporting
 - **FactorDB lookup** — auto-queries FactorDB and auto-submits discovered factorizations
-- **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution (3 concurrent) with early-stop
+- **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution (3 concurrent) with early-stop. handleCrack extracted into focused phases (frontendCheck execution, success surfacing, SageCell orchestration)
+- **Console Environment** — `window.env` exposes all config (workers, timeouts, FactorDB proxy) with localStorage persistence; `env.reset()` clears all stored state
 - **RSA Calculator** — standalone key generation, encryption, decryption (pure BigInt). 3-tab interface with merged form state. e defaults to 65537; Decrypt accepts any 2 of (p, q, n) with auto-derivation
 - **Format Converter** — live Hex / Decimal / Base64 / Text conversion
 - **Attack Index** — searchable catalog of all 47 attack proofs with KaTeX rendering
