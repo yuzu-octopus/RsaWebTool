@@ -97,7 +97,7 @@ _attack()\`);
  * @param token The attack token for SUCCESS/FAILED markers (e.g., "SMALL_FRACTION")
  * @param indent Python indentation level for the guard block (default 8 spaces)
  */
-export function sageGuardBlock(token: string, indent = '        '): string {
+function sageGuardBlock(token: string, indent = '        '): string {
   const inner = \`\${indent}    \`;
   return \`\${indent}if n < 2:
 \${inner}print(f"n = {n} is too small to factor")

@@ -17,7 +17,8 @@
     "test:attacks": "bun scripts/test-attacks.ts",
     "test:attacks:fail": "bun scripts/test-attacks.ts -- --fail",
     "test:attacks:json": "bun scripts/test-attacks.ts -- --json",
-    "test:attacks:sage": "bun scripts/test-sage-docker.ts"
+    "test:attacks:sage": "bun scripts/test-sage-docker.ts",
+    "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -44,6 +45,7 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
     "playwright": "^1.60.0",
+    "react-doctor": "^0.2.16",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.59.4",
     "vite": "^8.0.14"
