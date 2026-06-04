@@ -308,12 +308,33 @@ export function MagicPanel() {
   const testcaseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timer = useTimer();
   const { runAttack, cancelCurrentRun } = useWorkerPool();
+  const [displayedPct, setDisplayedPct] = useState(0);
+  const displayedPctRef = useRef(0);
 
   useEffect(() => {
     return () => {
       if (testcaseTimerRef.current) clearTimeout(testcaseTimerRef.current);
     };
   }, []);
+
+  // Smooth progress catch-up: displayed progress lags behind actual
+  useEffect(() => {
+    const actualPct = jobs.length > 0 ? (jobs.filter(j => j.status !== 'running').length / jobs.length) * 100 : 0;
+    if (actualPct !== displayedPctRef.current) {
+      const rafId = requestAnimationFrame(() => {
+        const current = displayedPctRef.current;
+        const diff = actualPct - current;
+        if (Math.abs(diff) < 1) {
+          displayedPctRef.current = actualPct;
+          setDisplayedPct(actualPct);
+        } else {
+          displayedPctRef.current = current + (diff > 0 ? Math.max(1, Math.ceil(diff / 3)) : Math.min(-1, Math.floor(diff / 3)));
+          setDisplayedPct(displayedPctRef.current);
+        }
+      });
+      return () => cancelAnimationFrame(rafId);
+    }
+  }, [jobs]);
 
   // Compute raw params once, share between applicablePreview and extractedParams
   const paramsFromInput = useMemo(() => {
@@ -538,6 +559,8 @@ export function MagicPanel() {
     setJobs([]);
     setOutputResult(null);
     setOutputError(null);
+    setDisplayedPct(0);
+    displayedPctRef.current = 0;
     dispatchExec({ type: 'SET_ERROR_INSIGHTS', insights: null });
 
     const params = paramsFromInput ?? {};
@@ -736,7 +759,7 @@ export function MagicPanel() {
             <Box sx={{ mt: 2, width: '100%' }}>
               <LinearProgress
                 variant="determinate"
-                value={jobs.length > 0 ? (jobs.filter(j => j.status !== 'running').length / jobs.length) * 100 : 0}
+                value={displayedPct}
                 sx={{
                   height: 6,
                   borderRadius: 3,

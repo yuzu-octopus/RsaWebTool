@@ -13,7 +13,7 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 - **3 concurrent Web Workers** — parallel frontendCheck execution across attacks
 - **SageMathCell integration** — 3 concurrent slots with 30s stall detection and immediate error element reporting
 - **FactorDB lookup** — auto-queries FactorDB and auto-submits discovered factorizations
-- **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution (3 concurrent) with early-stop. handleCrack extracted into focused phases (frontendCheck execution, success surfacing, SageCell orchestration)
+- **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution (3 concurrent) with early-stop on first true success (FactorDB non-FF results don't trigger early-stop)
 - **Console Environment** — `window.env` exposes all config (workers, timeouts, FactorDB proxy) with localStorage persistence; `env.reset()` clears all stored state
 - **RSA Calculator** — standalone key generation, encryption, decryption (pure BigInt). 3-tab interface with merged form state. e defaults to 65537; Decrypt accepts any 2 of (p, q, n) with auto-derivation
 - **Format Converter** — live Hex / Decimal / Base64 / Text conversion
@@ -23,7 +23,7 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 - **Command Palette** — ⌘/Ctrl+K fuzzy search across all 47 attacks + views
 - **Keyboard Shortcuts** — ⌘Enter (run), ⌘1/2/3 (tabs), ⌘Shift+C (copy), Tab/Shift+Tab (cycle attacks)
 - **PEM Decryptor** — Parse and decrypt PKCS#1/PKCS#8/encrypted PEM keys, feed params to Calculator or Attacks
-- **Instructions** — Collapsible reference guide for using the tool
+- **Instructions** — Reference guide for using the tool
 - **Console Configuration** — `env` object exposed on `window` for runtime config (proxy URL, worker pool, timeouts). Persisted to localStorage, `env.reset()` clears all stored data.
 - **Dracula theme** — dark, developer-friendly UI
 - **Prismjs syntax highlighting** — replaces react-syntax-highlighter, 33% smaller bundle (1.22MB)
@@ -145,7 +145,7 @@ TOKEN=SUCCESS
 METHOD=TYPESCRIPT
 ```
 
-The `METHOD=` line indicates whether the result came from the browser (`TYPESCRIPT`) or SageMathCell (`SAGEMATHCELL`). `TOKEN=` is one of `SUCCESS`, `PARTIAL`, or `FAILURE`.
+The `METHOD=` line indicates whether the result came from the browser (`TYPESCRIPT`) or SageMathCell (`SAGEMATHCELL`). Tokens: `=SUCCESS` (fully recovered), `=RESULT` (FactorDB query returned non-FF status), `=FAILED` (attack did not recover).
 
 ### RSA Calculator
 Standalone BigInt operations: key generation, encryption, and decryption. Smart defaults: `e` defaults to 65537 in Key Gen and Encrypt when left empty. Decrypt accepts any 2 of (p, q, n) and auto-derives the third.

@@ -57,7 +57,7 @@ export const attack: Attack = {
       }
 
       lines.push(\`\`);
-      lines.push(\`FACTORDB_LOOKUP=SUCCESS\`);
+      lines.push(result.status === 'FF' ? 'FACTORDB_LOOKUP=SUCCESS' : 'FACTORDB_LOOKUP=RESULT');
 
       return lines.join('\\n');
     } catch (e) {
