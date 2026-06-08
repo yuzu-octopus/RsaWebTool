@@ -101,20 +101,20 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                                 C = (3 * ai * bi * bi) % ni
                                 D = (bi * bi * bi - c_int[i]) % ni
                                 coeffs.append((ni, A, B, C, D))
-                        limit = 5 * 10**5
-                        for m_candidate in range(limit):
-                            ok = True
-                            for ni, A, B, C, D in coeffs:
-                                val = (A * m_candidate + B) % ni
-                                val = (val * m_candidate + C) % ni
-                                val = (val * m_candidate + D) % ni
-                                if val != 0:
-                                    ok = False
+                            limit = 5 * 10**5
+                            for m_candidate in range(limit):
+                                ok = True
+                                for ni, A, B, C, D in coeffs:
+                                    val = (A * m_candidate + B) % ni
+                                    val = (val * m_candidate + C) % ni
+                                    val = (val * m_candidate + D) % ni
+                                    if val != 0:
+                                        ok = False
+                                        break
+                                if ok:
+                                    found_m = m_candidate
+                                    out.append(f"m = {found_m}")
                                     break
-                            if ok:
-                                found_m = m_candidate
-                                out.append(f"m = {found_m}")
-                                break
                 if found_m is not None:
                     m = Integer(found_m)
                     out.append("")

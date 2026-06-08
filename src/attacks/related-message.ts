@@ -179,9 +179,10 @@ export const attack: Attack = {
       const workC2 = c2;
       let workA = a2;
       let workB = b2;
+      let invA1: bigint | null = null;
 
       if (a1 !== 1n || b1 !== 0n) {
-        const invA1 = modInverse(a1, n);
+        invA1 = modInverse(a1, n);
         if (invA1 === null) {
           // a1 shares factor with n - factor found!
           const g = gcd(a1, n);
@@ -214,10 +215,11 @@ export const attack: Attack = {
         const invB = modInverse(B, n);
         if (invB === null) return Promise.resolve(null);
         const m = ((-nMod % n) + n) % n * invB % n;
-        if (modPow(m, e, n) === c1 && modPow((a2 * m + b2) % n, e, n) === c2) {
-          const v1 = modPow(m, e, n);
-          const v2 = modPow((a2 * m + b2) % n, e, n);
-          return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na1 = ${a1}\nb1 = ${b1}\na2 = ${a2}\nb2 = ${b2}\n\nResults:\nm = ${m}\n\nVerification: (a1*m+b1)^e mod n = ${v1}, (a2*m+b2)^e mod n = ${v2}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
+        const m_orig = invA1 !== null ? (((invA1 * ((m - b1) % n)) % n + n) % n) : m;
+        if (modPow((a1 * m_orig + b1) % n, e, n) === c1 && modPow((a2 * m_orig + b2) % n, e, n) === c2) {
+          const v1 = modPow((a1 * m_orig + b1) % n, e, n);
+          const v2 = modPow((a2 * m_orig + b2) % n, e, n);
+          return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na1 = ${a1}\nb1 = ${b1}\na2 = ${a2}\nb2 = ${b2}\n\nResults:\nm = ${m_orig}\n\nVerification: (a1*m+b1)^e mod n = ${v1}, (a2*m+b2)^e mod n = ${v2}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
         }
         return Promise.resolve(null);
       }
@@ -231,11 +233,11 @@ export const attack: Attack = {
       const invDenom = modInverse(denom, n);
       if (invDenom === null) return Promise.resolve(null);
       const m = (numer * invDenom) % n;
-
-      if (modPow(m, e, n) === c1 && modPow((a2 * m + b2) % n, e, n) === c2) {
-        const v1 = modPow(m, e, n);
-        const v2 = modPow((a2 * m + b2) % n, e, n);
-        return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na1 = ${a1}\nb1 = ${b1}\na2 = ${a2}\nb2 = ${b2}\n\nResults:\nm = ${m}\n\nVerification: (a1*m+b1)^e mod n = ${v1}, (a2*m+b2)^e mod n = ${v2}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
+      const m_orig = invA1 !== null ? (((invA1 * ((m - b1) % n)) % n + n) % n) : m;
+      if (modPow((a1 * m_orig + b1) % n, e, n) === c1 && modPow((a2 * m_orig + b2) % n, e, n) === c2) {
+        const v1 = modPow((a1 * m_orig + b1) % n, e, n);
+        const v2 = modPow((a2 * m_orig + b2) % n, e, n);
+        return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na1 = ${a1}\nb1 = ${b1}\na2 = ${a2}\nb2 = ${b2}\n\nResults:\nm = ${m_orig}\n\nVerification: (a1*m+b1)^e mod n = ${v1}, (a2*m+b2)^e mod n = ${v2}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }

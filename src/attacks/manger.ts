@@ -57,13 +57,24 @@ export const attack: Attack = {
             B = Integer(2) ** (8 * (k - 1))
             queries_used = [0]
             f1 = Integer(2)
+            max_queries = len(oracle_list)
             while not oracle():
+                if oracle_idx[0] >= max_queries:
+                    out.append("ERROR: Oracle exhausted in Step 1 — no valid response found")
+                    out.append("MANGER=FAILED")
+                    print("\\n".join(out))
+                    quit()
                 queries_used[0] += 1
                 f1 *= 2
             queries_used[0] += 1
             f1_half = f1 // 2
             f2 = floor_div(n + B, B) * f1_half
             while oracle():
+                if oracle_idx[0] >= max_queries:
+                    out.append("ERROR: Oracle exhausted in Step 2 — no valid response found")
+                    out.append("MANGER=FAILED")
+                    print("\\n".join(out))
+                    quit()
                 queries_used[0] += 1
                 f2 += f1_half
             queries_used[0] += 1

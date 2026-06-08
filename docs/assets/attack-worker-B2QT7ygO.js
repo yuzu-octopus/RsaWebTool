@@ -1552,7 +1552,7 @@ n \\bmod (2^k + \\delta) = 0 &\\implies p = 2^k + \\delta,\\; q = n/p \\\\
                     out.append("")
                     out.append(f"Verification: (a1*m+b1)^e mod n = {v1}")
                     out.append("")
-                    out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")`}),frontendCheck:e=>{if(!e.n||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=(e.e||``).trim(),r=n?BigInt(n):65537n,i=BigInt(e.c1),a=BigInt(e.c2),o=(e.a1||``).trim(),s=o?BigInt(o):1n,c=(e.b1||``).trim(),l=c?BigInt(c):0n,u=(e.a2||``).trim(),d=u?BigInt(u):2n,f=(e.b2||``).trim(),p=f?BigInt(f):0n;if(t<2n||r<2n||i<0n||a<0n||r!==3n)return Promise.resolve(null);let m=i,h=a,g=d,_=p;if(s!==1n||l!==0n){let e=N(s,t);if(e===null){let e=A(s,t);if(1n<e&&e<t){let n=e,o=t/e;return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${t}\ne = ${r}\nc1 = ${i}\nc2 = ${a}\na1 = ${s}\nb1 = ${l}\na2 = ${d}\nb2 = ${p}\n\nResults:\np = ${n}\nq = ${o}\n\nVerification: p * q = ${n*o}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`)}return Promise.resolve(null)}g=d*e%t,_=(p-d*e%t*l)%t,_<0n&&(_+=t)}let v=3n*g*g%t*_%t,y=3n*g*_%t*_%t,b=((_*_*_-h+g*g*g%t*m)%t%t+t)%t;if(v===0n&&y===0n)return Promise.resolve(null);if(v===0n){if(y===0n)return Promise.resolve(null);let e=N(y,t);if(e===null)return Promise.resolve(null);let n=(-b%t+t)%t*e%t;if(P(n,r,t)===i&&P((d*n+p)%t,r,t)===a){let e=P(n,r,t),o=P((d*n+p)%t,r,t);return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${t}\ne = ${r}\nc1 = ${i}\nc2 = ${a}\na1 = ${s}\nb1 = ${l}\na2 = ${d}\nb2 = ${p}\n\nResults:\nm = ${n}\n\nVerification: (a1*m+b1)^e mod n = ${e}, (a2*m+b2)^e mod n = ${o}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`)}return Promise.resolve(null)}let x=((v*b-y*y)%t+t)%t,S=((y*b-v*v%t*m)%t+t)%t;if(x===0n)return Promise.resolve(null);let C=N(x,t);if(C===null)return Promise.resolve(null);let w=S*C%t;if(P(w,r,t)===i&&P((d*w+p)%t,r,t)===a){let e=P(w,r,t),n=P((d*w+p)%t,r,t);return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${t}\ne = ${r}\nc1 = ${i}\nc2 = ${a}\na1 = ${s}\nb1 = ${l}\na2 = ${d}\nb2 = ${p}\n\nResults:\nm = ${w}\n\nVerification: (a1*m+b1)^e mod n = ${e}, (a2*m+b2)^e mod n = ${n}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given $c_1 \\equiv (a_1 m + b_1)^e \\pmod{n}$ and $c_2 \\equiv (a_2 m + b_2)^e \\pmod{n}$ with known $a_1, b_1, a_2, b_2$ and $\\gcd(a_1, n) = 1$, recover $m$ by computing $\\gcd((a_1 x + b_1)^e - c_1, (a_2 x + b_2)^e - c_2)$.
+                    out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")`}),frontendCheck:e=>{if(!e.n||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=(e.e||``).trim(),r=n?BigInt(n):65537n,i=BigInt(e.c1),a=BigInt(e.c2),o=(e.a1||``).trim(),s=o?BigInt(o):1n,c=(e.b1||``).trim(),l=c?BigInt(c):0n,u=(e.a2||``).trim(),d=u?BigInt(u):2n,f=(e.b2||``).trim(),p=f?BigInt(f):0n;if(t<2n||r<2n||i<0n||a<0n||r!==3n)return Promise.resolve(null);let m=i,h=a,g=d,_=p,v=null;if(s!==1n||l!==0n){if(v=N(s,t),v===null){let e=A(s,t);if(1n<e&&e<t){let n=e,o=t/e;return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${t}\ne = ${r}\nc1 = ${i}\nc2 = ${a}\na1 = ${s}\nb1 = ${l}\na2 = ${d}\nb2 = ${p}\n\nResults:\np = ${n}\nq = ${o}\n\nVerification: p * q = ${n*o}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`)}return Promise.resolve(null)}g=d*v%t,_=(p-d*v%t*l)%t,_<0n&&(_+=t)}let y=3n*g*g%t*_%t,b=3n*g*_%t*_%t,x=((_*_*_-h+g*g*g%t*m)%t%t+t)%t;if(y===0n&&b===0n)return Promise.resolve(null);if(y===0n){if(b===0n)return Promise.resolve(null);let e=N(b,t);if(e===null)return Promise.resolve(null);let n=(-x%t+t)%t*e%t,o=v===null?n:(v*((n-l)%t)%t+t)%t;if(P((s*o+l)%t,r,t)===i&&P((d*o+p)%t,r,t)===a){let e=P((s*o+l)%t,r,t),n=P((d*o+p)%t,r,t);return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${t}\ne = ${r}\nc1 = ${i}\nc2 = ${a}\na1 = ${s}\nb1 = ${l}\na2 = ${d}\nb2 = ${p}\n\nResults:\nm = ${o}\n\nVerification: (a1*m+b1)^e mod n = ${e}, (a2*m+b2)^e mod n = ${n}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`)}return Promise.resolve(null)}let S=((y*x-b*b)%t+t)%t,C=((b*x-y*y%t*m)%t+t)%t;if(S===0n)return Promise.resolve(null);let w=N(S,t);if(w===null)return Promise.resolve(null);let T=C*w%t,E=v===null?T:(v*((T-l)%t)%t+t)%t;if(P((s*E+l)%t,r,t)===i&&P((d*E+p)%t,r,t)===a){let e=P((s*E+l)%t,r,t),n=P((d*E+p)%t,r,t);return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${t}\ne = ${r}\nc1 = ${i}\nc2 = ${a}\na1 = ${s}\nb1 = ${l}\na2 = ${d}\nb2 = ${p}\n\nResults:\nm = ${E}\n\nVerification: (a1*m+b1)^e mod n = ${e}, (a2*m+b2)^e mod n = ${n}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given $c_1 \\equiv (a_1 m + b_1)^e \\pmod{n}$ and $c_2 \\equiv (a_2 m + b_2)^e \\pmod{n}$ with known $a_1, b_1, a_2, b_2$ and $\\gcd(a_1, n) = 1$, recover $m$ by computing $\\gcd((a_1 x + b_1)^e - c_1, (a_2 x + b_2)^e - c_2)$.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2465,20 +2465,20 @@ print("HASTAD_LINEAR_PAD=FAILED")`:L({token:`HASTAD_LINEAR_PAD`,useGuard:!1,body
                                 C = (3 * ai * bi * bi) % ni
                                 D = (bi * bi * bi - c_int[i]) % ni
                                 coeffs.append((ni, A, B, C, D))
-                        limit = 5 * 10**5
-                        for m_candidate in range(limit):
-                            ok = True
-                            for ni, A, B, C, D in coeffs:
-                                val = (A * m_candidate + B) % ni
-                                val = (val * m_candidate + C) % ni
-                                val = (val * m_candidate + D) % ni
-                                if val != 0:
-                                    ok = False
+                            limit = 5 * 10**5
+                            for m_candidate in range(limit):
+                                ok = True
+                                for ni, A, B, C, D in coeffs:
+                                    val = (A * m_candidate + B) % ni
+                                    val = (val * m_candidate + C) % ni
+                                    val = (val * m_candidate + D) % ni
+                                    if val != 0:
+                                        ok = False
+                                        break
+                                if ok:
+                                    found_m = m_candidate
+                                    out.append(f"m = {found_m}")
                                     break
-                            if ok:
-                                found_m = m_candidate
-                                out.append(f"m = {found_m}")
-                                break
                 if found_m is not None:
                     m = Integer(found_m)
                     out.append("")
@@ -3158,13 +3158,24 @@ Tip: s=1 always returns 1 (the original ciphertext has valid padding). You need 
             B = Integer(2) ** (8 * (k - 1))
             queries_used = [0]
             f1 = Integer(2)
+            max_queries = len(oracle_list)
             while not oracle():
+                if oracle_idx[0] >= max_queries:
+                    out.append("ERROR: Oracle exhausted in Step 1 — no valid response found")
+                    out.append("MANGER=FAILED")
+                    print("\\n".join(out))
+                    quit()
                 queries_used[0] += 1
                 f1 *= 2
             queries_used[0] += 1
             f1_half = f1 // 2
             f2 = floor_div(n + B, B) * f1_half
             while oracle():
+                if oracle_idx[0] >= max_queries:
+                    out.append("ERROR: Oracle exhausted in Step 2 — no valid response found")
+                    out.append("MANGER=FAILED")
+                    print("\\n".join(out))
+                    quit()
                 queries_used[0] += 1
                 f2 += f1_half
             queries_used[0] += 1
@@ -3526,10 +3537,15 @@ p &= M \\cdot k_1 + r_1 \\qed
         out.append(f"base = {base}")
         out.append("")
         out.append("Results:")
-        # Use a single well-chosen M (product of first 16 primes ≈ 2^53)
-        # This keeps Coppersmith fast while covering typical Nitros/ROCA primes
-        primes_subset = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53]
-        M = prod(primes_subset)
+        # Dynamically select primes so M > n^(1/4) (Coppersmith condition for β=0.5)
+        # For 512-bit n: need M > 2^128 (~first 25 primes), 1024-bit: need M > 2^256 (~first 50 primes)
+        all_primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229]
+        target_bits = ceil(n.nbits() / 4)
+        M = Integer(1)
+        for p in all_primes:
+            M *= p
+            if M.nbits() > target_bits:
+                break
         if gcd(base, M) != 1:
             out.append("NITROS=FAILED")
         else:
@@ -3545,7 +3561,7 @@ p &= M \\cdot k_1 + r_1 \\qed
                 # Build the set of all possible remainders {base^i mod M}
                 r_set = set()
                 r_cur = Integer(1)
-                MAX_SET = 10000
+                MAX_SET = min(ord_val, 50000)
                 for _ in range(min(ord_val, MAX_SET)):
                     r_set.add(r_cur)
                     r_cur = ZZ(Mod(r_cur * base, M))
@@ -3566,7 +3582,7 @@ p &= M \\cdot k_1 + r_1 \\qed
                         continue
                 out.append(f"Found {len(candidates)} candidate remainder(s)")
                 # Coppersmith path (fast lattice reduction)
-                bound = min(int(ceil(Integer(isqrt(n)) / M)), 100000)
+                bound = int(ceil(Integer(isqrt(n)) / M))
                 factored = False
                 MAX_COPPER = min(len(candidates), 15)
                 try:
@@ -3633,7 +3649,7 @@ f(x) &= Mx + r_1 \\equiv 0 \\pmod{p} \\quad\\text{with root } x = k_1 \\\\
 \\text{Coppersmith (} \\beta = 0.5, X = \\sqrt{n}/M \\text{)} &\\implies p = M \\cdot k_1 + r_1 \\qed
 \\end{align*}
 
-\\textbf{Explanation:} The Nitros attack extends ROCA to arbitrary generator bases. Instead of $65537$, any base $a$ can generate the remainder set. The key insight is that the subgroup generated by $a$ modulo $M$ has size $\\text{ord}_M(a)$, and this is typically small enough to enumerate. To test if $n$ is vulnerable, compute $n^{\\text{ord}_M(a)} \\bmod M$ -- if the result is 1, $n$ is in the subgroup and the primes are Nitros-form. The recovery then proceeds identically to ROCA: use Coppersmith to find $k_1$, the small root of $f(x) = Mx + r_1$ modulo $p$. However, this implementation uses a fixed $M$ (product of first 16 primes, $\\approx 2^{65}$). For $n > 256$-bit, the Coppersmith bound is capped at $100000$, so only keys with very small $k$ values ($< 2^{17}$) can be factored.
+\\textbf{Explanation:} The Nitros attack extends ROCA to arbitrary generator bases. Instead of $65537$, any base $a$ can generate the remainder set. The key insight is that the subgroup generated by $a$ modulo $M$ has size $\\text{ord}_M(a)$, and this is typically small enough to enumerate. To test if $n$ is vulnerable, compute $n^{\\text{ord}_M(a)} \\bmod M$ -- if the result is 1, $n$ is in the subgroup and the primes are Nitros-form. The recovery then proceeds identically to ROCA: use Coppersmith to find $k_1$, the small root of $f(x) = Mx + r_1$ modulo $p$. This implementation dynamically selects primes to ensure $M > n^{1/4}$ (the Coppersmith condition for $\\beta = 0.5$), making the attack work for any realistic key size.
 
 \\textbf{References:} M. Nemec et al., "The Return of Coppersmith's Attack", CCS 2017; Nitros ROCA variant analysis, 2018`,priority:`medium`,applicableCheck:e=>!!e.n},Te={FF:`Fully factored — all prime factors known`,CF:`Composite, factors known — partially factored, not all factors are prime`,CC:`Composite, composite factors — factors known but contain composites`,CP:`Composite, partially factored — some factors found`,C:`Composite, no factors known — confirmed composite but unfactored`,P:`Definitely prime — n is proven prime, not a valid RSA modulus`,Prp:`Probably prime — strong probable prime, not a valid RSA modulus`,U:`Unknown — status undetermined`,Unit:`Unit — the number is 1`,N:`Not in database — not yet queried`,"*":`Added to database during this request`},Q=[ee,te,ne,re,ie,z,B,V,W,G,K,q,J,Y,{id:`euler`,name:`Euler Factorization`,category:`Factorization`,description:`Factors n by finding two distinct representations as a sum of squares a^2+b^2 = c^2+d^2 = n. Use when both primes are ≡ 1 (mod 4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>L({token:`EULER`,n:e.n,imports:[`import math`],body:`        n_int = int(n)
         out.append("Euler Factorization")
