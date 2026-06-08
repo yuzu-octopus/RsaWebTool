@@ -1,5 +1,5 @@
 var e=`import type { Attack } from '../types';
-import { isPrimeMR, generateKeyPair } from '../utils/testcases/core';
+import { isPrimeMR } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
 
@@ -53,28 +53,50 @@ export const attack: Attack = {
             if pow(Integer(n_mod), ord_val, Integer(M)) != 1:
                 out.append("NITROS=FAILED")
             else:
-                # Build the set of all possible remainders {base^i mod M}
-                r_set = set()
-                r_cur = Integer(1)
-                MAX_SET = min(ord_val, 50000)
-                for _ in range(min(ord_val, MAX_SET)):
-                    r_set.add(r_cur)
-                    r_cur = ZZ(Mod(r_cur * base, M))
-                # Find candidate remainder pairs (r1, r2) where r1*r2 ≡ n mod M
-                candidates = set()
-                candidates.add(Integer(1))
-                candidates.add(Integer(n_mod % M))
-                for r1 in list(r_set):
-                    if len(candidates) >= 20:
-                        break
-                    if r1 in candidates:
-                        continue
-                    try:
-                        r2 = (Integer(n_mod) * inverse_mod(ZZ(r1), Integer(M))) % Integer(M)
-                        if r2 in r_set:
-                            candidates.add(ZZ(r1))
-                    except (ZeroDivisionError, TypeError, ValueError, ArithmeticError):
-                        continue
+                # Use discrete_log to find remainder pairs without full enumeration
+                try:
+                    i = ZZ(Mod(n_mod, M).log(base))
+                    candidates = set()
+                    candidates.add(Integer(1))
+                    candidates.add(Integer(n_mod % M))
+                    r_cur = Integer(1)
+                    for j in range(min(ord_val, 20000)):
+                        if len(candidates) >= 20:
+                            break
+                        if r_cur in candidates:
+                            r_cur = ZZ(Mod(r_cur * base, M))
+                            continue
+                        # r2 = base^((i-j) mod ord_val), guaranteed in subgroup
+                        r2 = ZZ(Mod(base, M) ** ((i - j) % ord_val))
+                        candidates.add(ZZ(r_cur))
+                        r_cur = ZZ(Mod(r_cur * base, M))
+                except (TypeError, ValueError, ArithmeticError):
+                    # Fallback: enumerate for small ord_val
+                    MAX_SET = min(ord_val, 200000)
+                    if ord_val <= MAX_SET:
+                        candidates = set()
+                        candidates.add(Integer(1))
+                        candidates.add(Integer(n_mod % M))
+                        r_set = set()
+                        r_cur = Integer(1)
+                        for _ in range(ord_val):
+                            r_set.add(r_cur)
+                            r_cur = ZZ(Mod(r_cur * base, M))
+                        for r1 in list(r_set):
+                            if len(candidates) >= 20:
+                                break
+                            if r1 in candidates:
+                                continue
+                            try:
+                                r2 = (Integer(n_mod) * inverse_mod(ZZ(r1), Integer(M))) % Integer(M)
+                                if r2 in r_set:
+                                    candidates.add(ZZ(r1))
+                            except (ZeroDivisionError, TypeError, ValueError, ArithmeticError):
+                                continue
+                    else:
+                        out.append("NITROS=FAILED - discrete_log not available, order too large")
+                        found = True
+                        candidates = set()
                 out.append(f"Found {len(candidates)} candidate remainder(s)")
                 # Coppersmith path (fast lattice reduction)
                 bound = int(ceil(Integer(isqrt(n)) / M))
@@ -166,12 +188,12 @@ export const generateTestcase = (): Record<string, string> => {
   // The template always finds the smaller k (tries both remainders).
   const kBits = 12;
   const kMax = (1n << BigInt(kBits)) - 1n;
-  // Use r1=base^0=1 so the template's remainder list contains
-  // r1=1 = p's actual remainder. This avoids the combinatorial
-  // explosion of trying 8M+ remainder pairs.
-  const r1 = 1n;
+  // Randomize r1 like r2, but use disjoint exponent ranges so
+  // r1 != r2 (remainders are distinct), making the test realistic.
+  const i1 = BigInt(Math.floor(Math.random() * 10)); // 0..9
+  const r1 = modPow(base, i1, M);
   for (let attempt = 0; attempt < 10000; attempt++) {
-    const i2 = BigInt(Math.floor(Math.random() * 10000));
+    const i2 = BigInt(Math.floor(Math.random() * 10) + 10); // 10..19
     const r2 = modPow(base, i2, M);
     const k1 = BigInt(Math.floor(Math.random() * Number(kMax))) + 1n;
     const k2 = BigInt(Math.floor(Math.random() * Number(kMax))) + 1n;
@@ -182,8 +204,6 @@ export const generateTestcase = (): Record<string, string> => {
       return { n: (p * q).toString(), base: base.toString() };
     }
   }
-  // Fallback: use regular random RSA keypair
-  const pair = generateKeyPair(64, 64);
-  return { n: pair.n.toString(), base: base.toString() };
+  throw new Error("Failed to generate Nitros-vulnerable test key after 10000 attempts. Increase kBits or check parameters.");
 };
 `;export{e as default};

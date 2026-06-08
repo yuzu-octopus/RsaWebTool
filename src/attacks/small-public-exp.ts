@@ -36,14 +36,16 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
         # Modular residue pre-filter for e-th powers
         if e <= 100:
             p = Integer(e + 1)
-            while (p - 1) % e != 0 and p < 50000:
+            while True:
+                if p >= 50000:
+                    filter_mod = 0
+                    residues = set()
+                    break
+                if is_prime(p) and (p - 1) % e == 0:
+                    filter_mod = p
+                    residues = set(pow(x, e, filter_mod) for x in range(int(p)))
+                    break
                 p = next_prime(p + 1)
-            if (p - 1) % e == 0 and p < 50000:
-                filter_mod = p
-                residues = set(pow(x, e, filter_mod) for x in range(int(p)))
-            else:
-                filter_mod = 0
-                residues = set()
         else:
             filter_mod = 0
             residues = set()
@@ -94,7 +96,7 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
       // Perfect cubes mod 9 are only {0, 1, 8} — filters 67% of non-cubes
       filterMod = 9n;
       residues = new Set([0n, 1n, 8n]);
-    } else if (e <= 17n) {
+    } else if (e <= 100n) {
       // For other small e, find a prime p where e | (p-1) for residue filtering
       for (let p = 2n * e + 1n; p < 1000n; p += 2n) {
         if (p % 3n === 0n || p % 5n === 0n || p % 7n === 0n || p % 11n === 0n || p % 13n === 0n) continue;

@@ -274,10 +274,14 @@ export const generateTestcase = (): Record<string, string> => {
   const e = 3n;
   const { n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q, e);
   const m = BigInt(Math.floor(Math.random() * 10000) + 42);
-  const a1 = BigInt(Math.floor(Math.random() * 5) + 1);  // 1-5
-  const b1 = BigInt(Math.floor(Math.random() * 5));       // 0-4
-  const a2 = BigInt(Math.floor(Math.random() * 5) + 1);  // 1-5
-  const b2 = BigInt(Math.floor(Math.random() * 5));       // 0-4
+  let a1: bigint, b1: bigint, a2: bigint, b2: bigint;
+  // Ensure (a1,b1) ≠ (a2,b2) — identical transforms make the attack fail (same polynomial)
+  do {
+    a1 = BigInt(Math.floor(Math.random() * 5) + 1);  // 1-5
+    b1 = BigInt(Math.floor(Math.random() * 5));       // 0-4
+    a2 = BigInt(Math.floor(Math.random() * 5) + 1);  // 1-5
+    b2 = BigInt(Math.floor(Math.random() * 5));       // 0-4
+  } while (a1 === a2 && b1 === b2);
   const am1_b1 = (a1 * m + b1) % n;
   const am2_b2 = (a2 * m + b2) % n;
   return {

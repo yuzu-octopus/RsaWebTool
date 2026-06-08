@@ -11,8 +11,8 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
-    { name: 'p', label: 'p (prime factor)', placeholder: 'Enter prime factor p...', multiline: true, rows: 3, required: false, tooltip: 'Known prime factor of n. Required for e-th root disambiguation.' },
-    { name: 'q', label: 'q (prime factor)', placeholder: 'Enter prime factor q...', multiline: true, rows: 3, required: false, tooltip: 'Known prime factor of n. Required for e-th root disambiguation.' },
+    { name: 'p', label: 'p (prime factor)', placeholder: 'Enter prime factor p...', multiline: true, rows: 3, required: true, tooltip: 'Required. Known prime factor of n.' },
+    { name: 'q', label: 'q (prime factor)', placeholder: 'Enter prime factor q...', multiline: true, rows: 3, required: true, tooltip: 'Required. Known prime factor of n.' },
   ],
   sageTemplate: (vals: Record<string, string>) => {
     if (!vals.n || !vals.e || !vals.c) {

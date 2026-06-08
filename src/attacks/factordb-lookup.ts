@@ -99,10 +99,8 @@ export const attack: Attack = {
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Generate a random 10-digit number (not necessarily semiprime — FactorDB
-  // will return whatever status it has for it: FF, C, P, etc.)
-  const min = 10_000_000_000; // 10^10
-  const max = 99_999_999_999; // 10^11 - 1
-  const n = Math.floor(Math.random() * (max - min + 1)) + min;
-  return { n: String(n) };
+  // Use RSA-100 — a well-known 152-bit factored semiprime that is guaranteed
+  // to be fully factored (FF) in FactorDB, giving deterministic results.
+  const RSA_100 = '1522605027922533360535618378132637429718068114961380688657908494580122963258952897654000350692006139';
+  return { n: RSA_100 };
 };

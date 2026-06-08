@@ -2671,7 +2671,7 @@ How to use:
 
 Required: n, e, m (the signed message as an integer), sig_valid, sig_faulty
 
-Tip: The two signatures must be from the SAME message using the SAME key. The fault must affect only one of the two CRT exponentiations.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.m&&!!e.sig_faulty},ve={id:`non-coprime-exp`,name:`Non-Coprime Exponent Attack`,category:`Message / Protocol`,description:`Resolves multiple plaintexts when gcd(e, phi(n)) > 1 using known p and q factors. Use after factoring n, when public exponent shares a factor with phi(n).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`p`,label:`p (prime factor)`,placeholder:`Enter prime factor p...`,multiline:!0,rows:3,required:!1,tooltip:`Known prime factor of n. Required for e-th root disambiguation.`},{name:`q`,label:`q (prime factor)`,placeholder:`Enter prime factor q...`,multiline:!0,rows:3,required:!1,tooltip:`Known prime factor of n. Required for e-th root disambiguation.`}],sageTemplate:e=>!e.n||!e.e||!e.c?`print("ERROR: Missing required inputs (n, e, c)")
+Tip: The two signatures must be from the SAME message using the SAME key. The fault must affect only one of the two CRT exponentiations.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.m&&!!e.sig_faulty},ve={id:`non-coprime-exp`,name:`Non-Coprime Exponent Attack`,category:`Message / Protocol`,description:`Resolves multiple plaintexts when gcd(e, phi(n)) > 1 using known p and q factors. Use after factoring n, when public exponent shares a factor with phi(n).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`p`,label:`p (prime factor)`,placeholder:`Enter prime factor p...`,multiline:!0,rows:3,required:!0,tooltip:`Required. Known prime factor of n.`},{name:`q`,label:`q (prime factor)`,placeholder:`Enter prime factor q...`,multiline:!0,rows:3,required:!0,tooltip:`Required. Known prime factor of n.`}],sageTemplate:e=>!e.n||!e.e||!e.c?`print("ERROR: Missing required inputs (n, e, c)")
 print("NON_COPRIME_EXP=FAILED")`:!e.p||!e.q?`print("ERROR: This attack requires p and q to resolve multiple e-th roots. Use factorization attacks first to find p and q.")
 print("NON_COPRIME_EXP=FAILED")`:L({token:`NON_COPRIME_EXP`,useGuard:!1,body:`        n = Integer(${e.n})
         e = Integer(${e.e})
@@ -3039,6 +3039,7 @@ Tip: e must be exactly 3 for this attack. The modulus must be large enough to ac
                     a = 2 * B
                     b = 3 * B - 1
                     r_min = ceil((a * s1 - 3 * B + 1) / n)
+                    r_min = max(Integer(0), r_min)
                     r_max = floor((b * s1 - 2 * B) / n)
                     for r in range(int(r_min), int(r_max) + 1):
                         r_int = r
@@ -3196,7 +3197,7 @@ Tip: s=1 always returns 1 (the original ciphertext has valid padding). You need 
                 if oracle_result:
                     mmin = ceil_div(iNB, f3)
                 else:
-                    mmax = floor_div(iNB, f3)
+                    mmax = floor_div(iNB - 1, f3)
             m = mmin
             v = Integer(pow(int(m), int(e), int(n)))
             out.append("")
@@ -3240,7 +3241,7 @@ How to use:
 3. Provide n, e, c, and oracle_responses as comma-separated bits
 4. The attack narrows the message interval with each query
 
-Tip: Manger's attack requires O(log n) oracle queries — significantly fewer than Bleichenbacher. The oracle boundary is B = 2^(8*(k-1)) ≈ n/256, NOT n/2.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Z={id:`biased-lsb`,name:`Biased LSB Oracle`,category:`Oracle`,description:`Recovers plaintext m using a noisy LSB oracle with bias > 50% via majority voting and binary fraction accumulation. Use for error-prone side-channel LSB leaks.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_runs`,label:`Oracle runs (multiple response strings, newline-separated)`,placeholder:`0,1,0,1,1\\n1,0,1,1,0\\n0,1,1,1,0...`,multiline:!0,rows:6}],sageTemplate:e=>L({token:`BIASED_LSB`,useGuard:!1,body:`        valid = True
+Tip: Manger's attack requires O(log n) oracle queries — significantly fewer than Bleichenbacher. The oracle boundary is B = 2^(8*(k-1)) ≈ n/256, NOT n/2.`,frontendCheck:e=>{if(!e.n||!e.e||!e.c||!e.oracle_responses)return Promise.resolve(null);try{let t=BigInt(e.n),n=BigInt(e.e),r=BigInt(e.c),i=e.oracle_responses.split(`,`).map(e=>e.trim()).map(e=>e===`1`);if(i.length===0)return Promise.resolve(null);let a=t.toString(2).length,o=Math.ceil(a/8),s=1n<<BigInt(8*(o-1)),c=2n*s,l=(e,t)=>(e+t-1n)/t,u=0,d=i.length,f=()=>u>=d?!1:i[u++],p=2n;for(;!f();){if(u>=d)return Promise.resolve(null);p*=2n}let m=p/2n,h=(t+s)/s*m;for(;f();){if(u>=d)return Promise.resolve(null);h+=m}let g=l(t,h),_=(t+s)/h;for(;g<_;){let e=c/(_-g)*g/t,n=l(e*t,g);n===0n&&(n=1n);let r=f();if(u>=d+1&&g<_)return Promise.resolve(null);let i=e*t+s;r?g=l(i,n):_=(i-1n)/n}let v=g,y=P(v,n,t);return y===r?Promise.resolve(`Manger's OAEP Attack\nn = ${t}\ne = ${n}\nc = ${r}\noracle_responses = ${i.length}\n\nResults:\nm = ${v}\n\nVerification: m^e mod n = ${y}\n\nMANGER=SUCCESS`):Promise.resolve(null)}catch{return Promise.resolve(null)}},priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Z={id:`biased-lsb`,name:`Biased LSB Oracle`,category:`Oracle`,description:`Recovers plaintext m using a noisy LSB oracle with bias > 50% via majority voting and binary fraction accumulation. Use for error-prone side-channel LSB leaks.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_runs`,label:`Oracle runs (multiple response strings, newline-separated)`,placeholder:`0,1,0,1,1\\n1,0,1,1,0\\n0,1,1,1,0...`,multiline:!0,rows:6}],sageTemplate:e=>L({token:`BIASED_LSB`,useGuard:!1,body:`        valid = True
         if not "${e.n}".strip():
             out.append("ERROR: n is required")
             valid = False
@@ -3424,7 +3425,7 @@ Tip: More runs per position increases accuracy. With 31 runs and 90% accuracy pe
                 M_prime, ord_prime = _gfm(M)
                 g_mod_Mp = Zmod(M_prime)(65537)
                 c_prime = discrete_log(Zmod(M_prime)(n), g_mod_Mp)
-                X = Integer(2 * isqrt(n) // M_prime)
+                X = Integer(ceil(Integer(2 * isqrt(n)) / M_prime))
 
                 if X < 1:
                     out.append("ROCA=FAILED")
@@ -3558,28 +3559,50 @@ p &= M \\cdot k_1 + r_1 \\qed
             if pow(Integer(n_mod), ord_val, Integer(M)) != 1:
                 out.append("NITROS=FAILED")
             else:
-                # Build the set of all possible remainders {base^i mod M}
-                r_set = set()
-                r_cur = Integer(1)
-                MAX_SET = min(ord_val, 50000)
-                for _ in range(min(ord_val, MAX_SET)):
-                    r_set.add(r_cur)
-                    r_cur = ZZ(Mod(r_cur * base, M))
-                # Find candidate remainder pairs (r1, r2) where r1*r2 ≡ n mod M
-                candidates = set()
-                candidates.add(Integer(1))
-                candidates.add(Integer(n_mod % M))
-                for r1 in list(r_set):
-                    if len(candidates) >= 20:
-                        break
-                    if r1 in candidates:
-                        continue
-                    try:
-                        r2 = (Integer(n_mod) * inverse_mod(ZZ(r1), Integer(M))) % Integer(M)
-                        if r2 in r_set:
-                            candidates.add(ZZ(r1))
-                    except (ZeroDivisionError, TypeError, ValueError, ArithmeticError):
-                        continue
+                # Use discrete_log to find remainder pairs without full enumeration
+                try:
+                    i = ZZ(Mod(n_mod, M).log(base))
+                    candidates = set()
+                    candidates.add(Integer(1))
+                    candidates.add(Integer(n_mod % M))
+                    r_cur = Integer(1)
+                    for j in range(min(ord_val, 20000)):
+                        if len(candidates) >= 20:
+                            break
+                        if r_cur in candidates:
+                            r_cur = ZZ(Mod(r_cur * base, M))
+                            continue
+                        # r2 = base^((i-j) mod ord_val), guaranteed in subgroup
+                        r2 = ZZ(Mod(base, M) ** ((i - j) % ord_val))
+                        candidates.add(ZZ(r_cur))
+                        r_cur = ZZ(Mod(r_cur * base, M))
+                except (TypeError, ValueError, ArithmeticError):
+                    # Fallback: enumerate for small ord_val
+                    MAX_SET = min(ord_val, 200000)
+                    if ord_val <= MAX_SET:
+                        candidates = set()
+                        candidates.add(Integer(1))
+                        candidates.add(Integer(n_mod % M))
+                        r_set = set()
+                        r_cur = Integer(1)
+                        for _ in range(ord_val):
+                            r_set.add(r_cur)
+                            r_cur = ZZ(Mod(r_cur * base, M))
+                        for r1 in list(r_set):
+                            if len(candidates) >= 20:
+                                break
+                            if r1 in candidates:
+                                continue
+                            try:
+                                r2 = (Integer(n_mod) * inverse_mod(ZZ(r1), Integer(M))) % Integer(M)
+                                if r2 in r_set:
+                                    candidates.add(ZZ(r1))
+                            except (ZeroDivisionError, TypeError, ValueError, ArithmeticError):
+                                continue
+                    else:
+                        out.append("NITROS=FAILED - discrete_log not available, order too large")
+                        found = True
+                        candidates = set()
                 out.append(f"Found {len(candidates)} candidate remainder(s)")
                 # Coppersmith path (fast lattice reduction)
                 bound = int(ceil(Integer(isqrt(n)) / M))
@@ -4027,14 +4050,16 @@ print("SMALL_PUBLIC_EXP=FAILED")`:L({token:`SMALL_PUBLIC_EXP`,useGuard:!1,body:`
         # Modular residue pre-filter for e-th powers
         if e <= 100:
             p = Integer(e + 1)
-            while (p - 1) % e != 0 and p < 50000:
+            while True:
+                if p >= 50000:
+                    filter_mod = 0
+                    residues = set()
+                    break
+                if is_prime(p) and (p - 1) % e == 0:
+                    filter_mod = p
+                    residues = set(pow(x, e, filter_mod) for x in range(int(p)))
+                    break
                 p = next_prime(p + 1)
-            if (p - 1) % e == 0 and p < 50000:
-                filter_mod = p
-                residues = set(pow(x, e, filter_mod) for x in range(int(p)))
-            else:
-                filter_mod = 0
-                residues = set()
         else:
             filter_mod = 0
             residues = set()
@@ -4067,7 +4092,7 @@ print("SMALL_PUBLIC_EXP=FAILED")`:L({token:`SMALL_PUBLIC_EXP`,useGuard:!1,body:`
         else:
             out.append("")
             out.append("SMALL_PUBLIC_EXP=SUCCESS")
-`}),frontendCheck:(e,t)=>{let n=BigInt(e.n),r=BigInt(e.e||`3`),i=BigInt(e.c);if(r>1000n)return Promise.resolve(null);let a=BigInt(e.k_bound||`100000`);if(a<0n)return Promise.resolve(null);let o=0n,s=null;if(r===3n)o=9n,s=new Set([0n,1n,8n]);else if(r<=17n){for(let e=2n*r+1n;e<1000n;e+=2n){if(e%3n==0n||e%5n==0n||e%7n==0n||e%11n==0n||e%13n==0n)continue;let t=!1;for(let n=17n;n*n<=e;n+=2n)if(e%n===0n){t=!0;break}if(!t&&(e-1n)%r==0n){o=e;break}}if(o>0n){s=new Set;for(let e=0n;e<o;e++){let t=1n;for(let n=0n;n<r;n++)t=t*e%o;s.add(t)}}}let c=(e,t)=>{let n=t>1n&&(t+2n)**r>=e?t:1n<<BigInt(Math.ceil(e.toString(2).length/Number(r)));for(;;){let t=n**(r-1n),i=((r-1n)*n*t+e)/(r*t);if(i>=n)break;n=i}return n},l=(e,t)=>{let r=e.toString(16),a=r.length%2?`0`+r:r,o=`<not decodable>`;try{let e=new Uint8Array(a.length/2);for(let t=0;t<e.length;t++)e[t]=parseInt(a.substring(t*2,t*2+2),16);o=new TextDecoder().decode(e)}catch{}return`Small Public Exponent\nn = ${n}\nc = ${i}\n\nResults:\nm = ${e}\nk = ${t}\nm as hex: ${a}\nm as text: ${o}\n\nVerification: m^e mod n = ${i}\n\nSMALL_PUBLIC_EXP=SUCCESS`},u=1n;for(let e=0n;e<=a;e++){t&&a>1000n&&e%1000n==0n&&t(Number(e*100n/a),`k = ${e.toString()} / ${a.toString()}`);let d=i+e*n;if(!(s&&!s.has(d%o))){if(u=e===0n?c(d,1n):c(d,u),u**r===d)return t?.(100),Promise.resolve(l(u,e));if((u+1n)**r===d)return t?.(100),Promise.resolve(l(u+1n,e));if(u>0n&&(u-1n)**r===d)return t?.(100),Promise.resolve(l(u-1n,e))}}return Promise.resolve(null)},proof:`\\textbf{Theorem:} If $m^e \\geq n$, then $m^e = c + k \\cdot n$ for some $k \\geq 0$, and $m = \\sqrt[e]{c + k \\cdot n}$ when $k = \\lfloor m^e / n \\rfloor$.
+`}),frontendCheck:(e,t)=>{let n=BigInt(e.n),r=BigInt(e.e||`3`),i=BigInt(e.c);if(r>1000n)return Promise.resolve(null);let a=BigInt(e.k_bound||`100000`);if(a<0n)return Promise.resolve(null);let o=0n,s=null;if(r===3n)o=9n,s=new Set([0n,1n,8n]);else if(r<=100n){for(let e=2n*r+1n;e<1000n;e+=2n){if(e%3n==0n||e%5n==0n||e%7n==0n||e%11n==0n||e%13n==0n)continue;let t=!1;for(let n=17n;n*n<=e;n+=2n)if(e%n===0n){t=!0;break}if(!t&&(e-1n)%r==0n){o=e;break}}if(o>0n){s=new Set;for(let e=0n;e<o;e++){let t=1n;for(let n=0n;n<r;n++)t=t*e%o;s.add(t)}}}let c=(e,t)=>{let n=t>1n&&(t+2n)**r>=e?t:1n<<BigInt(Math.ceil(e.toString(2).length/Number(r)));for(;;){let t=n**(r-1n),i=((r-1n)*n*t+e)/(r*t);if(i>=n)break;n=i}return n},l=(e,t)=>{let r=e.toString(16),a=r.length%2?`0`+r:r,o=`<not decodable>`;try{let e=new Uint8Array(a.length/2);for(let t=0;t<e.length;t++)e[t]=parseInt(a.substring(t*2,t*2+2),16);o=new TextDecoder().decode(e)}catch{}return`Small Public Exponent\nn = ${n}\nc = ${i}\n\nResults:\nm = ${e}\nk = ${t}\nm as hex: ${a}\nm as text: ${o}\n\nVerification: m^e mod n = ${i}\n\nSMALL_PUBLIC_EXP=SUCCESS`},u=1n;for(let e=0n;e<=a;e++){t&&a>1000n&&e%1000n==0n&&t(Number(e*100n/a),`k = ${e.toString()} / ${a.toString()}`);let d=i+e*n;if(!(s&&!s.has(d%o))){if(u=e===0n?c(d,1n):c(d,u),u**r===d)return t?.(100),Promise.resolve(l(u,e));if((u+1n)**r===d)return t?.(100),Promise.resolve(l(u+1n,e));if(u>0n&&(u-1n)**r===d)return t?.(100),Promise.resolve(l(u-1n,e))}}return Promise.resolve(null)},proof:`\\textbf{Theorem:} If $m^e \\geq n$, then $m^e = c + k \\cdot n$ for some $k \\geq 0$, and $m = \\sqrt[e]{c + k \\cdot n}$ when $k = \\lfloor m^e / n \\rfloor$.
 
 \\textbf{Setup:}
 \\begin{itemize}

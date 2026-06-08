@@ -1,6 +1,6 @@
 var e=`import type { Attack } from '../types';
 import { modPow } from '../utils/bigint';
-import { generateKeyPair, isPrimeMR } from '../utils/testcases/core';
+import { isPrimeMR } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
 
 
@@ -85,7 +85,7 @@ export const attack: Attack = {
                 M_prime, ord_prime = _gfm(M)
                 g_mod_Mp = Zmod(M_prime)(65537)
                 c_prime = discrete_log(Zmod(M_prime)(n), g_mod_Mp)
-                X = Integer(2 * isqrt(n) // M_prime)
+                X = Integer(ceil(Integer(2 * isqrt(n)) / M_prime))
 
                 if X < 1:
                     out.append("ROCA=FAILED")
@@ -223,7 +223,6 @@ export const generateTestcase = (): Record<string, string> => {
       return { n: (p * q).toString() };
     }
   }
-  const pair = generateKeyPair(256, 256);
-  return { n: pair.n.toString() };
+  throw new Error("Failed to generate ROCA-vulnerable test key after 5000 attempts. Increase kBits or check parameters.");
 };
 `;export{e as default};

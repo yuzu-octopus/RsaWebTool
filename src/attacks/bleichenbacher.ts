@@ -61,6 +61,7 @@ export const attack: Attack = {
                     a = 2 * B
                     b = 3 * B - 1
                     r_min = ceil((a * s1 - 3 * B + 1) / n)
+                    r_min = max(Integer(0), r_min)
                     r_max = floor((b * s1 - 2 * B) / n)
                     for r in range(int(r_min), int(r_max) + 1):
                         r_int = r

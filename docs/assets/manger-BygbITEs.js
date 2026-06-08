@@ -95,7 +95,7 @@ export const attack: Attack = {
                 if oracle_result:
                     mmin = ceil_div(iNB, f3)
                 else:
-                    mmax = floor_div(iNB, f3)
+                    mmax = floor_div(iNB - 1, f3)
             m = mmin
             v = Integer(pow(int(m), int(e), int(n)))
             out.append("")
@@ -135,6 +135,73 @@ m &\\\\in \\\\bigcup_{r=0}^{s-1} \\\\left[ \\\\frac{rn}{s}, \\\\frac{rn+B}{s} \\
 
 \\\\textbf{References:} J. Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP) as Standardized in PKCS#1 v2.0", CRYPTO 2001\`,
   usageGuide: 'This requires oracle_responses \\u2014 a comma-separated list from an oracle that reveals whether the decrypted plaintext\\'s first byte is NOT 0x00 (i.e., plaintext >= B where B = 2^(8*(k-1)), k = ceil(n.nbits()/8)).\\n\\nHow to use:\\n1. Set up an oracle that returns 1 if decrypt(c\\') has first byte NOT 0x00 (plaintext >= B), 0 otherwise\\n2. Query the oracle for successive blinding values\\n3. Provide n, e, c, and oracle_responses as comma-separated bits\\n4. The attack narrows the message interval with each query\\n\\nTip: Manger\\'s attack requires O(log n) oracle queries \\u2014 significantly fewer than Bleichenbacher. The oracle boundary is B = 2^(8*(k-1)) \\u2248 n/256, NOT n/2.',
+  frontendCheck: (vals: Record<string, string>): Promise<string | null> => {
+    if (!vals.n || !vals.e || !vals.c || !vals.oracle_responses) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const e = BigInt(vals.e);
+      const c = BigInt(vals.c);
+      const raw = vals.oracle_responses.split(',').map(x => x.trim());
+      const oracleBits: boolean[] = raw.map(x => x === '1');
+      if (oracleBits.length === 0) return Promise.resolve(null);
+
+      const nBits = n.toString(2).length;
+      const k = Math.ceil(nBits / 8);
+      const B = 1n << BigInt(8 * (k - 1));
+      const twoB = 2n * B;
+
+      const ceilDiv = (a: bigint, b: bigint): bigint => (a + b - 1n) / b;
+
+      let oracleIdx = 0;
+      const maxQueries = oracleBits.length;
+      const oracle = (): boolean => {
+        if (oracleIdx >= maxQueries) return false;
+        return oracleBits[oracleIdx++];
+      };
+
+      // Step 1: find f1 = 2^i such that oracle(f1 * c mod n) = 1
+      let f1 = 2n;
+      while (!oracle()) {
+        if (oracleIdx >= maxQueries) return Promise.resolve(null);
+        f1 *= 2n;
+      }
+
+      // Step 2: find f2 such that oracle(f2 * c mod n) = 0
+      const f1Half = f1 / 2n;
+      let f2 = ((n + B) / B) * f1Half;
+      while (oracle()) {
+        if (oracleIdx >= maxQueries) return Promise.resolve(null);
+        f2 += f1Half;
+      }
+
+      // Step 3: binary search
+      let mmin = ceilDiv(n, f2);
+      let mmax = (n + B) / f2;
+      while (mmin < mmax) {
+        const fTmp = twoB / (mmax - mmin);
+        const iVal = (fTmp * mmin) / n;
+        let f3 = ceilDiv(iVal * n, mmin);
+        if (f3 === 0n) f3 = 1n;
+        const oracleResult = oracle();
+        if (oracleIdx >= maxQueries + 1 && mmin < mmax) return Promise.resolve(null);
+        const iNB = iVal * n + B;
+        if (oracleResult) {
+          mmin = ceilDiv(iNB, f3);
+        } else {
+          mmax = (iNB - 1n) / f3;
+        }
+      }
+
+      const m = mmin;
+      const v = modPow(m, e, n);
+      if (v === c) {
+        return Promise.resolve(
+          \`Manger's OAEP Attack\\nn = \${n}\\ne = \${e}\\nc = \${c}\\noracle_responses = \${oracleBits.length}\\n\\nResults:\\nm = \${m}\\n\\nVerification: m^e mod n = \${v}\\n\\nMANGER=SUCCESS\`
+        );
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
+  },
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_responses,
 };
@@ -199,7 +266,7 @@ export const generateTestcase = (): Record<string, string> => {
     if (oracleResult) {
       mmin = (iNB + f3 - 1n) / f3; // ceil
     } else {
-      mmax = iNB / f3; // floor
+      mmax = (iNB - 1n) / f3; // floor
     }
     steps++;
   }
