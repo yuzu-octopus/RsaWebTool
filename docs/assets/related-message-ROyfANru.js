@@ -1,4 +1,4 @@
-import type { Attack } from '../types';
+var e=`import type { Attack } from '../types';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd, modInverse, modPow } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
@@ -21,18 +21,18 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
       token: 'FRANKLIN_REITER_RELATED_MESSAGE',
       useGuard: false,
-      body: `        n = Integer(${vals.n})
-        e_val = "${vals.e}".strip()
+      body: \`        n = Integer(\${vals.n})
+        e_val = "\${vals.e}".strip()
         e = Integer(e_val) if e_val else Integer(65537)
-        c1 = Integer(${vals.c1})
-        c2 = Integer(${vals.c2})
-        a1_val = "${vals.a1 || ''}".strip()
+        c1 = Integer(\${vals.c1})
+        c2 = Integer(\${vals.c2})
+        a1_val = "\${vals.a1 || ''}".strip()
         a1 = Integer(a1_val) if a1_val else Integer(1)
-        b1_val = "${vals.b1 || ''}".strip()
+        b1_val = "\${vals.b1 || ''}".strip()
         b1 = Integer(b1_val) if b1_val else Integer(0)
-        a2_val = "${vals.a2 || ''}".strip()
+        a2_val = "\${vals.a2 || ''}".strip()
         a2 = Integer(a2_val) if a2_val else Integer(2)
-        b2_val = "${vals.b2 || ''}".strip()
+        b2_val = "\${vals.b2 || ''}".strip()
         b2 = Integer(b2_val) if b2_val else Integer(0)
         found = True
         if n < 2 or e < 2 or c1 < 0 or c2 < 0:
@@ -148,7 +148,7 @@ export const attack: Attack = {
                     out.append("")
                     out.append(f"Verification: (a1*m+b1)^e mod n = {v1}")
                     out.append("")
-                    out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")`,
+                    out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")\`,
     }),
   frontendCheck: (vals: Record<string, string>) => {
     if (!vals.n || !vals.c1 || !vals.c2) return Promise.resolve(null);
@@ -188,7 +188,7 @@ export const attack: Attack = {
           if (1n < g && g < n) {
             const p = g;
             const q = n / g;
-            return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na1 = ${a1}\nb1 = ${b1}\na2 = ${a2}\nb2 = ${b2}\n\nResults:\np = ${p}\nq = ${q}\n\nVerification: p * q = ${p * q}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
+            return Promise.resolve(\`Franklin-Reiter Related Message Attack\\nn = \${n}\\ne = \${e}\\nc1 = \${c1}\\nc2 = \${c2}\\na1 = \${a1}\\nb1 = \${b1}\\na2 = \${a2}\\nb2 = \${b2}\\n\\nResults:\\np = \${p}\\nq = \${q}\\n\\nVerification: p * q = \${p * q}\\n\\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS\`);
           }
           return Promise.resolve(null); // fall through to Sage
         }
@@ -217,7 +217,7 @@ export const attack: Attack = {
         if (modPow(m, e, n) === c1 && modPow((a2 * m + b2) % n, e, n) === c2) {
           const v1 = modPow(m, e, n);
           const v2 = modPow((a2 * m + b2) % n, e, n);
-          return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na1 = ${a1}\nb1 = ${b1}\na2 = ${a2}\nb2 = ${b2}\n\nResults:\nm = ${m}\n\nVerification: (a1*m+b1)^e mod n = ${v1}, (a2*m+b2)^e mod n = ${v2}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
+          return Promise.resolve(\`Franklin-Reiter Related Message Attack\\nn = \${n}\\ne = \${e}\\nc1 = \${c1}\\nc2 = \${c2}\\na1 = \${a1}\\nb1 = \${b1}\\na2 = \${a2}\\nb2 = \${b2}\\n\\nResults:\\nm = \${m}\\n\\nVerification: (a1*m+b1)^e mod n = \${v1}, (a2*m+b2)^e mod n = \${v2}\\n\\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS\`);
         }
         return Promise.resolve(null);
       }
@@ -235,35 +235,35 @@ export const attack: Attack = {
       if (modPow(m, e, n) === c1 && modPow((a2 * m + b2) % n, e, n) === c2) {
         const v1 = modPow(m, e, n);
         const v2 = modPow((a2 * m + b2) % n, e, n);
-        return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na1 = ${a1}\nb1 = ${b1}\na2 = ${a2}\nb2 = ${b2}\n\nResults:\nm = ${m}\n\nVerification: (a1*m+b1)^e mod n = ${v1}, (a2*m+b2)^e mod n = ${v2}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
+        return Promise.resolve(\`Franklin-Reiter Related Message Attack\\nn = \${n}\\ne = \${e}\\nc1 = \${c1}\\nc2 = \${c2}\\na1 = \${a1}\\nb1 = \${b1}\\na2 = \${a2}\\nb2 = \${b2}\\n\\nResults:\\nm = \${m}\\n\\nVerification: (a1*m+b1)^e mod n = \${v1}, (a2*m+b2)^e mod n = \${v2}\\n\\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS\`);
       }
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} Given $c_1 \\equiv (a_1 m + b_1)^e \\pmod{n}$ and $c_2 \\equiv (a_2 m + b_2)^e \\pmod{n}$ with known $a_1, b_1, a_2, b_2$ and $\\gcd(a_1, n) = 1$, recover $m$ by computing $\\gcd((a_1 x + b_1)^e - c_1, (a_2 x + b_2)^e - c_2)$.
+  proof: \`\\\\textbf{Theorem:} Given $c_1 \\\\equiv (a_1 m + b_1)^e \\\\pmod{n}$ and $c_2 \\\\equiv (a_2 m + b_2)^e \\\\pmod{n}$ with known $a_1, b_1, a_2, b_2$ and $\\\\gcd(a_1, n) = 1$, recover $m$ by computing $\\\\gcd((a_1 x + b_1)^e - c_1, (a_2 x + b_2)^e - c_2)$.
 
-\\textbf{Setup:}
-\\begin{itemize}
-\\item $c_1 \\equiv (a_1 m + b_1)^e \\pmod{n}$, $c_2 \\equiv (a_2 m + b_2)^e \\pmod{n}$
-\\item $a_1, b_1, a_2, b_2$ are known, $\\gcd(a_1, n) = 1$
-\\end{itemize}
+\\\\textbf{Setup:}
+\\\\begin{itemize}
+\\\\item $c_1 \\\\equiv (a_1 m + b_1)^e \\\\pmod{n}$, $c_2 \\\\equiv (a_2 m + b_2)^e \\\\pmod{n}$
+\\\\item $a_1, b_1, a_2, b_2$ are known, $\\\\gcd(a_1, n) = 1$
+\\\\end{itemize}
 
-\\textbf{Proof:}
-\\begin{align*}
-f_1(x) &= (a_1 x + b_1)^e - c_1 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
-f_2(x) &= (a_2 x + b_2)^e - c_2 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
-f_1(m) &\\equiv (a_1 m + b_1)^e - c_1 \\equiv 0 \\pmod{n} \\\\
-f_2(m) &\\equiv (a_2 m + b_2)^e - c_2 \\equiv 0 \\pmod{n} \\\\
-\\gcd(f_1, f_2) &= (x - m) \\quad \\text{(with high probability)} \\\\
-m &= -g[0] \\cdot g[1]^{-1} \\pmod{n}
-\\end{align*}
+\\\\textbf{Proof:}
+\\\\begin{align*}
+f_1(x) &= (a_1 x + b_1)^e - c_1 \\\\in (\\\\mathbb{Z}/n\\\\mathbb{Z})[x] \\\\\\\\
+f_2(x) &= (a_2 x + b_2)^e - c_2 \\\\in (\\\\mathbb{Z}/n\\\\mathbb{Z})[x] \\\\\\\\
+f_1(m) &\\\\equiv (a_1 m + b_1)^e - c_1 \\\\equiv 0 \\\\pmod{n} \\\\\\\\
+f_2(m) &\\\\equiv (a_2 m + b_2)^e - c_2 \\\\equiv 0 \\\\pmod{n} \\\\\\\\
+\\\\gcd(f_1, f_2) &= (x - m) \\\\quad \\\\text{(with high probability)} \\\\\\\\
+m &= -g[0] \\\\cdot g[1]^{-1} \\\\pmod{n}
+\\\\end{align*}
 
-\\textbf{Generalization (e=3):} When $a_1=1, b_1=0$, this reduces to the classical Franklin-Reiter form $c_1=m^e, c_2=(am+b)^e$. For arbitrary $a_1, b_1$ with $\\gcd(a_1, n)=1$, substitute $y = a_1 m + b_1$ to get $c_1=y^e$, $c_2=(a_2 a_1^{-1} y + (b_2 - a_2 a_1^{-1} b_1))^e$, reducing to the standard case.
+\\\\textbf{Generalization (e=3):} When $a_1=1, b_1=0$, this reduces to the classical Franklin-Reiter form $c_1=m^e, c_2=(am+b)^e$. For arbitrary $a_1, b_1$ with $\\\\gcd(a_1, n)=1$, substitute $y = a_1 m + b_1$ to get $c_1=y^e$, $c_2=(a_2 a_1^{-1} y + (b_2 - a_2 a_1^{-1} b_1))^e$, reducing to the standard case.
 
-\\textbf{Explanation:} Both polynomials share $m$ as a root modulo $n$. The polynomial GCD extracts their common linear factor $(x - m)$. For $e = 3$, a closed-form algebraic elimination is available. When $a_1$ is not invertible modulo $n$, $\\gcd(a_1, n)$ immediately reveals a factor of $n$.
+\\\\textbf{Explanation:} Both polynomials share $m$ as a root modulo $n$. The polynomial GCD extracts their common linear factor $(x - m)$. For $e = 3$, a closed-form algebraic elimination is available. When $a_1$ is not invertible modulo $n$, $\\\\gcd(a_1, n)$ immediately reveals a factor of $n$.
 
-\\textbf{References:} Franklin & Reiter, 1996; Boneh, "Twenty Years of Attacks on RSA," 1999`,
-  usageGuide: 'This attack recovers m when two ciphertexts of the SAME message under different linear transforms are encrypted with the same public key.\n\nHow to use:\n1. You have two ciphertexts c1, c2 encrypted under the same (n, e)\n2. The plaintexts are: m1 = a1*m + b1, m2 = a2*m + b2 for known a1,b1,a2,b2\n3. Provide n, e, c1, c2, a1, b1, a2, and b2\n4. The attack computes gcd((a1*x+b1)^e - c1, (a2*x+b2)^e - c2) to recover m\n\nDefaults: a1=1, b1=0 (standard Franklin-Reiter where c1 = m^e)\n\nTip: The attack requires e = 3 for reliable algebraic recovery in the browser; e = 5 or higher uses SageMathCell (may timeout). If a1 shares a factor with n, the attack immediately factors n. For convenience, paste into Magic Mode which auto-detects the parameters.',
+\\\\textbf{References:} Franklin & Reiter, 1996; Boneh, "Twenty Years of Attacks on RSA," 1999\`,
+  usageGuide: 'This attack recovers m when two ciphertexts of the SAME message under different linear transforms are encrypted with the same public key.\\n\\nHow to use:\\n1. You have two ciphertexts c1, c2 encrypted under the same (n, e)\\n2. The plaintexts are: m1 = a1*m + b1, m2 = a2*m + b2 for known a1,b1,a2,b2\\n3. Provide n, e, c1, c2, a1, b1, a2, and b2\\n4. The attack computes gcd((a1*x+b1)^e - c1, (a2*x+b2)^e - c2) to recover m\\n\\nDefaults: a1=1, b1=0 (standard Franklin-Reiter where c1 = m^e)\\n\\nTip: The attack requires e = 3 for reliable algebraic recovery in the browser; e = 5 or higher uses SageMathCell (may timeout). If a1 shares a factor with n, the attack immediately factors n. For convenience, paste into Magic Mode which auto-detects the parameters.',
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.c1 && !!p.c2,
 };
@@ -289,3 +289,4 @@ export const generateTestcase = (): Record<string, string> => {
     b2: b2.toString(),
   };
 };
+`;export{e as default};

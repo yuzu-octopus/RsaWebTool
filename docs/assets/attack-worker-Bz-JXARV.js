@@ -1425,15 +1425,19 @@ n \\bmod (2^k + \\delta) = 0 &\\implies p = 2^k + \\delta,\\; q = n/p \\\\
 
 \\textbf{Explanation:} CTF challenge authors sometimes construct primes from well-known numbers — $p = 2^k \\pm \\delta$ (near powers of two) or $p = \\lfloor \\pi \\times 10^m \\rfloor \\pm \\delta$ (from mathematical constants). This attack checks candidates in a window around each known value, testing divisibility of $n$.
 
-\\textbf{References:} Cryptopals; Cryptohack.org; various CTF writeups`,priority:`low`,applicableCheck:e=>!!e.n},ae={id:`related-message`,name:`Franklin-Reiter Related Message Attack`,category:`Message / Protocol`,description:`Recovers m from two ciphertexts with linearly related plaintexts via polynomial GCD. Use when c1 = m^e and c2 = (a·m + b)^e mod n with known a, b.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c1`,label:`c1 (ciphertext of m)`,placeholder:`Enter c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (ciphertext of a·m + b)`,placeholder:`Enter c2...`,multiline:!0,rows:3},{name:`a`,label:`a (linear coefficient)`,placeholder:`2`,multiline:!1},{name:`b`,label:`b (linear offset)`,placeholder:`0`,multiline:!1}],sageTemplate:e=>L({token:`FRANKLIN_REITER_RELATED_MESSAGE`,useGuard:!1,body:`        n = Integer(${e.n})
+\\textbf{References:} Cryptopals; Cryptohack.org; various CTF writeups`,priority:`low`,applicableCheck:e=>!!e.n},ae={id:`related-message`,name:`Franklin-Reiter Related Message Attack`,category:`Message / Protocol`,description:`Recovers m from two ciphertexts with arbitrary linear relations via polynomial GCD. Use when c1 = (a₁·m + b₁)^e and c2 = (a₂·m + b₂)^e mod n with known a₁,b₁,a₂,b₂. Defaults: a₁=1, b₁=0 (standard Franklin-Reiter).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`65537`,multiline:!1},{name:`c1`,label:`c1 (ciphertext of a₁·m + b₁)`,placeholder:`Enter c1...`,multiline:!0,rows:3},{name:`c2`,label:`c2 (ciphertext of a₂·m + b₂)`,placeholder:`Enter c2...`,multiline:!0,rows:3},{name:`a1`,label:`a1 (first linear coefficient)`,placeholder:`1`,multiline:!1},{name:`b1`,label:`b1 (first linear offset)`,placeholder:`0`,multiline:!1},{name:`a2`,label:`a2 (second linear coefficient)`,placeholder:`2`,multiline:!1},{name:`b2`,label:`b2 (second linear offset)`,placeholder:`0`,multiline:!1}],sageTemplate:e=>L({token:`FRANKLIN_REITER_RELATED_MESSAGE`,useGuard:!1,body:`        n = Integer(${e.n})
         e_val = "${e.e}".strip()
         e = Integer(e_val) if e_val else Integer(65537)
         c1 = Integer(${e.c1})
         c2 = Integer(${e.c2})
-        a_val = "${e.a}".strip()
-        a = Integer(a_val) if a_val else Integer(2)
-        b_val = "${e.b}".strip()
-        b = Integer(b_val) if b_val else Integer(0)
+        a1_val = "${e.a1||``}".strip()
+        a1 = Integer(a1_val) if a1_val else Integer(1)
+        b1_val = "${e.b1||``}".strip()
+        b1 = Integer(b1_val) if b1_val else Integer(0)
+        a2_val = "${e.a2||``}".strip()
+        a2 = Integer(a2_val) if a2_val else Integer(2)
+        b2_val = "${e.b2||``}".strip()
+        b2 = Integer(b2_val) if b2_val else Integer(0)
         found = True
         if n < 2 or e < 2 or c1 < 0 or c2 < 0:
             out.append("Invalid input")
@@ -1444,24 +1448,27 @@ n \\bmod (2^k + \\delta) = 0 &\\implies p = 2^k + \\delta,\\; q = n/p \\\\
             out.append(f"e = {e}")
             out.append(f"c1 = {c1}")
             out.append(f"c2 = {c2}")
-            out.append(f"a = {a}")
-            out.append(f"b = {b}")
+            out.append(f"a1 = {a1}")
+            out.append(f"b1 = {b1}")
+            out.append(f"a2 = {a2}")
+            out.append(f"b2 = {b2}")
             out.append("")
-            if b == 0:
-                ratio_check = power_mod(a, e, n) * c1 % n
-                out.append(f"Diagnostic: a^e * c1 mod n = {ratio_check}")
-                out.append(f"Diagnostic: c2 = {c2}")
-                out.append(f"Diagnostic: match? {ratio_check == c2}")
-                if ratio_check == c2:
-                    out.append("WARNING: b=0 and c2 == a^e*c1. Any m satisfies c2 = (am)^e mod n.")
-                    out.append("Cannot recover m uniquely. Try using b != 0.")
+            if b1 == 0 and b2 == 0:
+                ratio_check = power_mod(a2, e, n) * c1 % n
+                alt_ratio = power_mod(a1, e, n) * c2 % n
+                out.append(f"Diagnostic: a2^e * c1 mod n = {ratio_check}")
+                out.append(f"Diagnostic: a1^e * c2 mod n = {alt_ratio}")
+                out.append(f"Diagnostic: match? {ratio_check == alt_ratio}")
+                if ratio_check == alt_ratio:
+                    out.append("WARNING: b1=b2=0 and a2^e*c1 == a1^e*c2. Any m satisfies both equations.")
+                    out.append("Cannot recover m uniquely. Try using non-zero b1 or b2.")
                     found = False
                 else:
                     out.append("")
         if found:
             R.<x> = PolynomialRing(Zmod(n))
-            f1 = x**e - c1
-            f2 = (a * x + b)**e - c2
+            f1 = (a1 * x + b1)**e - c1
+            f2 = (a2 * x + b2)**e - c2
             def poly_gcd(p, q):
                 while q != 0:
                     try:
@@ -1491,14 +1498,14 @@ n \\bmod (2^k + \\delta) = 0 &\\implies p = 2^k + \\delta,\\; q = n/p \\\\
                     break
             if m_int is None and e == 3:
                 out.append("Trying e=3 closed-form fallback...")
-                A = (3 * a^2 * b) % n
-                B = (3 * a * b^2) % n
-                C = (b^3 - c2 + a^3 * c1) % n
+                A = (3 * (a1**3 * a2**2 * b2 - a2**3 * a1**2 * b1)) % n
+                B = (3 * (a1**3 * a2 * b2**2 - a2**3 * a1 * b1**2)) % n
+                C = (a1**3 * b2**3 - a2**3 * b1**3 - a1**3 * c2 + a2**3 * c1) % n
                 out.append(f"Algebraic elimination: {A}*m^2 + {B}*m + {C} = 0 (mod n)")
                 if A == 0 and B == 0 and C == 0:
-                    out.append("Degenerate: any m satisfies both equations (b=0 case).")
+                    out.append("Degenerate: any m satisfies both equations (b1=b2=0 case).")
                 elif A == 0 and B == 0:
-                    out.append(f"Contradiction: {C} != 0. a/b values are wrong.")
+                    out.append(f"Contradiction: {C} != 0. a1/b1/a2/b2 values produce inconsistent equations.")
                 elif A == 0:
                     try:
                         m_int = Integer((-C) * inverse_mod(B, n) % n)
@@ -1534,46 +1541,50 @@ n \\bmod (2^k + \\delta) = 0 &\\implies p = 2^k + \\delta,\\; q = n/p \\\\
             else:
                 out.append("Results:")
                 out.append(f"m = {m_int}")
-                v1 = power_mod(m_int, e, n)
-                v2 = power_mod(Integer(a * m_int + b), e, n)
+                v1 = power_mod(Integer(a1 * m_int + b1), e, n)
+                v2 = power_mod(Integer(a2 * m_int + b2), e, n)
                 if v1 == c1 and v2 == c2:
                     out.append("")
-                    out.append(f"Verification: m^e mod n = {v1}")
+                    out.append(f"Verification: (a1*m+b1)^e mod n = {v1}")
                     out.append("")
                     out.append("FRANKLIN_REITER_RELATED_MESSAGE=SUCCESS")
                 else:
                     out.append("")
-                    out.append(f"Verification: m^e mod n = {v1}")
+                    out.append(f"Verification: (a1*m+b1)^e mod n = {v1}")
                     out.append("")
-                    out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")`}),frontendCheck:e=>{if(!e.n||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=(e.e||``).trim(),r=n?BigInt(n):65537n,i=BigInt(e.c1),a=BigInt(e.c2),o=(e.a||``).trim(),s=o?BigInt(o):2n,c=(e.b||``).trim(),l=c?BigInt(c):0n;if(t<2n||r<2n||i<0n||a<0n||r!==3n)return Promise.resolve(null);let u=3n*s*s*l%t,d=3n*s*l*l%t,f=((l*l*l-a+s*s*s%t*i)%t%t+t)%t;if(u===0n&&d===0n)return Promise.resolve(null);if(u===0n){if(d===0n)return Promise.resolve(null);let e=N(d,t);if(e===null)return Promise.resolve(null);let n=(-f%t+t)%t*e%t;if(P(n,r,t)===i){let e=P(n,r,t);return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${t}\ne = ${r}\nc1 = ${i}\nc2 = ${a}\na = ${s}\nb = ${l}\n\nResults:\nm = ${n}\n\nVerification: m^e mod n = ${e}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`)}return Promise.resolve(null)}let p=((u*f-d*d)%t+t)%t,m=((d*f-u*u%t*i)%t+t)%t;if(p===0n)return Promise.resolve(null);let h=N(p,t);if(h===null)return Promise.resolve(null);let g=m*h%t;if(P(g,r,t)===i){let e=P(g,r,t);return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${t}\ne = ${r}\nc1 = ${i}\nc2 = ${a}\na = ${s}\nb = ${l}\n\nResults:\nm = ${g}\n\nVerification: m^e mod n = ${e}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given $c_1 \\equiv m^e \\pmod{n}$ and $c_2 \\equiv (am + b)^e \\pmod{n}$ with known $a, b$ and $\\gcd(a, n) = 1$, recover $m$ by computing $\\gcd(x^e - c_1, (ax + b)^e - c_2)$.
+                    out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")`}),frontendCheck:e=>{if(!e.n||!e.c1||!e.c2)return Promise.resolve(null);try{let t=BigInt(e.n),n=(e.e||``).trim(),r=n?BigInt(n):65537n,i=BigInt(e.c1),a=BigInt(e.c2),o=(e.a1||``).trim(),s=o?BigInt(o):1n,c=(e.b1||``).trim(),l=c?BigInt(c):0n,u=(e.a2||``).trim(),d=u?BigInt(u):2n,f=(e.b2||``).trim(),p=f?BigInt(f):0n;if(t<2n||r<2n||i<0n||a<0n||r!==3n)return Promise.resolve(null);let m=i,h=a,g=d,_=p;if(s!==1n||l!==0n){let e=N(s,t);if(e===null){let e=A(s,t);if(1n<e&&e<t){let n=e,o=t/e;return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${t}\ne = ${r}\nc1 = ${i}\nc2 = ${a}\na1 = ${s}\nb1 = ${l}\na2 = ${d}\nb2 = ${p}\n\nResults:\np = ${n}\nq = ${o}\n\nVerification: p * q = ${n*o}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`)}return Promise.resolve(null)}g=d*e%t,_=(p-d*e%t*l)%t,_<0n&&(_+=t)}let v=3n*g*g%t*_%t,y=3n*g*_%t*_%t,b=((_*_*_-h+g*g*g%t*m)%t%t+t)%t;if(v===0n&&y===0n)return Promise.resolve(null);if(v===0n){if(y===0n)return Promise.resolve(null);let e=N(y,t);if(e===null)return Promise.resolve(null);let n=(-b%t+t)%t*e%t;if(P(n,r,t)===i&&P((d*n+p)%t,r,t)===a){let e=P(n,r,t),o=P((d*n+p)%t,r,t);return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${t}\ne = ${r}\nc1 = ${i}\nc2 = ${a}\na1 = ${s}\nb1 = ${l}\na2 = ${d}\nb2 = ${p}\n\nResults:\nm = ${n}\n\nVerification: (a1*m+b1)^e mod n = ${e}, (a2*m+b2)^e mod n = ${o}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`)}return Promise.resolve(null)}let x=((v*b-y*y)%t+t)%t,S=((y*b-v*v%t*m)%t+t)%t;if(x===0n)return Promise.resolve(null);let C=N(x,t);if(C===null)return Promise.resolve(null);let w=S*C%t;if(P(w,r,t)===i&&P((d*w+p)%t,r,t)===a){let e=P(w,r,t),n=P((d*w+p)%t,r,t);return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${t}\ne = ${r}\nc1 = ${i}\nc2 = ${a}\na1 = ${s}\nb1 = ${l}\na2 = ${d}\nb2 = ${p}\n\nResults:\nm = ${w}\n\nVerification: (a1*m+b1)^e mod n = ${e}, (a2*m+b2)^e mod n = ${n}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`)}return Promise.resolve(null)}catch{return Promise.resolve(null)}},proof:`\\textbf{Theorem:} Given $c_1 \\equiv (a_1 m + b_1)^e \\pmod{n}$ and $c_2 \\equiv (a_2 m + b_2)^e \\pmod{n}$ with known $a_1, b_1, a_2, b_2$ and $\\gcd(a_1, n) = 1$, recover $m$ by computing $\\gcd((a_1 x + b_1)^e - c_1, (a_2 x + b_2)^e - c_2)$.
 
 \\textbf{Setup:}
 \\begin{itemize}
-\\item $c_1 \\equiv m^e \\pmod{n}$, $c_2 \\equiv (am+b)^e \\pmod{n}$
-\\item $a, b$ are known and $\\gcd(a, n) = 1$
+\\item $c_1 \\equiv (a_1 m + b_1)^e \\pmod{n}$, $c_2 \\equiv (a_2 m + b_2)^e \\pmod{n}$
+\\item $a_1, b_1, a_2, b_2$ are known, $\\gcd(a_1, n) = 1$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
-f_1(x) &= x^e - c_1 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
-f_2(x) &= (ax + b)^e - c_2 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
-f_1(m) &\\equiv m^e - c_1 \\equiv 0 \\pmod{n} \\\\
-f_2(m) &\\equiv (am+b)^e - c_2 \\equiv 0 \\pmod{n} \\\\
+f_1(x) &= (a_1 x + b_1)^e - c_1 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
+f_2(x) &= (a_2 x + b_2)^e - c_2 \\in (\\mathbb{Z}/n\\mathbb{Z})[x] \\\\
+f_1(m) &\\equiv (a_1 m + b_1)^e - c_1 \\equiv 0 \\pmod{n} \\\\
+f_2(m) &\\equiv (a_2 m + b_2)^e - c_2 \\equiv 0 \\pmod{n} \\\\
 \\gcd(f_1, f_2) &= (x - m) \\quad \\text{(with high probability)} \\\\
 m &= -g[0] \\cdot g[1]^{-1} \\pmod{n}
 \\end{align*}
 
-\\textbf{Explanation:} Both polynomials $f_1$ and $f_2$ share $m$ as a root modulo $n$. The polynomial GCD extracts their common linear factor $(x - m)$. For $e = 3$, a closed-form algebraic elimination is available without polynomial arithmetic over composite moduli.
+\\textbf{Generalization (e=3):} When $a_1=1, b_1=0$, this reduces to the classical Franklin-Reiter form $c_1=m^e, c_2=(am+b)^e$. For arbitrary $a_1, b_1$ with $\\gcd(a_1, n)=1$, substitute $y = a_1 m + b_1$ to get $c_1=y^e$, $c_2=(a_2 a_1^{-1} y + (b_2 - a_2 a_1^{-1} b_1))^e$, reducing to the standard case.
 
-\\textbf{References:} Franklin & Reiter, 1996; Boneh, "Twenty Years of Attacks on RSA," 1999`,usageGuide:`This attack recovers m when two related messages are encrypted with the same public key.
+\\textbf{Explanation:} Both polynomials share $m$ as a root modulo $n$. The polynomial GCD extracts their common linear factor $(x - m)$. For $e = 3$, a closed-form algebraic elimination is available. When $a_1$ is not invertible modulo $n$, $\\gcd(a_1, n)$ immediately reveals a factor of $n$.
+
+\\textbf{References:} Franklin & Reiter, 1996; Boneh, "Twenty Years of Attacks on RSA," 1999`,usageGuide:`This attack recovers m when two ciphertexts of the SAME message under different linear transforms are encrypted with the same public key.
 
 How to use:
 1. You have two ciphertexts c1, c2 encrypted under the same (n, e)
-2. The plaintexts are related: m2 = a*m1 + b for known a, b
-3. Provide n, e, c1, c2, a, and b
-4. The attack computes gcd(m1^e - c1, (a*m1 + b)^e - c2) to recover m1
+2. The plaintexts are: m1 = a1*m + b1, m2 = a2*m + b2 for known a1,b1,a2,b2
+3. Provide n, e, c1, c2, a1, b1, a2, and b2
+4. The attack computes gcd((a1*x+b1)^e - c1, (a2*x+b2)^e - c2) to recover m
 
-Tip: The attack requires e = 3 for reliable algebraic recovery; e = 5 or 7 may work via polynomial GCD but can fail over composite moduli. For convenience, paste into Magic Mode which auto-detects the parameters.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.c1&&!!e.c2},oe={id:`simple-lattice`,name:`Simple Lattice`,category:`Partial Key / Lattice`,description:`Recovers p from an approximate value nearp using Coppersmith's lattice when |nearp - p| < n^(1/4). Use when a close approximation of p is known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`nearp`,label:`nearp (approximate p)`,placeholder:`Enter approximate p value...`,multiline:!0,rows:3}],sageTemplate:e=>L({token:`SIMPLE_LATTICE`,useGuard:!1,body:`        n = Integer(${e.n})
+Defaults: a1=1, b1=0 (standard Franklin-Reiter where c1 = m^e)
+
+Tip: The attack requires e = 3 for reliable algebraic recovery in the browser; e = 5 or higher uses SageMathCell (may timeout). If a1 shares a factor with n, the attack immediately factors n. For convenience, paste into Magic Mode which auto-detects the parameters.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.c1&&!!e.c2},oe={id:`simple-lattice`,name:`Simple Lattice`,category:`Partial Key / Lattice`,description:`Recovers p from an approximate value nearp using Coppersmith's lattice when |nearp - p| < n^(1/4). Use when a close approximation of p is known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`nearp`,label:`nearp (approximate p)`,placeholder:`Enter approximate p value...`,multiline:!0,rows:3}],sageTemplate:e=>L({token:`SIMPLE_LATTICE`,useGuard:!1,body:`        n = Integer(${e.n})
         nearp = Integer(${e.nearp})
         found = False
         if n <= 0 or nearp <= 0:
