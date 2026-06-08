@@ -2498,7 +2498,15 @@ print("HASTAD_LINEAR_PAD=FAILED")`:L({token:`HASTAD_LINEAR_PAD`,useGuard:!1,body
                     else:
                         out.append("HASTAD_LINEAR_PAD=FAILED")
                 else:
-                    out.append("HASTAD_LINEAR_PAD=FAILED")`}),proof:`\\textbf{Theorem:} Given $k \\geq e$ ciphertexts $c_i \\equiv (a_i m + b_i)^e \\pmod{n_i}$ with pairwise coprime moduli, recover $m$ by CRT-combining the polynomials and applying Coppersmith small roots.
+                    out.append("HASTAD_LINEAR_PAD=FAILED")`}),usageGuide:`This attack recovers m from k >= e ciphertexts encrypted with the same small public exponent (typically e = 3) but different moduli, each with its own affine padding.
+
+How to use:
+1. Obtain k >= e ciphertexts c_i = (a_i*m + b_i)^e mod n_i (different modulus for each)
+2. Enter the triples in the format: n1,c1,a1,b1 (one per line)
+3. Provide the public exponent e
+4. The attack uses CRT to combine polynomials, then Coppersmith's method to find the small root m
+
+Tips: Each line must have exactly 4 comma-separated values (n_i, c_i, a_i, b_i). For standard Hastad (no padding), use a_i=1, b_i=0. The exploit includes an e=3 brute-force fallback with Horner evaluation for fast searching when Coppersmith fails.`,proof:`\\textbf{Theorem:} Given $k \\geq e$ ciphertexts $c_i \\equiv (a_i m + b_i)^e \\pmod{n_i}$ with pairwise coprime moduli, recover $m$ by CRT-combining the polynomials and applying Coppersmith small roots.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -2671,7 +2679,7 @@ How to use:
 
 Required: n, e, m (the signed message as an integer), sig_valid, sig_faulty
 
-Tip: The two signatures must be from the SAME message using the SAME key. The fault must affect only one of the two CRT exponentiations.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.m&&!!e.sig_faulty},ve={id:`non-coprime-exp`,name:`Non-Coprime Exponent Attack`,category:`Message / Protocol`,description:`Resolves multiple plaintexts when gcd(e, phi(n)) > 1 using known p and q factors. Use after factoring n, when public exponent shares a factor with phi(n).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`p`,label:`p (prime factor)`,placeholder:`Enter prime factor p...`,multiline:!0,rows:3,required:!0,tooltip:`Required. Known prime factor of n.`},{name:`q`,label:`q (prime factor)`,placeholder:`Enter prime factor q...`,multiline:!0,rows:3,required:!0,tooltip:`Required. Known prime factor of n.`}],sageTemplate:e=>!e.n||!e.e||!e.c?`print("ERROR: Missing required inputs (n, e, c)")
+Tip: The two signatures must be from the SAME message using the SAME key. The fault must affect only one of the two CRT exponentiations.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.m&&!!e.sig_faulty},ve={id:`non-coprime-exp`,name:`Non-Coprime Exponent Attack`,category:`Message / Protocol`,description:`Resolves multiple plaintexts when gcd(e, phi(n)) > 1 using known p and q factors. Requires p and q as inputs (use factorization attacks first). Use after factoring n, when public exponent shares a factor with phi(n).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`p`,label:`p (prime factor)`,placeholder:`Enter prime factor p...`,multiline:!0,rows:3,required:!0,tooltip:`Required. Known prime factor of n.`},{name:`q`,label:`q (prime factor)`,placeholder:`Enter prime factor q...`,multiline:!0,rows:3,required:!0,tooltip:`Required. Known prime factor of n.`}],sageTemplate:e=>!e.n||!e.e||!e.c?`print("ERROR: Missing required inputs (n, e, c)")
 print("NON_COPRIME_EXP=FAILED")`:!e.p||!e.q?`print("ERROR: This attack requires p and q to resolve multiple e-th roots. Use factorization attacks first to find p and q.")
 print("NON_COPRIME_EXP=FAILED")`:L({token:`NON_COPRIME_EXP`,useGuard:!1,body:`        n = Integer(${e.n})
         e = Integer(${e.e})
@@ -2782,7 +2790,15 @@ m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\quad \\text{for each pair} \\\\
 \\item \\textbf{Three-level e-th root fallback:} Tries progressively slower methods: (1) Sage's $\\mathbb{F}_p.\\mathtt{nth\\_root}(e, all=True)$ for a complete root set, (2) manual iteration for small $e \\leq 10$ and small fields $p < 2 \\times 10^6$, (3) Tonelli-Shanks for $e = 2$ with $p \\equiv 3 \\pmod{4}$. CRT combines all cross-product root pairs from both primes.
 \\end{itemize}
 
-\\textbf{References:} Williams, 1980; May, "Attacks on RSA with Small Parameters," 2003`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c},ye={id:`homomorphic-forgery`,name:`Homomorphic Forgery Attack`,category:`Message / Protocol`,description:`Forges a valid RSA signature by exploiting textbook RSA's multiplicative homomorphism. Use when an oracle signs chosen messages and target is a product of signed messages.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`target_m`,label:`Target message to forge`,placeholder:`Enter target message...`,multiline:!0,rows:3},{name:`oracle_pairs`,label:`Oracle pairs (m,s semicolon-separated)`,placeholder:`m1,s1;m2,s2;m3,s3...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.target_m||!e.oracle_pairs?`print("ERROR: Missing required inputs (n, e, target_m, oracle_pairs)")
+\\textbf{References:} Williams, 1980; May, "Attacks on RSA with Small Parameters," 2003`,usageGuide:`Resolves the non-unique decryption problem when gcd(e, phi(n)) > 1. Requires p and q as inputs — use factorization attacks first.
+
+How to use:
+1. First factor n (use any of the 19 factorization attacks in this tool)
+2. Provide n, e, c, and the discovered p and q factors
+3. The attack finds all e-th roots modulo p and q separately, then CRT-combines them
+4. All valid plaintexts are displayed — verify which is the intended message
+
+Tips: The three-level e-th root fallback tries Sage nth_root, manual iteration (for small e ≤ 10 and small fields), and Tonelli-Shanks (for e = 2, when p ≡ 3 mod 4). Both p and q are required — without them the attack cannot resolve the multiple roots since CRT needs both prime factors.`,priority:`low`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c},ye={id:`homomorphic-forgery`,name:`Homomorphic Forgery Attack`,category:`Message / Protocol`,description:`Forges a valid RSA signature by exploiting textbook RSA's multiplicative homomorphism. Use when an oracle signs chosen messages and target is a product of signed messages.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`target_m`,label:`Target message to forge`,placeholder:`Enter target message...`,multiline:!0,rows:3},{name:`oracle_pairs`,label:`Oracle pairs (m,s semicolon-separated)`,placeholder:`m1,s1;m2,s2;m3,s3...`,multiline:!0,rows:3}],sageTemplate:e=>!e.n||!e.e||!e.target_m||!e.oracle_pairs?`print("ERROR: Missing required inputs (n, e, target_m, oracle_pairs)")
 print("HOMOMORPHIC_FORGERY=FAILED")`:L({token:`HOMOMORPHIC_FORGERY`,useGuard:!1,body:`        n = Integer(${e.n})
         e = Integer(${e.e})
         target_m = Integer(${e.target_m})
@@ -3119,7 +3135,7 @@ How to use:
 3. Record the responses as comma-separated bits: 1,0,0,1,0,0,... (1 = valid padding)
 4. Provide n, e, c, and the full oracle_responses string
 
-Tip: s=1 always returns 1 (the original ciphertext has valid padding). You need roughly 20 valid responses to narrow the interval.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Se={id:`manger`,name:`Manger's OAEP Attack`,category:`Oracle`,description:`Decrypts OAEP-encrypted messages using a first-byte oracle in O(log n) queries. Use when an oracle returns 1 if the plaintext's first byte is NOT 0x00 (i.e., plaintext >= B).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>L({token:`MANGER`,useGuard:!1,body:`        valid = True
+Tip: s=1 always returns 1 (the original ciphertext has valid padding). You need roughly 20 valid responses to narrow the interval.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.oracle_responses},Se={id:`manger`,name:`Manger's OAEP Attack`,category:`Oracle`,description:`Decrypts OAEP-encrypted messages using a first-byte oracle in O(log n) queries. Use when an oracle returns 1 if the plaintext's first byte is NOT 0x00 (i.e., plaintext >= B). Browser-side frontendCheck available (instant execution).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`c`,label:`c (ciphertext)`,placeholder:`Enter ciphertext c...`,multiline:!0,rows:3},{name:`oracle_responses`,label:`Oracle responses (comma-separated 0/1)`,placeholder:`1,0,1,1,0,...`,multiline:!0,rows:3}],sageTemplate:e=>L({token:`MANGER`,useGuard:!1,body:`        valid = True
         if not "${e.n}".strip():
             out.append("ERROR: n is required")
             valid = False
@@ -3527,7 +3543,7 @@ p &= M \\cdot k_1 + r_1 \\qed
 
 \\textbf{Optimization:} The greedy M' search reduces the search space by removing prime factors from M that contribute the least order-reduction per M-reduction, yielding a smaller Coppersmith bound $X = 2\\sqrt{n}/M'$.
 
-\\textbf{References:} M. Nemec, M. Sys, P. Svenda, D. Klinec, V. Matyas, "The Return of Coppersmith's Attack: Practical Factorization of Widely Used RSA Moduli", CCS 2017`,priority:`high`,applicableCheck:e=>!!e.n},we={id:`nitros`,name:`Nitros / ROCA Variant`,category:`Advanced`,description:`Factors RSA keys with generalized ROCA primes p = k·M + (a^i mod M) for arbitrary generator a. Use when prime generation follows a ROCA-like pattern with non-standard base.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`base`,label:`Base (default 65537)`,placeholder:`65537`,required:!1,multiline:!1}],sageTemplate:e=>{let t=e.n??``,n=e.base??``;return t.trim()?L({token:`NITROS`,n:t,body:`        base_val = "${n}".strip()
+\\textbf{References:} M. Nemec, M. Sys, P. Svenda, D. Klinec, V. Matyas, "The Return of Coppersmith's Attack: Practical Factorization of Widely Used RSA Moduli", CCS 2017`,priority:`high`,applicableCheck:e=>!!e.n},we={id:`nitros`,name:`Nitros / ROCA Variant`,category:`Advanced`,description:`Factors RSA keys with generalized ROCA primes p = k·M + (a^i mod M) for arbitrary generator a. Dynamic M selection (M > n^(1/4) for Coppersmith condition) makes this work for any key size. Use when prime generation follows a ROCA-like pattern with non-standard base.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`base`,label:`Base (default 65537)`,placeholder:`65537`,required:!1,multiline:!1}],sageTemplate:e=>{let t=e.n??``,n=e.base??``;return t.trim()?L({token:`NITROS`,n:t,body:`        base_val = "${n}".strip()
         base = Integer(base_val) if base_val else Integer(65537)
         found = False
         # Guard handles n<2, n%2, n.is_prime(), n.is_square()
@@ -3674,7 +3690,16 @@ f(x) &= Mx + r_1 \\equiv 0 \\pmod{p} \\quad\\text{with root } x = k_1 \\\\
 
 \\textbf{Explanation:} The Nitros attack extends ROCA to arbitrary generator bases. Instead of $65537$, any base $a$ can generate the remainder set. The key insight is that the subgroup generated by $a$ modulo $M$ has size $\\text{ord}_M(a)$, and this is typically small enough to enumerate. To test if $n$ is vulnerable, compute $n^{\\text{ord}_M(a)} \\bmod M$ -- if the result is 1, $n$ is in the subgroup and the primes are Nitros-form. The recovery then proceeds identically to ROCA: use Coppersmith to find $k_1$, the small root of $f(x) = Mx + r_1$ modulo $p$. This implementation dynamically selects primes to ensure $M > n^{1/4}$ (the Coppersmith condition for $\\beta = 0.5$), making the attack work for any realistic key size.
 
-\\textbf{References:} M. Nemec et al., "The Return of Coppersmith's Attack", CCS 2017; Nitros ROCA variant analysis, 2018`,priority:`medium`,applicableCheck:e=>!!e.n},Te={FF:`Fully factored — all prime factors known`,CF:`Composite, factors known — partially factored, not all factors are prime`,CC:`Composite, composite factors — factors known but contain composites`,CP:`Composite, partially factored — some factors found`,C:`Composite, no factors known — confirmed composite but unfactored`,P:`Definitely prime — n is proven prime, not a valid RSA modulus`,Prp:`Probably prime — strong probable prime, not a valid RSA modulus`,U:`Unknown — status undetermined`,Unit:`Unit — the number is 1`,N:`Not in database — not yet queried`,"*":`Added to database during this request`},Q=[ee,te,ne,re,ie,z,B,V,W,G,K,q,J,Y,{id:`euler`,name:`Euler Factorization`,category:`Factorization`,description:`Factors n by finding two distinct representations as a sum of squares a^2+b^2 = c^2+d^2 = n. Use when both primes are ≡ 1 (mod 4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>L({token:`EULER`,n:e.n,imports:[`import math`],body:`        n_int = int(n)
+\\textbf{References:} M. Nemec et al., "The Return of Coppersmith's Attack", CCS 2017; Nitros ROCA variant analysis, 2018`,usageGuide:`This attack factors RSA keys where both primes follow a generalized ROCA pattern: p = k·M + (a^i mod M) for an arbitrary generator a (not just 65537).
+
+How to use:
+1. Provide n (the modulus) and optionally the generator base (default 65537)
+2. The attack first checks whether n mod M is in the subgroup generated by base modulo M
+3. If yes, Coppersmith lattice reduction finds the small root k to recover p
+
+Key improvements: Dynamic M selection chooses enough primes so M > n^(1/4), satisfying the Coppersmith condition (beta=0.5) for any realistic modulus size. No hard-coded cap on M size.
+
+Tip: If discrete_log or Coppersmith fails, the attack falls back to trial division of candidate remainders up to a total bound. Paste into Magic Mode for automatic detection.`,priority:`medium`,applicableCheck:e=>!!e.n},Te={FF:`Fully factored — all prime factors known`,CF:`Composite, factors known — partially factored, not all factors are prime`,CC:`Composite, composite factors — factors known but contain composites`,CP:`Composite, partially factored — some factors found`,C:`Composite, no factors known — confirmed composite but unfactored`,P:`Definitely prime — n is proven prime, not a valid RSA modulus`,Prp:`Probably prime — strong probable prime, not a valid RSA modulus`,U:`Unknown — status undetermined`,Unit:`Unit — the number is 1`,N:`Not in database — not yet queried`,"*":`Added to database during this request`},Q=[ee,te,ne,re,ie,z,B,V,W,G,K,q,J,Y,{id:`euler`,name:`Euler Factorization`,category:`Factorization`,description:`Factors n by finding two distinct representations as a sum of squares a^2+b^2 = c^2+d^2 = n. Use when both primes are ≡ 1 (mod 4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],sageTemplate:e=>L({token:`EULER`,n:e.n,imports:[`import math`],body:`        n_int = int(n)
         out.append("Euler Factorization")
         out.append(f"n = {n}")
         out.append("")
@@ -4112,12 +4137,21 @@ m^e &= c + k \\cdot n \\quad\\text{for some } k \\in \\mathbb{Z}_{\\geq 0} \\\\
 
 \\textbf{Optimizations:}
 \\begin{itemize}
-\\item \\textbf{Modular residue pre-filter:} For $e=3$, perfect cubes mod 9 are only $\\{0, 1, 8\\}$ — candidates with other residues are skipped before attempting the $e$-th root, reducing loop iterations by $\\sim 67\\%$. For $e \\leq 17$, a dynamic prime modulus $p$ with $e \\mid (p-1)$ is found at runtime and the $e$-th power residues are precomputed.
+\\item \\textbf{Modular residue pre-filter:} For $e=3$, perfect cubes mod 9 are only $\\{0, 1, 8\\}$ — candidates with other residues are skipped before attempting the $e$-th root, reducing loop iterations by $\\sim 67\\%$. For $e \\leq 100$, a dynamic prime modulus $p$ with $e \\mid (p-1)$ is found at runtime and the $e$-th power residues are precomputed.
 \\item \\textbf{Warm-start Newton:} The $e$-th root computation uses Newton's method seeded from the previous $k$'s root (warm-start). A guard condition $\\mathtt{prevRoot}^e \\geq \\mathtt{candidate}$ ensures the warm-start is only accepted when starting from above the true root, preventing mis-convergence.
 \\item \\textbf{Combined speedup:} The pre-filter + warm-start yield up to $2.5\\times$ faster worst-case search vs restarting Newton from scratch on every candidate.
 \\end{itemize}
 
-\\textbf{References:} D. Boneh et al., "Twenty Years of Attacks on the RSA Cryptosystem", Notices AMS 1999`,priority:`high`,applicableCheck:e=>!!(e.n&&e.e&&e.c)},{id:`multi-prime-gcd`,name:`Multi-Prime GCD`,category:`Factorization`,description:`Finds shared prime factors across multiple RSA moduli using pairwise GCD with pair reporting. Use when two or more moduli may share a common factor.`,inputs:[{name:`moduli_list`,label:`Moduli (one per line)`,placeholder:`Enter multiple moduli, one per line...`,multiline:!0,rows:6}],proof:`\\textbf{Theorem:} Pairwise GCD among a set of RSA moduli reveals shared prime factors and identifies which moduli share them.
+\\textbf{References:} D. Boneh et al., "Twenty Years of Attacks on the RSA Cryptosystem", Notices AMS 1999`,usageGuide:`Recovers plaintext m by iterating k and checking whether c + k·n is an exact e-th power.
+
+How to use:
+1. Provide n (modulus), e (small public exponent, default 3), and c (ciphertext)
+2. Optionally set a custom k_bound (default 100000) to limit the search space
+3. The attack searches k = 0, 1, ..., k_bound for c + k·n that yields an exact e-th root
+
+Optimizations: Modular residue pre-filter (for e ≤ 100) skips ~67% of candidates for e=3 by checking if c+k·n is a perfect cube mod 9 before attempting the e-th root. Warm-start Newton uses the previous k's root as seed for the next k's root computation, avoiding restarting Newton from scratch.
+
+Tips: This attack works best for e ≤ 17 where k_bound is small and the pre-filter is most effective. For e > 1000, the attack delegates to Sage. Use the frontendCheck for instant e=3 results.`,priority:`high`,applicableCheck:e=>!!(e.n&&e.e&&e.c)},{id:`multi-prime-gcd`,name:`Multi-Prime GCD`,category:`Factorization`,description:`Finds shared prime factors across multiple RSA moduli using pairwise GCD with pair reporting. Use when two or more moduli may share a common factor.`,inputs:[{name:`moduli_list`,label:`Moduli (one per line)`,placeholder:`Enter multiple moduli, one per line...`,multiline:!0,rows:6}],proof:`\\textbf{Theorem:} Pairwise GCD among a set of RSA moduli reveals shared prime factors and identifies which moduli share them.
 
 \\textbf{Setup:}
 \\begin{itemize}

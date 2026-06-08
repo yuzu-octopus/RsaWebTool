@@ -7,7 +7,7 @@ export const attack: Attack = {
   id: 'manger',
   name: "Manger's OAEP Attack",
   category: 'Oracle',
-  description: 'Decrypts OAEP-encrypted messages using a first-byte oracle in O(log n) queries. Use when an oracle returns 1 if the plaintext\'s first byte is NOT 0x00 (i.e., plaintext >= B).',
+  description: 'Decrypts OAEP-encrypted messages using a first-byte oracle in O(log n) queries. Use when an oracle returns 1 if the plaintext\'s first byte is NOT 0x00 (i.e., plaintext >= B). Browser-side frontendCheck available (instant execution).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },

@@ -198,12 +198,13 @@ m^e &= c + k \\cdot n \\quad\\text{for some } k \\in \\mathbb{Z}_{\\geq 0} \\\\
 
 \\textbf{Optimizations:}
 \\begin{itemize}
-\\item \\textbf{Modular residue pre-filter:} For $e=3$, perfect cubes mod 9 are only $\\{0, 1, 8\\}$ — candidates with other residues are skipped before attempting the $e$-th root, reducing loop iterations by $\\sim 67\\%$. For $e \\leq 17$, a dynamic prime modulus $p$ with $e \\mid (p-1)$ is found at runtime and the $e$-th power residues are precomputed.
+\\item \\textbf{Modular residue pre-filter:} For $e=3$, perfect cubes mod 9 are only $\\{0, 1, 8\\}$ — candidates with other residues are skipped before attempting the $e$-th root, reducing loop iterations by $\\sim 67\\%$. For $e \\leq 100$, a dynamic prime modulus $p$ with $e \\mid (p-1)$ is found at runtime and the $e$-th power residues are precomputed.
 \\item \\textbf{Warm-start Newton:} The $e$-th root computation uses Newton's method seeded from the previous $k$'s root (warm-start). A guard condition $\\mathtt{prevRoot}^e \\geq \\mathtt{candidate}$ ensures the warm-start is only accepted when starting from above the true root, preventing mis-convergence.
 \\item \\textbf{Combined speedup:} The pre-filter + warm-start yield up to $2.5\\times$ faster worst-case search vs restarting Newton from scratch on every candidate.
 \\end{itemize}
 
 \\textbf{References:} D. Boneh et al., "Twenty Years of Attacks on the RSA Cryptosystem", Notices AMS 1999`,
+  usageGuide: 'Recovers plaintext m by iterating k and checking whether c + k·n is an exact e-th power.\n\nHow to use:\n1. Provide n (modulus), e (small public exponent, default 3), and c (ciphertext)\n2. Optionally set a custom k_bound (default 100000) to limit the search space\n3. The attack searches k = 0, 1, ..., k_bound for c + k·n that yields an exact e-th root\n\nOptimizations: Modular residue pre-filter (for e ≤ 100) skips ~67% of candidates for e=3 by checking if c+k·n is a perfect cube mod 9 before attempting the e-th root. Warm-start Newton uses the previous k\'s root as seed for the next k\'s root computation, avoiding restarting Newton from scratch.\n\nTips: This attack works best for e ≤ 17 where k_bound is small and the pre-filter is most effective. For e > 1000, the attack delegates to Sage. Use the frontendCheck for instant e=3 results.',
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!(p.n && p.e && p.c),
 };

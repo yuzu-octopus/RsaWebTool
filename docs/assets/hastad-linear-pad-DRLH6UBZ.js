@@ -137,6 +137,7 @@ print("HASTAD_LINEAR_PAD=FAILED")\`;
                     out.append("HASTAD_LINEAR_PAD=FAILED")\`,
     });
   },
+  usageGuide: 'This attack recovers m from k >= e ciphertexts encrypted with the same small public exponent (typically e = 3) but different moduli, each with its own affine padding.\\n\\nHow to use:\\n1. Obtain k >= e ciphertexts c_i = (a_i*m + b_i)^e mod n_i (different modulus for each)\\n2. Enter the triples in the format: n1,c1,a1,b1 (one per line)\\n3. Provide the public exponent e\\n4. The attack uses CRT to combine polynomials, then Coppersmith\\'s method to find the small root m\\n\\nTips: Each line must have exactly 4 comma-separated values (n_i, c_i, a_i, b_i). For standard Hastad (no padding), use a_i=1, b_i=0. The exploit includes an e=3 brute-force fallback with Horner evaluation for fast searching when Coppersmith fails.',
   proof: \`\\\\textbf{Theorem:} Given $k \\\\geq e$ ciphertexts $c_i \\\\equiv (a_i m + b_i)^e \\\\pmod{n_i}$ with pairwise coprime moduli, recover $m$ by CRT-combining the polynomials and applying Coppersmith small roots.
 
 \\\\textbf{Setup:}

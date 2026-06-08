@@ -9,7 +9,7 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 ## Features
 
 - **47 attacks** — Factorization, Lattice, Protocol, Oracle, and Advanced categories
-- **34 browser-side checks** — instant results via native BigInt (no SageCell needed), with live progress bars showing iteration variable + count on longer-running attacks
+- **31 browser-side checks** — instant results via native BigInt (no SageCell needed), with live progress bars showing iteration variable + count on longer-running attacks
 - **3 concurrent Web Workers** — parallel frontendCheck execution across attacks
 - **SageMathCell integration** — 3 concurrent slots with 30s stall detection and immediate error element reporting
 - **FactorDB lookup** — auto-queries FactorDB and auto-submits discovered factorizations
@@ -97,13 +97,13 @@ Open `http://localhost:5173` in your browser.
 | biased-lsb | Majority-vote LSB oracle + binary fraction recovery | ✓ |
 | bleichenbacher | Full PKCS#1 v1.5 padding oracle (interval narrowing) | ✓ |
 | lsb-oracle | Binary fraction recovery of m from LSB oracle | ✓ |
-| manger | Manger oracle attack | — |
+| manger | Manger oracle attack | ✓ |
 
 ### Advanced (4)
 | Attack | Description | Frontend |
 |--------|-------------|----------|
 | factordb-lookup | Fetch factorization from FactorDB API | ✓ |
-| nitros | NITROS attack | — |
+| nitros | NITROS attack (dynamic M selection, M > n^(1/4), any key size) | — |
 | roca | ROCA vulnerability (CVE-2017-15361) | — |
 | small-public-exp | Small public exponent attack (modular pre-filter, warm-start Newton) | ✓ |
 
