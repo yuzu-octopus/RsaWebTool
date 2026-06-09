@@ -69,6 +69,7 @@ f(x) &= \\sum b_i x^i \\\\
 f(x) &= \\prod g_i(x)^{e_i} \\quad \\text{(irreducible factorization over } \\mathbb{Z}[x]\\text{)} \\\\
 n = f(2) &= \\prod g_i(2)^{e_i} \\\\
 \\exists i: g_i(2) &= p \\text{ or } q
+\\qed\\\\
 \\end{align*}
 If the binary convolution of $p$ and $q$ produces no carries, then $f_{pq}(x) = f_p(x) \\cdot f_q(x)$ and the polynomial factorization separates them.
 

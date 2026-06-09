@@ -147,9 +147,11 @@ export const attack: Attack = {
 a &= \\lceil\\sqrt{n}\\rceil,\\; b = \\sqrt{a^2 - n} \\\\
 \\text{Fermat: } a_{i+1} &= a_i + 1,\\; b_i^2 = a_i^2 - n \\\\
 a_i^2 - n \\text{ is square} &\\implies p = a_i - b_i,\\; q = a_i + b_i \\\\
-\\text{BSGS: } \\phi_{\\text{approx}} &= n - 2\\lfloor\\sqrt{n}\\rfloor + 1 \\\\
+\\text{BSGS: Let $b = \\lceil\\sqrt{n}\\rceil$ be the step size, $i$ the baby-step index, $j$ the giant-step index} \\\\
+\\phi_{\\text{approx}} &= n - 2\\lfloor\\sqrt{n}\\rfloor + 1 \\\\
 2^{\\delta} &\\equiv 2^{-\\phi_{\\text{approx}}} \\pmod{n},\\; \\delta = \\phi(n) - \\phi_{\\text{approx}} \\\\
 \\phi(n) &= \\phi_{\\text{approx}} + j - i \\cdot b,\\; p+q = n - \\phi(n) + 1
+\\qed\\\\
 \\end{align*}
 
 \\textbf{Explanation:} Fermat represents $n$ as $a^2 - b^2$ and searches for $a$ such that $a^2 - n$ is a perfect square. Each step increments $a$ by 1 and updates $b^2$ additively, avoiding multiplication. When $|p-q| < 10^6$, Fermat converges quickly. Londahl's BSGS recovers $\\phi(n)$ via a discrete-log collision for larger gaps.

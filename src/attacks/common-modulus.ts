@@ -113,6 +113,7 @@ print("COMMON_MODULUS=FAILED")`;
 c_1^a \\cdot c_2^b &\\equiv (m^{e_1})^a \\cdot (m^{e_2})^b \\pmod{n} \\\\
 &\\equiv m^{a e_1 + b e_2} \\pmod{n} \\\\
 &\\equiv m^1 \\equiv m \\pmod{n}
+\\qed\\\\
 \\end{align*}
 When $a < 0$, compute $c_1^a = (c_1^{-1})^{|a|} \\pmod{n}$. Same for $b < 0$.
 

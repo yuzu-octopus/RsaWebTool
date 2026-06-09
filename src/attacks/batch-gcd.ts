@@ -86,6 +86,7 @@ p \\mid n_i,\\; p \\mid n_j &\\implies p \\mid \\gcd(n_i, n_j) \\\\
 \\text{For each } i: \\quad g_i &= \\gcd\\left(n_i, \\prod_{j \\neq i} n_j\\right) \\\\
 g_i > 1 &\\implies g_i \\text{ is a shared prime factor} \\\\
 \\text{Naive product: } O(k) &\\text{ vs } O(k^2) \\text{ for pairwise GCD}
+\\qed\\\\
 \\end{align*}
 The product $\\prod_{j \\neq i} n_j$ is computed by first multiplying all moduli together, then dividing each out: $\\prod_{j \\neq i} n_j = (\\prod_j n_j) / n_i$, giving $O(k)$ total time rather than $O(k^2)$ pairwise GCDs.
 

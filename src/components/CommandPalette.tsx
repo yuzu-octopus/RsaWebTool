@@ -218,7 +218,7 @@ export function CommandPalette() {
           }}
         />
       </Box>
-      <DialogContent sx={{ p: 0, overflow: 'auto', bgcolor: '#282a36' }}>
+      <DialogContent sx={{ p: 0, overflow: 'auto', bgcolor: '#282a36', pb: '30vh' }}>
         <List dense>
           {allItems.map((item) => {
             const isSelected = item.index === selectedIndex;

@@ -185,7 +185,7 @@ function ECCKeyOpsTab() {
   }, [isX25519]);
 
   return (
-    <Box sx={{ pb: '30vh' }}>
+    <Box>
       <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
         <InputLabel>Curve</InputLabel>
         <Select value={curve} label="Curve" onChange={e => { setCurve(e.target.value); setResult(null); setError(null); }}>
@@ -282,7 +282,7 @@ function ECCSignVerifyTab() {
   const signCurves = CURVES.filter(c => c.hasSign);
 
   return (
-    <Box sx={{ pb: '30vh' }}>
+    <Box>
       <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
         <InputLabel>Curve</InputLabel>
         <Select value={curve} label="Curve" onChange={e => { setCurve(e.target.value); setResult(null); setError(null); }}>
@@ -471,7 +471,7 @@ function ECCAttacksTab() {
   }, [attack, h1, h2, r1, s1, s2, nHex, aVal, bVal, pVal, xVal, yVal]);
 
   return (
-    <Box sx={{ pb: '30vh' }}>
+    <Box>
       <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
         <InputLabel>Attack</InputLabel>
         <Select value={attack} label="Attack" onChange={e => setAttack(e.target.value)}>

@@ -99,7 +99,7 @@ export default function HashFunctionsTab() {
   const handleCopy = useCallback(() => { if (result) navigator.clipboard.writeText(result).catch(() => {}); }, [result]);
 
   return (
-    <Box sx={{ pb: '30vh' }}>
+    <Box>
       <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
         <InputLabel>Algorithm</InputLabel>
         <Select value={algorithm} label="Algorithm" onChange={e => setAlgorithm(e.target.value)}>

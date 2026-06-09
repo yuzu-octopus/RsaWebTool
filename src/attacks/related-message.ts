@@ -258,6 +258,7 @@ f_1(m) &\\equiv (a_1 m + b_1)^e - c_1 \\equiv 0 \\pmod{n} \\\\
 f_2(m) &\\equiv (a_2 m + b_2)^e - c_2 \\equiv 0 \\pmod{n} \\\\
 \\gcd(f_1, f_2) &= (x - m) \\quad \\text{(with high probability)} \\\\
 m &= -g[0] \\cdot g[1]^{-1} \\pmod{n}
+\\qed\\\\
 \\end{align*}
 
 \\textbf{Generalization (e=3):} When $a_1=1, b_1=0$, this reduces to the classical Franklin-Reiter form $c_1=m^e, c_2=(am+b)^e$. For arbitrary $a_1, b_1$ with $\\gcd(a_1, n)=1$, substitute $y = a_1 m + b_1$ to get $c_1=y^e$, $c_2=(a_2 a_1^{-1} y + (b_2 - a_2 a_1^{-1} b_1))^e$, reducing to the standard case.

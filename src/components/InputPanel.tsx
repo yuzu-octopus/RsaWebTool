@@ -334,7 +334,7 @@ export function InputPanel() {
 
       {/* Explanation tab - left aligned */}
       {tab === 0 && (
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2, pb: '30vh' }}>
           {selectedAttack.proof ? (
             <ProofRenderer latex={selectedAttack.proof} />
           ) : (
@@ -365,7 +365,7 @@ export function InputPanel() {
       {/* Input tab - center aligned */}
       {tab === 1 && (
         <Box sx={{ ...centeredPanelSx, p: 2 }}>
-          <Box sx={{ width: '100%', maxWidth: 500, pb: '30vh' }}>
+          <Box sx={{ width: '100%', maxWidth: 500 }}>
             <Typography variant="h4" sx={{ color: draculaColors.cyan, mb: 0.5 }}>
               {selectedAttack.name}
             </Typography>
@@ -457,7 +457,7 @@ export function InputPanel() {
 
       {/* Source tab */}
       {tab === 2 && (
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2 }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2, pb: '30vh' }}>
     <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
       {hasSage && (
         <Button

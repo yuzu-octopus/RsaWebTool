@@ -71,6 +71,7 @@ export const attack: Attack = {
 \\text{Interval } I_i &= \\{i c + 1, \\dots, (i+1) c\\} \\\\
 P_i &= \\prod_{j \\in I_i} j \\mod n \\\\
 \\gcd(P_i, n) &> 1 \\iff I_i \\text{ contains a factor of } n
+\\qed\\\\
 \\end{align*}
 Compute each $P_i$ incrementally and take $\\gcd(P_i, n)$. When a match is found, back-track within the interval to isolate the exact factor. The cost is $O(c) = O(n^{1/4})$ multiplications and GCDs.
 

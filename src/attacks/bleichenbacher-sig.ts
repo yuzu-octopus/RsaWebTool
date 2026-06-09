@@ -85,11 +85,12 @@ print("BLEICHENBACHER_SIG=FAILED")`;
 \\item Verifier only checks $\\text{0x00 0x01 FF}^* \\text{0x00}$ prefix and hash at expected offset — ignores trailing data
 \\end{itemize}
 
-\\textbf{Construction:}
+\\textbf{Proof:}
 \\begin{align*}
 \\text{target} &= \\text{0x00} \\| \\text{0x01} \\| \\text{FF}^8 \\| \\text{0x00} \\| H \\| \\text{garbage} \\\\
 S &= \\lceil \\sqrt[3]{\\text{target}} \\rceil \\\\
 S^3 &= \\text{target} + \\varepsilon, \\quad 0 \\leq \\varepsilon < 3S^2
+\\qed\\\\
 \\end{align*}
 The error $\\varepsilon$ from rounding up is bounded by $3S^2$. Garbage bytes at the end of the padding absorb this error, keeping the $\\text{0x0001FF}^8\\text{00}H$ prefix intact.
 

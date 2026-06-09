@@ -178,7 +178,7 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
     }
     return Promise.resolve(null);
   },
-  proof: `\\textbf{Theorem:} If $m^e \\geq n$, then $m^e = c + k \\cdot n$ for some $k \\geq 0$, and $m = \\sqrt[e]{c + k \\cdot n}$ when $k = \\lfloor m^e / n \\rfloor$.
+  proof: `\\textbf{Theorem:} For any RSA ciphertext, $m^e = c + k \\cdot n$ for some $k \\geq 0$. When $m^e < n$, $k=0$ and $m = \\sqrt[e]{c}$ directly. When $k > 0$, brute-force $k$ until $\\sqrt[e]{c + k \\cdot n}$ is integer.
 
 \\textbf{Setup:}
 \\begin{itemize}

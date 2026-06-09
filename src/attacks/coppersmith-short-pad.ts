@@ -131,7 +131,7 @@ export const attack: Attack = {
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} Given $c_1 \\equiv m_1^e \\pmod{n}$ and $c_2 \\equiv m_2^e \\pmod{n}$ where $m_1 = m + r_1$, $m_2 = m + r_2$ with small random pads, recover $m$ when $m^e < n$.
+  proof: `\\textbf{Theorem:} Given two ciphertexts $c_1 \\equiv m_1^e \\pmod{n}$, $c_2 \\equiv m_2^e \\pmod{n}$ where $e$ is small (e.g. $e = 3, 5$), recover $m$ via integer root extraction. For $|m| < n^{1/e^2}$, Coppersmith's lattice extension applies.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -140,14 +140,20 @@ export const attack: Attack = {
 \\item $r_1, r_2$ are short random pads
 \\end{itemize}
 
-\\textbf{Proof:}
+\\textbf{Direct e-th Root (when $m^e < n$, no modular reduction):}
 \\begin{align*}
 m_1 &= \\lfloor\\sqrt[e]{c_1}\\rfloor,\\quad m_2 = \\lfloor\\sqrt[e]{c_2}\\rfloor \\\\
-\\text{Verify } m_1^e &= c_1,\\; m_2^e = c_2 \\quad\\text{(exact integer e-th root)} \\\\
 \\Delta &= m_2 - m_1 = r_2 - r_1 \\\\
-\\text{If only one root found, brute-force } \\Delta &\\in [1, 255] \\\\
-m &= m_1 - r_1 = m_2 - r_2 \\qed
+m &= m_1 - r_1 = m_2 - r_2
+\\qed\\\\
 \\end{align*}
+
+\\textbf{Coppersmith Lattice (when $m^e \\ge n$, modular wrap-around):}
+\\begin{itemize}
+\\item Construct $f(x) = (m_0 + x)^e - c \\pmod{n}$ for known $m_0 \\approx m$; LLL finds small root $|x_0| \\le n^{1/e^2}$
+\\item Short-pad variant uses polynomial resultants to eliminate the unknown pad difference $\\Delta$
+\\end{itemize}
+\\qed
 
 \\textbf{Explanation:} When $m^e < n$, the ciphertext is an exact $e$-th power in the integers (no modular wrap-around). Integer $e$-th root directly recovers $m_1$ and $m_2$. If only one root is found, brute-force the small pad difference $\\Delta$ (at most 255). The full Coppersmith short-pad attack using polynomial resultants handles the general case where $m^e \\ge n$ and $|\\Delta| < n^{1/e^2}$, but requires lattice reduction not shown here.
 

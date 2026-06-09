@@ -646,7 +646,7 @@ export function MagicPanel() {
   return (
     <Box sx={colFlexSx}>
       <Box sx={{ ...centeredPanelSx, p: 2 }}>
-        <Box sx={{ width: '100%', maxWidth: 640, pb: '30vh' }}>
+        <Box sx={{ width: '100%', maxWidth: 640 }}>
           <Typography variant="h3" sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
             <AutoFixHigh sx={{ fontSize: 'inherit' }} /> Magic Cracker
           </Typography>

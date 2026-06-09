@@ -175,7 +175,7 @@ export default function LengthExtensionTab() {
   const handleCopyMsg = useCallback(() => { if (result?.extendedMsg) navigator.clipboard.writeText(result.extendedMsg).catch(() => {}); }, [result]);
 
   return (
-    <Box sx={{ pb: '30vh' }}>
+    <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, p: 1, borderRadius: 1, border: `1px solid ${draculaColors.orange}`, backgroundColor: 'rgba(255,184,108,0.08)' }}>
         <WarningAmber sx={{ color: draculaColors.orange, fontSize: 20 }} />
         <Typography variant="caption" sx={{ color: draculaColors.orange }}>

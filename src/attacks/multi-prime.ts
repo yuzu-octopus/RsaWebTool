@@ -75,7 +75,9 @@ export const attack: Attack = {
 n &= \\prod_{i=1}^{k} p_i,\\; \\phi(n) = \\prod_{i=1}^{k} (p_i - 1) \\\\
 p_i &\\approx n^{1/k} \\text{ (each prime is smaller than in 2-prime RSA)} \\\\
 \\text{CRT decryption: } m_i &= c^{d \\bmod (p_i-1)} \\bmod p_i \\\\
-\\text{Factorization cost } &\\propto \\min_i (\\text{cost to factor } p_i) \\qed
+\\text{Factorization cost } &\\propto \\min_i (\\text{cost to factor } p_i) \\\\
+\\text{Each } p_i &\\approx n^{1/k} \\text{ bits. For } k=3,\\; 512\\text{-bit } n \\rightarrow p_i \\approx 170 \\text{ bits} \\\\
+&\\text{(vs } 256 \\text{ bits for standard RSA), making ECM/Pollard's rho exponentially faster} \\qed
 \\end{align*}
 
 \\textbf{Explanation:} Multi-prime RSA (also called "RSA Multiprime") uses three or more primes for a fixed modulus size, making each prime factor smaller and easier to find via generic factorization algorithms. The attack uses trial division up to 10,000 followed by Sage's factor() for complete factorization.

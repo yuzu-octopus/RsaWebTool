@@ -211,6 +211,7 @@ m &= m_0 \\cdot 2^k + x, \\quad 0 \\leq x < 2^k \\\\
 c &\\equiv (m_0 \\cdot 2^k + x)^e \\pmod{n} \\\\
 \\text{Iterate } x &= 0, 1, \\ldots, 2^k - 1 \\\\
 \\text{Check: } &(m_0 \\cdot 2^k + x)^e \\equiv c \\pmod{n}
+\\qed\\\\
 \\end{align*}
 Feasible for $k \\leq 24$ (approx. 16 million modular exponentiations in the browser).
 

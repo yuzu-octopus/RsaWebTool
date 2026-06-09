@@ -90,7 +90,7 @@ export default function RSACalculator() {
 
           <CalculatorSubTabs tabs={SUB_TABS} activeTab={activeTab} onChange={setActiveTab} />
 
-          <Box sx={{ flex: 1, overflow: 'auto', px: 0.5, pt: 1, pb: '30vh' }}>
+          <Box sx={{ flex: 1, overflow: 'auto', px: 0.5, pt: 1 }}>
             {activeTab === 'explanation' && <ExplanationTab />}
             {activeTab === 'key-gen' && <RsaKeyGenTab />}
             {activeTab === 'encrypt' && <RsaEncryptTab />}

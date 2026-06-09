@@ -146,7 +146,8 @@ export const attack: Attack = {
 \\text{For } d_p = 0\\ldots\\text{bound}:\\quad &\\texttt{current} = \\texttt{step}^{d_p} \\bmod n = 2^{e d_p} \\bmod n \\\\
 \\text{Accumulate } \\Pi &= \\Pi \\cdot (\\texttt{current} - 2) \\bmod n \\\\
 \\text{Every } 5000 \\text{ steps:}\\quad &g = \\gcd(\\Pi, n) \\\\
-1 < g < n &\\implies \\text{scan batch for exact } d_p \\qed
+1 < g < n &\\implies \\text{scan batch for exact } d_p
+\\qed\\\\
 \\end{align*}
 
 \\textbf{Explanation:} Fermat's Little Theorem guarantees $2^{ed_p} \\equiv 2 \\pmod{p}$ when $d_p$ is the correct CRT exponent. The attack linearly scans candidate $d_p$ values, accumulating a product of $(2^{ed_p} - 2)$ values in batches of 5000. A single GCD per batch detects whether any candidate in the batch is correct, reducing GCD calls by $5000\\times$. Once a hit is found, a linear scan of just that batch identifies the exact $d_p$. This works for any $e$ (no $e$-size limit) since the iteration count depends only on the bound.

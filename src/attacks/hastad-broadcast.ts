@@ -153,6 +153,7 @@ c_i &\\equiv m^e \\pmod{n_i} \\\\
 M &\\equiv m^e \\pmod{\\prod n_i} \\quad \\text{(by CRT)} \\\\
 m^e < \\prod n_i &\\implies M = m^e \\quad \\text{(equality over $\\mathbb{Z}$, not just modulo)} \\\\
 m &= \\sqrt[e]{M} \\quad \\text{(exact integer e-th root)}
+\\qed\\\\
 \\end{align*}
 
 \\textbf{Explanation:} CRT reconstructs $m^e$ as an integer $M$. Since $m^e$ is smaller than the product of all moduli, the reconstruction is exact — there is no modular wrap-around. The e-th root then recovers $m$ directly. This is why small exponents like $e = 3$ are dangerous when broadcasting: only 3 ciphertexts suffice for recovery.

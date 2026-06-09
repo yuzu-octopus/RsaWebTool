@@ -92,7 +92,7 @@ export const attack: Attack = {
             out.append("PARTIAL_KEY_EXPOSURE=FAILED")`,
     useGuard: true,
   }),
-  proof: `\\textbf{Theorem:} If MSBs of $p$ are known with $|x| < n^{\\beta^2}$ where $\\beta = 0.5$, Coppersmith's lattice recovers $p$.
+  proof: `\\textbf{Theorem:} If MSBs of $p$ are known with $|x| < n^{0.25}$, Coppersmith's lattice recovers $p$.
 
 \\textbf{Setup:}
 \\begin{itemize}

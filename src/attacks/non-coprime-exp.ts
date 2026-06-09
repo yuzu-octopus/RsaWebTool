@@ -129,6 +129,7 @@ R_p &= \\{r \\in \\mathbb{F}_p : r^e \\equiv c \\pmod{p}\\}, \\quad |R_p| = g_p 
 R_q &= \\{r \\in \\mathbb{F}_q : r^e \\equiv c \\pmod{q}\\}, \\quad |R_q| = g_q \\\\
 m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\quad \\text{for each pair} \\\\
 \\#\\text{valid plaintexts} &= g_p \\cdot g_q
+\\qed\\\\
 \\end{align*}
 
 \\textbf{Explanation:} RSA requires $\\gcd(e, \\varphi(n)) = 1$ for a unique decryption exponent $d$. When this fails, the encryption map $m \\mapsto m^e \\bmod n$ is many-to-one: multiple plaintexts produce the same ciphertext. The attack finds all e-th roots in $\\mathbb{F}_p$ and $\\mathbb{F}_q$ using finite field algebra, then combines them via CRT. Each combination is a valid preimage of $c$.

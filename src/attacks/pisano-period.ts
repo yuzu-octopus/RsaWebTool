@@ -189,8 +189,8 @@ export const attack: Attack = {
 \\begin{align*}
 f(i) = f(j) &\\implies 2^i \\equiv 2^j \\pmod{n} \\\\
 &\\implies 2^{|j-i|} \\equiv 1 \\pmod{n} \\\\
-|j-i| &\\text{ is a multiple of } \\operatorname{ord}_n(2) \\mid \\lambda(n) \\\\
-\\phi &= k \\cdot |j-i| \\text{ as candidate for } \\phi(n) \\\\
+|j-i| &\\text{ is a multiple of } \\operatorname{ord}_n(2) \\mid \\lambda(n) \\mid \\phi(n) \\\\
+\\text{Candidate } \\phi &= k \\cdot |j-i|,\\; \\phi(n) = k \\cdot \\operatorname{ord}_n(2) \\\\
 p,q &= \\frac{n - \\phi + 1 \\pm \\sqrt{(n - \\phi + 1)^2 - 4n}}{2} \\qed
 \\end{align*}
 
