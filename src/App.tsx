@@ -7,7 +7,7 @@ import { InputPanel } from './components/InputPanel';
 import { OutputPanel } from './components/OutputPanel';
 import { MagicPanel } from './components/MagicPanel';
 import { ProofIndex } from './components/ProofIndex';
-import { RsaCalculator } from './components/RsaCalculator';
+import { Calculator } from './components/calculator/Calculator';
 import { FormatConverter } from './components/FormatConverter';
 import { InstructionsPanel } from './components/InstructionsPanel';
 import { PemDecryptor } from './components/PemDecryptor';
@@ -48,7 +48,7 @@ function AppContent() {
               <InputPanel />
               <MagicPanel />
               <ProofIndex />
-              <RsaCalculator />
+              <Calculator />
               <FormatConverter />
               <InstructionsPanel />
               <PemDecryptor />

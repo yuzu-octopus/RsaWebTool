@@ -10,9 +10,10 @@ import {
   Divider,
   Link,
 } from '@mui/material';
-import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, Calculate, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey, Lock, Hub, Tag } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { CATEGORIES, attacksByCategory } from '../attacks';
+import { CALCULATOR_ITEMS } from '../config/sidebarItems';
 import type { Attack } from '../types';
 import { useAppContext } from '../hooks/useAppContext';
 import env from '../config/env';
@@ -25,8 +26,8 @@ interface ServiceStatus {
 }
 
 export function Sidebar() {
-  const { selectedAttack, setSelectedAttack, setViewMode, viewMode } = useAppContext();
-  const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set(CATEGORIES));
+  const { selectedAttack, setSelectedAttack, setViewMode, viewMode, calculatorMode, setCalculatorMode } = useAppContext();
+  const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set([...CATEGORIES, 'Calculators']));
   const [status, setStatus] = useState<ServiceStatus>({
     factordb: 'checking',
     sagecell: typeof window !== 'undefined' && window.sagecell ? 'ok' : 'checking',
@@ -116,13 +117,25 @@ export function Sidebar() {
     let el: HTMLElement | null = null;
     if (viewMode === 'attack' && selectedAttack) {
       el = document.getElementById(`sidebar-attack-${selectedAttack.id}`);
+    } else if (viewMode === 'calculator') {
+      el = document.getElementById(`sidebar-calc-${calculatorMode}`);
     } else if (viewMode !== 'attack') {
       el = document.getElementById(`sidebar-view-${viewMode}`);
     }
     if (el) {
       el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
-  }, [selectedAttack, viewMode]);
+  }, [selectedAttack, viewMode, calculatorMode]);
+
+  const calculatorIcon = (mode: string) => {
+    switch (mode) {
+      case 'rsa': return <VpnKey sx={{ color: draculaColors.cyan, mr: 1, fontSize: '1.1rem' }} />;
+      case 'aes': return <Lock sx={{ color: draculaColors.purple, mr: 1, fontSize: '1.1rem' }} />;
+      case 'ecc': return <Hub sx={{ color: draculaColors.green, mr: 1, fontSize: '1.1rem' }} />;
+      case 'hash': return <Tag sx={{ color: draculaColors.orange, mr: 1, fontSize: '1.1rem' }} />;
+      default: return null;
+    }
+  };
 
   return (
     <Drawer
@@ -186,6 +199,38 @@ export function Sidebar() {
           </Box>
         ))}
 
+        <Box key="Calculators">
+          <ListItemButton onClick={() => toggleCat('Calculators')} sx={{ px: 2 }}>
+            <Typography sx={{ color: draculaColors.cyan, fontWeight: 600, fontSize: '0.85rem', flex: 1 }}>
+              Calculators
+            </Typography>
+            {expandedCats.has('Calculators') ? <ExpandLess sx={{ color: draculaColors.comment }} /> : <ExpandMore sx={{ color: draculaColors.comment }} />}
+          </ListItemButton>
+          <Collapse in={expandedCats.has('Calculators')} unmountOnExit>
+            <List component="div" disablePadding>
+              {CALCULATOR_ITEMS.map(item => (
+                <ListItemButton
+                  key={item.id}
+                  id={`sidebar-calc-${item.calculatorMode}`}
+                  onClick={() => { setViewMode('calculator'); setCalculatorMode(item.calculatorMode); }}
+                  sx={{
+                    pl: 4,
+                    borderLeft: viewMode === 'calculator' && calculatorMode === item.calculatorMode ? `3px solid ${draculaColors.cyan}` : '3px solid transparent',
+                    backgroundColor: viewMode === 'calculator' && calculatorMode === item.calculatorMode ? draculaColors.currentLine : 'transparent',
+                    '&:hover': { backgroundColor: draculaColors.background },
+                  }}
+                >
+                  {calculatorIcon(item.calculatorMode)}
+                  <ListItemText
+                    primary={item.label}
+                    slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.85rem' } } }}
+                  />
+                </ListItemButton>
+              ))}
+            </List>
+          </Collapse>
+        </Box>
+
         <Divider sx={{ borderColor: draculaColors.comment, my: 1 }} />
 
         <ListItemButton
@@ -237,24 +282,6 @@ export function Sidebar() {
           <ListItemText
             primary="Attack Index"
             slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.85rem' } } }}
-          />
-        </ListItemButton>
-
-        <ListItemButton
-          id="sidebar-view-calculator"
-          onClick={() => setViewMode('calculator')}
-          sx={{
-            pl: 4,
-            mt: 0.5,
-            borderLeft: isViewActive('calculator') ? `3px solid ${draculaColors.purple}` : '3px solid transparent',
-            backgroundColor: isViewActive('calculator') ? draculaColors.background : 'transparent',
-            '&:hover': { backgroundColor: draculaColors.background },
-          }}
-        >
-          <Calculate sx={{ color: draculaColors.cyan, mr: 1, fontSize: '1.1rem' }} />
-          <ListItemText
-            primary="Calculator"
-            slotProps={{ primary: { sx: { color: draculaColors.cyan, fontSize: '0.85rem' } } }}
           />
         </ListItemButton>
 

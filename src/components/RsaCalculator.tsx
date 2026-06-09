@@ -2,17 +2,13 @@ import { useState } from 'react';
 import { Box, Typography, Tabs, Tab } from '@mui/material';
 import { Calculate } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
-import { useAppContext } from '../hooks/useAppContext';
 import { colFlexSx, centeredPanelSx, tabSx } from '../styles/shared';
 import { RsaKeyGenTab } from './RsaKeyGenTab';
 import { RsaEncryptTab } from './RsaEncryptTab';
 import { RsaDecryptTab } from './RsaDecryptTab';
 
 export function RsaCalculator() {
-  const { viewMode } = useAppContext();
   const [tab, setTab] = useState(0);
-
-  if (viewMode !== 'calculator') return null;
 
   return (
     <Box sx={colFlexSx}>

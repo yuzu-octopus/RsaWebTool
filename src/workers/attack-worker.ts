@@ -1,5 +1,6 @@
 /**
  * Web Worker for running attack frontendCheck computations off the main thread.
+ * Also handles Proof-of-Work computation via the built-in PoW solver.
  * Imports all attacks via the barrel and runs frontendCheck for a given attackId.
  * Workers have no DOM access, but all attack frontendCheck functions are pure
  * BigInt math (no DOM dependencies), so this is safe.
@@ -9,11 +10,19 @@
  *   Main → Worker: { type: 'cancel', ids: number[] }
  *   Worker → Main: { id: number, result: string | null, error?: string }
  *   Worker → Main: { type: 'progress', id: number, pct: number, detail?: string }
+ *
+ * Special attackId '__pow__' runs the PoW solver:
+ *   params.challenge — the challenge string
+ *   params.difficulty — number of leading zero bits required (>= 1)
+ *   Returns JSON-stringified PoWResult on success.
  */
 
 import { attacks } from '../attacks';
 import env from '../config/env';
 import { setFactorDBProxy } from '../utils/factordb';
+import { solvePoW } from './pow-worker';
+export type { PoWInput, PoWResult } from './pow-worker';
+export { solvePoW };
 
 // Initialize services that rely on singleton config (same as App.tsx does on main thread)
 setFactorDBProxy(env.factordbProxyUrl);
@@ -46,6 +55,9 @@ interface WorkerProgress {
 // the worker discards the result instead of posting it back.
 const cancelledIds = new Set<number>();
 
+// AbortControllers for PoW tasks keyed by task ID — enables proper AbortSignal propagation
+const powControllers = new Map<number, AbortController>();
+
 self.onmessage = (e: MessageEvent<CancelMessage | WorkerRequest>) => {
   const data = e.data;
 
@@ -53,6 +65,11 @@ self.onmessage = (e: MessageEvent<CancelMessage | WorkerRequest>) => {
   if ('type' in data && data.type === 'cancel') {
     for (const id of data.ids) {
       cancelledIds.add(id);
+      const ctrl = powControllers.get(id);
+      if (ctrl) {
+        ctrl.abort();
+        powControllers.delete(id);
+      }
     }
     return;
   }
@@ -65,6 +82,42 @@ self.onmessage = (e: MessageEvent<CancelMessage | WorkerRequest>) => {
     return;
   }
 
+  // Special handler: Proof-of-Work computation (attackId === '__pow__')
+  if (attackId === '__pow__') {
+    const challenge = params.challenge;
+    const difficulty = parseInt(params.difficulty, 10);
+    if (!challenge || isNaN(difficulty) || difficulty < 1) {
+      if (!cancelledIds.has(id)) {
+        self.postMessage({ id, result: null, error: 'Invalid PoW params: challenge and difficulty (>= 1) required' } satisfies WorkerResponse);
+      }
+      return;
+    }
+
+    const abortController = new AbortController();
+    powControllers.set(id, abortController);
+    void (async () => {
+      try {
+        const onProgress = (pct: number, detail?: string) => {
+          if (!cancelledIds.has(id)) {
+            self.postMessage({ type: 'progress', id, pct, detail } satisfies WorkerProgress);
+          }
+        };
+        const result = await solvePoW({ challenge, difficulty }, abortController.signal, onProgress);
+        if (!cancelledIds.has(id)) {
+          self.postMessage({ id, result: result ? JSON.stringify(result) : null } satisfies WorkerResponse);
+        }
+      } catch (err) {
+        if (!cancelledIds.has(id)) {
+          self.postMessage({ id, result: null, error: String(err) } satisfies WorkerResponse);
+        }
+      } finally {
+        powControllers.delete(id);
+      }
+    })();
+    return;
+  }
+
+  // Standard attack handler
   const attack = attacks.find(a => a.id === attackId);
   if (!attack?.frontendCheck) {
     if (!cancelledIds.has(id)) {

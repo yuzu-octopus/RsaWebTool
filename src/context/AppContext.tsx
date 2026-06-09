@@ -6,6 +6,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [app, setApp] = useState({
     selectedAttack: null as AppContextType['selectedAttack'],
     viewMode: 'attack' as AppContextType['viewMode'],
+    calculatorMode: 'rsa' as AppContextType['calculatorMode'],
     outputResult: null as string | null,
     outputError: null as string | null,
     outputSource: null as AppContextType['outputSource'],
@@ -56,6 +57,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setSelectedAttack: (v: AppContextType['selectedAttack']) => setApp(prev => ({ ...prev, selectedAttack: v })),
     viewMode: app.viewMode,
     setViewMode: (v: AppContextType['viewMode']) => setApp(prev => ({ ...prev, viewMode: v })),
+    calculatorMode: app.calculatorMode,
+    setCalculatorMode: (v: AppContextType['calculatorMode']) => setApp(prev => ({ ...prev, calculatorMode: v })),
     outputResult: app.outputResult,
     setOutputResult: (v: string | null) => setApp(prev => ({ ...prev, outputResult: v })),
     outputError: app.outputError,
@@ -65,7 +68,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     history, addToHistory, notification, showNotification,
     commandPaletteOpen, setCommandPaletteOpen,
   }), [
-    app.selectedAttack, app.viewMode, app.outputResult, app.outputError, app.outputSource,
+    app.selectedAttack, app.viewMode, app.calculatorMode, app.outputResult, app.outputError, app.outputSource,
     history, addToHistory, notification, showNotification,
     commandPaletteOpen, setCommandPaletteOpen,
   ]);

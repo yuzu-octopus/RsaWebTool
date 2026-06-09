@@ -5,7 +5,7 @@ import { attacks } from '../attacks';
 import { ALL_SIDEBAR_ITEMS } from '../config/sidebarItems';
 
 export function useKeyboardShortcuts() {
-  const { selectedAttack, setSelectedAttack, setViewMode, viewMode } = useAppContext();
+  const { selectedAttack, setSelectedAttack, setViewMode, setCalculatorMode, viewMode, calculatorMode } = useAppContext();
   const { toggle } = useCommandPalette();
 
   useEffect(() => {
@@ -23,6 +23,10 @@ export function useKeyboardShortcuts() {
         if (selectedAttack && viewMode === 'attack') {
           currentIdx = ALL_SIDEBAR_ITEMS.findIndex(
             item => item.type === 'attack' && item.id === selectedAttack.id,
+          );
+        } else if (viewMode === 'calculator') {
+          currentIdx = ALL_SIDEBAR_ITEMS.findIndex(
+            item => item.type === 'calculator-tab' && item.calculatorMode === calculatorMode,
           );
         } else {
           currentIdx = ALL_SIDEBAR_ITEMS.findIndex(
@@ -48,6 +52,9 @@ export function useKeyboardShortcuts() {
             setSelectedAttack(attack);
             setViewMode('attack');
           }
+        } else if (nextItem.type === 'calculator-tab') {
+          setViewMode('calculator');
+          setCalculatorMode(nextItem.calculatorMode);
         } else {
           setViewMode(nextItem.mode as 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter' | 'instructions' | 'pem');
         }
@@ -63,15 +70,33 @@ export function useKeyboardShortcuts() {
           break;
         case '1':
           e.preventDefault();
-          window.dispatchEvent(new CustomEvent('rsa-switch-tab', { detail: 0 }));
+          if (viewMode === 'calculator') {
+            window.dispatchEvent(new CustomEvent('calculator-switch-tab', { detail: 0 }));
+          } else {
+            window.dispatchEvent(new CustomEvent('rsa-switch-tab', { detail: 0 }));
+          }
           break;
         case '2':
           e.preventDefault();
-          window.dispatchEvent(new CustomEvent('rsa-switch-tab', { detail: 1 }));
+          if (viewMode === 'calculator') {
+            window.dispatchEvent(new CustomEvent('calculator-switch-tab', { detail: 1 }));
+          } else {
+            window.dispatchEvent(new CustomEvent('rsa-switch-tab', { detail: 1 }));
+          }
           break;
         case '3':
           e.preventDefault();
-          window.dispatchEvent(new CustomEvent('rsa-switch-tab', { detail: 2 }));
+          if (viewMode === 'calculator') {
+            window.dispatchEvent(new CustomEvent('calculator-switch-tab', { detail: 2 }));
+          } else {
+            window.dispatchEvent(new CustomEvent('rsa-switch-tab', { detail: 2 }));
+          }
+          break;
+        case '4':
+          e.preventDefault();
+          if (viewMode === 'calculator') {
+            window.dispatchEvent(new CustomEvent('calculator-switch-tab', { detail: 3 }));
+          }
           break;
         case 'enter':
           e.preventDefault();
@@ -90,5 +115,5 @@ export function useKeyboardShortcuts() {
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [setViewMode, toggle, selectedAttack, setSelectedAttack, viewMode]);
+  }, [setViewMode, setCalculatorMode, toggle, selectedAttack, setSelectedAttack, viewMode, calculatorMode]);
 }

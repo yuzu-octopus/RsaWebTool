@@ -14,7 +14,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { attacks } from '../attacks';
 import { SIDEBAR_MODULES, ALL_SIDEBAR_ITEMS } from '../config/sidebarItems';
 import { draculaColors } from '../theme/dracula';
-import type { Attack, AttackCategory } from '../types';
+import type { Attack, AttackCategory, CalculatorMode } from '../types';
 
 const MODULE_ICONS: Record<string, React.ElementType> = {
   instructions: MenuBook,
@@ -31,6 +31,9 @@ const CATEGORY_COLORS: Record<AttackCategory, string> = {
   'Message / Protocol': draculaColors.cyan,
   Oracle: draculaColors.orange,
   Advanced: draculaColors.yellow,
+  Symmetric: draculaColors.pink,
+  Hash: draculaColors.cyan,
+  ECC: draculaColors.purple,
 };
 
 export function CommandPalette() {
@@ -39,6 +42,7 @@ export function CommandPalette() {
     setCommandPaletteOpen,
     setViewMode,
     setSelectedAttack,
+    setCalculatorMode,
   } = useAppContext();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -58,6 +62,7 @@ export function CommandPalette() {
     const items: Array<
       | { type: 'view'; module: typeof SIDEBAR_MODULES[number]; index: number }
       | { type: 'attack'; attack: Attack; index: number }
+      | { type: 'calculator-tab'; calculatorMode: CalculatorMode; label: string; index: number }
     > = [];
     let idx = 0;
 
@@ -77,6 +82,8 @@ export function CommandPalette() {
       if (item.type === 'attack') {
         const attack = attacks.find(a => a.id === item.id);
         if (attack) items.push({ type: 'attack', attack, index: idx++ });
+      } else if (item.type === 'calculator-tab') {
+        items.push({ type: 'calculator-tab', calculatorMode: item.calculatorMode, label: item.label, index: idx++ });
       } else {
         const mod = SIDEBAR_MODULES.find(m => m.id === item.id);
         if (mod) items.push({ type: 'view', module: mod, index: idx++ });
@@ -89,12 +96,27 @@ export function CommandPalette() {
     setCommandPaletteOpen(false);
   }, [setCommandPaletteOpen]);
 
+  const VIEW_MODES = ['attack', 'magic', 'proofs', 'calculator', 'format-converter', 'instructions', 'pem'] as const;
+  type ViewMode = typeof VIEW_MODES[number];
+
   const selectView = useCallback(
     (mode: string) => {
-      (setViewMode as (mode: string) => void)(mode);
+      if (VIEW_MODES.includes(mode as ViewMode)) {
+        setViewMode(mode as ViewMode);
+      }
       close();
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [setViewMode, close],
+  );
+
+  const selectCalculatorTab = useCallback(
+    (calculatorMode: CalculatorMode) => {
+      setViewMode('calculator');
+      setCalculatorMode(calculatorMode);
+      close();
+    },
+    [setViewMode, setCalculatorMode, close],
   );
 
   const selectAttack = useCallback(
@@ -124,6 +146,7 @@ export function CommandPalette() {
           if (selectedIndex < allItems.length) {
             const item = allItems[selectedIndex];
             if (item.type === 'view') selectView(item.module.mode);
+            else if (item.type === 'calculator-tab') selectCalculatorTab(item.calculatorMode);
             else selectAttack(item.attack);
           }
           break;
@@ -133,7 +156,7 @@ export function CommandPalette() {
           break;
       }
     },
-    [allItems, selectedIndex, selectView, selectAttack, close],
+    [allItems, selectedIndex, selectView, selectAttack, selectCalculatorTab, close],
   );
 
   return (
@@ -237,6 +260,48 @@ export function CommandPalette() {
                       height: 18,
                       bgcolor: 'transparent',
                       border: `1px solid ${draculaColors.comment}`,
+                    }}
+                  />
+                </ListItemButton>
+              );
+            }
+            if (item.type === 'calculator-tab') {
+              return (
+                <ListItemButton
+                  key={`calc-${item.calculatorMode}`}
+                  selected={isSelected}
+                  onClick={() => selectCalculatorTab(item.calculatorMode)}
+                  onMouseEnter={() => setSelectedIndex(item.index)}
+                  sx={{
+                    px: 2,
+                    py: 0.75,
+                    backgroundColor: isSelected ? draculaColors.currentLine : 'transparent',
+                    '&:hover': { backgroundColor: draculaColors.currentLine },
+                    borderLeft: `3px solid ${isSelected ? draculaColors.purple : 'transparent'}`,
+                  }}
+                >
+                  <Calculate sx={{ color: draculaColors.comment, mr: 1.5, fontSize: 20 }} />
+                  <ListItemText
+                    primary={item.label}
+                    slotProps={{
+                      primary: {
+                        sx: {
+                          color: draculaColors.foreground,
+                          fontFamily: "'JetBrains Mono', monospace",
+                          fontSize: '0.8rem',
+                        },
+                      },
+                    }}
+                  />
+                  <Chip
+                    label="Calculator"
+                    size="small"
+                    sx={{
+                      color: draculaColors.cyan,
+                      fontSize: '0.6rem',
+                      height: 18,
+                      bgcolor: 'transparent',
+                      border: `1px solid ${draculaColors.cyan}`,
                     }}
                   />
                 </ListItemButton>

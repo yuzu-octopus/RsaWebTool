@@ -10,7 +10,9 @@ export interface InputField {
   options?: { label: string; value: string }[];
 }
 
-export type AttackCategory = 'Factorization' | 'Partial Key / Lattice' | 'Message / Protocol' | 'Oracle' | 'Advanced';
+export type AttackCategory = 'Factorization' | 'Partial Key / Lattice' | 'Message / Protocol' | 'Oracle' | 'Advanced' | 'Symmetric' | 'Hash' | 'ECC';
+
+export type CalculatorMode = 'rsa' | 'aes' | 'ecc' | 'hash';
 
 export interface Attack {
   id: string;
@@ -45,6 +47,8 @@ export interface AppContextType {
   setSelectedAttack: (attack: Attack | null) => void;
   viewMode: 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter' | 'instructions' | 'pem';
   setViewMode: (mode: 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter' | 'instructions' | 'pem') => void;
+  calculatorMode: CalculatorMode;
+  setCalculatorMode: (mode: CalculatorMode) => void;
   outputResult: string | null;
   setOutputResult: (result: string | null) => void;
   outputError: string | null;

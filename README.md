@@ -1,6 +1,6 @@
 # RSA Web Tool
 
-A browser-only RSA CTF (Capture The Flag) tool with 47 cryptographic attacks across 5 categories.
+A browser-only RSA CTF (Capture The Flag) tool with 47 cryptographic attacks across 5 categories, plus 4 built-in calculators.
 
 **Live at:** [yuzu-octopus.github.io/RsaWebTool](https://yuzu-octopus.github.io/RsaWebTool/)
 
@@ -8,25 +8,36 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 
 ## Features
 
-- **47 attacks** — Factorization, Lattice, Protocol, Oracle, and Advanced categories
+### Cryptographic Attacks
+
+- **47 attacks** — Factorization (19), Lattice/Partial Key (11), Message/Protocol (9), Oracle (4), and Advanced (4) categories
 - **31 browser-side checks** — instant results via native BigInt (no SageCell needed), with live progress bars showing iteration variable + count on longer-running attacks
 - **3 concurrent Web Workers** — parallel frontendCheck execution across attacks
 - **SageMathCell integration** — 3 concurrent slots with 30s stall detection and immediate error element reporting
 - **FactorDB lookup** — auto-queries FactorDB and auto-submits discovered factorizations
-- **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution (3 concurrent) with early-stop on first true success (FactorDB non-FF results don't trigger early-stop)
+- **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution (3 concurrent) with early-stop on first true success
 - **Console Environment** — `window.env` exposes all config (workers, timeouts, FactorDB proxy) with localStorage persistence; `env.reset()` clears all stored state
-- **RSA Calculator** — standalone key generation, encryption, decryption (pure BigInt). 3-tab interface with merged form state. e defaults to 65537; Decrypt accepts any 2 of (p, q, n) with auto-derivation
+
+### Built-in Calculators
+
+- 🔢 **RSA Calculator** — Key Generation, Encryption, Decryption (pure BigInt) with Explanation tab. e defaults to 65537; Decrypt auto-derives missing parameters from any 2 of (p, q, n)
+- 🔒 **AES Calculator** — Encrypt/Decrypt via Web Crypto API (@noble/ciphers) in ECB/CBC/CTR/GCM/OFB/CFB modes with explanation tab. 8 attack modes: CTR nonce reuse, CBC bit-flipping, ECB mode detection, ECB cut-and-paste, ECB byte-at-a-time oracle, CBC padding oracle, GCM nonce reuse, AES-128 key schedule inversion
+- 📐 **ECC Calculator** — Key generation, public-from-private, ECDH shared secret, ECDSA sign/verify via @noble/curves (secp256k1, P-256, P-384, P-521, Curve25519). 7 attack modes: ECDSA nonce reuse, point validation checker, biased nonce LLL, invalid curve attack, MOV embedding degree, Smart's anomalous attack, singular curve attack
+- 🔏 **Hash Calculator** — 11 hash algorithms (SHA-256/384/512, MD5, SHA-1, BLAKE2b, BLAKE2s, BLAKE3, SHA-3-256/512, Keccak-256/512), HMAC, Proof of Work with Web Worker support, Length Extension attack, Format Converter (hex/decimal/base64/text)
+
+### Interface
+
 - **Format Converter** — live Hex / Decimal / Base64 / Text conversion
 - **Attack Index** — searchable catalog of all 47 attack proofs with KaTeX rendering
 - **METHOD indicator** — every output shows `METHOD=TYPESCRIPT` or `METHOD=SAGEMATHCELL`
 - **Standardized output format** — all 47 attacks produce consistent `Attack Name → Inputs → Results → Verification → TOKEN → METHOD` output
-- **Command Palette** — ⌘/Ctrl+K fuzzy search across all 47 attacks + views
-- **Keyboard Shortcuts** — ⌘Enter (run), ⌘1/2/3 (tabs), ⌘Shift+C (copy), Tab/Shift+Tab (cycle attacks)
+- **Command Palette** — ⌘/Ctrl+K fuzzy search across all 47 attacks + calculators + views
+- **Keyboard Shortcuts** — ⌘Enter (run), ⌘1/2/3/4/5/6 (tabs / calculator sub-tabs), ⌘Shift+C (copy), Tab/Shift+Tab (cycle attacks)
 - **PEM Decryptor** — Parse and decrypt PKCS#1/PKCS#8/encrypted PEM keys, feed params to Calculator or Attacks
 - **Instructions** — Reference guide for using the tool
 - **Console Configuration** — `env` object exposed on `window` for runtime config (proxy URL, worker pool, timeouts). Persisted to localStorage, `env.reset()` clears all stored data.
 - **Dracula theme** — dark, developer-friendly UI
-- **Prismjs syntax highlighting** — replaces react-syntax-highlighter, 33% smaller bundle (1.22MB)
+- **Prismjs syntax highlighting** — replaces react-syntax-highlighter, 33% smaller bundle
 - **Notepad** — drag-resizeable scratchpad with localStorage persistence
 
 ## Quick Start
@@ -46,7 +57,7 @@ Open `http://localhost:5173` in your browser.
 | batch-gcd | GCD across comma-separated moduli | ✓ |
 | binary-poly-factor | Binary polynomial factorization | — |
 | boneh-durfee | Boneh-Durfee lattice for small d | — |
-| close-prime | Fermat factorization (|p-q| small) | ✓ |
+| close-prime | Fermat factorization (\|p-q\| small) | ✓ |
 | common-prime-rsa | GCD chain across multiple moduli | ✓ |
 | ecm2 | ECM factorization (elliptic curve method) | — |
 | euler | Euler factorization via two sum-of-squares | ✓ |
@@ -148,13 +159,22 @@ METHOD=TYPESCRIPT
 The `METHOD=` line indicates whether the result came from the browser (`TYPESCRIPT`) or SageMathCell (`SAGEMATHCELL`). Tokens: `=SUCCESS` (fully recovered), `=RESULT` (FactorDB query returned non-FF status), `=FAILED` (attack did not recover).
 
 ### RSA Calculator
-Standalone BigInt operations: key generation, encryption, and decryption. Smart defaults: `e` defaults to 65537 in Key Gen and Encrypt when left empty. Decrypt accepts any 2 of (p, q, n) and auto-derives the third.
+Standalone BigInt operations: key generation, encryption, and decryption. Smart defaults: `e` defaults to 65537 in Key Gen and Encrypt when left empty. Decrypt accepts any 2 of (p, q, n) and auto-derives the third. Includes an Explanation tab for RSA theory reference.
+
+### AES Calculator
+Encrypt/Decrypt in 6 modes (ECB, CBC, CTR, GCM, OFB, CFB) via @noble/ciphers Web Crypto API. Supports hex, base64, and text input encoding. AAD for GCM mode. 8 attack modes: CTR nonce reuse (keystream recovery), CBC bit-flipping (plaintext manipulation), ECB mode detector (block dedup), ECB cut-and-paste (block reordering), ECB byte-at-a-time oracle, CBC padding oracle, GCM nonce reuse (keystream + tag forgery), AES-128 key schedule inversion (last round key → original key).
+
+### ECC Calculator
+Curve operations via @noble/curves: key generation (compressed/uncompressed), public key from private, ECDH shared secret with secp256k1, P-256, P-384, P-521, and Curve25519. ECDSA sign/verify. 7 attack modes (some via SageMathCell): ECDSA nonce reuse, point validation checker, biased nonce LLL, invalid curve attack, MOV embedding degree, Smart's anomalous curve attack, singular curve attack.
+
+### Hash Calculator
+Pure JS hash computation (no SageCell needed). 11 algorithms: SHA-256/384/512, MD5, SHA-1, BLAKE2b, BLAKE2s, BLAKE3, SHA-3-256/512, Keccak-256/512. HMAC with any algorithm. Proof of Work with user-defined conditions (prefix + difficulty), Web Worker offload, EWMA ETA. Length Extension attack demonstration. Format Converter between hex, decimal, base64, and text.
 
 ### Format Converter
 Live conversion between hex, decimal, base64, and text.
 
 ### Command Palette
-Press `⌘K` (Mac) or `Ctrl+K` (Windows/Linux) to open. Fuzzy-search across all attacks and views. Arrow keys to navigate, Enter to select.
+Press `⌘K` (Mac) or `Ctrl+K` (Windows/Linux) to open. Fuzzy-search across all attacks, calculators, and views. Arrow keys to navigate, Enter to select.
 
 ### PEM Decryptor
 Paste a PEM private key (PKCS#1, PKCS#8, or encrypted). The tool parses the key, extracts n/e/d/p/q parameters, and offers "Feed to Calculator" or "Feed to Attacks" buttons. Supports passphrase-protected keys via Web Crypto API.
@@ -164,9 +184,10 @@ Paste a PEM private key (PKCS#1, PKCS#8, or encrypted). The tool parses the key,
 |----------|--------|
 | ⌘/Ctrl+K | Open command palette |
 | ⌘/Ctrl+Enter | Run current attack |
-| ⌘/Ctrl+1/2/3 | Switch Explanation/Input/Source tabs |
+| ⌘/Ctrl+1/2/3 | Switch Explanation/Input/Source tabs (attack mode), or RSA/AES/ECC/Hash calculator tabs (calculator mode) |
+| ⌘/Ctrl+4/5/6 | Switch calculator sub-tabs for AES/ECC/Hash (only in calculator mode) |
 | ⌘/Ctrl+Shift+C | Copy output |
-| Tab/Shift+Tab | Cycle through attacks |
+| Tab/Shift+Tab | Cycle through sidebar items |
 
 ### Console Configuration
 
@@ -196,6 +217,7 @@ env.reset()              // clears ALL localStorage + reloads
 | Build | Vite 8.0 + Rolldown |
 | Syntax Highlighting | Prismjs (replaces react-syntax-highlighter) |
 | Math | SageMathCell (embedded JS), KaTeX 0.17 |
+| Crypto | @noble/ciphers (AES), @noble/curves (ECC), @noble/hashes (hash) |
 | External | FactorDB (via Cloudflare Worker CORS proxy) |
 | Hosting | GitHub Pages |
 
@@ -203,17 +225,50 @@ env.reset()              // clears ALL localStorage + reloads
 
 ```
 src/
-  attacks/          47 individual .ts files + guard.ts + index.ts + rawSources.ts
-  components/       15 React components (Sidebar, InputPanel, OutputPanel, MagicPanel, CommandPalette, InstructionsPanel, PemDecryptor, etc.)
-  config/           env.ts (console-accessible Env class), sidebarItems.ts
-  context/          AppContext provider, ctx.ts
-  hooks/            useSageMath, useWorkerPool, useDragResize, useAppContext, useTimer, useCommandPalette, useKeyboardShortcuts
-  styles/           shared.ts, inputSx.ts
-  theme/            dracula.ts
-  types/            index.ts
-  utils/            bigint.ts, converters.ts, factordb.ts, sageOutput.ts, testcases/core.ts, attackSource.ts, pemParser.ts, asn1.ts, progressEstimator.ts
-workers/            Cloudflare Worker CORS proxy for FactorDB
+  attacks/           47 individual .ts files + guard.ts + index.ts + rawSources.ts
+  components/        React components (Sidebar, InputPanel, OutputPanel, MagicPanel,
+                     CommandPalette, InstructionsPanel, PemDecryptor, calculators, etc.)
+    calculator/      Calculator shell (Calculator.tsx, CalculatorSubTabs.tsx)
+      RSACalculator, AESCalculator, ECCCalculator, HashCalculator
+      hash/          Hash sub-tabs (Explanation, HashFunctions, HMAC, LengthExt, PoW, FormatConv)
+  config/            env.ts (console-accessible Env class), sidebarItems.ts
+  context/           AppContext provider, ctx.ts
+  hooks/             useSageMath, useWorkerPool, useDragResize, useAppContext, useTimer,
+                     useCommandPalette, useKeyboardShortcuts
+  styles/            shared.ts, inputSx.ts
+  theme/             dracula.ts
+  types/             index.ts
+  utils/             bigint.ts, converters.ts, factordb.ts, sageOutput.ts,
+                     testcases/core.ts, attackSource.ts, pemParser.ts, asn1.ts, progressEstimator.ts
+workers/             Cloudflare Worker CORS proxy for FactorDB
 ```
+
+## Calculator Architecture
+
+The unified Calculator shell (`Calculator.tsx`) provides a 4-tab selector (RSA / AES / ECC / Hash) with keyboard shortcuts (⌘1-⌘4) to switch modes. Each calculator is lazy-loaded via `React.lazy` and wrapped in a `<Suspense>` boundary. All calculators support:
+- **Explanation tab** — KaTeX-rendered reference theory
+- **Sub-tab navigation** via shared `CalculatorSubTabs` component
+- **Pure browser-side execution** — no SageCell required for basic operations
+
+### RSA Calculator (`RSACalculator.tsx`)
+- 4 sub-tabs: Explanation, Key Gen, Encrypt, Decrypt
+- Uses existing `RsaKeyGenTab`, `RsaEncryptTab`, `RsaDecryptTab` components
+- Pure BigInt, e defaults to 65537, auto-derives missing params
+
+### AES Calculator (`AESCalculator.tsx`)
+- 3 sub-tabs: Explanation, Encrypt/Decrypt, Attacks
+- @noble/ciphers for ECB/CBC/CTR/GCM/OFB/CFB modes, AES-128/192/256
+- 8 attack modes with in-browser computation
+
+### ECC Calculator (`ECCCalculator.tsx`)
+- 4 sub-tabs: Explanation, Key Operations, Sign/Verify, Attacks
+- @noble/curves for secp256k1, P-256, P-384, P-521, Curve25519
+- 7 attack modes (5 via SageMathCell, 2 in-browser)
+
+### Hash Calculator (`HashCalculator.tsx`)
+- 6 sub-tabs: Explanation, Hash Functions, HMAC, Length Ext., Format Conv., PoW
+- @noble/hashes for 11 algorithms + HMAC
+- Proof of Work with Web Worker offload and EWMA ETA
 
 ## External Services
 

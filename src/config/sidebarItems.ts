@@ -1,4 +1,5 @@
 import { CATEGORIES, attacksByCategory } from '../attacks';
+import type { CalculatorMode } from '../types';
 
 export interface SidebarAttackItem {
   type: 'attack';
@@ -12,21 +13,36 @@ export interface SidebarModuleItem {
   label: string;
 }
 
-export type SidebarItem = SidebarAttackItem | SidebarModuleItem;
+export interface SidebarCalculatorTabItem {
+  type: 'calculator-tab';
+  id: string;
+  label: string;
+  icon: string;
+  calculatorMode: CalculatorMode;
+}
+
+export type SidebarItem = SidebarAttackItem | SidebarModuleItem | SidebarCalculatorTabItem;
 
 export const SIDEBAR_MODULES: SidebarModuleItem[] = [
   { type: 'module', id: 'instructions', mode: 'instructions', label: 'Instructions' },
   { type: 'module', id: 'magic', mode: 'magic', label: 'Magic Panel' },
   { type: 'module', id: 'proofs', mode: 'proofs', label: 'Attack Index' },
-  { type: 'module', id: 'calculator', mode: 'calculator', label: 'RSA Calculator' },
   { type: 'module', id: 'format-converter', mode: 'format-converter', label: 'Format Converter' },
   { type: 'module', id: 'pem', mode: 'pem', label: 'PEM Decryptor' },
 ];
 
-// Full sidebar order: attacks grouped by category, then modules
+export const CALCULATOR_ITEMS: SidebarCalculatorTabItem[] = [
+  { type: 'calculator-tab', id: 'rsa', label: 'RSA', icon: 'Calculate', calculatorMode: 'rsa' },
+  { type: 'calculator-tab', id: 'aes', label: 'AES', icon: 'Calculate', calculatorMode: 'aes' },
+  { type: 'calculator-tab', id: 'ecc', label: 'ECC', icon: 'Calculate', calculatorMode: 'ecc' },
+  { type: 'calculator-tab', id: 'hash', label: 'Hash', icon: 'Calculate', calculatorMode: 'hash' },
+];
+
+// Full sidebar order: attacks grouped by category, then calculator tabs, then modules
 export const ALL_SIDEBAR_ITEMS: SidebarItem[] = [
   ...CATEGORIES.flatMap(cat =>
     (attacksByCategory.get(cat) ?? []).map(a => ({ type: 'attack' as const, id: a.id })),
   ),
+  ...CALCULATOR_ITEMS,
   ...SIDEBAR_MODULES,
 ];
