@@ -36,6 +36,9 @@ const CATEGORY_COLORS: Record<AttackCategory, string> = {
   ECC: draculaColors.purple,
 };
 
+const VIEW_MODES = ['attack', 'magic', 'proofs', 'calculator', 'format-converter', 'instructions', 'pem'] as const;
+type ViewMode = typeof VIEW_MODES[number];
+
 export function CommandPalette() {
   const {
     commandPaletteOpen,
@@ -78,14 +81,17 @@ export function CommandPalette() {
         attack.id.toLowerCase().includes(q);
     });
 
+    const attacksMap = new Map(attacks.map(a => [a.id, a]));
+    const modulesMap = new Map(SIDEBAR_MODULES.map(m => [m.id, m]));
+
     for (const item of filteredSidebarItems) {
       if (item.type === 'attack') {
-        const attack = attacks.find(a => a.id === item.id);
+        const attack = attacksMap.get(item.id);
         if (attack) items.push({ type: 'attack', attack, index: idx++ });
       } else if (item.type === 'calculator-tab') {
         items.push({ type: 'calculator-tab', calculatorMode: item.calculatorMode, label: item.label, index: idx++ });
       } else {
-        const mod = SIDEBAR_MODULES.find(m => m.id === item.id);
+        const mod = modulesMap.get(item.id);
         if (mod) items.push({ type: 'view', module: mod, index: idx++ });
       }
     }
@@ -96,9 +102,6 @@ export function CommandPalette() {
     setCommandPaletteOpen(false);
   }, [setCommandPaletteOpen]);
 
-  const VIEW_MODES = ['attack', 'magic', 'proofs', 'calculator', 'format-converter', 'instructions', 'pem'] as const;
-  type ViewMode = typeof VIEW_MODES[number];
-
   const selectView = useCallback(
     (mode: string) => {
       if (VIEW_MODES.includes(mode as ViewMode)) {
@@ -106,7 +109,6 @@ export function CommandPalette() {
       }
       close();
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [setViewMode, close],
   );
 
@@ -218,7 +220,7 @@ export function CommandPalette() {
           }}
         />
       </Box>
-      <DialogContent sx={{ p: 0, overflow: 'auto', bgcolor: '#282a36', pb: '30vh' }}>
+      <DialogContent sx={{ p: 0, overflow: 'auto', bgcolor: '#282a36', pb: '20vh' }}>
         <List dense>
           {allItems.map((item) => {
             const isSelected = item.index === selectedIndex;

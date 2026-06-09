@@ -10,6 +10,7 @@ import { colFlexSx, centeredPanelSx, outputBoxSx } from '../../styles/shared';
 import { inputSx } from '../../styles/inputSx';
 import { CalculatorSubTabs } from './CalculatorSubTabs';
 import { ProofRenderer } from '../ProofRenderer';
+import { useAppContext } from '../../hooks/useAppContext';
 import { ecb, cbc, ctr, gcm, cfb } from '@noble/ciphers/aes.js';
 import { bytesToHex, hexToBytes } from '@noble/ciphers/utils.js';
 
@@ -103,7 +104,7 @@ function AESExplanationTab() {
   return (
     <Box>
       <Typography variant="h6" sx={{ color: draculaColors.cyan, mb: 1 }}>AES Block Cipher Reference</Typography>
-      <Box sx={{ maxHeight: '60vh', overflow: 'auto', pr: 1, '&::-webkit-scrollbar': { width: '8px' }, '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' } }}>
+      <Box sx={{ maxHeight: '60vh', overflow: 'auto', pr: 1, pb: '20vh', '&::-webkit-scrollbar': { width: '8px' }, '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' } }}>
         <ProofRenderer latex={PROOF} />
       </Box>
     </Box>
@@ -129,6 +130,7 @@ function AESEncryptDecryptTab() {
   const [op, setOp] = useState('encrypt');
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { setOutputResult: setCtxOutput, setOutputError: setCtxError, setOutputSource, addToHistory } = useAppContext();
 
   const needsIv = useMemo(() => ['CBC', 'CTR', 'GCM', 'OFB', 'CFB'].includes(mode), [mode]);
   const needsAad = mode === 'GCM';
@@ -143,6 +145,7 @@ function AESEncryptDecryptTab() {
 
   const handleRun = useCallback(() => {
     setError(null); setResult(null);
+    setCtxOutput(null); setCtxError(null);
     try {
       const key = hexToBytes(keyHex.replace(/\s/g, ''));
       if (![16, 24, 32].includes(key.length)) throw new Error('Key must be 16/24/32 hex bytes');
@@ -167,9 +170,18 @@ function AESEncryptDecryptTab() {
         case 'OFB': { if (iv.length !== 16) throw new Error('OFB needs 16-byte IV'); out = ofbEncrypt(key, iv, data); break; }
         default: throw new Error('Unknown mode');
       }
-      setResult(bytesToHex(out));
-    } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
-  }, [mode, keyHex, ivHex, aadHex, inputText, inputEnc, op, needsIv, needsAad]);
+      const resultText = bytesToHex(out);
+      setResult(resultText);
+      setCtxOutput(resultText);
+      setOutputSource('calculator');
+      addToHistory('calculator-aes', `AES ${op === 'encrypt' ? 'Encrypt' : 'Decrypt'} (${mode})`, resultText, true);
+    } catch (e) {
+      const errMsg = e instanceof Error ? e.message : String(e);
+      setError(errMsg);
+      setCtxError(errMsg);
+      setOutputSource('calculator');
+    }
+  }, [mode, keyHex, ivHex, aadHex, inputText, inputEnc, op, needsIv, needsAad, addToHistory, setCtxError, setCtxOutput, setOutputSource]);
 
   const handleCopy = useCallback(() => { if (result) navigator.clipboard.writeText(result).catch(() => {}); }, [result]);
 
@@ -238,6 +250,7 @@ function AESAttacksTab() {
   const [attack, setAttack] = useState('ctr-nonce');
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { setOutputResult: setCtxOutput, setOutputError: setCtxError, setOutputSource, addToHistory } = useAppContext();
   const [ct1, setCt1] = useState('');
   const [ct2, setCt2] = useState('');
   const [knownPt, setKnownPt] = useState('');
@@ -256,6 +269,7 @@ function AESAttacksTab() {
 
   const run = useCallback(() => {
     setError(null); setResult(null);
+    setCtxOutput(null); setCtxError(null);
     try {
       switch (attack) {
         case 'ctr-nonce': {
@@ -267,7 +281,11 @@ function AESAttacksTab() {
           const pt2 = xorBytes(c2.subarray(0, ks.length), ks);
           let txt = '';
           try { txt = new TextDecoder().decode(pt2); } catch { txt = '(non-UTF8)'; }
-          setResult(`CTR keystream (${ks.length} bytes): ${bytesToHex(ks)}\n\nDecrypted CT2: ${bytesToHex(pt2)}\n\nAs text: ${txt}`);
+          const resultA = `CTR keystream (${ks.length} bytes): ${bytesToHex(ks)}\n\nDecrypted CT2: ${bytesToHex(pt2)}\n\nAs text: ${txt}`;
+          setResult(resultA);
+          setCtxOutput(resultA);
+          setOutputSource('calculator');
+          addToHistory('calculator-aes', `AES Attack: ${attack}`, resultA, true);
           break;
         }
         case 'cbc-bitflip': {
@@ -283,7 +301,11 @@ function AESAttacksTab() {
           const mod = new Uint8Array(isIV ? iv : ct);
           for (let j = 0; j < Math.min(tgt.length, curPlain.length, isIV ? iv.length - off : ct.length - off); j++)
             mod[off + j] ^= curPlain[j] ^ tgt[j];
-          setResult(`Modified ${isIV ? 'IV' : `CT block ${idx-1}`}:\n${bytesToHex(mod)}\n\nCBC bit flip: mod[offset+j] = original[offset+j] ^ current_plaintext[j] ^ target_byte.`);
+          const resultB = `Modified ${isIV ? 'IV' : `CT block ${idx-1}`}:\n${bytesToHex(mod)}\n\nCBC bit flip: mod[offset+j] = original[offset+j] ^ current_plaintext[j] ^ target_byte.`;
+          setResult(resultB);
+          setCtxOutput(resultB);
+          setOutputSource('calculator');
+          addToHistory('calculator-aes', `AES Attack: ${attack}`, resultB, true);
           break;
         }
         case 'ecb-detect': {
@@ -295,7 +317,11 @@ function AESAttacksTab() {
             for (let i = 0; i < ct.length; i += 16) { const h = bytesToHex(ct.subarray(i, i + 16)); if (seen.has(h)) return `[ECB] ${line.slice(0, 40)}...`; seen.add(h); }
             return `[not ECB] ${line.slice(0, 40)}...`;
           });
-          setResult(out.join('\n'));
+          const resultC = out.join('\n');
+          setResult(resultC);
+          setCtxOutput(resultC);
+          setOutputSource('calculator');
+          addToHistory('calculator-aes', `AES Attack: ${attack}`, resultC, true);
           break;
         }
         case 'ecb-cutpaste': {
@@ -303,15 +329,29 @@ function AESAttacksTab() {
           if (ct.length < 32 || ct.length % 16) throw new Error('CT must be multiple of 16 bytes');
           const blks = [];
           for (let i = 0; i < ct.length; i += 16) blks.push(`[${i/16}] ${bytesToHex(ct.subarray(i, i+16))}`);
-          setResult(`Blocks:\n${blks.join('\n')}\n\nReorder blocks to forge new plaintext under the same key.`);
+          const resultD = `Blocks:\n${blks.join('\n')}\n\nReorder blocks to forge new plaintext under the same key.`;
+          setResult(resultD);
+          setCtxOutput(resultD);
+          setOutputSource('calculator');
+          addToHistory('calculator-aes', `AES Attack: ${attack}`, resultD, true);
           break;
         }
-        case 'ecb-byte':
-          setResult(`ECB Byte-at-a-Time Attack\n\nOracle: ${oracleUrl || '(not set)'}\n\n1. Feed 'A'*1..'A'*32 to find block size (output length jump)\n2. Send 48 'A's → repeating blocks → ECB confirmed\n3. For byte position p: send 'A'*(15-p%16), brute-force last byte\n\nRequires live oracle endpoint. This is the algorithmic reference.`);
+        case 'ecb-byte': {
+          const resultE = `ECB Byte-at-a-Time Attack\n\nOracle: ${oracleUrl || '(not set)'}\n\n1. Feed 'A'*1..'A'*32 to find block size (output length jump)\n2. Send 48 'A's → repeating blocks → ECB confirmed\n3. For byte position p: send 'A'*(15-p%16), brute-force last byte\n\nRequires live oracle endpoint. This is the algorithmic reference.`;
+          setResult(resultE);
+          setCtxOutput(resultE);
+          setOutputSource('calculator');
+          addToHistory('calculator-aes', `AES Attack: ${attack}`, resultE, true);
           break;
-        case 'cbc-padding':
-          setResult(`CBC Padding Oracle Attack\n\nOracle: ${oracleUrl || '(not set)'}\n\nFor each pair (C[i-1], C[i]):\n  For byte p = 15..0:\n    For guess g = 0..255:\n      C'[i-1][p] = C[i-1][p] ^ g ^ (16-p)\n      Submit (C'[i-1] || C[i]) → oracle\n      If 'valid padding' → P[i][p] = C[i-1][p] ^ g ^ (16-p)\n\nCS'16 padding oracle: Pr[valid padding] ≈ 1/256 × (257 - #bad padding)`);
+        }
+        case 'cbc-padding': {
+          const resultF = `CBC Padding Oracle Attack\n\nOracle: ${oracleUrl || '(not set)'}\n\nFor each pair (C[i-1], C[i]):\n  For byte p = 15..0:\n    For guess g = 0..255:\n      C'[i-1][p] = C[i-1][p] ^ g ^ (16-p)\n      Submit (C'[i-1] || C[i]) → oracle\n      If 'valid padding' → P[i][p] = C[i-1][p] ^ g ^ (16-p)\n\nCS'16 padding oracle: Pr[valid padding] ≈ 1/256 × (257 - #bad padding)`;
+          setResult(resultF);
+          setCtxOutput(resultF);
+          setOutputSource('calculator');
+          addToHistory('calculator-aes', `AES Attack: ${attack}`, resultF, true);
           break;
+        }
         case 'gcm-nonce': {
           const c1 = hexToBytes(gcmCt1.replace(/\s/g, ''));
           const p1 = hexToBytes(gcmPt1.replace(/\s/g, ''));
@@ -322,7 +362,11 @@ function AESAttacksTab() {
           const pt2 = xorBytes(c2.subarray(0, ml), ks);
           let txt = '';
           try { txt = new TextDecoder().decode(pt2); } catch { txt = '(non-UTF8)'; }
-          setResult(`Keystream: ${bytesToHex(ks)}\nPT2: ${bytesToHex(pt2)}\nText: ${txt}\n\nGCM nonce reuse: same nonce → identical GHASH key H = AES_K(0). Compute H, forge tags.`);
+          const resultG = `Keystream: ${bytesToHex(ks)}\nPT2: ${bytesToHex(pt2)}\nText: ${txt}\n\nGCM nonce reuse: same nonce → identical GHASH key H = AES_K(0). Compute H, forge tags.`;
+          setResult(resultG);
+          setCtxOutput(resultG);
+          setOutputSource('calculator');
+          addToHistory('calculator-aes', `AES Attack: ${attack}`, resultG, true);
           break;
         }
         case 'key-schedule': {
@@ -332,12 +376,21 @@ function AESAttacksTab() {
           const rks = fmtRounds(expandKey(key), nr);
           rks.push(`\n${nr+1} round keys, ${expandKey(key).length} words`);
           if (key.length === 16) rks.push('\nAES-128: last round key → invert key schedule → original key. Side-channel the last round to recover the key.');
-          setResult(rks.join('\n'));
+          const resultH = rks.join('\n');
+          setResult(resultH);
+          setCtxOutput(resultH);
+          setOutputSource('calculator');
+          addToHistory('calculator-aes', `AES Attack: ${attack}`, resultH, true);
           break;
         }
       }
-    } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
-  }, [attack, ct1, ct2, knownPt, ivHex, blockIdx, targetText, currentPtHex, cts, oracleUrl, gcmCt1, gcmPt1, gcmCt2, scheduleKey]);
+    } catch (e) {
+      const errMsg = e instanceof Error ? e.message : String(e);
+      setError(errMsg);
+      setCtxError(errMsg);
+      setOutputSource('calculator');
+    }
+  }, [attack, ct1, ct2, knownPt, ivHex, blockIdx, targetText, currentPtHex, cts, oracleUrl, gcmCt1, gcmPt1, gcmCt2, scheduleKey, addToHistory, setCtxError, setCtxOutput, setOutputSource]);
 
   const attackFields = useMemo(() => {
     switch (attack) {
@@ -408,6 +461,15 @@ function AESAttacksTab() {
 
 export default function AESCalculator() {
   const [tab, setTab] = useState('explanation');
+  const { setOutputResult, setOutputError, setOutputSource } = useAppContext();
+
+  const handleTabChange = useCallback((tabId: string) => {
+    setTab(tabId);
+    setOutputResult(null);
+    setOutputError(null);
+    setOutputSource(null);
+  }, [setOutputResult, setOutputError, setOutputSource]);
+
   return (
     <Box sx={colFlexSx}>
       <Box sx={{ ...centeredPanelSx, p: 2 }}>
@@ -418,7 +480,7 @@ export default function AESCalculator() {
           <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 2 }}>
             AES encryption, decryption, mode analysis, and attacks — powered by @noble/ciphers
           </Typography>
-          <CalculatorSubTabs tabs={TABS} activeTab={tab} onChange={setTab} />
+          <CalculatorSubTabs tabs={TABS} activeTab={tab} onChange={handleTabChange} />
           <Box sx={{ flex: 1, overflow: 'auto', px: 0.5, pt: 1 }}>
             {tab === 'explanation' && <AESExplanationTab />}
             {tab === 'encrypt-decrypt' && <AESEncryptDecryptTab />}

@@ -8,6 +8,7 @@ import { draculaColors } from '../../../theme/dracula';
 import { inputSx } from '../../../styles/inputSx';
 import { outputBoxSx } from '../../../styles/shared';
 import { bytesToHex } from '@noble/hashes/utils.js';
+import { useAppContext } from '../../../hooks/useAppContext';
 
 const CONVERSION_TYPES: { value: string; label: string }[] = [
   { value: 'hex2b64', label: 'Hex → Base64' },
@@ -81,28 +82,43 @@ export default function FormatConverterTab() {
   const [conversion, setConversion] = useState('detect');
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { setOutputResult: setCtxOutput, setOutputError: setCtxError, setOutputSource, addToHistory } = useAppContext();
   const detected = useMemo(() => input.trim() ? detectHash(input) : null, [input]);
 
   const handleConvert = useCallback(() => {
     setError(null); setResult(null);
+    setCtxOutput(null); setCtxError(null);
     try {
       const cleaned = input.replace(/\s/g, '');
       if (!cleaned) throw new Error('No input');
       if (conversion === 'detect') {
         const info = detectHash(input);
         if (!info) throw new Error('Could not detect hash format');
-        setResult(`Detected: ${info.algorithm}\nBit length: ${info.bits}\nHex length: ${info.hexLen} chars`);
+        const outStr = `Detected: ${info.algorithm}\nBit length: ${info.bits}\nHex length: ${info.hexLen} chars`;
+        setResult(outStr);
+        setCtxOutput(outStr);
+        setOutputSource('calculator');
+        addToHistory('calculator-hash', 'Format Converter', outStr, true);
         return;
       }
       if (conversion === 'hex2b64') {
         if (!/^[0-9a-fA-F]+$/.test(cleaned)) throw new Error('Invalid hex');
-        setResult(bytesToBase64(hexToBytes(cleaned)));
+        const outStr = bytesToBase64(hexToBytes(cleaned));
+        setResult(outStr);
+        setCtxOutput(outStr);
+        setOutputSource('calculator');
+        addToHistory('calculator-hash', 'Format Converter', outStr, true);
       } else if (conversion === 'b642hex') {
-        try { const bin = atob(cleaned); const bytes = new Uint8Array(bin.length); for (let i=0; i<bin.length; i++) bytes[i]=bin.charCodeAt(i); setResult(bytesToHex(bytes)); }
+        try { const bin = atob(cleaned); const bytes = new Uint8Array(bin.length); for (let i=0; i<bin.length; i++) bytes[i]=bin.charCodeAt(i); const outStr = bytesToHex(bytes); setResult(outStr); setCtxOutput(outStr); setOutputSource('calculator'); addToHistory('calculator-hash', 'Format Converter', outStr, true); }
         catch { throw new Error('Invalid Base64'); }
       }
-    } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
-  }, [input, conversion]);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(msg);
+      setCtxError(msg);
+      setOutputSource('calculator');
+    }
+  }, [input, conversion, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
 
   const handleCopy = useCallback(() => { if (result) navigator.clipboard.writeText(result).catch(() => {}); }, [result]);
 

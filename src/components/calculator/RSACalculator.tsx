@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
 import { VpnKey } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
@@ -8,6 +8,7 @@ import { RsaKeyGenTab } from '../RsaKeyGenTab';
 import { RsaEncryptTab } from '../RsaEncryptTab';
 import { RsaDecryptTab } from '../RsaDecryptTab';
 import { ProofRenderer } from '../ProofRenderer';
+import { useAppContext } from '../../hooks/useAppContext';
 
 const SUB_TABS = [
   { id: 'explanation', label: 'Explanation' },
@@ -61,7 +62,7 @@ function ExplanationTab() {
         RSA Reference
       </Typography>
       <Box sx={{
-        maxHeight: '60vh', overflow: 'auto', pr: 1, pb: '30vh',
+        maxHeight: '60vh', overflow: 'auto', pr: 1, pb: '20vh',
         '&::-webkit-scrollbar': { width: '8px' },
         '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' },
       }}>
@@ -73,6 +74,14 @@ function ExplanationTab() {
 
 export default function RSACalculator() {
   const [activeTab, setActiveTab] = useState('explanation');
+  const { setOutputResult, setOutputError, setOutputSource } = useAppContext();
+
+  const handleTabChange = useCallback((tabId: string) => {
+    setActiveTab(tabId);
+    setOutputResult(null);
+    setOutputError(null);
+    setOutputSource(null);
+  }, [setOutputResult, setOutputError, setOutputSource]);
 
   return (
     <Box sx={colFlexSx}>
@@ -88,7 +97,7 @@ export default function RSACalculator() {
             RSA encryption, decryption, and key generation reference
           </Typography>
 
-          <CalculatorSubTabs tabs={SUB_TABS} activeTab={activeTab} onChange={setActiveTab} />
+          <CalculatorSubTabs tabs={SUB_TABS} activeTab={activeTab} onChange={handleTabChange} />
 
           <Box sx={{ flex: 1, overflow: 'auto', px: 0.5, pt: 1 }}>
             {activeTab === 'explanation' && <ExplanationTab />}

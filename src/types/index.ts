@@ -53,10 +53,11 @@ export interface AppContextType {
   setOutputResult: (result: string | null) => void;
   outputError: string | null;
   setOutputError: (error: string | null) => void;
-  outputSource: 'input' | 'magic' | null;
-  setOutputSource: (source: 'input' | 'magic' | null) => void;
+  outputSource: 'input' | 'magic' | 'calculator' | null;
+  setOutputSource: (source: 'input' | 'magic' | 'calculator' | null) => void;
   history: HistoryEntry[];
   addToHistory: (attackId: string, attackName: string, result: string, success: boolean) => void;
+  clearHistory: () => void;
   notification: NotificationState | null;
   showNotification: (message: string, severity?: 'success' | 'error' | 'info') => void;
   commandPaletteOpen: boolean;

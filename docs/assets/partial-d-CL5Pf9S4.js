@@ -152,7 +152,7 @@ x^2 - (n - \\\\varphi + 1)x + n &= 0 \\\\\\\\implies p,q \\\\qed
 \\\\end{itemize}
 
 \\\\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998\`,
-  usageGuide: 'This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.\\n\\nHow to use:\\n1. You have modulus n, public exponent e, and dLow (the low-order bits of d)\\n2. Provide n, e, and dLow\\n3. The attack iterates k in ed = k\\\\phi(n) + 1, checking if d_approx has matching low bits\\n4. For each matching candidate, it computes \\\\phi(n) and solves the quadratic for p,q\\n\\nTip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~16M iterations). Uses incremental d_approx update (avoiding BigInt division per iteration) for performance.',
+  usageGuide: 'This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.\\n\\nHow to use:\\n1. You have modulus n, public exponent e, and dLow (the low-order bits of d)\\n2. Provide n, e, and dLow\\n3. The attack iterates k in ed = kphi(n) + 1, checking if d_approx has matching low bits\\n4. For each matching candidate, it computes phi(n) and solves the quadratic for p,q\\n\\nTip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~16M iterations). Uses incremental d_approx update (avoiding BigInt division per iteration) for performance.',
   priority: 'high',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.dLow,
 };

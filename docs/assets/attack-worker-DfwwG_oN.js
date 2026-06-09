@@ -1779,8 +1779,8 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\\\implies p,q \\qed
 How to use:
 1. You have modulus n, public exponent e, and dLow (the low-order bits of d)
 2. Provide n, e, and dLow
-3. The attack iterates k in ed = k\\phi(n) + 1, checking if d_approx has matching low bits
-4. For each matching candidate, it computes \\phi(n) and solves the quadratic for p,q
+3. The attack iterates k in ed = kphi(n) + 1, checking if d_approx has matching low bits
+4. For each matching candidate, it computes phi(n) and solves the quadratic for p,q
 
 Tip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~16M iterations). Uses incremental d_approx update (avoiding BigInt division per iteration) for performance.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.dLow},le={id:`partial-pq-bits`,name:`Partial p/q Bits`,category:`Partial Key / Lattice`,description:`Recovers p from known high (MSB) or low (LSB) bits using Coppersmith's lattice. Use when half or more of p's bits are known via side-channel.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`knownBits`,label:`knownBits (known bits of p)`,placeholder:`Enter known bits as integer...`,multiline:!0,rows:3},{name:`bitPosition`,label:`bitPosition`,placeholder:`msb or lsb`,multiline:!1}],sageTemplate:e=>L({token:`PARTIAL_PQ_BITS`,n:e.n,body:`        knownBits = Integer(${e.knownBits})
         bitPosition = "${e.bitPosition}"
@@ -1923,7 +1923,7 @@ Tip: The attack works best when e is small (smaller k search space). The kBound 
 
 How to use:
 1. You know some bits of p (or q) and need to recover the full prime
-2. Provide n, knownBits, and bitPosition (\\"msb\\" or \\"lsb\\")
+2. Provide n, knownBits, and bitPosition ("msb" or "lsb")
 3. The attack uses Coppersmith\\'s method to find the missing bits
 
 Tip: This is inherently probabilistic — the lattice may fail even with the right inputs. Try with more known bits if it fails. bitPosition=msb = known high bits, lsb = known low bits.`,priority:`high`,applicableCheck:e=>!!e.n&&!!e.knownBits&&!!e.bitPosition},Y=5000n,ue={id:`small-crt-exp`,name:`Small CRT Exponent`,category:`Partial Key / Lattice`,description:`Factors n via FLT-based batch GCD search over small CRT exponent d_p. Use when d_p = d mod (p-1) is small (< bound, default 5,000,000).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3},{name:`bound`,label:`bound (max d_p, optional)`,placeholder:`Default 5000000`,required:!1,multiline:!1}],sageTemplate:e=>L({token:`SMALL_CRT_EXP`,imports:[`import math`],useGuard:!1,body:`        n = Integer(${e.n})
@@ -3957,7 +3957,7 @@ p,q &= \\frac{n - \\phi + 1 \\pm \\sqrt{(n - \\phi + 1)^2 - 4n}}{2} \\qed
 
 \\textbf{API Mechanism:}
 \\begin{itemize}
-\\item Query: \`GET /query?n=\\texttt{<hex>}\` to factordb.com API
+\\item Query: \`GET /query?n=<hex>\` to factordb.com API
 \\item Response contains status (FF = fully factored, CF = composite factors, etc.)
 \\item If FF, factors are returned as a list of prime-power pairs
 \\item Verification: $\\prod p_i^{e_i} = n$

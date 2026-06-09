@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAppContext } from '../hooks/useAppContext';
 import { Box, Typography, TextField, Button } from '@mui/material';
 import { draculaColors } from '../theme/dracula';
 import { modInverse } from '../utils/bigint';
@@ -14,23 +15,28 @@ export function RsaKeyGenTab() {
     output: null,
     error: null,
   });
+  const { setOutputResult: setCtxOutput, setOutputError: setCtxError, setOutputSource, addToHistory } = useAppContext();
 
   const handleKeyGen = () => {
     setResult({ output: null, error: null });
+    setCtxOutput(null); setCtxError(null);
     const pn = parseBigInt(p);
     const qn = parseBigInt(q);
     const en = parseBigInt(e) || 65537n;
 
     if (pn === null || qn === null) {
       setResult({ output: null, error: 'p and q must be valid numbers' });
+      setCtxError('p and q must be valid numbers'); setOutputSource('calculator');
       return;
     }
     if (pn <= 1n || qn <= 1n) {
       setResult({ output: null, error: 'p and q must be > 1' });
+      setCtxError('p and q must be > 1'); setOutputSource('calculator');
       return;
     }
     if (en <= 0n) {
       setResult({ output: null, error: 'e must be positive' });
+      setCtxError('e must be positive'); setOutputSource('calculator');
       return;
     }
 
@@ -42,6 +48,7 @@ export function RsaKeyGenTab() {
     outputText += `phi = ${phi}\n`;
     outputText += d !== null ? `d  = ${d}` : 'd  = undefined (e and phi not coprime)';
     setResult({ output: outputText, error: null });
+    setCtxOutput(outputText); setOutputSource('calculator'); addToHistory('calculator-rsa', 'RSA Key Gen', outputText, true);
   };
 
   return (

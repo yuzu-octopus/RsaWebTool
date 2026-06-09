@@ -75,7 +75,7 @@ export const attack: Attack = {
 
 \\\\textbf{API Mechanism:}
 \\\\begin{itemize}
-\\\\item Query: \\\`GET /query?n=\\\\texttt{<hex>}\\\` to factordb.com API
+\\\\item Query: \\\`GET /query?n=<hex>\\\` to factordb.com API
 \\\\item Response contains status (FF = fully factored, CF = composite factors, etc.)
 \\\\item If FF, factors are returned as a list of prime-power pairs
 \\\\item Verification: $\\\\prod p_i^{e_i} = n$

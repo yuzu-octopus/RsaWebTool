@@ -128,6 +128,11 @@ function InlineMath({ text }: { text: string }) {
  */
 function renderInlineText(text: string): string {
   let html = text;
+  // Process LaTeX command wrappers before escape sequences
+  html = html.replace(/\\texttt\{([^}]*)\}/g, '<code>$1</code>');
+  html = html.replace(/\\text\{([^}]*)\}/g, '<span>$1</span>');
+  html = html.replace(/\\emph\{([^}]*)\}/g, '<em>$1</em>');
+  html = html.replace(/\\underline\{([^}]*)\}/g, '<u>$1</u>');
   html = html.replace(/\\textbf\{([^}]*)\}/g, '<strong>$1</strong>');
   html = html.replace(/\\textit\{([^}]*)\}/g, '<em>$1</em>');
   html = html.replace(/\\&/g, '&');

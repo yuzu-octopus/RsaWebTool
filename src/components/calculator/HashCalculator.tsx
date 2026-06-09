@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
 import { Tag } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
@@ -10,6 +10,7 @@ import LengthExtensionTab from './hash/LengthExtensionTab';
 import FormatConverterTab from './hash/FormatConverterTab';
 import ExplanationTab from './hash/ExplanationTab';
 import ProofOfWorkTab from './hash/ProofOfWorkTab';
+import { useAppContext } from '../../hooks/useAppContext';
 
 const SUB_TABS = [
   { id: 'explanation', label: 'Explanation' },
@@ -22,6 +23,14 @@ const SUB_TABS = [
 
 export default function HashCalculator() {
   const [activeTab, setActiveTab] = useState('explanation');
+  const { setOutputResult, setOutputError, setOutputSource } = useAppContext();
+
+  const handleTabChange = useCallback((tabId: string) => {
+    setActiveTab(tabId);
+    setOutputResult(null);
+    setOutputError(null);
+    setOutputSource(null);
+  }, [setOutputResult, setOutputError, setOutputSource]);
 
   return (
     <Box sx={colFlexSx}>
@@ -37,7 +46,7 @@ export default function HashCalculator() {
             Pure JS hash computation — no SageCell needed
           </Typography>
 
-          <CalculatorSubTabs tabs={SUB_TABS} activeTab={activeTab} onChange={setActiveTab} />
+          <CalculatorSubTabs tabs={SUB_TABS} activeTab={activeTab} onChange={handleTabChange} />
 
           <Box sx={{ flex: 1, overflow: 'auto', px: 0.5, pt: 1 }}>
             {activeTab === 'explanation' && <ExplanationTab />}

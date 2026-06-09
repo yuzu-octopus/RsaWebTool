@@ -9,6 +9,7 @@ import { inputSx } from '../../../styles/inputSx';
 import { outputBoxSx, colorGhostBtn, FONT_FAMILY } from '../../../styles/shared';
 import { useWorkerPool } from '../../../hooks/useWorkerPool';
 import { ProgressEstimator } from '../../../utils/progressEstimator';
+import { useAppContext } from '../../../hooks/useAppContext';
 
 const hourglassSpin = keyframes`
   0% { transform: rotate(0deg); }
@@ -29,6 +30,7 @@ export default function ProofOfWorkTab() {
   const [eta, setEta] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { setOutputResult: setCtxOutput, setOutputError: setCtxError, setOutputSource, addToHistory } = useAppContext();
 
   const estimatorRef = useRef<ProgressEstimator | null>(null);
   if (estimatorRef.current === null) estimatorRef.current = new ProgressEstimator();
@@ -46,12 +48,16 @@ export default function ProofOfWorkTab() {
   const handleRun = useCallback(async () => {
     const diff = parseInt(difficulty, 10);
     if (isNaN(diff) || diff < 1) {
-      setError('Difficulty must be at least 1');
+      const errMsg = 'Difficulty must be at least 1';
+      setError(errMsg);
+      setCtxError(errMsg);
+      setOutputSource('calculator');
       return;
     }
 
     setResult(null);
     setError(null);
+    setCtxOutput(null); setCtxError(null);
     setRunning(true);
     setProgress(0);
     setProgressDetail('');
@@ -74,7 +80,10 @@ export default function ProofOfWorkTab() {
 
       if (workerResult === null) {
         const elapsed = performance.now() - startTime;
-        setError(`No valid nonce found within maximum attempts (${Math.round(elapsed)}ms)`);
+        const errMsg = `No valid nonce found within maximum attempts (${Math.round(elapsed)}ms)`;
+        setError(errMsg);
+        setCtxError(errMsg);
+        setOutputSource('calculator');
         return;
       }
 
@@ -93,15 +102,21 @@ export default function ProofOfWorkTab() {
       ].join('\n');
 
       setResult(output);
+      setCtxOutput(output);
+      setOutputSource('calculator');
+      addToHistory('calculator-hash', 'Proof of Work', output, true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(msg);
+      setCtxError(msg);
+      setOutputSource('calculator');
     } finally {
       setRunning(false);
       setProgress(0);
       setProgressDetail('');
       setEta(null);
     }
-  }, [prefix, difficulty, runAttack]);
+  }, [prefix, difficulty, runAttack, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
 
   const handleCopyResult = useCallback(() => {
     if (result) navigator.clipboard.writeText(result).catch(() => {});

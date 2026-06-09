@@ -66,8 +66,10 @@ export function PemDecryptor() {
       `Format: ${parsed.format}`,
       '',
       ...Object.entries(parsed.keyParams)
-        .filter(([, v]) => v && v !== '0')
-        .map(([k, v]) => `${k}: ${v}`),
+        .reduce<string[]>((acc, [k, v]) => {
+          if (v && v !== '0') acc.push(`${k}: ${v}`);
+          return acc;
+        }, []),
     ];
     navigator.clipboard.writeText(lines.join('\n')).then(
       () => showNotification('Parameters copied to clipboard', 'success'),
@@ -273,7 +275,7 @@ export function PemDecryptor() {
               {parsed.keyParams ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
                   {Object.entries(parsed.keyParams)
-                    .filter(([k]) => k !== 'dp' && k !== 'dq' && k !== 'qInv' || true)
+                    .filter(([k]) => !['dp', 'dq', 'qInv'].includes(k))
                     .map(([key, value]) => {
                       if (!value || value === '0') return null;
                       const display = truncateHex(value);

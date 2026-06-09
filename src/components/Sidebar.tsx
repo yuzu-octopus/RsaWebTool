@@ -25,6 +25,16 @@ interface ServiceStatus {
   sagecell: 'checking' | 'ok' | 'error';
 }
 
+const calculatorIcon = (mode: string) => {
+  switch (mode) {
+    case 'rsa': return <VpnKey sx={{ color: draculaColors.cyan, mr: 1, fontSize: '1.1rem' }} />;
+    case 'aes': return <Lock sx={{ color: draculaColors.purple, mr: 1, fontSize: '1.1rem' }} />;
+    case 'ecc': return <Hub sx={{ color: draculaColors.green, mr: 1, fontSize: '1.1rem' }} />;
+    case 'hash': return <Tag sx={{ color: draculaColors.orange, mr: 1, fontSize: '1.1rem' }} />;
+    default: return null;
+  }
+};
+
 export function Sidebar() {
   const { selectedAttack, setSelectedAttack, setViewMode, viewMode, calculatorMode, setCalculatorMode } = useAppContext();
   const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set([...CATEGORIES, 'Calculators']));
@@ -126,16 +136,6 @@ export function Sidebar() {
       el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
   }, [selectedAttack, viewMode, calculatorMode]);
-
-  const calculatorIcon = (mode: string) => {
-    switch (mode) {
-      case 'rsa': return <VpnKey sx={{ color: draculaColors.cyan, mr: 1, fontSize: '1.1rem' }} />;
-      case 'aes': return <Lock sx={{ color: draculaColors.purple, mr: 1, fontSize: '1.1rem' }} />;
-      case 'ecc': return <Hub sx={{ color: draculaColors.green, mr: 1, fontSize: '1.1rem' }} />;
-      case 'hash': return <Tag sx={{ color: draculaColors.orange, mr: 1, fontSize: '1.1rem' }} />;
-      default: return null;
-    }
-  };
 
   return (
     <Drawer

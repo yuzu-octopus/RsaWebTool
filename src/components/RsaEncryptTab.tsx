@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAppContext } from '../hooks/useAppContext';
 import { Box, Typography, TextField, Button } from '@mui/material';
 import { draculaColors } from '../theme/dracula';
 import { modPow } from '../utils/bigint';
@@ -14,27 +15,33 @@ export function RsaEncryptTab() {
     output: null,
     error: null,
   });
+  const { setOutputResult: setCtxOutput, setOutputError: setCtxError, setOutputSource, addToHistory } = useAppContext();
 
   const handleEncrypt = () => {
     setResult({ output: null, error: null });
+    setCtxOutput(null); setCtxError(null);
     const mn = parseBigInt(m);
     const nn = parseBigInt(n);
     const en = parseBigInt(e) || 65537n;
 
     if (mn === null || nn === null) {
       setResult({ output: null, error: 'm and n must be valid numbers (e defaults to 65537)' });
+      setCtxError('m and n must be valid numbers (e defaults to 65537)'); setOutputSource('calculator');
       return;
     }
     if (nn <= 1n) {
       setResult({ output: null, error: 'n must be > 1' });
+      setCtxError('n must be > 1'); setOutputSource('calculator');
       return;
     }
     if (en <= 0n) {
       setResult({ output: null, error: 'e must be positive' });
+      setCtxError('e must be positive'); setOutputSource('calculator');
       return;
     }
     if (mn >= nn) {
       setResult({ output: null, error: 'm must be < n' });
+      setCtxError('m must be < n'); setOutputSource('calculator');
       return;
     }
 
@@ -45,6 +52,7 @@ export function RsaEncryptTab() {
       outputText += `c (ascii) = ${toAscii(c)}`;
     }
     setResult({ output: outputText, error: null });
+    setCtxOutput(outputText); setOutputSource('calculator'); addToHistory('calculator-rsa', 'RSA Encrypt', outputText, true);
   };
 
   return (

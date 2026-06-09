@@ -13,6 +13,7 @@ import { blake2b, blake2s } from '@noble/hashes/blake2.js';
 import { blake3 } from '@noble/hashes/blake3.js';
 import { sha3_256, sha3_512, keccak_256, keccak_512 } from '@noble/hashes/sha3.js';
 import { bytesToHex } from '@noble/hashes/utils.js';
+import { useAppContext } from '../../../hooks/useAppContext';
 
 const ALGORITHMS = [
   { value: 'sha256', label: 'SHA-256' },
@@ -68,33 +69,60 @@ export default function HashFunctionsTab() {
   const [input, setInput] = useState('');
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { setOutputResult: setCtxOutput, setOutputError: setCtxError, setOutputSource, addToHistory } = useAppContext();
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleCompute = useCallback(() => {
     setError(null); setResult(null);
+    setCtxOutput(null); setCtxError(null);
     try {
       const fn = HASH_FNS[algorithm];
       if (!fn) throw new Error('Unknown algorithm');
       const bytes = decodeInput(input, encoding);
       if (bytes.length === 0) throw new Error('Empty input');
-      setResult(bytesToHex(fn(bytes)));
-    } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
-  }, [algorithm, encoding, input]);
+      const hashHex = bytesToHex(fn(bytes));
+      setResult(hashHex);
+      setCtxOutput(hashHex);
+      setOutputSource('calculator');
+      addToHistory('calculator-hash', `Hash: ${algorithm}`, hashHex, true);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(msg);
+      setCtxError(msg);
+      setOutputSource('calculator');
+    }
+  }, [algorithm, encoding, input, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
 
   const handleFile = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setError(null); setResult(null);
+    setCtxOutput(null); setCtxError(null);
     const reader = new FileReader();
     reader.onload = () => {
       try {
         const fn = HASH_FNS[algorithm];
-        if (fn) setResult(bytesToHex(fn(new Uint8Array(reader.result as ArrayBuffer))));
-      } catch (err) { setError(err instanceof Error ? err.message : String(err)); }
+        if (fn) {
+          const hashHex = bytesToHex(fn(new Uint8Array(reader.result as ArrayBuffer)));
+          setResult(hashHex);
+          setCtxOutput(hashHex);
+          setOutputSource('calculator');
+          addToHistory('calculator-hash', `Hash: ${algorithm} (file)`, hashHex, true);
+        }
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        setError(msg);
+        setCtxError(msg);
+        setOutputSource('calculator');
+      }
     };
-    reader.onerror = () => setError('File read error');
+    reader.onerror = () => {
+      setError('File read error');
+      setCtxError('File read error');
+      setOutputSource('calculator');
+    };
     reader.readAsArrayBuffer(file);
-  }, [algorithm]);
+  }, [algorithm, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
 
   const handleCopy = useCallback(() => { if (result) navigator.clipboard.writeText(result).catch(() => {}); }, [result]);
 
@@ -120,7 +148,7 @@ export default function HashFunctionsTab() {
         <Button variant="contained" startIcon={<PlayArrow />} onClick={handleCompute} disabled={!input.trim()}
           sx={{ backgroundColor: draculaColors.purple, fontFamily: "'JetBrains Mono', monospace", '&:hover': { backgroundColor: '#a575f6' }, '&:disabled': { backgroundColor: draculaColors.comment } }}>Compute Hash</Button>
         <Button variant="outlined" startIcon={<UploadFile />} onClick={() => fileRef.current?.click()} sx={colorGhostBtn(draculaColors.cyan)}>Hash File</Button>
-        <input ref={fileRef} type="file" hidden onChange={handleFile} />
+        <input ref={fileRef} type="file" hidden onChange={handleFile} aria-label="Select a file to hash" />
       </Box>
       {result && (
         <Box>

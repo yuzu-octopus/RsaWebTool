@@ -16,6 +16,51 @@ import { attacks } from '../attacks';
 import { colFlexSx } from '../styles/shared';
 import { inputSx } from '../styles/inputSx';
 
+function AttackListItem({
+  attack,
+  onClick,
+}: {
+  attack: typeof attacks[0];
+  onClick: (attack: typeof attacks[0]) => void;
+}) {
+  const primaryContent = (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+      <Typography sx={{ color: draculaColors.cyan, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>
+        {attack.name}
+      </Typography>
+      <Typography
+        component="span"
+        sx={{
+          color: attack.frontendCheck ? draculaColors.green : draculaColors.orange,
+          fontSize: '0.65rem',
+          fontFamily: "'JetBrains Mono', monospace",
+        }}
+      >
+        ({attack.frontendCheck ? 'Local' : 'SageMath'})
+      </Typography>
+    </Box>
+  );
+  const secondaryContent = (
+    <Typography sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", fontSize: '0.75rem' }}>
+      [{attack.category}] {attack.description}
+    </Typography>
+  );
+  return (
+    <ListItem disablePadding sx={{ mb: 1 }}>
+      <ListItemButton
+        onClick={() => onClick(attack)}
+        sx={{
+          borderRadius: 1,
+          border: `1px solid ${draculaColors.comment}`,
+          '&:hover': { backgroundColor: draculaColors.background, borderColor: draculaColors.purple },
+        }}
+      >
+        <ListItemText primary={primaryContent} secondary={secondaryContent} />
+      </ListItemButton>
+    </ListItem>
+  );
+}
+
 export function ProofIndex() {
   const { viewMode, setSelectedAttack, setViewMode } = useAppContext();
   const [search, setSearch] = useState('');
@@ -35,44 +80,9 @@ export function ProofIndex() {
   }, [setSelectedAttack, setViewMode]);
 
   const attackItems = useMemo(() =>
-    filtered.map(attack => {
-      const primaryContent = (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-          <Typography sx={{ color: draculaColors.cyan, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>
-            {attack.name}
-          </Typography>
-          <Typography
-            component="span"
-            sx={{
-              color: attack.frontendCheck ? draculaColors.green : draculaColors.orange,
-              fontSize: '0.65rem',
-              fontFamily: "'JetBrains Mono', monospace",
-            }}
-          >
-            ({attack.frontendCheck ? 'Local' : 'SageMath'})
-          </Typography>
-        </Box>
-      );
-      const secondaryContent = (
-        <Typography sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", fontSize: '0.75rem' }}>
-          [{attack.category}] {attack.description}
-        </Typography>
-      );
-      return (
-        <ListItem key={attack.id} disablePadding sx={{ mb: 1 }}>
-          <ListItemButton
-            onClick={() => handleClick(attack)}
-            sx={{
-              borderRadius: 1,
-              border: `1px solid ${draculaColors.comment}`,
-              '&:hover': { backgroundColor: draculaColors.background, borderColor: draculaColors.purple },
-            }}
-          >
-            <ListItemText primary={primaryContent} secondary={secondaryContent} />
-          </ListItemButton>
-        </ListItem>
-      );
-    }),
+    filtered.map(attack => (
+      <AttackListItem key={attack.id} attack={attack} onClick={handleClick} />
+    )),
     [filtered, handleClick],
   );
 

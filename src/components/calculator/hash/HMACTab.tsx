@@ -15,6 +15,7 @@ import { sha3_256, sha3_512, keccak_256, keccak_512 } from '@noble/hashes/sha3.j
 import { hmac } from '@noble/hashes/hmac.js';
 import { bytesToHex } from '@noble/hashes/utils.js';
 import type { CHash } from '@noble/hashes/utils.js';
+import { useAppContext } from '../../../hooks/useAppContext';
 
 const ENCODINGS: { value: string; label: string }[] = [
   { value: 'utf8', label: 'UTF-8' },
@@ -55,6 +56,7 @@ export default function HMACTab() {
   const [message, setMessage] = useState('');
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { setOutputResult: setCtxOutput, setOutputError: setCtxError, setOutputSource, addToHistory } = useAppContext();
 
   const getAlgorithms = useCallback((): AlgorithmMeta[] => [
     { value: 'sha256', label: 'SHA-256', fn: sha256 },
@@ -73,6 +75,7 @@ export default function HMACTab() {
 
   const handleCompute = useCallback(() => {
     setError(null); setResult(null);
+    setCtxOutput(null); setCtxError(null);
     try {
       const alg = getAlgorithms().find(a => a.value === algorithm);
       if (!alg) throw new Error('Unknown algorithm');
@@ -80,9 +83,18 @@ export default function HMACTab() {
       if (!message) throw new Error('Message is required');
       const keyBytes = decodeBytes(key, keyEncoding);
       const msgBytes = decodeBytes(message, msgEncoding);
-      setResult(bytesToHex(hmac(alg.fn, keyBytes, msgBytes)));
-    } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
-  }, [algorithm, keyEncoding, msgEncoding, key, message, getAlgorithms]);
+      const hmacHex = bytesToHex(hmac(alg.fn, keyBytes, msgBytes));
+      setResult(hmacHex);
+      setCtxOutput(hmacHex);
+      setOutputSource('calculator');
+      addToHistory('calculator-hash', `HMAC-${algorithm}`, hmacHex, true);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(msg);
+      setCtxError(msg);
+      setOutputSource('calculator');
+    }
+  }, [algorithm, keyEncoding, msgEncoding, key, message, getAlgorithms, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
 
   const handleCopy = useCallback(() => { if (result) navigator.clipboard.writeText(result).catch(() => {}); }, [result]);
 

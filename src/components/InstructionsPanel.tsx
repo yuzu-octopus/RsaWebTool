@@ -84,7 +84,7 @@ export function InstructionsPanel() {
 
       <Divider sx={{ borderColor: draculaColors.comment }} />
 
-      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center', pb: '30vh' }}>
+      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center', pb: '20vh' }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
           {SECTIONS.map((section) => (
             <Box key={section.title} sx={{ mb: 1.5 }}>

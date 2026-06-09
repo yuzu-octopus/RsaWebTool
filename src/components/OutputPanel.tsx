@@ -5,15 +5,21 @@ import {
   Button,
   Collapse,
   List,
-  ListItem,
+  ListItemButton,
   ListItemText,
   Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from '@mui/material';
 import { ExpandLess, ExpandMore, ContentCopy, CheckCircle, Cancel, History as HistoryIcon } from '@mui/icons-material';
 import type { HistoryEntry } from '../types';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useDragResize } from '../hooks/useDragResize';
+import { useNotepad } from '../hooks/useNotepad';
 import { ghostBtnSx, FONT_FAMILY } from '../styles/shared';
 
 const notepadBaseStyle: React.CSSProperties = {
@@ -32,9 +38,38 @@ const notepadBaseStyle: React.CSSProperties = {
   boxSizing: 'border-box',
 };
 
+function HistoryListItem({ entry, isSelected, onClick }: { entry: HistoryEntry; isSelected: boolean; onClick: () => void }) {
+  return (
+    <ListItemButton
+      selected={isSelected}
+      onClick={onClick}
+      sx={{
+        px: 1,
+        cursor: 'pointer',
+        borderRadius: 1,
+        border: `1px solid ${isSelected ? draculaColors.comment : 'transparent'}`,
+        '&:hover': { borderColor: draculaColors.comment },
+      }}
+    >
+      <ListItemText
+        primary={
+          <Typography sx={{ display: 'flex', alignItems: 'center', color: entry.success ? draculaColors.green : draculaColors.red, fontSize: '0.75rem', fontFamily: "'JetBrains Mono', monospace" }}>
+            {entry.success ? <CheckCircle sx={{ fontSize: '1rem', mr: 0.5 }} /> : <Cancel sx={{ fontSize: '1rem', mr: 0.5 }} />} {entry.attackName}
+          </Typography>
+        }
+        secondary={
+          <Typography sx={{ color: draculaColors.comment, fontSize: '0.65rem' }}>
+            {entry.timestamp.toLocaleTimeString()}
+          </Typography>
+        }
+      />
+    </ListItemButton>
+  );
+}
+
 export function OutputPanel() {
-  const { outputResult, outputError, history } = useAppContext();
-  const [ui, setUi] = useState({ copyMessage: null as string | null, historySelectedKey: null as string | null, historyOpen: false });
+  const { outputResult, outputError, history, clearHistory } = useAppContext();
+  const [ui, setUi] = useState({ copyMessage: null as string | null, historySelectedKey: null as string | null, historyOpen: false, confirmOpen: false });
   const mountedRef = useRef(true);
   useEffect(() => {
     mountedRef.current = true;
@@ -49,25 +84,7 @@ export function OutputPanel() {
   const handleHistoryClick = useCallback((_entry: HistoryEntry, key: string) => {
     setUi(prev => ({ ...prev, historySelectedKey: key }));
   }, []);
-  const [notepadOpen, setNotepadOpen] = useState(false);
-  const [notepadText, setNotepadText] = useState(() => {
-    try {
-      const stored = localStorage.getItem('notepad:v1') ?? localStorage.getItem('notepad');
-      if (stored) {
-        const { text, timestamp } = JSON.parse(stored) as { text: string; timestamp: number };
-        if (Date.now() - timestamp < 3600000) return text;
-      }
-    } catch { /* ignore */ }
-    return '';
-  });
-  const notepadTextRef = useRef(notepadText);
-  const [notepadHeight, handleNotepadResizeMouseDown] = useDragResize({
-    axis: 'y',
-    min: 80,
-    max: 200,
-    defaultValue: 80,
-    storageKey: 'notepadHeight',
-  });
+  const { notepadOpen, setNotepadOpen, notepadText, handleNotepadChange, notepadHeight, handleNotepadResizeMouseDown } = useNotepad();
   const [width, handleMouseDown] = useDragResize({
     axis: 'x',
     min: 200,
@@ -82,38 +99,6 @@ export function OutputPanel() {
       setUi(prev => ({ ...prev, copyMessage: 'Copied to clipboard!' }));
       setTimeout(() => { if (mountedRef.current) setUi(prev => ({ ...prev, copyMessage: null })); }, 2000);
     }
-  };
-
-  // Debounced localStorage write for notepad (500ms)
-  useEffect(() => {
-    if (!notepadOpen) return;
-    const timer = setTimeout(() => {
-      try {
-        localStorage.setItem('notepad:v1', JSON.stringify({ text: notepadText, timestamp: Date.now() }));
-      } catch { /* ignore */ }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [notepadText, notepadOpen]);
-
-  // Keep ref in sync with notepadText
-  useEffect(() => {
-    notepadTextRef.current = notepadText;
-  }, [notepadText]);
-
-  // Flush notepad to localStorage before page unload
-  useEffect(() => {
-    if (!notepadOpen) return;
-    const handleBeforeUnload = () => {
-      try {
-        localStorage.setItem('notepad:v1', JSON.stringify({ text: notepadTextRef.current, timestamp: Date.now() }));
-      } catch { /* ignore */ }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [notepadOpen]);
-
-  const handleNotepadChange = (text: string) => {
-    setNotepadText(text);
   };
 
   return (
@@ -143,7 +128,7 @@ export function OutputPanel() {
         onMouseDown={handleMouseDown}
       />
 
-      <Box sx={{ p: 2, overflow: 'auto', flex: 1, pb: '30vh' }}>
+      <Box sx={{ p: 2, overflow: 'auto', flex: 1, pb: '20vh' }}>
         <Typography variant="h6" sx={{ color: draculaColors.purple, mb: 2, fontWeight: 700 }}>
           Results
         </Typography>
@@ -283,38 +268,77 @@ export function OutputPanel() {
             {history.map((entry) => {
               const key = entry.timestamp.getTime() + '-' + entry.attackId;
               const selected = ui.historySelectedKey === key;
-              const primaryContent = (
-                <Typography sx={{ display: 'flex', alignItems: 'center', color: entry.success ? draculaColors.green : draculaColors.red, fontSize: '0.75rem', fontFamily: "'JetBrains Mono', monospace" }}>
-                  {entry.success ? <CheckCircle sx={{ fontSize: '1rem', mr: 0.5 }} /> : <Cancel sx={{ fontSize: '1rem', mr: 0.5 }} />} {entry.attackName}
-                </Typography>
-              );
-              const secondaryContent = (
-                <Typography sx={{ color: draculaColors.comment, fontSize: '0.65rem' }}>
-                  {entry.timestamp.toLocaleTimeString()}
-                </Typography>
-              );
               return (
-                <ListItem
+                <HistoryListItem
                   key={key}
-                  sx={{
-                    px: 1,
-                    cursor: 'pointer',
-                    borderRadius: 1,
-                    border: `1px solid ${selected ? draculaColors.comment : 'transparent'}`,
-                    '&:hover': { borderColor: draculaColors.comment },
-                  }}
+                  entry={entry}
+                  isSelected={selected}
                   onClick={() => handleHistoryClick(entry, key)}
-                >
-                  <ListItemText
-                    primary={primaryContent}
-                    secondary={secondaryContent}
-                  />
-                </ListItem>
+                />
               );
             })}
           </List>
+          <Box sx={{ mt: 1, display: 'flex', justifyContent: 'center' }}>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => setUi(prev => ({ ...prev, confirmOpen: true }))}
+              disabled={history.length === 0}
+              sx={{
+                borderColor: draculaColors.red,
+                color: draculaColors.red,
+                fontSize: '0.7rem',
+                fontFamily: "'JetBrains Mono', monospace",
+                '&:hover': { backgroundColor: 'rgba(255,85,85,0.1)' },
+                '&:disabled': { borderColor: draculaColors.comment, color: draculaColors.comment },
+              }}
+            >
+              Clear All
+            </Button>
+          </Box>
         </Collapse>
       </Box>
+
+      <Dialog
+        open={ui.confirmOpen}
+        onClose={() => setUi(prev => ({ ...prev, confirmOpen: false }))}
+        slotProps={{
+          paper: {
+            sx: {
+              backgroundColor: draculaColors.background,
+              border: `1px solid ${draculaColors.comment}`,
+              borderRadius: 2,
+            },
+          },
+        }}
+      >
+        <DialogTitle sx={{ color: draculaColors.foreground, fontFamily: "'JetBrains Mono', monospace" }}>
+          Clear History?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', monospace" }}>
+            This will permanently delete all {history.length} history entries.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button
+            onClick={() => setUi(prev => ({ ...prev, confirmOpen: false }))}
+            sx={{ borderColor: draculaColors.comment, color: draculaColors.comment }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              clearHistory();
+              setUi(prev => ({ ...prev, confirmOpen: false, historySelectedKey: null }));
+            }}
+            sx={{ borderColor: draculaColors.red, color: draculaColors.red }}
+            variant="outlined"
+          >
+            Clear All
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

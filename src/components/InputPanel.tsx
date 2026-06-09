@@ -1,4 +1,4 @@
-import { useState, useReducer, useRef, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { keyframes } from '@mui/material/styles';
 import {
   Box,
@@ -13,37 +13,17 @@ import {
 import { Stop, Casino, ContentCopy, HourglassEmpty } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
-import { useSageMath, DEFAULT_SAGE_TIMEOUT } from '../hooks/useSageMath';
+import { useSageMath } from '../hooks/useSageMath';
 import { useWorkerPool } from '../hooks/useWorkerPool';
+import { useAttackExecution } from '../hooks/useAttackExecution';
 import { ProofRenderer } from './ProofRenderer';
-import { testcaseGenerators, submitToFactorDB, autoDecrypt } from '../attacks';
-import { isActualSuccess } from '../utils/sageOutput';
 import { inputSx } from '../styles/inputSx';
 import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, FONT_FAMILY } from '../styles/shared';
-import { useTimer } from '../hooks/useTimer';
 import Prism from 'prismjs';
 import '../styles/draculaPrism.css';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/components/prism-python';
 import { getAttackSource, extractFrontendCheck, dedent } from '../attacks/rawSources';
-import { ProgressEstimator } from '../utils/progressEstimator';
-
-type ProgressAction =
-  | { type: 'START' }
-  | { type: 'PROGRESS'; pct: number; detail?: string }
-  | { type: 'DONE' }
-  | { type: 'ERROR' };
-type ProgressState = { loading: boolean; pct: number; detail: string };
-const initialProgress: ProgressState = { loading: false, pct: 0, detail: '' };
-function progressReducer(state: ProgressState, action: ProgressAction): ProgressState {
-  switch (action.type) {
-    case 'START': return { loading: true, pct: 0, detail: '' };
-    case 'PROGRESS': return { ...state, pct: action.pct, detail: action.detail ?? state.detail };
-    case 'DONE': return { loading: false, pct: 100, detail: '' };
-    case 'ERROR': return { loading: false, pct: 0, detail: '' };
-    default: return state;
-  }
-}
 
 const hourglassSpin = keyframes`
   0% { transform: rotate(0deg); }
@@ -59,38 +39,12 @@ export function InputPanel() {
   const [tab, setTab] = useState(0);
   const [sourceMode, setSourceMode] = useState<'sage' | 'frontend'>('sage');
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
-  const [progressState, dispatchProgress] = useReducer(progressReducer, initialProgress);
-  const loading = progressState.loading;
-  const progress = progressState.pct;
-  const progressDetail = progressState.detail;
-  const isRunning = loading && progress < 100;
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const attackIdRef = useRef<string | null>(null);
-  const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
-  const mountedRef = useRef(true);
-  const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const estimatorRef = useRef<ProgressEstimator | null>(null);
-  if (estimatorRef.current === null) estimatorRef.current = new ProgressEstimator();
-  const lastEtaUpdate = useRef(0);
-  const ownershipRef = useRef<'input' | 'magic' | null>(null);
-  const timer = useTimer();
   const [frontendCode, setFrontendCode] = useState('');
-  const [eta, setEta] = useState<string | null>(null);
   const { runAttack, cancelCurrentRun } = useWorkerPool();
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-      for (const id of timeoutIdsRef.current) clearTimeout(id);
-      timeoutIdsRef.current = [];
-    };
-  }, []);
-
-  useEffect(() => {
-    if (viewMode !== 'attack') {
-      abortControllerRef.current?.abort();
-    }
-  }, [viewMode]);
+  const { handleRun, handleStop, handleGenerateTestcase, testcaseMsg, isRunning, progress, progressDetail, timer, eta } = useAttackExecution(
+    execute, runAttack, cancelCurrentRun,
+    { setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification, setInputValues },
+  );
 
   // Keyboard shortcut: ⌘/Ctrl+1/2/3 switches tabs within the attack view
   useEffect(() => {
@@ -166,151 +120,6 @@ export function InputPanel() {
     setInputValues(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleStop = () => {
-    abortControllerRef.current?.abort();
-    cancelCurrentRun();
-    dispatchProgress({ type: 'DONE' });
-    setEta(null);
-    timer.stop();
-  };
-
-  const handleGenerateTestcase = () => {
-    const gen = testcaseGenerators[selectedAttack.id];
-    if (!gen) {
-      setTestcaseMsg('No testcase generator for this attack');
-      const id = setTimeout(() => { if (mountedRef.current) setTestcaseMsg(null); }, 2000);
-      timeoutIdsRef.current.push(id);
-      return;
-    }
-    const values = gen();
-    setInputValues(values);
-    setTestcaseMsg('Testcase generated');
-    const id = setTimeout(() => { if (mountedRef.current) setTestcaseMsg(null); }, 2000);
-    timeoutIdsRef.current.push(id);
-  };
-
-  const handleRun = async () => {
-    setTestcaseMsg(null);
-    abortControllerRef.current?.abort();
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-    dispatchProgress({ type: 'START' });
-    estimatorRef.current!.reset();
-    setEta(null);
-    timer.start();
-    setOutputResult(null);
-    setOutputError(null);
-    ownershipRef.current = 'input';
-    setOutputSource('input');
-    const currentAttackId = selectedAttack.id;
-    attackIdRef.current = currentAttackId;
-
-    // Strip whitespace from input values (e.g. spaces in numbers pasted from websites).
-    // For multiline fields, preserve newlines — they're used as value separators.
-    const vals: Record<string, string> = {};
-    for (const [key, value] of Object.entries(inputValues)) {
-      const field = selectedAttack.inputs.find(f => f.name === key);
-      vals[key] = field?.multiline
-        ? value.replace(/[^\S\n]/g, '')  // strip horizontal whitespace only, preserve newlines
-        : value.replace(/\s/g, '');       // strip ALL whitespace for single-line inputs
-    }
-
-    const missingFields = selectedAttack.inputs
-      .flatMap(f => (f.required !== false && !vals[f.name]?.trim()) ? [f.label || f.name] : []);
-    if (missingFields.length > 0) {
-      const msg = `Missing required inputs:\n${missingFields.map(f => `- ${f}`).join('\n')}`;
-      if (!mountedRef.current) return;
-      if (ownershipRef.current !== 'input') return;
-      setOutputError(msg);
-      if (!mountedRef.current) return;
-      addToHistory(selectedAttack.id, selectedAttack.name, msg, false);
-      return;
-    }
-
-    try {
-      if (selectedAttack.frontendCheck) {
-        const handleProgress = (pct: number, detail?: string) => {
-          dispatchProgress({ type: 'PROGRESS', pct, detail });
-          const est = estimatorRef.current!.update(pct);
-          const now = Date.now();
-          if (now - lastEtaUpdate.current > 500) {
-            lastEtaUpdate.current = now;
-            setEta(est.formattedEta);
-          }
-        };
-        const preResult = await runAttack(selectedAttack.id, vals, handleProgress);
-        if (preResult !== null) {
-          if (attackIdRef.current !== currentAttackId) return;
-          let displayPreResult = preResult;
-          displayPreResult += '\nMETHOD=TYPESCRIPT';
-          const decryptedPre = autoDecrypt(selectedAttack, vals, preResult);
-          if (decryptedPre) displayPreResult += '\n\n## Decrypted message\n' + decryptedPre;
-          if (!mountedRef.current) return;
-          if (ownershipRef.current !== 'input') return;
-          setOutputResult(displayPreResult);
-          if (!mountedRef.current) return;
-          addToHistory(selectedAttack.id, selectedAttack.name, preResult, isActualSuccess(preResult));
-          const preSuccess = isActualSuccess(preResult);
-          if (!mountedRef.current) return;
-          showNotification(`${selectedAttack.name}: ${preSuccess ? 'success' : 'failed'}`, preSuccess ? 'success' : 'error');
-          if (preSuccess) submitToFactorDB(selectedAttack, preResult, vals.n, showNotification);
-          return;
-        }
-      }
-
-      const code = selectedAttack.sageTemplate?.(vals);
-      if (!code) {
-        if (!mountedRef.current) return;
-        if (selectedAttack.frontendCheck) {
-          setOutputError('Frontend check returned no result — no SageMath fallback available for this attack');
-        } else {
-          setOutputError('No SageMath template available for this attack');
-        }
-        return;
-      }
-      if (attackIdRef.current !== currentAttackId) return;
-      const result = await execute(code, DEFAULT_SAGE_TIMEOUT, controller.signal);
-      if (attackIdRef.current !== currentAttackId) return;
-      if (result.success) {
-        let displayStdout = result.stdout;
-        displayStdout += '\nMETHOD=SAGEMATHCELL';
-        const decryptedSage = autoDecrypt(selectedAttack, vals, result.stdout);
-        if (decryptedSage) displayStdout += '\n\n## Decrypted message\n' + decryptedSage;
-        if (!mountedRef.current) return;
-        if (ownershipRef.current !== 'input') return;
-        setOutputResult(displayStdout);
-        if (!mountedRef.current) return;
-        addToHistory(selectedAttack.id, selectedAttack.name, result.stdout, isActualSuccess(result.stdout));
-        const runSuccess = isActualSuccess(result.stdout);
-        if (!mountedRef.current) return;
-        showNotification(`${selectedAttack.name}: ${runSuccess ? 'success' : 'failed'}`, runSuccess ? 'success' : 'error');
-        if (runSuccess) submitToFactorDB(selectedAttack, result.stdout, vals.n, showNotification);
-      } else {
-        if (!mountedRef.current) return;
-        if (ownershipRef.current !== 'input') return;
-        setOutputError(result.error || 'SageCell execution failed with no specific error. Check that all required inputs are filled.');
-        if (!mountedRef.current) return;
-        addToHistory(selectedAttack.id, selectedAttack.name, result.error || 'SageCell execution failed with no specific error. Check that all required inputs are filled.', false);
-      }
-    } catch (err: unknown) {
-      if (attackIdRef.current !== currentAttackId) { return; }
-      const message = err instanceof Error ? err.message : 'Execution failed';
-      if (!mountedRef.current) return;
-      if (ownershipRef.current !== 'input') return;
-      setOutputError(message);
-      if (!mountedRef.current) return;
-      addToHistory(selectedAttack.id, selectedAttack.name, message, false);
-    } finally {
-      // Same cleanup as manual Stop — single code path for all exits
-      handleStop();
-      if (attackIdRef.current === currentAttackId && ownershipRef.current === 'input') {
-        abortControllerRef.current = null;
-        ownershipRef.current = null;
-        setOutputSource(null);
-      }
-    }
-  };
-
   return (
     <Box sx={colFlexSx}>
       {/* Tabs at top-left */}
@@ -334,7 +143,7 @@ export function InputPanel() {
 
       {/* Explanation tab - left aligned */}
       {tab === 0 && (
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2, pb: '30vh' }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2, pb: '20vh' }}>
           {selectedAttack.proof ? (
             <ProofRenderer latex={selectedAttack.proof} />
           ) : (
@@ -409,7 +218,7 @@ export function InputPanel() {
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={isRunning ? handleStop : () => { void handleRun(); }}
+                onClick={isRunning ? handleStop : () => { void handleRun(selectedAttack, inputValues); }}
                 data-testid={isRunning ? 'stop-attack' : 'run-attack'}
                 sx={colorGhostBtn(isRunning ? draculaColors.red : draculaColors.purple)}
                 startIcon={isRunning ? <Stop /> : undefined}
@@ -457,7 +266,7 @@ export function InputPanel() {
 
       {/* Source tab */}
       {tab === 2 && (
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2, pb: '30vh' }}>
+        <Box sx={{ flex: 1, overflow: 'auto', p: 2, pb: '20vh' }}>
     <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
       {hasSage && (
         <Button

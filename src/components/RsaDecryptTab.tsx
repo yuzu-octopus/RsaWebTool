@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAppContext } from '../hooks/useAppContext';
 import { Box, Typography, TextField, Button } from '@mui/material';
 import { draculaColors } from '../theme/dracula';
 import { modPow, modInverse } from '../utils/bigint';
@@ -12,9 +13,11 @@ export function RsaDecryptTab() {
     output: null,
     error: null,
   });
+  const { setOutputResult: setCtxOutput, setOutputError: setCtxError, setOutputSource, addToHistory } = useAppContext();
 
   const handleDecrypt = () => {
     setResult({ output: null, error: null });
+    setCtxOutput(null); setCtxError(null);
     const cn = parseBigInt(form.c);
     let nn = parseBigInt(form.n);
     let pn = parseBigInt(form.p);
@@ -24,6 +27,7 @@ export function RsaDecryptTab() {
 
     if (cn === null) {
       setResult({ output: null, error: 'c must be a valid number' });
+      setCtxError('c must be a valid number'); setOutputSource('calculator');
       return;
     }
 
@@ -38,14 +42,17 @@ export function RsaDecryptTab() {
 
     if (nn === null) {
       setResult({ output: null, error: 'Provide n, or p+q (any 2 of p, q, n)' });
+      setCtxError('Provide n, or p+q (any 2 of p, q, n)'); setOutputSource('calculator');
       return;
     }
     if (nn <= 1n) {
       setResult({ output: null, error: 'n must be > 1' });
+      setCtxError('n must be > 1'); setOutputSource('calculator');
       return;
     }
     if (cn >= nn) {
       setResult({ output: null, error: 'c must be < n' });
+      setCtxError('c must be < n'); setOutputSource('calculator');
       return;
     }
 
@@ -65,6 +72,7 @@ export function RsaDecryptTab() {
 
     if (m === null) {
       setResult({ output: null, error: 'Provide d, or at least 2 of (p, q, n) + e' });
+      setCtxError('Provide d, or at least 2 of (p, q, n) + e'); setOutputSource('calculator');
       return;
     }
 
@@ -74,6 +82,7 @@ export function RsaDecryptTab() {
       outputText += `m (ascii) = ${toAscii(m)}`;
     }
     setResult({ output: outputText, error: null });
+    setCtxOutput(outputText); setOutputSource('calculator'); addToHistory('calculator-rsa', 'RSA Decrypt', outputText, true);
   };
 
   return (

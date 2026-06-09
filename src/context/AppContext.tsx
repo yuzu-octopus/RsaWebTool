@@ -33,7 +33,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const addToHistory = useCallback((attackId: string, attackName: string, result: string, success: boolean) => {
     setHistory(prev => {
       const entry: HistoryEntry = { attackId, attackName, timestamp: new Date(), result, success };
-      const updated = [entry, ...prev].slice(0, 50);
+      const updated = [entry, ...prev].slice(0, 500);
       // Persist to localStorage (truncate result to 200 chars to stay under quota)
       try {
         const stored = updated.map(e => ({ ...e, result: e.result.length > 200 ? e.result.slice(0, 200) + '...' : e.result }));
@@ -41,6 +41,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       } catch { /* localStorage full or unavailable — silently ignore */ }
       return updated;
     });
+  }, []);
+
+  const clearHistory = useCallback(() => {
+    setHistory([]);
+    localStorage.removeItem('rsa-history:v1');
+    localStorage.removeItem('rsa-history');
   }, []);
 
   const showNotification = useCallback((message: string, severity?: 'success' | 'error' | 'info') => {
@@ -65,11 +71,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setOutputError: (v: string | null) => setApp(prev => ({ ...prev, outputError: v })),
     outputSource: app.outputSource,
     setOutputSource: (v: AppContextType['outputSource']) => setApp(prev => ({ ...prev, outputSource: v })),
-    history, addToHistory, notification, showNotification,
+    history, addToHistory, clearHistory, notification, showNotification,
     commandPaletteOpen, setCommandPaletteOpen,
   }), [
     app.selectedAttack, app.viewMode, app.calculatorMode, app.outputResult, app.outputError, app.outputSource,
-    history, addToHistory, notification, showNotification,
+    history, addToHistory, clearHistory, notification, showNotification,
     commandPaletteOpen, setCommandPaletteOpen,
   ]);
 

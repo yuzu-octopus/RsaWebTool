@@ -10,6 +10,7 @@ import { outputBoxSx } from '../../../styles/shared';
 import { sha256, sha512 } from '@noble/hashes/sha2.js';
 import { sha1, md5 } from '@noble/hashes/legacy.js';
 import { bytesToHex } from '@noble/hashes/utils.js';
+import { useAppContext } from '../../../hooks/useAppContext';
 
 interface AlgInfo {
   value: string;
@@ -147,9 +148,11 @@ export default function LengthExtensionTab() {
   const [results, setResults] = useState<{ secretLen: number; hash: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
   const alg = ALGORITHMS.find(a => a.value === algorithm)!;
+  const { setOutputResult: setCtxOutput, setOutputError: setCtxError, setOutputSource, addToHistory } = useAppContext();
 
   const handleRun = useCallback(() => {
     setError(null); setResult(null); setResults([]);
+    setCtxOutput(null); setCtxError(null);
     try {
       const msgBytes = decodeMsg(originalMessage);
       const appendBytes = decodeMsg(appendData);
@@ -163,13 +166,26 @@ export default function LengthExtensionTab() {
         }
         if (attempts.length === 0) throw new Error('No results for any secret length');
         setResults(attempts);
-        setResult({ extendedMsg: bytesToHex(runSingle(1).extendedMessage), newHash: attempts[0].hash });
+        const leResult = { extendedMsg: bytesToHex(runSingle(1).extendedMessage), newHash: attempts[0].hash };
+        setResult(leResult);
+        setCtxOutput(`Extended Message: ${leResult.extendedMsg}\nNew Hash: ${leResult.newHash}`);
+        setOutputSource('calculator');
+        addToHistory('calculator-hash', 'Length Extension', `Extended Message: ${leResult.extendedMsg}\nNew Hash: ${leResult.newHash}`, true);
       } else {
         const out = runSingle(secretLen);
-        setResult({ extendedMsg: bytesToHex(out.extendedMessage), newHash: out.newHash });
+        const leResult = { extendedMsg: bytesToHex(out.extendedMessage), newHash: out.newHash };
+        setResult(leResult);
+        setCtxOutput(`Extended Message: ${leResult.extendedMsg}\nNew Hash: ${leResult.newHash}`);
+        setOutputSource('calculator');
+        addToHistory('calculator-hash', 'Length Extension', `Extended Message: ${leResult.extendedMsg}\nNew Hash: ${leResult.newHash}`, true);
       }
-    } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
-  }, [originalHash, originalMessage, secretLen, secretUnknown, secretRangeEnd, appendData, alg]);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setError(msg);
+      setCtxError(msg);
+      setOutputSource('calculator');
+    }
+  }, [originalHash, originalMessage, secretLen, secretUnknown, secretRangeEnd, appendData, alg, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
 
   const handleCopyHash = useCallback(() => { if (result?.newHash) navigator.clipboard.writeText(result.newHash).catch(() => {}); }, [result]);
   const handleCopyMsg = useCallback(() => { if (result?.extendedMsg) navigator.clipboard.writeText(result.extendedMsg).catch(() => {}); }, [result]);
