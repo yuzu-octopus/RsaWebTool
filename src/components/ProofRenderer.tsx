@@ -132,6 +132,8 @@ function renderInlineText(text: string): string {
   html = html.replace(/\\textit\{([^}]*)\}/g, '<em>$1</em>');
   html = html.replace(/\\&/g, '&');
   html = html.replace(/\\#/g, '#');
+  html = html.replace(/\\%/g, '%');
+  html = html.replace(/\\'/g, "'");
   return html;
 }
 

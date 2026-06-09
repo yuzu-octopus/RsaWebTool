@@ -24,13 +24,13 @@ const EXPLANATION_LATEX =
 'Select public exponent $e$ where $\\gcd(e, \\varphi(n)) = 1$ (commonly $65537$).\n' +
 'The private exponent is:\n\n' +
 '$d \\equiv e^{-1} \\pmod{\\varphi(n)}$\n\n' +
-'Public key: $(e, n)$ \\quad Private key: $(d, n)$.\n\n' +
+'Public key: $(e, n)$ \u00a0 Private key: $(d, n)$.\n\n' +
 '\\textbf{Encryption:}\n\n' +
 '$c \\equiv m^e \\pmod{n}$\n\n' +
 '$m$ is the plaintext as an integer $0 < m < n$.\n\n' +
 '\\textbf{Decryption:}\n\n' +
 '$m \\equiv c^d \\pmod{n}$\n\n' +
-'This works because $e \\cdot d \\equiv 1 \\pmod{\\varphi(n)}$, so $m^{e \\cdot d} \\equiv m \\pmod{n}$ by Euler\\\'s theorem.\n\n' +
+'This works because $e \\cdot d \\equiv 1 \\pmod{\\varphi(n)}$, so $m^{e \\cdot d} \\equiv m \\pmod{n}$ by Euler\'s theorem.\n\n' +
 '\\textbf{CRT Optimization:}\n\n' +
 'Chinese Remainder Theorem speeds up decryption ~4x. Precompute:\n\n' +
 '$d_p = d \\bmod (p-1)$\n' +
@@ -39,7 +39,7 @@ const EXPLANATION_LATEX =
 'Decrypt: $m_p = c^{d_p} \\bmod p$, $m_q = c^{d_q} \\bmod q$, then $m = m_q + q \\cdot ((q_{\\text{inv}} \\cdot (m_p - m_q)) \\bmod p)$.\n\n' +
 '\\textbf{PKCS\\#1 v1.5 Padding:}\n\n' +
 '$\\text{EM} = \\texttt{0x00} \\parallel \\texttt{0x02} \\parallel \\text{PS} \\parallel \\texttt{0x00} \\parallel M$\n\n' +
-'PS is $k-3-|M|$ random non-zero bytes. The leading \\texttt{0x00} ensures the padded message is less than $n$.\n\n' +
+'PS is $k-3-|M|$ random non-zero bytes. The leading $\texttt{0x00}$ ensures the padded message is less than $n$.\n\n' +
 '\\textbf{OAEP Padding:}\n\n' +
 'Optimal Asymmetric Encryption Padding uses a Feistel network with a hash function $G$ and $H$ (MGF1):\n\n' +
 '$\\text{EM} = \\text{mask\\_seed} \\parallel \\text{masked\\_DB}$' +
@@ -49,8 +49,8 @@ const EXPLANATION_LATEX =
 '\\begin{itemize}\n' +
 '\\item \\textbf{Small $e$:} When $e=3$ and $m^3 < n$, ciphertext decryption is simply $m = \\sqrt[3]{c}$ (integer cube root).\n' +
 '\\item \\textbf{Common Modulus:} Same $n$, different $e_1, e_2$. If $\\gcd(e_1, e_2) = 1$, find $a e_1 + b e_2 = 1$ via extended GCD, then $m = c_1^a \\cdot c_2^b \\bmod n$.\n' +
-'\\item \\textbf{Wiener\\\'s Attack:} When $d < \\frac{1}{3} n^{1/4}$, continued fractions on $e/n$ recover $d$ directly.\n' +
-'\\item \\textbf{Hastad\\\'s Broadcast:} Same $m$ encrypted to $k \\geq e$ recipients with the same $e$ — CRT recovers $m^e$, then take $e$th root.\n' +
+'\\item \\textbf{Wiener\'s Attack:} When $d < \\frac{1}{3} n^{1/4}$, continued fractions on $e/n$ recover $d$ directly.\n' +
+'\\item \\textbf{Hastad\'s Broadcast:} Same $m$ encrypted to $k \\geq e$ recipients with the same $e$ — CRT recovers $m^e$, then take $e$th root.\n' +
 '\\item \\textbf{Coppersmith:} Partial knowledge of $p$ or small roots of $f(x) \\equiv 0 \\pmod{p}$ using LLL/Howgrave-Graham.\n' +
 '\\end{itemize}';
 

@@ -23,7 +23,7 @@ export const centeredPanelSx = {
   display: 'flex',
   flexDirection: 'column' as const,
   alignItems: 'center',
-  pb: '30vh',
+  pb: '25vh',
 };
 
 export const outputBoxSx = {
