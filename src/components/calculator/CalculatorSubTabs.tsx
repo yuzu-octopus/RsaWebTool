@@ -17,13 +17,15 @@ export function CalculatorSubTabs({ tabs, activeTab, onChange }: CalculatorSubTa
   const activeIndex = tabs.findIndex(t => t.id === activeTab);
 
   return (
-    <Tabs
-      value={activeIndex < 0 ? 0 : activeIndex}
-      onChange={(_e, value) => {
-        const idx = value as number;
-        onChange(tabs[idx]?.id ?? tabs[0].id);
-      }}
-      sx={{
+ <Tabs
+ value={activeIndex < 0 ? 0 : activeIndex}
+ onChange={(_e, value) => {
+ const idx = value as number;
+ onChange(tabs[idx]?.id ?? tabs[0].id);
+ }}
+ variant="scrollable"
+ scrollButtons="auto"
+ sx={{
         mb: 2,
         borderBottom: `1px solid ${draculaColors.comment}`,
         minHeight: 40,
