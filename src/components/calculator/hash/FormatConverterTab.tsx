@@ -107,7 +107,7 @@ export default function FormatConverterTab() {
   const handleCopy = useCallback(() => { if (result) navigator.clipboard.writeText(result).catch(() => {}); }, [result]);
 
   return (
-    <Box>
+    <Box sx={{ pb: '30vh' }}>
       <FormControl fullWidth sx={{ ...inputSx, mb:2 }}>
         <InputLabel>Conversion</InputLabel>
         <Select value={conversion} label="Conversion" onChange={e => setConversion(e.target.value)}>

@@ -90,7 +90,7 @@ export default function HMACTab() {
   const selectedAlg = algs.find(a => a.value === algorithm);
 
   return (
-    <Box>
+    <Box sx={{ pb: '30vh' }}>
       <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
         <InputLabel>Algorithm</InputLabel>
         <Select value={algorithm} label="Algorithm" onChange={e => setAlgorithm(e.target.value)}>

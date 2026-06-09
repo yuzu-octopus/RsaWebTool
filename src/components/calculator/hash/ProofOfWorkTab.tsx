@@ -109,7 +109,7 @@ export default function ProofOfWorkTab() {
 
   /* ---- render ---- */
   return (
-    <Box>
+    <Box sx={{ pb: '30vh' }}>
       <Box sx={{ mb: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
         <Typography variant="caption" sx={{ color: draculaColors.comment, fontFamily: FONT_FAMILY }}>
           SHA-256 Proof of Work — finds a nonce such that the hash has N leading zero bits.

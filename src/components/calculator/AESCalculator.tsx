@@ -310,7 +310,7 @@ function AESAttacksTab() {
           setResult(`ECB Byte-at-a-Time Attack\n\nOracle: ${oracleUrl || '(not set)'}\n\n1. Feed 'A'*1..'A'*32 to find block size (output length jump)\n2. Send 48 'A's → repeating blocks → ECB confirmed\n3. For byte position p: send 'A'*(15-p%16), brute-force last byte\n\nRequires live oracle endpoint. This is the algorithmic reference.`);
           break;
         case 'cbc-padding':
-          setResult(`CBC Padding Oracle Attack\n\nOracle: ${oracleUrl || '(not set)'}\n\nFor each pair (C[i-1], C[i]):\n  For byte p = 15..0:\n    For guess g = 0..255:\n      C'[i-1][p] = C[i-1][p] ^ g ^ (16-p)\n      Submit (C'[i-1] || C[i]) → oracle\n      If 'valid padding' → P[i][p] = C[i-1][p] ^ g ^ (16-p)\n\nCS'16 padding oracle: $\\Pr[\\text{valid padding}] \\approx \\frac{1}{256} \\times (257 - \\text{\\#bad padding})$`);
+          setResult(`CBC Padding Oracle Attack\n\nOracle: ${oracleUrl || '(not set)'}\n\nFor each pair (C[i-1], C[i]):\n  For byte p = 15..0:\n    For guess g = 0..255:\n      C'[i-1][p] = C[i-1][p] ^ g ^ (16-p)\n      Submit (C'[i-1] || C[i]) → oracle\n      If 'valid padding' → P[i][p] = C[i-1][p] ^ g ^ (16-p)\n\nCS'16 padding oracle: Pr[valid padding] ≈ 1/256 × (257 - #bad padding)`);
           break;
         case 'gcm-nonce': {
           const c1 = hexToBytes(gcmCt1.replace(/\s/g, ''));

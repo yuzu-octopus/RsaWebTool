@@ -4,7 +4,7 @@ import {
   FormControl, InputLabel, Tooltip, IconButton, Radio, RadioGroup,
   FormControlLabel,
 } from '@mui/material';
-import { VpnKey, PlayArrow, ContentCopy } from '@mui/icons-material';
+import { Hub, PlayArrow, ContentCopy } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
 import { colFlexSx, centeredPanelSx, outputBoxSx } from '../../styles/shared';
 import { inputSx } from '../../styles/inputSx';
@@ -101,7 +101,7 @@ function ECCExplanationTab() {
   return (
     <Box>
       <Typography variant="h6" sx={{ color: draculaColors.cyan, mb: 1 }}>ECC Reference</Typography>
-      <Box sx={{ maxHeight: '60vh', overflow: 'auto', pr: 1,
+      <Box sx={{ maxHeight: '60vh', overflow: 'auto', pr: 1, pb: '30vh',
         '&::-webkit-scrollbar': { width: '8px' },
         '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' },
       }}>
@@ -185,7 +185,7 @@ function ECCKeyOpsTab() {
   }, [isX25519]);
 
   return (
-    <Box>
+    <Box sx={{ pb: '30vh' }}>
       <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
         <InputLabel>Curve</InputLabel>
         <Select value={curve} label="Curve" onChange={e => { setCurve(e.target.value); setResult(null); setError(null); }}>
@@ -282,7 +282,7 @@ function ECCSignVerifyTab() {
   const signCurves = CURVES.filter(c => c.hasSign);
 
   return (
-    <Box>
+    <Box sx={{ pb: '30vh' }}>
       <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
         <InputLabel>Curve</InputLabel>
         <Select value={curve} label="Curve" onChange={e => { setCurve(e.target.value); setResult(null); setError(null); }}>
@@ -471,7 +471,7 @@ function ECCAttacksTab() {
   }, [attack, h1, h2, r1, s1, s2, nHex, aVal, bVal, pVal, xVal, yVal]);
 
   return (
-    <Box>
+    <Box sx={{ pb: '30vh' }}>
       <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
         <InputLabel>Attack</InputLabel>
         <Select value={attack} label="Attack" onChange={e => setAttack(e.target.value)}>
@@ -507,7 +507,7 @@ export default function ECCCalculator() {
       <Box sx={{ ...centeredPanelSx, p: 2 }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
           <Typography variant="h3" sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <VpnKey sx={{ fontSize: 'inherit' }} /> ECC Calculator
+            <Hub sx={{ fontSize: 'inherit' }} /> ECC Calculator
           </Typography>
           <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 2 }}>
             Elliptic curve operations, ECDSA, ECDH, and attacks — powered by @noble/curves

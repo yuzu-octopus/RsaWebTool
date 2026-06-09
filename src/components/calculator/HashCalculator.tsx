@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { Fingerprint } from '@mui/icons-material';
+import { Tag } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
 import { colFlexSx, centeredPanelSx } from '../../styles/shared';
 import { CalculatorSubTabs } from './CalculatorSubTabs';
@@ -31,7 +31,7 @@ export default function HashCalculator() {
             variant="h3"
             sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}
           >
-            <Fingerprint sx={{ fontSize: 'inherit' }} /> Hash Calculator
+            <Tag sx={{ fontSize: 'inherit' }} /> Hash Calculator
           </Typography>
           <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 2 }}>
             Pure JS hash computation — no SageCell needed

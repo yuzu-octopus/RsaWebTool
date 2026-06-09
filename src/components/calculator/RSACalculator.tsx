@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import { Calculate } from '@mui/icons-material';
+import { VpnKey } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
 import { colFlexSx, centeredPanelSx } from '../../styles/shared';
 import { CalculatorSubTabs } from './CalculatorSubTabs';
@@ -61,7 +61,7 @@ function ExplanationTab() {
         RSA Reference
       </Typography>
       <Box sx={{
-        maxHeight: '60vh', overflow: 'auto', pr: 1,
+        maxHeight: '60vh', overflow: 'auto', pr: 1, pb: '30vh',
         '&::-webkit-scrollbar': { width: '8px' },
         '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' },
       }}>
@@ -82,7 +82,7 @@ export default function RSACalculator() {
             variant="h3"
             sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}
           >
-            <Calculate sx={{ fontSize: 'inherit' }} /> RSA Calculator
+            <VpnKey sx={{ fontSize: 'inherit' }} /> RSA Calculator
           </Typography>
           <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 2 }}>
             RSA encryption, decryption, and key generation reference
@@ -90,7 +90,7 @@ export default function RSACalculator() {
 
           <CalculatorSubTabs tabs={SUB_TABS} activeTab={activeTab} onChange={setActiveTab} />
 
-          <Box sx={{ flex: 1, overflow: 'auto', px: 0.5, pt: 1 }}>
+          <Box sx={{ flex: 1, overflow: 'auto', px: 0.5, pt: 1, pb: '30vh' }}>
             {activeTab === 'explanation' && <ExplanationTab />}
             {activeTab === 'key-gen' && <RsaKeyGenTab />}
             {activeTab === 'encrypt' && <RsaEncryptTab />}

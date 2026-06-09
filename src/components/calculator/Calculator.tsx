@@ -1,28 +1,14 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { Box, Tabs, Tab, Skeleton } from '@mui/material';
+import { Box, Skeleton } from '@mui/material';
 import { draculaColors } from '../../theme/dracula';
 import { useAppContext } from '../../hooks/useAppContext';
-import { colFlexSx, centeredPanelSx, tabSx } from '../../styles/shared';
+import { colFlexSx, centeredPanelSx } from '../../styles/shared';
 import type { CalculatorMode } from '../../types';
 
 const RSACalculator = lazy(() => import('./RSACalculator'));
 const AESCalculator = lazy(() => import('./AESCalculator'));
 const ECCCalculator = lazy(() => import('./ECCCalculator'));
 const HashCalculator = lazy(() => import('./HashCalculator'));
-
-const TABS: { label: string; mode: CalculatorMode }[] = [
-  { label: 'RSA', mode: 'rsa' },
-  { label: 'AES', mode: 'aes' },
-  { label: 'ECC', mode: 'ecc' },
-  { label: 'Hash', mode: 'hash' },
-];
-
-const TAB_INDEX: Record<CalculatorMode, number> = {
-  rsa: 0,
-  aes: 1,
-  ecc: 2,
-  hash: 3,
-};
 
 const MODE_BY_INDEX: CalculatorMode[] = ['rsa', 'aes', 'ecc', 'hash'];
 
@@ -45,26 +31,13 @@ export function Calculator() {
 
   if (viewMode !== 'calculator') return null;
 
-  const tabIndex = TAB_INDEX[calculatorMode];
+  const tabIndex = MODE_BY_INDEX.indexOf(calculatorMode);
   const ActiveComponent = COMPONENTS[tabIndex];
 
   return (
     <Box sx={colFlexSx}>
       <Box sx={{ ...centeredPanelSx, p: 2 }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Tabs
-            value={tabIndex}
-            onChange={(_e, v) => setCalculatorMode(MODE_BY_INDEX[v as number])}
-            sx={{
-              mb: 2,
-              borderBottom: `1px solid ${draculaColors.comment}`,
-              '& .MuiTabs-indicator': { backgroundColor: draculaColors.cyan },
-            }}
-          >
-            {TABS.map(t => (
-              <Tab key={t.mode} label={t.label} sx={tabSx} />
-            ))}
-          </Tabs>
           <Suspense
             fallback={
               <Skeleton

@@ -43,7 +43,7 @@ export default function ExplanationTab() {
         }} variant="scrollable" scrollButtons="auto">
         {TABS.map(t => (<Tab key={t.id} label={t.label} />))}
       </Tabs>
-      <Box sx={{ maxHeight: '60vh', overflow: 'auto', pr: 1,
+      <Box sx={{ maxHeight: '60vh', overflow: 'auto', pr: 1, pb: '30vh',
         '&::-webkit-scrollbar': { width: '8px' },
         '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' },
       }}>
