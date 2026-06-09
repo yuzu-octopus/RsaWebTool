@@ -18,14 +18,18 @@ const inlineMathRegex = /\$([^$]+)\$|\\\(([^)]+)\\\)/g;
  * Parses a LaTeX proof string into segments.
  */
 function parseProof(latex: string): ProofSegment[] {
+  // Normalize $$...$$ display math blocks to \begin{equation*}...\end{equation*}
+  // for consistent handling by the existing displayMathRegex
+  const text = latex.replace(/\$\$((?:\\.|[^$])+)\$\$/g, (_match, inner) => `\\begin{equation*}${inner}\\end{equation*}`);
+
   const segments: ProofSegment[] = [];
   let lastEnd = 0;
   let m;
 
-  while ((m = displayMathRegex.exec(latex)) !== null) {
+  while ((m = displayMathRegex.exec(text)) !== null) {
     // Text before this math block
     if (m.index > lastEnd) {
-      const textBefore = latex.slice(lastEnd, m.index);
+      const textBefore = text.slice(lastEnd, m.index);
       const textSegments = parseTextBlock(textBefore);
       segments.push(...textSegments);
     }
@@ -39,8 +43,8 @@ function parseProof(latex: string): ProofSegment[] {
   }
 
   // Remaining text after last math block
-  if (lastEnd < latex.length) {
-    const textAfter = latex.slice(lastEnd);
+  if (lastEnd < text.length) {
+    const textAfter = text.slice(lastEnd);
     const textSegments = parseTextBlock(textAfter);
     segments.push(...textSegments);
   }

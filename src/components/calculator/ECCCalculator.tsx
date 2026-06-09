@@ -47,7 +47,7 @@ const TABS = [
 const PROOF = `\\textbf{Elliptic Curve Cryptography (ECC)}: Public-key cryptography based on the algebraic structure of elliptic curves over finite fields.
 
 \\textbf{Weierstrass form:}
-$$y^2 = x^3 + ax + b \\quad (4a^3 + 27b^2 \\neq 0)$$
+$y^2 = x^3 + ax + b \\quad (4a^3 + 27b^2 \\neq 0)$
 
 \\textbf{Group Law:} Points on the curve form an additive group:
 \\begin{itemize}
@@ -74,10 +74,10 @@ $$y^2 = x^3 + ax + b \\quad (4a^3 + 27b^2 \\neq 0)$$
 \\end{itemize}
 
 \\textbf{Nonce Importance:} Reusing $k$ across two signatures immediately leaks $d$:
-$$k = \\frac{h_1 - h_2}{s_1 - s_2} \\bmod n, \\quad d = \\frac{s_1 \\cdot k - h_1}{r} \\bmod n$$
+$k = \\frac{h_1 - h_2}{s_1 - s_2} \\bmod n, \\quad d = \\frac{s_1 \\cdot k - h_1}{r} \\bmod n$
 
 \\textbf{ECDH Key Exchange:} Alice ($a, A = aG$), Bob ($b, B = bG$):
-$$\\text{Shared} = a \\cdot B = b \\cdot A = ab \\cdot G$$
+$\\text{Shared} = a \\cdot B = b \\cdot A = ab \\cdot G$
 
 \\textbf{Standard Curves:}
 \\begin{itemize}

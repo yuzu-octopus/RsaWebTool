@@ -19,30 +19,30 @@ const SUB_TABS = [
 const EXPLANATION_LATEX =
 '\\textbf{RSA Key Generation:}\n\n' +
 'Choose two large primes $p$ and $q$, then compute:\n\n' +
-'$$n = p \\cdot q$$\n' +
-'$$\\varphi(n) = (p-1)(q-1)$$\n\n' +
+'$n = p \\cdot q$\n' +
+'$\\varphi(n) = (p-1)(q-1)$\n\n' +
 'Select public exponent $e$ where $\\gcd(e, \\varphi(n)) = 1$ (commonly $65537$).\n' +
 'The private exponent is:\n\n' +
-'$$d \\equiv e^{-1} \\pmod{\\varphi(n)}$$\n\n' +
+'$d \\equiv e^{-1} \\pmod{\\varphi(n)}$\n\n' +
 'Public key: $(e, n)$ \\quad Private key: $(d, n)$.\n\n' +
 '\\textbf{Encryption:}\n\n' +
-'$$c \\equiv m^e \\pmod{n}$$\n\n' +
+'$c \\equiv m^e \\pmod{n}$\n\n' +
 '$m$ is the plaintext as an integer $0 < m < n$.\n\n' +
 '\\textbf{Decryption:}\n\n' +
-'$$m \\equiv c^d \\pmod{n}$$\n\n' +
+'$m \\equiv c^d \\pmod{n}$\n\n' +
 'This works because $e \\cdot d \\equiv 1 \\pmod{\\varphi(n)}$, so $m^{e \\cdot d} \\equiv m \\pmod{n}$ by Euler\\\'s theorem.\n\n' +
 '\\textbf{CRT Optimization:}\n\n' +
 'Chinese Remainder Theorem speeds up decryption ~4x. Precompute:\n\n' +
-'$$d_p = d \\bmod (p-1)$$\n' +
-'$$d_q = d \\bmod (q-1)$$\n' +
-'$$q_{\\text{inv}} = q^{-1} \\pmod{p}$$\n\n' +
+'$d_p = d \\bmod (p-1)$\n' +
+'$d_q = d \\bmod (q-1)$\n' +
+'$q_{\\text{inv}} = q^{-1} \\pmod{p}$\n\n' +
 'Decrypt: $m_p = c^{d_p} \\bmod p$, $m_q = c^{d_q} \\bmod q$, then $m = m_q + q \\cdot ((q_{\\text{inv}} \\cdot (m_p - m_q)) \\bmod p)$.\n\n' +
 '\\textbf{PKCS\\#1 v1.5 Padding:}\n\n' +
-'$$\\text{EM} = \\texttt{0x00} \\parallel \\texttt{0x02} \\parallel \\text{PS} \\parallel \\texttt{0x00} \\parallel M$$\n\n' +
+'$\\text{EM} = \\texttt{0x00} \\parallel \\texttt{0x02} \\parallel \\text{PS} \\parallel \\texttt{0x00} \\parallel M$\n\n' +
 'PS is $k-3-|M|$ random non-zero bytes. The leading \\texttt{0x00} ensures the padded message is less than $n$.\n\n' +
 '\\textbf{OAEP Padding:}\n\n' +
 'Optimal Asymmetric Encryption Padding uses a Feistel network with a hash function $G$ and $H$ (MGF1):\n\n' +
-'$$\\text{EM} = \\text{mask\\_seed} \\parallel \\text{masked\\_DB}$$' +
+'$\\text{EM} = \\text{mask\\_seed} \\parallel \\text{masked\\_DB}$' +
 '\n\n' +
 'Provides semantic security: same plaintext produces different ciphertexts each time. Recommended over PKCS\\#1 v1.5.\n\n' +
 '\\textbf{Common CTF Attacks:}\n\n' +

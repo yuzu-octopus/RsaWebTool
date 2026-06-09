@@ -84,14 +84,14 @@ const PROOF = `\\textbf{AES (Rijndael)}: 128-bit block cipher, 10/12/14 rounds f
 \\textbf{Per-round:} SubBytes (S-box), ShiftRows (cyclic shift), MixColumns ($GF(2^8)$), AddRoundKey (XOR).
 
 \\textbf{Mode Comparison:}
-$$\\begin{array}{ll}
+$\\begin{array}{ll}
 \\text{ECB} & \\text{Each block independent — pattern leaks} \\\\
 \\text{CBC} & \\text{CT chain + IV — parallel decrypt only} \\\\
 \\text{CTR} & \\text{Counter + AES = keystream — parallel, no pad} \\\\
 \\text{GCM} & \\text{CTR + GHASH — AEAD, unique nonce} \\\\
 \\text{OFB} & \\text{AES(feedback) — precomputable} \\\\
 \\text{CFB} & \\text{AES(prev CT) — self-synchronising}
-\\end{array}$$
+\\end{array}$
 
 \\textbf{PKCS#7}: Fill remaining bytes with N where N = pad count. Verify on decrypt.
 
