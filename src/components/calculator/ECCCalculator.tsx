@@ -6,9 +6,10 @@ import {
 } from '@mui/material';
 import { Hub, PlayArrow, ContentCopy } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
-import { colFlexSx, centeredPanelSx, outputBoxSx, FONT_FAMILY } from '../../styles/shared';
+import { colFlexSx, centeredPanelSx, outputBoxSx } from '../../styles/shared';
 import { inputSx } from '../../styles/inputSx';
 import { CalculatorSubTabs } from './CalculatorSubTabs';
+import { AttackExplanationPanel, type AttackExplanationData } from './AttackExplanationPanel';
 import { ProofRenderer } from '../ProofRenderer';
 import { useAppContext } from '../../hooks/useAppContext';
 import { useSageMath, DEFAULT_SAGE_TIMEOUT } from '../../hooks/useSageMath';
@@ -360,16 +361,7 @@ const ECC_ATTACKS = [
 
 /* ─── Attack Explanations ─── */
 
-interface AttackInfo {
-  title: string;
-  description: string;
-  whenToUse: string;
-  algorithm: string[];
-  python: string;
-  references: string[];
-}
-
-const ATTACK_INFO: Record<string, AttackInfo> = {
+const ECC_ATTACK_EXPLANATIONS: Record<string, AttackExplanationData> = {
   'nonce-reuse': {
     title: 'ECDSA Nonce Reuse',
     description: 'When the same ephemeral key k is reused to sign two different messages, the private key d is immediately recoverable. Given two signatures (r, s1) on hash h1 and (r, s2) on hash h2 — sharing the same r means the same k was used — the private key falls out from basic algebra:\n\nk = (h1 - h2) * (s1 - s2)^-1 mod n\nd = (s1 * k - h1) * r^-1 mod n\n\nThis is the single most common ECDSA implementation bug, responsible for the PlayStation 3 ECDSA private key leak (2010) and multiple cryptocurrency thefts where biased or duplicated nonces leaked wallet private keys.',
@@ -647,74 +639,6 @@ else:
   },
 };
 
-function ECCAttackInfoPanel({ attack }: { attack: string }) {
-  const info = ATTACK_INFO[attack];
-  if (!info) return null;
-
-  return (
-    <Box sx={{
-      mb: 2,
-      backgroundColor: draculaColors.currentLine,
-      borderRadius: '4px',
-      p: 1.5,
-      maxHeight: '50vh',
-      overflow: 'auto',
-      '&::-webkit-scrollbar': { width: '8px' },
-      '&::-webkit-scrollbar-thumb': { background: draculaColors.comment, borderRadius: '4px' },
-    }}>
-      <Typography variant="h6" sx={{ color: draculaColors.cyan, mb: 1, fontSize: '0.95rem' }}>
-        {info.title}
-      </Typography>
-      <Typography variant="body2" sx={{ color: draculaColors.foreground, mb: 1.5, lineHeight: 1.6, whiteSpace: 'pre-wrap', fontSize: '0.82rem' }}>
-        {info.description}
-      </Typography>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.orange, mb: 0.5, fontSize: '0.82rem' }}>
-        When to use:
-      </Typography>
-      <Typography variant="body2" sx={{ color: draculaColors.foreground, mb: 1.5, fontStyle: 'italic', fontSize: '0.82rem' }}>
-        {info.whenToUse}
-      </Typography>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.green, mb: 0.5, fontSize: '0.82rem' }}>
-        Algorithm:
-      </Typography>
-      <Box component="ol" sx={{ m: 0, mb: 1.5, pl: 2, color: draculaColors.foreground, fontSize: '0.82rem' }}>
-        {info.algorithm.map((step, i) => (
-          <Typography key={i} component="li" variant="body2" sx={{ color: draculaColors.foreground, mb: 0.3, lineHeight: 1.5, fontSize: '0.82rem' }}>
-            {step}
-          </Typography>
-        ))}
-      </Box>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.pink, mb: 0.5, fontSize: '0.82rem' }}>
-        Python Exploit Script:
-      </Typography>
-      <Box sx={{
-        backgroundColor: draculaColors.background,
-        border: `1px solid ${draculaColors.currentLine}`,
-        borderRadius: '4px',
-        p: 1.5,
-        fontFamily: FONT_FAMILY,
-        fontSize: '0.72rem',
-        whiteSpace: 'pre-wrap',
-        overflow: 'auto',
-        maxHeight: '180px',
-        mb: 1.5,
-        lineHeight: 1.4,
-        color: draculaColors.green,
-      }}>
-        {info.python}
-      </Box>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.comment, mb: 0.5, fontSize: '0.82rem' }}>
-        References:
-      </Typography>
-      {info.references.map((ref, i) => (
-        <Typography key={i} variant="body2" sx={{ color: draculaColors.comment, mb: 0.2, fontSize: '0.78rem', pl: 1 }}>
-          {ref}
-        </Typography>
-      ))}
-    </Box>
-  );
-}
-
 function ECCAttacksTab() {
   const [attack, setAttack] = useState('nonce-reuse');
   const [h1, setH1] = useState('');
@@ -728,8 +652,6 @@ function ECCAttacksTab() {
   const [pVal, setPVal] = useState('');
   const [xVal, setXVal] = useState('');
   const [yVal, setYVal] = useState('');
-  const [gxVal, setGxVal] = useState('');
-  const [gyVal, setGyVal] = useState('');
   const [pxVal, setPxVal] = useState('');
   const [pyVal, setPyVal] = useState('');
   const [pairsMultiline, setPairsMultiline] = useState('');
@@ -1075,12 +997,7 @@ print('\\\\n'.join(out)); print('TOKEN=SUCCESS')`;
           </Box>
           <TextField fullWidth label="p (prime, hex)" value={pVal} onChange={e => setPVal(e.target.value)} variant="outlined"
             sx={{ ...inputSx, mb: 2 }} placeholder="Field prime" spellCheck={false} />
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField fullWidth label="Gx (hex)" value={gxVal} onChange={e => setGxVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="Generator x" spellCheck={false} />
-            <TextField fullWidth label="Gy (hex)" value={gyVal} onChange={e => setGyVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="Generator y" spellCheck={false} />
-          </Box>
+
         </>
       );
       case 'mov': return (
@@ -1106,12 +1023,6 @@ print('\\\\n'.join(out)); print('TOKEN=SUCCESS')`;
           <TextField fullWidth label="p (prime, hex)" value={pVal} onChange={e => setPVal(e.target.value)} variant="outlined"
             sx={{ ...inputSx, mb: 2 }} placeholder="Field prime" spellCheck={false} />
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField fullWidth label="Px (hex)" value={gxVal} onChange={e => setGxVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="Generator/base x" spellCheck={false} />
-            <TextField fullWidth label="Py (hex)" value={gyVal} onChange={e => setGyVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="Generator/base y" spellCheck={false} />
-          </Box>
-          <Box sx={{ display: 'flex', gap: 1 }}>
             <TextField fullWidth label="Qx (hex)" value={pxVal} onChange={e => setPxVal(e.target.value)} variant="outlined"
               sx={{ ...inputSx, mb: 2 }} placeholder="Target point x" spellCheck={false} />
             <TextField fullWidth label="Qy (hex)" value={pyVal} onChange={e => setPyVal(e.target.value)} variant="outlined"
@@ -1132,7 +1043,7 @@ print('\\\\n'.join(out)); print('TOKEN=SUCCESS')`;
         </>
       );
     }
-  }, [attack, h1, h2, r1, s1, s2, nHex, aVal, bVal, pVal, xVal, yVal, gxVal, gyVal, pxVal, pyVal, pairsMultiline, kbitsVal]);
+  }, [attack, h1, h2, r1, s1, s2, nHex, aVal, bVal, pVal, xVal, yVal, pxVal, pyVal, pairsMultiline, kbitsVal]);
 
   return (
     <Box>
@@ -1142,7 +1053,7 @@ print('\\\\n'.join(out)); print('TOKEN=SUCCESS')`;
           {ECC_ATTACKS.map(a => (<MenuItem key={a.value} value={a.value}>{a.label}</MenuItem>))}
         </Select>
       </FormControl>
-      <ECCAttackInfoPanel attack={attack} />
+      {ECC_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={ECC_ATTACK_EXPLANATIONS[attack]} />}
       {attackFields}
       <Button variant="contained" startIcon={<PlayArrow />} onClick={() => { void run(); }} fullWidth
         sx={{ backgroundColor: draculaColors.purple, fontFamily: "'JetBrains Mono', monospace", mb: 2,

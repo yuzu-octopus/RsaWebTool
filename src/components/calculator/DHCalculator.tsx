@@ -5,8 +5,10 @@ import {
 } from '@mui/material';
 import { Security, PlayArrow, ContentCopy } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
-import { colFlexSx, centeredPanelSx, outputBoxSx, FONT_FAMILY } from '../../styles/shared';
+import { colFlexSx, centeredPanelSx, outputBoxSx } from '../../styles/shared';
 import { inputSx } from '../../styles/inputSx';
+import { AttackExplanationPanel } from './AttackExplanationPanel';
+import type { AttackExplanationData } from './AttackExplanationPanel';
 import { CalculatorSubTabs } from './CalculatorSubTabs';
 import { useAppContext } from '../../hooks/useAppContext';
 import { useSageMath, DEFAULT_SAGE_TIMEOUT } from '../../hooks/useSageMath';
@@ -426,64 +428,22 @@ function DHKeyExchangeTab() {
   );
 }
 
-/* ─── Attack Explanation Components ─── */
+/* ─── Attack Data ─── */
 
-function SmallSubgroupExplanation() {
-  return (
-    <Box sx={{
-      mb: 2, maxHeight: '40vh', overflow: 'auto', pr: 1,
-      '&::-webkit-scrollbar': { width: '8px' },
-      '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' },
-    }}>
-      <Typography variant="subtitle1" sx={{ color: draculaColors.pink, mb: 1 }}>
-        Small Subgroup Confinement
-      </Typography>
-      <Typography variant="body2" sx={{ color: draculaColors.foreground, mb: 1, lineHeight: 1.7 }}>
-        When the group order p-1 has small factors, an attacker can confine the shared secret to a small subgroup.
-        The server doesn't validate that public keys lie in the large subgroup, allowing the attacker to learn
-        the private key modulo each small factor.
-      </Typography>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mt: 1.5, mb: 0.5 }}>When to use</Typography>
-      <Typography variant="body2" sx={{ color: draculaColors.foreground, mb: 1, lineHeight: 1.7 }}>
-        When the DH parameters (p, g) are such that p-1 has known small factors and the server
-        does not validate that received public keys are in the correct subgroup.
-      </Typography>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mt: 1.5, mb: 0.5 }}>Algorithm</Typography>
-      <Box sx={{
-        backgroundColor: draculaColors.background,
-        border: `1px solid ${draculaColors.currentLine}`,
-        borderRadius: '4px',
-        p: 1.5,
-        fontFamily: FONT_FAMILY,
-        fontSize: '0.75rem',
-        lineHeight: 1.6,
-        color: draculaColors.foreground,
-        whiteSpace: 'pre',
-        overflow: 'auto',
-        mb: 1.5,
-      }}>
-{`1. Compute p-1 and find all small prime factors
-2. For each small prime r, project y into subgroup of order r:
-     g' = g^{(p-1)/r} mod p
-     y' = y^{(p-1)/r} mod p
-3. Solve DLP in subgroup via BSGS (O(sqrt(r)))
-4. CRT reconstruct the private key from (x_i mod r_i)`}
-      </Box>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mt: 1.5, mb: 0.5 }}>Python Script</Typography>
-      <Box sx={{
-        backgroundColor: draculaColors.background,
-        border: `1px solid ${draculaColors.currentLine}`,
-        borderRadius: '4px',
-        p: 1.5,
-        fontFamily: FONT_FAMILY,
-        fontSize: '0.75rem',
-        lineHeight: 1.6,
-        color: draculaColors.foreground,
-        whiteSpace: 'pre',
-        overflow: 'auto',
-        mb: 1.5,
-      }}>
-{`from sympy import factorint
+const DH_ATTACK_EXPLANATIONS: Record<string, AttackExplanationData> = {
+  'small-subgroup': {
+    title: 'Small Subgroup Confinement',
+    description: 'When the group order p-1 has small factors, an attacker can confine the shared secret to a small subgroup. The server doesn\'t validate that public keys lie in the large subgroup, allowing the attacker to learn the private key modulo each small factor.',
+    whenToUse: 'When the DH parameters (p, g) are such that p-1 has known small factors and the server does not validate that received public keys are in the correct subgroup.',
+    algorithm: [
+      '1. Compute p-1 and find all small prime factors',
+      '2. For each small prime r, project y into subgroup of order r:',
+      '     g\' = g^{(p-1)/r} mod p',
+      '     y\' = y^{(p-1)/r} mod p',
+      '3. Solve DLP in subgroup via BSGS (O(sqrt(r)))',
+      '4. CRT reconstruct the private key from (x_i mod r_i)',
+    ],
+    python: `from sympy import factorint
 from gmpy2 import isqrt, mpz
 
 def subgroup_confinement(p, g, y):
@@ -518,75 +478,26 @@ def subgroup_confinement(p, g, y):
     
     from sympy.ntheory.modular import crt
     result, _ = crt(moduli, residues)
-    return result`}
-      </Box>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mt: 1.5, mb: 0.5 }}>References</Typography>
-      <Typography variant="body2" sx={{ color: draculaColors.cyan, mb: 0.25, lineHeight: 1.7 }}>
-        &bull; Lim &amp; Lee, &quot;A key recovery attack on discrete log-based schemes using a prime order subgroup&quot; (1997)
-      </Typography>
-      <Typography variant="body2" sx={{ color: draculaColors.cyan, lineHeight: 1.7 }}>
-        &bull; Handbook of Applied Cryptography, &sect;3.6.4
-      </Typography>
-    </Box>
-  );
-}
-
-function PohligHellmanExplanation() {
-  return (
-    <Box sx={{
-      mb: 2, maxHeight: '40vh', overflow: 'auto', pr: 1,
-      '&::-webkit-scrollbar': { width: '8px' },
-      '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' },
-    }}>
-      <Typography variant="subtitle1" sx={{ color: draculaColors.pink, mb: 1 }}>
-        Pohlig-Hellman DLP
-      </Typography>
-      <Typography variant="body2" sx={{ color: draculaColors.foreground, mb: 1, lineHeight: 1.7 }}>
-        When p-1 is smooth (all prime factors are small), the Discrete Logarithm Problem can be solved
-        efficiently by decomposing it into smaller subgroups. This is the classic Pohlig-Hellman algorithm.
-      </Typography>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mt: 1.5, mb: 0.5 }}>When to use</Typography>
-      <Typography variant="body2" sx={{ color: draculaColors.foreground, mb: 1, lineHeight: 1.7 }}>
-        When p-1 factors into small primes (smooth group order). Standard MODP groups using safe primes
-        (p = 2q + 1) are resistant to this attack.
-      </Typography>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mt: 1.5, mb: 0.5 }}>Algorithm</Typography>
-      <Box sx={{
-        backgroundColor: draculaColors.background,
-        border: `1px solid ${draculaColors.currentLine}`,
-        borderRadius: '4px',
-        p: 1.5,
-        fontFamily: FONT_FAMILY,
-        fontSize: '0.75rem',
-        lineHeight: 1.6,
-        color: draculaColors.foreground,
-        whiteSpace: 'pre',
-        overflow: 'auto',
-        mb: 1.5,
-      }}>
-{`1. Factor p-1 = prod q_i^{e_i}
-2. For each prime power q_i^{e_i}:
-     g_i = g^{(p-1)/q_i^{e_i}} mod p
-     y_i = y^{(p-1)/q_i^{e_i}} mod p
-     Solve DLP in subgroup: x_i = dlog(g_i, y_i) mod q_i^{e_i}
-3. CRT: x = CRT(x_1, x_2, ..., x_k)
-Complexity: O(sum e_i (sqrt(q_i) + log p)) vs O(sqrt(p))`}
-      </Box>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mt: 1.5, mb: 0.5 }}>Python Script</Typography>
-      <Box sx={{
-        backgroundColor: draculaColors.background,
-        border: `1px solid ${draculaColors.currentLine}`,
-        borderRadius: '4px',
-        p: 1.5,
-        fontFamily: FONT_FAMILY,
-        fontSize: '0.75rem',
-        lineHeight: 1.6,
-        color: draculaColors.foreground,
-        whiteSpace: 'pre',
-        overflow: 'auto',
-        mb: 1.5,
-      }}>
-{`from sympy import factorint, discrete_log
+    return result`,
+    references: [
+      '• Lim & Lee, "A key recovery attack on discrete log-based schemes using a prime order subgroup" (1997)',
+      '• Handbook of Applied Cryptography, §3.6.4',
+    ],
+  },
+  'pohlig-hellman': {
+    title: 'Pohlig-Hellman DLP',
+    description: 'When p-1 is smooth (all prime factors are small), the Discrete Logarithm Problem can be solved efficiently by decomposing it into smaller subgroups. This is the classic Pohlig-Hellman algorithm.',
+    whenToUse: 'When p-1 factors into small primes (smooth group order). Standard MODP groups using safe primes (p = 2q + 1) are resistant to this attack.',
+    algorithm: [
+      '1. Factor p-1 = prod q_i^{e_i}',
+      '2. For each prime power q_i^{e_i}:',
+      '     g_i = g^{(p-1)/q_i^{e_i}} mod p',
+      '     y_i = y^{(p-1)/q_i^{e_i}} mod p',
+      '     Solve DLP in subgroup: x_i = dlog(g_i, y_i) mod q_i^{e_i}',
+      '3. CRT: x = CRT(x_1, x_2, ..., x_k)',
+      'Complexity: O(sum e_i (sqrt(q_i) + log p)) vs O(sqrt(p))',
+    ],
+    python: `from sympy import factorint, discrete_log
 
 def pohlig_hellman(p, g, y):
     """Recover DH private key via Pohlig-Hellman."""
@@ -606,78 +517,29 @@ def pohlig_hellman(p, g, y):
     
     from sympy.ntheory.modular import crt
     result, _ = crt(moduli, residues)
-    return result`}
-      </Box>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mt: 1.5, mb: 0.5 }}>References</Typography>
-      <Typography variant="body2" sx={{ color: draculaColors.cyan, mb: 0.25, lineHeight: 1.7 }}>
-        &bull; Pohlig &amp; Hellman, &quot;An improved algorithm for computing logarithms over GF(p) and its cryptographic significance&quot; (1978)
-      </Typography>
-      <Typography variant="body2" sx={{ color: draculaColors.cyan, lineHeight: 1.7 }}>
-        &bull; Handbook of Applied Cryptography, &sect;3.6.3
-      </Typography>
-    </Box>
-  );
-}
-
-function GeneralDLPExplanation() {
-  return (
-    <Box sx={{
-      mb: 2, maxHeight: '40vh', overflow: 'auto', pr: 1,
-      '&::-webkit-scrollbar': { width: '8px' },
-      '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' },
-    }}>
-      <Typography variant="subtitle1" sx={{ color: draculaColors.pink, mb: 1 }}>
-        General Discrete Log - SageCell
-      </Typography>
-      <Typography variant="body2" sx={{ color: draculaColors.foreground, mb: 1, lineHeight: 1.7 }}>
-        When the group order is not smooth, generic DLP algorithms are required. SageMath&apos;s discrete_log
-        function combines Pohlig-Hellman with Pollard&apos;s rho algorithm, falling back to BSGS for small subgroups.
-      </Typography>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mt: 1.5, mb: 0.5 }}>When to use</Typography>
-      <Typography variant="body2" sx={{ color: draculaColors.foreground, mb: 1, lineHeight: 1.7 }}>
-        When p-1 has at least one large prime factor, making small-subgroup attacks infeasible.
-        Requires SageMath backend for the general-purpose discrete_log implementation.
-      </Typography>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mt: 1.5, mb: 0.5 }}>Algorithm</Typography>
-      <Box sx={{
-        backgroundColor: draculaColors.background,
-        border: `1px solid ${draculaColors.currentLine}`,
-        borderRadius: '4px',
-        p: 1.5,
-        fontFamily: FONT_FAMILY,
-        fontSize: '0.75rem',
-        lineHeight: 1.6,
-        color: draculaColors.foreground,
-        whiteSpace: 'pre',
-        overflow: 'auto',
-        mb: 1.5,
-      }}>
-{`SageMath's discrete_log uses:
-
-1. Factor p-1 via PARI's factorint
-2. For each prime power q^e, project to subgroup
-3. Use Pollard rho (O(sqrt(q))) for DLP in each subgroup
-4. Hensel lifting for higher exponents
-5. CRT to combine results
-
-SageMath is recommended over pure Python for general DLP
-because its PARI/GP backend is significantly faster.`}
-      </Box>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mt: 1.5, mb: 0.5 }}>Python Script</Typography>
-      <Box sx={{
-        backgroundColor: draculaColors.background,
-        border: `1px solid ${draculaColors.currentLine}`,
-        borderRadius: '4px',
-        p: 1.5,
-        fontFamily: FONT_FAMILY,
-        fontSize: '0.75rem',
-        lineHeight: 1.6,
-        color: draculaColors.foreground,
-        whiteSpace: 'pre',
-        overflow: 'auto',
-        mb: 1.5,
-      }}>
-{`from sympy import discrete_log, isprime
+    return result`,
+    references: [
+      '• Pohlig & Hellman, "An improved algorithm for computing logarithms over GF(p) and its cryptographic significance" (1978)',
+      '• Handbook of Applied Cryptography, §3.6.3',
+    ],
+  },
+  'general-dlp': {
+    title: 'General Discrete Log - SageCell',
+    description: 'When the group order is not smooth, generic DLP algorithms are required. SageMath\'s discrete_log function combines Pohlig-Hellman with Pollard\'s rho algorithm, falling back to BSGS for small subgroups.',
+    whenToUse: 'When p-1 has at least one large prime factor, making small-subgroup attacks infeasible. Requires SageMath backend for the general-purpose discrete_log implementation.',
+    algorithm: [
+      'SageMath\'s discrete_log uses:',
+      '',
+      '1. Factor p-1 via PARI\'s factorint',
+      '2. For each prime power q^e, project to subgroup',
+      '3. Use Pollard rho (O(sqrt(q))) for DLP in each subgroup',
+      '4. Hensel lifting for higher exponents',
+      '5. CRT to combine results',
+      '',
+      'SageMath is recommended over pure Python for general DLP',
+      'because its PARI/GP backend is significantly faster.',
+    ],
+    python: `from sympy import discrete_log, isprime
 
 def general_dlp(p, g, y):
     """Solve discrete log - uses Pohlig-Hellman
@@ -688,18 +550,13 @@ def general_dlp(p, g, y):
     x = discrete_log(p, y, g)
     # Verify
     assert pow(g, x, p) == y, "Verification failed"
-    return x`}
-      </Box>
-      <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mt: 1.5, mb: 0.5 }}>References</Typography>
-      <Typography variant="body2" sx={{ color: draculaColors.cyan, mb: 0.25, lineHeight: 1.7 }}>
-        &bull; Pollard, &quot;Monte Carlo methods for index computation (mod p)&quot; (1978)
-      </Typography>
-      <Typography variant="body2" sx={{ color: draculaColors.cyan, lineHeight: 1.7 }}>
-        &bull; SageMath documentation: discrete_log
-      </Typography>
-    </Box>
-  );
-}
+    return x`,
+    references: [
+      '• Pollard, "Monte Carlo methods for index computation (mod p)" (1978)',
+      '• SageMath documentation: discrete_log',
+    ],
+  },
+};
 
 /* ─── Attacks Tab ─── */
 
@@ -904,9 +761,7 @@ except Exception as e:
         </Select>
       </FormControl>
 
-      {attack === 'small-subgroup' && <SmallSubgroupExplanation />}
-      {attack === 'pohlig-hellman' && <PohligHellmanExplanation />}
-      {attack === 'general-dlp' && <GeneralDLPExplanation />}
+      {DH_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={DH_ATTACK_EXPLANATIONS[attack]} />}
 
       <TextField fullWidth label="p (prime, hex)" value={pVal} onChange={e => setPVal(e.target.value)}
         variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Prime modulus" spellCheck={false} />
