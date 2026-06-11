@@ -31,7 +31,13 @@ pnpm-debug.log*
 opencode.json
 AGENTS.md
 
-# Per-developer react-doctor config (tune rule strictness to taste, do not commit)
+# Per-developer react-doctor config (tune rule strictness to taste, do not commit).
+# To recreate after a fresh clone, git clean, or worktree reset, save the
+# following as `doctor.config.ts` in the repo root:
+#   import type { ReactDoctorConfig } from "react-doctor/api";
+#   export default { ignore: { files: ["docs/**"] } } satisfies ReactDoctorConfig;
+# (The `docs/**` ignore excludes the GitHub Pages build output from scans
+# and is what lifted the baseline react-doctor score from 44 to 68.)
 doctor.config.*
 
 # Test infrastructure (scripts + artifacts, tracked separately)
