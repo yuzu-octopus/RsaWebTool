@@ -12,7 +12,7 @@ export interface InputField {
 
 export type AttackCategory = 'Factorization' | 'Partial Key / Lattice' | 'Message / Protocol' | 'Oracle' | 'Advanced' | 'Symmetric' | 'Hash' | 'ECC';
 
-export type CalculatorMode = 'rsa' | 'aes' | 'ecc' | 'hash';
+export type CalculatorMode = 'rsa' | 'aes' | 'ecc' | 'hash' | 'dh';
 
 export interface Attack {
   id: string;

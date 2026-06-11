@@ -9,15 +9,16 @@ const RSACalculator = lazy(() => import('./RSACalculator'));
 const AESCalculator = lazy(() => import('./AESCalculator'));
 const ECCCalculator = lazy(() => import('./ECCCalculator'));
 const HashCalculator = lazy(() => import('./HashCalculator'));
+const DHCalculator = lazy(() => import('./DHCalculator'));
 
-const MODE_BY_INDEX: CalculatorMode[] = ['rsa', 'aes', 'ecc', 'hash'];
+const MODE_BY_INDEX: CalculatorMode[] = ['rsa', 'aes', 'ecc', 'hash', 'dh'];
 
-const COMPONENTS = [RSACalculator, AESCalculator, ECCCalculator, HashCalculator];
+const COMPONENTS = [RSACalculator, AESCalculator, ECCCalculator, HashCalculator, DHCalculator];
 
 export function Calculator() {
   const { viewMode, calculatorMode, setCalculatorMode } = useAppContext();
 
-  // Keyboard shortcuts for calculator sub-tabs (⌘1-⌘4) — must be before early return
+  // Keyboard shortcuts for calculator sub-tabs (⌘1-⌘5) — must be before early return
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail as number;

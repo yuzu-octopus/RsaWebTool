@@ -7,7 +7,6 @@ import { CalculatorSubTabs } from './CalculatorSubTabs';
 import HashFunctionsTab from './hash/HashFunctionsTab';
 import HMACTab from './hash/HMACTab';
 import LengthExtensionTab from './hash/LengthExtensionTab';
-import FormatConverterTab from './hash/FormatConverterTab';
 import ExplanationTab from './hash/ExplanationTab';
 import ProofOfWorkTab from './hash/ProofOfWorkTab';
 import { useAppContext } from '../../hooks/useAppContext';
@@ -17,7 +16,6 @@ const SUB_TABS = [
   { id: 'hash-functions', label: 'Hash Functions' },
   { id: 'hmac', label: 'HMAC' },
   { id: 'length-ext', label: 'Length Ext.' },
-  { id: 'format-conv', label: 'Format Conv.' },
   { id: 'pow', label: 'PoW' },
 ];
 
@@ -53,7 +51,6 @@ export default function HashCalculator() {
             {activeTab === 'hash-functions' && <HashFunctionsTab />}
             {activeTab === 'hmac' && <HMACTab />}
             {activeTab === 'length-ext' && <LengthExtensionTab />}
-            {activeTab === 'format-conv' && <FormatConverterTab />}
             {activeTab === 'pow' && <ProofOfWorkTab />}
           </Box>
         </Box>

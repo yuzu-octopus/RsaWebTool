@@ -13,7 +13,8 @@
  *
  * Special attackId '__pow__' runs the PoW solver:
  *   params.challenge — the challenge string
- *   params.difficulty — number of leading zero bits required (>= 1)
+ *   params.difficulty — number of leading zero bits required (>= 1, fallback)
+ *   params.checkCode — optional JS check function body (receives hex `hash`, returns bool)
  *   Returns JSON-stringified PoWResult on success.
  */
 
@@ -102,7 +103,7 @@ self.onmessage = (e: MessageEvent<CancelMessage | WorkerRequest>) => {
             self.postMessage({ type: 'progress', id, pct, detail } satisfies WorkerProgress);
           }
         };
-        const result = await solvePoW({ challenge, difficulty }, abortController.signal, onProgress);
+        const result = await solvePoW({ challenge, difficulty, checkCode: params.checkCode }, abortController.signal, onProgress);
         if (!cancelledIds.has(id)) {
           self.postMessage({ id, result: result ? JSON.stringify(result) : null } satisfies WorkerResponse);
         }

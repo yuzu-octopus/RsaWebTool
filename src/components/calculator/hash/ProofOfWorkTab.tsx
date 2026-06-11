@@ -1,9 +1,9 @@
 import { useState, useRef, useCallback } from 'react';
 import { keyframes } from '@mui/material/styles';
 import {
-  Box, Typography, TextField, Button, IconButton, Tooltip, LinearProgress,
+  Box, Typography, TextField, Button, IconButton, Tooltip, LinearProgress, Collapse,
 } from '@mui/material';
-import { Stop, PlayArrow, HourglassEmpty, ContentCopy } from '@mui/icons-material';
+import { Stop, PlayArrow, HourglassEmpty, ContentCopy, ExpandMore, ExpandLess } from '@mui/icons-material';
 import { draculaColors } from '../../../theme/dracula';
 import { inputSx } from '../../../styles/inputSx';
 import { outputBoxSx, colorGhostBtn, FONT_FAMILY } from '../../../styles/shared';
@@ -19,11 +19,46 @@ const hourglassSpin = keyframes`
   100% { transform: rotate(360deg); }
 `;
 
+/** Default check function: require first 20 hex chars of hash to be '0' (80 leading bits). */
+const DEFAULT_CHECK_CODE = "return hash.startsWith('0'.repeat(20));";
+
+/** Docs examples shown in the collapsible section. */
+const DOCS_EXAMPLES = [
+  {
+    label: 'Leading zeros (hex chars)',
+    code: "return hash.startsWith('0'.repeat(20));",
+  },
+  {
+    label: 'Leading zeros (bits)',
+    code: [
+      "// Convert hex to binary, count leading zeros",
+      "const bits = BigInt('0x' + hash).toString(2);",
+      "return bits.startsWith('0'.repeat(20));",
+    ].join('\n'),
+  },
+  {
+    label: 'Contains substring',
+    code: "return hash.includes('deadbeef');",
+  },
+  {
+    label: 'Ends with pattern',
+    code: "return hash.endsWith('cafe');",
+  },
+  {
+    label: 'Custom byte sum',
+    code: [
+      "const bytes = new Uint8Array(hash.match(/.{2}/g).map(b => parseInt(b, 16)));",
+      "return ((bytes[0] + bytes[1]) & 0xff) === 0x00;",
+    ].join('\n'),
+  },
+];
+
 /* ---------- component ---------- */
 
 export default function ProofOfWorkTab() {
   const [prefix, setPrefix] = useState('');
-  const [difficulty, setDifficulty] = useState('20');
+  const [checkCode, setCheckCode] = useState(DEFAULT_CHECK_CODE);
+  const [docsOpen, setDocsOpen] = useState(false);
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [progressDetail, setProgressDetail] = useState('');
@@ -46,15 +81,6 @@ export default function ProofOfWorkTab() {
   }, []);
 
   const handleRun = useCallback(async () => {
-    const diff = parseInt(difficulty, 10);
-    if (isNaN(diff) || diff < 1) {
-      const errMsg = 'Difficulty must be at least 1';
-      setError(errMsg);
-      setCtxError(errMsg);
-      setOutputSource('calculator');
-      return;
-    }
-
     setResult(null);
     setError(null);
     setCtxOutput(null); setCtxError(null);
@@ -65,12 +91,12 @@ export default function ProofOfWorkTab() {
 
     estimatorRef.current!.reset();
     const startTime = performance.now();
-    const diffParam = String(diff);
 
     try {
       const workerResult = await runAttack('__pow__', {
         challenge: prefix,
-        difficulty: diffParam,
+        difficulty: '20',
+        checkCode,
       }, (pct: number, detail?: string) => {
         setProgress(pct);
         if (detail) setProgressDetail(detail);
@@ -91,7 +117,6 @@ export default function ProofOfWorkTab() {
       const elapsed = performance.now() - startTime;
       const output = [
         `Algorithm: SHA-256`,
-        `Condition: Leading Zero Bits (${diff})`,
         `Prefix: "${prefix}"`,
         `Attempts: ${parsed.attempts.toLocaleString()}`,
         `Time: ${Math.round(elapsed)}ms`,
@@ -116,18 +141,23 @@ export default function ProofOfWorkTab() {
       setProgressDetail('');
       setEta(null);
     }
-  }, [prefix, difficulty, runAttack, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
+  }, [prefix, checkCode, runAttack, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
 
   const handleCopyResult = useCallback(() => {
     if (result) navigator.clipboard.writeText(result).catch(() => {});
   }, [result]);
+
+  /** Insert an example into the code editor. */
+  const insertExample = useCallback((code: string) => {
+    setCheckCode(code);
+  }, []);
 
   /* ---- render ---- */
   return (
     <Box>
       <Box sx={{ mb: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
         <Typography variant="caption" sx={{ color: draculaColors.comment, fontFamily: FONT_FAMILY }}>
-          SHA-256 Proof of Work — finds a nonce such that the hash has N leading zero bits.
+          SHA-256 Proof of Work — find a nonce where SHA256(challenge + nonce) satisfies your check function.
         </Typography>
       </Box>
 
@@ -142,17 +172,116 @@ export default function ProofOfWorkTab() {
         placeholder="Text to prefix before nonce (e.g., block_data_)"
       />
 
-      {/* Difficulty */}
-      <TextField
-        fullWidth
-        label="Required Zero Bits"
-        value={difficulty}
-        onChange={e => setDifficulty(e.target.value)}
-        variant="outlined"
-        type="number"
-        slotProps={{ htmlInput: { min: 1, max: 32 } }}
-        sx={{ ...inputSx, mb: 2 }}
-        placeholder="e.g., 20"
+      {/* Documentation / Examples — collapsible */}
+      <Box sx={{ mb: 2 }}>
+        <Box
+          onClick={() => setDocsOpen(!docsOpen)}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            cursor: 'pointer',
+            color: draculaColors.comment,
+            fontFamily: FONT_FAMILY,
+            fontSize: '0.8rem',
+            userSelect: 'none',
+            '&:hover': { color: draculaColors.foreground },
+          }}
+        >
+          {docsOpen ? <ExpandLess sx={{ fontSize: '1rem', mr: 0.5 }} /> : <ExpandMore sx={{ fontSize: '1rem', mr: 0.5 }} />}
+          Check function examples
+        </Box>
+        <Collapse in={docsOpen}>
+          <Box
+            sx={{
+              mt: 1,
+              p: 1.5,
+              backgroundColor: draculaColors.background,
+              border: `1px solid ${draculaColors.currentLine}`,
+              borderRadius: '4px',
+              fontFamily: FONT_FAMILY,
+              fontSize: '0.75rem',
+              color: draculaColors.comment,
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {DOCS_EXAMPLES.map((example, i) => (
+              <Box key={i} sx={{ mb: i < DOCS_EXAMPLES.length - 1 ? 1.5 : 0 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.25 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: draculaColors.cyan, fontFamily: FONT_FAMILY, fontSize: '0.7rem' }}
+                  >
+                    {example.label}
+                  </Typography>
+                  <Button
+                    size="small"
+                    variant="text"
+                    onClick={() => insertExample(example.code)}
+                    sx={{
+                      minWidth: 0,
+                      fontSize: '0.65rem',
+                      color: draculaColors.purple,
+                      fontFamily: FONT_FAMILY,
+                      textTransform: 'none',
+                      p: 0,
+                      '&:hover': { color: draculaColors.foreground, backgroundColor: 'transparent' },
+                    }}
+                  >
+                    Use
+                  </Button>
+                </Box>
+                <Box
+                  sx={{
+                    p: 0.75,
+                    backgroundColor: draculaColors.currentLine,
+                    borderRadius: '2px',
+                    color: draculaColors.foreground,
+                    fontFamily: FONT_FAMILY,
+                    fontSize: '0.72rem',
+                    whiteSpace: 'pre-wrap',
+                    overflowX: 'auto',
+                  }}
+                >
+                  {example.code}
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        </Collapse>
+      </Box>
+
+      {/* Check function editor */}
+      <Typography
+        variant="caption"
+        sx={{ color: draculaColors.comment, fontFamily: FONT_FAMILY, mb: 0.5, display: 'block' }}
+      >
+        Check function: receives <Box component="code" sx={{ color: draculaColors.cyan }}>hash</Box> (hex string), returns <Box component="code" sx={{ color: draculaColors.green }}>true</Box> when condition met.
+      </Typography>
+      <Box
+        component="textarea"
+        value={checkCode}
+        onChange={e => setCheckCode(e.target.value)}
+        spellCheck={false}
+        sx={{
+          width: '100%',
+          height: 120,
+          resize: 'vertical',
+          fontFamily: "'JetBrains Mono', monospace",
+          fontSize: '0.8rem',
+          backgroundColor: '#282a36',
+          color: '#f8f8f2',
+          border: '1px solid #44475a',
+          borderRadius: '4px',
+          p: 1,
+          outline: 'none',
+          '&:focus': {
+            borderColor: draculaColors.purple,
+          },
+          '&::placeholder': {
+            color: draculaColors.comment,
+          },
+        }}
+        placeholder="return hash.startsWith('0'.repeat(20));"
       />
 
       {/* Run / Stop morphing button */}
@@ -162,6 +291,7 @@ export default function ProofOfWorkTab() {
         onClick={running ? handleStop : () => { void handleRun(); }}
         sx={{
           ...colorGhostBtn(running ? draculaColors.red : draculaColors.purple),
+          mt: 2,
           mb: 2,
         }}
         startIcon={running ? <Stop /> : <PlayArrow />}

@@ -11,6 +11,7 @@ import { inputSx } from '../../styles/inputSx';
 import { CalculatorSubTabs } from './CalculatorSubTabs';
 import { ProofRenderer } from '../ProofRenderer';
 import { useAppContext } from '../../hooks/useAppContext';
+import { useSageMath, DEFAULT_SAGE_TIMEOUT } from '../../hooks/useSageMath';
 import { secp256k1 } from '@noble/curves/secp256k1.js';
 import { p256, p384, p521 } from '@noble/curves/nist.js';
 import { x25519 } from '@noble/curves/ed25519.js';
@@ -370,86 +371,23 @@ function ECCAttacksTab() {
   const [pVal, setPVal] = useState('');
   const [xVal, setXVal] = useState('');
   const [yVal, setYVal] = useState('');
+  const [gxVal, setGxVal] = useState('');
+  const [gyVal, setGyVal] = useState('');
+  const [pxVal, setPxVal] = useState('');
+  const [pyVal, setPyVal] = useState('');
+  const [pairsMultiline, setPairsMultiline] = useState('');
+  const [kbitsVal, setKbitsVal] = useState('64');
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const { setOutputResult: setCtxOutput, setOutputError: setCtxError, setOutputSource, addToHistory } = useAppContext();
+  const { execute } = useSageMath();
 
   const handleCopy = useCallback(() => { if (result) navigator.clipboard.writeText(result).catch(() => {}); }, [result]);
 
-  const run = useCallback(() => {
+  const run = useCallback(async () => {
     setError(null); setResult(null);
     setCtxOutput(null); setCtxError(null);
     try {
-      const biasedDesc = `Biased Nonce Attack (LLL)
-Detects non-uniform k distribution from many ECDSA signatures.
-Algorithm:
-1. Collect signatures (r_i, s_i) with biased nonces k_i
-2. Construct lattice basis from signature equations:
-   k_i = s_i^{-1}·(h_i + r_i·d) mod n
-3. If k_i has small bias (e.g. few bits of entropy), LLL recovers d
-SageMathCell input (send to SageCell):
-  n = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141
-  sigs = [(r1,s1,h1), (r2,s2,h2), ...]
-  # Build lattice, LLL(), recover d`;
-      const invalidDesc = `Invalid Curve Attack
-Exploits missing point validation: attacker submits a point on a weak curve
-where ECDLP is easy.
-Steps:
-1. Choose a point P on a different curve with same p but different (a',b')
-2. Find one where #E' has small factor or smooth order
-3. Submit (x,y) — if implementation skips cofactor/on-curve check,
-   scalar multiplication uses the attacker's curve
-4. Solve ECDLP on the weak curve via Pohlig-Hellman / BSGS
-SageMathCell input:
-  F = GF(p)
-  E = EllipticCurve(F, [a_smooth, b_smooth])
-  P = E(x_attacker, y_attacker)
-  Q = E(x_Q, y_Q)  # received from server
-  discrete_log(Q, P, ord(P), operation='+')`;
-      const movDesc = `MOV / Embedding Degree Attack
-Checks whether the embedding degree k is small enough to transfer
-the ECDLP to F_{p^k} where index calculus may be faster.
-Given curve E(F_p) with order n:
-1. Compute embedding degree k = min{ t > 0 : p^t ≡ 1 (mod n) }
-2. If k is small (≤ 6), the Weil/Tate pairing maps ECDLP to F_{p^k}
-3. Use GNFS or index calculus in F_{p^k}
-Small k occurs for supersingular curves (k ≤ 6). Most standard
-curves (secp256k1, P-256) have huge k (impractical).
-SageMathCell input:
-  p = ...
-  n = ...
-  for k in range(1, 13):
-      if pow(p, k, n) == 1:
-          print(f'Embedding degree k = {k}')
-          break`;
-      const anomalousDesc = `Smart's Attack (Anomalous Curve)
-Exploits curves where #E(F_p) = p (anomalous/prime-field trace 1).
-The ECDLP can be solved in O(log p) via p-adic elliptic logarithm lift.
-Algorithm (Smart '99):
-1. Lift P, Q ∈ E(F_p) to points P̂, Q̂ ∈ E(Q_p) (p-adic)
-2. Compute p·P̂ = (x̂_P, ŷ_P), p·Q̂ = (x̂_Q, ŷ_Q)
-3. Extract p-adic logarithms: φ(P) = x̂_P / ŷ_P (mod p)
-4. d = φ(Q) / φ(P) mod p
-SageMathCell input:
-  p = <prime>
-  E = EllipticCurve(GF(p), [a, b])
-  P = E.gens()[0]
-  Q = d*P  # target
-  SmartAttack(P, Q, p)  # see Sage's anomalous.primes implementation`;
-      const singularDesc = `Singular Curve Attack
-When discriminant Δ = -16(4a³ + 27b²) = 0, the curve has a node or cusp.
-This reduces ECDLP to the multiplicative or additive group.
-For Δ = 0:
-  - Node: map to F_p^* via (y - y₀) / (x - x₀) = t, then DLP in F_p^*
-  - Cusp (a=b=0): map to F_p^+ via x/y, easy solve
-SageMathCell input:
-  p = <prime>
-  a = ...; b = ...
-  Δ = -16 * (4*a^3 + 27*b^2)
-  if Δ % p == 0: print('SINGULAR')
-  F = GF(p)
-  E = EllipticCurve(F, [a, b])
-  if E.discriminant() == 0: ...`;
       switch (attack) {
         case 'nonce-reuse': {
           if (!h1.trim() || !h2.trim() || !r1.trim() || !s1.trim() || !s2.trim()) throw new Error('All fields required');
@@ -497,24 +435,227 @@ ${onCurve ? '✓ Point IS on the curve' : '✗ Point is NOT on the curve'}`;
           setResult(rPoint); setCtxOutput(rPoint); setOutputSource('calculator'); addToHistory('calculator-ecc', 'ECC Attack: ' + attack, rPoint, true);
           break;
         }
-        case 'biased-nonce':
-          setResult(biasedDesc); setCtxOutput(biasedDesc); setOutputSource('calculator'); addToHistory('calculator-ecc', 'ECC Attack: ' + attack, biasedDesc, true);
+        case 'biased-nonce': {
+          if (!nHex.trim() || !pairsMultiline.trim()) throw new Error('Curve order and signature pairs required');
+          const nHexClean = nHex.trim().replace(/\s/g, '');
+          const nHexPrefix = nHexClean.startsWith('0x') ? nHexClean : '0x' + nHexClean;
+          const code = `n = Integer(${nHexPrefix})
+lines = '''${pairsMultiline.trim()}'''.strip().split('\\\\n')
+pairs = []
+for line in lines:
+    if not line.strip(): continue
+    parts = [p.strip() for p in line.split(',')]
+    if len(parts) < 3: continue
+    r, s, h = Integer(int(parts[0],16)), Integer(int(parts[1],16)), Integer(int(parts[2],16))
+    pairs.append((r,s,h))
+B = int(${kbitsVal.trim() || '64'})
+m = len(pairs)
+out = [f"Signatures loaded: {m}", f"Nonce bound: 2^{B}={2^B}"]
+if m < 2:
+    out.append("ERROR: Need >= 2 signatures")
+    print('\\\\n'.join(out)); print('TOKEN=FAILED')
+else:
+    F = Integers(n)
+    # Build HNP lattice: k_i = a_i*d + b_i mod n, k_i < 2^B
+    M = Matrix(ZZ, m+2, m+2)
+    for i in range(m):
+        r,s,h = pairs[i]
+        a = ZZ(F(r)/s)
+        b = ZZ(F(h)/s)
+        M[i,i] = n
+        M[m,i] = a
+        M[m+1,i] = b
+    M[m,m] = 1
+    M[m+1,m+1] = 2^B
+    L = M.LLL()
+    out.append(f"Lattice dim: {m+2} x {m+2}")
+    out.append("---- Searching short vectors ----")
+    found = False
+    for i, row in enumerate(L.rows()):
+        last = abs(row[m+1])
+        if last == 2^B or last == 0: continue
+        d_cand = abs(row[m])
+        if d_cand > 1 and d_cand < n:
+            r0,s0,h0 = pairs[0]
+            k0 = ZZ(F(r0)/s0 * d_cand + F(h0)/s0)
+            if k0 < 2^B * 2:
+                out.append(f"Row {i}: d = 0x{hex(d_cand)}")
+                out.append(f"  k0 = 0x{hex(k0)}")
+                found = True
+    if not found:
+        out.append("No valid candidate. Try more signatures or larger B.")
+        print('\\\\n'.join(out)); print('TOKEN=FAILED')
+    else:
+        print('\\\\n'.join(out)); print('TOKEN=SUCCESS')`;
+          const sageResult = await execute(code, DEFAULT_SAGE_TIMEOUT);
+          if (sageResult.success) {
+            const display = sageResult.stdout + '\nMETHOD=SAGEMATHCELL';
+            setResult(display); setCtxOutput(display); setOutputSource('calculator'); addToHistory('calculator-ecc', 'ECC Attack: ' + attack, display, true);
+          } else {
+            const errMsg = sageResult.error || 'SageCell execution failed';
+            setError(errMsg); setCtxError(errMsg); setOutputSource('calculator');
+          }
           break;
-        case 'invalid-curve':
-          setResult(invalidDesc); setCtxOutput(invalidDesc); setOutputSource('calculator'); addToHistory('calculator-ecc', 'ECC Attack: ' + attack, invalidDesc, true);
+        }
+        case 'invalid-curve': {
+          if (!aVal.trim() || !bVal.trim() || !pVal.trim()) throw new Error('Curve parameters required');
+          const code = `p = Integer(0x${pVal.trim().replace(/\s/g, '')})
+a = Integer(0x${aVal.trim().replace(/\s/g, '')})
+b = Integer(0x${bVal.trim().replace(/\s/g, '')})
+out = []
+F = GF(p)
+E = EllipticCurve(F, [a, b])
+out.append(f"Curve: y^2 = x^3 + {a}x + {b} over F_{p}")
+out.append(f"Order: {E.order()}")
+out.append(f"Factors: {factor(E.order())}")
+out.append("")
+out.append("Searching for weak related curves (same a,p, different b):")
+for db in range(1, 20):
+    try:
+        E2 = EllipticCurve(F, [a, F(b+db)])
+        n2 = E2.order()
+        fac = factor(n2)
+        max_prime = max([e for _,e in fac])
+        out.append(f"  b+{db}: order={n2}, max_prime={max_prime}")
+        if max_prime < 2^16:
+            P = E2.gens()[0]
+            out.append(f"    SMOOTH! Generator: {P}")
+    except: pass
+print('\\\\n'.join(out)); print('TOKEN=SUCCESS')`;
+          const sageResult = await execute(code, DEFAULT_SAGE_TIMEOUT);
+          if (sageResult.success) {
+            const display = sageResult.stdout + '\nMETHOD=SAGEMATHCELL';
+            setResult(display); setCtxOutput(display); setOutputSource('calculator'); addToHistory('calculator-ecc', 'ECC Attack: ' + attack, display, true);
+          } else {
+            const errMsg = sageResult.error || 'SageCell execution failed';
+            setError(errMsg); setCtxError(errMsg); setOutputSource('calculator');
+          }
           break;
-        case 'mov':
-          setResult(movDesc); setCtxOutput(movDesc); setOutputSource('calculator'); addToHistory('calculator-ecc', 'ECC Attack: ' + attack, movDesc, true);
+        }
+        case 'mov': {
+          if (!aVal.trim() || !bVal.trim() || !pVal.trim()) throw new Error('Curve parameters required');
+          const code = `p = Integer(0x${pVal.trim().replace(/\s/g, '')})
+a = Integer(0x${aVal.trim().replace(/\s/g, '')})
+b = Integer(0x${bVal.trim().replace(/\s/g, '')})
+out = []
+F = GF(p)
+E = EllipticCurve(F, [a, b])
+n = E.order()
+out.append(f"Curve: y^2 = x^3 + {a}x + {b} over F_{p}")
+out.append(f"Order n = {n}")
+out.append(f"Factor: {factor(n)}")
+out.append("")
+out.append("Computing embedding degree k")
+out.append("(smallest k > 0 where p^k ≡ 1 mod n):")
+found = False
+for k in range(1, 13):
+    if Integer(p)^k % n == 1:
+        out.append(f"  k = {k}")
+        if k <= 6:
+            out.append(f"  MOV attack feasible via pairing to F_{p}^{k}")
+        else:
+            out.append(f"  k > 6, pairing attack likely impractical")
+        found = True
+        break
+if not found:
+    out.append("  k > 12, MOV attack not feasible")
+print('\\\\n'.join(out)); print('TOKEN=SUCCESS')`;
+          const sageResult = await execute(code, DEFAULT_SAGE_TIMEOUT);
+          if (sageResult.success) {
+            const display = sageResult.stdout + '\nMETHOD=SAGEMATHCELL';
+            setResult(display); setCtxOutput(display); setOutputSource('calculator'); addToHistory('calculator-ecc', 'ECC Attack: ' + attack, display, true);
+          } else {
+            const errMsg = sageResult.error || 'SageCell execution failed';
+            setError(errMsg); setCtxError(errMsg); setOutputSource('calculator');
+          }
           break;
-        case 'anomalous':
-          setResult(anomalousDesc); setCtxOutput(anomalousDesc); setOutputSource('calculator'); addToHistory('calculator-ecc', 'ECC Attack: ' + attack, anomalousDesc, true);
+        }
+        case 'anomalous': {
+          if (!aVal.trim() || !bVal.trim() || !pVal.trim()) throw new Error('Curve parameters required');
+          const code = `p = Integer(0x${pVal.trim().replace(/\s/g, '')})
+a = Integer(0x${aVal.trim().replace(/\s/g, '')})
+b = Integer(0x${bVal.trim().replace(/\s/g, '')})
+Qx = Integer(0x${pxVal.trim().replace(/\s/g, '') || 0})
+Qy = Integer(0x${pyVal.trim().replace(/\s/g, '') || 0})
+out = []
+F = GF(p)
+E = EllipticCurve(F, [a, b])
+n = E.order()
+out.append(f"Curve: y^2 = x^3 + {a}x + {b} over F_{p}")
+out.append(f"Order: {n}")
+out.append(f"p = {p}")
+out.append(f"n == p: {n == p}")
+if n == p:
+    out.append("ANOMALOUS CURVE! Smart's attack applicable.")
+    G = E.gens()[0]
+    Q = E(Qx, Qy) if Qx > 0 else G
+    out.append(f"Generator: {G}")
+    out.append(f"Target: Q = {Q}")
+    try:
+        d = discrete_log(Q, G, operation='+')
+        out.append(f"Private key d = {d}")
+        out.append(f"Verify: d * G = {d*G}")
+        out.append(f"d * G == Q: {d*G == Q}")
+    except Exception as e:
+        out.append(f"discrete_log failed: {e}")
+        out.append("(SageCell may not support p-adic lift — try local Sage)")
+else:
+    out.append("NOT anomalous: trace != 1")
+print('\\\\n'.join(out))
+if n == p: print('TOKEN=SUCCESS')
+else: print('TOKEN=FAILED')`;
+          const sageResult = await execute(code, DEFAULT_SAGE_TIMEOUT);
+          if (sageResult.success) {
+            const display = sageResult.stdout + '\nMETHOD=SAGEMATHCELL';
+            setResult(display); setCtxOutput(display); setOutputSource('calculator'); addToHistory('calculator-ecc', 'ECC Attack: ' + attack, display, true);
+          } else {
+            const errMsg = sageResult.error || 'SageCell execution failed';
+            setError(errMsg); setCtxError(errMsg); setOutputSource('calculator');
+          }
           break;
-        case 'singular':
-          setResult(singularDesc); setCtxOutput(singularDesc); setOutputSource('calculator'); addToHistory('calculator-ecc', 'ECC Attack: ' + attack, singularDesc, true);
+        }
+        case 'singular': {
+          if (!aVal.trim() || !bVal.trim() || !pVal.trim()) throw new Error('Curve parameters required');
+          const code = `p = Integer(0x${pVal.trim().replace(/\s/g, '')})
+a = Integer(0x${aVal.trim().replace(/\s/g, '')})
+b = Integer(0x${bVal.trim().replace(/\s/g, '')})
+out = []
+F = GF(p)
+disc = (-16 * (4*a^3 + 27*b^2)) % p
+out.append(f"Curve: y^2 = x^3 + {a}x + {b} over F_{p}")
+out.append(f"Discriminant Δ = -16(4a³+27b²) mod p = {disc}")
+if disc == 0:
+    out.append("Δ ≡ 0 → SINGULAR CURVE (node or cusp)")
+    if a == 0 and b == 0:
+        out.append("  Cusp: ECDLP reduces to additive group (trivial)")
+    else:
+        out.append("  Node: ECDLP reduces to multiplicative group of F_p")
+        R.<x> = F[]
+        f = x^3 + a*x + b
+        roots = f.roots()
+        out.append(f"  Singular point x = {roots}")
+    E = EllipticCurve(F, [a, b])
+    out.append(f"  Sage curve object: {E}")
+    out.append(f"  Discriminant via Sage: {E.discriminant()}")
+else:
+    out.append("Δ ≠ 0 → non-singular curve (standard)")
+    E = EllipticCurve(F, [a, b])
+    out.append(f"  Order: {E.order()}")
+    out.append(f"  Factors: {factor(E.order())}")
+print('\\\\n'.join(out)); print('TOKEN=SUCCESS')`;
+          const sageResult = await execute(code, DEFAULT_SAGE_TIMEOUT);
+          if (sageResult.success) {
+            const display = sageResult.stdout + '\nMETHOD=SAGEMATHCELL';
+            setResult(display); setCtxOutput(display); setOutputSource('calculator'); addToHistory('calculator-ecc', 'ECC Attack: ' + attack, display, true);
+          } else {
+            const errMsg = sageResult.error || 'SageCell execution failed';
+            setError(errMsg); setCtxError(errMsg); setOutputSource('calculator');
+          }
           break;
+        }
       }
     } catch (e) { const msg = e instanceof Error ? e.message : String(e); setError(msg); setCtxError(msg); setOutputSource('calculator'); }
-  }, [attack, h1, h2, r1, s1, s2, nHex, aVal, bVal, pVal, xVal, yVal, addToHistory, setCtxError, setCtxOutput, setOutputSource]);
+  }, [attack, h1, h2, r1, s1, s2, nHex, aVal, bVal, pVal, xVal, yVal, pxVal, pyVal, pairsMultiline, kbitsVal, execute, addToHistory, setCtxError, setCtxOutput, setOutputSource]);
 
   const attackFields = useMemo(() => {
     switch (attack) {
@@ -556,13 +697,85 @@ ${onCurve ? '✓ Point IS on the curve' : '✗ Point is NOT on the curve'}`;
           </Box>
         </>
       );
-      default: return (
-        <Typography sx={{ color: draculaColors.comment, mb: 2, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem' }}>
-          This attack requires SageMathCell. Click Run for the SageCell code and description.
-        </Typography>
+      case 'biased-nonce': return (
+        <>
+          <TextField fullWidth label="Curve order n (hex)" value={nHex} onChange={e => setNHex(e.target.value)} variant="outlined"
+            sx={{ ...inputSx, mb: 2 }} placeholder="secp256k1 order" spellCheck={false} />
+          <TextField fullWidth label="kbits (unknown nonce bits)" value={kbitsVal} onChange={e => setKbitsVal(e.target.value)} variant="outlined"
+            sx={{ ...inputSx, mb: 2 }} placeholder="64" spellCheck={false} helperText="Lower = easier (e.g., kbits=64 means k &lt; 2^64)" />
+          <TextField fullWidth multiline minRows={4} maxRows={8} label="Signature pairs (r,s,h hex, one per line)" value={pairsMultiline}
+            onChange={e => setPairsMultiline(e.target.value)} variant="outlined"
+            sx={{ ...inputSx, mb: 2 }} placeholder={'r1,s1,h1\nr2,s2,h2\n...'} spellCheck={false} />
+        </>
+      );
+      case 'invalid-curve': return (
+        <>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <TextField fullWidth label="a (hex)" value={aVal} onChange={e => setAVal(e.target.value)} variant="outlined"
+              sx={{ ...inputSx, mb: 2 }} placeholder="a param" spellCheck={false} />
+            <TextField fullWidth label="b (hex)" value={bVal} onChange={e => setBVal(e.target.value)} variant="outlined"
+              sx={{ ...inputSx, mb: 2 }} placeholder="b param" spellCheck={false} />
+          </Box>
+          <TextField fullWidth label="p (prime, hex)" value={pVal} onChange={e => setPVal(e.target.value)} variant="outlined"
+            sx={{ ...inputSx, mb: 2 }} placeholder="Field prime" spellCheck={false} />
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <TextField fullWidth label="Gx (hex)" value={gxVal} onChange={e => setGxVal(e.target.value)} variant="outlined"
+              sx={{ ...inputSx, mb: 2 }} placeholder="Generator x" spellCheck={false} />
+            <TextField fullWidth label="Gy (hex)" value={gyVal} onChange={e => setGyVal(e.target.value)} variant="outlined"
+              sx={{ ...inputSx, mb: 2 }} placeholder="Generator y" spellCheck={false} />
+          </Box>
+        </>
+      );
+      case 'mov': return (
+        <>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <TextField fullWidth label="a (hex)" value={aVal} onChange={e => setAVal(e.target.value)} variant="outlined"
+              sx={{ ...inputSx, mb: 2 }} placeholder="a param" spellCheck={false} />
+            <TextField fullWidth label="b (hex)" value={bVal} onChange={e => setBVal(e.target.value)} variant="outlined"
+              sx={{ ...inputSx, mb: 2 }} placeholder="b param" spellCheck={false} />
+          </Box>
+          <TextField fullWidth label="p (prime, hex)" value={pVal} onChange={e => setPVal(e.target.value)} variant="outlined"
+            sx={{ ...inputSx, mb: 2 }} placeholder="Field prime" spellCheck={false} />
+        </>
+      );
+      case 'anomalous': return (
+        <>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <TextField fullWidth label="a (hex)" value={aVal} onChange={e => setAVal(e.target.value)} variant="outlined"
+              sx={{ ...inputSx, mb: 2 }} placeholder="a param" spellCheck={false} />
+            <TextField fullWidth label="b (hex)" value={bVal} onChange={e => setBVal(e.target.value)} variant="outlined"
+              sx={{ ...inputSx, mb: 2 }} placeholder="b param" spellCheck={false} />
+          </Box>
+          <TextField fullWidth label="p (prime, hex)" value={pVal} onChange={e => setPVal(e.target.value)} variant="outlined"
+            sx={{ ...inputSx, mb: 2 }} placeholder="Field prime" spellCheck={false} />
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <TextField fullWidth label="Px (hex)" value={gxVal} onChange={e => setGxVal(e.target.value)} variant="outlined"
+              sx={{ ...inputSx, mb: 2 }} placeholder="Generator/base x" spellCheck={false} />
+            <TextField fullWidth label="Py (hex)" value={gyVal} onChange={e => setGyVal(e.target.value)} variant="outlined"
+              sx={{ ...inputSx, mb: 2 }} placeholder="Generator/base y" spellCheck={false} />
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <TextField fullWidth label="Qx (hex)" value={pxVal} onChange={e => setPxVal(e.target.value)} variant="outlined"
+              sx={{ ...inputSx, mb: 2 }} placeholder="Target point x" spellCheck={false} />
+            <TextField fullWidth label="Qy (hex)" value={pyVal} onChange={e => setPyVal(e.target.value)} variant="outlined"
+              sx={{ ...inputSx, mb: 2 }} placeholder="Target point y" spellCheck={false} />
+          </Box>
+        </>
+      );
+      case 'singular': return (
+        <>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <TextField fullWidth label="a (hex)" value={aVal} onChange={e => setAVal(e.target.value)} variant="outlined"
+              sx={{ ...inputSx, mb: 2 }} placeholder="a param" spellCheck={false} />
+            <TextField fullWidth label="b (hex)" value={bVal} onChange={e => setBVal(e.target.value)} variant="outlined"
+              sx={{ ...inputSx, mb: 2 }} placeholder="b param" spellCheck={false} />
+          </Box>
+          <TextField fullWidth label="p (prime, hex)" value={pVal} onChange={e => setPVal(e.target.value)} variant="outlined"
+            sx={{ ...inputSx, mb: 2 }} placeholder="Field prime" spellCheck={false} />
+        </>
       );
     }
-  }, [attack, h1, h2, r1, s1, s2, nHex, aVal, bVal, pVal, xVal, yVal]);
+  }, [attack, h1, h2, r1, s1, s2, nHex, aVal, bVal, pVal, xVal, yVal, gxVal, gyVal, pxVal, pyVal, pairsMultiline, kbitsVal]);
 
   return (
     <Box>
@@ -573,7 +786,7 @@ ${onCurve ? '✓ Point IS on the curve' : '✗ Point is NOT on the curve'}`;
         </Select>
       </FormControl>
       {attackFields}
-      <Button variant="contained" startIcon={<PlayArrow />} onClick={run} fullWidth
+      <Button variant="contained" startIcon={<PlayArrow />} onClick={() => { void run(); }} fullWidth
         sx={{ backgroundColor: draculaColors.purple, fontFamily: "'JetBrains Mono', monospace", mb: 2,
           '&:hover': { backgroundColor: '#a575f6' } }}>
         Run Attack

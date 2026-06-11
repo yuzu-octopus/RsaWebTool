@@ -36,6 +36,7 @@ export const CALCULATOR_ITEMS: SidebarCalculatorTabItem[] = [
   { type: 'calculator-tab', id: 'aes', label: 'AES', icon: 'Calculate', calculatorMode: 'aes' },
   { type: 'calculator-tab', id: 'ecc', label: 'ECC', icon: 'Calculate', calculatorMode: 'ecc' },
   { type: 'calculator-tab', id: 'hash', label: 'Hash', icon: 'Calculate', calculatorMode: 'hash' },
+  { type: 'calculator-tab', id: 'dh', label: 'DH', icon: 'VpnKey', calculatorMode: 'dh' },
 ];
 
 // Full sidebar order: attacks grouped by category, then calculator tabs, then modules

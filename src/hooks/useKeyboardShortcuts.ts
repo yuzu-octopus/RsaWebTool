@@ -98,6 +98,12 @@ export function useKeyboardShortcuts() {
             window.dispatchEvent(new CustomEvent('calculator-switch-tab', { detail: 3 }));
           }
           break;
+        case '5':
+          e.preventDefault();
+          if (viewMode === 'calculator') {
+            window.dispatchEvent(new CustomEvent('calculator-switch-tab', { detail: 4 }));
+          }
+          break;
         case 'enter':
           e.preventDefault();
           window.dispatchEvent(new CustomEvent('rsa-run-attack'));
