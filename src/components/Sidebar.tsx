@@ -20,6 +20,17 @@ import env from '../config/env';
 
 const drawerWidth = 220;
 
+const sidebarActiveSx = {
+  borderLeft: `3px solid ${draculaColors.purple}`,
+  backgroundColor: draculaColors.background,
+  '&:hover': { backgroundColor: draculaColors.background },
+} as const;
+const sidebarInactiveSx = {
+  borderLeft: '3px solid transparent',
+  backgroundColor: 'transparent',
+  '&:hover': { backgroundColor: draculaColors.currentLine },
+} as const;
+
 interface ServiceStatus {
   factordb: 'checking' | 'ok' | 'error';
   sagecell: 'checking' | 'ok' | 'error';
@@ -184,9 +195,7 @@ export function Sidebar() {
                     data-testid={`attack-${attack.id}`}
                     sx={{
                       pl: 4,
-                      borderLeft: isAttackActive(attack.id) ? `3px solid ${draculaColors.purple}` : '3px solid transparent',
-                      backgroundColor: isAttackActive(attack.id) ? draculaColors.background : 'transparent',
-                      '&:hover': { backgroundColor: draculaColors.background },
+                      ...(isAttackActive(attack.id) ? sidebarActiveSx : sidebarInactiveSx),
                     }}
                   >
                     <ListItemText
@@ -216,9 +225,7 @@ export function Sidebar() {
                   onClick={() => { setViewMode('calculator'); setCalculatorMode(item.calculatorMode); }}
                   sx={{
                     pl: 4,
-                    borderLeft: viewMode === 'calculator' && calculatorMode === item.calculatorMode ? `3px solid ${draculaColors.cyan}` : '3px solid transparent',
-                    backgroundColor: viewMode === 'calculator' && calculatorMode === item.calculatorMode ? draculaColors.currentLine : 'transparent',
-                    '&:hover': { backgroundColor: draculaColors.background },
+                    ...(viewMode === 'calculator' && calculatorMode === item.calculatorMode ? sidebarActiveSx : sidebarInactiveSx),
                   }}
                 >
                   {calculatorIcon(item.calculatorMode)}
@@ -239,9 +246,7 @@ export function Sidebar() {
           onClick={() => setViewMode('instructions')}
           sx={{
             pl: 4,
-            borderLeft: isViewActive('instructions') ? `3px solid ${draculaColors.purple}` : '3px solid transparent',
-            backgroundColor: isViewActive('instructions') ? draculaColors.background : 'transparent',
-            '&:hover': { backgroundColor: draculaColors.background },
+            ...(isViewActive('instructions') ? sidebarActiveSx : sidebarInactiveSx),
           }}
         >
           <MenuBook sx={{ color: draculaColors.green, mr: 1, fontSize: '1.1rem' }} />
@@ -256,9 +261,7 @@ export function Sidebar() {
           onClick={() => setViewMode('magic')}
           sx={{
             pl: 4,
-            borderLeft: isViewActive('magic') ? `3px solid ${draculaColors.purple}` : '3px solid transparent',
-            backgroundColor: isViewActive('magic') ? draculaColors.background : 'transparent',
-            '&:hover': { backgroundColor: draculaColors.background },
+            ...(isViewActive('magic') ? sidebarActiveSx : sidebarInactiveSx),
           }}
         >
           <AutoFixHigh sx={{ color: draculaColors.purple, mr: 1, fontSize: '1.1rem' }} />
@@ -274,9 +277,7 @@ export function Sidebar() {
           sx={{
             pl: 4,
             mt: 0.5,
-            borderLeft: isViewActive('proofs') ? `3px solid ${draculaColors.purple}` : '3px solid transparent',
-            backgroundColor: isViewActive('proofs') ? draculaColors.background : 'transparent',
-            '&:hover': { backgroundColor: draculaColors.background },
+            ...(isViewActive('proofs') ? sidebarActiveSx : sidebarInactiveSx),
           }}
         >
           <MenuBook sx={{ color: draculaColors.foreground, mr: 1, fontSize: '1.1rem' }} />
@@ -292,9 +293,7 @@ export function Sidebar() {
           sx={{
             pl: 4,
             mt: 0.5,
-            borderLeft: isViewActive('format-converter') ? `3px solid ${draculaColors.purple}` : '3px solid transparent',
-            backgroundColor: isViewActive('format-converter') ? draculaColors.background : 'transparent',
-            '&:hover': { backgroundColor: draculaColors.background },
+            ...(isViewActive('format-converter') ? sidebarActiveSx : sidebarInactiveSx),
           }}
         >
           <SwapHoriz sx={{ color: draculaColors.orange, mr: 1, fontSize: '1.1rem' }} />
@@ -310,9 +309,7 @@ export function Sidebar() {
           sx={{
             pl: 4,
             mt: 0.5,
-            borderLeft: isViewActive('pem') ? `3px solid ${draculaColors.purple}` : '3px solid transparent',
-            backgroundColor: isViewActive('pem') ? draculaColors.background : 'transparent',
-            '&:hover': { backgroundColor: draculaColors.background },
+            ...(isViewActive('pem') ? sidebarActiveSx : sidebarInactiveSx),
           }}
         >
           <VpnKey sx={{ color: draculaColors.yellow, mr: 1, fontSize: '1.1rem' }} />

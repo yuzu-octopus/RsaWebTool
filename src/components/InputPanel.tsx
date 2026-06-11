@@ -105,10 +105,6 @@ export function InputPanel() {
     );
   }
 
-  // Auto-select source mode based on what's available
-  if (tab === 2 && sourceMode === 'sage' && !hasSage && hasFrontend) {
-    // Can't use setSourceMode here (render phase), so derive it inline
-  }
   const effectiveSourceMode = !hasSage ? 'frontend' : !hasFrontend ? 'sage' : sourceMode;
   // frontendCode is now loaded asynchronously via useEffect below
   const handleCopySource = () => {

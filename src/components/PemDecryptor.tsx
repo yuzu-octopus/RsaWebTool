@@ -24,7 +24,7 @@ function truncateHex(hex: string, maxLen = 48): string {
 }
 
 export function PemDecryptor() {
-  const { viewMode, showNotification } = useAppContext();
+  const { viewMode, setViewMode, setCalculatorMode, showNotification } = useAppContext();
   const [pemInput, setPemInput] = useState('');
   const [parsed, setParsed] = useState<ParsedPEM | null>(null);
   const [passphrase, setPassphrase] = useState('');
@@ -80,10 +80,13 @@ export function PemDecryptor() {
   const handleFeedAttacks = useCallback(() => {
     if (!parsed?.keyParams) return;
     const n = parsed.keyParams.n;
-    if (n && n !== '0') {
-      showNotification('Paste n/e into Magic Panel', 'info');
-    }
-  }, [parsed, showNotification]);
+    if (!n || n === '0') return;
+    setViewMode('magic');
+    window.dispatchEvent(new CustomEvent('magic-prefill', {
+      detail: { n, e: parsed.keyParams.e }
+    }));
+    showNotification('Prefilled Magic Panel with n/e', 'success');
+  }, [parsed, setViewMode, showNotification]);
 
   if (viewMode !== 'pem') return null;
 
@@ -361,10 +364,10 @@ export function PemDecryptor() {
               <IconButton
                 onClick={() => {
                   const { n: nVal } = parsed.keyParams!;
-                  if (nVal && nVal !== '0') {
-                    // Navigate to calculator — user will paste
-                    showNotification('n/e extracted — use Calculator', 'info');
-                  }
+                  if (!nVal || nVal === '0') return;
+                  setViewMode('calculator');
+                  setCalculatorMode('rsa');
+                  showNotification('Switched to RSA Calculator', 'success');
                 }}
                 sx={{
                   border: `1px solid ${draculaColors.cyan}`,

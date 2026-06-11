@@ -114,7 +114,7 @@ export function ProofIndex() {
 
       <Divider sx={{ borderColor: draculaColors.comment }} />
 
-      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center', pb: '30vh' }}>
+      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center', pb: '20vh' }}>
         <List sx={{ width: '100%', maxWidth: 640, px: 2 }}>
           {attackItems}
         </List>

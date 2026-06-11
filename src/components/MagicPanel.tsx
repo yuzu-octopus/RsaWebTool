@@ -1,4 +1,4 @@
-import { useState, useMemo, memo } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 import {
   Box,
   Typography,
@@ -285,6 +285,18 @@ export function MagicPanel() {
     timer,
     handleCrack, handleStop, handleGenerateTestcase,
   } = useMagicExecution(sortedApplicable, paramsFromInput, setRawInput);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { n, e: eVal } = (e as CustomEvent<{ n: string; e?: string }>).detail ?? {};
+      if (!n) return;
+      const lines = [`n = ${n}`];
+      if (eVal) lines.push(`e = ${eVal}`);
+      setRawInput(lines.join('\n'));
+    };
+    window.addEventListener('magic-prefill', handler);
+    return () => window.removeEventListener('magic-prefill', handler);
+  }, []);
 
   if (viewMode !== 'magic') return null;
 
