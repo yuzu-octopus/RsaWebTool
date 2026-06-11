@@ -106,7 +106,7 @@ function AESExplanationTab() {
   return (
     <Box>
       <Typography variant="h6" sx={{ color: draculaColors.cyan, mb: 1 }}>AES Block Cipher Reference</Typography>
-      <Box sx={{ maxHeight: '60vh', overflow: 'auto', pr: 1, pb: '20vh', '&::-webkit-scrollbar': { width: '8px' }, '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' } }}>
+      <Box sx={{ maxHeight: '60vh', overflow: 'auto', pr: 1, '&::-webkit-scrollbar': { width: '8px' }, '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' } }}>
         <ProofRenderer latex={PROOF} />
       </Box>
     </Box>
@@ -755,7 +755,7 @@ export default function AESCalculator() {
 
   return (
     <Box sx={colFlexSx}>
-      <Box sx={{ ...centeredPanelSx, p: 2 }}>
+      <Box sx={{ ...centeredPanelSx, pt: 2, px: 2 }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
           <Typography variant="h3" sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
             <Lock sx={{ fontSize: 'inherit' }} /> AES Calculator

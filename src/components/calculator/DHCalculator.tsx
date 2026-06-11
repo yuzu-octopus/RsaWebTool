@@ -147,7 +147,7 @@ function DHExplanationTab() {
     <Box>
       <Typography variant="h6" sx={{ color: draculaColors.cyan, mb: 1 }}>Diffie-Hellman Key Exchange</Typography>
       <Box sx={{
-        maxHeight: '60vh', overflow: 'auto', pr: 1, pb: '20vh',
+        maxHeight: '60vh', overflow: 'auto', pr: 1,
         '&::-webkit-scrollbar': { width: '8px' },
         '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' },
       }}>
@@ -811,7 +811,7 @@ export default function DHCalculator() {
 
   return (
     <Box sx={colFlexSx}>
-      <Box sx={{ ...centeredPanelSx, p: 2 }}>
+      <Box sx={{ ...centeredPanelSx, pt: 2, px: 2 }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
           <Typography variant="h3" sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
             <Security sx={{ fontSize: 'inherit' }} /> DH Calculator

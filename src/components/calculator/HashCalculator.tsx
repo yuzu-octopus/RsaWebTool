@@ -32,7 +32,7 @@ export default function HashCalculator() {
 
   return (
     <Box sx={colFlexSx}>
-      <Box sx={{ ...centeredPanelSx, p: 2 }}>
+      <Box sx={{ ...centeredPanelSx, pt: 2, px: 2 }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
           <Typography
             variant="h3"

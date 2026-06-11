@@ -62,7 +62,7 @@ function ExplanationTab() {
         RSA Reference
       </Typography>
       <Box sx={{
-        maxHeight: '60vh', overflow: 'auto', pr: 1, pb: '20vh',
+        maxHeight: '60vh', overflow: 'auto', pr: 1,
         '&::-webkit-scrollbar': { width: '8px' },
         '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' },
       }}>
@@ -85,7 +85,7 @@ export default function RSACalculator() {
 
   return (
     <Box sx={colFlexSx}>
-      <Box sx={{ ...centeredPanelSx, p: 2 }}>
+      <Box sx={{ ...centeredPanelSx, pt: 2, px: 2 }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
           <Typography
             variant="h3"
