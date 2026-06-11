@@ -20,17 +20,6 @@ import env from '../config/env';
 
 const drawerWidth = 220;
 
-const sidebarActiveSx = {
-  borderLeft: `3px solid ${draculaColors.purple}`,
-  backgroundColor: draculaColors.background,
-  '&:hover': { backgroundColor: draculaColors.background },
-} as const;
-const sidebarInactiveSx = {
-  borderLeft: '3px solid transparent',
-  backgroundColor: 'transparent',
-  '&:hover': { backgroundColor: draculaColors.currentLine },
-} as const;
-
 interface ServiceStatus {
   factordb: 'checking' | 'ok' | 'error';
   sagecell: 'checking' | 'ok' | 'error';
@@ -46,6 +35,20 @@ const calculatorIcon = (mode: string) => {
     default: return null;
   }
 };
+
+const sidebarActiveSx = {
+  borderLeft: `3px solid ${draculaColors.purple}`,
+  backgroundColor: draculaColors.background,
+  '&:hover': { backgroundColor: draculaColors.background },
+} as const;
+const sidebarInactiveSx = {
+  borderLeft: '3px solid transparent',
+  backgroundColor: 'transparent',
+  // Hover uses `background` (darker than the Drawer's `currentLine` background)
+  // so the hover state is actually visible. Using `currentLine` here would
+  // produce no visible change against the sidebar paper.
+  '&:hover': { backgroundColor: draculaColors.background },
+} as const;
 
 export function Sidebar() {
   const { selectedAttack, setSelectedAttack, setViewMode, viewMode, calculatorMode, setCalculatorMode } = useAppContext();

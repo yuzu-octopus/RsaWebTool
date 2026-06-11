@@ -367,7 +367,7 @@ export function PemDecryptor() {
                   if (!nVal || nVal === '0') return;
                   setViewMode('calculator');
                   setCalculatorMode('rsa');
-                  showNotification('Switched to RSA Calculator', 'success');
+                  showNotification('Switched to RSA Calculator — paste n/e from copied params', 'success');
                 }}
                 sx={{
                   border: `1px solid ${draculaColors.cyan}`,
@@ -383,7 +383,7 @@ export function PemDecryptor() {
               >
                 <Calculate sx={{ fontSize: '1rem' }} />
                 <Typography variant="caption" sx={{ fontFamily: FONT_FAMILY }}>
-                  Feed to Calculator
+                  Switch to RSA Calculator
                 </Typography>
               </IconButton>
 

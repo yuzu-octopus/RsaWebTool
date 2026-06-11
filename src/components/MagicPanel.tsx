@@ -286,12 +286,17 @@ export function MagicPanel() {
     handleCrack, handleStop, handleGenerateTestcase,
   } = useMagicExecution(sortedApplicable, paramsFromInput, setRawInput);
 
+  // NOTE: This listener must stay registered even when MagicPanel is hidden
+  // (it is placed before the viewMode early-return below). It depends on
+  // MagicPanel being always-mounted in App.tsx — if you ever switch to
+  // conditional panel mounting, move the prefill payload into AppContext
+  // instead, otherwise events dispatched before mount will be lost.
   useEffect(() => {
-    const handler = (e: Event) => {
-      const { n, e: eVal } = (e as CustomEvent<{ n: string; e?: string }>).detail ?? {};
+    const handler = (event: Event) => {
+      const { n, e } = (event as CustomEvent<{ n: string; e?: string }>).detail ?? {};
       if (!n) return;
       const lines = [`n = ${n}`];
-      if (eVal) lines.push(`e = ${eVal}`);
+      if (e) lines.push(`e = ${e}`);
       setRawInput(lines.join('\n'));
     };
     window.addEventListener('magic-prefill', handler);
