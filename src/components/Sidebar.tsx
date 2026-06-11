@@ -10,7 +10,7 @@ import {
   Divider,
   Link,
 } from '@mui/material';
-import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey, Lock, Hub, Tag } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey, Lock, Hub, Tag, Security } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { CATEGORIES, attacksByCategory } from '../attacks';
 import { CALCULATOR_ITEMS } from '../config/sidebarItems';
@@ -31,6 +31,7 @@ const calculatorIcon = (mode: string) => {
     case 'aes': return <Lock sx={{ color: draculaColors.purple, mr: 1, fontSize: '1.1rem' }} />;
     case 'ecc': return <Hub sx={{ color: draculaColors.green, mr: 1, fontSize: '1.1rem' }} />;
     case 'hash': return <Tag sx={{ color: draculaColors.orange, mr: 1, fontSize: '1.1rem' }} />;
+    case 'dh': return <Security sx={{ color: draculaColors.pink, mr: 1, fontSize: '1.1rem' }} />;
     default: return null;
   }
 };
