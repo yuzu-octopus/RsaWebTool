@@ -11,6 +11,7 @@ export interface PoWInput {
   challenge: string;
   difficulty: number; // number of leading zero bits required (fallback when no checkCode)
   checkCode?: string; // optional JavaScript code for the check function: (hash: string) => boolean
+  hashAlgorithm?: string; // hash algorithm name (default: SHA-256)
 }
 
 export interface PoWResult {
@@ -53,7 +54,7 @@ export async function solvePoW(
   signal?: AbortSignal,
   onProgress?: (pct: number, detail?: string) => void,
 ): Promise<PoWResult | null> {
-  const { challenge, difficulty, checkCode } = input;
+  const { challenge, difficulty, checkCode, hashAlgorithm = 'SHA-256' } = input;
   const encoder = new TextEncoder();
   let nonce = 0;
   const maxAttempts = 1 << 24; // ~16.7M attempts cap
@@ -82,7 +83,7 @@ export async function solvePoW(
     if (signal?.aborted) return null;
 
     const data = encoder.encode(challenge + nonce.toString());
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashBuffer = await crypto.subtle.digest(hashAlgorithm, data);
     const hashArray = new Uint8Array(hashBuffer);
     const hashHex = Array.from(hashArray)
       .map(b => b.toString(16).padStart(2, '0'))

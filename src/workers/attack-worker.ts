@@ -103,7 +103,7 @@ self.onmessage = (e: MessageEvent<CancelMessage | WorkerRequest>) => {
             self.postMessage({ type: 'progress', id, pct, detail } satisfies WorkerProgress);
           }
         };
-        const result = await solvePoW({ challenge, difficulty, checkCode: params.checkCode }, abortController.signal, onProgress);
+        const result = await solvePoW({ challenge, difficulty, checkCode: params.checkCode, hashAlgorithm: params.hashAlgorithm }, abortController.signal, onProgress);
         if (!cancelledIds.has(id)) {
           self.postMessage({ id, result: result ? JSON.stringify(result) : null } satisfies WorkerResponse);
         }

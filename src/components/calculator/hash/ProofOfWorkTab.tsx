@@ -1,7 +1,8 @@
 import { useState, useRef, useCallback } from 'react';
 import { keyframes } from '@mui/material/styles';
 import {
-  Box, Typography, TextField, Button, IconButton, Tooltip, LinearProgress, Collapse,
+  Box, Typography, TextField, Button, IconButton, Tooltip, LinearProgress, Collapse, FormControl,
+  InputLabel, Select, MenuItem,
 } from '@mui/material';
 import { Stop, PlayArrow, HourglassEmpty, ContentCopy, ExpandMore, ExpandLess } from '@mui/icons-material';
 import { draculaColors } from '../../../theme/dracula';
@@ -10,6 +11,14 @@ import { outputBoxSx, colorGhostBtn, FONT_FAMILY } from '../../../styles/shared'
 import { useWorkerPool } from '../../../hooks/useWorkerPool';
 import { ProgressEstimator } from '../../../utils/progressEstimator';
 import { useAppContext } from '../../../hooks/useAppContext';
+
+const HASH_ALGORITHMS = [
+  { value: 'SHA-256', label: 'SHA-256 (256-bit)' },
+  { value: 'SHA-384', label: 'SHA-384 (384-bit)' },
+  { value: 'SHA-512', label: 'SHA-512 (512-bit)' },
+  { value: 'SHA-1', label: 'SHA-1 (160-bit)' },
+  { value: 'MD5', label: 'MD5 (128-bit)' },
+];
 
 const hourglassSpin = keyframes`
   0% { transform: rotate(0deg); }
@@ -57,6 +66,7 @@ const DOCS_EXAMPLES = [
 
 export default function ProofOfWorkTab() {
   const [prefix, setPrefix] = useState('');
+  const [hashAlgo, setHashAlgo] = useState('SHA-256');
   const [checkCode, setCheckCode] = useState(DEFAULT_CHECK_CODE);
   const [docsOpen, setDocsOpen] = useState(false);
   const [running, setRunning] = useState(false);
@@ -97,6 +107,7 @@ export default function ProofOfWorkTab() {
         challenge: prefix,
         difficulty: '20',
         checkCode,
+        hashAlgorithm: hashAlgo,
       }, (pct: number, detail?: string) => {
         setProgress(pct);
         if (detail) setProgressDetail(detail);
@@ -116,7 +127,7 @@ export default function ProofOfWorkTab() {
       const parsed = JSON.parse(workerResult) as { nonce: string; hash: string; attempts: number };
       const elapsed = performance.now() - startTime;
       const output = [
-        `Algorithm: SHA-256`,
+        `Algorithm: ${hashAlgo}`,
         `Prefix: "${prefix}"`,
         `Attempts: ${parsed.attempts.toLocaleString()}`,
         `Time: ${Math.round(elapsed)}ms`,
@@ -141,7 +152,7 @@ export default function ProofOfWorkTab() {
       setProgressDetail('');
       setEta(null);
     }
-  }, [prefix, checkCode, runAttack, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
+  }, [prefix, checkCode, hashAlgo, runAttack, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
 
   const handleCopyResult = useCallback(() => {
     if (result) navigator.clipboard.writeText(result).catch(() => {});
@@ -155,11 +166,38 @@ export default function ProofOfWorkTab() {
   /* ---- render ---- */
   return (
     <Box>
-      <Box sx={{ mb: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
-        <Typography variant="caption" sx={{ color: draculaColors.comment, fontFamily: FONT_FAMILY }}>
-          SHA-256 Proof of Work — find a nonce where SHA256(challenge + nonce) satisfies your check function.
-        </Typography>
-      </Box>
+      <Typography variant="caption" sx={{ color: draculaColors.comment, fontFamily: FONT_FAMILY, mb: 1, display: 'block' }}>
+        {hashAlgo} Proof of Work — find a nonce where {hashAlgo}(challenge + nonce) satisfies your check function.
+      </Typography>
+
+      {/* Hash Algorithm dropdown */}
+      <FormControl fullWidth sx={{ mb: 2 }}>
+        <InputLabel sx={{ color: draculaColors.comment, fontFamily: FONT_FAMILY, fontSize: '0.85rem' }}>
+          Hash Algorithm
+        </InputLabel>
+        <Select
+          value={hashAlgo}
+          label="Hash Algorithm"
+          onChange={e => setHashAlgo(e.target.value)}
+          sx={{
+            fontFamily: FONT_FAMILY,
+            fontSize: '0.85rem',
+            color: draculaColors.foreground,
+            backgroundColor: draculaColors.background,
+            border: `1px solid ${draculaColors.currentLine}`,
+            borderRadius: '4px',
+            '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+            '&:hover': { borderColor: draculaColors.purple },
+            '&.Mui-focused': { borderColor: draculaColors.purple },
+          }}
+        >
+          {HASH_ALGORITHMS.map(algo => (
+            <MenuItem key={algo.value} value={algo.value} sx={{ fontFamily: FONT_FAMILY, fontSize: '0.85rem' }}>
+              {algo.label}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
       {/* Prefix / Challenge */}
       <TextField
