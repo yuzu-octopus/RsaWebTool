@@ -31,6 +31,9 @@ pnpm-debug.log*
 opencode.json
 AGENTS.md
 
+# Per-developer react-doctor config (tune rule strictness to taste, do not commit)
+doctor.config.*
+
 # Test infrastructure (scripts + artifacts, tracked separately)
 scripts/
 test-results/
