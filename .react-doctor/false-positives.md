@@ -15,7 +15,7 @@ Future scans should not re-flag the items below. If the underlying assumption ch
 ### `dangerouslySetInnerHTML` in `ProofRenderer.tsx:96,108,117,196`
 - **Rule:** Raw HTML injection / XSS risk
 - **Why suppressed:** Renders KaTeX-rendered LaTeX output (`katex.renderToString()`) and `renderInlineText()` output. KaTeX sanitizes its *output* but does NOT sanitize the input LaTeX string. The safety of these call sites depends entirely on the *input source* being static build-time constants (calculator proof data bundled with the app), NOT on KaTeX itself. Currently all call sites pass static content (`ECC_PROOF`, `EXPLANATION_LATEX`, `AES_PROOF`, `selectedAttack.proof`, etc.) — no user-supplied strings reach this component.
-- **Do not un-suppress** unless user input starts flowing into these call sites. If a future feature adds a "render your own proof" textbox that feeds `ProofRenderer`, the XSS concern becomes real and the call sites must add DOMPurify sanitization (or the feature must be rejected).
+- **Do not un-suppress** unless user input starts flowing into these call sites. If a future feature adds a "render your own proof" textbox that feeds `ProofRenderer`, the XSS concern becomes real — DOMPurify sanitization must be added before merging the feature, or the feature must be rejected.
 
 ### `dangerouslySetInnerHTML` in `AttackExplanationPanel.tsx:88`
 - **Rule:** Raw HTML injection / XSS risk
