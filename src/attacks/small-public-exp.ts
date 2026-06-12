@@ -212,5 +212,6 @@ m^e &= c + k \\cdot n \\quad\\text{for some } k \\in \\mathbb{Z}_{\\geq 0} \\\\
 
 export const generateTestcase = (): Record<string, string> => {
   const kp = generateHastadTestcase();
-  return { n: kp.n.toString(), e: kp.e.toString(), c: kp.c.toString() };
+  // k_bound limits the k search space for m^e = c + k*n (default 100000 matches the input placeholder).
+  return { n: kp.n.toString(), e: kp.e.toString(), c: kp.c.toString(), k_bound: '100000' };
 };
