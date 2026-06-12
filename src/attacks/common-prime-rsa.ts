@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { rsaNeeds, noopSageTemplate } from './_rsaHelpers';
-import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
+import { generateCommonPrimeTestcase } from '../utils/testcases/core';
 import { gcd } from '../utils/bigint';
 
 export const attack: Attack = {
@@ -76,10 +76,6 @@ The GCD extracts the shared prime directly — no factorization of either modulu
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const p = randomPrime(TESTCASE_BITS.p);
-  const q1 = randomPrime(TESTCASE_BITS.q);
-  const q2 = randomPrime(TESTCASE_BITS.q);
-  const n1 = p * q1;
-  const n2 = p * q2;
-  return { n1: n1.toString(), n2: n2.toString() };
+  const kp = generateCommonPrimeTestcase();
+  return { n1: kp.n1.toString(), n2: kp.n2.toString() };
 };
