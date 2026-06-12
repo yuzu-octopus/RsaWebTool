@@ -17,6 +17,7 @@ import { useSageMath } from '../hooks/useSageMath';
 import { useWorkerPool } from '../hooks/useWorkerPool';
 import { useAttackExecution } from '../hooks/useAttackExecution';
 import { ProofRenderer } from './ProofRenderer';
+import { EmptyState } from './calculator/_shared/EmptyState';
 import { inputSx } from '../styles/inputSx';
 import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, FONT_FAMILY } from '../styles/shared';
 import Prism from 'prismjs';
@@ -98,9 +99,7 @@ export function InputPanel() {
   if (!selectedAttack) {
     return (
       <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0 }}>
-        <Typography variant="body1" sx={{ color: draculaColors.comment, fontStyle: 'italic' }}>
-          Select an attack from the sidebar
-        </Typography>
+        <EmptyState title="Select an attack from the sidebar" padding={4} />
       </Box>
     );
   }

@@ -21,6 +21,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { useDragResize } from '../hooks/useDragResize';
 import { useNotepad } from '../hooks/useNotepad';
 import { ghostBtnSx, FONT_FAMILY } from '../styles/shared';
+import { EmptyState } from './calculator/_shared/EmptyState';
 
 const notepadBaseStyle: React.CSSProperties = {
   width: '100%',
@@ -197,9 +198,7 @@ export function OutputPanel() {
         )}
 
         {!displayResult && !outputError && !ui.historySelectedKey && (
-          <Typography variant="body1" sx={{ color: draculaColors.comment, fontStyle: 'italic' }}>
-            Run an attack to see results here
-          </Typography>
+          <EmptyState title="Run an attack to see results here" padding={4} />
         )}
       </Box>
 

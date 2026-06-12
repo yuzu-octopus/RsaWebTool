@@ -9,9 +9,13 @@ import {
   Box,
   Divider,
   Link,
+  IconButton,
+  useMediaQuery,
 } from '@mui/material';
-import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey, Lock, Hub, Tag, Security } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey, Lock, Hub, Tag, Security, Menu } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
+import { pulse } from '../styles/shared';
 import { CATEGORIES, attacksByCategory } from '../attacks';
 import { CALCULATOR_ITEMS } from '../config/sidebarItems';
 import type { Attack } from '../types';
@@ -58,6 +62,9 @@ export function Sidebar() {
     sagecell: typeof window !== 'undefined' && window.sagecell ? 'ok' : 'checking',
   });
   const sageCellChecked = useRef(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -153,21 +160,46 @@ export function Sidebar() {
   }, [selectedAttack, viewMode, calculatorMode]);
 
   return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
+    <>
+      {/* Mobile-only hamburger toggle (rendered into a portal by App.tsx normally,
+          but inline here for simplicity — hidden on md+ viewports and when the
+          Drawer is already open, since the Drawer's own backdrop handles close). */}
+      {isMobile && !mobileOpen && (
+        <IconButton
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open navigation"
+          sx={{
+            position: 'fixed',
+            top: 8,
+            left: 8,
+            zIndex: 1300,
+            color: draculaColors.purple,
+            backgroundColor: draculaColors.background,
+            border: `1px solid ${draculaColors.comment}`,
+            '&:hover': { backgroundColor: draculaColors.currentLine },
+          }}
+        >
+          <Menu />
+        </IconButton>
+      )}
+      <Drawer
+        variant={isMobile ? 'temporary' : 'permanent'}
+        open={isMobile ? mobileOpen : true}
+        onClose={() => setMobileOpen(false)}
+        ModalProps={{ keepMounted: true }}
+        sx={{
           width: drawerWidth,
-          boxSizing: 'border-box',
-          backgroundColor: draculaColors.currentLine,
-          borderRight: `1px solid ${draculaColors.comment}`,
-          display: 'flex',
-          flexDirection: 'column',
-        },
-      }}
-    >
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+            backgroundColor: draculaColors.currentLine,
+            borderRight: `1px solid ${draculaColors.comment}`,
+            display: 'flex',
+            flexDirection: 'column',
+          },
+        }}
+      >
       <Box sx={{ p: 2 }}>
         <Typography variant="h6" sx={{ color: draculaColors.purple, fontWeight: 700 }}>
           RSA CTF Tool
@@ -334,7 +366,11 @@ export function Sidebar() {
             ) : status.factordb === 'error' ? (
               <ErrorOutlined sx={{ color: draculaColors.red, fontSize: '0.9rem' }} />
             ) : (
-              <Box sx={{ width: '0.9rem', height: '0.9rem', borderRadius: '50%', border: `2px solid ${draculaColors.comment}` }} />
+              <Box sx={{
+                width: '0.9rem', height: '0.9rem', borderRadius: '50%',
+                border: `2px solid ${draculaColors.comment}`,
+                animation: `${pulse} 1.4s ease-in-out infinite`,
+              }} />
             )}
             <Typography variant="caption" sx={{ color: draculaColors.foreground, fontSize: '0.7rem' }}>
               FactorDB
@@ -346,7 +382,11 @@ export function Sidebar() {
             ) : status.sagecell === 'error' ? (
               <ErrorOutlined sx={{ color: draculaColors.red, fontSize: '0.9rem' }} />
             ) : (
-              <Box sx={{ width: '0.9rem', height: '0.9rem', borderRadius: '50%', border: `2px solid ${draculaColors.comment}` }} />
+              <Box sx={{
+                width: '0.9rem', height: '0.9rem', borderRadius: '50%',
+                border: `2px solid ${draculaColors.comment}`,
+                animation: `${pulse} 1.4s ease-in-out infinite`,
+              }} />
             )}
             <Typography variant="caption" sx={{ color: draculaColors.foreground, fontSize: '0.7rem' }}>
               SageMathCell
@@ -374,6 +414,7 @@ export function Sidebar() {
           </Link>
         </Typography>
       </Box>
-    </Drawer>
+      </Drawer>
+    </>
   );
 }
