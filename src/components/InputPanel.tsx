@@ -105,7 +105,7 @@ export function InputPanel() {
   }
 
   const effectiveSourceMode = !hasSage ? 'frontend' : !hasFrontend ? 'sage' : sourceMode;
-  // frontendCode is now loaded asynchronously via useEffect below
+  // frontendCode is now loaded asynchronously via the useEffect above
   const handleCopySource = () => {
     const code = effectiveSourceMode === 'sage' ? pythonCode : frontendCode;
     void navigator.clipboard.writeText(code);

@@ -2,11 +2,10 @@ import { useState, useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
 import { VpnKey, MenuBook, AutoAwesome, Lock, LockOpen } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
-import { colFlexSx, centeredPanelSx } from '../../styles/shared';
-import { CalculatorSubTabs } from './CalculatorSubTabs';
-import { RsaKeyGenTab } from '../RsaKeyGenTab';
-import { RsaEncryptTab } from '../RsaEncryptTab';
-import { RsaDecryptTab } from '../RsaDecryptTab';
+import { CalculatorHeader } from './_shared/CalculatorHeader';
+import { RsaKeyGenTab } from './RsaKeyGenTab';
+import { RsaEncryptTab } from './RsaEncryptTab';
+import { RsaDecryptTab } from './RsaDecryptTab';
 import { ProofRenderer } from '../ProofRenderer';
 import { useAppContext } from '../../hooks/useAppContext';
 
@@ -84,29 +83,18 @@ export default function RSACalculator() {
   }, [setOutputResult, setOutputError, setOutputSource]);
 
   return (
-    <Box sx={colFlexSx}>
-      <Box sx={{ ...centeredPanelSx, pt: 2, px: 2 }}>
-        <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Typography
-            variant="h3"
-            sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <VpnKey sx={{ fontSize: 'inherit' }} /> RSA Calculator
-          </Typography>
-          <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 2 }}>
-            RSA encryption, decryption, and key generation reference
-          </Typography>
-
-          <CalculatorSubTabs tabs={SUB_TABS} activeTab={activeTab} onChange={handleTabChange} />
-
-          <Box sx={{ flex: 1, overflow: 'auto', px: 0.5, pt: 1 }}>
-            {activeTab === 'explanation' && <ExplanationTab />}
-            {activeTab === 'key-gen' && <RsaKeyGenTab />}
-            {activeTab === 'encrypt' && <RsaEncryptTab />}
-            {activeTab === 'decrypt' && <RsaDecryptTab />}
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+    <CalculatorHeader
+      icon={VpnKey}
+      title="RSA Calculator"
+      subtitle="RSA encryption, decryption, and key generation reference"
+      tabs={SUB_TABS}
+      activeTab={activeTab}
+      onTabChange={handleTabChange}
+    >
+      {activeTab === 'explanation' && <ExplanationTab />}
+      {activeTab === 'key-gen' && <RsaKeyGenTab />}
+      {activeTab === 'encrypt' && <RsaEncryptTab />}
+      {activeTab === 'decrypt' && <RsaDecryptTab />}
+    </CalculatorHeader>
   );
 }

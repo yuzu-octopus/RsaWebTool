@@ -16,7 +16,7 @@ import { keyframes } from '@mui/material/styles';
 import { AutoFixHigh, Science, CheckCircle, Cancel, HourglassEmpty, SkipNext, Stop, ExpandMore, ExpandLess, Casino, ContentCopy } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
-import { useMagicExecution } from '../hooks/useMagicExecution';
+import { useMagicExecution, type MagicJob } from '../hooks/useMagicExecution';
 import { attacks } from '../attacks';
 import { detectFormat, parsePEM } from '../utils/converters';
 import { inputSx } from '../styles/inputSx';
@@ -105,13 +105,6 @@ function statusIcon(status: MagicJob['status']) {
 }
 
 
-interface MagicJob {
-  attackId: string;
-  attackName: string;
-  status: 'running' | 'success' | 'error' | 'aborted' | 'cancelled';
-  result?: string;
-  error?: string;
-}
 
 // --- Extracted memoized components ---
 

@@ -29,6 +29,8 @@ export interface Attack {
 }
 
 export interface HistoryEntry {
+  /** Unique key for React list rendering (timestamp.getTime() + '-' + nanoid). */
+  id: string;
   attackId: string;
   attackName: string;
   timestamp: Date;

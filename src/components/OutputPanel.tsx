@@ -79,7 +79,7 @@ export function OutputPanel() {
 
   const displayResult = useMemo(() => {
     if (!ui.historySelectedKey) return outputResult;
-    return history.find(h => (h.timestamp.getTime() + '-' + h.attackId) === ui.historySelectedKey)?.result ?? null;
+    return history.find(h => h.id === ui.historySelectedKey)?.result ?? null;
   }, [ui.historySelectedKey, history, outputResult]);
 
   const handleHistoryClick = useCallback((_entry: HistoryEntry, key: string) => {
@@ -138,7 +138,7 @@ export function OutputPanel() {
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
             <HistoryIcon sx={{ fontSize: '1rem', color: draculaColors.cyan }} />
             <Typography sx={{ color: draculaColors.cyan, fontSize: '0.75rem', fontFamily: MONO_FAMILY, flex: 1 }}>
-              History: {history.find(h => (h.timestamp.getTime() + '-' + h.attackId) === ui.historySelectedKey)?.attackName ?? ''}
+              History: {history.find(h => h.id === ui.historySelectedKey)?.attackName ?? ''}
             </Typography>
             <Button
               size="small"
@@ -265,7 +265,7 @@ export function OutputPanel() {
         <Collapse in={ui.historyOpen}>
           <List dense sx={{ maxHeight: '200px', overflow: 'auto' }}>
             {history.map((entry) => {
-              const key = entry.timestamp.getTime() + '-' + entry.attackId;
+              const key = entry.id;
               const selected = ui.historySelectedKey === key;
               return (
                 <HistoryListItem

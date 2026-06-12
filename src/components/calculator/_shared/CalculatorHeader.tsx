@@ -13,22 +13,39 @@ export interface CalculatorHeaderTab {
   label: string;
 }
 
-export interface CalculatorHeaderProps {
+/**
+ * Base props shared by both variants.
+ */
+interface CalculatorHeaderBase {
   /** Icon component to render next to the title (e.g., `Lock`, `Hub`, `VpnKey`). */
   icon: ElementType;
   /** Page title (h3). */
   title: string;
   /** One-line subtitle shown under the title. */
   subtitle?: string;
-  /** Optional sub-tabs (omit for calculators without them, e.g. RSA). */
-  tabs?: CalculatorHeaderTab[];
-  /** Currently active tab id. Required when `tabs` is provided. */
-  activeTab?: string;
-  /** Tab change handler. Required when `tabs` is provided. */
-  onTabChange?: (id: string) => void;
   /** The active tab's content. */
   children: ReactNode;
 }
+
+/**
+ * Variant WITH sub-tabs: tabs/activeTab/onTabChange are required together.
+ */
+export interface CalculatorHeaderWithTabs extends CalculatorHeaderBase {
+  tabs: CalculatorHeaderTab[];
+  activeTab: string;
+  onTabChange: (id: string) => void;
+}
+
+/**
+ * Variant WITHOUT sub-tabs: tabs/activeTab/onTabChange must be omitted.
+ */
+export interface CalculatorHeaderWithoutTabs extends CalculatorHeaderBase {
+  tabs?: undefined;
+  activeTab?: undefined;
+  onTabChange?: undefined;
+}
+
+export type CalculatorHeaderProps = CalculatorHeaderWithTabs | CalculatorHeaderWithoutTabs;
 
 /**
  * Standard shell for every calculator (RSA, AES, ECC, DH, Hash).
@@ -46,15 +63,11 @@ export interface CalculatorHeaderProps {
  *     {tab === 'encrypt-decrypt' && <AESEncryptDecryptTab />}
  *   </CalculatorHeader>
  */
-export function CalculatorHeader({
-  icon: Icon,
-  title,
-  subtitle,
-  tabs,
-  activeTab,
-  onTabChange,
-  children,
-}: CalculatorHeaderProps) {
+export function CalculatorHeader(props: CalculatorHeaderProps) {
+  const { icon: Icon, title, subtitle, children } = props;
+  const tabs = 'tabs' in props ? props.tabs : undefined;
+  const activeTab = 'activeTab' in props ? props.activeTab : undefined;
+  const onTabChange = 'onTabChange' in props ? props.onTabChange : undefined;
   return (
     <Box sx={colFlexSx}>
       <Box sx={{ ...centeredPanelSx, pt: 2, px: 2 }}>

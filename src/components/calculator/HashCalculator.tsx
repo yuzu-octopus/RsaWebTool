@@ -1,9 +1,6 @@
 import { useState, useCallback } from 'react';
-import { Box, Typography } from '@mui/material';
 import { Tag, MenuBook, Functions, Key, LinearScale, Bolt } from '@mui/icons-material';
-import { draculaColors } from '../../theme/dracula';
-import { colFlexSx, centeredPanelSx } from '../../styles/shared';
-import { CalculatorSubTabs } from './CalculatorSubTabs';
+import { CalculatorHeader } from './_shared/CalculatorHeader';
 import HashFunctionsTab from './hash/HashFunctionsTab';
 import HMACTab from './hash/HMACTab';
 import LengthExtensionTab from './hash/LengthExtensionTab';
@@ -31,30 +28,19 @@ export default function HashCalculator() {
   }, [setOutputResult, setOutputError, setOutputSource]);
 
   return (
-    <Box sx={colFlexSx}>
-      <Box sx={{ ...centeredPanelSx, pt: 2, px: 2 }}>
-        <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Typography
-            variant="h3"
-            sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <Tag sx={{ fontSize: 'inherit' }} /> Hash Calculator
-          </Typography>
-          <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 2 }}>
-            Pure JS hash computation — no SageCell needed
-          </Typography>
-
-          <CalculatorSubTabs tabs={SUB_TABS} activeTab={activeTab} onChange={handleTabChange} />
-
-          <Box sx={{ flex: 1, overflow: 'auto', px: 0.5, pt: 1 }}>
-            {activeTab === 'explanation' && <ExplanationTab />}
-            {activeTab === 'hash-functions' && <HashFunctionsTab />}
-            {activeTab === 'hmac' && <HMACTab />}
-            {activeTab === 'length-ext' && <LengthExtensionTab />}
-            {activeTab === 'pow' && <ProofOfWorkTab />}
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+    <CalculatorHeader
+      icon={Tag}
+      title="Hash Calculator"
+      subtitle="Pure JS hash computation — no SageCell needed"
+      tabs={SUB_TABS}
+      activeTab={activeTab}
+      onTabChange={handleTabChange}
+    >
+      {activeTab === 'explanation' && <ExplanationTab />}
+      {activeTab === 'hash-functions' && <HashFunctionsTab />}
+      {activeTab === 'hmac' && <HMACTab />}
+      {activeTab === 'length-ext' && <LengthExtensionTab />}
+      {activeTab === 'pow' && <ProofOfWorkTab />}
+    </CalculatorHeader>
   );
 }
