@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { gcd } from '../utils/bigint';
-import { generatePollardTestcase } from '../utils/testcases/core';
+import { randomPrime, isPrimeMR } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
@@ -174,8 +174,18 @@ p &\\mid (x_i - x_j) \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Use the shared Pollard generator for a semiprime with p-1 B-smooth.
-  // Pollard's rho will also find p quickly (B-smooth p-1 implies small ord).
-  const { n, p } = generatePollardTestcase();
+  // Pollard-rho needs a SMALL prime factor (e.g., 34 bits) so the attack
+  // converges within SageCell timeout. generatePollardTestcase produces
+  // TESTCASE_BITS-sized primes (512-bit) which would time out, so we keep
+  // custom construction with a 34-bit small factor.
+  let p: bigint;
+  do {
+    p = (1n << 33n) | 1n | (BigInt(Math.floor(Math.random() * (1 << 33))) & ((1n << 33n) - 1n));
+  } while (!isPrimeMR(p));
+  let q: bigint;
+  do {
+    q = randomPrime(512);
+  } while (q === p);
+  const n = p * q;
   return { n: n.toString(), p: p.toString() };
 };
