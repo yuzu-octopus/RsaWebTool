@@ -1,11 +1,6 @@
 import { keyframes } from '@mui/material/styles';
 import { draculaColors } from '../theme/dracula';
 
-// ─── Re-export for convenience ──────────────────────────────────────────
-// Allows consumers to import draculaColors from one place (styles/shared.ts)
-// instead of needing the ../../theme/dracula path from deeply nested files.
-export { draculaColors };
-
 // ─── Font families ──────────────────────────────────────────────────────
 /** Monospace family used for code, numbers, key values, and most UI text. */
 export const MONO_FAMILY = "'JetBrains Mono', monospace" as const;
