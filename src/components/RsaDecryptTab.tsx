@@ -1,23 +1,18 @@
 import { useState } from 'react';
-import { useAppContext } from '../hooks/useAppContext';
 import { Box, Typography, TextField, Button } from '@mui/material';
 import { draculaColors } from '../theme/dracula';
 import { modPow, modInverse } from '../utils/bigint';
 import { parseBigInt, toHex, toAscii, isPrintableAscii } from '../utils/rsaCalc';
 import { inputSx } from '../styles/inputSx';
-import { outputBoxSx } from '../styles/shared';
+import { outputBoxSx, primaryBtnSx } from '../styles/shared';
+import { useCalculatorOutput } from '../hooks/useCalculatorOutput';
 
 export function RsaDecryptTab() {
   const [form, setForm] = useState({ c: '', n: '', d: '', p: '', q: '', e: '' });
-  const [result, setResult] = useState<{ output: string | null; error: string | null }>({
-    output: null,
-    error: null,
-  });
-  const { setOutputResult: setCtxOutput, setOutputError: setCtxError, setOutputSource, addToHistory } = useAppContext();
+  const out = useCalculatorOutput({ category: 'calculator-rsa' });
 
   const handleDecrypt = () => {
-    setResult({ output: null, error: null });
-    setCtxOutput(null); setCtxError(null);
+    out.clear();
     const cn = parseBigInt(form.c);
     let nn = parseBigInt(form.n);
     let pn = parseBigInt(form.p);
@@ -26,8 +21,7 @@ export function RsaDecryptTab() {
     const dn = parseBigInt(form.d);
 
     if (cn === null) {
-      setResult({ output: null, error: 'c must be a valid number' });
-      setCtxError('c must be a valid number'); setOutputSource('calculator');
+      out.dispatchError('c must be a valid number');
       return;
     }
 
@@ -41,18 +35,15 @@ export function RsaDecryptTab() {
     }
 
     if (nn === null) {
-      setResult({ output: null, error: 'Provide n, or p+q (any 2 of p, q, n)' });
-      setCtxError('Provide n, or p+q (any 2 of p, q, n)'); setOutputSource('calculator');
+      out.dispatchError('Provide n, or p+q (any 2 of p, q, n)');
       return;
     }
     if (nn <= 1n) {
-      setResult({ output: null, error: 'n must be > 1' });
-      setCtxError('n must be > 1'); setOutputSource('calculator');
+      out.dispatchError('n must be > 1');
       return;
     }
     if (cn >= nn) {
-      setResult({ output: null, error: 'c must be < n' });
-      setCtxError('c must be < n'); setOutputSource('calculator');
+      out.dispatchError('c must be < n');
       return;
     }
 
@@ -71,8 +62,7 @@ export function RsaDecryptTab() {
     }
 
     if (m === null) {
-      setResult({ output: null, error: 'Provide d, or at least 2 of (p, q, n) + e' });
-      setCtxError('Provide d, or at least 2 of (p, q, n) + e'); setOutputSource('calculator');
+      out.dispatchError('Provide d, or at least 2 of (p, q, n) + e');
       return;
     }
 
@@ -81,8 +71,7 @@ export function RsaDecryptTab() {
     if (isPrintableAscii(m)) {
       outputText += `m (ascii) = ${toAscii(m)}`;
     }
-    setResult({ output: outputText, error: null });
-    setCtxOutput(outputText); setOutputSource('calculator'); addToHistory('calculator-rsa', 'RSA Decrypt', outputText, true);
+    out.dispatch(outputText, 'RSA Decrypt');
   };
 
   return (
@@ -142,21 +131,16 @@ export function RsaDecryptTab() {
         variant="contained"
         onClick={handleDecrypt}
         disabled={!form.c.trim() || (!form.n.trim() && (!form.p.trim() || !form.q.trim()))}
-        sx={{
-          backgroundColor: draculaColors.purple,
-          fontFamily: "'JetBrains Mono', monospace",
-          '&:hover': { backgroundColor: '#a575f6' },
-          '&:disabled': { backgroundColor: draculaColors.comment },
-        }}
+        sx={primaryBtnSx}
       >
         Decrypt
       </Button>
-      {result.output && <Box sx={outputBoxSx}>{result.output}</Box>}
-      {result.error && (
+      {out.result && <Box sx={outputBoxSx}>{out.result}</Box>}
+      {out.error && (
         <Typography
           sx={{ color: draculaColors.red, mt: 2, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem' }}
         >
-          {result.error}
+          {out.error}
         </Typography>
       )}
     </>

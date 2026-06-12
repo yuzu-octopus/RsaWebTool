@@ -1,47 +1,38 @@
 import { useState } from 'react';
-import { useAppContext } from '../hooks/useAppContext';
 import { Box, Typography, TextField, Button } from '@mui/material';
 import { draculaColors } from '../theme/dracula';
 import { modPow } from '../utils/bigint';
 import { parseBigInt, toHex, toAscii, isPrintableAscii } from '../utils/rsaCalc';
 import { inputSx } from '../styles/inputSx';
-import { outputBoxSx } from '../styles/shared';
+import { outputBoxSx, primaryBtnSx } from '../styles/shared';
+import { useCalculatorOutput } from '../hooks/useCalculatorOutput';
 
 export function RsaEncryptTab() {
   const [m, setM] = useState('');
   const [n, setN] = useState('');
   const [e, setE] = useState('');
-  const [result, setResult] = useState<{ output: string | null; error: string | null }>({
-    output: null,
-    error: null,
-  });
-  const { setOutputResult: setCtxOutput, setOutputError: setCtxError, setOutputSource, addToHistory } = useAppContext();
+  const out = useCalculatorOutput({ category: 'calculator-rsa' });
 
   const handleEncrypt = () => {
-    setResult({ output: null, error: null });
-    setCtxOutput(null); setCtxError(null);
+    out.clear();
     const mn = parseBigInt(m);
     const nn = parseBigInt(n);
     const en = parseBigInt(e) || 65537n;
 
     if (mn === null || nn === null) {
-      setResult({ output: null, error: 'm and n must be valid numbers (e defaults to 65537)' });
-      setCtxError('m and n must be valid numbers (e defaults to 65537)'); setOutputSource('calculator');
+      out.dispatchError('m and n must be valid numbers (e defaults to 65537)');
       return;
     }
     if (nn <= 1n) {
-      setResult({ output: null, error: 'n must be > 1' });
-      setCtxError('n must be > 1'); setOutputSource('calculator');
+      out.dispatchError('n must be > 1');
       return;
     }
     if (en <= 0n) {
-      setResult({ output: null, error: 'e must be positive' });
-      setCtxError('e must be positive'); setOutputSource('calculator');
+      out.dispatchError('e must be positive');
       return;
     }
     if (mn >= nn) {
-      setResult({ output: null, error: 'm must be < n' });
-      setCtxError('m must be < n'); setOutputSource('calculator');
+      out.dispatchError('m must be < n');
       return;
     }
 
@@ -51,8 +42,7 @@ export function RsaEncryptTab() {
     if (isPrintableAscii(c)) {
       outputText += `c (ascii) = ${toAscii(c)}`;
     }
-    setResult({ output: outputText, error: null });
-    setCtxOutput(outputText); setOutputSource('calculator'); addToHistory('calculator-rsa', 'RSA Encrypt', outputText, true);
+    out.dispatch(outputText, 'RSA Encrypt');
   };
 
   return (
@@ -86,21 +76,16 @@ export function RsaEncryptTab() {
         variant="contained"
         onClick={handleEncrypt}
         disabled={!m.trim() || !n.trim()}
-        sx={{
-          backgroundColor: draculaColors.purple,
-          fontFamily: "'JetBrains Mono', monospace",
-          '&:hover': { backgroundColor: '#a575f6' },
-          '&:disabled': { backgroundColor: draculaColors.comment },
-        }}
+        sx={primaryBtnSx}
       >
         Encrypt
       </Button>
-      {result.output && <Box sx={outputBoxSx}>{result.output}</Box>}
-      {result.error && (
+      {out.result && <Box sx={outputBoxSx}>{out.result}</Box>}
+      {out.error && (
         <Typography
           sx={{ color: draculaColors.red, mt: 2, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem' }}
         >
-          {result.error}
+          {out.error}
         </Typography>
       )}
     </>
