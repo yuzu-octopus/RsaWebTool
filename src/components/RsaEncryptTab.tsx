@@ -4,7 +4,7 @@ import { draculaColors } from '../theme/dracula';
 import { modPow } from '../utils/bigint';
 import { parseBigInt, toHex, toAscii, isPrintableAscii } from '../utils/rsaCalc';
 import { inputSx } from '../styles/inputSx';
-import { outputBoxSx, primaryBtnSx } from '../styles/shared';
+import { outputBoxSx, primaryBtnSx, MONO_FAMILY } from '../styles/shared';
 import { useCalculatorOutput } from '../hooks/useCalculatorOutput';
 
 export function RsaEncryptTab() {
@@ -83,7 +83,7 @@ export function RsaEncryptTab() {
       {out.result && <Box sx={outputBoxSx}>{out.result}</Box>}
       {out.error && (
         <Typography
-          sx={{ color: draculaColors.red, mt: 2, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem' }}
+          sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}
         >
           {out.error}
         </Typography>

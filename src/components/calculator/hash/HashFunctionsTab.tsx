@@ -6,7 +6,7 @@ import {
 import { PlayArrow, UploadFile, ContentCopy } from '@mui/icons-material';
 import { draculaColors } from '../../../theme/dracula';
 import { inputSx } from '../../../styles/inputSx';
-import { outputBoxSx, colorGhostBtn } from '../../../styles/shared';
+import { outputBoxSx, colorGhostBtn, primaryBtnSx, MONO_FAMILY } from '../../../styles/shared';
 import { sha256, sha384, sha512 } from '@noble/hashes/sha2.js';
 import { md5, sha1 } from '@noble/hashes/legacy.js';
 import { blake2b, blake2s } from '@noble/hashes/blake2.js';
@@ -146,7 +146,7 @@ export default function HashFunctionsTab() {
         placeholder={encoding === 'hex' ? 'Hex string (e.g., 48656c6c6f)' : encoding === 'base64' ? 'Base64 string (e.g., SGVsbG8=)' : 'Enter text to hash...'} />
       <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
         <Button variant="contained" startIcon={<PlayArrow />} onClick={handleCompute} disabled={!input.trim()}
-          sx={{ backgroundColor: draculaColors.purple, fontFamily: "'JetBrains Mono', monospace", '&:hover': { backgroundColor: '#a575f6' }, '&:disabled': { backgroundColor: draculaColors.comment } }}>Compute Hash</Button>
+          sx={primaryBtnSx}>Compute Hash</Button>
         <Button variant="outlined" startIcon={<UploadFile />} onClick={() => fileRef.current?.click()} sx={colorGhostBtn(draculaColors.cyan)}>Hash File</Button>
         <input ref={fileRef} type="file" hidden onChange={handleFile} aria-label="Select a file to hash" />
       </Box>
@@ -156,10 +156,10 @@ export default function HashFunctionsTab() {
             <Typography variant="caption" sx={{ color: draculaColors.green }}>{algorithm.toUpperCase()} hash ({encoding.toUpperCase()} input):</Typography>
             <Tooltip title="Copy hash"><IconButton size="small" onClick={handleCopy} sx={{ color: draculaColors.cyan }}><ContentCopy fontSize="small" /></IconButton></Tooltip>
           </Box>
-          <Box sx={outputBoxSx}><Box sx={{ fontFamily: "'JetBrains Mono', monospace", wordBreak: 'break-all' }}>{result}</Box></Box>
+          <Box sx={outputBoxSx}><Box sx={{ fontFamily: MONO_FAMILY, wordBreak: 'break-all' }}>{result}</Box></Box>
         </Box>
       )}
-      {error && (<Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem' }}>{error}</Typography>)}
+      {error && (<Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>{error}</Typography>)}
     </Box>
   );
 }

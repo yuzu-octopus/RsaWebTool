@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
-import { VpnKey } from '@mui/icons-material';
+import { VpnKey, MenuBook, AutoAwesome, Lock, LockOpen } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
 import { colFlexSx, centeredPanelSx } from '../../styles/shared';
 import { CalculatorSubTabs } from './CalculatorSubTabs';
@@ -11,10 +11,10 @@ import { ProofRenderer } from '../ProofRenderer';
 import { useAppContext } from '../../hooks/useAppContext';
 
 const SUB_TABS = [
-  { id: 'explanation', label: 'Explanation' },
-  { id: 'key-gen', label: 'Key Gen' },
-  { id: 'encrypt', label: 'Encrypt' },
-  { id: 'decrypt', label: 'Decrypt' },
+  { id: 'explanation', label: 'Explanation', icon: <MenuBook fontSize="small" /> },
+  { id: 'key-gen', label: 'Key Gen', icon: <AutoAwesome fontSize="small" /> },
+  { id: 'encrypt', label: 'Encrypt', icon: <Lock fontSize="small" /> },
+  { id: 'decrypt', label: 'Decrypt', icon: <LockOpen fontSize="small" /> },
 ];
 
 const EXPLANATION_LATEX =

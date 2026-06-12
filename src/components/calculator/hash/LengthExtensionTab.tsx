@@ -6,7 +6,7 @@ import {
 import { PlayArrow, ContentCopy, WarningAmber } from '@mui/icons-material';
 import { draculaColors } from '../../../theme/dracula';
 import { inputSx } from '../../../styles/inputSx';
-import { outputBoxSx } from '../../../styles/shared';
+import { outputBoxSx, primaryBtnSx, MONO_FAMILY } from '../../../styles/shared';
 import { sha256, sha512 } from '@noble/hashes/sha2.js';
 import { sha1, md5 } from '@noble/hashes/legacy.js';
 import { bytesToHex } from '@noble/hashes/utils.js';
@@ -215,7 +215,7 @@ export default function LengthExtensionTab() {
           ) : (
             <Typography variant="body2" sx={{ color: draculaColors.cyan }}>{secretLen} bytes</Typography>
           )}
-          <Button size="small" variant="text" onClick={() => setSecretUnknown(!secretUnknown)} sx={{ color: draculaColors.purple, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.7rem', textTransform: 'none' }}>
+          <Button size="small" variant="text" onClick={() => setSecretUnknown(!secretUnknown)} sx={{ color: draculaColors.purple, fontFamily: MONO_FAMILY, fontSize: '0.7rem', textTransform: 'none' }}>
             {secretUnknown ? 'Fixed' : 'Unknown'}
           </Button>
         </Box>
@@ -232,7 +232,7 @@ export default function LengthExtensionTab() {
       </Box>
       <TextField fullWidth multiline minRows={2} maxRows={6} label="Append Data" value={appendData} onChange={e => setAppendData(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Data to append (hex or plaintext)" />
       <Button variant="contained" startIcon={<PlayArrow />} onClick={handleRun} disabled={!originalHash.trim()||!originalMessage.trim()||!appendData.trim()} fullWidth
-        sx={{ backgroundColor: draculaColors.purple, fontFamily: "'JetBrains Mono', monospace", mb: 2, '&:hover': { backgroundColor: '#a575f6' }, '&:disabled': { backgroundColor: draculaColors.comment } }}>
+        sx={primaryBtnSx}>
         {secretUnknown ? 'Brute-force & Compute' : 'Compute Extension'}
       </Button>
       {result && (
@@ -249,13 +249,13 @@ export default function LengthExtensionTab() {
               <Typography variant="caption" sx={{ color: draculaColors.green }}>New Hash {secretUnknown ? '(for secret_len=1)' : `(secret_len=${secretLen})`}:</Typography>
               <Tooltip title="Copy new hash"><IconButton size="small" onClick={handleCopyHash} sx={{ color: draculaColors.cyan }}><ContentCopy fontSize="small" /></IconButton></Tooltip>
             </Box>
-            <Box sx={outputBoxSx}><Box sx={{ fontFamily: "'JetBrains Mono', monospace", wordBreak:'break-all' }}>{result.newHash}</Box></Box>
+            <Box sx={outputBoxSx}><Box sx={{ fontFamily: MONO_FAMILY, wordBreak:'break-all' }}>{result.newHash}</Box></Box>
           </Box>
           {results.length > 1 && (
             <Box sx={{ mt:2 }}>
               <Typography variant="caption" sx={{ color: draculaColors.comment, mb:0.5, display:'block' }}>All candidates ({results.length} lengths):</Typography>
               <Box sx={{ maxHeight:200, overflow:'auto', backgroundColor: draculaColors.currentLine, borderRadius:1, p:1 }}>
-                <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'0.75rem', fontFamily: "'JetBrains Mono', monospace" }}>
+                <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'0.75rem', fontFamily: MONO_FAMILY }}>
                   <thead><tr><th style={{ color: draculaColors.cyan, textAlign:'left', padding:'2px 8px', borderBottom: `1px solid ${draculaColors.comment}` }}>Len</th><th style={{ color: draculaColors.cyan, textAlign:'left', padding:'2px 8px', borderBottom: `1px solid ${draculaColors.comment}` }}>Hash</th></tr></thead>
                   <tbody>{results.map(r => (<tr key={r.secretLen}><td style={{ color: draculaColors.foreground, padding:'2px 8px' }}>{r.secretLen}</td><td style={{ color: draculaColors.foreground, padding:'2px 8px', wordBreak:'break-all' }}>{r.hash}</td></tr>))}</tbody>
                 </table>
@@ -264,7 +264,7 @@ export default function LengthExtensionTab() {
           )}
         </Box>
       )}
-      {error && (<Typography sx={{ color: draculaColors.red, mt:2, fontFamily: "'JetBrains Mono', monospace", fontSize:'0.85rem' }}>{error}</Typography>)}
+      {error && (<Typography sx={{ color: draculaColors.red, mt:2, fontFamily: MONO_FAMILY, fontSize:'0.85rem' }}>{error}</Typography>)}
     </Box>
   );
 }

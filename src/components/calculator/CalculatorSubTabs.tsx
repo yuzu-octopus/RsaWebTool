@@ -1,10 +1,13 @@
 import { Tabs, Tab } from '@mui/material';
+import type { ReactElement } from 'react';
 import { draculaColors } from '../../theme/dracula';
 import { tabSx } from '../../styles/shared';
 
-interface TabItem {
+export interface TabItem {
   id: string;
   label: string;
+  /** Optional icon shown inline to the left of the label. */
+  icon?: ReactElement;
 }
 
 interface CalculatorSubTabsProps {
@@ -31,13 +34,13 @@ export function CalculatorSubTabs({ tabs, activeTab, onChange }: CalculatorSubTa
         minHeight: 40,
         backgroundColor: draculaColors.background,
         '& .MuiTabs-flexContainer': { justifyContent: 'flex-start' },
-        '& .MuiTab-root': { ...tabSx, px: 3 },
+        '& .MuiTab-root': { ...tabSx, px: 3, minHeight: 48 },
         '& .Mui-selected': { color: draculaColors.cyan },
         '& .MuiTabs-indicator': { backgroundColor: draculaColors.cyan },
       }}
     >
       {tabs.map(t => (
-        <Tab key={t.id} label={t.label} />
+        <Tab key={t.id} label={t.label} icon={t.icon} iconPosition="start" />
       ))}
     </Tabs>
   );
