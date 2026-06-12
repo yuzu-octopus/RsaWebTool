@@ -1,6 +1,19 @@
 import gcdFn from 'bigint-gcd';
 
 /**
+ * Parse a hex string into a bigint, with or without the `0x` prefix,
+ * ignoring whitespace. Empty or whitespace-only input returns 0n.
+ *
+ * Consolidates the 5+ inlined copies of this pattern that previously
+ * lived in ECC and DH calculator attack tabs.
+ */
+export function parseHex(s: string): bigint {
+  const clean = s.trim().replace(/\s/g, '');
+  if (!clean || clean === '0x' || clean === '0X') return 0n;
+  return BigInt(clean.startsWith('0x') ? clean : '0x' + clean);
+}
+
+/**
  * Greatest common divisor (Lehmer's algorithm, ~3x faster than Euclidean on 512-bit).
  */
 export function gcd(a: bigint, b: bigint): bigint {
