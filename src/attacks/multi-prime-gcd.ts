@@ -79,11 +79,13 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{
 
       let foundAny = false;
 
-      // Only check pairs involving hit indices
+      // Only check pairs of hit indices (proven: if gcd(ni, nj) > 1 then both are hits,
+      // so restricting to hit × hit pairs is both correct and avoids O(k^2) wasted GCDs)
       for (let ii = 0; ii < hitIndices.length; ii++) {
         const i = hitIndices[ii];
         const ni = moduli[i];
-        for (let j = i + 1; j < moduli.length; j++) {
+        for (let jj = ii + 1; jj < hitIndices.length; jj++) {
+          const j = hitIndices[jj];
           const nj = moduli[j];
           const g = gcd(ni, nj);
           if (g > 1n && g < ni) {

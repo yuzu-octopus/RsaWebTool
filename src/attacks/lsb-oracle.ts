@@ -97,8 +97,12 @@ export const attack: Attack = {
       const divisor = 1n << k;
       const mCeil = divisor > n ? (q * n + divisor - 1n) / divisor : q * n / divisor;
 
-      // Scan ±2 around candidate for safety (handles edge rounding)
-      for (let mVal = mCeil - 2n; mVal <= mCeil + 2n; mVal++) {
+      // Try mCeil directly (the binary-fraction ceil is exact when k >= n.bit_length());
+      // fall back to ±2 scan only if rounding produces a neighbor match.
+      if (mCeil >= 0n && modPow(mCeil, e, n) === c) {
+        return Promise.resolve(`LSB Oracle\nn = ${n}\ne = ${e}\nc = ${c}\noracle_responses = ${k} bits\n\nResults:\nm = ${mCeil}\n\nVerification: m^e mod n = ${modPow(mCeil, e, n)}\n\nLSB_ORACLE=SUCCESS`);
+      }
+      for (const mVal of [mCeil - 1n, mCeil + 1n, mCeil - 2n, mCeil + 2n]) {
         if (mVal >= 0n && modPow(mVal, e, n) === c) {
           return Promise.resolve(`LSB Oracle\nn = ${n}\ne = ${e}\nc = ${c}\noracle_responses = ${k} bits\n\nResults:\nm = ${mVal}\n\nVerification: m^e mod n = ${modPow(mVal, e, n)}\n\nLSB_ORACLE=SUCCESS`);
         }

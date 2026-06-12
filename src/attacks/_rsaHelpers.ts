@@ -50,11 +50,6 @@ export const rsaNeeds = {
     if (!vals) return false;
     return vals.split('\n').filter(x => x.trim()).length >= 2;
   },
-  pairsMultiline: (p: Record<string, string>) => {
-    const vals = (p.pairs || '').trim();
-    if (!vals) return false;
-    return vals.split('\n').filter(x => x.trim()).length >= 2;
-  },
 } as const;
 
 /**
@@ -66,12 +61,3 @@ export const rsaNeeds = {
  */
 export const noopSageTemplate = (token: string = 'ATTACK'): string =>
   `This attack runs entirely in the browser via frontendCheck. No SageMath execution is needed.\n\nSee the proof panel for the algorithm and the result panel for the computed output.\n\n${token}=NOT_APPLICABLE`;
-
-/**
- * Helper to add the no-op sageTemplate to an attack object.
- * Use: { ...attack, sageTemplate: noopSageTemplate }
- */
-export const withNoopSage = <T extends Pick<Attack, 'sageTemplate'>>(attack: T): T => ({
-  ...attack,
-  sageTemplate: noopSageTemplate,
-});
