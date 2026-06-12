@@ -85,7 +85,7 @@ ${onCurve ? '✓ Point IS on the curve' : '✗ Point is NOT on the curve'}`;
           const nHexClean = nHex.trim().replace(/\s/g, '');
           const nHexPrefix = nHexClean.startsWith('0x') ? nHexClean : '0x' + nHexClean;
           const code = `n = Integer(${nHexPrefix})
-lines = '''${pairsMultiline.trim()}'''.strip().split('\\\\n')
+lines = '''${pairsMultiline.trim()}'''.strip().splitlines()
 pairs = []
 for line in lines:
     if not line.strip(): continue

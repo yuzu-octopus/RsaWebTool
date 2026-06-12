@@ -31,14 +31,18 @@ export const RFC3526_GROUPS: RFCGroupEntry[] = [
 export function factorSmall(n: bigint, limit: number): bigint[] {
   const factors: bigint[] = [];
   let m = n;
-  for (let p = 2; p <= limit && m > 1n; p++) {
+  // Handle factor 2 separately, then iterate odd candidates only.
+  // (The previous `for p; p++ { if (p===2) p=1; }` pattern oscillated 1→2 forever.)
+  if (m % 2n === 0n) {
+    factors.push(2n);
+    while (m % 2n === 0n) m /= 2n;
+  }
+  for (let p = 3; p <= limit && m > 1n; p += 2) {
     const bp = BigInt(p);
     if (m % bp === 0n) {
       factors.push(bp);
       while (m % bp === 0n) m /= bp;
     }
-    // Skip evens after 2
-    if (p === 2) p = 1;
   }
   return factors;
 }
@@ -47,7 +51,16 @@ export function factorSmall(n: bigint, limit: number): bigint[] {
 export function factorPowers(n: bigint, limit: number): { prime: bigint; exp: number }[] {
   const result: { prime: bigint; exp: number }[] = [];
   let m = n;
-  for (let p = 2; p <= limit && m > 1n; p++) {
+  // Handle factor 2 separately, then iterate odd candidates only.
+  if (m % 2n === 0n) {
+    let exp = 0;
+    while (m % 2n === 0n) {
+      m /= 2n;
+      exp++;
+    }
+    result.push({ prime: 2n, exp });
+  }
+  for (let p = 3; p <= limit && m > 1n; p += 2) {
     const bp = BigInt(p);
     if (m % bp === 0n) {
       let exp = 0;
@@ -57,7 +70,6 @@ export function factorPowers(n: bigint, limit: number): { prime: bigint; exp: nu
       }
       result.push({ prime: bp, exp });
     }
-    if (p === 2) p = 1;
   }
   if (m > 1n) result.push({ prime: m, exp: 1 });
   return result;
