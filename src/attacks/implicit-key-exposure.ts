@@ -38,8 +38,7 @@ p &= \\gcd(\\text{leak} - a, n) \\qed
 \\textbf{References:} Common CTF pattern; based on Fermat's Little Theorem`,
   priority: 'high',
   applicableCheck: rsaNeeds.nALeak,
-  // eslint-disable-next-line @typescript-eslint/require-await
-  frontendCheck: async (vals: Record<string, string>) => {
+  frontendCheck: (vals: Record<string, string>) => {
     try {
       if (!vals.n || !vals.a || !vals.leak) return 'ERROR: Missing required input: n, a, or leak\nIMPLICIT_KEY_EXPOSURE=FAILED';
       const n = BigInt(vals.n);

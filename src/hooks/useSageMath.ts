@@ -138,7 +138,7 @@ function createSageMathExecutor() {
 
     const container = createOffscreenContainer();
     injectSageScript(container, code);
-    console.warn('[SageCell]', 'Script injected, container id:', container.id);
+    if (import.meta.env.DEV) console.warn('[SageCell]', 'Script injected, container id:', container.id);
 
     return new Promise<SageResult>((resolve) => {
       let resolved = false;
@@ -167,7 +167,7 @@ function createSageMathExecutor() {
       };
 
       const timeout = setTimeout(() => {
-        console.warn('[SageCell]', 'Timeout fired after', timeoutMs, 'ms');
+        if (import.meta.env.DEV) console.warn('[SageCell]', 'Timeout fired after', timeoutMs, 'ms');
         // Before finishing with timeout, check if error DOM elements exist
         const errorText = detectError(container);
         if (errorText) {
@@ -185,7 +185,7 @@ function createSageMathExecutor() {
         // Check for error indicators first (kernel crash, red error boxes)
         const errorText = detectError(container);
         if (errorText) {
-          console.warn('[SageCell]', 'Error element detected:', errorText);
+          if (import.meta.env.DEV) console.warn('[SageCell]', 'Error element detected:', errorText);
           finish({ success: false, stdout: '', error: errorText });
           return;
         }
@@ -195,7 +195,7 @@ function createSageMathExecutor() {
         if (stdoutDiv) {
           if (!hasSeenStdout) {
             hasSeenStdout = true;
-            console.warn('[SageCell]', 'stdout element detected');
+            if (import.meta.env.DEV) console.warn('[SageCell]', 'stdout element detected');
           }
 
           // Start polling stdout for completion markers (once)
@@ -245,14 +245,14 @@ function createSageMathExecutor() {
       signal?.addEventListener('abort', onAbort, { once: true });
 
       try {
-        console.warn('[SageCell]', 'Initializing SageCell...');
+        if (import.meta.env.DEV) console.warn('[SageCell]', 'Initializing SageCell...');
         window.sagecell.makeSagecell({
           inputLocation: `#${container.id}`,
           template: window.sagecell.templates.minimal,
           evalButtonText: 'Evaluate',
           autoeval: true,
           callback: () => {
-            console.warn('[SageCell]', 'SageCell evaluation queued');
+            if (import.meta.env.DEV) console.warn('[SageCell]', 'SageCell evaluation queued');
             // Startup detection: if no stdout or error after 10s, kernel likely failed to start
             kernelAliveTimer = setTimeout(() => {
               if (resolved) return;
@@ -260,17 +260,17 @@ function createSageMathExecutor() {
               if (!hasAnyOutput) {
                 const lateError = detectError(container);
                 if (lateError) {
-                  console.warn('[SageCell]', 'Kernel error via startup check:', lateError);
+                  if (import.meta.env.DEV) console.warn('[SageCell]', 'Kernel error via startup check:', lateError);
                   finish({ success: false, stdout: '', error: lateError });
                 } else {
-                  console.warn('[SageCell]', 'No output after 10s, kernel may have crashed');
+                  if (import.meta.env.DEV) console.warn('[SageCell]', 'No output after 10s, kernel may have crashed');
                   finish({ success: false, stdout: '', error: 'SageCell kernel produced no output after 10s. The kernel may have crashed during startup. Check your network connection and try again.' });
                 }
               }
             }, 10000);
           },
         });
-        console.warn('[SageCell]', 'SageCell initialized successfully');
+        if (import.meta.env.DEV) console.warn('[SageCell]', 'SageCell initialized successfully');
       } catch (err: unknown) {
         if (!resolved) {
           clearTimeout(timeout);
@@ -278,7 +278,7 @@ function createSageMathExecutor() {
           if (pollTimer) clearInterval(pollTimer);
           if (kernelAliveTimer) clearTimeout(kernelAliveTimer);
           const message = err instanceof Error ? err.message : 'Failed to execute Sage code';
-          console.warn('[SageCell]', 'makeSagecell threw:', message);
+          if (import.meta.env.DEV) console.warn('[SageCell]', 'makeSagecell threw:', message);
           finish({ success: false, stdout: '', error: message });
         }
       }

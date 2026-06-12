@@ -66,8 +66,7 @@ export const attack: Attack = {
       useGuard: true,
     });
   },
-  // eslint-disable-next-line @typescript-eslint/require-await
-  frontendCheck: async (vals: Record<string, string>) => {
+  frontendCheck: (vals: Record<string, string>) => {
     if (!vals.n || !vals.phi) return null;
     try {
       const n = BigInt(vals.n);

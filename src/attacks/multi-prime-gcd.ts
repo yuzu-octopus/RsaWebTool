@@ -40,8 +40,7 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{
 \\textbf{References:} N. Heninger, Z. Durumeric, E. Wustrow, J. A. Halderman, "Mining Your Ps and Qs", USENIX Security Symposium, 2012`,
   priority: 'high',
   applicableCheck: rsaNeeds.moduliList,
-  // eslint-disable-next-line @typescript-eslint/require-await
-  frontendCheck: async (vals: Record<string, string>) => {
+  frontendCheck: (vals: Record<string, string>) => {
     try {
       const raw = (vals.moduli_list || '').trim();
       if (!raw) return 'ERROR: Missing required input: moduli_list\nMULTI_PRIME_GCD=FAILED';

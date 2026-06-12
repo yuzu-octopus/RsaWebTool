@@ -15,8 +15,7 @@ export const attack: Attack = {
     { name: 'dp', label: 'dp (d mod p-1)', placeholder: 'Enter dp value...', multiline: true, rows: 3 },
     { name: 'dq', label: 'dq (d mod q-1, optional)', placeholder: 'Enter dq value...', required: false, multiline: true, rows: 3 },
   ],
-  // eslint-disable-next-line @typescript-eslint/require-await
-  frontendCheck: async (vals: Record<string, string>) => {
+  frontendCheck: (vals: Record<string, string>) => {
     try {
       const n = BigInt(vals.n);
       const e = BigInt(vals.e);

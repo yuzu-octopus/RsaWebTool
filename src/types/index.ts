@@ -14,6 +14,9 @@ export type AttackCategory = 'Factorization' | 'Partial Key / Lattice' | 'Messag
 
 export type CalculatorMode = 'rsa' | 'aes' | 'ecc' | 'hash' | 'dh';
 
+/** A value that may be either synchronous or wrapped in a Promise. */
+export type MaybePromise<T> = T | Promise<T>;
+
 export interface Attack {
   id: string;
   name: string;
@@ -25,7 +28,7 @@ export interface Attack {
   usageGuide?: string;
   priority: 'high' | 'medium' | 'low';
   applicableCheck: (params: Record<string, string>) => boolean;
-  frontendCheck?: (vals: Record<string, string>, onProgress?: (pct: number, detail?: string) => void) => Promise<string | null>;
+  frontendCheck?: (vals: Record<string, string>, onProgress?: (pct: number, detail?: string) => void) => MaybePromise<string | null>;
 }
 
 export interface HistoryEntry {

@@ -12,8 +12,7 @@ export const attack: Attack = {
   inputs: [
     { name: 'n_values', label: 'Moduli (one per line or comma-separated)', placeholder: 'n1\\nn2\\nn3...', multiline: true, rows: 5 },
   ],
-  // eslint-disable-next-line @typescript-eslint/require-await
-  frontendCheck: async (vals: Record<string, string>) => {
+  frontendCheck: (vals: Record<string, string>) => {
     try {
       const raw = (vals.n_values || '').trim();
       if (!raw) return 'ERROR: Missing required input: n_values (comma-separated moduli)\nBATCH_GCD=FAILED';

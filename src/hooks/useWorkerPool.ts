@@ -141,7 +141,9 @@ export function useWorkerPool(poolSize: number = env.workerPoolSize) {
             resolve(null);
             return;
           }
-          attack.frontendCheck(vals, onProgress).then(result => {
+          // frontendCheck may be sync or async (MaybePromise<string | null>);
+          // Promise.resolve() normalizes both cases to a Promise.
+          Promise.resolve(attack.frontendCheck(vals, onProgress)).then(result => {
             if (pending.has(id)) {
               pending.delete(id);
               resolve(result);

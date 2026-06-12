@@ -167,12 +167,10 @@ m &= \\sqrt[e]{M} \\quad \\text{(exact integer e-th root)}
 
 export const generateTestcase = (): Record<string, string> => {
   const kp = generateHastadBroadcastTestcase();
-  // frontendCheck parses each line as "c, n" by splitting on comma — pair each
-  // ciphertext with its modulus on the same line in the format the attack expects.
+  // frontendCheck only reads `ciphertexts` (newline-separated "c, n" pairs) and `e`.
+  // n1/n2/n3 are intentionally embedded inside `ciphertexts` rather than exported
+  // as separate top-level fields, since the input schema declares only `ciphertexts`.
   return {
-    n1: kp.n1.toString(),
-    n2: kp.n2.toString(),
-    n3: kp.n3.toString(),
     e: kp.e.toString(),
     ciphertexts: `${kp.c1}, ${kp.n1}\n${kp.c2}, ${kp.n2}\n${kp.c3}, ${kp.n3}`,
   };

@@ -36,8 +36,7 @@ The GCD extracts the shared prime directly — no factorization of either modulu
 \\textbf{References:} A. K. Lenstra et al., "Ron was wrong, Whit is right" (2012) — found 0.2\\% of RSA keys shared factors`,
   priority: 'high',
   applicableCheck: rsaNeeds.n1N2,
-  // eslint-disable-next-line @typescript-eslint/require-await
-  frontendCheck: async (vals: Record<string, string>) => {
+  frontendCheck: (vals: Record<string, string>) => {
     try {
       if (!vals.n1 || !vals.n2) return 'ERROR: Missing required input: n1 and n2\nCOMMON_PRIME_RSA=FAILED';
       const n1 = BigInt(vals.n1);
