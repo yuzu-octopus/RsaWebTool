@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback } from 'react';
-import { keyframes } from '@mui/material/styles';
 import {
   Box, Typography, TextField, Button, IconButton, Tooltip, LinearProgress, Collapse, FormControl,
   InputLabel, Select, MenuItem,
@@ -7,7 +6,7 @@ import {
 import { Stop, PlayArrow, HourglassEmpty, ContentCopy, ExpandMore, ExpandLess } from '@mui/icons-material';
 import { draculaColors } from '../../../theme/dracula';
 import { inputSx } from '../../../styles/inputSx';
-import { outputBoxSx, colorGhostBtn, MONO_FAMILY } from '../../../styles/shared';
+import { outputBoxSx, colorGhostBtn, hourglassSpin, MONO_FAMILY } from '../../../styles/shared';
 import { useWorkerPool } from '../../../hooks/useWorkerPool';
 import { ProgressEstimator } from '../../../utils/progressEstimator';
 import { useAppContext } from '../../../hooks/useAppContext';
@@ -19,14 +18,6 @@ const HASH_ALGORITHMS = [
   { value: 'SHA-1', label: 'SHA-1 (160-bit)' },
   { value: 'MD5', label: 'MD5 (128-bit)' },
 ];
-
-const hourglassSpin = keyframes`
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(180deg); }
-  50% { transform: rotate(180deg); }
-  75% { transform: rotate(360deg); }
-  100% { transform: rotate(360deg); }
-`;
 
 /** Default check function: require first 20 hex chars of hash to be '0' (80 leading bits). */
 const DEFAULT_CHECK_CODE = "return hash.startsWith('0'.repeat(20));";

@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useReducer } from 'react';
 import { Box, TextField, Button, Select, MenuItem, FormControl, InputLabel, Typography } from '@mui/material';
 import { PlayArrow } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
@@ -25,12 +25,13 @@ export function AESAttacksTab() {
   const [gcmPt1, setGcmPt1] = useState('');
   const [gcmCt2, setGcmCt2] = useState('');
   const [scheduleKey, setScheduleKey] = useState('');
-  const [running, setRunning] = useState(false);
+  const [loading, dispatchLoading] = useReducer((_s: boolean, action: 'start' | 'stop') => action === 'start', false);
+  const isRunning = loading;
   const out = useCalculatorOutput({ category: 'calculator-aes' });
 
   const run = useCallback(() => {
     out.clear();
-    setRunning(true);
+    dispatchLoading('start');
     try {
       switch (attack) {
         case 'ctr-nonce': {
@@ -132,7 +133,7 @@ export function AESAttacksTab() {
     } catch (e) {
       out.dispatchError(e instanceof Error ? e.message : String(e));
     } finally {
-      setRunning(false);
+      dispatchLoading('stop');
     }
   }, [attack, ct1, ct2, knownPt, ivHex, blockIdx, targetText, currentPtHex, cts, gcmCt1, gcmPt1, gcmCt2, scheduleKey, out]);
 
@@ -200,7 +201,7 @@ export function AESAttacksTab() {
         variant="contained"
         startIcon={<PlayArrow />}
         onClick={() => { void run(); }}
-        disabled={running}
+        disabled={isRunning}
         fullWidth
         sx={primaryBtnSx}
       >

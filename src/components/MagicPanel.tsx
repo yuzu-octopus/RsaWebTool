@@ -12,7 +12,6 @@ import {
   Collapse,
   LinearProgress,
 } from '@mui/material';
-import { keyframes } from '@mui/material/styles';
 import { AutoFixHigh, Science, CheckCircle, Cancel, HourglassEmpty, SkipNext, Stop, ExpandMore, ExpandLess, Casino, ContentCopy } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
@@ -20,18 +19,10 @@ import { useMagicExecution, type MagicJob } from '../hooks/useMagicExecution';
 import { attacks } from '../attacks';
 import { detectFormat, parsePEM } from '../utils/converters';
 import { inputSx } from '../styles/inputSx';
-import { colFlexSx, centeredPanelSx, colorGhostBtn, MONO_FAMILY } from '../styles/shared';
+import { colFlexSx, centeredPanelSx, colorGhostBtn, hourglassSpin, MONO_FAMILY } from '../styles/shared';
 import type { Attack } from '../types';
 
 const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
-
-const hourglassSpin = keyframes`
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(180deg); }
-  50% { transform: rotate(180deg); }
-  75% { transform: rotate(360deg); }
-  100% { transform: rotate(360deg); }
-`;
 
 // Categorized parameter names for key=value extraction
 const kvParamNames = [

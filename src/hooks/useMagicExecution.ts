@@ -98,11 +98,13 @@ export function useMagicExecution(
 
   const [displayedPct, setDisplayedPct] = useState(0);
   const displayedPctRef = useRef(0);
+  const rafIdRef = useRef<number | null>(null);
 
-  // Cleanup testcase timer on unmount
+  // Cleanup testcase timer + any pending rAF on unmount
   useEffect(() => {
     return () => {
       if (testcaseTimerRef.current) clearTimeout(testcaseTimerRef.current);
+      if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
     };
   }, []);
 
@@ -110,7 +112,14 @@ export function useMagicExecution(
   useEffect(() => {
     const actualPct = jobs.length > 0 ? (jobs.filter(j => j.status !== 'running').length / jobs.length) * 100 : 0;
     if (actualPct !== displayedPctRef.current) {
-      const rafId = requestAnimationFrame(() => {
+      // Cancel any previously scheduled rAF before scheduling a new one, to
+      // avoid a multi-rAF window where stale frames can run after jobs change.
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+      rafIdRef.current = requestAnimationFrame(() => {
+        rafIdRef.current = null;
         const current = displayedPctRef.current;
         const diff = actualPct - current;
         if (Math.abs(diff) < 1) {
@@ -121,7 +130,12 @@ export function useMagicExecution(
           setDisplayedPct(displayedPctRef.current);
         }
       });
-      return () => cancelAnimationFrame(rafId);
+      return () => {
+        if (rafIdRef.current !== null) {
+          cancelAnimationFrame(rafIdRef.current);
+          rafIdRef.current = null;
+        }
+      };
     }
   }, [jobs]);
 
