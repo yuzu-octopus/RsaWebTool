@@ -196,3 +196,67 @@ export function generatePhiLeakTestcase(): { n: bigint; phi: bigint; p: bigint; 
   if (d === null) throw new Error('modInverse failed');
   return { p, q, n, phi, e, d };
 }
+
+
+/**
+ * Generate a small-d testcase: d < bound (default 10100).
+ * This is NOT Wiener-vulnerable (Wiener requires d < n^0.25 which is much larger).
+ * It's specifically for attacks that need a very small d so k = (ed-1)/phi
+ * is reachable within a small kBound (e.g. partial-d key exposure).
+ */
+export function generateSmallDTestcase(bound: bigint = 10100n): RSAKeyPair {
+  const p = randomPrime(TESTCASE_BITS.p);
+  const q = randomPrime(TESTCASE_BITS.q);
+  const phi = (p - 1n) * (q - 1n);
+  // Pick small d in [100, bound] and derive e from it
+  let d = 100n + BigInt(Math.floor(Math.random() * Number(bound - 100n)));
+  while (modInverse(d, phi) === null) {
+    d += 1n;
+  }
+  const e = modInverse(d, phi)!;
+  const n = p * q;
+  return { p, q, n, e, d, phi };
+}
+
+/**
+ * Generate a Pollard-vulnerable testcase: p is a B-smooth prime (p-1 has only
+ * small factors) so Pollard's p-1 algorithm can find it in O(B) steps.
+ * Returns {n, p, q} — attacks use the public n and recover p, q.
+ */
+export function generatePollardTestcase(): { n: bigint; p: bigint; q: bigint } {
+  // S = product of first 11 primes ≈ 2^37. p-1 must be a multiple of S
+  // (i.e. p ≡ 1 mod S) for Pollard p-1 to find p in O(B) steps.
+  const smallPrimes = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n];
+  let S = 1n;
+  for (const pr of smallPrimes) S *= pr;
+  // Search p = S*t + 1 at TESTCASE_BITS size, checking primality
+  let p: bigint;
+  let attempts = 0;
+  while (true) {
+    if (attempts++ > 10000) throw new Error('Failed to find B-smooth prime');
+    // Random t at TESTCASE_BITS size, then p = S*t + 1
+    const tBits = TESTCASE_BITS.p - 37; // S is ~37 bits
+    const t = randomPrime(Math.max(tBits, 64));
+    p = S * t + 1n;
+    if (p.toString(2).length === TESTCASE_BITS.p && isPrimeMR(p)) break;
+  }
+  const q = randomPrime(TESTCASE_BITS.q);
+  return { n: p * q, p, q };
+}
+
+/**
+ * Generate a generic semiprime testcase: n = p * q with both primes
+ * of TESTCASE_BITS size. Used by factoring attacks that don't need a
+ * specific edge case (Euler, SQUFOF, quadratic sieve, ECM, etc.).
+ * Returns full RSAKeyPair so attacks that also encrypt a message can do so.
+ */
+export function generateSemiprimeTestcase(): RSAKeyPair {
+  const p = randomPrime(TESTCASE_BITS.p);
+  const q = randomPrime(TESTCASE_BITS.q);
+  const n = p * q;
+  const phi = (p - 1n) * (q - 1n);
+  const e = 65537n;
+  const d = modInverse(e, phi);
+  if (d === null) throw new Error('modInverse failed for semiprime');
+  return { p, q, n, e, d, phi };
+}
