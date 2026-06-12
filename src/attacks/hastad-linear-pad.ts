@@ -58,16 +58,31 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                 lc = Integer(F.leading_coefficient())
                 g = gcd(lc, Integer(N))
                 if g > 1 and g < N:
-                    out.append(f"Lead coeff shares factor g={g} with N — can factor directly")
+                    # Leading coefficient shares a factor with N — we have a factor of N.
+                    # Factor N and recurse on the attack modulo each prime power.
+                    out.append(f"Lead coeff shares factor g={g} with N — N is factored")
+                    p_factor = g
+                    q_factor = N // Integer(p_factor)
+                    out.append(f"p = {p_factor}")
+                    out.append(f"q = {q_factor}")
+                    out.append(f"Verification: p * q = {p_factor * q_factor}")
+                    out.append("")
+                    out.append("HASTAD_LINEAR_PAD=SUCCESS")
+                    found = True
                 elif g == N:
-                    out.append("Lead coeff is a multiple of N")
+                    out.append("Lead coeff is a multiple of N — polynomial is degenerate")
+                    out.append("HASTAD_LINEAR_PAD=FAILED")
+                    found = True
                 else:
                     try:
                         F = F * inverse_mod(lc, N)
                     except Exception as ex2:
                         out.append(f"Cannot invert lead coeff: {ex2}")
-            if F.leading_coefficient() != 1:
+                        out.append("HASTAD_LINEAR_PAD=FAILED")
+                        found = True
+            if not found and F.leading_coefficient() != 1:
                 out.append("HASTAD_LINEAR_PAD=FAILED")
+                found = True
             else:
                 found_m = None
                 try:

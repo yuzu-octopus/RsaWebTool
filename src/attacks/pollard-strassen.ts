@@ -92,11 +92,22 @@ Compute each $P_i$ incrementally and take $\\gcd(P_i, n)$. When a match is found
 export const generateTestcase = (): Record<string, string> => {
   // Strassen's Sage template caps c = n^(1/4) at 50000 (n <= 62 bit)
   // Use p=16, q=46 so n ≈ 62-bit, c ≈ 46000, safe under the 50000 cap
-  let p: bigint, q: bigint, n: bigint;
-  do {
+  let p: bigint | undefined;
+  let q: bigint | undefined;
+  for (let attempt = 0; attempt < 100; attempt++) {
+    const pTry = randomPrime(16);
+    const qTry = randomPrime(46);
+    const nTry = pTry * qTry;
+    if (Math.pow(Number(nTry), 0.25) <= 49900) {
+      p = pTry;
+      q = qTry;
+      break;
+    }
+  }
+  // Fallback: should not trigger with p=16, q=46 (n always < 2^62, c always < 50000)
+  if (p === undefined || q === undefined) {
     p = randomPrime(16);
     q = randomPrime(46);
-    n = p * q;
-  } while (Number(n) >= 0 && Math.pow(Number(n), 0.25) > 49900);
+  }
   return { n: (p * q).toString() };
 };

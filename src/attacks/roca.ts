@@ -49,9 +49,11 @@ export const attack: Attack = {
             try:
                 c = discrete_log(n_mod_M, g)
                 detected = True
-            except (ValueError, TypeError, ArithmeticError):
+            except Exception:
+                detected = False
+            if not detected:
                 out.append("ROCA=FAILED")
-            if detected:
+            else:
                 out.append("ROCA VULNERABILITY DETECTED")
                 # Compute max M' dividing M_val where ord_{65537}(M') divides ord_
                 def _cmm(M_val, ord_):

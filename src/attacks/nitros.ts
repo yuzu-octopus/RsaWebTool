@@ -108,7 +108,29 @@ export const attack: Attack = {
                     for r_candidate in list(candidates)[:MAX_COPPER]:
                         f = M*x + r_candidate
                         f_mod = f.change_ring(Zmod(n))
-                        f_monic = f_mod.monic()
+                        # Check gcd(M, n) before monic() — M is a primorial, so
+                        # if any small prime divides n, monic() will fail.
+                        g_Mn = gcd(Integer(M), Integer(n))
+                        if 1 < g_Mn < n:
+                            # We have a factor of n — report directly.
+                            p_candidate = int(g_Mn)
+                            q = n // p_candidate
+                            out.append(f"p = {p_candidate}")
+                            out.append(f"q = {q}")
+                            out.append(f"Verification: p * q = {p_candidate * q}")
+                            out.append("")
+                            out.append("NITROS=SUCCESS")
+                            found = True
+                            factored = True
+                            break
+                        try:
+                            f_monic = f_mod.monic()
+                        except (ZeroDivisionError, ValueError, TypeError):
+                            # monic() failed — leading coefficient shares factor with n.
+                            # We've already checked gcd(M, n) above, so this branch
+                            # means the issue is with n's structure; fall through to
+                            # brute-force fallback below.
+                            continue
                         roots = f_monic.small_roots(X=bound, beta=0.5, epsilon=0.05)
                         if roots:
                             k = int(roots[0])

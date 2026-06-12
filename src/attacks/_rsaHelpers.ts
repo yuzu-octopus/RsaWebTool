@@ -60,9 +60,12 @@ export const rsaNeeds = {
 /**
  * No-op sageTemplate for pure-TypeScript attacks (frontendCheck only).
  * Returns a clear message if ever triggered, explaining the attack is browser-only.
+ * Accepts (and ignores) the standard sageTemplate vals arg, plus an optional token
+ * to include in the marker line. Callers should use the wrapper form so the token
+ * is substituted in the message body (the literal `TOKEN` is never reached).
  */
-export const noopSageTemplate = (): string =>
-  'This attack runs entirely in the browser via frontendCheck. No SageMath execution is needed.\n\nSee the proof panel for the algorithm and the result panel for the computed output.\n\nTOKEN=NOT_APPLICABLE';
+export const noopSageTemplate = (token: string = 'ATTACK'): string =>
+  `This attack runs entirely in the browser via frontendCheck. No SageMath execution is needed.\n\nSee the proof panel for the algorithm and the result panel for the computed output.\n\n${token}=NOT_APPLICABLE`;
 
 /**
  * Helper to add the no-op sageTemplate to an attack object.

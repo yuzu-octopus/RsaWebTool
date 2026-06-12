@@ -6,7 +6,7 @@ import { gcd } from '../utils/bigint';
 export const attack: Attack = {
   // This attack runs entirely in the browser via frontendCheck — no SageMath needed.
   // The sageTemplate is a no-op that returns a clear message if ever triggered.
-  sageTemplate: noopSageTemplate,
+  sageTemplate: (_vals) => noopSageTemplate('MULTI_PRIME_GCD'),
   id: 'multi-prime-gcd',
   name: 'Multi-Prime GCD',
   category: 'Factorization',

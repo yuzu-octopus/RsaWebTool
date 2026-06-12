@@ -4,7 +4,7 @@ import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd } from '../utils/bigint';
 
 export const attack: Attack = {
-  sageTemplate: noopSageTemplate,
+  sageTemplate: (_vals) => noopSageTemplate('BATCH_GCD'),
   id: 'batch-gcd',
   name: 'Batch GCD',
   category: 'Factorization',

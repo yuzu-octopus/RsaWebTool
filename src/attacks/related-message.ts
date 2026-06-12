@@ -67,32 +67,40 @@ export const attack: Attack = {
             f1 = (a1 * x + b1)**e - c1
             f2 = (a2 * x + b2)**e - c2
             def poly_gcd(p, q):
+                # Poly GCD over composite modulus n: when leading coefficient shares
+                # a factor with n, the `%` operator is not well-defined. Detect and
+                # return None to signal failure (caller falls through to e=3 closed-form).
                 while q != 0:
                     try:
                         p, q = q, p % q
-                    except (ZeroDivisionError, ValueError, TypeError):
+                    except (ZeroDivisionError, ValueError, TypeError, NotImplementedError):
                         lc = q.leading_coefficient()
                         g = gcd(Integer(lc), Integer(n))
                         if 1 < g < n:
                             out.append(f"GCD found factor of n: {g}")
-                        break
+                        return None
                 return p
             g = poly_gcd(f1, f2)
-            out.append(f"GCD degree: {g.degree()}")
+            if g is None:
+                out.append("Polynomial GCD failed (composite-modulus non-Euclidean behavior).")
+                out.append("Try the e=3 closed-form fallback below.")
+            else:
+                out.append(f"GCD degree: {g.degree()}")
             m_int = None
-            if g.degree() == 1:
-                a_coeff = Integer(g[1])
-                b_coeff = Integer(g[0])
-                try:
-                    m_int = Integer((-b_coeff) * inverse_mod(a_coeff, n) % n)
-                except (ZeroDivisionError, ValueError):
+            if g is not None:
+                if g.degree() == 1:
+                    a_coeff = Integer(g[1])
+                    b_coeff = Integer(g[0])
+                    try:
+                        m_int = Integer((-b_coeff) * inverse_mod(a_coeff, n) % n)
+                    except (ZeroDivisionError, ValueError):
+                        for r, _ in g.roots():
+                            m_int = Integer(r)
+                            break
+                elif g.degree() > 1:
                     for r, _ in g.roots():
                         m_int = Integer(r)
                         break
-            elif g.degree() > 1:
-                for r, _ in g.roots():
-                    m_int = Integer(r)
-                    break
             if m_int is None and e == 3:
                 out.append("Trying e=3 closed-form fallback...")
                 A = (3 * (a1**3 * a2**2 * b2 - a2**3 * a1**2 * b1)) % n

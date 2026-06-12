@@ -175,8 +175,10 @@ export const attack: Attack = {
         }
       }
 
-      // Verify
-      for (let mVal = a; mVal <= b && mVal < a + 100n; mVal++) {
+      // Verify — scan the full interval up to a 10K cap (interval width can exceed 100 for short oracle responses)
+      const verifyCap = 10000n;
+      const upper = b < a + verifyCap ? b : a + verifyCap;
+      for (let mVal = a; mVal <= upper; mVal++) {
         if (modPow(mVal, e, n) === c) {
           return Promise.resolve(`Bleichenbacher PKCS#1 v1.5\nn = ${n}\ne = ${e}\nc = ${c}\noracle_responses = ${responses.length}\n\nResults:\nm = ${mVal}\n\nVerification: m^e mod n = ${modPow(mVal, e, n)}\n\nBLEICHENBACHER=SUCCESS`);
         }

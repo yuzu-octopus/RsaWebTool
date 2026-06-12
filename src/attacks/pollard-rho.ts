@@ -100,8 +100,8 @@ export const attack: Attack = {
         let iter = 0;
         while (g === 1n && iter < maxIter) {
           x = y;
-          let count = 0;
-          while (count < Number(r) && iter < maxIter) {
+          let count = 0n;
+          while (count < r && iter < maxIter) {
             y = (y * y + c_i) % n_i;
             iter++;
             count++;
