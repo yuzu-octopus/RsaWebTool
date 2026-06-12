@@ -10,7 +10,7 @@ import gcdFn from 'bigint-gcd';
 export function parseHex(s: string): bigint {
   const clean = s.trim().replace(/\s/g, '');
   if (!clean || clean === '0x' || clean === '0X') return 0n;
-  return BigInt(clean.startsWith('0x') ? clean : '0x' + clean);
+  return BigInt(clean.toLowerCase().startsWith('0x') ? clean : '0x' + clean);
 }
 
 /**

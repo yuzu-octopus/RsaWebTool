@@ -14,6 +14,7 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc -b --noEmit",
     "preview": "vite preview",
+    "test:unit": "bun test src/utils/__tests__/",
     "test:attacks": "bun scripts/test-attacks.ts",
     "test:attacks:fail": "bun scripts/test-attacks.ts -- --fail",
     "test:attacks:json": "bun scripts/test-attacks.ts -- --json",
