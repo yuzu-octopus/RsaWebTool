@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
 
@@ -114,7 +115,7 @@ p &= p_{\\text{msb}} + x_0,\\quad q = n/p \\qed
 
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", Eurocrypt 1996; A. May, "Using Coppersmith's Method to Attack RSA", 2009`,
   priority: 'high',
-  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.p_msb,
+  applicableCheck: rsaNeeds.nPmsb,
 };
 
 export const generateTestcase = (): Record<string, string> => {

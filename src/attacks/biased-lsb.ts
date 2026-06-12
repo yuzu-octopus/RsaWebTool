@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
@@ -165,7 +166,7 @@ m &= \\left\\lceil \\frac{q \\cdot n}{2^k} \\right\\rceil \\quad \\text{(verify 
 \\textbf{References:} S. Goldwasser, S. Micali, "Probabilistic Encryption", JCSS 1984; J. Håstad et al., "A Pseudorandom Generator from any One-Way Function", SIAM J. Comp. 1999`,
   usageGuide: 'This attack is for when your LSB oracle is noisy \u2014 instead of a single correct bit per query, you have multiple responses and use majority voting.\n\nHow to use:\n1. Query the oracle multiple times per blinding value to get multiple response strings\n2. Provide n, e, c, and oracle_runs \u2014 one response per line, each line being comma-separated 0/1 bits\n3. The attack uses majority voting per bit position, then accumulates voted bits into binary fraction m/n\n4. The final m is computed as ceil(q * n / 2^k) where q is the accumulated voted bits\n\nTip: More runs per position increases accuracy. With 31 runs and 90% accuracy per bit, majority voting gives >99.9% confidence per bit position after 31 runs.',
   priority: 'low',
-  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_runs,
+  applicableCheck: rsaNeeds.nEOracleRuns,
 };
 
 export const generateTestcase = (): Record<string, string> => {

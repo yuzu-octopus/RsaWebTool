@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { modPow, iroot } from '../utils/bigint';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
@@ -224,7 +225,7 @@ Feasible for $k \\leq 24$ (approx. 16 million modular exponentiations in the bro
 
 \\textbf{References:} D. Coppersmith, 1997; May, "Attacks on RSA with Small Parameters," 2003`,
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!(p.n && p.c),
+  applicableCheck: rsaNeeds.nEC,
 };
 
 export const generateTestcase = (): Record<string, string> => {

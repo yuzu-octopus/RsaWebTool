@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
@@ -77,7 +78,7 @@ If the binary convolution of $p$ and $q$ produces no carries, then $f_{pq}(x) = 
 
 \\textbf{References:} Coppersmith, "Finding a Small Root of a Univariate Modular Equation", 1996; von zur Gathen & Gerhard, "Modern Computer Algebra", Chapter 5`,
   priority: 'low',
-  applicableCheck: (p: Record<string, string>) => !!p.n,
+  applicableCheck: rsaNeeds.n,
 };
 
 // Pre-computed no-carry products: polynomials f(x) = p(x)·q(x) where binary

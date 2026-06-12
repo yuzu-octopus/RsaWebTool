@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
 import { iroot } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
@@ -206,7 +207,7 @@ m^e &= c + k \\cdot n \\quad\\text{for some } k \\in \\mathbb{Z}_{\\geq 0} \\\\
 \\textbf{References:} D. Boneh et al., "Twenty Years of Attacks on the RSA Cryptosystem", Notices AMS 1999`,
   usageGuide: 'Recovers plaintext m by iterating k and checking whether c + k·n is an exact e-th power.\n\nHow to use:\n1. Provide n (modulus), e (small public exponent, default 3), and c (ciphertext)\n2. Optionally set a custom k_bound (default 100000) to limit the search space\n3. The attack searches k = 0, 1, ..., k_bound for c + k·n that yields an exact e-th root\n\nOptimizations: Modular residue pre-filter (for e ≤ 100) skips ~67% of candidates for e=3 by checking if c+k·n is a perfect cube mod 9 before attempting the e-th root. Warm-start Newton uses the previous k\'s root as seed for the next k\'s root computation, avoiding restarting Newton from scratch.\n\nTips: This attack works best for e ≤ 17 where k_bound is small and the pre-filter is most effective. For e > 1000, the attack delegates to Sage. Use the frontendCheck for instant e=3 results.',
   priority: 'high',
-  applicableCheck: (p: Record<string, string>) => !!(p.n && p.e && p.c),
+  applicableCheck: rsaNeeds.nEC,
 };
 
 export const generateTestcase = (): Record<string, string> => {

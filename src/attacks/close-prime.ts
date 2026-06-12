@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { isqrt } from '../utils/bigint';
 import { randomPrime, isPrimeMR } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
@@ -164,7 +165,7 @@ a_i^2 - n \\text{ is square} &\\implies p = a_i - b_i,\\; q = a_i + b_i \\\\
 
 \\textbf{References:} Fermat (1643); C. L\\"ondahl, "Finding Close-Prime Factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)`,
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.n,
+  applicableCheck: rsaNeeds.n,
 };
 
 export const generateTestcase = (): Record<string, string> => {

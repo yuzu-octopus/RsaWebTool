@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime } from '../utils/testcases/core';
 import { modPow, iroot } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
@@ -160,7 +161,7 @@ m &= m_1 - r_1 = m_2 - r_2
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Bivariate Integer Equation", J. Cryptology, 1997; D. Boneh, "Twenty Years of Attacks on RSA", 1999`,
   usageGuide: 'Recovers small messages via integer e-th root (degenerate case where m^e < n). NOT the full Coppersmith lattice attack.\n\nHow to use:\n1. You have two ciphertexts c1, c2 of the same plaintext m with small pads r1, r2\n2. The pads are small (|r1|, |r2| < n^(1/e)) so m^e < n (no modular wrap-around)\n3. Provide n, e, c1, c2\n4. The attack uses integer e-th root to recover the messages and pads\n\nTip: Works best with e=3 and small messages. For convenience, paste into Magic Mode which auto-detects.',
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c1 && !!p.c2,
+  applicableCheck: rsaNeeds.nEC1C2,
 };
 
 export const generateTestcase = (): Record<string, string> => {

@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
 
@@ -84,7 +85,7 @@ p_i &\\approx n^{1/k} \\text{ (each prime is smaller than in 2-prime RSA)} \\\\
 
 \\textbf{References:} G. J. Simmons and M. J. Norris, "Preliminary Comments on the MIT Public Key Cryptosystem", Cryptologia, 1976; D. Boneh, "Twenty Years of Attacks on RSA", Notices of the AMS, 1999`,
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.n,
+  applicableCheck: rsaNeeds.n,
 };
 
 export const generateTestcase = (): Record<string, string> => {

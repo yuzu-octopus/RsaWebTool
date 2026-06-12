@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd, modInverse, modPow } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
@@ -268,7 +269,7 @@ m &= -g[0] \\cdot g[1]^{-1} \\pmod{n}
 \\textbf{References:} Franklin & Reiter, 1996; Boneh, "Twenty Years of Attacks on RSA," 1999`,
   usageGuide: 'This attack recovers m when two ciphertexts of the SAME message under different linear transforms are encrypted with the same public key.\n\nHow to use:\n1. You have two ciphertexts c1, c2 encrypted under the same (n, e)\n2. The plaintexts are: m1 = a1*m + b1, m2 = a2*m + b2 for known a1,b1,a2,b2\n3. Provide n, e, c1, c2, a1, b1, a2, and b2\n4. The attack computes gcd((a1*x+b1)^e - c1, (a2*x+b2)^e - c2) to recover m\n\nDefaults: a1=1, b1=0 (standard Franklin-Reiter where c1 = m^e)\n\nTip: The attack requires e = 3 for reliable algebraic recovery in the browser; e = 5 or higher uses SageMathCell (may timeout). If a1 shares a factor with n, the attack immediately factors n. For convenience, paste into Magic Mode which auto-detects the parameters.',
   priority: 'high',
-  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.c1 && !!p.c2,
+  applicableCheck: rsaNeeds.nC1C2,
 };
 
 export const generateTestcase = (): Record<string, string> => {

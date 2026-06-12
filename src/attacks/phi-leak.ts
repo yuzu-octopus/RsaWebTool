@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { isqrt } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
@@ -128,7 +129,7 @@ p, q &= \\frac{s \\pm \\sqrt{\\Delta}}{2} \\qed
 
 \\textbf{References:} Rivest, Shamir, Adleman, "A Method for Obtaining Digital Signatures and Public-Key Cryptosystems", 1978; Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2`,
   priority: 'high',
-  applicableCheck: (p: Record<string, string>) => !!p.n,
+  applicableCheck: rsaNeeds.n,
 };
 
 export const generateTestcase = (): Record<string, string> => {

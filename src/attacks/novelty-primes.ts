@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
 
@@ -124,7 +125,7 @@ n \\bmod (2^k + \\delta) = 0 &\\implies p = 2^k + \\delta,\\; q = n/p \\\\
 
 \\textbf{References:} Cryptopals; Cryptohack.org; various CTF writeups`,
   priority: 'low',
-  applicableCheck: (p: Record<string, string>) => !!p.n,
+  applicableCheck: rsaNeeds.n,
 };
 
 export const generateTestcase = (): Record<string, string> => {

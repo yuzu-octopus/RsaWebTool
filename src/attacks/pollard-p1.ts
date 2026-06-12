@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { wrapSageTemplate } from './guard';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd, modPow } from '../utils/bigint';
@@ -202,7 +203,7 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
     }
   },
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.n,
+  applicableCheck: rsaNeeds.n,
 };
 
 export const generateTestcase = (): Record<string, string> => {

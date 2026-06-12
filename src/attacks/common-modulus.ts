@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
 import { gcd, extendedGcd, modPow, modInverse } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
@@ -121,7 +122,7 @@ When $a < 0$, compute $c_1^a = (c_1^{-1})^{|a|} \\pmod{n}$. Same for $b < 0$.
 
 \\textbf{References:} Simmons & Norris, 1977; Boneh, "Twenty Years of Attacks on RSA," 1999`,
   priority: 'high',
-  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e1 && !!p.e2 && !!p.c1 && !!p.c2,
+  applicableCheck: rsaNeeds.nE1E2C1C2,
 };
 
 export const generateTestcase = (): Record<string, string> => {

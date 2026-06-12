@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { gcd } from '../utils/bigint';
 import { randomPrime } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
@@ -169,7 +170,7 @@ p &\\mid (x_i - x_j) \\\\
 
 \\textbf{References:} J. M. Pollard, "A Monte Carlo Method for Factorization", BIT 1975; R. P. Brent, "An Improved Monte Carlo Factorization Algorithm", BIT 1980`,
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.n,
+  applicableCheck: rsaNeeds.n,
 };
 
 export const generateTestcase = (): Record<string, string> => {

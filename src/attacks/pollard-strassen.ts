@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
 
@@ -85,7 +86,7 @@ Compute each $P_i$ incrementally and take $\\gcd(P_i, n)$. When a match is found
 
 \\textbf{References:} Strassen, 1977; Pollard, 1974`,
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.n,
+  applicableCheck: rsaNeeds.n,
 };
 
 export const generateTestcase = (): Record<string, string> => {

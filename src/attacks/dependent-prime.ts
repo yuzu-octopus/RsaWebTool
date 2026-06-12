@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { modInverse, isqrt } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
@@ -114,7 +115,7 @@ p &= \\frac{-1 + \\sqrt{1 + 4kne}}{2k} \\\\
 \\textbf{References:} Custom CTF construction; related to Nitaj's constrained prime analysis`,
   usageGuide: 'This attack factors n when q is derived from p through a modular relationship: q·e ≡ 1 (mod p).\n\nHow to use:\n1. You have n and e, and know that q is computed as q = e^(-1) mod p\n2. Provide n and e\n3. The attack solves the equation k*p^2 + p - n*e = 0 to recover p\n\nTip: This key generation pattern occurs in some embedded RSA implementations where q is derived from p to speed up CRT operations.',
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e,
+  applicableCheck: rsaNeeds.nE,
 };
 
 export const generateTestcase = (): Record<string, string> => {

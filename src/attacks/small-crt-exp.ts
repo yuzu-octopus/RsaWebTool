@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd, modPow } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
@@ -161,7 +162,7 @@ export const attack: Attack = {
 \\textbf{References:} Boneh \\textit{et al.}, "Cryptanalysis of RSA with Small CRT Exponents", CRYPTO 1998; Cohn & Heninger, ePrint 2011/436`,
    usageGuide: 'This attack recovers the private key when either dp or dq (the CRT exponents) is small.\n\nHow to use:\n1. You have n, e, and know that dp (d mod p-1) is small (< bound)\n2. The attack uses Fermat\'s Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p\n3. A batched GCD approach (product tree) accelerates the linear scan ~5000x by reducing gcd calls via product accumulation\n4. Provide n, e, and optionally bound         (max dp to try, default 5000000)\n\nTip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 5000000 runs in ~900ms for 1024-bit n.',
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e,
+  applicableCheck: rsaNeeds.nE,
 };
 
 export const generateTestcase = (): Record<string, string> => {

@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
 
@@ -157,7 +158,7 @@ The algorithm searches the forward cycle for a square $c_i$, then starts a rever
 
 \\textbf{References:} Shanks, 1975; Gower & Wagstaff, Math. Comp., 2008`,
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.n,
+  applicableCheck: rsaNeeds.n,
 };
 
 export const generateTestcase = (): Record<string, string> => {

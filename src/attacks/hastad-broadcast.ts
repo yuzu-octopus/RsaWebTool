@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 import { modPow, modInverse, iroot, gcd } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
@@ -161,7 +162,7 @@ m &= \\sqrt[e]{M} \\quad \\text{(exact integer e-th root)}
 \\textbf{References:} J. Hastad, "Solving Low-Exponent RSA," Eurocrypt 1988`,
   usageGuide: 'This attack recovers m when the same plaintext is encrypted with the same small exponent e to e different moduli.\n\nHow to use:\n1. Collect e ciphertext/modulus pairs: (c1, n1), (c2, n2), ..., (ce, ne)\n2. Paste them into the ciphertexts field, one per line: c, n\n3. Set e to the public exponent (usually 3)\n4. The attack uses CRT to combine the ciphertexts and takes the integer e-th root\n\nInput format:\nc1, n1\nc2, n2\nc3, n3\n\nTip: For convenience, paste this into Magic Mode which auto-detects the format. Works when m^e < n1*n2*...*ne.',
   priority: 'high',
-  applicableCheck: (p: Record<string, string>) => !!p.e && !!p.ciphertexts,
+  applicableCheck: rsaNeeds.nECiphertexts,
 };
 
 export const generateTestcase = (): Record<string, string> => {

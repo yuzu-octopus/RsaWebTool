@@ -16,6 +16,28 @@ export const rsaNeeds = {
   nDP: (p: Record<string, string>) => !!p.n && !!p.dp,
   nDQ: (p: Record<string, string>) => !!p.n && !!p.dq,
   n1N2: (p: Record<string, string>) => !!p.n1 && !!p.n2,
+  // ─── Multi-key patterns ──────────────────────────────────────────────────
+  nE1E2C1C2: (p: Record<string, string>) => !!p.n && !!p.e1 && !!p.e2 && !!p.c1 && !!p.c2,
+  nEC1C2: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c1 && !!p.c2,
+  nC1C2: (p: Record<string, string>) => !!p.n && !!p.c1 && !!p.c2,
+  // ─── Oracle-based patterns ──────────────────────────────────────────────
+  nECOracleResponses: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_responses,
+  nEOracleRuns: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_runs,
+  nETargetMOraclePairs: (p: Record<string, string>) => !!p.n && !!p.e && !!p.target_m && !!p.oracle_pairs,
+  // ─── Signature-based patterns ───────────────────────────────────────────
+  nEMSigFaulty: (p: Record<string, string>) => !!p.n && !!p.e && !!p.m && !!p.sig_faulty,
+  nHashHex: (p: Record<string, string>) => !!p.n && !!p.hash_hex,
+  // ─── Partial-key patterns ───────────────────────────────────────────────
+  nEDLow: (p: Record<string, string>) => !!p.n && !!p.e && !!p.dLow,
+  nEK: (p: Record<string, string>) => !!p.n && !!p.k,
+  nPmsb: (p: Record<string, string>) => !!p.n && !!p.p_msb,
+  nNearp: (p: Record<string, string>) => !!p.n && !!p.nearp,
+  nKnownBitsBitPos: (p: Record<string, string>) => !!p.n && !!p.knownBits && !!p.bitPosition,
+  nDpDq: (p: Record<string, string>) => !!p.n && !!p.e && (!!p.dp || !!p.dq),
+  // ─── Other patterns ─────────────────────────────────────────────────────
+  nECiphertexts: (p: Record<string, string>) => !!p.e && !!p.ciphertexts,
+  triplesE: (p: Record<string, string>) => !!p.triples && !!p.e,
+  nValues: (p: Record<string, string>) => !!p.n_values,
   nALeak: (p: Record<string, string>) => !!p.n && !!p.a && !!p.leak,
   moduliList: (p: Record<string, string>) => {
     const vals = (p.moduli_list || '').trim();

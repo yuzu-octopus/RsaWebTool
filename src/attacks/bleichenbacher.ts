@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
@@ -207,7 +208,7 @@ b - a \\to 0 &\\implies m = a \\qed
 \\textbf{References:} D. Bleichenbacher, "Chosen Ciphertext Attacks Against Protocols Based on the RSA Encryption Standard PKCS#1", CRYPTO 1998`,
   usageGuide: 'This requires oracle_responses \u2014 a comma-separated list of 1s (valid padding) and 0s (invalid) from a PKCS#1 v1.5 padding oracle.\n\nHow to use:\n1. Set up an oracle that returns 1 if decrypt(c\') has valid PKCS#1 v1.5 padding, 0 otherwise\n2. For s = 1, 2, 3, ... query the oracle with c\' = c * s^e mod n\n3. Record the responses as comma-separated bits: 1,0,0,1,0,0,... (1 = valid padding)\n4. Provide n, e, c, and the full oracle_responses string\n\nTip: s=1 always returns 1 (the original ciphertext has valid padding). You need roughly 20 valid responses to narrow the interval.',
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_responses,
+  applicableCheck: rsaNeeds.nECOracleResponses,
 };
 
 export const generateTestcase = (): Record<string, string> => {

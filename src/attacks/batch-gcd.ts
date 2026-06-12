@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd } from '../utils/bigint';
 
@@ -99,11 +100,7 @@ The product $\\prod_{j \\neq i} n_j$ is computed by first multiplying all moduli
 
 \\textbf{References:} Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012; Bernstein, "How to Find Small Factors of Products", 2004`,
   priority: 'high',
-  applicableCheck: (p: Record<string, string>) => {
-    const vals = (p.n_values || '').trim();
-    if (!vals) return false;
-    return vals.split(/[\n,]+/).filter(x => x.trim()).length >= 2;
-  },
+  applicableCheck: rsaNeeds.nValues,
 };
 
 export const generateTestcase = (): Record<string, string> => {

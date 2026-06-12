@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { wrapSageTemplate } from './guard';
 import { randomPrime } from '../utils/testcases/core';
 
@@ -112,7 +113,7 @@ X^2 &\\equiv Y^2 \\pmod{n} \\\\
 
 \\textbf{References:} C. Pomerance, "The Quadratic Sieve Factoring Algorithm", Eurocrypt 1984`,
   priority: 'high',
-  applicableCheck: (p: Record<string, string>) => !!p.n,
+  applicableCheck: rsaNeeds.n,
 };
 
 export const generateTestcase = (): Record<string, string> => {

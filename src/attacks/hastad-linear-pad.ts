@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
 
@@ -166,7 +167,7 @@ m &= \\text{small\\_roots}(F) \\quad \\text{(since $|m| < N^{1/e}$)}
 
 \\textbf{References:} J. Hastad, "Solving Low-Exponent RSA," Eurocrypt 1988; Coppersmith et al., 1996`,
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.triples && !!p.e,
+  applicableCheck: rsaNeeds.triplesE,
 };
 
 export const generateTestcase = (): Record<string, string> => {

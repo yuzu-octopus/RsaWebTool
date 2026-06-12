@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
@@ -203,7 +204,7 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{rn+B}{s} \\right) \\\
     } catch { return Promise.resolve(null); }
   },
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_responses,
+  applicableCheck: rsaNeeds.nECOracleResponses,
 };
 
 export const generateTestcase = (): Record<string, string> => {

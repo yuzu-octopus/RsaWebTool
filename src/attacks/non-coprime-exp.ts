@@ -1,5 +1,6 @@
 import type { Attack } from '../types';
 import { randomPrime, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
+import { rsaNeeds } from './_rsaHelpers';
 import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
@@ -142,7 +143,7 @@ m_{i,j} &= \\text{CRT}(r_{p,i}, r_{q,j}; p, q) \\quad \\text{for each pair} \\\\
 \\textbf{References:} Williams, 1980; May, "Attacks on RSA with Small Parameters," 2003`,
   usageGuide: 'Resolves the non-unique decryption problem when gcd(e, phi(n)) > 1. Requires p and q as inputs — use factorization attacks first.\n\nHow to use:\n1. First factor n (use any of the 19 factorization attacks in this tool)\n2. Provide n, e, c, and the discovered p and q factors\n3. The attack finds all e-th roots modulo p and q separately, then CRT-combines them\n4. All valid plaintexts are displayed — verify which is the intended message\n\nTips: The three-level e-th root fallback tries Sage nth_root, manual iteration (for small e ≤ 10 and small fields), and Tonelli-Shanks (for e = 2, when p ≡ 3 mod 4). Both p and q are required — without them the attack cannot resolve the multiple roots since CRT needs both prime factors.',
   priority: 'low',
-  applicableCheck: (vals: Record<string, string>) => !!vals.n && !!vals.e && !!vals.c,
+  applicableCheck: rsaNeeds.nEC,
 };
 
 export const generateTestcase = (): Record<string, string> => {

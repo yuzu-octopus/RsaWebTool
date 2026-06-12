@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
 
@@ -118,7 +119,7 @@ p &= p_0 + x_0,\\quad q = n/p \\qed
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996`,
   usageGuide: 'This recovers a factor p from an approximate value nearp using Coppersmith\\\'s lattice method.\n\nHow to use:\n1. You have a modulus n and an approximation nearp ≈ p (one of the prime factors)\n2. The approximation must be within n^(1/4) of the actual p\n3. Provide n and nearp\n4. The attack constructs a lattice and uses LLL to find the exact p\n\nTip: nearp can come from side-channel leaks, known bits of p, or approximations from other attacks. If |nearp - p| > n^(1/4) the attack may fail.',
   priority: 'high',
-  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.nearp,
+  applicableCheck: rsaNeeds.nNearp,
 };
 
 export const generateTestcase = (): Record<string, string> => {

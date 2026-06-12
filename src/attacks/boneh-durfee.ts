@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 import { modInverse } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
@@ -202,7 +203,7 @@ p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2}
 
 \\textbf{References:} M. Wiener, CRYPTO 1990; D. Boneh, G. Durfee, CRYPTO 1999`,
   priority: 'high',
-  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e,
+  applicableCheck: rsaNeeds.nE,
 };
 
 export const generateTestcase = (): Record<string, string> => {

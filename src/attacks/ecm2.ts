@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
 
@@ -96,7 +97,7 @@ n &= p_1^{e_1} p_2^{e_2} \\cdots p_k^{e_k} \\\\
 
 \\textbf{References:} H. W. Lenstra Jr., "Factoring Integers with Elliptic Curves", Annals of Mathematics, 1987`,
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.n,
+  applicableCheck: rsaNeeds.n,
 };
 
 export const generateTestcase = (): Record<string, string> => {

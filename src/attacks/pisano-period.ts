@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
 import { modPow, gcd, isqrt } from '../utils/bigint';
 import { randomPrime } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
@@ -198,7 +199,7 @@ p,q &= \\frac{n - \\phi + 1 \\pm \\sqrt{(n - \\phi + 1)^2 - 4n}}{2} \\qed
 
 \\textbf{References:} Wuliangshun, "Integer Factorization With Pisano Period", IEEE Access, 2019`,
   priority: 'medium',
-  applicableCheck: (p: Record<string, string>) => !!p.n,
+  applicableCheck: rsaNeeds.n,
 };
 
 export const generateTestcase = (): Record<string, string> => {
