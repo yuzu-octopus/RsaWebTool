@@ -63,7 +63,7 @@ function AppContent() {
         onClose={() => showNotification('')}
         message={notification?.message ?? ''}
         key={notification?.key}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         slotProps={{
           content: {
             sx: {

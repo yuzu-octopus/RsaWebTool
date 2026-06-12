@@ -10,9 +10,11 @@ export const draculaColors = {
   orange: '#ffb86c',
   pink: '#ff79c6',
   purple: '#bd93f9',
+  purpleHover: '#a575f6',
+  purpleActive: '#9168e0',
   red: '#ff5555',
   yellow: '#f1fa8c',
-};
+} as const;
 
 export const draculaTheme = createTheme({
   cssVariables: true,
