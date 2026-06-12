@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Lock } from '@mui/icons-material';
+import { Lock, MenuBook, Bolt } from '@mui/icons-material';
 import { useAppContext } from '../../hooks/useAppContext';
 import { CalculatorHeader } from './_shared/CalculatorHeader';
 import { AESExplanationTab } from './AESExplanationTab';
@@ -7,9 +7,9 @@ import { AESEncryptDecryptTab } from './AESEncryptDecryptTab';
 import { AESAttacksTab } from './AESAttacksTab';
 
 const TABS = [
-  { id: 'explanation', label: 'Explanation' },
-  { id: 'encrypt-decrypt', label: 'Encrypt / Decrypt' },
-  { id: 'attacks', label: 'Attacks' },
+  { id: 'explanation', label: 'Explanation', icon: <MenuBook fontSize="small" /> },
+  { id: 'encrypt-decrypt', label: 'Encrypt / Decrypt', icon: <Lock fontSize="small" /> },
+  { id: 'attacks', label: 'Attacks', icon: <Bolt fontSize="small" /> },
 ];
 
 export default function AESCalculator() {

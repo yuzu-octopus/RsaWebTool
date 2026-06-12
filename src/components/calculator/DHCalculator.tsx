@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Security } from '@mui/icons-material';
+import { Security, MenuBook, SwapHoriz, Bolt } from '@mui/icons-material';
 import { useAppContext } from '../../hooks/useAppContext';
 import { CalculatorHeader } from './_shared/CalculatorHeader';
 import { DHExplanationTab } from './DHExplanationTab';
@@ -7,9 +7,9 @@ import { DHKeyExchangeTab } from './DHKeyExchangeTab';
 import { DHAttacksTab } from './DHAttacksTab';
 
 const TABS = [
-  { id: 'explanation', label: 'Explanation' },
-  { id: 'keyexchange', label: 'Key Exchange' },
-  { id: 'attacks', label: 'Attacks' },
+  { id: 'explanation', label: 'Explanation', icon: <MenuBook fontSize="small" /> },
+  { id: 'keyexchange', label: 'Key Exchange', icon: <SwapHoriz fontSize="small" /> },
+  { id: 'attacks', label: 'Attacks', icon: <Bolt fontSize="small" /> },
 ];
 
 export default function DHCalculator() {

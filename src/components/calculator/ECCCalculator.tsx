@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Hub } from '@mui/icons-material';
+import { Hub, MenuBook, VpnKey, Verified, Bolt } from '@mui/icons-material';
 import { useAppContext } from '../../hooks/useAppContext';
 import { CalculatorHeader } from './_shared/CalculatorHeader';
 import { ECCExplanationTab } from './ECCExplanationTab';
@@ -8,10 +8,10 @@ import { ECCSignVerifyTab } from './ECCSignVerifyTab';
 import { ECCAttacksTab } from './ECCAttacksTab';
 
 const TABS = [
-  { id: 'explanation', label: 'Explanation' },
-  { id: 'keyops', label: 'Key Operations' },
-  { id: 'signverify', label: 'Sign / Verify' },
-  { id: 'attacks', label: 'Attacks' },
+  { id: 'explanation', label: 'Explanation', icon: <MenuBook fontSize="small" /> },
+  { id: 'keyops', label: 'Key Operations', icon: <VpnKey fontSize="small" /> },
+  { id: 'signverify', label: 'Sign / Verify', icon: <Verified fontSize="small" /> },
+  { id: 'attacks', label: 'Attacks', icon: <Bolt fontSize="small" /> },
 ];
 
 export default function ECCCalculator() {
