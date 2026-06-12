@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { generateHastadTestcase } from '../utils/testcases/core';;
+import { generateHastadBroadcastTestcase } from '../utils/testcases/core';
 import { modPow, modInverse, iroot, gcd } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
 
@@ -166,6 +166,12 @@ m &= \\sqrt[e]{M} \\quad \\text{(exact integer e-th root)}
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const kp = generateHastadTestcase();
-  return { n: kp.n.toString(), e: kp.e.toString(), ciphertexts: kp.c.toString() };
+  const kp = generateHastadBroadcastTestcase();
+  return {
+    n1: kp.n1.toString(),
+    n2: kp.n2.toString(),
+    n3: kp.n3.toString(),
+    e: kp.e.toString(),
+    ciphertexts: kp.ciphertexts,
+  };
 };
