@@ -1,30 +1,29 @@
 import { describe, test, expect } from 'bun:test';
+import { generateKeyPairSync } from 'node:crypto';
 import { parsePEM } from '../pemParser';
 
 describe('parsePEM', () => {
-  // PKCS#1 RSA Private Key: SEQUENCE { version=0, n, e, d, p, q, dp, dq, qInv }
-  // Minimal: 9 zero-length integers except n=5, e=65537
-  // 0x30 0x0a 0x02 0x01 0x00 (version) 0x02 0x01 0x05 (n=5) 0x02 0x03 0x01 0x00 0x01 (e=65537)
-  // ... plus 6 more empty integers (d, p, q, dp, dq, qInv) = 0x02 0x00 × 6
-  // Hand-crafted: total 7 + 6×2 = 19 bytes of content
-  // 0x30 0x13
-  //   0x02 0x01 0x00 (version)
-  //   0x02 0x01 0x05 (n=5)
-  //   0x02 0x03 0x01 0x00 0x01 (e=65537)
-  //   0x02 0x00 (d)
-  //   0x02 0x00 (p)
-  //   0x02 0x00 (q)
-  //   0x02 0x00 (dp)
-  //   0x02 0x00 (dq)
-  //   0x02 0x00 (qInv)
-  const pkcs1Hex = '301702010002010502030100010202000202000202000202000202000200';
-  const pkcs1Base64 = Buffer.from(pkcs1Hex, 'hex').toString('base64');
-  const pkcs1PEM = `-----BEGIN RSA PRIVATE KEY-----\n${pkcs1Base64}\n-----END RSA PRIVATE KEY-----`;
+  // Generate a real PKCS#1 RSA private key using Node's crypto API.
+  // This avoids fragile hand-crafted hex fixtures and exercises the full
+  // DER length-octet encoding, INTEGER leading-zero handling, and SEQUENCE nesting.
+  const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 512 });
+  const realKeyPEM = privateKey.export({ type: 'pkcs1', format: 'pem' }) as string;
 
-  // Note: skipped — hand-crafted degenerate PKCS#1 keys are fragile to get right.
-  // The PKCS#1 public key test below exercises the parser path.
-  test.skip('parses PKCS#1 private key header (skipped — needs real key fixture)', () => {});
-  test.skip('extracts n, e from PKCS#1 (skipped — needs real key fixture)', () => {});
+  test('parses PKCS#1 private key header (real crypto-generated key)', () => {
+    const result = parsePEM(realKeyPEM);
+    expect(result.type).toBe('pkcs1');
+    expect(result.format).toBe('PKCS#1 RSA Private Key');
+    expect(result.keyParams).toBeDefined();
+  });
+
+  test('extracts n, e, d from real PKCS#1 private key', () => {
+    const result = parsePEM(realKeyPEM);
+    expect(result.keyParams!.n.length).toBeGreaterThan(0);
+    expect(result.keyParams!.e.length).toBeGreaterThan(0);
+    expect(result.keyParams!.d.length).toBeGreaterThan(0);
+    // e should be 65537 (0x10001)
+    expect(result.keyParams!.e).toBe('10001');
+  });
 
   test('PKCS#1 public key', () => {
     // SEQUENCE { INTEGER n=7, INTEGER e=65537 }

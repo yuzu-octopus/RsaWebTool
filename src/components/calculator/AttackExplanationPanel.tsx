@@ -85,6 +85,9 @@ export function AttackExplanationPanel({ data }: { data: AttackExplanationData }
           maxHeight: '400px',
           mb: 1.5,
         }}
+        // SAFE: Prism.highlight returns syntax-highlighted HTML containing only
+        // <span> tags with class names — no executable script, no user-supplied
+        // HTML. The Python source is bundled with each attack (not user input).
         dangerouslySetInnerHTML={{
           __html: Prism.highlight(data.python, Prism.languages.python, 'python'),
         }}

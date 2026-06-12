@@ -325,6 +325,10 @@ export function InputPanel() {
                 p: 1.5,
                 lineHeight: '1.5',
               }}
+              // SAFE: Prism.highlight returns syntax-highlighted HTML containing
+              // only <span> tags with class names — no executable script, no
+              // user-supplied HTML. Source code is bundled with each attack
+              // definition (not arbitrary user input).
               dangerouslySetInnerHTML={{
                 __html: Prism.highlight(
                   effectiveSourceMode === 'sage' ? pythonCode : frontendCode,

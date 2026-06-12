@@ -93,6 +93,9 @@ function InlineMath({ text }: { text: string }) {
       if (match.index > lastIdx) {
         const textContent = text.slice(lastIdx, match.index);
         result.push(
+          // SAFE: renderInlineText only emits a fixed set of HTML wrappers
+          // (<code>, <span>, <em>, <u>, <strong>) around captured groups.
+          // Input is bundled LaTeX proof text (not user input).
           <span key={"txt-" + result.length} dangerouslySetInnerHTML={{ __html: renderInlineText(textContent) }} />
         );
       }
@@ -104,6 +107,8 @@ function InlineMath({ text }: { text: string }) {
         /* fall through — html stays undefined, render raw fallback below */
       }
       result.push(
+        // SAFE: katex.renderToString produces sanitized HTML (KaTeX escapes
+        // user input internally) — no executable script, no event handlers.
         html !== undefined
           ? <span key={"math-" + result.length} dangerouslySetInnerHTML={{ __html: html }} />
           : <span key={"math-" + result.length}>{`$${mathContent}$`}</span>
@@ -193,6 +198,9 @@ export function ProofRenderer({ latex }: { latex: string }) {
                 });
                 return (
                   <Box key={'dm-' + segment.content.slice(0, 20)} sx={{ my: 2 }}>
+                    {/* SAFE: katex.renderToString produces sanitized HTML (KaTeX
+                        escapes user input internally). Input is bundled proof
+                        LaTeX. */}
                     <Box component="div" dangerouslySetInnerHTML={{ __html: html }} />
                     {hasQed && (
                       <Box component="span" sx={{ float: 'right', mr: 2, fontSize: '1.2em' }}>
