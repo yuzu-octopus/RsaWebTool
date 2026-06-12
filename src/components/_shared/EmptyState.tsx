@@ -1,7 +1,7 @@
 import type { ReactNode, ElementType } from 'react';
 import { Box, Typography } from '@mui/material';
-import { draculaColors } from '../../../theme/dracula';
-import { MONO_FAMILY } from '../../../styles/shared';
+import { draculaColors } from '../../theme/dracula';
+import { MONO_FAMILY } from '../../styles/shared';
 
 export interface EmptyStateProps {
   /** Optional icon component to render above the title (e.g., `Calculate`, `HourglassEmpty`). */

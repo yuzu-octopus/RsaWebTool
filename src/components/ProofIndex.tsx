@@ -13,7 +13,7 @@ import { MenuBook } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { attacks } from '../attacks';
-import { colFlexSx } from '../styles/shared';
+import { colFlexSx, MONO_FAMILY, PROSE_FAMILY } from '../styles/shared';
 import { inputSx } from '../styles/inputSx';
 
 function AttackListItem({
@@ -25,7 +25,7 @@ function AttackListItem({
 }) {
   const primaryContent = (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-      <Typography sx={{ color: draculaColors.cyan, fontFamily: "'JetBrains Mono', monospace", fontWeight: 600 }}>
+      <Typography sx={{ color: draculaColors.cyan, fontFamily: MONO_FAMILY, fontWeight: 600 }}>
         {attack.name}
       </Typography>
       <Typography
@@ -33,7 +33,7 @@ function AttackListItem({
         sx={{
           color: attack.frontendCheck ? draculaColors.green : draculaColors.orange,
           fontSize: '0.65rem',
-          fontFamily: "'JetBrains Mono', monospace",
+          fontFamily: MONO_FAMILY,
         }}
       >
         ({attack.frontendCheck ? 'Local' : 'SageMath'})
@@ -41,7 +41,7 @@ function AttackListItem({
     </Box>
   );
   const secondaryContent = (
-    <Typography sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif", fontSize: '0.75rem' }}>
+    <Typography sx={{ color: draculaColors.comment, fontFamily: PROSE_FAMILY, fontSize: '0.75rem' }}>
       [{attack.category}] {attack.description}
     </Typography>
   );

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useAppContext } from './useAppContext';
 
 export interface UseCalculatorOutputOptions {
@@ -70,5 +70,8 @@ export function useCalculatorOutput({
     setOutputError(null);
   }, [setOutputResult, setOutputError]);
 
-  return { result, error, dispatch, dispatchError, clear };
+  return useMemo(
+    () => ({ result, error, dispatch, dispatchError, clear }),
+    [result, error, dispatch, dispatchError, clear],
+  );
 }

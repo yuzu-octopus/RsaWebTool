@@ -14,6 +14,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { attacks } from '../attacks';
 import { SIDEBAR_MODULES, ALL_SIDEBAR_ITEMS } from '../config/sidebarItems';
 import { draculaColors } from '../theme/dracula';
+import { MONO_FAMILY } from '../styles/shared';
 import type { Attack, AttackCategory, CalculatorMode } from '../types';
 
 const MODULE_ICONS: Record<string, React.ElementType> = {
@@ -209,7 +210,7 @@ export function CommandPalette() {
               sx: {
                 color: draculaColors.foreground,
                 fontSize: '1rem',
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: MONO_FAMILY,
                 bgcolor: draculaColors.currentLine,
                 borderRadius: '8px',
                 px: 1.5,
@@ -247,7 +248,7 @@ export function CommandPalette() {
                       primary: {
                         sx: {
                           color: draculaColors.foreground,
-                          fontFamily: "'JetBrains Mono', monospace",
+                          fontFamily: MONO_FAMILY,
                           fontSize: '0.8rem',
                         },
                       },
@@ -289,7 +290,7 @@ export function CommandPalette() {
                       primary: {
                         sx: {
                           color: draculaColors.foreground,
-                          fontFamily: "'JetBrains Mono', monospace",
+                          fontFamily: MONO_FAMILY,
                           fontSize: '0.8rem',
                         },
                       },
@@ -334,14 +335,14 @@ export function CommandPalette() {
                     primary: {
                       sx: {
                         color: draculaColors.foreground,
-                        fontFamily: "'JetBrains Mono', monospace",
+                        fontFamily: MONO_FAMILY,
                         fontSize: '0.8rem',
                       },
                     },
                     secondary: {
                       sx: {
                         color: draculaColors.comment,
-                        fontFamily: "'JetBrains Mono', monospace",
+                        fontFamily: MONO_FAMILY,
                         fontSize: '0.7rem',
                       },
                     },
@@ -379,7 +380,7 @@ export function CommandPalette() {
               <Typography
                 sx={{
                   color: draculaColors.comment,
-                  fontFamily: "'JetBrains Mono', monospace",
+                  fontFamily: MONO_FAMILY,
                   fontSize: '0.8rem',
                 }}
               >

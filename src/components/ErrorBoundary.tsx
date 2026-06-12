@@ -1,6 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { Box, Typography } from '@mui/material';
 import { draculaColors } from '../theme/dracula';
+import { MONO_FAMILY } from '../styles/shared';
 
 interface Props {
   children: ReactNode;
@@ -31,10 +32,10 @@ export class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) return this.props.fallback;
       return (
         <Box sx={{ flex: 1, p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <Typography variant="h6" sx={{ color: draculaColors.red, mb: 1, fontFamily: "'JetBrains Mono', monospace" }}>
+          <Typography variant="h6" sx={{ color: draculaColors.red, mb: 1, fontFamily: MONO_FAMILY }}>
             Something went wrong
           </Typography>
-          <Typography variant="body2" sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', monospace", textAlign: 'center' }}>
+          <Typography variant="body2" sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, textAlign: 'center' }}>
             {this.state.error?.message ?? 'Unknown error'}
           </Typography>
         </Box>

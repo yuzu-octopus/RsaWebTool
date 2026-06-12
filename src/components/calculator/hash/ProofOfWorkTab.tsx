@@ -7,7 +7,7 @@ import {
 import { Stop, PlayArrow, HourglassEmpty, ContentCopy, ExpandMore, ExpandLess } from '@mui/icons-material';
 import { draculaColors } from '../../../theme/dracula';
 import { inputSx } from '../../../styles/inputSx';
-import { outputBoxSx, colorGhostBtn, FONT_FAMILY } from '../../../styles/shared';
+import { outputBoxSx, colorGhostBtn, FONT_FAMILY, MONO_FAMILY } from '../../../styles/shared';
 import { useWorkerPool } from '../../../hooks/useWorkerPool';
 import { ProgressEstimator } from '../../../utils/progressEstimator';
 import { useAppContext } from '../../../hooks/useAppContext';
@@ -304,7 +304,7 @@ export default function ProofOfWorkTab() {
           width: '100%',
           height: 120,
           resize: 'vertical',
-          fontFamily: "'JetBrains Mono', monospace",
+          fontFamily: MONO_FAMILY,
           fontSize: '0.8rem',
           backgroundColor: '#282a36',
           color: '#f8f8f2',

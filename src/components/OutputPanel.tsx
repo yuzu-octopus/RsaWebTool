@@ -20,8 +20,8 @@ import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useDragResize } from '../hooks/useDragResize';
 import { useNotepad } from '../hooks/useNotepad';
-import { ghostBtnSx, FONT_FAMILY } from '../styles/shared';
-import { EmptyState } from './calculator/_shared/EmptyState';
+import { ghostBtnSx, FONT_FAMILY, MONO_FAMILY } from '../styles/shared';
+import { EmptyState } from './_shared/EmptyState';
 
 const notepadBaseStyle: React.CSSProperties = {
   width: '100%',
@@ -30,7 +30,7 @@ const notepadBaseStyle: React.CSSProperties = {
   padding: '8px 12px',
   backgroundColor: draculaColors.currentLine,
   color: draculaColors.foreground,
-  fontFamily: "'JetBrains Mono', monospace",
+  fontFamily: MONO_FAMILY,
   fontSize: '0.8rem',
   border: `1px solid ${draculaColors.comment}`,
   borderRadius: '4px',
@@ -54,7 +54,7 @@ function HistoryListItem({ entry, isSelected, onClick }: { entry: HistoryEntry; 
     >
       <ListItemText
         primary={
-          <Typography sx={{ display: 'flex', alignItems: 'center', color: entry.success ? draculaColors.green : draculaColors.red, fontSize: '0.75rem', fontFamily: "'JetBrains Mono', monospace" }}>
+          <Typography sx={{ display: 'flex', alignItems: 'center', color: entry.success ? draculaColors.green : draculaColors.red, fontSize: '0.75rem', fontFamily: MONO_FAMILY }}>
             {entry.success ? <CheckCircle sx={{ fontSize: '1rem', mr: 0.5 }} /> : <Cancel sx={{ fontSize: '1rem', mr: 0.5 }} />} {entry.attackName}
           </Typography>
         }
@@ -137,14 +137,14 @@ export function OutputPanel() {
         {ui.historySelectedKey && (
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
             <HistoryIcon sx={{ fontSize: '1rem', color: draculaColors.cyan }} />
-            <Typography sx={{ color: draculaColors.cyan, fontSize: '0.75rem', fontFamily: "'JetBrains Mono', monospace", flex: 1 }}>
+            <Typography sx={{ color: draculaColors.cyan, fontSize: '0.75rem', fontFamily: MONO_FAMILY, flex: 1 }}>
               History: {history.find(h => (h.timestamp.getTime() + '-' + h.attackId) === ui.historySelectedKey)?.attackName ?? ''}
             </Typography>
             <Button
               size="small"
               variant="outlined"
               onClick={() => { setUi(prev => ({ ...prev, historySelectedKey: null })); }}
-              sx={{ borderColor: draculaColors.comment, color: draculaColors.comment, fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", '&:hover': { backgroundColor: draculaColors.currentLine }, py: 0, px: 1, minWidth: 0 }}
+              sx={{ borderColor: draculaColors.comment, color: draculaColors.comment, fontSize: '0.65rem', fontFamily: MONO_FAMILY, '&:hover': { backgroundColor: draculaColors.currentLine }, py: 0, px: 1, minWidth: 0 }}
             >
               Back
             </Button>
@@ -192,7 +192,7 @@ export function OutputPanel() {
         )}
 
         {outputError && (
-          <Typography data-testid="output-error" sx={{ color: draculaColors.red, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.85rem', whiteSpace: 'pre-wrap' }}>
+          <Typography data-testid="output-error" sx={{ color: draculaColors.red, fontFamily: MONO_FAMILY, fontSize: '0.85rem', whiteSpace: 'pre-wrap' }}>
             {outputError}
           </Typography>
         )}
@@ -225,7 +225,7 @@ export function OutputPanel() {
         <Button
           fullWidth
           onClick={() => setNotepadOpen(!notepadOpen)}
-          sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', monospace", justifyContent: 'space-between' }}
+          sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, justifyContent: 'space-between' }}
           endIcon={notepadOpen ? <ExpandLess /> : <ExpandMore />}
         >
           Notepad
@@ -256,7 +256,7 @@ export function OutputPanel() {
         <Button
           fullWidth
           onClick={() => setUi(prev => ({ ...prev, historyOpen: !prev.historyOpen }))}
-          sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', monospace", justifyContent: 'space-between' }}
+          sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, justifyContent: 'space-between' }}
           endIcon={ui.historyOpen ? <ExpandLess /> : <ExpandMore />}
         >
           History ({history.length})
@@ -287,7 +287,7 @@ export function OutputPanel() {
                 borderColor: draculaColors.red,
                 color: draculaColors.red,
                 fontSize: '0.7rem',
-                fontFamily: "'JetBrains Mono', monospace",
+                fontFamily: MONO_FAMILY,
                 '&:hover': { backgroundColor: 'rgba(255,85,85,0.1)' },
                 '&:disabled': { borderColor: draculaColors.comment, color: draculaColors.comment },
               }}
@@ -311,11 +311,11 @@ export function OutputPanel() {
           },
         }}
       >
-        <DialogTitle sx={{ color: draculaColors.foreground, fontFamily: "'JetBrains Mono', monospace" }}>
+        <DialogTitle sx={{ color: draculaColors.foreground, fontFamily: MONO_FAMILY }}>
           Clear History?
         </DialogTitle>
         <DialogContent>
-          <DialogContentText sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', monospace" }}>
+          <DialogContentText sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY }}>
             This will permanently delete all {history.length} history entries.
           </DialogContentText>
         </DialogContent>

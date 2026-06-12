@@ -14,7 +14,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { convertFormat } from '../utils/converters';
 import type { Format } from '../utils/converters';
 import { inputSx } from '../styles/inputSx';
-import { colFlexSx, centeredPanelSx } from '../styles/shared';
+import { colFlexSx, centeredPanelSx, MONO_FAMILY } from '../styles/shared';
 
 const FORMATS: { value: Format; label: string }[] = [
   { value: 'hex', label: 'Hex' },
@@ -28,14 +28,14 @@ const selectSx = {
   '& .MuiOutlinedInput-root': {
     backgroundColor: draculaColors.currentLine,
     color: draculaColors.foreground,
-    fontFamily: "'JetBrains Mono', monospace",
+    fontFamily: MONO_FAMILY,
     '& fieldset': { borderColor: draculaColors.comment },
     '&:hover fieldset': { borderColor: draculaColors.purple },
     '&.Mui-focused fieldset': { borderColor: draculaColors.purple },
   },
   '& .MuiInputLabel-root': {
     color: draculaColors.comment,
-    fontFamily: "'JetBrains Mono', monospace",
+    fontFamily: MONO_FAMILY,
     '&.Mui-focused': { color: draculaColors.purple },
   },
   '& .MuiSvgIcon-root': {
@@ -48,7 +48,7 @@ const readOnlySx = {
   '& .MuiInputBase-root': {
     backgroundColor: draculaColors.background,
     color: draculaColors.foreground,
-    fontFamily: "'JetBrains Mono', monospace",
+    fontFamily: MONO_FAMILY,
     '& fieldset': { borderColor: draculaColors.comment },
   },
 };
@@ -81,7 +81,7 @@ export function FormatConverter() {
             <SwapHoriz sx={{ fontSize: 'inherit' }} /> Format Converter
           </Typography>
 
-          <Typography variant="body2" sx={{ color: draculaColors.comment, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.75rem', mb: 3 }}>
+          <Typography variant="body2" sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, fontSize: '0.75rem', mb: 3 }}>
             Convert between Hex, Decimal, Base64, and Text
           </Typography>
 
@@ -107,7 +107,7 @@ export function FormatConverter() {
                   key={f.value}
                   value={f.value}
                   sx={{
-                    fontFamily: "'JetBrains Mono', monospace",
+                    fontFamily: MONO_FAMILY,
                     color: draculaColors.foreground,
                     '&:hover': { backgroundColor: draculaColors.currentLine },
                     '&.Mui-selected': { backgroundColor: draculaColors.comment, '&:hover': { backgroundColor: draculaColors.comment } },
@@ -152,7 +152,7 @@ export function FormatConverter() {
                   key={f.value}
                   value={f.value}
                   sx={{
-                    fontFamily: "'JetBrains Mono', monospace",
+                    fontFamily: MONO_FAMILY,
                     color: draculaColors.foreground,
                     '&:hover': { backgroundColor: draculaColors.currentLine },
                     '&.Mui-selected': { backgroundColor: draculaColors.comment, '&:hover': { backgroundColor: draculaColors.comment } },

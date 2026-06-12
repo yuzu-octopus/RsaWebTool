@@ -20,7 +20,7 @@ import { useMagicExecution } from '../hooks/useMagicExecution';
 import { attacks } from '../attacks';
 import { detectFormat, parsePEM } from '../utils/converters';
 import { inputSx } from '../styles/inputSx';
-import { colFlexSx, centeredPanelSx, colorGhostBtn } from '../styles/shared';
+import { colFlexSx, centeredPanelSx, colorGhostBtn, MONO_FAMILY } from '../styles/shared';
 import type { Attack } from '../types';
 
 const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
@@ -130,7 +130,7 @@ const JobListItem = memo(function JobListItem({
     <Typography sx={{
       display: 'flex',
       alignItems: 'center',
-      fontFamily: "'JetBrains Mono', monospace",
+      fontFamily: MONO_FAMILY,
       fontSize: '0.8rem',
       color: job.status === 'success' ? draculaColors.green : job.status === 'error' ? draculaColors.red : job.status === 'cancelled' ? draculaColors.orange : draculaColors.orange,
     }}>
@@ -140,7 +140,7 @@ const JobListItem = memo(function JobListItem({
 
   const secondaryContent = useMemo(() =>
     job.error && !expanded ? (
-      <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>
+      <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: MONO_FAMILY }}>
         {job.error.length > 80 ? `${job.error.slice(0, 77)}...` : job.error}
       </Typography>
     ) : null,
@@ -174,7 +174,7 @@ const JobListItem = memo(function JobListItem({
               <ContentCopy sx={{ fontSize: '0.8rem' }} />
             </IconButton>
           )}
-          <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+          <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: MONO_FAMILY, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
             {job.result || job.error || ''}
           </Typography>
         </Box>
@@ -186,15 +186,15 @@ const JobListItem = memo(function JobListItem({
 const ExtractedParams = memo(function ExtractedParams({ params }: { params: Record<string, string> }) {
   return (
     <Box sx={{ mt: 2, p: 1.5, borderRadius: 1, backgroundColor: draculaColors.currentLine, border: `1px solid ${draculaColors.comment}` }}>
-      <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", mb: 0.75 }}>
+      <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: MONO_FAMILY, mb: 0.75 }}>
         Extracted parameters
       </Typography>
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
         {Object.entries(params).map(([key, value]) => (
           <Box key={key} sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.25, backgroundColor: draculaColors.background, borderRadius: 0.5, px: 0.75, py: 0.25 }}>
-            <Typography sx={{ color: draculaColors.purple, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>{key}</Typography>
-            <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>=</Typography>
-            <Typography sx={{ color: value.length > 50 ? draculaColors.orange : draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <Typography sx={{ color: draculaColors.purple, fontSize: '0.7rem', fontFamily: MONO_FAMILY }}>{key}</Typography>
+            <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: MONO_FAMILY }}>=</Typography>
+            <Typography sx={{ color: value.length > 50 ? draculaColors.orange : draculaColors.foreground, fontSize: '0.7rem', fontFamily: MONO_FAMILY, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {value.length > 50 ? `${value.slice(0, 47)}...` : value}
             </Typography>
           </Box>
@@ -209,11 +209,11 @@ const ApplicableList = memo(function ApplicableList({ byCategory }: { byCategory
     <>
       {Object.entries(byCategory).map(([cat, catAttacks]) => (
         <Box key={cat} sx={{ mb: 1 }}>
-          <Typography sx={{ color: draculaColors.cyan, fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", mb: 0.5 }}>
+          <Typography sx={{ color: draculaColors.cyan, fontSize: '0.65rem', fontFamily: MONO_FAMILY, mb: 0.5 }}>
             {cat}
           </Typography>
           {catAttacks.map(a => (
-            <Typography key={a.id} sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", py: 0.25 }}>
+            <Typography key={a.id} sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: MONO_FAMILY, py: 0.25 }}>
               {a.name} <Typography component="span" sx={{ color: draculaColors.comment }}>({a.priority})</Typography>
             </Typography>
           ))}
@@ -226,10 +226,10 @@ const ApplicableList = memo(function ApplicableList({ byCategory }: { byCategory
 const ErrorInsightBox = memo(function ErrorInsightBox({ insights }: { insights: string }) {
   return (
     <Box sx={{ mt: 1.5, p: 1, borderRadius: 1, backgroundColor: draculaColors.currentLine, border: `1px solid ${draculaColors.comment}` }}>
-      <Typography sx={{ color: draculaColors.orange, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace" }}>
+      <Typography sx={{ color: draculaColors.orange, fontSize: '0.7rem', fontFamily: MONO_FAMILY }}>
         No attack succeeded: {insights}
       </Typography>
-      <Typography sx={{ color: draculaColors.comment, fontSize: '0.65rem', fontFamily: "'JetBrains Mono', monospace", mt: 0.5 }}>
+      <Typography sx={{ color: draculaColors.comment, fontSize: '0.65rem', fontFamily: MONO_FAMILY, mt: 0.5 }}>
         Try checking parameter names, using a PEM key, or selecting a specific attack from the sidebar
       </Typography>
     </Box>
@@ -330,10 +330,10 @@ export function MagicPanel() {
           {/* Empty state — show format examples */}
           {!rawInput.trim() && !running && jobs.length === 0 && (
             <Box sx={{ mt: 2, p: 2, borderRadius: 1, backgroundColor: draculaColors.currentLine, border: `1px solid ${draculaColors.comment}` }}>
-              <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: "'JetBrains Mono', monospace", mb: 1 }}>
+              <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: MONO_FAMILY, mb: 1 }}>
                 Paste any of these formats:
               </Typography>
-              <Box sx={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '0.7rem', color: draculaColors.foreground, '& div': { mb: 0.5 } }}>
+              <Box sx={{ fontFamily: MONO_FAMILY, fontSize: '0.7rem', color: draculaColors.foreground, '& div': { mb: 0.5 } }}>
                 <div>n = <span style={{ color: draculaColors.cyan }}>1234567890abcdef…</span></div>
                 <div>e = <span style={{ color: draculaColors.cyan }}>65537</span></div>
                 <div style={{ color: draculaColors.comment }}>/ or PEM public key /</div>
@@ -359,7 +359,7 @@ export function MagicPanel() {
                 onClick={() => setShowApplicable(!showApplicable)}
                 sx={{
                   color: draculaColors.comment,
-                  fontFamily: "'JetBrains Mono', monospace",
+                  fontFamily: MONO_FAMILY,
                   fontSize: '0.75rem',
                   justifyContent: 'space-between',
                   px: 1,

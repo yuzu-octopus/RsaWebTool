@@ -17,9 +17,9 @@ import { useSageMath } from '../hooks/useSageMath';
 import { useWorkerPool } from '../hooks/useWorkerPool';
 import { useAttackExecution } from '../hooks/useAttackExecution';
 import { ProofRenderer } from './ProofRenderer';
-import { EmptyState } from './calculator/_shared/EmptyState';
+import { EmptyState } from './_shared/EmptyState';
 import { inputSx } from '../styles/inputSx';
-import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, FONT_FAMILY } from '../styles/shared';
+import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, FONT_FAMILY, MONO_FAMILY, PROSE_FAMILY } from '../styles/shared';
 import Prism from 'prismjs';
 import '../styles/draculaPrism.css';
 import 'prismjs/components/prism-typescript';
@@ -152,12 +152,12 @@ export function InputPanel() {
               <Divider sx={{ borderColor: draculaColors.comment, my: 2 }} />
               <Typography
                 variant="h5"
-                sx={{ color: draculaColors.cyan, mb: 1, fontFamily: "'JetBrains Mono', monospace" }}
+                sx={{ color: draculaColors.cyan, mb: 1, fontFamily: MONO_FAMILY }}
               >
                 How to Use
               </Typography>
               <Typography
-                sx={{ color: draculaColors.foreground, fontSize: '0.85rem', whiteSpace: 'pre-wrap', fontFamily: "'JetBrains Mono', monospace", lineHeight: 1.6 }}
+                sx={{ color: draculaColors.foreground, fontSize: '0.85rem', whiteSpace: 'pre-wrap', fontFamily: MONO_FAMILY, lineHeight: 1.6 }}
               >
                 {selectedAttack.usageGuide}
               </Typography>
@@ -176,7 +176,7 @@ export function InputPanel() {
             <Typography variant="caption" sx={{ color: draculaColors.pink, display: 'block', mb: 1, fontSize: '0.7rem' }}>
               {selectedAttack.frontendCheck ? 'Runs locally in browser' : 'Executed via SageMathCell'}
             </Typography>
-            <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 3, fontFamily: "'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" }}>
+            <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 3, fontFamily: PROSE_FAMILY }}>
               {selectedAttack.description}
             </Typography>
 
@@ -269,7 +269,7 @@ export function InputPanel() {
           variant="outlined"
           onClick={() => setSourceMode('sage')}
           sx={{
-            fontFamily: "'JetBrains Mono', monospace",
+            fontFamily: MONO_FAMILY,
             fontSize: '0.75rem',
             textTransform: 'none',
             color: effectiveSourceMode === 'sage' ? draculaColors.purple : draculaColors.comment,
@@ -291,7 +291,7 @@ export function InputPanel() {
           variant="outlined"
           onClick={() => setSourceMode('frontend')}
           sx={{
-            fontFamily: "'JetBrains Mono', monospace",
+            fontFamily: MONO_FAMILY,
             fontSize: '0.75rem',
             textTransform: 'none',
             color: effectiveSourceMode === 'frontend' ? draculaColors.purple : draculaColors.comment,

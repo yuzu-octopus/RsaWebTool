@@ -3,6 +3,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { Box, Typography } from '@mui/material';
 import { draculaColors } from '../theme/dracula';
+import { MONO_FAMILY, PROSE_FAMILY } from '../styles/shared';
 interface ProofSegment {
   type: 'text' | 'displayMath' | 'list';
   content: string;
@@ -153,7 +154,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
         <Box
           sx={{
             color: draculaColors.foreground,
-            fontFamily: "'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+            fontFamily: PROSE_FAMILY,
             lineHeight: 1.8,
             '& .katex-display': {
               margin: '1.2em 0',
@@ -202,7 +203,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
                 );
               } catch {
                 return (
-                  <Box key={'dm-err-' + segment.content.slice(0, 20)} sx={{ my: 2, color: draculaColors.red, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.8rem' }}>
+                  <Box key={'dm-err-' + segment.content.slice(0, 20)} sx={{ my: 2, color: draculaColors.red, fontFamily: MONO_FAMILY, fontSize: '0.8rem' }}>
                     Math render error
                   </Box>
                 );
