@@ -1,4 +1,5 @@
 import type { Attack } from '../types';
+import { rsaNeeds, noopSageTemplate } from './_rsaHelpers';
 import { queryFactorDB } from '../utils/factordb';
 
 const STATUS_DESCRIPTIONS: Record<string, string> = {
@@ -16,6 +17,9 @@ const STATUS_DESCRIPTIONS: Record<string, string> = {
 };
 
 export const attack: Attack = {
+  // This attack runs entirely in the browser via frontendCheck — no SageMath needed.
+  // The sageTemplate is a no-op that returns a clear message if ever triggered.
+  sageTemplate: noopSageTemplate,
   id: 'factordb-lookup',
   name: 'FactorDB Lookup',
   category: 'Advanced',
@@ -95,7 +99,7 @@ export const attack: Attack = {
 
 \\textbf{References:} https://factordb.com`,
   priority: 'low',
-  applicableCheck: (p: Record<string, string>) => !!p.n,
+  applicableCheck: rsaNeeds.n,
 };
 
 export const generateTestcase = (): Record<string, string> => {

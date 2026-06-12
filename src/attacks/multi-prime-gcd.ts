@@ -1,8 +1,12 @@
 import type { Attack } from '../types';
+import { rsaNeeds, noopSageTemplate } from './_rsaHelpers';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd } from '../utils/bigint';
 
 export const attack: Attack = {
+  // This attack runs entirely in the browser via frontendCheck — no SageMath needed.
+  // The sageTemplate is a no-op that returns a clear message if ever triggered.
+  sageTemplate: noopSageTemplate,
   id: 'multi-prime-gcd',
   name: 'Multi-Prime GCD',
   category: 'Factorization',
@@ -35,11 +39,7 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{
 
 \\textbf{References:} N. Heninger, Z. Durumeric, E. Wustrow, J. A. Halderman, "Mining Your Ps and Qs", USENIX Security Symposium, 2012`,
   priority: 'high',
-  applicableCheck: (p: Record<string, string>) => {
-    const vals = (p.moduli_list || '').trim();
-    if (!vals) return false;
-    return vals.split('\n').filter(x => x.trim()).length >= 2;
-  },
+  applicableCheck: rsaNeeds.moduliList,
   // eslint-disable-next-line @typescript-eslint/require-await
   frontendCheck: async (vals: Record<string, string>) => {
     try {

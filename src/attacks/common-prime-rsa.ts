@@ -1,8 +1,12 @@
 import type { Attack } from '../types';
+import { rsaNeeds, noopSageTemplate } from './_rsaHelpers';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd } from '../utils/bigint';
 
 export const attack: Attack = {
+  // This attack runs entirely in the browser via frontendCheck — no SageMath needed.
+  // The sageTemplate is a no-op that returns a clear message if ever triggered.
+  sageTemplate: noopSageTemplate,
   id: 'common-prime-rsa',
   name: 'Common Prime RSA',
   category: 'Factorization',
@@ -31,7 +35,7 @@ The GCD extracts the shared prime directly — no factorization of either modulu
 
 \\textbf{References:} A. K. Lenstra et al., "Ron was wrong, Whit is right" (2012) — found 0.2\\% of RSA keys shared factors`,
   priority: 'high',
-  applicableCheck: (p: Record<string, string>) => !!p.n1 && !!p.n2,
+  applicableCheck: rsaNeeds.n1N2,
   // eslint-disable-next-line @typescript-eslint/require-await
   frontendCheck: async (vals: Record<string, string>) => {
     try {

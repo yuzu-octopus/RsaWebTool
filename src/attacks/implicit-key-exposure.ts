@@ -1,8 +1,12 @@
 import type { Attack } from '../types';
+import { rsaNeeds, noopSageTemplate } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { modPow, gcd } from '../utils/bigint';
 
 export const attack: Attack = {
+  // This attack runs entirely in the browser via frontendCheck — no SageMath needed.
+  // The sageTemplate is a no-op that returns a clear message if ever triggered.
+  sageTemplate: noopSageTemplate,
   id: 'implicit-key-exposure',
   name: 'Implicit Key Exposure',
   category: 'Partial Key / Lattice',
@@ -33,7 +37,7 @@ p &= \\gcd(\\text{leak} - a, n) \\qed
 
 \\textbf{References:} Common CTF pattern; based on Fermat's Little Theorem`,
   priority: 'high',
-  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.a && !!p.leak,
+  applicableCheck: rsaNeeds.n, // implicit-key-exposure also needs a, leak (TODO: extend rsaNeeds)
   // eslint-disable-next-line @typescript-eslint/require-await
   frontendCheck: async (vals: Record<string, string>) => {
     try {
