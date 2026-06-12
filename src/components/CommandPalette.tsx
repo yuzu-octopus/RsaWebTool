@@ -24,7 +24,6 @@ const MODULE_ICONS: Record<string, React.ElementType> = {
   instructions: MenuBook,
   magic: AutoFixHigh,
   proofs: MenuBook,
-  calculator: AutoFixHigh,
   'format-converter': SwapHoriz,
   pem: VpnKey,
 };
@@ -302,7 +301,7 @@ export function CommandPalette() {
             setSelectedIndex(0);
           }}
           onKeyDown={handleKeyDown}
-          placeholder="Search attacks and views..."
+          placeholder="Search attacks, calculators, and views..."
           slotProps={{
             input: {
               startAdornment: (
