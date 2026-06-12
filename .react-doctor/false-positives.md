@@ -1,6 +1,6 @@
 # React Doctor — False Positives & Deferred Findings
 
-Last triage: b8a4cf6 (score: 69/100, 32 remaining warnings)
+Last triage: faf156a (score: 69/100, 32 remaining warnings)
 
 This file documents findings that react-doctor flags but are either:
 1. **False positives** — the rule doesn't apply to this codebase's context
@@ -85,7 +85,11 @@ The following components exceed the size threshold and are flagged for splitting
 A refactor here is a separate effort that should be paired with adding tests for the existing behavior first. The components are not "too large" in the sense of doing too many things — they have a single responsibility that happens to need many UI elements.
 
 ### Unused exports (remaining, 2) — Verified in use
-The scan reported "3 unused exports" but per-export analysis confirmed only 1 was actually unused (`sectionTitleSx`, now removed). The other exports referenced in the scan output are imported transitively via barrel re-exports or in test files.
+The scan reported "3 unused exports" but per-export analysis confirmed only 2 were actually unused:
+- ✅ `sectionTitleSx` from `src/styles/shared.ts` — removed in b8a4cf6.
+- ✅ `draculaColors` re-export from `src/styles/shared.ts` — removed in faf156a (the re-export `export { draculaColors };` had zero importers; all consumers import `draculaColors` directly from `theme/dracula`).
+
+The third export flagged by the scan was a false positive (imported transitively or in test files).
 
 ---
 
