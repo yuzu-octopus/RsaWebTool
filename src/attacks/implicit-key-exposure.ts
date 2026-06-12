@@ -37,7 +37,7 @@ p &= \\gcd(\\text{leak} - a, n) \\qed
 
 \\textbf{References:} Common CTF pattern; based on Fermat's Little Theorem`,
   priority: 'high',
-  applicableCheck: rsaNeeds.n, // implicit-key-exposure also needs a, leak (TODO: extend rsaNeeds)
+  applicableCheck: rsaNeeds.nALeak,
   // eslint-disable-next-line @typescript-eslint/require-await
   frontendCheck: async (vals: Record<string, string>) => {
     try {

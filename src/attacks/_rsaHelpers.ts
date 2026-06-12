@@ -16,6 +16,7 @@ export const rsaNeeds = {
   nDP: (p: Record<string, string>) => !!p.n && !!p.dp,
   nDQ: (p: Record<string, string>) => !!p.n && !!p.dq,
   n1N2: (p: Record<string, string>) => !!p.n1 && !!p.n2,
+  nALeak: (p: Record<string, string>) => !!p.n && !!p.a && !!p.leak,
   moduliList: (p: Record<string, string>) => {
     const vals = (p.moduli_list || '').trim();
     if (!vals) return false;
