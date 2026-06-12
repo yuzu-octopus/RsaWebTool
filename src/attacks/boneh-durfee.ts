@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
-import { modInverse } from '../utils/bigint';
+import { generateWienerTestcase } from '../utils/testcases/core';;
+import {  } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
@@ -207,20 +207,6 @@ p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2}
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const p = randomPrime(TESTCASE_BITS.p);
-  const q = randomPrime(TESTCASE_BITS.q);
-  const n = p * q;
-  const phi = (p - 1n) * (q - 1n);
-  // d must be < n^0.25/3 ≈ 2^126.4 so Wiener's continued fraction attack (Phase 1)
-  // succeeds quickly on SageCell (120s timeout). The lattice phase (Phase 2) is too slow.
-  // For 512-bit n: n^0.25 ≈ 2^128 → d with 125 bits ≈ n^0.244, well within Wiener bound.
-  const nBits = n.toString(2).length;
-  const fourthRootBits = Math.floor(nBits / 4);
-  const dBits = fourthRootBits - 3;
-  let d = (1n << BigInt(dBits)) + 1n;
-  while (modInverse(d, phi) === null) {
-    d += 2n;
-  }
-  const e = modInverse(d, phi)!;
-  return { n: n.toString(), e: e.toString() };
+  const kp = generateWienerTestcase();
+  return { n: kp.n.toString(), e: kp.e.toString() };
 };

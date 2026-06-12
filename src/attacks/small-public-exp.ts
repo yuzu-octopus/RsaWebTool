@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
-import { iroot } from '../utils/bigint';
+import { generateHastadTestcase } from '../utils/testcases/core';;
+import {  } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
@@ -211,44 +211,6 @@ m^e &= c + k \\cdot n \\quad\\text{for some } k \\in \\mathbb{Z}_{\\geq 0} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q, 3n);
-  const e = 3n;
-  const nCr = iroot(n, e);
-
-  // Pick random k ∈ [0, 10000] to exercise various k paths
-  const k = BigInt(Math.floor(Math.random() * 10001));
-
-  let m: bigint;
-  if (k === 0n) {
-    // m^3 < n → m in [42, nCr − 1]
-    const minM = 42n;
-    const maxM = nCr - 1n;
-    if (minM >= maxM) {
-      m = nCr / 2n;
-    } else {
-      const range = maxM - minM + 1n;
-      const sampleRange = range > 1000000n ? 1000000n : range;
-      m = minM + BigInt(Math.floor(Math.random() * Number(sampleRange)));
-    }
-  } else {
-    // m^3 ∈ [k·n, (k+1)·n − 1)
-    // ceil((k·n)^(1/e))
-    const k_n = k * n;
-    let lower = iroot(k_n, e);
-    if (lower ** e < k_n) lower += 1n;
-
-    // floor(((k+1)·n − 1)^(1/e))
-    const upper = iroot((k + 1n) * n - 1n, e);
-
-    if (lower > upper) {
-      m = lower;
-    } else {
-      const range = upper - lower + 1n;
-      const sampleRange = range > 1000000n ? 1000000n : range;
-      m = lower + BigInt(Math.floor(Math.random() * Number(sampleRange)));
-    }
-  }
-
-  const c = encrypt(m, n, e);
-  return { n: n.toString(), e: e.toString(), c: c.toString(), k_bound: '100000', m: m.toString() };
+  const kp = generateHastadTestcase();
+  return { n: kp.n.toString(), e: kp.e.toString(), c: kp.c.toString() };
 };

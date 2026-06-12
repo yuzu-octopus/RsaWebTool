@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
+import { generatePhiLeakTestcase } from '../utils/testcases/core';;
 import { isqrt } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
 
@@ -133,6 +133,6 @@ p, q &= \\frac{s \\pm \\sqrt{\\Delta}}{2} \\qed
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const { n, phi } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
-  return { n: n.toString(), phi: phi.toString() };
+  const kp = generatePhiLeakTestcase();
+  return { n: kp.n.toString(), phi: kp.phi.toString() };
 };

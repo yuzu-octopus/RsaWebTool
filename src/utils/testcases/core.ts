@@ -117,6 +117,19 @@ export function generateHastadTestcase(): RSAKeyPair & { m: bigint; c: bigint } 
   return { ...pair, m, c };
 }
 
+/**
+ * Generate a Hastad Broadcast testcase: 3 separate moduli (same m, e=3),
+ * 3 separate ciphertexts. The attack uses CRT to recover m^3, then takes the
+ * cube root. Each modulus is a separate keypair so the CRT is well-defined.
+ */
+export function generateHastadBroadcastTestcase(): { n_list: string[]; e: bigint } {
+  const m = 12345n;
+  const e = 3n;
+  const pairs = [generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q, e), generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q, e), generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q, e)];
+  const ciphertexts = pairs.map(p => modPow(m, e, p.n).toString());
+  return { n_list: pairs.map(p => p.n.toString()), e };
+}
+
 /** Generate a Wiener-vulnerable testcase: d < n^(1/4)/3. */
 export function generateWienerTestcase(): RSAKeyPair {
   // Start with a small d, then solve for e = d^-1 mod phi.

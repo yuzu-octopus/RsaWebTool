@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { isqrt } from '../utils/bigint';
-import { randomPrime, isPrimeMR } from '../utils/testcases/core';
+import { generateFermatTestcase } from '../utils/testcases/core';;
 import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
@@ -169,11 +169,6 @@ a_i^2 - n \\text{ is square} &\\implies p = a_i - b_i,\\; q = a_i + b_i \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Use 512-bit close primes — Fermat converges in < 5000 iterations
-  // for |p - q| < 10000, regardless of absolute bit size
-  const p = randomPrime(512);
-  const delta = Math.floor(Math.random() * 250000) * 2 + 2;
-  let q = p + BigInt(delta);
-  while (!isPrimeMR(q)) q += 2n;
-  return { n: (p * q).toString() };
+  const kp = generateFermatTestcase();
+  return { n: kp.n.toString(), e: kp.e.toString() };
 };
