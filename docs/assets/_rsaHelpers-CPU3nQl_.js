@@ -1,4 +1,4 @@
-import type { Attack } from '../types';
+var e=`import type { Attack } from '../types';
 
 /**
  * Common applicableCheck patterns for RSA attacks.
@@ -42,13 +42,13 @@ export const rsaNeeds = {
   nValuesMulti: (p: Record<string, string>) => {
     const vals = (p.n_values || '').trim();
     if (!vals) return false;
-    return vals.split(/[\n,]+/).filter(x => x.trim()).length >= 2;
+    return vals.split(/[\\n,]+/).filter(x => x.trim()).length >= 2;
   },
   nALeak: (p: Record<string, string>) => !!p.n && !!p.a && !!p.leak,
   moduliList: (p: Record<string, string>) => {
     const vals = (p.moduli_list || '').trim();
     if (!vals) return false;
-    return vals.split('\n').filter(x => x.trim()).length >= 2;
+    return vals.split('\\n').filter(x => x.trim()).length >= 2;
   },
 } as const;
 
@@ -58,4 +58,5 @@ export const rsaNeeds = {
  * @param token Attack-specific token for the NOT_APPLICABLE marker
  */
 export const noopSageTemplate = (token: string = 'ATTACK'): string =>
-  `This attack runs entirely in the browser via frontendCheck. No SageMath execution is needed.\n\nSee the proof panel for the algorithm and the result panel for the computed output.\n\n${token}=NOT_APPLICABLE`;
+  \`This attack runs entirely in the browser via frontendCheck. No SageMath execution is needed.\\n\\nSee the proof panel for the algorithm and the result panel for the computed output.\\n\\n\${token}=NOT_APPLICABLE\`;
+`;export{e as default};

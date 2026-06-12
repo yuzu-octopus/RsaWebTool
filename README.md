@@ -11,9 +11,9 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 ### Cryptographic Attacks
 
 - **47 attacks** — Factorization (19), Lattice/Partial Key (11), Message/Protocol (9), Oracle (4), and Advanced (4) categories
-- **33 browser-side checks** — instant results via native BigInt (no SageCell needed), with live progress bars showing iteration variable + count on longer-running attacks
+- **31 browser-side checks** — instant results via native BigInt (no SageCell needed), with live progress bars showing iteration variable + count on longer-running attacks
 - **3 concurrent Web Workers** — parallel frontendCheck execution across attacks
-- **SageMathCell integration** — 43 attacks with SageMath backstop (4 are pure-JS only), 3 concurrent slots, 30s stall detection, immediate error element reporting
+- **SageMathCell integration** — 42 attacks with SageMath backstop (5 are pure-JS only), 3 concurrent slots, 30s stall detection, immediate error element reporting
 - **FactorDB lookup** — auto-queries FactorDB and auto-submits discovered factorizations
 - **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution (3 concurrent) with early-stop on first true success
 - **Console Environment** — `window.env` exposes all config (workers, timeouts, FactorDB proxy) with localStorage persistence; `env.reset()` clears all stored state
@@ -129,6 +129,7 @@ Open `http://localhost:5173` in your browser.
 Select an attack from the sidebar. The Input Panel shows:
 - **Explanation tab** — KaTeX-rendered proof of how the attack works
 - **Input tab** — form fields for RSA parameters. Fill in values (manually or via "Generate Testcase") and click **Run**.
+- **Source tab** — raw source code of the frontendCheck function with syntax highlighting
 
 ### Magic Panel
 Click the wand icon in the sidebar. Paste all known RSA parameters — the tool auto-detects values via regex, shows which attacks apply, and runs them all in parallel (up to 3 at a time) via Web Workers and SageCell slots. Stops at first success.
@@ -224,7 +225,7 @@ env.reset()              // clears ALL localStorage + reloads
 |-------|------------|
 | UI | React 19.2 + TypeScript 6.0 + Material UI 9.0 |
 | Build | Vite 8.0 + Rolldown |
-| Syntax Highlighting | Prism.js (replaces react-syntax-highlighter) |
+| Syntax Highlighting | Prism.js |
 | Math | SageMathCell (embedded JS), KaTeX 0.17 |
 | Crypto | @noble/ciphers 2.2 (AES), @noble/curves 2.2 (ECC), @noble/hashes 2.2 (hash), bigint-gcd 1.0 |
 | External | FactorDB (via Cloudflare Worker CORS proxy) |
@@ -237,7 +238,7 @@ src/
   attacks/           47 attack files + guard.ts + index.ts + rawSources.ts + _rsaHelpers.ts
   components/        React components (40 .tsx files)
     _shared/         EmptyState.tsx
-    calculator/      Calculator shell + 5 calculators with sub-tabs (28 files)
+    calculator/      Calculator shell + 5 calculators with sub-tabs (21 files)
       _shared/       CalculatorHeader.tsx, ResultBox.tsx
       hash/          ExplanationTab, HashFunctionsTab, HMACTab, LengthExtensionTab, ProofOfWorkTab
   config/            env.ts (console-accessible Env class), sidebarItems.ts
@@ -246,14 +247,16 @@ src/
                      useCommandPalette, useCopyToClipboard, useDragResize,
                      useKeyboardShortcuts, useMagicExecution, useNotepad,
                      useSageMath, useTimer, useWorkerPool
-  styles/            shared.ts (7 style objects, FONT_FAMILY, animation keyframes),
+  styles/            shared.ts (16 style objects + keyframes + FONT_FAMILY),
                      inputSx.ts, draculaPrism.css
   theme/             dracula.ts — full Dracula palette
-  types/             index.ts — Attack, InputField, HistoryEntry, NotificationState,
+  types/             index.ts — Attack (sageTemplate optional, usageGuide optional),
+                     InputField, HistoryEntry, NotificationState,
                      AppContextType, CalculatorMode, AttackCategory
   utils/             bigint.ts, converters.ts, dhCrypto.ts, aesCrypto.ts, eccCurves.ts,
-                     factordb.ts, sageOutput.ts, rsaCalc.ts, testcases/core.ts,
-                     attackSource.ts, pemParser.ts, asn1.ts, progressEstimator.ts
+                     factordb.ts, sageOutput.ts, rsaCalc.ts, pemParser.ts, asn1.ts,
+                     progressEstimator.ts
+    testcases/       core.ts — prime generation, testcase utilities, TESTCASE_BITS
   workers/           2 Web Workers
     attack-worker.ts    Attack execution worker (~304KB lazy chunk)
     pow-worker.ts       Hashcash Proof of Work solver (~86 lines)
@@ -261,12 +264,17 @@ workers/             Cloudflare Worker CORS proxy for FactorDB
   factordb-proxy.js
   wrangler.toml
   DEPLOY.md
+scripts/             Test scripts and utilities
+  test-attacks.ts    Attack E2E test runner
+  test-sage-docker.ts SageMath Docker test runner
+  test-playwright.ts Playwright integration tests
+  gen-missing.ts     Testcase generation utilities
 .github/workflows/deploy.yml
 ```
 
 ## Calculator Architecture
 
-The unified Calculator shell (`Calculator.tsx`) provides a 5-tab selector (RSA / AES / ECC / Hash / DH) with keyboard shortcuts (⌘1-⌘5). Each calculator is lazy-loaded via `React.lazy` and wrapped in a `<Suspense>` boundary. Shared UI components (`CalculatorHeader`, `ResultBox`, `AttackExplanationPanel`) eliminate duplicate layout patterns.
+The unified Calculator shell (`Calculator.tsx`) provides a 5-tab selector (RSA / AES / ECC / Hash / DH) with keyboard shortcuts (⌘1-⌘5). Each calculator is lazy-loaded via `React.lazy` and wrapped in a `<Suspense>` boundary. Shared UI components (`CalculatorHeader`, `ResultBox`, `AttackExplanationPanel`, `CalculatorSubTabs`) eliminate duplicate layout patterns.
 
 ### RSA Calculator (`RSACalculator.tsx`)
 - 4 sub-tabs: Explanation, Key Gen, Encrypt, Decrypt

@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { keyframes } from '@mui/material/styles';
 import {
   Box,
   Typography,
@@ -19,20 +18,12 @@ import { useAttackExecution } from '../hooks/useAttackExecution';
 import { ProofRenderer } from './ProofRenderer';
 import { EmptyState } from './_shared/EmptyState';
 import { inputSx } from '../styles/inputSx';
-import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, MONO_FAMILY, PROSE_FAMILY } from '../styles/shared';
+import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, hourglassSpin, MONO_FAMILY, PROSE_FAMILY } from '../styles/shared';
 import Prism from 'prismjs';
 import '../styles/draculaPrism.css';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/components/prism-python';
 import { getAttackSource, extractFrontendCheck, dedent } from '../attacks/rawSources';
-
-const hourglassSpin = keyframes`
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(180deg); }
-  50% { transform: rotate(180deg); }
-  75% { transform: rotate(360deg); }
-  100% { transform: rotate(360deg); }
-`;
 
 export function InputPanel() {
   const { selectedAttack, viewMode, setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification } = useAppContext();

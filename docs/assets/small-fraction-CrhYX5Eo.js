@@ -1,4 +1,4 @@
-import type { Attack } from '../types';
+var e=`import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { isqrt } from '../utils/bigint';
@@ -28,7 +28,7 @@ export const attack: Attack = {
     token: 'SMALL_FRACTION',
     n: vals.n,
     useGuard: true,
-    body: `        #
+    body: \`        #
         # Small fraction attack: p/q ≈ a/b for small a, b
         # Use Python ints for fast trial division
         out.append("Small Fraction Attack")
@@ -102,7 +102,7 @@ export const attack: Attack = {
             out.append("Results:")
             out.append("")
             out.append("SMALL_FRACTION=FAILED")
-`,
+\`,
     imports: ['import math'],
   }),
   frontendCheck: (vals, onProgress) => {
@@ -110,7 +110,7 @@ export const attack: Attack = {
     try {
       const n = BigInt(vals.n);
       if (n % 2n === 0n) {
-        return Promise.resolve(`Small Fraction Attack\nn = ${n}\n\nResults:\np = 2\nq = ${n / 2n}\n\nVerification: p * q = ${n}\n\nSMALL_FRACTION=SUCCESS`);
+        return Promise.resolve(\`Small Fraction Attack\\nn = \${n}\\n\\nResults:\\np = 2\\nq = \${n / 2n}\\n\\nVerification: p * q = \${n}\\n\\nSMALL_FRACTION=SUCCESS\`);
       }
 
       // n is odd (product of odd primes) — skip even q candidates
@@ -119,7 +119,7 @@ export const attack: Attack = {
       for (let b = 1; b <= 100; b++) {
         if (onProgress) {
           const pct = Math.round((b - 1) * 100 / 100);
-          onProgress(pct, `b = ${b} / 100`);
+          onProgress(pct, \`b = \${b} / 100\`);
         }
         for (let a = 1; a <= b; a++) {
           if (numGcd(a, b) !== 1) continue;
@@ -132,7 +132,7 @@ export const attack: Attack = {
               const p = n / q;
               if (p > 1n) {
                 onProgress?.(100);
-                return Promise.resolve(`Small Fraction Attack\nn = ${n}\n\nResults:\np = ${p}\nq = ${q}\n\nVerification: p * q = ${p * q}\na/b = ${a}/${b}\n\nSMALL_FRACTION=SUCCESS`);
+                return Promise.resolve(\`Small Fraction Attack\\nn = \${n}\\n\\nResults:\\np = \${p}\\nq = \${q}\\n\\nVerification: p * q = \${p * q}\\na/b = \${a}/\${b}\\n\\nSMALL_FRACTION=SUCCESS\`);
               }
             }
           }
@@ -141,35 +141,35 @@ export const attack: Attack = {
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  usageGuide: 'This attack factors n when the ratio of its two prime factors p/q is close to a simple fraction a/b with small denominator (≤ 100).\n\nHow it works:\n1. For each coprime pair (a,b) with 1 ≤ b ≤ 100 and 1 ≤ a ≤ b, estimate q₀ ≈ √(n·b/a)\n2. Test q₀ ± 2000 for divisibility: if q | n then p = n/q recovers both factors\n3. Since n is odd (product of two odd primes), even q can never divide n — a single-bit (q & 1) check skips ~50% of BigInt divisions\n4. Precomputed offset BigInts avoid per-iteration allocation overhead\n\nTip: Works in-browser (frontendCheck) for any n. Falls back to SageMathCell for larger systematic searches. Testcase generated with a=3, b=5 for immediate verification.',
-  proof: `\\textbf{Theorem:} If $p/q \\approx a/b$ for small coprime $a, b$, then $q \\approx \\sqrt{nb/a}$ and parity-optimized trial division near $q_0$ recovers the factor.
+  usageGuide: 'This attack factors n when the ratio of its two prime factors p/q is close to a simple fraction a/b with small denominator (≤ 100).\\n\\nHow it works:\\n1. For each coprime pair (a,b) with 1 ≤ b ≤ 100 and 1 ≤ a ≤ b, estimate q₀ ≈ √(n·b/a)\\n2. Test q₀ ± 2000 for divisibility: if q | n then p = n/q recovers both factors\\n3. Since n is odd (product of two odd primes), even q can never divide n — a single-bit (q & 1) check skips ~50% of BigInt divisions\\n4. Precomputed offset BigInts avoid per-iteration allocation overhead\\n\\nTip: Works in-browser (frontendCheck) for any n. Falls back to SageMathCell for larger systematic searches. Testcase generated with a=3, b=5 for immediate verification.',
+  proof: \`\\\\textbf{Theorem:} If $p/q \\\\approx a/b$ for small coprime $a, b$, then $q \\\\approx \\\\sqrt{nb/a}$ and parity-optimized trial division near $q_0$ recovers the factor.
 
-\\textbf{Setup:}
-\\begin{itemize}
-\\item $n = pq$, with $p,q$ odd primes
-\\item $p/q \\approx a/b$, $\\gcd(a,b) = 1$, $1 \\leq b \\leq 100$
-\\end{itemize}
+\\\\textbf{Setup:}
+\\\\begin{itemize}
+\\\\item $n = pq$, with $p,q$ odd primes
+\\\\item $p/q \\\\approx a/b$, $\\\\gcd(a,b) = 1$, $1 \\\\leq b \\\\leq 100$
+\\\\end{itemize}
 
-\\textbf{Proof:}
-\\begin{align*}
-\\frac{p}{q} &\\approx \\frac{a}{b} \\\\
-n = pq &\\approx \\frac{a}{b} q^2 \\\\
-q_0 &= \\left\\lfloor\\sqrt{\\frac{nb}{a}}\\right\\rfloor \\\\
-\\text{Search } q_0 \\pm k\\text{ for } &|k| \\leq 2000,\\; k \\in \\mathbb{Z} \\\\
-\\text{Even } q\\text{ cannot divide odd } n &\\implies \\text{skip } q \\equiv 0 \\pmod{2} \\\\
-\\text{Search space: } 1 \\leq b &\\leq 100,\\; 1 \\leq a \\leq b,\\; \\gcd(a,b) = 1 \\\\
-\\text{Complexity: } O(B^2 \\cdot \\Delta) & \\text{ with parity filter: } \\frac{1}{2}\\text{ fewer divisions}
-\\end{align*}
+\\\\textbf{Proof:}
+\\\\begin{align*}
+\\\\frac{p}{q} &\\\\approx \\\\frac{a}{b} \\\\\\\\
+n = pq &\\\\approx \\\\frac{a}{b} q^2 \\\\\\\\
+q_0 &= \\\\left\\\\lfloor\\\\sqrt{\\\\frac{nb}{a}}\\\\right\\\\rfloor \\\\\\\\
+\\\\text{Search } q_0 \\\\pm k\\\\text{ for } &|k| \\\\leq 2000,\\\\; k \\\\in \\\\mathbb{Z} \\\\\\\\
+\\\\text{Even } q\\\\text{ cannot divide odd } n &\\\\implies \\\\text{skip } q \\\\equiv 0 \\\\pmod{2} \\\\\\\\
+\\\\text{Search space: } 1 \\\\leq b &\\\\leq 100,\\\\; 1 \\\\leq a \\\\leq b,\\\\; \\\\gcd(a,b) = 1 \\\\\\\\
+\\\\text{Complexity: } O(B^2 \\\\cdot \\\\Delta) & \\\\text{ with parity filter: } \\\\frac{1}{2}\\\\text{ fewer divisions}
+\\\\end{align*}
 
-\\textbf{Explanation:} When $p \\approx (a/b) \\cdot q$, substituting into $n = pq$ gives $q^2 \\approx nb/a$. We compute $q_0 = \\lfloor\\sqrt{nb/a}\\rfloor$ for each coprime $a,b$ and test $q_0 \\pm 2000$ for an exact divisor of $n$. Since $n$ is odd (product of odd primes), even candidates can never divide $n$ and are skipped via a $\\& 1$ bit check — cutting the effective trial division count in half. Precomputed BigInt offsets avoid per-iteration allocation. The search examines $\\approx 5050$ fraction pairs, each with $4001$ delta candidates, halved to $\\approx 10$M BigInt divisions worst-case.
+\\\\textbf{Explanation:} When $p \\\\approx (a/b) \\\\cdot q$, substituting into $n = pq$ gives $q^2 \\\\approx nb/a$. We compute $q_0 = \\\\lfloor\\\\sqrt{nb/a}\\\\rfloor$ for each coprime $a,b$ and test $q_0 \\\\pm 2000$ for an exact divisor of $n$. Since $n$ is odd (product of odd primes), even candidates can never divide $n$ and are skipped via a $\\\\& 1$ bit check — cutting the effective trial division count in half. Precomputed BigInt offsets avoid per-iteration allocation. The search examines $\\\\approx 5050$ fraction pairs, each with $4001$ delta candidates, halved to $\\\\approx 10$M BigInt divisions worst-case.
 
-\\textbf{Optimizations:}
-\\begin{itemize}
-\\item \\textbf{Parity pre-filter:} Since $n$ is odd (product of odd primes), even $q$ can never divide $n$, so a single-bit check $(q \\& 1)$ skips half the trial divisions with zero BigInt arithmetic cost.
-\\item \\textbf{Precomputed BigInt offsets:} Delta candidates are stored in a precomputed array as $BigInt$ values, avoiding per-iteration $BigInt(number)$ allocation overhead in the inner loop.
-\\end{itemize}
+\\\\textbf{Optimizations:}
+\\\\begin{itemize}
+\\\\item \\\\textbf{Parity pre-filter:} Since $n$ is odd (product of odd primes), even $q$ can never divide $n$, so a single-bit check $(q \\\\& 1)$ skips half the trial divisions with zero BigInt arithmetic cost.
+\\\\item \\\\textbf{Precomputed BigInt offsets:} Delta candidates are stored in a precomputed array as $BigInt$ values, avoiding per-iteration $BigInt(number)$ allocation overhead in the inner loop.
+\\\\end{itemize}
 
-\\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999`,
+\\\\textbf{References:} Menezes et al., "Handbook of Applied Cryptography"; Boneh, "Twenty Years of Attacks on the RSA Cryptosystem", 1999\`,
   priority: 'medium',
   applicableCheck: rsaNeeds.n,
 };
@@ -189,3 +189,4 @@ export const generateTestcase = (): Record<string, string> => {
   }
   return { n: (p * q).toString() };
 };
+`;export{e as default};

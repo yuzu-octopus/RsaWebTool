@@ -1,4 +1,4 @@
-import type { Attack } from '../types';
+var e=`import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateSmallDTestcase } from '../utils/testcases/core';
 import { isqrt } from '../utils/bigint';
@@ -18,8 +18,8 @@ export const attack: Attack = {
     token: 'PARTIAL_D',
     n: vals.n,
     imports: ['import math'],
-    body: `        e = Integer(${vals.e})
-        dLow = Integer(${vals.dLow})
+    body: \`        e = Integer(\${vals.e})
+        dLow = Integer(\${vals.dLow})
         if n <= 0 or e <= 0 or dLow < 0:
             out.append("PARTIAL_D=FAILED: invalid input values")
         else:
@@ -70,7 +70,7 @@ export const attack: Attack = {
             if not found:
                 out.append("PARTIAL_D=FAILED: no valid d found")
         if not found:
-            out.append("PARTIAL_D=FAILED")`,
+            out.append("PARTIAL_D=FAILED")\`,
     useGuard: true,
   }),
   frontendCheck: (vals: Record<string, string>, onProgress?: (pct: number, detail?: string) => void) => {
@@ -96,7 +96,7 @@ export const attack: Attack = {
       for (let k = 1n; k <= kBound; k++) {
         if (onProgress && kBound > 10000n && k % 100000n === 0n) {
           const pct = Number(k * 100n / kBound);
-          onProgress(pct, `k = ${k.toString()} / ${kBound.toString()}`);
+          onProgress(pct, \`k = \${k.toString()} / \${kBound.toString()}\`);
         }
         if ((dApprox & mask) === dLow) {
           // Found candidate — verify
@@ -110,7 +110,7 @@ export const attack: Attack = {
               if (p > 0n && n % p === 0n) {
                 const qVal = n / p;
                 onProgress?.(100);
-                return Promise.resolve(`Partial d Key Exposure\nn = ${n}\ne = ${e}\ndLow = ${dLow}\n\nResults:\np = ${p}\nq = ${qVal}\n\nVerification: p * q = ${p * qVal}\n\nPARTIAL_D=SUCCESS`);
+                return Promise.resolve(\`Partial d Key Exposure\\nn = \${n}\\ne = \${e}\\ndLow = \${dLow}\\n\\nResults:\\np = \${p}\\nq = \${qVal}\\n\\nVerification: p * q = \${p * qVal}\\n\\nPARTIAL_D=SUCCESS\`);
               }
             }
           }
@@ -127,32 +127,32 @@ export const attack: Attack = {
       return Promise.resolve(null);
     } catch { return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} If low $m$ bits of $d$ are known, recover $d$ by iterating $k$ in the key equation $ed = k\\varphi(n)+1$.
+  proof: \`\\\\textbf{Theorem:} If low $m$ bits of $d$ are known, recover $d$ by iterating $k$ in the key equation $ed = k\\\\varphi(n)+1$.
 
-\\textbf{Setup:}
-\\begin{itemize}
-\\item $ed \\equiv 1 \\pmod{\\varphi(n)}$, so $ed - 1 = k\\varphi(n)$ for some $k \\in [1, e]$
-\\item $d_{\\text{low}} = d \\bmod 2^m$ known, $m = \\text{bit-length of } d_{\\text{low}}$
-\\end{itemize}
+\\\\textbf{Setup:}
+\\\\begin{itemize}
+\\\\item $ed \\\\equiv 1 \\\\pmod{\\\\varphi(n)}$, so $ed - 1 = k\\\\varphi(n)$ for some $k \\\\in [1, e]$
+\\\\item $d_{\\\\text{low}} = d \\\\bmod 2^m$ known, $m = \\\\text{bit-length of } d_{\\\\text{low}}$
+\\\\end{itemize}
 
-\\textbf{Proof:}
-\\begin{align*}
-\\text{Since } \\varphi(n) &\\approx n,\\quad d \\approx \\frac{kn + 1}{e} \\\\
-d_{\\text{approx}} &= \\left\\lfloor \\frac{kn + 1}{e} \\right\\rfloor \\\\
-d_{\\text{approx}} \\bmod 2^m &\\stackrel{?}{=} d_{\\text{low}} \\\\
-\\varphi &= (ed_{\\text{approx}} - 1)/k \\\\
-x^2 - (n - \\varphi + 1)x + n &= 0 \\\\implies p,q \\qed
-\\end{align*}
+\\\\textbf{Proof:}
+\\\\begin{align*}
+\\\\text{Since } \\\\varphi(n) &\\\\approx n,\\\\quad d \\\\approx \\\\frac{kn + 1}{e} \\\\\\\\
+d_{\\\\text{approx}} &= \\\\left\\\\lfloor \\\\frac{kn + 1}{e} \\\\right\\\\rfloor \\\\\\\\
+d_{\\\\text{approx}} \\\\bmod 2^m &\\\\stackrel{?}{=} d_{\\\\text{low}} \\\\\\\\
+\\\\varphi &= (ed_{\\\\text{approx}} - 1)/k \\\\\\\\
+x^2 - (n - \\\\varphi + 1)x + n &= 0 \\\\\\\\implies p,q \\\\qed
+\\\\end{align*}
 
-\\textbf{Explanation:} For each $k \\in [1,e]$, compute $d_{\\text{approx}} = \\lfloor(kn+1)/e\\rfloor$. If the low $m$ bits match $d_{\\text{low}}$, recover $\\varphi(n) = (ed-1)/k$ and solve the quadratic $x^2 - (n-\\varphi+1)x + n = 0$ for $p$ and $q$. The search bound is limited to $k < 2^{m+2}$ (cap at $\\sim 16\\times 10^6$) for efficiency.
+\\\\textbf{Explanation:} For each $k \\\\in [1,e]$, compute $d_{\\\\text{approx}} = \\\\lfloor(kn+1)/e\\\\rfloor$. If the low $m$ bits match $d_{\\\\text{low}}$, recover $\\\\varphi(n) = (ed-1)/k$ and solve the quadratic $x^2 - (n-\\\\varphi+1)x + n = 0$ for $p$ and $q$. The search bound is limited to $k < 2^{m+2}$ (cap at $\\\\sim 16\\\\times 10^6$) for efficiency.
 
-\\textbf{Optimizations:}
-\\begin{itemize}
-\\item \\textbf{Incremental }$d_{\\text{approx}}$\\textbf{ update:} Instead of recomputing $d_{\\text{approx}} = \\lfloor (kn+1)/e \\rfloor$ from scratch each iteration (costly BigInt division), maintains a running quotient/remainder: increments $d_{\\text{approx}}$ by $q = (d_{\\text{approx}} + n) \\div e$ and tracks a running remainder, updating both additively per step.
-\\end{itemize}
+\\\\textbf{Optimizations:}
+\\\\begin{itemize}
+\\\\item \\\\textbf{Incremental }$d_{\\\\text{approx}}$\\\\textbf{ update:} Instead of recomputing $d_{\\\\text{approx}} = \\\\lfloor (kn+1)/e \\\\rfloor$ from scratch each iteration (costly BigInt division), maintains a running quotient/remainder: increments $d_{\\\\text{approx}}$ by $q = (d_{\\\\text{approx}} + n) \\\\div e$ and tracks a running remainder, updating both additively per step.
+\\\\end{itemize}
 
-\\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,
-  usageGuide: 'This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.\n\nHow to use:\n1. You have modulus n, public exponent e, and dLow (the low-order bits of d)\n2. Provide n, e, and dLow\n3. The attack iterates k in ed = kphi(n) + 1, checking if d_approx has matching low bits\n4. For each matching candidate, it computes phi(n) and solves the quadratic for p,q\n\nTip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~16M iterations). Uses incremental d_approx update (avoiding BigInt division per iteration) for performance.',
+\\\\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998\`,
+  usageGuide: 'This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.\\n\\nHow to use:\\n1. You have modulus n, public exponent e, and dLow (the low-order bits of d)\\n2. Provide n, e, and dLow\\n3. The attack iterates k in ed = kphi(n) + 1, checking if d_approx has matching low bits\\n4. For each matching candidate, it computes phi(n) and solves the quadratic for p,q\\n\\nTip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~16M iterations). Uses incremental d_approx update (avoiding BigInt division per iteration) for performance.',
   priority: 'high',
   applicableCheck: rsaNeeds.nEDLow,
 };
@@ -165,3 +165,4 @@ export const generateTestcase = (): Record<string, string> => {
   const dLow = kp.d & ((1n << 20n) - 1n);
   return { n: kp.n.toString(), e: kp.e.toString(), dLow: dLow.toString() };
 };
+`;export{e as default};

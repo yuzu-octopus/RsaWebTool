@@ -1,4 +1,4 @@
-import type { Attack } from '../types';
+var e=`import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateWienerTestcase } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
@@ -15,7 +15,7 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'BONEH_DURFEE',
     n: vals.n,
-    body: `        e = Integer(${vals.e})
+    body: \`        e = Integer(\${vals.e})
         found = False
         if e < 2:
             out.append("Boneh-Durfee Attack")
@@ -175,32 +175,32 @@ export const attack: Attack = {
                         found = True
                         break
         if not found:
-            out.append("BONEH_DURFEE=FAILED")`,
+            out.append("BONEH_DURFEE=FAILED")\`,
     useGuard: true,
   }),
-  proof: `\\textbf{Theorem:} Find $d$ when $d < n^{0.260}$ using Wiener's continued fractions ($d < n^{0.25}$) or Boneh-Durfee's lattice ($d < n^{0.260}$).
+  proof: \`\\\\textbf{Theorem:} Find $d$ when $d < n^{0.260}$ using Wiener's continued fractions ($d < n^{0.25}$) or Boneh-Durfee's lattice ($d < n^{0.260}$).
 
-\\textbf{Setup:}
-\\begin{itemize}
-\\item $ed \\equiv 1 \\pmod{\\phi(n)}$ with unknown $d$, $k$, $\\phi(n)$
-\\item $e \\approx n$ and $d < n^{\\delta}$ with $\\delta < 0.5$
-\\end{itemize}
+\\\\textbf{Setup:}
+\\\\begin{itemize}
+\\\\item $ed \\\\equiv 1 \\\\pmod{\\\\phi(n)}$ with unknown $d$, $k$, $\\\\phi(n)$
+\\\\item $e \\\\approx n$ and $d < n^{\\\\delta}$ with $\\\\delta < 0.5$
+\\\\end{itemize}
 
-\\textbf{Proof:}
-\\begin{align*}
-\\left|\\frac{e}{n} - \\frac{k}{d}\\right| &= \\frac{|ed - kn|}{dn} = \\frac{|1 - k(p+q-1)|}{dn} < \\frac{1}{2d^2} \\quad \\text{(for $d < n^{0.25}$)}\\\\
-\\frac{k}{d} \\text{ a convergent of } \\frac{e}{n} &\\implies \\phi(n) = \\frac{ed-1}{k},\\; p+q = n - \\phi(n) + 1 \\\\
-p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2}
-\\end{align*}
+\\\\textbf{Proof:}
+\\\\begin{align*}
+\\\\left|\\\\frac{e}{n} - \\\\frac{k}{d}\\\\right| &= \\\\frac{|ed - kn|}{dn} = \\\\frac{|1 - k(p+q-1)|}{dn} < \\\\frac{1}{2d^2} \\\\quad \\\\text{(for $d < n^{0.25}$)}\\\\\\\\
+\\\\frac{k}{d} \\\\text{ a convergent of } \\\\frac{e}{n} &\\\\implies \\\\phi(n) = \\\\frac{ed-1}{k},\\\\; p+q = n - \\\\phi(n) + 1 \\\\\\\\
+p,q &= \\\\frac{(p+q) \\\\pm \\\\sqrt{(p+q)^2 - 4n}}{2}
+\\\\end{align*}
 
-\\textbf{Explanation:} Wiener's attack exploits the fact that when $d$ is small, $e/n$ approximates $k/d$ so closely that $k/d$ appears as a convergent in the continued fraction expansion of $e/n$. The Boneh-Durfee lattice uses Coppersmith's method with a bivariate polynomial $f(x,y) = x(A+y)-1$ to extend the bound to $d < n^{0.260}$ by finding short vectors via LLL.
+\\\\textbf{Explanation:} Wiener's attack exploits the fact that when $d$ is small, $e/n$ approximates $k/d$ so closely that $k/d$ appears as a convergent in the continued fraction expansion of $e/n$. The Boneh-Durfee lattice uses Coppersmith's method with a bivariate polynomial $f(x,y) = x(A+y)-1$ to extend the bound to $d < n^{0.260}$ by finding short vectors via LLL.
 
-\\textbf{Optimizations:}
-\\begin{itemize}
-\\item \\textbf{Two-phase execution:} Phase 1 runs Wiener's continued fraction attack ($d < n^{0.25}$) — a fast $O(\\log n)$ check using $e/n$ convergents that immediately succeeds for small $d$ without invoking lattice reduction. Phase 2 runs the Herrmann-May Coppersmith lattice ($d < n^{0.260}$) with Sage native resultant for bivariate root recovery, only when Wiener fails.
-\\end{itemize}
+\\\\textbf{Optimizations:}
+\\\\begin{itemize}
+\\\\item \\\\textbf{Two-phase execution:} Phase 1 runs Wiener's continued fraction attack ($d < n^{0.25}$) — a fast $O(\\\\log n)$ check using $e/n$ convergents that immediately succeeds for small $d$ without invoking lattice reduction. Phase 2 runs the Herrmann-May Coppersmith lattice ($d < n^{0.260}$) with Sage native resultant for bivariate root recovery, only when Wiener fails.
+\\\\end{itemize}
 
-\\textbf{References:} M. Wiener, CRYPTO 1990; D. Boneh, G. Durfee, CRYPTO 1999`,
+\\\\textbf{References:} M. Wiener, CRYPTO 1990; D. Boneh, G. Durfee, CRYPTO 1999\`,
   priority: 'high',
   applicableCheck: rsaNeeds.nE,
 };
@@ -209,3 +209,4 @@ export const generateTestcase = (): Record<string, string> => {
   const kp = generateWienerTestcase();
   return { n: kp.n.toString(), e: kp.e.toString() };
 };
+`;export{e as default};
