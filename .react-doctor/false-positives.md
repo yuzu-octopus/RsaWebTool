@@ -14,8 +14,8 @@ Future scans should not re-flag the items below. If the underlying assumption ch
 
 ### `dangerouslySetInnerHTML` in `ProofRenderer.tsx:96,108,117,196`
 - **Rule:** Raw HTML injection / XSS risk
-- **Why suppressed:** Renders KaTeX-rendered LaTeX output (`katex.renderToString()`) and `renderInlineText()` output, both of which produce escaped HTML from trusted internal sources (calculator proof constants, not user input). KaTeX has its own MathML/HTML sanitization. The rendered strings never include unescaped user content.
-- **Do not un-suppress** unless user input starts flowing into these call sites.
+- **Why suppressed:** Renders KaTeX-rendered LaTeX output (`katex.renderToString()`) and `renderInlineText()` output. KaTeX sanitizes its *output* but does NOT sanitize the input LaTeX string. The safety of these call sites depends entirely on the *input source* being static build-time constants (calculator proof data bundled with the app), NOT on KaTeX itself. Currently all call sites pass static content (`ECC_PROOF`, `EXPLANATION_LATEX`, `AES_PROOF`, `selectedAttack.proof`, etc.) — no user-supplied strings reach this component.
+- **Do not un-suppress** unless user input starts flowing into these call sites. If a future feature adds a "render your own proof" textbox that feeds `ProofRenderer`, the XSS concern becomes real and the call sites must add DOMPurify sanitization (or the feature must be rejected).
 
 ### `dangerouslySetInnerHTML` in `AttackExplanationPanel.tsx:88`
 - **Rule:** Raw HTML injection / XSS risk
@@ -34,7 +34,7 @@ Future scans should not re-flag the items below. If the underlying assumption ch
 - `ProofOfWorkTab.tsx:246` — Index key in a derived list computed from a static alphabet. No reordering.
 
 ### Missing effect dependencies (1)
-- `ProofOfWorkTab.tsx:91` — `useCallback` references values intentionally excluded from deps (synchronous refs to worker pool). Behavior verified safe; the alternative (adding deps) causes worker teardown on every render.
+- `ProofOfWorkTab.tsx:91` — `useCallback` references values intentionally excluded from deps (synchronous refs to worker pool). Behavior verified safe; the alternative (adding deps) causes worker teardown on every render. The suppression is self-documenting in the source via a local `// eslint-disable-next-line react-hooks/exhaustive-deps` comment.
 
 ### Data fetching in useEffect (1)
 - `Sidebar.tsx:69` — The "data fetching" is reading `localStorage` for the notepad persist-on-mount. Not a network race condition; `useEffect` is the correct hook for mount-time hydration. No cleanup needed (synchronous read).
