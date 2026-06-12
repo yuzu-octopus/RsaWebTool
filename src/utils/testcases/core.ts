@@ -110,11 +110,23 @@ export function generateFermatTestcase(): RSAKeyPair & { m: bigint; c: bigint } 
 
 /** Generate a Hastad-vulnerable testcase: e=3, m^3 < n. */
 export function generateHastadTestcase(): RSAKeyPair & { m: bigint; c: bigint } {
-  // With e=3 and small m, m^3 fits in a single integer — cube root recovers m.
-  const pair = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q, 3n);
+  // For e=3 to be valid RSA, gcd(3, phi) must be 1, i.e. 3 ∤ (p-1)(q-1).
+  // Reject primes p where p ≡ 1 (mod 3) so that 3 ∤ (p-1). Combined with the
+  // same for q, we get gcd(3, phi) = 1 and the generator returns e=3 (not 5, 7, ...).
+  let p: bigint, q: bigint;
+  do {
+    p = randomPrime(TESTCASE_BITS.p);
+    q = randomPrime(TESTCASE_BITS.q);
+  } while (p === q || p % 3n === 1n || q % 3n === 1n);
+  if (p > q) [p, q] = [q, p];
+  const n = p * q;
+  const phi = (p - 1n) * (q - 1n);
+  const e = 3n;
+  const d = modInverse(e, phi);
+  if (d === null) throw new Error('modInverse failed for e=3');
   const m = 12345n;
-  const c = modPow(m, 3n, pair.n);
-  return { ...pair, m, c };
+  const c = modPow(m, e, n);
+  return { p, q, n, e, d, phi, m, c };
 }
 
 /**

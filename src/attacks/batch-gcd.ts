@@ -1,9 +1,10 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { rsaNeeds, noopSageTemplate } from './_rsaHelpers';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd } from '../utils/bigint';
 
 export const attack: Attack = {
+  sageTemplate: noopSageTemplate,
   id: 'batch-gcd',
   name: 'Batch GCD',
   category: 'Factorization',
