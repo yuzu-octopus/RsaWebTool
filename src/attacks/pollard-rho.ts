@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { gcd } from '../utils/bigint';
-import { randomPrime } from '../utils/testcases/core';
+import { generatePollardTestcase } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
@@ -174,10 +174,8 @@ p &\\mid (x_i - x_j) \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Generate n with one SMALL factor (≤28 bits) so rho succeeds within SageCell 120s
-  // Rho runs in O(sqrt(p)) — with p=28 bits, ~2^14 = 16384 iterations, very fast
-  // n = 28 + 64 = 92 bits total — fast modular arithmetic
-  const p = randomPrime(34);
-  const q = randomPrime(64);
-  return { n: (p * q).toString() };
+  // Use the shared Pollard generator for a semiprime with p-1 B-smooth.
+  // Pollard's rho will also find p quickly (B-smooth p-1 implies small ord).
+  const { n, p } = generatePollardTestcase();
+  return { n: n.toString(), p: p.toString() };
 };

@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
-import { modInverse, isqrt } from '../utils/bigint';
+import { generateSmallDTestcase } from '../utils/testcases/core';
+import { isqrt } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
@@ -159,22 +159,10 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\\\implies p,q \\qed
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Construct RSA key with VERY small d (d in [100, 10100]) so the k-iteration
-  // attack converges. This is NOT Wiener-vulnerable (Wiener requires d < n^0.25
-  // which is much larger); the partial-d attack needs d small enough that
-  // k = (ed-1)/phi is reachable within kBound = 1 << min(dLowBits + 2, 24).
-  // generateWienerTestcase produces a Wiener-vulnerable d which is too large
-  // for the partial-d k-iteration, so we keep custom construction here.
-  const p = randomPrime(TESTCASE_BITS.p);
-  const q = randomPrime(TESTCASE_BITS.q);
-  const n = p * q;
-  const phi = (p - 1n) * (q - 1n);
-  let d = BigInt(100 + Math.floor(Math.random() * 10000));
-  while (modInverse(d, phi) === null) {
-    d += 1n;
-  }
-  const e = modInverse(d, phi)!;
-  // Leak low 20 bits of d (test expects dLow <= 20 bits)
-  const dLow = d & ((1n << 20n) - 1n);
-  return { n: n.toString(), e: e.toString(), dLow: dLow.toString() };
+  // Use the shared small-d generator to get a keypair with d in [100, 10100],
+  // then leak the low 20 bits of d. generateWienerTestcase doesn't fit because
+  // Wiener d (up to n^0.25) is too large for the partial-d kBound cap (2^24).
+  const kp = generateSmallDTestcase();
+  const dLow = kp.d & ((1n << 20n) - 1n);
+  return { n: kp.n.toString(), e: kp.e.toString(), dLow: dLow.toString() };
 };

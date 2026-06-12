@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { wrapSageTemplate } from './guard';
-import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
+import { generatePollardTestcase } from '../utils/testcases/core';
 import { gcd, modPow } from '../utils/bigint';
 
 export const attack: Attack = {
@@ -207,32 +207,9 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  let p: bigint;
-  while (true) {
-    let pMinus1 = 2n;
-    const primes = [];
-    for (let i = 2; i <= 5000; i++) {
-      if (isPrimeMR(BigInt(i))) primes.push(BigInt(i));
-    }
-    // Fisher-Yates shuffle for unbiased randomness
-    for (let i = primes.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [primes[i], primes[j]] = [primes[j], primes[i]];
-    }
-    let currentBits = 0n;
-    let idx = 0;
-    while (currentBits < 256n && idx < primes.length) {
-      pMinus1 *= primes[idx];
-      // Use BigInt bitLength for accurate bit counting
-      currentBits += BigInt(primes[idx].toString(2).length);
-      idx++;
-    }
-    // Stage 1 only: p = smoothProduct + 1
-    p = pMinus1 + 1n;
-    if (isPrimeMR(p)) break;
-  }
-
-  const q = randomPrime(TESTCASE_BITS.q);
-  const n = p * q;
-  return { n: n.toString(), B: '10000', B2: '0' };
+  // Use the shared Pollard generator for a semiprime with p-1 B-smooth
+  // (p ≡ 1 mod prod(first 11 primes) ≈ 2^37). The B/B2 bounds tell the
+  // attack how far to search; 10000 covers all prime factors of p-1.
+  const { n, p } = generatePollardTestcase();
+  return { n: n.toString(), p: p.toString(), B: '10000', B2: '0' };
 };
