@@ -4,6 +4,8 @@ import { generateHastadTestcase } from '../utils/testcases/core';;
 import {  } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
 
+export const K_BOUND_DEFAULT = 100000;
+
 export const attack: Attack = {
   id: 'small-public-exp',
   name: 'Small Public Exponent',
@@ -13,7 +15,7 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: '3' },
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
-    { name: 'k_bound', label: 'k bound (c + k*n iterations)', placeholder: '100000', required: false },
+    { name: 'k_bound', label: 'k bound (c + k*n iterations)', placeholder: String(K_BOUND_DEFAULT), required: false },
   ],
   sageTemplate: (vals: Record<string, string>) => {
     if (!vals.n || !vals.c) {
@@ -213,5 +215,5 @@ m^e &= c + k \\cdot n \\quad\\text{for some } k \\in \\mathbb{Z}_{\\geq 0} \\\\
 export const generateTestcase = (): Record<string, string> => {
   const kp = generateHastadTestcase();
   // k_bound limits the k search space for m^e = c + k*n (default 100000 matches the input placeholder).
-  return { n: kp.n.toString(), e: kp.e.toString(), c: kp.c.toString(), k_bound: '100000' };
+  return { n: kp.n.toString(), e: kp.e.toString(), c: kp.c.toString(), k_bound: String(K_BOUND_DEFAULT) };
 };
