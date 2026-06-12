@@ -167,11 +167,13 @@ m &= \\sqrt[e]{M} \\quad \\text{(exact integer e-th root)}
 
 export const generateTestcase = (): Record<string, string> => {
   const kp = generateHastadBroadcastTestcase();
+  // frontendCheck expects each ciphertexts line to be "c, n" (parses [c, n] = line.split(','))
+  // so join the broadcast generator's (c1, n1), (c2, n2), (c3, n3) into the expected format.
   return {
     n1: kp.n1.toString(),
     n2: kp.n2.toString(),
     n3: kp.n3.toString(),
     e: kp.e.toString(),
-    ciphertexts: kp.ciphertexts,
+    ciphertexts: `${kp.ciphertexts.split('\n').map((c, i) => `${c}, ${[kp.n1, kp.n2, kp.n3][i]}`).join('\n')}`,
   };
 };
