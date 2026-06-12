@@ -9,6 +9,7 @@ export const rsaNeeds = {
   nE: (p: Record<string, string>) => !!p.n && !!p.e,
   nC: (p: Record<string, string>) => !!p.n && !!p.c,
   nEC: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c,
+  nECPQ: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.p && !!p.q,
   nP: (p: Record<string, string>) => !!p.n && !!p.p,
   nQ: (p: Record<string, string>) => !!p.n && !!p.q,
   nPQ: (p: Record<string, string>) => !!p.n && !!p.p && !!p.q,
@@ -38,6 +39,11 @@ export const rsaNeeds = {
   nECiphertexts: (p: Record<string, string>) => !!p.e && !!p.ciphertexts,
   triplesE: (p: Record<string, string>) => !!p.triples && !!p.e,
   nValues: (p: Record<string, string>) => !!p.n_values,
+  nValuesMulti: (p: Record<string, string>) => {
+    const vals = (p.n_values || '').trim();
+    if (!vals) return false;
+    return vals.split(/[\n,]+/).filter(x => x.trim()).length >= 2;
+  },
   nALeak: (p: Record<string, string>) => !!p.n && !!p.a && !!p.leak,
   moduliList: (p: Record<string, string>) => {
     const vals = (p.moduli_list || '').trim();

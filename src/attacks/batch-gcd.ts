@@ -100,7 +100,7 @@ The product $\\prod_{j \\neq i} n_j$ is computed by first multiplying all moduli
 
 \\textbf{References:} Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012; Bernstein, "How to Find Small Factors of Products", 2004`,
   priority: 'high',
-  applicableCheck: rsaNeeds.nValues,
+  applicableCheck: rsaNeeds.nValuesMulti,
 };
 
 export const generateTestcase = (): Record<string, string> => {
