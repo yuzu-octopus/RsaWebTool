@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { generateWienerTestcase } from '../utils/testcases/core';;
+import { generateWienerTestcase } from '../utils/testcases/core';
 import {  } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
 

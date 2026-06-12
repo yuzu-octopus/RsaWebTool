@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { generatePhiLeakTestcase } from '../utils/testcases/core';;
+import { generatePhiLeakTestcase } from '../utils/testcases/core';
 import { isqrt } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
 

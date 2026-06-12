@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { generateMultiPrimeTestcase } from '../utils/testcases/core';;
+import { generateMultiPrimeTestcase } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
