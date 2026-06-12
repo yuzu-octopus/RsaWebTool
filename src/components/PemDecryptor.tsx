@@ -277,55 +277,53 @@ export function PemDecryptor() {
 
               {parsed.keyParams ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
-                  {Object.entries(parsed.keyParams)
-                    .filter(([k]) => !['dp', 'dq', 'qInv'].includes(k))
-                    .map(([key, value]) => {
-                      if (!value || value === '0') return null;
-                      const display = truncateHex(value);
-                      return (
-                        <Box
-                          key={key}
+                  {Object.entries(parsed.keyParams).flatMap(([key, value]) => {
+                    if (['dp', 'dq', 'qInv'].includes(key) || !value || value === '0') return [];
+                    const display = truncateHex(value);
+                    return [
+                      <Box
+                        key={key}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'baseline',
+                          gap: 1,
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
                           sx={{
-                            display: 'flex',
-                            alignItems: 'baseline',
-                            gap: 1,
+                            color: draculaColors.purple,
+                            fontFamily: MONO_FAMILY,
+                            fontSize: '0.7rem',
+                            fontWeight: 600,
+                            minWidth: 32,
+                            textTransform: 'uppercase',
                           }}
                         >
+                          {key}:
+                        </Typography>
+                        <Tooltip title={value} arrow placement="top">
                           <Typography
                             variant="caption"
                             sx={{
-                              color: draculaColors.purple,
+                              color: draculaColors.foreground,
                               fontFamily: MONO_FAMILY,
                               fontSize: '0.7rem',
-                              fontWeight: 600,
-                              minWidth: 32,
-                              textTransform: 'uppercase',
+                              wordBreak: 'break-all',
+                              cursor: 'pointer',
+                              '&:hover': { color: draculaColors.cyan },
+                            }}
+                            onClick={() => {
+                              navigator.clipboard.writeText(value).catch(() => {});
+                              showNotification(`Copied ${key}`, 'info');
                             }}
                           >
-                            {key}:
+                            {display}
                           </Typography>
-                          <Tooltip title={value} arrow placement="top">
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                color: draculaColors.foreground,
-                                fontFamily: MONO_FAMILY,
-                                fontSize: '0.7rem',
-                                wordBreak: 'break-all',
-                                cursor: 'pointer',
-                                '&:hover': { color: draculaColors.cyan },
-                              }}
-                              onClick={() => {
-                                navigator.clipboard.writeText(value).catch(() => {});
-                                showNotification(`Copied ${key}`, 'info');
-                              }}
-                            >
-                              {display}
-                            </Typography>
-                          </Tooltip>
-                        </Box>
-                      );
-                    })}
+                        </Tooltip>
+                      </Box>,
+                    ];
+                  })}
                 </Box>
               ) : (
                 <Typography

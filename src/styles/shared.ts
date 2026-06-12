@@ -155,13 +155,6 @@ export const pageTitleSx = {
   fontWeight: 700,
 } as const;
 
-/** Section title (h5/h6) — used for sub-sections. */
-export const sectionTitleSx = {
-  color: draculaColors.cyan,
-  fontFamily: MONO_FAMILY,
-  fontWeight: 700,
-} as const;
-
 /** Sub-section title — quieter, used for tertiary headings. */
 export const subTitleSx = {
   color: draculaColors.comment,
