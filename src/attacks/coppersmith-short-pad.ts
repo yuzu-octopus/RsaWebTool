@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { randomPrime } from '../utils/testcases/core';
+import { generateHastadTestcase, generateKeyPair } from '../utils/testcases/core';
 import { modPow, iroot } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
 
@@ -165,12 +165,14 @@ m &= m_1 - r_1 = m_2 - r_2
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const e = 3n;
-  const p = randomPrime(256);
-  const q = randomPrime(256);
-  const n = p * q;
-  const m = BigInt(Math.floor(Math.random() * 10000) + 42);
-  // Use 12-bit padding for fast brute-force delta search (max delta = 4095)
+  // Use the shared Hastad generator for the (e, m) pair (small e, small m),
+  // then build n at 256-bit primes (512-bit n) so m1^e < n holds for the
+  // integer e-th root attack. Using kp.n from generateHastadTestcase would
+  // give a 1024-bit n that times out in L2b testing.
+  const kp = generateHastadTestcase();
+  const e = kp.e;
+  const m = kp.m;
+  const { n } = generateKeyPair(256, 256);
   const maxPad = 2 ** 12;
   const r1 = BigInt(Math.floor(Math.random() * maxPad));
   const r2 = BigInt(Math.floor(Math.random() * maxPad));

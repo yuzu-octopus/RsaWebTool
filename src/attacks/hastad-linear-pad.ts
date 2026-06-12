@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { generateKeyPair, encrypt } from '../utils/testcases/core';
+import { generateHastadTestcase, generateKeyPair, encrypt } from '../utils/testcases/core';
 import { wrapSageTemplate } from './guard';
 
 export const attack: Attack = {
@@ -171,8 +171,11 @@ m &= \\text{small\\_roots}(F) \\quad \\text{(since $|m| < N^{1/e}$)}
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const e = 3n;
-  const m = BigInt(Math.floor(Math.random() * 10000) + 42);
+  // Use the shared Hastad generator for the vulnerable (e=3, m) pair,
+  // then build 3 ciphertexts on different moduli with affine padding.
+  const kp = generateHastadTestcase();
+  const e = kp.e;
+  const m = kp.m;
   const triples: string[] = [];
   for (let i = 0; i < 3; i++) {
     const { n } = generateKeyPair(256, 256);
