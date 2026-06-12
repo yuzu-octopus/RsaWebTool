@@ -122,7 +122,7 @@ export function generateHastadTestcase(): RSAKeyPair & { m: bigint; c: bigint } 
  * 3 separate ciphertexts. The attack uses CRT to recover m^3, then takes the
  * cube root. Each modulus is a separate keypair so the CRT is well-defined.
  */
-export function generateHastadBroadcastTestcase(): { n1: bigint; n2: bigint; n3: bigint; e: bigint; ciphertexts: string } {
+export function generateHastadBroadcastTestcase(): { n1: bigint; n2: bigint; n3: bigint; e: bigint; c1: bigint; c2: bigint; c3: bigint } {
   // Hastad's broadcast attack: same m encrypted to k=3 recipients with the same e=3.
   // The attack uses CRT on the 3 ciphertexts to recover m^3, then takes the cube root.
   const m = 12345n;
@@ -133,7 +133,7 @@ export function generateHastadBroadcastTestcase(): { n1: bigint; n2: bigint; n3:
   const c1 = modPow(m, e, kp1.n);
   const c2 = modPow(m, e, kp2.n);
   const c3 = modPow(m, e, kp3.n);
-  return { n1: kp1.n, n2: kp2.n, n3: kp3.n, e, ciphertexts: `${c1}\n${c2}\n${c3}` };
+  return { n1: kp1.n, n2: kp2.n, n3: kp3.n, e, c1, c2, c3 };
 }
 
 /** Generate a Wiener-vulnerable testcase: d < n^(1/4)/3. */
