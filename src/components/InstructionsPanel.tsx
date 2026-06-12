@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import { MenuBook } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
-import { colFlexSx, FONT_FAMILY } from '../styles/shared';
+import { colFlexSx, MONO_FAMILY } from '../styles/shared';
 import { useAppContext } from '../hooks/useAppContext';
 
 interface Section {
@@ -61,7 +61,7 @@ const sectionContentSx = {
 
 const bulletSx = {
   color: draculaColors.foreground,
-  fontFamily: FONT_FAMILY,
+  fontFamily: MONO_FAMILY,
   fontSize: '0.85rem',
   lineHeight: 1.6,
   mb: 0.25,
@@ -93,7 +93,7 @@ export function InstructionsPanel() {
                   variant="h5"
                   sx={{
                     color: draculaColors.cyan,
-                    fontFamily: FONT_FAMILY,
+                    fontFamily: MONO_FAMILY,
                     fontWeight: 700,
                   }}
                 >

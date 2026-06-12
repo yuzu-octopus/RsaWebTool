@@ -20,7 +20,7 @@ import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useDragResize } from '../hooks/useDragResize';
 import { useNotepad } from '../hooks/useNotepad';
-import { ghostBtnSx, FONT_FAMILY, MONO_FAMILY } from '../styles/shared';
+import { ghostBtnSx, MONO_FAMILY } from '../styles/shared';
 import { EmptyState } from './_shared/EmptyState';
 
 const notepadBaseStyle: React.CSSProperties = {
@@ -165,7 +165,7 @@ export function OutputPanel() {
                   margin: 0,
                   borderRadius: 'inherit',
                   fontSize: '0.8rem',
-                  fontFamily: FONT_FAMILY,
+                  fontFamily: MONO_FAMILY,
                   backgroundColor: draculaColors.background,
                   color: draculaColors.foreground,
                   p: 1.5,

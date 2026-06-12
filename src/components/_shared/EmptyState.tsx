@@ -38,7 +38,7 @@ export interface EmptyStateProps {
  *
  *   // With rich example content (MagicPanel-style):
  *   <EmptyState title="Paste any of these formats:">
- *     <Box sx={{ fontFamily: 'JetBrains Mono', fontSize: '0.7rem' }}>
+ *     <Box sx={{ fontFamily: MONO_FAMILY, fontSize: '0.7rem' }}>
  *       <div>n = 0x1234...</div>
  *       <div>e = 65537</div>
  *     </Box>

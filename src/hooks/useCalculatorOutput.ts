@@ -25,6 +25,11 @@ export interface CalculatorOutputApi {
  * Encapsulates the "set local result, set global output, set source, add to history"
  * sequence that was repeated 30+ times across calculator tabs.
  *
+ * The returned object is memoized — its reference is stable across renders
+ * where `result` and `error` did not change. This means `useCallback` hooks
+ * that depend on `out` won't rebuild every render, eliminating a class of
+ * stale-closure bugs in the calculator tabs.
+ *
  * @example
  *   const out = useCalculatorOutput({ category: 'calculator-rsa' });
  *   out.dispatch('n = ...\nd = ...', 'RSA Key Gen');

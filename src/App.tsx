@@ -13,7 +13,7 @@ import { InstructionsPanel } from './components/InstructionsPanel';
 import { PemDecryptor } from './components/PemDecryptor';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { CommandPalette } from './components/CommandPalette';
-import { flexPanelSx, FONT_FAMILY } from './styles/shared';
+import { flexPanelSx, MONO_FAMILY } from './styles/shared';
 import { setFactorDBProxy } from './utils/factordb';
 import env from './config/env';
 import { useAppContext } from './hooks/useAppContext';
@@ -71,7 +71,7 @@ function AppContent() {
               border: `2px solid ${borderColor}`,
               borderRadius: '4px',
               color: draculaColors.foreground,
-              fontFamily: FONT_FAMILY,
+              fontFamily: MONO_FAMILY,
               fontSize: '0.8rem',
             },
           },

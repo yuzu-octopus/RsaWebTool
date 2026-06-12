@@ -13,9 +13,6 @@ export const MONO_FAMILY = "'JetBrains Mono', monospace" as const;
 /** Mixed family for prose-heavy areas: falls back through the OS font stack. */
 export const PROSE_FAMILY = `${MONO_FAMILY}, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif` as const;
 
-/** @deprecated Use MONO_FAMILY — kept for backward compat with existing imports. */
-export const FONT_FAMILY = MONO_FAMILY;
-
 // ─── Animations ─────────────────────────────────────────────────────────
 /** Spinning hourglass keyframe used for "running" status indicators. */
 export const hourglassSpin = keyframes`

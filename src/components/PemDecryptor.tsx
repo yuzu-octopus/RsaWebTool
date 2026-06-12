@@ -12,7 +12,7 @@ import {
 import { VpnKey, ContentCopy, Calculate, AutoFixHigh } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { inputSx } from '../styles/inputSx';
-import { colFlexSx, centeredPanelSx, FONT_FAMILY } from '../styles/shared';
+import { colFlexSx, centeredPanelSx, MONO_FAMILY } from '../styles/shared';
 import { useAppContext } from '../hooks/useAppContext';
 import { parsePEM, decryptPEM } from '../utils/pemParser';
 import type { ParsedPEM } from '../utils/pemParser';
@@ -111,7 +111,7 @@ export function PemDecryptor() {
             variant="body2"
             sx={{
               color: draculaColors.comment,
-              fontFamily: FONT_FAMILY,
+              fontFamily: MONO_FAMILY,
               fontSize: '0.75rem',
               mb: 3,
             }}
@@ -140,7 +140,7 @@ export function PemDecryptor() {
             sx={{
               borderColor: draculaColors.purple,
               color: draculaColors.purple,
-              fontFamily: FONT_FAMILY,
+              fontFamily: MONO_FAMILY,
               fontSize: '0.8rem',
               mb: 2,
               '&:hover': {
@@ -158,7 +158,7 @@ export function PemDecryptor() {
               variant="body2"
               sx={{
                 color: draculaColors.red,
-                fontFamily: FONT_FAMILY,
+                fontFamily: MONO_FAMILY,
                 fontSize: '0.75rem',
                 mb: 2,
                 p: 1,
@@ -186,7 +186,7 @@ export function PemDecryptor() {
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: draculaColors.currentLine,
                     color: draculaColors.foreground,
-                    fontFamily: FONT_FAMILY,
+                    fontFamily: MONO_FAMILY,
                     '& fieldset': { borderColor: draculaColors.comment },
                     '&:hover fieldset': { borderColor: draculaColors.purple },
                     '&.Mui-focused fieldset': { borderColor: draculaColors.purple },
@@ -201,7 +201,7 @@ export function PemDecryptor() {
                 sx={{
                   borderColor: draculaColors.green,
                   color: draculaColors.green,
-                  fontFamily: FONT_FAMILY,
+                  fontFamily: MONO_FAMILY,
                   fontSize: '0.8rem',
                   whiteSpace: 'nowrap',
                   '&:hover': {
@@ -229,7 +229,7 @@ export function PemDecryptor() {
                 variant="caption"
                 sx={{
                   color: draculaColors.comment,
-                  fontFamily: FONT_FAMILY,
+                  fontFamily: MONO_FAMILY,
                   mt: 0.5,
                   display: 'block',
                 }}
@@ -255,7 +255,7 @@ export function PemDecryptor() {
                 variant="subtitle2"
                 sx={{
                   color: parsed.encrypted ? draculaColors.orange : draculaColors.green,
-                  fontFamily: FONT_FAMILY,
+                  fontFamily: MONO_FAMILY,
                   mb: 1.5,
                   display: 'flex',
                   alignItems: 'center',
@@ -268,7 +268,7 @@ export function PemDecryptor() {
                   <Typography
                     component="span"
                     variant="caption"
-                    sx={{ color: draculaColors.comment, fontFamily: FONT_FAMILY }}
+                    sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY }}
                   >
                     ({parsed.encryptionAlgorithm})
                   </Typography>
@@ -295,7 +295,7 @@ export function PemDecryptor() {
                             variant="caption"
                             sx={{
                               color: draculaColors.purple,
-                              fontFamily: FONT_FAMILY,
+                              fontFamily: MONO_FAMILY,
                               fontSize: '0.7rem',
                               fontWeight: 600,
                               minWidth: 32,
@@ -309,7 +309,7 @@ export function PemDecryptor() {
                               variant="caption"
                               sx={{
                                 color: draculaColors.foreground,
-                                fontFamily: FONT_FAMILY,
+                                fontFamily: MONO_FAMILY,
                                 fontSize: '0.7rem',
                                 wordBreak: 'break-all',
                                 cursor: 'pointer',
@@ -330,7 +330,7 @@ export function PemDecryptor() {
               ) : (
                 <Typography
                   variant="body2"
-                  sx={{ color: draculaColors.comment, fontFamily: FONT_FAMILY, fontSize: '0.75rem' }}
+                  sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, fontSize: '0.75rem' }}
                 >
                   No parameters extracted (encrypted key — decrypt first)
                 </Typography>
@@ -347,7 +347,7 @@ export function PemDecryptor() {
                   border: `1px solid ${draculaColors.purple}`,
                   borderRadius: 1,
                   color: draculaColors.purple,
-                  fontFamily: FONT_FAMILY,
+                  fontFamily: MONO_FAMILY,
                   fontSize: '0.75rem',
                   gap: 0.5,
                   px: 1.5,
@@ -356,7 +356,7 @@ export function PemDecryptor() {
                 }}
               >
                 <ContentCopy sx={{ fontSize: '1rem' }} />
-                <Typography variant="caption" sx={{ fontFamily: FONT_FAMILY }}>
+                <Typography variant="caption" sx={{ fontFamily: MONO_FAMILY }}>
                   Copy All Params
                 </Typography>
               </IconButton>
@@ -373,7 +373,7 @@ export function PemDecryptor() {
                   border: `1px solid ${draculaColors.cyan}`,
                   borderRadius: 1,
                   color: draculaColors.cyan,
-                  fontFamily: FONT_FAMILY,
+                  fontFamily: MONO_FAMILY,
                   fontSize: '0.75rem',
                   gap: 0.5,
                   px: 1.5,
@@ -382,7 +382,7 @@ export function PemDecryptor() {
                 }}
               >
                 <Calculate sx={{ fontSize: '1rem' }} />
-                <Typography variant="caption" sx={{ fontFamily: FONT_FAMILY }}>
+                <Typography variant="caption" sx={{ fontFamily: MONO_FAMILY }}>
                   Switch to RSA Calculator
                 </Typography>
               </IconButton>
@@ -393,7 +393,7 @@ export function PemDecryptor() {
                   border: `1px solid ${draculaColors.green}`,
                   borderRadius: 1,
                   color: draculaColors.green,
-                  fontFamily: FONT_FAMILY,
+                  fontFamily: MONO_FAMILY,
                   fontSize: '0.75rem',
                   gap: 0.5,
                   px: 1.5,
@@ -402,7 +402,7 @@ export function PemDecryptor() {
                 }}
               >
                 <AutoFixHigh sx={{ fontSize: '1rem' }} />
-                <Typography variant="caption" sx={{ fontFamily: FONT_FAMILY }}>
+                <Typography variant="caption" sx={{ fontFamily: MONO_FAMILY }}>
                   Feed to Attacks
                 </Typography>
               </IconButton>

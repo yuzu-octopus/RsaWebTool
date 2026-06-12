@@ -19,7 +19,7 @@ import { useAttackExecution } from '../hooks/useAttackExecution';
 import { ProofRenderer } from './ProofRenderer';
 import { EmptyState } from './_shared/EmptyState';
 import { inputSx } from '../styles/inputSx';
-import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, FONT_FAMILY, MONO_FAMILY, PROSE_FAMILY } from '../styles/shared';
+import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, MONO_FAMILY, PROSE_FAMILY } from '../styles/shared';
 import Prism from 'prismjs';
 import '../styles/draculaPrism.css';
 import 'prismjs/components/prism-typescript';
@@ -319,7 +319,7 @@ export function InputPanel() {
                 margin: 0,
                 borderRadius: 'inherit',
                 fontSize: '0.8rem',
-                fontFamily: FONT_FAMILY,
+                fontFamily: MONO_FAMILY,
                 maxHeight: '50vh',
                 overflow: 'auto',
                 p: 1.5,

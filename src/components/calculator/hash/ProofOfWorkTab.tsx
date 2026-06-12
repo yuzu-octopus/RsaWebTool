@@ -7,7 +7,7 @@ import {
 import { Stop, PlayArrow, HourglassEmpty, ContentCopy, ExpandMore, ExpandLess } from '@mui/icons-material';
 import { draculaColors } from '../../../theme/dracula';
 import { inputSx } from '../../../styles/inputSx';
-import { outputBoxSx, colorGhostBtn, FONT_FAMILY, MONO_FAMILY } from '../../../styles/shared';
+import { outputBoxSx, colorGhostBtn, MONO_FAMILY } from '../../../styles/shared';
 import { useWorkerPool } from '../../../hooks/useWorkerPool';
 import { ProgressEstimator } from '../../../utils/progressEstimator';
 import { useAppContext } from '../../../hooks/useAppContext';
@@ -166,13 +166,13 @@ export default function ProofOfWorkTab() {
   /* ---- render ---- */
   return (
     <Box>
-      <Typography variant="caption" sx={{ color: draculaColors.comment, fontFamily: FONT_FAMILY, mb: 1, display: 'block' }}>
+      <Typography variant="caption" sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, mb: 1, display: 'block' }}>
         {hashAlgo} Proof of Work — find a nonce where {hashAlgo}(challenge + nonce) satisfies your check function.
       </Typography>
 
       {/* Hash Algorithm dropdown */}
       <FormControl fullWidth sx={{ mb: 2 }}>
-        <InputLabel sx={{ color: draculaColors.comment, fontFamily: FONT_FAMILY, fontSize: '0.85rem' }}>
+        <InputLabel sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>
           Hash Algorithm
         </InputLabel>
         <Select
@@ -180,7 +180,7 @@ export default function ProofOfWorkTab() {
           label="Hash Algorithm"
           onChange={e => setHashAlgo(e.target.value)}
           sx={{
-            fontFamily: FONT_FAMILY,
+            fontFamily: MONO_FAMILY,
             fontSize: '0.85rem',
             color: draculaColors.foreground,
             backgroundColor: draculaColors.background,
@@ -192,7 +192,7 @@ export default function ProofOfWorkTab() {
           }}
         >
           {HASH_ALGORITHMS.map(algo => (
-            <MenuItem key={algo.value} value={algo.value} sx={{ fontFamily: FONT_FAMILY, fontSize: '0.85rem' }}>
+            <MenuItem key={algo.value} value={algo.value} sx={{ fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>
               {algo.label}
             </MenuItem>
           ))}
@@ -219,7 +219,7 @@ export default function ProofOfWorkTab() {
             alignItems: 'center',
             cursor: 'pointer',
             color: draculaColors.comment,
-            fontFamily: FONT_FAMILY,
+            fontFamily: MONO_FAMILY,
             fontSize: '0.8rem',
             userSelect: 'none',
             '&:hover': { color: draculaColors.foreground },
@@ -236,7 +236,7 @@ export default function ProofOfWorkTab() {
               backgroundColor: draculaColors.background,
               border: `1px solid ${draculaColors.currentLine}`,
               borderRadius: '4px',
-              fontFamily: FONT_FAMILY,
+              fontFamily: MONO_FAMILY,
               fontSize: '0.75rem',
               color: draculaColors.comment,
               whiteSpace: 'pre-wrap',
@@ -247,7 +247,7 @@ export default function ProofOfWorkTab() {
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.25 }}>
                   <Typography
                     variant="caption"
-                    sx={{ color: draculaColors.cyan, fontFamily: FONT_FAMILY, fontSize: '0.7rem' }}
+                    sx={{ color: draculaColors.cyan, fontFamily: MONO_FAMILY, fontSize: '0.7rem' }}
                   >
                     {example.label}
                   </Typography>
@@ -259,7 +259,7 @@ export default function ProofOfWorkTab() {
                       minWidth: 0,
                       fontSize: '0.65rem',
                       color: draculaColors.purple,
-                      fontFamily: FONT_FAMILY,
+                      fontFamily: MONO_FAMILY,
                       textTransform: 'none',
                       p: 0,
                       '&:hover': { color: draculaColors.foreground, backgroundColor: 'transparent' },
@@ -274,7 +274,7 @@ export default function ProofOfWorkTab() {
                     backgroundColor: draculaColors.currentLine,
                     borderRadius: '2px',
                     color: draculaColors.foreground,
-                    fontFamily: FONT_FAMILY,
+                    fontFamily: MONO_FAMILY,
                     fontSize: '0.72rem',
                     whiteSpace: 'pre-wrap',
                     overflowX: 'auto',
@@ -291,7 +291,7 @@ export default function ProofOfWorkTab() {
       {/* Check function editor */}
       <Typography
         variant="caption"
-        sx={{ color: draculaColors.comment, fontFamily: FONT_FAMILY, mb: 0.5, display: 'block' }}
+        sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, mb: 0.5, display: 'block' }}
       >
         Check function: receives <Box component="code" sx={{ color: draculaColors.cyan }}>hash</Box> (hex string), returns <Box component="code" sx={{ color: draculaColors.green }}>true</Box> when condition met.
       </Typography>
@@ -384,7 +384,7 @@ export default function ProofOfWorkTab() {
                   mt: 0.5,
                   textAlign: 'center',
                   display: 'block',
-                  fontFamily: FONT_FAMILY,
+                  fontFamily: MONO_FAMILY,
                 }}
               >
                 {progressDetail}
@@ -427,7 +427,7 @@ export default function ProofOfWorkTab() {
           <Box sx={outputBoxSx}>
             <Box
               sx={{
-                fontFamily: FONT_FAMILY,
+                fontFamily: MONO_FAMILY,
                 whiteSpace: 'pre-wrap',
                 wordBreak: 'break-all',
               }}
@@ -444,7 +444,7 @@ export default function ProofOfWorkTab() {
           sx={{
             color: draculaColors.red,
             mt: 2,
-            fontFamily: FONT_FAMILY,
+            fontFamily: MONO_FAMILY,
             fontSize: '0.85rem',
           }}
         >

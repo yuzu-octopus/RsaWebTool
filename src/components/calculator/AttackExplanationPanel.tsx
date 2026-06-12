@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { draculaColors } from '../../theme/dracula';
-import { FONT_FAMILY } from '../../styles/shared';
+import { MONO_FAMILY } from '../../styles/shared';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-python';
 import '../../styles/draculaPrism.css';
@@ -55,7 +55,7 @@ export function AttackExplanationPanel({ data }: { data: AttackExplanationData }
           border: `1px solid ${draculaColors.currentLine}`,
           borderRadius: '4px',
           p: 1.5,
-          fontFamily: FONT_FAMILY,
+          fontFamily: MONO_FAMILY,
           fontSize: '0.75rem',
           lineHeight: 1.6,
           color: draculaColors.foreground,
@@ -77,7 +77,7 @@ export function AttackExplanationPanel({ data }: { data: AttackExplanationData }
           border: `1px solid ${draculaColors.currentLine}`,
           borderRadius: '4px',
           p: 1.5,
-          fontFamily: FONT_FAMILY,
+          fontFamily: MONO_FAMILY,
           fontSize: '0.75rem',
           lineHeight: 1.6,
           whiteSpace: 'pre',
