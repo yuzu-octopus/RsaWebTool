@@ -1,0 +1,175 @@
+var e=`import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
+import { isqrt } from '../utils/bigint';
+import { generateFermatTestcase } from '../utils/testcases/core';;
+import { wrapSageTemplate } from './guard';
+
+export const attack: Attack = {
+  id: 'close-prime',
+  name: 'Close-Prime',
+  category: 'Factorization',
+  description: 'Factors n when p and q are close via Fermat iteration and Londahl BSGS fallback. Use when primes are suspected close together.',
+  inputs: [
+    { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
+  ],
+  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
+    token: 'CLOSE_PRIME',
+    n: vals.n,
+    imports: ['import math'],
+    body: \`        n_int = int(n)
+        found = False
+        # Step 1: Fermat factorization (fast for close primes)
+        out.append("Close-prime")
+        out.append(f"n = {n}")
+        out.append("")
+        a, rem = n.sqrtrem()
+        b2 = -rem
+        c = 2*a + 1
+        max_iter = 100000
+        iterations = 0
+        while not b2.is_square():
+            iterations += 1
+            if iterations > max_iter:
+                break
+            b2 += c
+            c += 2
+        if b2.is_square():
+            a_final = (c - 1) // 2
+            b = isqrt(b2)
+            p = a_final - b
+            q = a_final + b
+            if p > 1 and q < n and p*q == n:
+                out.append("Results:")
+                out.append(f"p = {p}")
+                out.append(f"q = {q}")
+                out.append("")
+                out.append(f"Verification: p * q = {p * q}")
+                out.append(f"|p - q| = {q - p}")
+                out.append(f"Iterations: {iterations}")
+                out.append("")
+                out.append("CLOSE_PRIME=SUCCESS")
+                found = True
+        if not found:
+            # Step 2: Londahl BSGS fallback (for larger prime gaps)
+            b_val = 50000
+            phi_approx = n_int - 2*math.isqrt(n_int) + 1
+            look_up = {}
+            z = 1
+            parity = int(phi_approx & 1)
+            for j in range(b_val + 1):
+                if (j & 1) == parity:
+                    look_up[z] = j
+                z = (z * 2) % n_int
+            mu = int(inverse_mod(power_mod(2, Integer(phi_approx), n), n))
+            step = int(power_mod(2, b_val, n))
+            for i in range(b_val + 1):
+                if mu in look_up:
+                    j = look_up[mu]
+                    phi = phi_approx + j - i*b_val
+                    m_val = n_int - phi + 1
+                    disc = m_val*m_val - 4*n_int
+                    if disc > 0:
+                        sqrt_disc = math.isqrt(disc)
+                        if sqrt_disc*sqrt_disc == disc:
+                            p_candidate = (m_val - sqrt_disc) // 2
+                            q_candidate = (m_val + sqrt_disc) // 2
+                            if p_candidate * q_candidate == n_int and p_candidate > 1 and q_candidate > 1:
+                                out.append("Results:")
+                                out.append(f"p = {p_candidate}")
+                                out.append(f"q = {q_candidate}")
+                                out.append("")
+                                out.append(f"Verification: p * q = {p_candidate * q_candidate}")
+                                out.append(f"|p - q| = {abs(q_candidate - p_candidate)}")
+                                out.append(f"Baby steps: {b_val+1}, Giant steps: {i+1}")
+                                found = True
+                                break
+                mu = (mu * step) % n_int
+            if found:
+                out.append("")
+                out.append("CLOSE_PRIME=SUCCESS")
+            else:
+                out.append("")
+                out.append("Both Fermat and Londahl BSGS failed to factor n.")
+                out.append("")
+                out.append("CLOSE_PRIME=FAILED")\`,
+  }),
+  frontendCheck: (vals, onProgress) => {
+    if (!vals.n) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      if (n % 2n === 0n) {
+        const half = n / 2n;
+        return Promise.resolve(\`Close-prime\\nn = \${n}\\n\\nResults:\\np = 2\\nq = \${half}\\n\\nVerification: p * q = \${n}\\n|p - q| = \${half - 2n}\\nIterations: 0\\n\\nCLOSE_PRIME=SUCCESS\`);
+      }
+      // Incremental Fermat: b2 = a^2 - n, updated as b2 += 2*a + 1 each step
+      // This avoids repeated a*a - n (a BigInt multiplication)
+      let a = isqrt(n);
+      if (a * a < n) a++;
+      const initialA = a;
+      let b2 = a * a - n;
+      const limit = a + 1000000n;
+      while (a < limit) {
+        if (onProgress && a % 50000n === 0n) {
+          const iter = Number(a - initialA);
+          const total = Number(limit - initialA);
+          onProgress(Math.round(iter * 100 / total), \`a = \${iter.toLocaleString()} / \${total.toLocaleString()}\`);
+        }
+        // Mod-16 perfect square pre-filter: valid squares end in 0,1,4,9 hex
+        const lastNybble = Number(b2 & 15n);
+        if (lastNybble === 0 || lastNybble === 1 || lastNybble === 4 || lastNybble === 9) {
+          const b = isqrt(b2);
+          if (b * b === b2) {
+            const p = a - b;
+            const q = a + b;
+            if (p > 1n && q > 1n && p * q === n) {
+              onProgress?.(100);
+              const iterations = a - initialA;
+              return Promise.resolve(\`Close-prime\\nn = \${n}\\n\\nResults:\\np = \${p}\\nq = \${q}\\n\\nVerification: p * q = \${p * q}\\n|p - q| = \${q - p}\\nIterations: \${iterations}\\n\\nCLOSE_PRIME=SUCCESS\`);
+            }
+          }
+        }
+        // Increment a and b2: (a+1)^2 - n = a^2 - n + 2a + 1 = b2 + 2a + 1
+        b2 += 2n * a + 1n;
+        a++;
+      }
+      return Promise.resolve(null);
+    } catch { return Promise.resolve(null); }
+  },
+  proof: \`\\\\textbf{Theorem:} Factor $n = pq$ when $|p-q|$ is small via Fermat's difference-of-squares iteration, extended by Londahl's BSGS to larger gaps.
+
+\\\\textbf{Setup:}
+\\\\begin{itemize}
+\\\\item $n = pq$ with $p \\\\approx q$
+\\\\item Let $a = \\\\frac{p+q}{2}$, $b = \\\\frac{p-q}{2}$, so $n = a^2 - b^2$
+\\\\end{itemize}
+
+\\\\textbf{Proof:}
+\\\\begin{align*}
+a &= \\\\lceil\\\\sqrt{n}\\\\rceil,\\\\; b = \\\\sqrt{a^2 - n} \\\\\\\\
+\\\\text{Fermat: } a_{i+1} &= a_i + 1,\\\\; b_i^2 = a_i^2 - n \\\\\\\\
+a_i^2 - n \\\\text{ is square} &\\\\implies p = a_i - b_i,\\\\; q = a_i + b_i \\\\\\\\
+\\\\text{BSGS: Let $b = \\\\lceil\\\\sqrt{n}\\\\rceil$ be the step size, $i$ the baby-step index, $j$ the giant-step index} \\\\\\\\
+\\\\phi_{\\\\text{approx}} &= n - 2\\\\lfloor\\\\sqrt{n}\\\\rfloor + 1 \\\\\\\\
+2^{\\\\delta} &\\\\equiv 2^{-\\\\phi_{\\\\text{approx}}} \\\\pmod{n},\\\\; \\\\delta = \\\\phi(n) - \\\\phi_{\\\\text{approx}} \\\\\\\\
+\\\\phi(n) &= \\\\phi_{\\\\text{approx}} + j - i \\\\cdot b,\\\\; p+q = n - \\\\phi(n) + 1
+\\\\qed\\\\\\\\
+\\\\end{align*}
+
+\\\\textbf{Explanation:} Fermat represents $n$ as $a^2 - b^2$ and searches for $a$ such that $a^2 - n$ is a perfect square. Each step increments $a$ by 1 and updates $b^2$ additively, avoiding multiplication. When $|p-q| < 10^6$, Fermat converges quickly. Londahl's BSGS recovers $\\\\phi(n)$ via a discrete-log collision for larger gaps.
+
+\\\\textbf{Optimizations:}
+\\\\begin{itemize}
+\\\\item \\\\textbf{Incremental Fermat update:} The difference-of-squares term $a^2 - n$ updates via $b^2 \\\\mathrel{+}= 2a + 1$ each iteration, avoiding a full $a^2$ multiplication per step.
+\\\\item \\\\textbf{Parity-optimized BSGS (Londahl fallback):} When Fermat's direct search exceeds $10^6$ steps, switches to Londahl's baby-step giant-step. Baby-step table construction skips entries where $(j \\\\& 1)$ mismatches $\\\\phi(n)$ parity, halving the table size.
+\\\\end{itemize}
+
+\\\\textbf{References:} Fermat (1643); C. L\\\\"ondahl, "Finding Close-Prime Factorizations", 2017 (https://grocid.net/2017/09/16/finding-close-prime-factorizations/)\`,
+  priority: 'medium',
+  applicableCheck: rsaNeeds.n,
+};
+
+export const generateTestcase = (): Record<string, string> => {
+  const kp = generateFermatTestcase();
+  return { n: kp.n.toString(), e: kp.e.toString() };
+};
+`;export{e as default};
