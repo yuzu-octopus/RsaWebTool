@@ -28,6 +28,7 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 
 ### Interface
 
+- **Calculator Switcher Tabs** — 5-tab bar (RSA / AES / ECC / Hash / DH) with icons, keyboard shortcuts (⌘1-⌘5), scrollable on narrow screens
 - **Format Converter** — live Hex / Decimal / Base64 / Binary conversion
 - **Attack Index** — searchable catalog of all 47 attack proofs with KaTeX rendering
 - **METHOD indicator** — every output shows `METHOD=TYPESCRIPT` or `METHOD=SAGEMATHCELL`
@@ -36,9 +37,12 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 - **Keyboard Shortcuts** — ⌘Enter (run), ⌘1-5 (calculator tabs), ⌘Shift+C (copy), Tab/Shift+Tab (cycle)
 - **PEM Decryptor** — Parse and decrypt PKCS#1/PKCS#8/encrypted PEM keys, feed params to Calculator or Attacks
 - **Instructions Panel** — Always-visible reference guide
+- **"Continue to Input" CTA** — after viewing an attack explanation, jump directly to the input form
 - **Notepad** — Drag-resizable scratchpad with localStorage persistence (1h expiry)
 - **Prism.js syntax highlighting** — replaces react-syntax-highlighter, 33% smaller bundle
 - **Dracula theme** — dark, developer-friendly UI
+- **Consistent content width** — all panels use `maxWidth: 640` for readable line lengths
+- **Viewport-aware OutputPanel** — max output width adapts to `Math.min(600, window.innerWidth - 620)`, re-evaluated on resize
 
 ## Quick Start
 
@@ -142,7 +146,8 @@ Results appear in the Output Panel on the right. Features:
 - Syntax-highlighted output
 - Copy button
 - Clickable history (last 50 results)
-- Resizable notepad (drag from bottom)
+- Viewport-aware max width: adapts to `Math.min(600, window.innerWidth - 620)`, re-evaluated on resize
+- Resizable notepad (drag from bottom, 80-200px)
 
 ### Attack Output Format
 Every attack produces a standardized output:
@@ -274,7 +279,7 @@ scripts/             Test scripts and utilities
 
 ## Calculator Architecture
 
-The unified Calculator shell (`Calculator.tsx`) provides a 5-tab selector (RSA / AES / ECC / Hash / DH) with keyboard shortcuts (⌘1-⌘5). Each calculator is lazy-loaded via `React.lazy` and wrapped in a `<Suspense>` boundary. Shared UI components (`CalculatorHeader`, `ResultBox`, `AttackExplanationPanel`, `CalculatorSubTabs`) eliminate duplicate layout patterns.
+The unified Calculator shell (`Calculator.tsx`) provides a 5-tab selector (RSA / AES / ECC / Hash / DH) with icons, keyboard shortcuts (⌘1-⌘5), scrollable on narrow screens. Each calculator is lazy-loaded via `React.lazy` and wrapped in a `<Suspense>` boundary. Shared UI components (`CalculatorHeader`, `ResultBox`, `AttackExplanationPanel`, `CalculatorSubTabs`) eliminate duplicate layout patterns. All calculator content uses `maxWidth: 640` for consistent line lengths.
 
 ### RSA Calculator (`RSACalculator.tsx`)
 - 4 sub-tabs: Explanation, Key Gen, Encrypt, Decrypt

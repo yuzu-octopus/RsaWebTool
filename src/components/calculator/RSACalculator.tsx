@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
-import { VpnKey, MenuBook, AutoAwesome, Lock, LockOpen } from '@mui/icons-material';
+import { MenuBook, AutoAwesome, Lock, LockOpen } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
 import { CalculatorHeader } from './_shared/CalculatorHeader';
 import { RsaKeyGenTab } from './RsaKeyGenTab';
@@ -84,7 +84,6 @@ export default function RSACalculator() {
 
   return (
     <CalculatorHeader
-      icon={VpnKey}
       title="RSA Calculator"
       subtitle="RSA encryption, decryption, and key generation reference"
       tabs={SUB_TABS}

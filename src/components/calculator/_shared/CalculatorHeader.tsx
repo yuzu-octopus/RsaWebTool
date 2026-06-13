@@ -1,4 +1,4 @@
-import type { ReactNode, ElementType } from 'react';
+import type { ReactNode } from 'react';
 import { Box, Typography } from '@mui/material';
 import {
   colFlexSx,
@@ -17,8 +17,6 @@ export interface CalculatorHeaderTab {
  * Base props shared by both variants.
  */
 interface CalculatorHeaderBase {
-  /** Icon component to render next to the title (e.g., `Lock`, `Hub`, `VpnKey`). */
-  icon: ElementType;
   /** Page title (h3). */
   title: string;
   /** One-line subtitle shown under the title. */
@@ -53,7 +51,6 @@ export type CalculatorHeaderProps = CalculatorHeaderWithTabs | CalculatorHeaderW
  *
  * @example
  *   <CalculatorHeader
- *     icon={Lock}
  *     title="AES Calculator"
  *     subtitle="AES encryption, decryption, mode analysis, and attacks"
  *     tabs={TABS}
@@ -64,7 +61,7 @@ export type CalculatorHeaderProps = CalculatorHeaderWithTabs | CalculatorHeaderW
  *   </CalculatorHeader>
  */
 export function CalculatorHeader(props: CalculatorHeaderProps) {
-  const { icon: Icon, title, subtitle, children } = props;
+  const { title, subtitle, children } = props;
   const tabs = 'tabs' in props ? props.tabs : undefined;
   const activeTab = 'activeTab' in props ? props.activeTab : undefined;
   const onTabChange = 'onTabChange' in props ? props.onTabChange : undefined;
@@ -73,7 +70,7 @@ export function CalculatorHeader(props: CalculatorHeaderProps) {
       <Box sx={{ ...centeredPanelSx, pt: 2, px: 2 }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
           <Typography variant="h3" sx={pageTitleSx}>
-            <Icon sx={{ fontSize: 'inherit' }} /> {title}
+            {title}
           </Typography>
           {subtitle && (
             <Typography variant="body2" sx={subTitleSx}>

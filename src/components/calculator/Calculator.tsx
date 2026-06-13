@@ -3,7 +3,7 @@ import { Box, Skeleton, Tabs, Tab } from '@mui/material';
 import { Calculate, Lock, Hub, Tag, Security } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
 import { useAppContext } from '../../hooks/useAppContext';
-import { colFlexSx, centeredPanelSx, tabSx } from '../../styles/shared';
+import { colFlexSx, tabSx } from '../../styles/shared';
 import type { CalculatorMode } from '../../types';
 
 const RSACalculator = lazy(() => import('./RSACalculator'));
@@ -70,21 +70,17 @@ export function Calculator() {
           <Tab key={t.mode} label={t.label} icon={t.icon} iconPosition="start" />
         ))}
       </Tabs>
-      <Box sx={{ ...centeredPanelSx, pt: 2, px: 2 }}>
-        <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Suspense
-            fallback={
-              <Skeleton
-                variant="rectangular"
-                height={200}
-                sx={{ borderRadius: 1, bgcolor: draculaColors.currentLine }}
-              />
-            }
-          >
-            <ActiveComponent />
-          </Suspense>
-        </Box>
-      </Box>
+      <Suspense
+        fallback={
+          <Skeleton
+            variant="rectangular"
+            height={200}
+            sx={{ borderRadius: 1, bgcolor: draculaColors.currentLine }}
+          />
+        }
+      >
+        <ActiveComponent />
+      </Suspense>
     </Box>
   );
 }

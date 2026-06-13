@@ -201,7 +201,7 @@ export function Sidebar() {
         }}
       >
       <Box sx={{ p: 2 }}>
-        <Typography variant="h6" sx={{ color: draculaColors.purple, fontWeight: 700 }}>
+        <Typography variant="h5" sx={{ color: draculaColors.purple, fontWeight: 700 }}>
           RSA CTF Tool
         </Typography>
         <Typography variant="caption" sx={{ color: draculaColors.comment }}>

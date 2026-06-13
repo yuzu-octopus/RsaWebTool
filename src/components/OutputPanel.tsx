@@ -59,7 +59,7 @@ function HistoryListItem({ entry, isSelected, onClick }: { entry: HistoryEntry; 
           </Typography>
         }
         secondary={
-          <Typography sx={{ color: draculaColors.comment, fontSize: '0.65rem' }}>
+          <Typography sx={{ color: draculaColors.comment, fontSize: '0.75rem' }}>
             {entry.timestamp.toLocaleTimeString()}
           </Typography>
         }
@@ -86,10 +86,20 @@ export function OutputPanel() {
     setUi(prev => ({ ...prev, historySelectedKey: key }));
   }, []);
   const { notepadOpen, setNotepadOpen, notepadText, handleNotepadChange, notepadHeight, handleNotepadResizeMouseDown } = useNotepad();
+  const getMaxOutputWidth = useCallback(() => Math.min(600, window.innerWidth - 620), []);
+
+  const [maxOutputWidth, setMaxOutputWidth] = useState(getMaxOutputWidth);
+
+  useEffect(() => {
+    const handleResize = () => setMaxOutputWidth(getMaxOutputWidth());
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [getMaxOutputWidth]);
+
   const [width, handleMouseDown] = useDragResize({
     axis: 'x',
     min: 200,
-    max: 600,
+    max: maxOutputWidth,
     defaultValue: 300,
     storageKey: 'outputPanelWidth',
   });
@@ -110,7 +120,7 @@ export function OutputPanel() {
           left: 0,
           top: 0,
           bottom: 0,
-          width: '4px',
+          width: '6px',
           cursor: 'col-resize',
           zIndex: 10,
           display: 'flex',
@@ -121,7 +131,7 @@ export function OutputPanel() {
             display: 'block',
             width: '1px',
             height: '100%',
-            backgroundColor: draculaColors.comment,
+            backgroundColor: draculaColors.currentLine,
             transition: 'background-color 0.15s',
           },
           '&:hover::after, &.active::after': { backgroundColor: draculaColors.purple },

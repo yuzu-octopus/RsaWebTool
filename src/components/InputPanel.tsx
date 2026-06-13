@@ -9,7 +9,7 @@ import {
   LinearProgress,
   Divider,
 } from '@mui/material';
-import { Stop, Casino, ContentCopy, HourglassEmpty } from '@mui/icons-material';
+import { Stop, Casino, ContentCopy, HourglassEmpty, ArrowForward } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useSageMath } from '../hooks/useSageMath';
@@ -18,7 +18,7 @@ import { useAttackExecution } from '../hooks/useAttackExecution';
 import { ProofRenderer } from './ProofRenderer';
 import { EmptyState } from './_shared/EmptyState';
 import { inputSx } from '../styles/inputSx';
-import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, hourglassSpin, MONO_FAMILY, PROSE_FAMILY } from '../styles/shared';
+import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, hourglassSpin, pageTitleSx, MONO_FAMILY, PROSE_FAMILY } from '../styles/shared';
 import Prism from 'prismjs';
 import '../styles/draculaPrism.css';
 import 'prismjs/components/prism-typescript';
@@ -116,9 +116,8 @@ export function InputPanel() {
         value={tab}
         onChange={(_, v) => setTab(v as number)}
         sx={{
-          minHeight: 40,
+          minHeight: 48,
           px: 2,
-          pt: 2,
           '& .MuiTabs-flexContainer': { justifyContent: 'flex-start' },
           '& .MuiTab-root': { ...tabSx, px: 3 },
           '& .Mui-selected': { color: draculaColors.purple },
@@ -157,14 +156,22 @@ export function InputPanel() {
               </Typography>
             </>
           )}
+          <Button
+            endIcon={<ArrowForward />}
+            onClick={() => setTab(1)}
+            sx={{ mt: 2, color: draculaColors.purple, borderColor: draculaColors.purple, '&:hover': { borderColor: draculaColors.purple, backgroundColor: `${draculaColors.purple}22` } }}
+            variant="outlined"
+          >
+            Continue to Input
+          </Button>
         </Box>
       )}
 
       {/* Input tab - center aligned */}
       {tab === 1 && (
         <Box sx={{ ...centeredPanelSx, p: 2 }}>
-          <Box sx={{ width: '100%', maxWidth: 500 }}>
-            <Typography variant="h4" sx={{ color: draculaColors.cyan, mb: 0.5 }}>
+          <Box sx={{ width: '100%', maxWidth: 640 }}>
+            <Typography variant="h3" sx={pageTitleSx}>
               {selectedAttack.name}
             </Typography>
             <Typography variant="caption" sx={{ color: draculaColors.pink, display: 'block', mb: 1, fontSize: '0.7rem' }}>

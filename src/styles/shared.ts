@@ -31,7 +31,7 @@ export const pulse = keyframes`
 export const flexPanelSx = {
   flex: 1,
   display: 'flex',
-  minWidth: 0,
+  minWidth: 400,
   overflow: 'hidden',
 } as const;
 
@@ -46,7 +46,7 @@ export const centeredPanelSx = {
   display: 'flex',
   flexDirection: 'column' as const,
   alignItems: 'center',
-  pb: '20vh',
+  pb: '8vh',
 };
 
 // ─── Output boxes ───────────────────────────────────────────────────────

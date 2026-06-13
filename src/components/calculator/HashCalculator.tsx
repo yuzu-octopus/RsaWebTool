@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Tag, MenuBook, Functions, Key, LinearScale, Bolt } from '@mui/icons-material';
+import { MenuBook, Functions, Key, LinearScale, Bolt } from '@mui/icons-material';
 import { CalculatorHeader } from './_shared/CalculatorHeader';
 import HashFunctionsTab from './hash/HashFunctionsTab';
 import HMACTab from './hash/HMACTab';
@@ -29,7 +29,6 @@ export default function HashCalculator() {
 
   return (
     <CalculatorHeader
-      icon={Tag}
       title="Hash Calculator"
       subtitle="Pure JS hash computation — no SageCell needed"
       tabs={SUB_TABS}

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Security, MenuBook, SwapHoriz, Bolt } from '@mui/icons-material';
+import { MenuBook, SwapHoriz, Bolt } from '@mui/icons-material';
 import { useAppContext } from '../../hooks/useAppContext';
 import { CalculatorHeader } from './_shared/CalculatorHeader';
 import { DHExplanationTab } from './DHExplanationTab';
@@ -25,7 +25,6 @@ export default function DHCalculator() {
 
   return (
     <CalculatorHeader
-      icon={Security}
       title="DH Calculator"
       subtitle="Diffie-Hellman key exchange simulation and discrete log attacks"
       tabs={TABS}

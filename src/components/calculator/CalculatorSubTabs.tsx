@@ -34,9 +34,9 @@ export function CalculatorSubTabs({ tabs, activeTab, onChange }: CalculatorSubTa
         minHeight: 40,
         backgroundColor: draculaColors.background,
         '& .MuiTabs-flexContainer': { justifyContent: 'flex-start' },
-        '& .MuiTab-root': { ...tabSx, px: 3, minHeight: 48 },
-        '& .Mui-selected': { color: draculaColors.cyan },
-        '& .MuiTabs-indicator': { backgroundColor: draculaColors.cyan },
+        '& .MuiTab-root': { ...tabSx, px: 3, minHeight: 40, fontSize: '0.8rem' },
+        '& .Mui-selected': { color: draculaColors.purple },
+        '& .MuiTabs-indicator': { backgroundColor: draculaColors.purple },
       }}
     >
       {tabs.map(t => (

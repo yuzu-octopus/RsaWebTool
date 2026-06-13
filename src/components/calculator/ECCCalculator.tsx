@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Hub, MenuBook, VpnKey, Verified, Bolt } from '@mui/icons-material';
+import { MenuBook, VpnKey, Verified, Bolt } from '@mui/icons-material';
 import { useAppContext } from '../../hooks/useAppContext';
 import { CalculatorHeader } from './_shared/CalculatorHeader';
 import { ECCExplanationTab } from './ECCExplanationTab';
@@ -27,7 +27,6 @@ export default function ECCCalculator() {
 
   return (
     <CalculatorHeader
-      icon={Hub}
       title="ECC Calculator"
       subtitle="Elliptic curve operations, ECDSA, ECDH, and attacks — powered by @noble/curves"
       tabs={TABS}

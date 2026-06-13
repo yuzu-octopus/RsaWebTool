@@ -25,7 +25,6 @@ export default function AESCalculator() {
 
   return (
     <CalculatorHeader
-      icon={Lock}
       title="AES Calculator"
       subtitle="AES encryption, decryption, mode analysis, and attacks — powered by @noble/ciphers"
       tabs={TABS}
