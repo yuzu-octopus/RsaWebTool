@@ -9,18 +9,18 @@ import {
   Tooltip,
   IconButton,
 } from '@mui/material';
-import { VpnKey, ContentCopy, Calculate, AutoFixHigh } from '@mui/icons-material';
+import { VpnKey, ContentCopy, Send } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { inputSx } from '../styles/inputSx';
-import { colFlexSx, centeredPanelSx, MONO_FAMILY } from '../styles/shared';
+import { colFlexSx, centeredPanelSx, MONO_FAMILY, colorGhostBtn } from '../styles/shared';
 import { useAppContext } from '../hooks/useAppContext';
 import { parsePEM, decryptPEM } from '../utils/pemParser';
 import type { ParsedPEM } from '../utils/pemParser';
 
-/** Truncate a hex string for display: show first n chars + "..." */
-function truncateHex(hex: string, maxLen = 48): string {
-  if (hex.length <= maxLen) return hex;
-  return `${hex.slice(0, maxLen)}...`;
+/** Truncate a hex string for display: show first keepLen + "..." + last keepLen chars */
+function truncateHex(hex: string, keepLen = 16): string {
+  if (hex.length <= keepLen * 2 + 3) return hex;
+  return `${hex.slice(0, keepLen)}...${hex.slice(-keepLen)}`;
 }
 
 export function PemDecryptor() {
@@ -123,13 +123,25 @@ export function PemDecryptor() {
           <TextField
             fullWidth
             multiline
-            rows={8}
+            rows={6}
             value={pemInput}
             onChange={(e) => setPemInput(e.target.value)}
-            placeholder={`-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA...\n-----END RSA PRIVATE KEY-----`}
+            placeholder="Paste a PEM private key here..."
             variant="outlined"
-            sx={{ ...inputSx, mb: 2 }}
+            sx={{ ...inputSx, mb: 1 }}
           />
+
+          {/* PEM Format Example */}
+          <Box sx={{
+            fontFamily: MONO_FAMILY, fontSize: '0.75rem',
+            color: draculaColors.comment, mt: 0, p: 1,
+            border: `1px solid ${draculaColors.currentLine}`, borderRadius: '4px',
+            whiteSpace: 'pre-wrap', mb: 2,
+          }}>
+{`-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA...
+-----END RSA PRIVATE KEY-----`}
+          </Box>
 
           {/* Parse Button */}
           <Button
@@ -178,6 +190,12 @@ export function PemDecryptor() {
                 size="small"
                 value={passphrase}
                 onChange={(e) => setPassphrase(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && passphrase && !decrypting) {
+                    e.preventDefault();
+                    void handleDecrypt();
+                  }
+                }}
                 placeholder="Passphrase"
                 variant="outlined"
                 disabled={decrypting}
@@ -285,8 +303,8 @@ export function PemDecryptor() {
                         key={key}
                         sx={{
                           display: 'flex',
-                          alignItems: 'baseline',
-                          gap: 1,
+                          alignItems: 'center',
+                          gap: 0.5,
                         }}
                       >
                         <Typography
@@ -310,17 +328,23 @@ export function PemDecryptor() {
                               fontFamily: MONO_FAMILY,
                               fontSize: '0.7rem',
                               wordBreak: 'break-all',
-                              cursor: 'pointer',
                               '&:hover': { color: draculaColors.cyan },
-                            }}
-                            onClick={() => {
-                              navigator.clipboard.writeText(value).catch(() => {});
-                              showNotification(`Copied ${key}`, 'info');
                             }}
                           >
                             {display}
                           </Typography>
                         </Tooltip>
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            navigator.clipboard.writeText(value).catch(() => {});
+                            showNotification(`Copied ${key}`, 'info');
+                          }}
+                          sx={{ color: draculaColors.comment, p: '2px' }}
+                          aria-label={`Copy ${key}`}
+                        >
+                          <ContentCopy sx={{ fontSize: '0.65rem' }} />
+                        </IconButton>
                       </Box>,
                     ];
                   })}
@@ -339,27 +363,18 @@ export function PemDecryptor() {
           {/* Action Buttons */}
           {parsed?.keyParams && !parsed.encrypted && (
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              <IconButton
+              <Button
+                variant="outlined"
+                startIcon={<ContentCopy />}
                 onClick={handleCopyParams}
-                sx={{
-                  border: `1px solid ${draculaColors.purple}`,
-                  borderRadius: 1,
-                  color: draculaColors.purple,
-                  fontFamily: MONO_FAMILY,
-                  fontSize: '0.75rem',
-                  gap: 0.5,
-                  px: 1.5,
-                  py: 0.5,
-                  '&:hover': { backgroundColor: draculaColors.purple, color: draculaColors.background },
-                }}
+                sx={colorGhostBtn(draculaColors.purple)}
               >
-                <ContentCopy sx={{ fontSize: '1rem' }} />
-                <Typography variant="caption" sx={{ fontFamily: MONO_FAMILY }}>
-                  Copy All Params
-                </Typography>
-              </IconButton>
+                Copy All Params
+              </Button>
 
-              <IconButton
+              <Button
+                variant="outlined"
+                startIcon={<VpnKey />}
                 onClick={() => {
                   const { n: nVal } = parsed.keyParams!;
                   if (!nVal || nVal === '0') return;
@@ -367,43 +382,19 @@ export function PemDecryptor() {
                   setCalculatorMode('rsa');
                   showNotification('Switched to RSA Calculator — paste n/e from copied params', 'success');
                 }}
-                sx={{
-                  border: `1px solid ${draculaColors.cyan}`,
-                  borderRadius: 1,
-                  color: draculaColors.cyan,
-                  fontFamily: MONO_FAMILY,
-                  fontSize: '0.75rem',
-                  gap: 0.5,
-                  px: 1.5,
-                  py: 0.5,
-                  '&:hover': { backgroundColor: draculaColors.cyan, color: draculaColors.background },
-                }}
+                sx={colorGhostBtn(draculaColors.cyan)}
               >
-                <Calculate sx={{ fontSize: '1rem' }} />
-                <Typography variant="caption" sx={{ fontFamily: MONO_FAMILY }}>
-                  Switch to RSA Calculator
-                </Typography>
-              </IconButton>
+                Switch to Calculator
+              </Button>
 
-              <IconButton
+              <Button
+                variant="outlined"
+                startIcon={<Send />}
                 onClick={handleFeedAttacks}
-                sx={{
-                  border: `1px solid ${draculaColors.green}`,
-                  borderRadius: 1,
-                  color: draculaColors.green,
-                  fontFamily: MONO_FAMILY,
-                  fontSize: '0.75rem',
-                  gap: 0.5,
-                  px: 1.5,
-                  py: 0.5,
-                  '&:hover': { backgroundColor: draculaColors.green, color: draculaColors.background },
-                }}
+                sx={colorGhostBtn(draculaColors.green)}
               >
-                <AutoFixHigh sx={{ fontSize: '1rem' }} />
-                <Typography variant="caption" sx={{ fontFamily: MONO_FAMILY }}>
-                  Feed to Attacks
-                </Typography>
-              </IconButton>
+                Feed to Attacks
+              </Button>
             </Box>
           )}
         </Box>

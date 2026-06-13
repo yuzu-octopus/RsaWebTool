@@ -214,13 +214,18 @@ export function Sidebar() {
       <List sx={{ flex: 1, overflow: 'auto' }}>
         {CATEGORIES.map(cat => (
           <Box key={cat}>
-            <ListItemButton onClick={() => toggleCat(cat)} sx={{ px: 2 }}>
+            <ListItemButton
+              onClick={() => toggleCat(cat)}
+              sx={{ px: 2 }}
+              aria-expanded={expandedCats.has(cat)}
+              aria-controls={`sidebar-cat-${cat}`}
+            >
               <Typography sx={{ color: draculaColors.cyan, fontWeight: 600, fontSize: '0.85rem', flex: 1 }}>
                 {cat}
               </Typography>
               {expandedCats.has(cat) ? <ExpandLess sx={{ color: draculaColors.comment }} /> : <ExpandMore sx={{ color: draculaColors.comment }} />}
             </ListItemButton>
-            <Collapse in={expandedCats.has(cat)} unmountOnExit>
+            <Collapse in={expandedCats.has(cat)} unmountOnExit id={`sidebar-cat-${cat}`}>
               <List component="div" disablePadding>
                 {(attacksByCategory.get(cat) || []).map(attack => (
                   <ListItemButton
@@ -245,13 +250,18 @@ export function Sidebar() {
         ))}
 
         <Box key="Calculators">
-          <ListItemButton onClick={() => toggleCat('Calculators')} sx={{ px: 2 }}>
+          <ListItemButton
+            onClick={() => toggleCat('Calculators')}
+            sx={{ px: 2 }}
+            aria-expanded={expandedCats.has('Calculators')}
+            aria-controls="sidebar-cat-Calculators"
+          >
             <Typography sx={{ color: draculaColors.cyan, fontWeight: 600, fontSize: '0.85rem', flex: 1 }}>
               Calculators
             </Typography>
             {expandedCats.has('Calculators') ? <ExpandLess sx={{ color: draculaColors.comment }} /> : <ExpandMore sx={{ color: draculaColors.comment }} />}
           </ListItemButton>
-          <Collapse in={expandedCats.has('Calculators')} unmountOnExit>
+          <Collapse in={expandedCats.has('Calculators')} unmountOnExit id="sidebar-cat-Calculators">
             <List component="div" disablePadding>
               {CALCULATOR_ITEMS.map(item => (
                 <ListItemButton
@@ -302,7 +312,7 @@ export function Sidebar() {
           <AutoFixHigh sx={{ color: draculaColors.purple, mr: 1, fontSize: '1.1rem' }} />
           <ListItemText
             primary="Magic"
-            slotProps={{ primary: { sx: { color: draculaColors.purple, fontWeight: 600, fontSize: '0.85rem' } } }}
+            slotProps={{ primary: { sx: { color: draculaColors.purple, fontSize: '0.85rem' } } }}
           />
         </ListItemButton>
 

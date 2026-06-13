@@ -333,7 +333,7 @@ export function CommandPalette() {
                   key={`view-${item.module.id}`}
                   Icon={Icon}
                   primary={item.module.label}
-                  chips={[{ label: 'View', color: draculaColors.comment, variant: 'outlined' }]}
+                  chips={[{ label: 'Module', color: draculaColors.comment, variant: 'outlined' }]}
                   isSelected={isSelected}
                   onClick={() => selectView(item.module.mode)}
                   onMouseEnter={() => setSelectedIndex(item.index)}

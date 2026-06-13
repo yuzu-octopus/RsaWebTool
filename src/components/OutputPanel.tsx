@@ -14,13 +14,13 @@ import {
   DialogContentText,
   DialogActions,
 } from '@mui/material';
-import { ExpandLess, ExpandMore, ContentCopy, CheckCircle, Cancel, History as HistoryIcon } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, ContentCopy, CheckCircle, Cancel, History as HistoryIcon, ArrowBack } from '@mui/icons-material';
 import type { HistoryEntry } from '../types';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useDragResize } from '../hooks/useDragResize';
 import { useNotepad } from '../hooks/useNotepad';
-import { ghostBtnSx, MONO_FAMILY } from '../styles/shared';
+import { ghostBtnSx, pageTitleSx, MONO_FAMILY } from '../styles/shared';
 import { EmptyState } from './_shared/EmptyState';
 
 const notepadBaseStyle: React.CSSProperties = {
@@ -130,7 +130,7 @@ export function OutputPanel() {
       />
 
       <Box sx={{ p: 2, overflow: 'auto', flex: 1, pb: '20vh' }}>
-        <Typography variant="h6" sx={{ color: draculaColors.purple, mb: 2, fontWeight: 700 }}>
+        <Typography variant="h3" sx={{ ...pageTitleSx, mb: 2 }}>
           Results
         </Typography>
 
@@ -143,8 +143,9 @@ export function OutputPanel() {
             <Button
               size="small"
               variant="outlined"
+              startIcon={<ArrowBack fontSize="small" />}
               onClick={() => { setUi(prev => ({ ...prev, historySelectedKey: null })); }}
-              sx={{ borderColor: draculaColors.comment, color: draculaColors.comment, fontSize: '0.65rem', fontFamily: MONO_FAMILY, '&:hover': { backgroundColor: draculaColors.currentLine }, py: 0, px: 1, minWidth: 0 }}
+              sx={{ borderColor: draculaColors.comment, color: draculaColors.comment, fontSize: '0.65rem', fontFamily: MONO_FAMILY, '&:hover': { backgroundColor: draculaColors.currentLine } }}
             >
               Back
             </Button>

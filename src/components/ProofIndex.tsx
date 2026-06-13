@@ -9,7 +9,7 @@ import {
   ListItemText,
   Divider,
 } from '@mui/material';
-import { MenuBook } from '@mui/icons-material';
+import { Computer, Cloud, MenuBook } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { attacks } from '../attacks';
@@ -28,6 +28,9 @@ function AttackListItem({
       <Typography sx={{ color: draculaColors.cyan, fontFamily: MONO_FAMILY, fontWeight: 600 }}>
         {attack.name}
       </Typography>
+      {attack.frontendCheck
+        ? <Computer sx={{ color: draculaColors.green, fontSize: '0.85rem' }} />
+        : <Cloud sx={{ color: draculaColors.orange, fontSize: '0.85rem' }} />}
       <Typography
         component="span"
         sx={{

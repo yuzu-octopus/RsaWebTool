@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -32,6 +32,7 @@ export function InputPanel() {
   const [sourceMode, setSourceMode] = useState<'sage' | 'frontend'>('sage');
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
   const [frontendCode, setFrontendCode] = useState('');
+  const [copied, setCopied] = useState(false);
   const { runAttack, cancelCurrentRun } = useWorkerPool();
   const { handleRun, handleStop, handleGenerateTestcase, testcaseMsg, isRunning, progress, progressDetail, timer, eta } = useAttackExecution(
     execute, runAttack, cancelCurrentRun,
@@ -97,10 +98,12 @@ export function InputPanel() {
 
   const effectiveSourceMode = !hasSage ? 'frontend' : !hasFrontend ? 'sage' : sourceMode;
   // frontendCode is now loaded asynchronously via the useEffect above
-  const handleCopySource = () => {
+  const handleCopySource = useCallback(() => {
     const code = effectiveSourceMode === 'sage' ? pythonCode : frontendCode;
     void navigator.clipboard.writeText(code);
-  };
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [effectiveSourceMode, pythonCode, frontendCode]);
 
   const handleInputChange = (name: string, value: string) => {
     setInputValues(prev => ({ ...prev, [name]: value }));
@@ -179,6 +182,12 @@ export function InputPanel() {
                   placeholder={field.placeholder}
                   value={inputValues[field.name] || ''}
                   onChange={e => handleInputChange(field.name, e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !isRunning && selectedAttack) {
+                      e.preventDefault();
+                      void handleRun(selectedAttack, inputValues);
+                    }
+                  }}
                   multiline={field.multiline}
                   rows={field.rows || 1}
                   required={field.required !== false}
@@ -338,7 +347,7 @@ export function InputPanel() {
               sx={ghostBtnSx}
               startIcon={<ContentCopy />}
             >
-              Copy
+              {copied ? 'Copied!' : 'Copy'}
             </Button>
           </Box>
         </Box>

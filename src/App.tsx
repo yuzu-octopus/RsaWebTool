@@ -54,7 +54,9 @@ function AppContent() {
               <PemDecryptor />
             </Box>
           </ErrorBoundary>
-          <OutputPanel />
+          <ErrorBoundary>
+            <OutputPanel />
+          </ErrorBoundary>
         </Box>
       </Box>
       <Snackbar
