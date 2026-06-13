@@ -20,7 +20,7 @@ import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useDragResize } from '../hooks/useDragResize';
 import { useNotepad } from '../hooks/useNotepad';
-import { ghostBtnSx, pageTitleSx, MONO_FAMILY } from '../styles/shared';
+import { ghostBtnSx, MONO_FAMILY } from '../styles/shared';
 import { EmptyState } from './_shared/EmptyState';
 
 const notepadBaseStyle: React.CSSProperties = {
@@ -139,8 +139,8 @@ export function OutputPanel() {
         onMouseDown={handleMouseDown}
       />
 
-      <Box sx={{ p: 2, overflow: 'auto', flex: 1, pb: '20vh' }}>
-        <Typography variant="h3" sx={{ ...pageTitleSx, mb: 2 }}>
+      <Box sx={{ p: 2, overflow: 'auto', flex: 1, pb: '8vh' }}>
+        <Typography variant="h5" sx={{ color: draculaColors.foreground, fontWeight: 600, mb: 2, fontFamily: MONO_FAMILY }}>
           Results
         </Typography>
 
