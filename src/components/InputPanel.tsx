@@ -143,9 +143,7 @@ export function InputPanel() {
         onChange={(_, v) => setTab(v as number)}
         sx={{
           minHeight: 48,
-          pt: 2,
           px: 2,
-          borderBottom: `1px solid ${draculaColors.currentLine}`,
           '& .MuiTabs-flexContainer': { justifyContent: 'flex-start' },
           '& .MuiTab-root': { ...tabSx, px: 3 },
           '& .Mui-selected': { color: draculaColors.purple },
