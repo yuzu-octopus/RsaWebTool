@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -26,11 +26,14 @@ import 'prismjs/components/prism-python';
 import { getAttackSource, extractFrontendCheck, dedent } from '../attacks/rawSources';
 
 export function InputPanel() {
-  const { selectedAttack, viewMode, setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification } = useAppContext();
+  const { selectedAttack, viewMode, outputResult, setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification } = useAppContext();
   const { execute } = useSageMath();
   const [tab, setTab] = useState(0);
   const [sourceMode, setSourceMode] = useState<'sage' | 'frontend'>('sage');
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
+  // Ref so event listeners always read latest inputValues without re-registration
+  const inputValuesRef = useRef(inputValues);
+  inputValuesRef.current = inputValues;
   const [frontendCode, setFrontendCode] = useState('');
   const [copied, setCopied] = useState(false);
   const { runAttack, cancelCurrentRun } = useWorkerPool();
@@ -38,6 +41,9 @@ export function InputPanel() {
     execute, runAttack, cancelCurrentRun,
     { setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification, setInputValues },
   );
+  // Ref so event listeners always read latest handleRun without re-registration
+  const handleRunRef = useRef(handleRun);
+  handleRunRef.current = handleRun;
 
   // Keyboard shortcut: ⌘/Ctrl+1/2/3 switches tabs within the attack view
   useEffect(() => {
@@ -50,6 +56,26 @@ export function InputPanel() {
     window.addEventListener('rsa-switch-tab', handler);
     return () => window.removeEventListener('rsa-switch-tab', handler);
   }, []);
+
+  // Keyboard shortcut: ⌘+Enter to run attack, ⌘+Shift+C to copy output
+  useEffect(() => {
+    const runHandler = () => {
+      if (selectedAttack && !isRunning) {
+        void handleRunRef.current(selectedAttack, inputValuesRef.current);
+      }
+    };
+    const copyHandler = () => {
+      if (outputResult) {
+        void navigator.clipboard.writeText(outputResult);
+      }
+    };
+    window.addEventListener('rsa-run-attack', runHandler);
+    window.addEventListener('rsa-copy-output', copyHandler);
+    return () => {
+      window.removeEventListener('rsa-run-attack', runHandler);
+      window.removeEventListener('rsa-copy-output', copyHandler);
+    };
+  }, [selectedAttack, isRunning, outputResult]);
 
   // Load raw source for the Source tab, extracting only the frontendCheck function.
   // All setState calls happen inside .then()/.catch() — never synchronously in the effect body.

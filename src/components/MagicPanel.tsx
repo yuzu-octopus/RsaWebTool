@@ -38,7 +38,7 @@ const kvParamNames = [
   'oracle_responses', 'oracle_runs', 'phi', 'moduli_list', 'n_values',
   'pairs', 'triples', 'oracle_pairs', 'known_prefix', 'p_msb', 'leak', 'unknown_bits',
 ];
-const kvRegex = new RegExp(`(?<name>${kvParamNames.join('|')})\\s*=\\s*(?<value>[0-9a-fA-FxX,\\n]+)`, 'g');
+const kvRegex = new RegExp(`(?<name>${kvParamNames.join('|')})\\s*=\\s*(?<value>[0-9a-fA-FxX\\n]+)`, 'g');
 
 // Common JSON key aliases for structured input
 const KEY_ALIASES: Record<string, string> = {
