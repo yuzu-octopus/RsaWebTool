@@ -112,6 +112,15 @@ export function InputPanel() {
     return selectedAttack.sageTemplate!(Object.fromEntries(selectedAttack.inputs.map(f => [f.name, f.name])));
   }, [hasSage, selectedAttack]);
 
+  const effectiveSourceMode = !hasSage ? 'frontend' : !hasFrontend ? 'sage' : sourceMode;
+  // handleCopySource is a useCallback — must be defined before any early returns (Rules of Hooks)
+  const handleCopySource = useCallback(() => {
+    const code = effectiveSourceMode === 'sage' ? pythonCode : frontendCode;
+    void navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [effectiveSourceMode, pythonCode, frontendCode]);
+
   if (viewMode !== 'attack') return null;
 
   if (!selectedAttack) {
@@ -121,15 +130,6 @@ export function InputPanel() {
       </Box>
     );
   }
-
-  const effectiveSourceMode = !hasSage ? 'frontend' : !hasFrontend ? 'sage' : sourceMode;
-  // frontendCode is now loaded asynchronously via the useEffect above
-  const handleCopySource = useCallback(() => {
-    const code = effectiveSourceMode === 'sage' ? pythonCode : frontendCode;
-    void navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [effectiveSourceMode, pythonCode, frontendCode]);
 
   const handleInputChange = (name: string, value: string) => {
     setInputValues(prev => ({ ...prev, [name]: value }));
