@@ -140,7 +140,7 @@ export function OutputPanel() {
       />
 
       <Box sx={{ p: 2, overflow: 'auto', flex: 1, pb: '8vh' }}>
-        <Typography variant="h5" sx={{ color: draculaColors.foreground, fontWeight: 600, mb: 2, fontFamily: MONO_FAMILY }}>
+        <Typography variant="h5" sx={{ color: draculaColors.purple, fontWeight: 600, mb: 2, fontFamily: MONO_FAMILY }}>
           Results
         </Typography>
 
