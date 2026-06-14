@@ -139,6 +139,9 @@ export const generateTestcase = (): Record<string, string> => {
     const candidate2 = target - delta;
     if (candidate2 > 1n && isPrimeMR(candidate2)) { p = candidate2; break; }
   }
+  if (p === 0n) {
+    throw new Error('No prime found near 2^512 — retry');
+  }
   const q = randomPrime(TESTCASE_BITS.q);
   return { n: (p * q).toString() };
 };

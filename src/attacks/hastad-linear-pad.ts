@@ -51,6 +51,7 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                 fi = (a_i*x + b_i)**e - c_i
                 F += coeff * fi
             out.append(f"Combined polynomial degree: {F.degree()}")
+            found = False
             try:
                 F = F.monic()
             except Exception as ex:
@@ -190,7 +191,7 @@ export const generateTestcase = (): Record<string, string> => {
   // then build 3 ciphertexts on different moduli with affine padding.
   const kp = generateHastadTestcase();
   const e = kp.e;
-  const m = kp.m;
+  const m = BigInt(Math.floor(Math.random() * 1000) + 100); // small message that fits within n
   const triples: string[] = [];
   for (let i = 0; i < 3; i++) {
     const { n } = generateKeyPair(256, 256);

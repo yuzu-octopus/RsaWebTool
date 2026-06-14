@@ -187,5 +187,8 @@ export const generateTestcase = (): Record<string, string> => {
     const candidate2 = pTarget - delta;
     if (candidate2 > 1n && isPrimeMR(candidate2)) { p = candidate2; break; }
   }
+  if (!isPrimeMR(p)) {
+    throw new Error('No prime found in ±500 of pTarget — retry');
+  }
   return { n: (p * q).toString() };
 };

@@ -1,6 +1,6 @@
 var e=`import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { generateHastadTestcase, generateKeyPair } from '../utils/testcases/core';
+import { generateHastadTestcase, generateKeyPair, randomPrime } from '../utils/testcases/core';
 import { modPow, iroot } from '../utils/bigint';
 import { wrapSageTemplate } from './guard';
 
@@ -149,13 +149,6 @@ m &= m_1 - r_1 = m_2 - r_2
 \\\\qed\\\\\\\\
 \\\\end{align*}
 
-\\\\textbf{Coppersmith Lattice (when $m^e \\\\ge n$, modular wrap-around):}
-\\\\begin{itemize}
-\\\\item Construct $f(x) = (m_0 + x)^e - c \\\\pmod{n}$ for known $m_0 \\\\approx m$; LLL finds small root $|x_0| \\\\le n^{1/e^2}$
-\\\\item Short-pad variant uses polynomial resultants to eliminate the unknown pad difference $\\\\Delta$
-\\\\end{itemize}
-\\\\qed
-
 \\\\textbf{Explanation:} When $m^e < n$, the ciphertext is an exact $e$-th power in the integers (no modular wrap-around). Integer $e$-th root directly recovers $m_1$ and $m_2$. If only one root is found, brute-force the small pad difference $\\\\Delta$ (at most 255). The full Coppersmith short-pad attack using polynomial resultants handles the general case where $m^e \\\\ge n$ and $|\\\\Delta| < n^{1/e^2}$, but requires lattice reduction not shown here.
 
 \\\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Bivariate Integer Equation", J. Cryptology, 1997; D. Boneh, "Twenty Years of Attacks on RSA", 1999\`,
@@ -171,8 +164,10 @@ export const generateTestcase = (): Record<string, string> => {
   // give a 1024-bit n that times out in L2b testing.
   const kp = generateHastadTestcase();
   const e = kp.e;
-  const m = kp.m;
   const { n } = generateKeyPair(256, 256);
+  // m must be small enough that m^e < n (no modular wrap-around).
+  // For 512-bit n and e=3: m < n^(1/3) ≈ 170 bits.
+  const m = randomPrime(80); // 80-bit m, m^3 ≈ 240 bits, well within 512-bit n
   const maxPad = 2 ** 12;
   const r1 = BigInt(Math.floor(Math.random() * maxPad));
   const r2 = BigInt(Math.floor(Math.random() * maxPad));

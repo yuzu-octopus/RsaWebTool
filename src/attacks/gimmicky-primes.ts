@@ -277,17 +277,66 @@ s \\mid n &\\implies p = s,\\; q = n/s \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Generate using a random Mersenne prime: 2^p - 1
-  // Skip trivial ones (2,3,5,7); use medium ones for variety
-  const mersenneP = [17, 19, 31, 61, 89, 107, 127];
-  const candidates = mersenneP.flatMap(p => {
-    const val = (1n << BigInt(p)) - 1n;
-    return isPrimeMR(val) ? [{ p, val }] : [];
-  });
-  // Fallback: 2^17 - 1 = 131071 is a known Mersenne prime guaranteed to pass
-  const mersenne = candidates.length > 0
-    ? candidates[Math.floor(Math.random() * candidates.length)].val
-    : (1n << 17n) - 1n;
+  // Generate a prime of a random gimmicky form
+  const FORMS = ['mersenne', 'primorial', 'fermat', 'fibonacci', 'repunit', 'factorial', 'carol', 'cullen'];
+  const form = FORMS[Math.floor(Math.random() * FORMS.length)];
+  let gimmickPrime: bigint;
+  switch (form) {
+    case 'mersenne': {
+      const mersenneP = [17, 19, 31, 61, 89, 107, 127];
+      const candidates = mersenneP.flatMap(p => {
+        const val = (1n << BigInt(p)) - 1n;
+        return isPrimeMR(val) ? [{ p, val }] : [];
+      });
+      gimmickPrime = candidates.length > 0
+        ? candidates[Math.floor(Math.random() * candidates.length)].val
+        : (1n << 17n) - 1n;
+      break;
+    }
+    case 'primorial': {
+      // Euclid primes (primorial + 1)
+      const primorialPrimes = [3n, 7n, 31n, 211n, 2311n, 200560490131n];
+      gimmickPrime = primorialPrimes[Math.floor(Math.random() * primorialPrimes.length)];
+      break;
+    }
+    case 'fermat': {
+      // Fermat: 2^(2^k) + 1 (k=0..4)
+      gimmickPrime = 65537n; // 2^16 + 1
+      break;
+    }
+    case 'fibonacci': {
+      // Quick Fibonacci: F_17 = 1597, F_23 = 28657, F_31 = 1346269
+      const fibPrimes = [3n, 5n, 13n, 89n, 233n, 1597n, 28657n, 514229n, 433494437n];
+      gimmickPrime = fibPrimes[Math.floor(Math.random() * fibPrimes.length)];
+      break;
+    }
+    case 'repunit': {
+      // R_2 = 11, R_19 = 1111111111111111111
+      const repunitPrimes = [11n, 1111111111111111111n];
+      gimmickPrime = repunitPrimes[Math.floor(Math.random() * repunitPrimes.length)];
+      break;
+    }
+    case 'factorial': {
+      // Factorial primes: 3!-1 = 5, 4!-1 = 23, 5!+1 = 121 (no thanks), 7!-1 = 5039
+      const factPrimes = [5n, 23n, 5039n, 3628799n];
+      gimmickPrime = factPrimes[Math.floor(Math.random() * factPrimes.length)];
+      break;
+    }
+    case 'carol': {
+      // Carol primes: (2^n-1)^2-2. Known: n=2→7, n=3→47, n=4→223, n=6→3967, n=7→16127, n=10→1046527
+      const carolPrimes = [7n, 47n, 223n, 3967n, 16127n, 1046527n];
+      gimmickPrime = carolPrimes[Math.floor(Math.random() * carolPrimes.length)];
+      break;
+    }
+    case 'cullen': {
+      // Cullen primes: n*2^n+1. Known: n=1→3 (only small one; large ones have n>140)
+      const cullenPrimes = [3n];
+      gimmickPrime = cullenPrimes[Math.floor(Math.random() * cullenPrimes.length)];
+      break;
+    }
+    default:
+      gimmickPrime = (1n << 17n) - 1n;
+  }
   const q = randomPrime(TESTCASE_BITS.q);
-  return { n: (mersenne * q).toString() };
+  return { n: (gimmickPrime * q).toString() };
 };

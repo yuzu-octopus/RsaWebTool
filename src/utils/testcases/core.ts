@@ -234,11 +234,17 @@ export function generatePollardTestcase(): { n: bigint; p: bigint; q: bigint } {
   let attempts = 0;
   while (true) {
     if (attempts++ > 10000) throw new Error('Failed to find B-smooth prime');
-    // Random t at TESTCASE_BITS size, then p = S*t + 1
-    const tBits = TESTCASE_BITS.p - 37; // S is ~37 bits
-    const t = randomPrime(Math.max(tBits, 64));
-    p = S * t + 1n;
-    if (p.toString(2).length === TESTCASE_BITS.p && isPrimeMR(p)) break;
+    // p-1 must be B-smooth (all prime factors ≤ B=10000) for Pollard's p-1 to work.
+    // S = product of primes ≤ 31 ≈ 2^37. Multiply by random small primes (≤ 10000)
+    // to grow p-1 while keeping it smooth, then p = p-1 + 1.
+    const smoothPool = [37n, 41n, 43n, 47n, 53n, 59n, 61n, 67n, 71n, 73n, 79n, 83n, 89n, 97n, 101n];
+    let pMinus1 = S;
+    const extraCount = Math.floor(Math.random() * 3) + 5; // 5-7 extra primes, giving ~70 bits total
+    for (let i = 0; i < extraCount; i++) {
+      pMinus1 *= smoothPool[Math.floor(Math.random() * smoothPool.length)];
+    }
+    p = pMinus1 + 1n;
+    if (isPrimeMR(p)) break;
   }
   const q = randomPrime(TESTCASE_BITS.q);
   return { n: p * q, p, q };

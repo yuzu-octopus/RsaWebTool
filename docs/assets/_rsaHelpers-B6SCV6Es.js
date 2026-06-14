@@ -46,7 +46,7 @@ export const rsaNeeds = {
   },
   nALeak: (p: Record<string, string>) => !!p.n && !!p.a && !!p.leak,
   moduliList: (p: Record<string, string>) => {
-    const vals = (p.moduli_list || '').trim();
+    const vals = (p.n_values || '').trim();
     if (!vals) return false;
     return vals.split('\\n').filter(x => x.trim()).length >= 2;
   },

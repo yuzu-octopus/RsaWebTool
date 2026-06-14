@@ -12,7 +12,7 @@ export const attack: Attack = {
   category: 'Factorization',
   description: 'Finds shared prime factors across multiple RSA moduli using pairwise GCD with pair reporting. Use when two or more moduli may share a common factor.',
   inputs: [
-    { name: 'moduli_list', label: 'Moduli (one per line)', placeholder: 'Enter multiple moduli, one per line...', multiline: true, rows: 6 },
+    { name: 'n_values', label: 'Moduli (one per line)', placeholder: 'Enter multiple moduli, one per line...', multiline: true, rows: 6 },
   ],
   proof: `\\textbf{Theorem:} Pairwise GCD among a set of RSA moduli reveals shared prime factors and identifies which moduli share them.
 
@@ -42,8 +42,8 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{
   applicableCheck: rsaNeeds.moduliList,
   frontendCheck: (vals: Record<string, string>) => {
     try {
-      const raw = (vals.moduli_list || '').trim();
-      if (!raw) return 'ERROR: Missing required input: moduli_list\nMULTI_PRIME_GCD=FAILED';
+      const raw = (vals.n_values || '').trim();
+      if (!raw) return 'ERROR: Missing required input: n_values\nMULTI_PRIME_GCD=FAILED';
 
       const moduli = raw.split('\n')
         .map(s => s.trim())
@@ -56,7 +56,7 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{
 
       const lines: string[] = [
         `Multi-Prime GCD`,
-        `moduli_list = ${raw}`,
+        `n_values = ${raw}`,
         ``,
         `Results:`,
       ];
@@ -119,5 +119,5 @@ export const generateTestcase = (): Record<string, string> => {
   const q1 = randomPrime(TESTCASE_BITS.q);
   const q2 = randomPrime(TESTCASE_BITS.q);
   const q3 = randomPrime(TESTCASE_BITS.q);
-  return { moduli_list: `${sharedP * q1}\n${sharedP * q2}\n${sharedP * q3}` };
+  return { n_values: `${sharedP * q1}\n${sharedP * q2}\n${sharedP * q3}` };
 };

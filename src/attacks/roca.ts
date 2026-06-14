@@ -188,7 +188,7 @@ f(x) &= Mx + r_1 \\equiv 0 \\pmod{p} \\quad\\text{with root } x = k_1 \\\\
 p &= M \\cdot k_1 + r_1 \\qed
 \\end{align*}
 
-\\textbf{Explanation:} The Infineon RSA key generator had a bug: it generated primes by starting with a random $k$, computing $p = k \\cdot M + (65537^i \\bmod M)$, and testing primality. Since $M$ is large (product of many small primes), the $k$ values are small (often $k < \\sqrt{n}/M \\ll n^{0.5}$), making $p$'s high bits predictable. Coppersmith's theorem says we can find small roots of $f(x) = Mx + r \\bmod p$ when $|x| < p^\\beta$. With $\\beta = 0.5$ and $X = 2\\sqrt{n}/M'$ (factor 2 safety margin), the bounded root $k$ is recovered via lattice reduction (LLL). This attack factored 512-bit keys in minutes and 1024-bit keys in hours in practice.
+\\textbf{Explanation:} The Infineon RSA key generator had a bug: it generated primes by starting with a random $k$, computing $p = k \\cdot M + (65537^i \\bmod M)$, and testing primality. Since $M$ is large (product of many small primes), the $k$ values are small (often $k < \\sqrt{n}/M \\ll n^{0.5}$), making $p$'s high bits predictable. Coppersmith's theorem says we can find small roots of $f(x) = Mx + r \\bmod p$ when $|x| < p^\\beta$. With $\\beta = 0.5$ and $X = 2\\sqrt{n}/M'$ (factor 2 safety margin), the bounded root $k$ is recovered via lattice reduction (LLL). This attack factored 512-bit keys in seconds and 1024-bit keys in approximately 25 days on a single CPU in practice.
 
 \\textbf{Optimization:} The greedy M' search reduces the search space by removing prime factors from M that contribute the least order-reduction per M-reduction, yielding a smaller Coppersmith bound $X = 2\\sqrt{n}/M'$.
 

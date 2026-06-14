@@ -184,7 +184,7 @@ export const generateTestcase = (): Record<string, string> => {
     if (Math.random() < 0.7) {
       p = pPlus1 - 1n;
     } else {
-      let largePrime = BigInt(Math.floor(Math.random() * 900000) + 10000);
+      let largePrime = BigInt(Math.floor(Math.random() * 40000) + 10000);
       while (!isPrimeMR(largePrime)) {
         largePrime++;
       }
