@@ -98,11 +98,60 @@ export function extractFrontendCheck(rawSource: string): string | null {
   // 4. Brace-count from the opening { to find the matching closing }
   // Tracks template expression depth ($ {...}) to avoid counting
   // template literal braces as real scope braces.
+  // Also skips braces inside string literals, template literals, and regex patterns.
   let braceDepth = 0;
   let templateDepth = 0;
+  let inString: string | null = null; // null | '"' | "'"
+  let inRegex = false;
+  let escape = false;
 
   while (idx < rawSource.length) {
     const ch = rawSource[idx];
+
+    if (escape) {
+      escape = false;
+      idx++;
+      continue;
+    }
+
+    if (ch === '\\') {
+      escape = true;
+      idx++;
+      continue;
+    }
+
+    // Handle string literals
+    if (inString) {
+      if (ch === inString) inString = null;
+      idx++;
+      continue;
+    }
+
+    // Handle regex literals
+    if (inRegex) {
+      if (ch === '/') inRegex = false;
+      idx++;
+      continue;
+    }
+
+    // Enter string literals
+    if (ch === '"' || ch === "'") {
+      inString = ch;
+      idx++;
+      continue;
+    }
+
+    // Enter regex literals (after operators, parens, braces, keywords — not after identifiers/numbers/closing-brackets)
+    if (ch === '/' && idx > 0) {
+      const prev = rawSource[idx - 1];
+      if (/[\w)\]},!?:;>=+\-*/%&|^~]/.test(prev)) {
+        // Division — not a regex start
+      } else {
+        inRegex = true;
+        idx++;
+        continue;
+      }
+    }
 
     if (ch === '{') {
       if (templateDepth > 0) {

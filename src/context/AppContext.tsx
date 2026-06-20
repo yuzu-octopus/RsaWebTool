@@ -32,8 +32,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addToHistory = useCallback((attackId: string, attackName: string, result: string, success: boolean) => {
     setHistory(prev => {
-      const entry: HistoryEntry = { id: crypto.randomUUID(), attackId, attackName, timestamp: new Date(), result, success };
-      const updated = [entry, ...prev].slice(0, 500);
+      const truncatedResult = result.length > 200 ? result.slice(0, 200) + '…' : result;
+      const entry: HistoryEntry = { id: crypto.randomUUID(), attackId, attackName, timestamp: new Date(), result: truncatedResult, success };
+      const updated = [entry, ...prev].slice(0, 50);
       // Persist to localStorage (truncate result to 200 chars to stay under quota)
       try {
         const stored = updated.map(e => ({ ...e, result: e.result.length > 200 ? e.result.slice(0, 200) + '...' : e.result }));

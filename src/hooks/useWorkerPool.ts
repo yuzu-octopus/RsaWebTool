@@ -32,6 +32,7 @@ export function useWorkerPool(poolSize: number = env.workerPoolSize) {
   const idCounterRef = useRef(0);
   const fallbackRef = useRef(false);
   const freeRef = useRef<number[]>([]);
+  const currentTaskIdRef = useRef<(number | null)[]>([]);
 
   const processQueue = () => {
     while (queueRef.current.length > 0) {
@@ -39,6 +40,7 @@ export function useWorkerPool(poolSize: number = env.workerPoolSize) {
       const freeIndex = freeRef.current.shift()!;
       const task = queueRef.current.shift()!;
       busyRef.current[freeIndex] = true;
+      currentTaskIdRef.current[freeIndex] = task.id;
       workersRef.current[freeIndex].postMessage({
         id: task.id,
         attackId: task.attackId,
@@ -75,6 +77,15 @@ export function useWorkerPool(poolSize: number = env.workerPoolSize) {
       processQueue();
     };
     worker.onerror = () => {
+      const taskId = currentTaskIdRef.current[i];
+      if (taskId !== undefined && taskId !== null) {
+        const pt = pending.get(taskId);
+        if (pt) {
+          pending.delete(taskId);
+          pt.reject(new Error('Web Worker crashed'));
+        }
+      }
+      currentTaskIdRef.current[i] = null;
       freeRef.current.push(i);
       busyRef.current[i] = false;
       processQueue();
@@ -92,6 +103,7 @@ export function useWorkerPool(poolSize: number = env.workerPoolSize) {
       for (let i = 0; i < poolSize; i++) {
         workersRef.current.push(createWorker(i));
         busyRef.current.push(false);
+        currentTaskIdRef.current.push(null);
       }
       freeRef.current = Array.from({ length: poolSize }, (_, i) => i);
     } catch (e) {
@@ -111,6 +123,7 @@ export function useWorkerPool(poolSize: number = env.workerPoolSize) {
       workersRef.current = [];
       busyRef.current = [];
       freeRef.current = [];
+      currentTaskIdRef.current = [];
       pending.clear();
       queue.length = 0;
     };
@@ -169,6 +182,7 @@ export function useWorkerPool(poolSize: number = env.workerPoolSize) {
       const freeIndex = freeRef.current.shift();
       if (freeIndex !== undefined) {
         busyRef.current[freeIndex] = true;
+        currentTaskIdRef.current[freeIndex] = id;
         workersRef.current[freeIndex].postMessage({
           id,
           attackId,
@@ -199,6 +213,7 @@ export function useWorkerPool(poolSize: number = env.workerPoolSize) {
     workersRef.current = [];
     busyRef.current = [];
     freeRef.current = [];
+    currentTaskIdRef.current = [];
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

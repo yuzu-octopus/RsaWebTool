@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { modPow, iroot } from '../utils/bigint';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, sanitizePython } from './guard';
 
 export const attack: Attack = {
   id: 'known-plaintext',
@@ -28,7 +28,7 @@ print("KNOWN_PLAINTEXT=FAILED")`;
         e_val = "${vals.e}".strip()
         e = Integer(e_val) if e_val else Integer(65537)
         c = Integer(${vals.c})
-        known_prefix = "${vals.known_prefix || ''}"
+        known_prefix = "${sanitizePython(vals.known_prefix || '')}"
         unknown_bits = Integer("${(vals.unknown_bits || '24').trim()}")
         out.append(f"Known Plaintext Attack")
         out.append(f"n = {n}")

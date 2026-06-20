@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateHastadTestcase, generateKeyPair, encrypt } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, sanitizePython } from './guard';
 
 export const attack: Attack = {
   id: 'hastad-linear-pad',
@@ -21,7 +21,7 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
       token: 'HASTAD_LINEAR_PAD',
       useGuard: false,
       body: `        e = Integer(${vals.e})
-        triples_str = """${vals.triples}""".strip()
+        triples_str = """${sanitizePython(vals.triples)}""".strip()
         triples = []
         for line in triples_str.split('\\n'):
             line = line.strip()

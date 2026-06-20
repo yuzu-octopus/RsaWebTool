@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { modPow, modInverse, gcd } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, sanitizePython } from './guard';
 
 export const attack: Attack = {
   id: 'rsa-crt-fault',
@@ -28,7 +28,7 @@ print("RSA_CRT_FAULT=FAILED")`;
         e = Integer(${vals.e})
         m = Integer(${vals.m})
         sig_faulty = Integer(${vals.sig_faulty})
-        sig_valid_str = "${(vals.sig_valid || '').trim()}"
+        sig_valid_str = "${sanitizePython((vals.sig_valid || '').trim())}"
         if sig_valid_str:
             sig_valid = Integer(sig_valid_str)
         out.append("RSA-CRT Fault Attack (Bellcore)")

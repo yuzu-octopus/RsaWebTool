@@ -125,3 +125,15 @@ ${inner}print()
 ${inner}print("${token}=SUCCESS")
 ${inner}return`;
 }
+
+/**
+ * Sanitize a user-supplied string for safe interpolation into a Python
+ * string literal. Escapes backslashes, quotes, and newlines.
+ */
+export function sanitizePython(value: string): string {
+  return value
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r');
+}

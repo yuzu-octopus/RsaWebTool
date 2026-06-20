@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, sanitizePython } from './guard';
 
 export const attack: Attack = {
   id: 'manger',
@@ -28,7 +28,7 @@ export const attack: Attack = {
         if not "${vals.c}".strip():
             out.append("ERROR: c is required")
             valid = False
-        responses_raw = """${vals.oracle_responses || ''}""".strip()
+        responses_raw = """${sanitizePython(vals.oracle_responses || '')}""".strip()
         if not responses_raw:
             out.append("ERROR: oracle_responses is required")
             valid = False

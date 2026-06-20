@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, sanitizePython } from './guard';
 
 export const attack: Attack = {
   id: 'biased-lsb',
@@ -39,7 +39,7 @@ export const attack: Attack = {
             two_e = pow(2, int(e), int(n))
             two_e_sage = Integer(two_e)
             c = (Integer(${vals.c}) * Integer(two_e)) % n
-            runs_str = """${vals.oracle_runs}""".strip()
+            runs_str = """${sanitizePython(vals.oracle_runs)}""".strip()
             runs = []
             for line in runs_str.split('\\n'):
                 line = line.strip()

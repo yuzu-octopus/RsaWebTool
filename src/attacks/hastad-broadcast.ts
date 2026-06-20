@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateHastadBroadcastTestcase } from '../utils/testcases/core';
 import { modPow, modInverse, iroot, gcd } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, sanitizePython } from './guard';
 
 export const attack: Attack = {
   id: 'hastad-broadcast',
@@ -28,7 +28,7 @@ print("HASTAD_BROADCAST=FAILED")`;
             out.append(f"ERROR: e must be >= 2, got e = {e}")
             out.append("HASTAD_BROADCAST=FAILED")
         else:
-            lines_str = """${vals.ciphertexts}""".strip()
+            lines_str = """${sanitizePython(vals.ciphertexts)}""".strip()
             pairs = []
             for line in lines_str.split('\\n'):
                 line = line.strip()

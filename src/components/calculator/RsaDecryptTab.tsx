@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Typography, TextField, Button } from '@mui/material';
 import { draculaColors } from '../../theme/dracula';
 import { modPow, modInverse } from '../../utils/bigint';
@@ -10,6 +10,16 @@ import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 export function RsaDecryptTab() {
   const [form, setForm] = useState({ c: '', n: '', d: '', p: '', q: '', e: '' });
   const out = useCalculatorOutput({ category: 'calculator-rsa' });
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const { n, e } = (event as CustomEvent<{ n?: string; e?: string }>).detail ?? {};
+      if (n) setForm(prev => ({ ...prev, n }));
+      if (e) setForm(prev => ({ ...prev, e }));
+    };
+    window.addEventListener('calculator-prefill', handler);
+    return () => window.removeEventListener('calculator-prefill', handler);
+  }, []);
 
   const handleDecrypt = () => {
     out.clear();

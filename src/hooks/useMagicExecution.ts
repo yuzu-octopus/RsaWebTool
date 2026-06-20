@@ -361,9 +361,11 @@ export function useMagicExecution(
     }
 
     // Build remaining list (attacks that need SageCell)
+    // Only include attacks whose frontendCheck was cancelled (still 'running')
+    // — not those that completed with a non-success result.
     const remaining: { attack: Attack; originalIndex: number }[] = [];
     for (let i = 0; i < attacksToRun.length; i++) {
-      if (!preCheckResults[i]) {
+      if (!preCheckResults[i] && jobs[i]?.status === 'running') {
         remaining.push({ attack: attacksToRun[i], originalIndex: i });
       }
     }

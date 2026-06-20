@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, sanitizePython } from './guard';
 
 export const attack: Attack = {
   id: 'bleichenbacher-sig',
@@ -23,7 +23,7 @@ print("BLEICHENBACHER_SIG=FAILED")`;
       useGuard: false,
       body: `        n = Integer(${vals.n})
         e = Integer(${vals.e || '3'})
-        hash_hex = "${vals.hash_hex}".strip()
+        hash_hex = "${sanitizePython(vals.hash_hex)}".strip()
         found = True
         if not hash_hex:
             out.append("ERROR: hash_hex is empty")

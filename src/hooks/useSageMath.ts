@@ -225,13 +225,13 @@ function createSageMathExecutor() {
                 finish({
                   success: false,
                   stdout: text.trim(),
-                  error: `SageCell kernel stalled — no output for 30s.\n\nOutput before stall:\n${text.trim()}`,
+                  error: `SageCell kernel stalled — no output for ${env.stallTimeout}s.\n\nOutput before stall:\n${text.trim()}`,
                 });
               } else {
                 finish({
                   success: false,
                   stdout: '',
-                  error: 'SageCell produced no output for 30s. The kernel may have crashed or the computation is too slow for remote execution.',
+                  error: `SageCell produced no output for ${env.stallTimeout}s. The kernel may have crashed or the computation is too slow for remote execution.`,
                 });
               }
               return;

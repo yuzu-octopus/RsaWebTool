@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { modPow, modInverse } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, sanitizePython } from './guard';
 
 export const attack: Attack = {
   id: 'homomorphic-forgery',
@@ -31,7 +31,7 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
             out.append("ERROR: Invalid n or e")
             found = False
         else:
-            pairs_str = "${vals.oracle_pairs}".strip()
+            pairs_str = "${sanitizePython(vals.oracle_pairs)}".strip()
             if not pairs_str:
                 out.append("ERROR: Empty oracle_pairs")
                 found = False

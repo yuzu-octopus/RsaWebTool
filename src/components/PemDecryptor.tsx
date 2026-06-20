@@ -376,11 +376,14 @@ MIIEpAIBAAKCAQEA...
                 variant="outlined"
                 startIcon={<VpnKey />}
                 onClick={() => {
-                  const { n: nVal } = parsed.keyParams!;
+                  const { n: nVal, e: eVal } = parsed.keyParams!;
                   if (!nVal || nVal === '0') return;
                   setViewMode('calculator');
                   setCalculatorMode('rsa');
-                  showNotification('Switched to RSA Calculator — paste n/e from copied params', 'success');
+                  window.dispatchEvent(new CustomEvent('calculator-prefill', {
+                    detail: { n: nVal, e: eVal }
+                  }));
+                  showNotification('Prefilled RSA Calculator with key parameters', 'success');
                 }}
                 sx={colorGhostBtn(draculaColors.cyan)}
               >

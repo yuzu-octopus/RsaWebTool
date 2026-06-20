@@ -129,11 +129,18 @@ function InlineMath({ text }: { text: string }) {
   return <>{parts}</>;
 }
 
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 /**
  * Converts LaTeX text commands to HTML for rendering.
  */
 function renderInlineText(text: string): string {
-  let html = text;
+  let html = escapeHtml(text);
   // Process LaTeX command wrappers before escape sequences
   html = html.replace(/\\texttt\{([^}]*)\}/g, '<code>$1</code>');
   html = html.replace(/\\text\{([^}]*)\}/g, '<span>$1</span>');
