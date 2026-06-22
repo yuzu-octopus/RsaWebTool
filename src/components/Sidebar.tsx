@@ -13,7 +13,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey, Lock, Hub, Tag, Security, Menu } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey, Lock, Hub, Tag, Security, Menu, LockOpen } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { pulse } from '../styles/shared';
 import { CATEGORIES, attacksByCategory } from '../attacks';
@@ -201,8 +201,8 @@ export function Sidebar() {
         }}
       >
       <Box sx={{ p: 2 }}>
-        <Typography variant="h5" sx={{ color: draculaColors.purple, fontWeight: 700 }}>
-          RSA CTF Tool
+        <Typography variant="h5" sx={{ color: draculaColors.purple, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <LockOpen sx={{ fontSize: '1.2rem', color: draculaColors.purple }} /> RSA CTF Tool
         </Typography>
         <Typography variant="caption" sx={{ color: draculaColors.comment }}>
           SageMath Powered
