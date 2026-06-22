@@ -17,7 +17,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { attacks } from '../attacks';
 import { SIDEBAR_MODULES, ALL_SIDEBAR_ITEMS } from '../config/sidebarItems';
 import { draculaColors } from '../theme/dracula';
-import { MONO_FAMILY } from '../styles/shared';
+import { MONO_FAMILY, ICON_SIZES } from '../styles/shared';
 import type { Attack, AttackCategory, CalculatorMode } from '../types';
 
 const MODULE_ICONS: Record<string, React.ElementType> = {
@@ -90,7 +90,7 @@ function CommandPaletteItem({
         borderLeft: `3px solid ${isSelected ? draculaColors.purple : 'transparent'}`,
       }}
     >
-      <Icon sx={{ color: draculaColors.comment, mr: 1.5, fontSize: 20 }} />
+      <Icon sx={{ color: draculaColors.comment, mr: 1.5, fontSize: ICON_SIZES.lg }} />
       <ListItemText
         primary={primary}
         secondary={secondary}
@@ -277,7 +277,7 @@ export function CommandPalette() {
         },
         paper: {
           sx: {
-            bgcolor: '#282a36 !important',
+            bgcolor: draculaColors.background,
             color: draculaColors.foreground,
             width: 480,
             maxHeight: 400,
@@ -290,7 +290,7 @@ export function CommandPalette() {
         },
       }}
     >
-      <Box sx={{ p: 1.5, pb: 0, bgcolor: '#282a36' }}>
+      <Box sx={{ p: 1.5, pb: 0, bgcolor: draculaColors.background }}>
         <TextField
           fullWidth
           autoFocus
@@ -305,7 +305,7 @@ export function CommandPalette() {
           slotProps={{
             input: {
               startAdornment: (
-                <SearchIcon sx={{ color: draculaColors.comment, mr: 1, fontSize: 20 }} />
+                <SearchIcon sx={{ color: draculaColors.comment, mr: 1, fontSize: ICON_SIZES.lg }} />
               ),
               disableUnderline: true,
               sx: {
@@ -322,7 +322,7 @@ export function CommandPalette() {
           }}
         />
       </Box>
-      <DialogContent sx={{ p: 0, overflow: 'auto', bgcolor: '#282a36', pb: '20vh' }}>
+      <DialogContent sx={{ p: 0, overflow: 'auto', bgcolor: draculaColors.background, pb: '20vh' }}>
         <List dense>
           {allItems.map((item) => {
             const isSelected = item.index === selectedIndex;

@@ -13,7 +13,7 @@ import { Computer, Cloud, MenuBook } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { attacks } from '../attacks';
-import { colFlexSx, MONO_FAMILY, PROSE_FAMILY } from '../styles/shared';
+import { colFlexSx, MONO_FAMILY, PROSE_FAMILY, ICON_SIZES } from '../styles/shared';
 import { inputSx } from '../styles/inputSx';
 
 function AttackListItem({
@@ -29,8 +29,8 @@ function AttackListItem({
         {attack.name}
       </Typography>
       {attack.frontendCheck
-        ? <Computer sx={{ color: draculaColors.green, fontSize: '0.85rem' }} />
-        : <Cloud sx={{ color: draculaColors.orange, fontSize: '0.85rem' }} />}
+        ? <Computer sx={{ color: draculaColors.green, fontSize: ICON_SIZES.sm }} />
+        : <Cloud sx={{ color: draculaColors.orange, fontSize: ICON_SIZES.sm }} />}
       <Typography
         component="span"
         sx={{
@@ -95,7 +95,7 @@ export function ProofIndex() {
     <Box sx={colFlexSx}>
       <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Typography variant="h3" sx={{ color: draculaColors.purple, mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="h3" sx={{ color: draculaColors.purple, fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
             <MenuBook sx={{ fontSize: 'inherit' }} /> Attack Index
           </Typography>
 
@@ -118,9 +118,20 @@ export function ProofIndex() {
       <Divider sx={{ borderColor: draculaColors.comment }} />
 
       <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center', pb: '20vh' }}>
-        <List sx={{ width: '100%', maxWidth: 640, px: 2 }}>
-          {attackItems}
-        </List>
+        {filtered.length === 0 && search ? (
+          <Box sx={{ textAlign: 'center', mt: 4, px: 2 }}>
+            <Typography sx={{ color: draculaColors.comment, fontSize: '0.85rem', fontFamily: MONO_FAMILY }}>
+              No proofs match &quot;{search}&quot;
+            </Typography>
+            <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', mt: 1, fontFamily: MONO_FAMILY }}>
+              Try a different search term or clear the search field
+            </Typography>
+          </Box>
+        ) : (
+          <List sx={{ width: '100%', maxWidth: 640, px: 2 }}>
+            {attackItems}
+          </List>
+        )}
       </Box>
     </Box>
   );

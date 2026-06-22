@@ -152,6 +152,7 @@ const JobListItem = memo(function JobListItem({
           {(job.result || job.error) && (
             <IconButton
               size="small"
+              aria-label="Copy result"
               onClick={() => { void navigator.clipboard.writeText(job.result || job.error || ''); }}
               sx={{ position: 'absolute', top: 2, right: 2, color: draculaColors.comment, zIndex: 1 }}
             >

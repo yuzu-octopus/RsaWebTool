@@ -13,9 +13,10 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey, Lock, Hub, Tag, Security, Menu, LockOpen } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey, Lock, Hub, Tag, Security, Menu } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
-import { pulse, MONO_FAMILY } from '../styles/shared';
+import { LogoIcon } from './_shared/LogoIcon';
+import { pulse, MONO_FAMILY, ICON_SIZES } from '../styles/shared';
 import { CATEGORIES, attacksByCategory } from '../attacks';
 import { CALCULATOR_ITEMS, SIDEBAR_MODULES } from '../config/sidebarItems';
 import type { Attack } from '../types';
@@ -31,11 +32,11 @@ interface ServiceStatus {
 
 function modIcon(id: string, color: string): React.ReactNode {
   switch (id) {
-    case 'instructions': return <MenuBook sx={{ color, fontSize: '1.1rem' }} />;
-    case 'magic': return <AutoFixHigh sx={{ color, fontSize: '1.1rem' }} />;
-    case 'proofs': return <MenuBook sx={{ color, fontSize: '1.1rem' }} />;
-    case 'format-converter': return <SwapHoriz sx={{ color, fontSize: '1.1rem' }} />;
-    case 'pem': return <VpnKey sx={{ color, fontSize: '1.1rem' }} />;
+    case 'instructions': return <MenuBook sx={{ color, fontSize: ICON_SIZES.lg }} />;
+    case 'magic': return <AutoFixHigh sx={{ color, fontSize: ICON_SIZES.lg }} />;
+    case 'proofs': return <MenuBook sx={{ color, fontSize: ICON_SIZES.lg }} />;
+    case 'format-converter': return <SwapHoriz sx={{ color, fontSize: ICON_SIZES.lg }} />;
+    case 'pem': return <VpnKey sx={{ color, fontSize: ICON_SIZES.lg }} />;
     default: return null;
   }
 }
@@ -43,11 +44,11 @@ function modIcon(id: string, color: string): React.ReactNode {
 function calcIcon(mode: string): React.ReactNode {
   const colors: Record<string, string> = { rsa: draculaColors.cyan, aes: draculaColors.purple, ecc: draculaColors.green, hash: draculaColors.orange, dh: draculaColors.pink };
   switch (mode) {
-    case 'rsa': return <VpnKey sx={{ color: colors[mode], fontSize: '1.1rem' }} />;
-    case 'aes': return <Lock sx={{ color: colors[mode], fontSize: '1.1rem' }} />;
-    case 'ecc': return <Hub sx={{ color: colors[mode], fontSize: '1.1rem' }} />;
-    case 'hash': return <Tag sx={{ color: colors[mode], fontSize: '1.1rem' }} />;
-    case 'dh': return <Security sx={{ color: colors[mode], fontSize: '1.1rem' }} />;
+    case 'rsa': return <VpnKey sx={{ color: colors[mode], fontSize: ICON_SIZES.lg }} />;
+    case 'aes': return <Lock sx={{ color: colors[mode], fontSize: ICON_SIZES.lg }} />;
+    case 'ecc': return <Hub sx={{ color: colors[mode], fontSize: ICON_SIZES.lg }} />;
+    case 'hash': return <Tag sx={{ color: colors[mode], fontSize: ICON_SIZES.lg }} />;
+    case 'dh': return <Security sx={{ color: colors[mode], fontSize: ICON_SIZES.lg }} />;
     default: return null;
   }
 }
@@ -55,10 +56,12 @@ function calcIcon(mode: string): React.ReactNode {
 const sidebarActiveSx = {
   backgroundColor: 'rgba(255,255,255,0.08)',
   '&:hover': { backgroundColor: 'rgba(255,255,255,0.12)' },
+  '&:focus-visible': { outline: `2px solid ${draculaColors.cyan}`, outlineOffset: -2 },
 } as const;
 const sidebarInactiveSx = {
   backgroundColor: 'transparent',
   '&:hover': { backgroundColor: 'rgba(255,255,255,0.08)' },
+  '&:focus-visible': { outline: `2px solid ${draculaColors.cyan}`, outlineOffset: -2 },
 } as const;
 
 export function Sidebar() {
@@ -213,7 +216,7 @@ export function Sidebar() {
           borderRadius: '50%', backgroundColor: draculaColors.background,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <LockOpen sx={{ fontSize: '2rem', color: draculaColors.purple }} />
+          <LogoIcon size={32} />
         </Box>
         <Typography sx={{ color: draculaColors.purple, fontWeight: 700, fontSize: '1.05rem', lineHeight: 1.5 }}>
           RSA CTF Tool
@@ -230,14 +233,14 @@ export function Sidebar() {
           <Box key={cat}>
             <ListItemButton
               onClick={() => toggleCat(cat)}
-              sx={{ px: 2, minHeight: 40 }}
+              sx={{ px: 2, minHeight: 40, '&:hover': { backgroundColor: draculaColors.background } }}
               aria-expanded={expandedCats.has(cat)}
               aria-controls={`sidebar-cat-${cat}`}
             >
               <Typography sx={{ color: draculaColors.cyan, fontWeight: 600, fontSize: '0.85rem', flex: 1, fontFamily: MONO_FAMILY }}>
                 {cat}
               </Typography>
-              {expandedCats.has(cat) ? <ExpandLess sx={{ color: draculaColors.comment, fontSize: '1rem' }} /> : <ExpandMore sx={{ color: draculaColors.comment, fontSize: '1rem' }} />}
+              {expandedCats.has(cat) ? <ExpandLess sx={{ color: draculaColors.comment, fontSize: ICON_SIZES.md }} /> : <ExpandMore sx={{ color: draculaColors.comment, fontSize: ICON_SIZES.md }} />}
             </ListItemButton>
             <Collapse in={expandedCats.has(cat)} unmountOnExit id={`sidebar-cat-${cat}`}>
               <List component="div" disablePadding>
@@ -267,14 +270,14 @@ export function Sidebar() {
         <Box key="Calculators">
           <ListItemButton
             onClick={() => toggleCat('Calculators')}
-            sx={{ px: 2, minHeight: 40 }}
+            sx={{ px: 2, minHeight: 40, '&:hover': { backgroundColor: draculaColors.background } }}
             aria-expanded={expandedCats.has('Calculators')}
             aria-controls="sidebar-cat-Calculators"
           >
             <Typography sx={{ color: draculaColors.foreground, fontWeight: 600, fontSize: '0.75rem', flex: 1, fontFamily: MONO_FAMILY }}>
               Calculators
             </Typography>
-            {expandedCats.has('Calculators') ? <ExpandLess sx={{ color: draculaColors.comment, fontSize: '1rem' }} /> : <ExpandMore sx={{ color: draculaColors.comment, fontSize: '1rem' }} />}
+            {expandedCats.has('Calculators') ? <ExpandLess sx={{ color: draculaColors.comment, fontSize: ICON_SIZES.md }} /> : <ExpandMore sx={{ color: draculaColors.comment, fontSize: ICON_SIZES.md }} />}
           </ListItemButton>
           <Collapse in={expandedCats.has('Calculators')} unmountOnExit id="sidebar-cat-Calculators">
             <List component="div" disablePadding>
@@ -309,7 +312,7 @@ export function Sidebar() {
         <Divider sx={{ borderColor: draculaColors.comment, my: 1 }} />
 
         {SIDEBAR_MODULES.map(mod => {
-          const modColors: Record<string, string> = { instructions: draculaColors.green, magic: draculaColors.purple, proofs: draculaColors.foreground, 'format-converter': draculaColors.orange, pem: draculaColors.yellow };
+          const modColors: Record<string, string> = { instructions: draculaColors.green, magic: draculaColors.purple, proofs: draculaColors.cyan, 'format-converter': draculaColors.orange, pem: draculaColors.yellow };
           const modColor = modColors[mod.id] || draculaColors.foreground;
           return (
           <ListItemButton
@@ -341,9 +344,9 @@ export function Sidebar() {
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
             {status.factordb === 'ok' ? (
-              <CheckCircle sx={{ color: draculaColors.green, fontSize: '0.9rem' }} />
+              <CheckCircle sx={{ color: draculaColors.green, fontSize: ICON_SIZES.sm }} />
             ) : status.factordb === 'error' ? (
-              <ErrorOutlined sx={{ color: draculaColors.red, fontSize: '0.9rem' }} />
+              <ErrorOutlined sx={{ color: draculaColors.red, fontSize: ICON_SIZES.sm }} />
             ) : (
               <Box sx={{
                 width: '0.9rem', height: '0.9rem', borderRadius: '50%',
@@ -357,9 +360,9 @@ export function Sidebar() {
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {status.sagecell === 'ok' ? (
-              <CheckCircle sx={{ color: draculaColors.green, fontSize: '0.9rem' }} />
+              <CheckCircle sx={{ color: draculaColors.green, fontSize: ICON_SIZES.sm }} />
             ) : status.sagecell === 'error' ? (
-              <ErrorOutlined sx={{ color: draculaColors.red, fontSize: '0.9rem' }} />
+              <ErrorOutlined sx={{ color: draculaColors.red, fontSize: ICON_SIZES.sm }} />
             ) : (
               <Box sx={{
                 width: '0.9rem', height: '0.9rem', borderRadius: '50%',

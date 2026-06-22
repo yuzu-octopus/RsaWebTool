@@ -8,6 +8,16 @@ export const MONO_FAMILY = "'JetBrains Mono', monospace" as const;
 /** Mixed family for prose-heavy areas: falls back through the OS font stack. */
 export const PROSE_FAMILY = `${MONO_FAMILY}, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif` as const;
 
+// ─── Icon sizes ────────────────────────────────────────────────────────
+/** Standardized icon size scale. Use these instead of hardcoded fontSize. */
+export const ICON_SIZES = {
+  xs: '0.65rem',
+  sm: '0.75rem',
+  md: '1rem',
+  lg: '1.25rem',
+  xl: '2rem',
+} as const;
+
 // ─── Animations ─────────────────────────────────────────────────────────
 /** Spinning hourglass keyframe used for "running" status indicators. */
 export const hourglassSpin = keyframes`
@@ -100,7 +110,7 @@ export const ghostBtnSx = {
   borderColor: draculaColors.purple,
   color: draculaColors.purple,
   fontFamily: MONO_FAMILY,
-  fontSize: '0.7rem',
+  fontSize: ICON_SIZES.sm,
   '&:hover': { backgroundColor: draculaColors.purple, color: draculaColors.background },
   '&:focus-visible': {
     outline: `2px solid ${draculaColors.cyan}`,
@@ -114,7 +124,7 @@ export function colorGhostBtn(color: string) {
     borderColor: color,
     color,
     fontFamily: MONO_FAMILY,
-    fontSize: '0.8rem',
+    fontSize: ICON_SIZES.sm,
     '&:hover': { backgroundColor: color, color: draculaColors.background },
     '&:focus-visible': {
       outline: `2px solid ${draculaColors.cyan}`,

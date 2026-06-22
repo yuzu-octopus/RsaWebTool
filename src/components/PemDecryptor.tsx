@@ -12,7 +12,7 @@ import {
 import { VpnKey, ContentCopy, Send } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { inputSx } from '../styles/inputSx';
-import { colFlexSx, centeredPanelSx, MONO_FAMILY, colorGhostBtn } from '../styles/shared';
+import { colFlexSx, centeredPanelSx, MONO_FAMILY, colorGhostBtn, ICON_SIZES } from '../styles/shared';
 import { useAppContext } from '../hooks/useAppContext';
 import { parsePEM, decryptPEM } from '../utils/pemParser';
 import type { ParsedPEM } from '../utils/pemParser';
@@ -343,7 +343,7 @@ MIIEpAIBAAKCAQEA...
                           sx={{ color: draculaColors.comment, p: '2px' }}
                           aria-label={`Copy ${key}`}
                         >
-                          <ContentCopy sx={{ fontSize: '0.65rem' }} />
+                          <ContentCopy sx={{ fontSize: ICON_SIZES.xs }} />
                         </IconButton>
                       </Box>,
                     ];
