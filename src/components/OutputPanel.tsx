@@ -139,7 +139,7 @@ export function OutputPanel() {
         onMouseDown={handleMouseDown}
       />
 
-      <Box sx={{ p: 2, overflow: 'auto', flex: 1, pb: '8vh' }}>
+      <Box sx={{ p: 2, overflow: 'auto', flex: 1, pb: '20vh' }}>
         <Typography variant="h5" sx={{ color: draculaColors.purple, fontWeight: 600, mb: 2, fontFamily: MONO_FAMILY }}>
           Results
         </Typography>

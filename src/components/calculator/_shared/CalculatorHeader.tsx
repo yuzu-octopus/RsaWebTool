@@ -80,7 +80,7 @@ export function CalculatorHeader(props: CalculatorHeaderProps) {
           {tabs && activeTab !== undefined && onTabChange && (
             <CalculatorSubTabs tabs={tabs} activeTab={activeTab} onChange={onTabChange} />
           )}
-          <Box sx={{ flex: 1, overflow: 'auto', px: 0.5, pt: 1 }}>
+          <Box sx={{ flex: 1, overflow: 'auto', px: 0.5, pt: 1, pb: '20vh' }}>
             {children}
           </Box>
         </Box>
