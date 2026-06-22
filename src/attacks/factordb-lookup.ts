@@ -19,7 +19,7 @@ const STATUS_DESCRIPTIONS: Record<string, string> = {
 export const attack: Attack = {
   // This attack runs entirely in the browser via frontendCheck — no SageMath needed.
   // The sageTemplate is a no-op that returns a clear message if ever triggered.
-  sageTemplate: (_vals) => noopSageTemplate('FACTORDB_LOOKUP'),
+  sageTemplate: (_) => noopSageTemplate('FACTORDB_LOOKUP'),
   id: 'factordb-lookup',
   name: 'FactorDB Lookup',
   category: 'Advanced',

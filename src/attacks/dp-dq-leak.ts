@@ -150,7 +150,7 @@ q &\\nmid 2^{e d_p - 1} - 1 \\quad \\text{(in general, with high probability)} \
 \\item \\textbf{FLT-based direct GCD:} Both the browser frontendCheck and the Sage template compute $g = \\gcd(2^{e \\cdot d_p - 1} - 1, n)$ in a single modular exponentiation and GCD, replacing the $O(e)$ k-iteration approach. $\\sim 10^4\\times$ faster for $e = 65537$.
 \\end{itemize}
 
-\\textbf{References:} Standard RSA-CRT analysis; M. Campagna, A. Sethi, \"Key Recovery Method for CRT Implementation of RSA\"`,
+\\textbf{References:} Standard RSA-CRT analysis; M. Campagna, A. Sethi, "Key Recovery Method for CRT Implementation of RSA"`,
   usageGuide: 'This attack factors n using leaked CRT parameters dp and dq.\n\nHow to use:\n1. You have modulus n, public exponent e, and the CRT exponent dp (= d mod p-1)\n2. Optionally provide dq (= d mod q-1) as well\n3. The attack computes p from dp via gcd(pow(2, e*dp - 1, n) - 1, n)\n4. q = n / p gives the factorization\n\nTip: dp and dq are often stored alongside the private key. This attack runs entirely in your browser — no server computation needed.',
   priority: 'high',
   applicableCheck: rsaNeeds.nDpDq,

@@ -15,8 +15,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "types": ["bun", "node"]
   },
-  "include": ["src"],
-  "exclude": ["src/utils/__tests__", "src/**/__tests__"]
+  "include": ["src"]
 }

@@ -33,6 +33,7 @@ export function InputPanel() {
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
   // Ref so event listeners always read latest inputValues without re-registration
   const inputValuesRef = useRef(inputValues);
+  // eslint-disable-next-line react-hooks/refs
   inputValuesRef.current = inputValues;
   const [frontendCode, setFrontendCode] = useState('');
   const [copied, setCopied] = useState(false);
@@ -43,6 +44,7 @@ export function InputPanel() {
   );
   // Ref so event listeners always read latest handleRun without re-registration
   const handleRunRef = useRef(handleRun);
+  // eslint-disable-next-line react-hooks/refs
   handleRunRef.current = handleRun;
 
   // Keyboard shortcut: ⌘/Ctrl+1/2/3 switches tabs within the attack view

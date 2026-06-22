@@ -7,7 +7,7 @@ describe('parsePEM', () => {
   // This avoids fragile hand-crafted hex fixtures and exercises the full
   // DER length-octet encoding, INTEGER leading-zero handling, and SEQUENCE nesting.
   const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 512 });
-  const realKeyPEM = privateKey.export({ type: 'pkcs1', format: 'pem' }) as string;
+  const realKeyPEM = privateKey.export({ type: 'pkcs1', format: 'pem' });
 
   test('parses PKCS#1 private key header (real crypto-generated key)', () => {
     const result = parsePEM(realKeyPEM);
