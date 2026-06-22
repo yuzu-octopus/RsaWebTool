@@ -19,10 +19,8 @@ export const attack: Attack = {
     { name: 'a2', label: 'a2 (second linear coefficient)', placeholder: '2', multiline: false },
     { name: 'b2', label: 'b2 (second linear offset)', placeholder: '0', multiline: false },
   ],
-  sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
-      token: 'FRANKLIN_REITER_RELATED_MESSAGE',
-      useGuard: false,
-      body: `        n = Integer(${vals.n})
+  sageTemplate: (vals: Record<string, string>) => {
+    const body: string = `        n = Integer(${vals.n})
         e_val = "${vals.e}".strip()
         e = Integer(e_val) if e_val else Integer(65537)
         c1 = Integer(${vals.c1})
@@ -68,7 +66,7 @@ export const attack: Attack = {
             f2 = (a2 * x + b2)**e - c2
             def poly_gcd(p, q):
                 # Poly GCD over composite modulus n: when leading coefficient shares
-                # a factor with n, the `%` operator is not well-defined. Detect and
+                # a factor with n, the \`%\` operator is not well-defined. Detect and
                 # return None to signal failure (caller falls through to e=3 closed-form).
                 while q != 0:
                     try:
@@ -157,8 +155,9 @@ export const attack: Attack = {
                     out.append("")
                     out.append(f"Verification: (a1*m+b1)^e mod n = {v1}")
                     out.append("")
-                    out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")`,
-    }),
+                    out.append("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")`;
+    return wrapSageTemplate({ token: 'FRANKLIN_REITER_RELATED_MESSAGE', useGuard: false, body });
+  },
   frontendCheck: (vals: Record<string, string>) => {
     if (!vals.n || !vals.c1 || !vals.c2) return Promise.resolve(null);
     try {

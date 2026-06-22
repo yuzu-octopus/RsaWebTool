@@ -1,5 +1,3 @@
-import type { Attack } from '../types';
-
 /**
  * Common applicableCheck patterns for RSA attacks.
  * Centralized to avoid 20+ duplicate inline checks across attack files.
