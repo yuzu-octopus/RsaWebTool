@@ -13,7 +13,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey, Lock, Hub, Tag, Security, Menu, LockOpen, Search, GridOn, Send, Visibility, Science } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey, Lock, Hub, Tag, Security, Menu, LockOpen } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { pulse, MONO_FAMILY } from '../styles/shared';
 import { CATEGORIES, attacksByCategory } from '../attacks';
@@ -29,35 +29,25 @@ interface ServiceStatus {
   sagecell: 'checking' | 'ok' | 'error';
 }
 
-function catIcon(cat: string): React.ReactElement | null {
-  switch (cat) {
-    case 'Factorization': return <Search sx={{ fontSize: '1.1rem' }} />;
-    case 'Partial Key / Lattice': return <GridOn sx={{ fontSize: '1.1rem' }} />;
-    case 'Message / Protocol': return <Send sx={{ fontSize: '1.1rem' }} />;
-    case 'Oracle': return <Visibility sx={{ fontSize: '1.1rem' }} />;
-    case 'Advanced': return <Science sx={{ fontSize: '1.1rem' }} />;
-    default: return null;
-  }
-}
-
-function modIcon(id: string): React.ReactNode {
+function modIcon(id: string, color: string): React.ReactNode {
   switch (id) {
-    case 'instructions': return <MenuBook sx={{ fontSize: '1.1rem' }} />;
-    case 'magic': return <AutoFixHigh sx={{ fontSize: '1.1rem' }} />;
-    case 'proofs': return <MenuBook sx={{ fontSize: '1.1rem' }} />;
-    case 'format-converter': return <SwapHoriz sx={{ fontSize: '1.1rem' }} />;
-    case 'pem': return <VpnKey sx={{ fontSize: '1.1rem' }} />;
+    case 'instructions': return <MenuBook sx={{ color, fontSize: '1.1rem' }} />;
+    case 'magic': return <AutoFixHigh sx={{ color, fontSize: '1.1rem' }} />;
+    case 'proofs': return <MenuBook sx={{ color, fontSize: '1.1rem' }} />;
+    case 'format-converter': return <SwapHoriz sx={{ color, fontSize: '1.1rem' }} />;
+    case 'pem': return <VpnKey sx={{ color, fontSize: '1.1rem' }} />;
     default: return null;
   }
 }
 
 function calcIcon(mode: string): React.ReactNode {
+  const colors: Record<string, string> = { rsa: draculaColors.cyan, aes: draculaColors.purple, ecc: draculaColors.green, hash: draculaColors.orange, dh: draculaColors.pink };
   switch (mode) {
-    case 'rsa': return <VpnKey sx={{ fontSize: '1.1rem' }} />;
-    case 'aes': return <Lock sx={{ fontSize: '1.1rem' }} />;
-    case 'ecc': return <Hub sx={{ fontSize: '1.1rem' }} />;
-    case 'hash': return <Tag sx={{ fontSize: '1.1rem' }} />;
-    case 'dh': return <Security sx={{ fontSize: '1.1rem' }} />;
+    case 'rsa': return <VpnKey sx={{ color: colors[mode], fontSize: '1.1rem' }} />;
+    case 'aes': return <Lock sx={{ color: colors[mode], fontSize: '1.1rem' }} />;
+    case 'ecc': return <Hub sx={{ color: colors[mode], fontSize: '1.1rem' }} />;
+    case 'hash': return <Tag sx={{ color: colors[mode], fontSize: '1.1rem' }} />;
+    case 'dh': return <Security sx={{ color: colors[mode], fontSize: '1.1rem' }} />;
     default: return null;
   }
 }
@@ -243,7 +233,7 @@ export function Sidebar() {
               aria-expanded={expandedCats.has(cat)}
               aria-controls={`sidebar-cat-${cat}`}
             >
-              <Typography sx={{ color: draculaColors.foreground, fontWeight: 600, fontSize: '0.75rem', flex: 1, fontFamily: MONO_FAMILY }}>
+              <Typography sx={{ color: draculaColors.cyan, fontWeight: 600, fontSize: '0.85rem', flex: 1, fontFamily: MONO_FAMILY }}>
                 {cat}
               </Typography>
               {expandedCats.has(cat) ? <ExpandLess sx={{ color: draculaColors.comment, fontSize: '1rem' }} /> : <ExpandMore sx={{ color: draculaColors.comment, fontSize: '1rem' }} />}
@@ -262,9 +252,6 @@ export function Sidebar() {
                       ...(isAttackActive(attack.id) ? sidebarActiveSx : sidebarInactiveSx),
                     }}
                   >
-                    <Box sx={{ width: 28, minWidth: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', color: draculaColors.comment }}>
-                      {catIcon(cat)}
-                    </Box>
                     <ListItemText
                       primary={attack.name}
                       slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.75rem', fontFamily: MONO_FAMILY } } }}
@@ -290,7 +277,10 @@ export function Sidebar() {
           </ListItemButton>
           <Collapse in={expandedCats.has('Calculators')} unmountOnExit id="sidebar-cat-Calculators">
             <List component="div" disablePadding>
-              {CALCULATOR_ITEMS.map(item => (
+              {CALCULATOR_ITEMS.map(item => {
+                const calcColors: Record<string, string> = { rsa: draculaColors.cyan, aes: draculaColors.purple, ecc: draculaColors.green, hash: draculaColors.orange, dh: draculaColors.pink };
+                const calcColor = calcColors[item.calculatorMode] || draculaColors.foreground;
+                return (
                 <ListItemButton
                   key={item.id}
                   id={`sidebar-calc-${item.calculatorMode}`}
@@ -306,17 +296,21 @@ export function Sidebar() {
                   </Box>
                   <ListItemText
                     primary={item.label}
-                    slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.85rem', fontFamily: MONO_FAMILY } } }}
+                    slotProps={{ primary: { sx: { color: calcColor, fontSize: '0.85rem', fontFamily: MONO_FAMILY } } }}
                   />
                 </ListItemButton>
-              ))}
+                );
+              })}
             </List>
           </Collapse>
         </Box>
 
         <Divider sx={{ borderColor: draculaColors.comment, my: 1 }} />
 
-        {SIDEBAR_MODULES.map(mod => (
+        {SIDEBAR_MODULES.map(mod => {
+          const modColors: Record<string, string> = { instructions: draculaColors.green, magic: draculaColors.purple, proofs: draculaColors.foreground, 'format-converter': draculaColors.orange, pem: draculaColors.yellow };
+          const modColor = modColors[mod.id] || draculaColors.foreground;
+          return (
           <ListItemButton
             key={mod.id}
             id={`sidebar-view-${mod.mode}`}
@@ -328,14 +322,15 @@ export function Sidebar() {
             }}
           >
             <Box sx={{ width: 28, minWidth: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {modIcon(mod.id)}
+              {modIcon(mod.id, modColor)}
             </Box>
             <ListItemText
               primary={mod.label}
-              slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.85rem', fontFamily: MONO_FAMILY } } }}
+              slotProps={{ primary: { sx: { color: modColor, fontSize: '0.85rem', fontFamily: MONO_FAMILY } } }}
             />
           </ListItemButton>
-        ))}
+          );
+        })}
 
         <Divider sx={{ borderColor: draculaColors.comment, my: 1 }} />
 
