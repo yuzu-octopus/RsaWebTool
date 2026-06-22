@@ -13,11 +13,11 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey, Lock, Hub, Tag, Security, Menu, LockOpen } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey, Lock, Hub, Tag, Security, Menu, LockOpen, Search, GridOn, Send, Visibility, Science } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
-import { pulse } from '../styles/shared';
+import { pulse, MONO_FAMILY } from '../styles/shared';
 import { CATEGORIES, attacksByCategory } from '../attacks';
-import { CALCULATOR_ITEMS } from '../config/sidebarItems';
+import { CALCULATOR_ITEMS, SIDEBAR_MODULES } from '../config/sidebarItems';
 import type { Attack } from '../types';
 import { useAppContext } from '../hooks/useAppContext';
 import env from '../config/env';
@@ -29,29 +29,46 @@ interface ServiceStatus {
   sagecell: 'checking' | 'ok' | 'error';
 }
 
-const calculatorIcon = (mode: string) => {
-  switch (mode) {
-    case 'rsa': return <VpnKey sx={{ color: draculaColors.cyan, mr: 1, fontSize: '1.1rem' }} />;
-    case 'aes': return <Lock sx={{ color: draculaColors.purple, mr: 1, fontSize: '1.1rem' }} />;
-    case 'ecc': return <Hub sx={{ color: draculaColors.green, mr: 1, fontSize: '1.1rem' }} />;
-    case 'hash': return <Tag sx={{ color: draculaColors.orange, mr: 1, fontSize: '1.1rem' }} />;
-    case 'dh': return <Security sx={{ color: draculaColors.pink, mr: 1, fontSize: '1.1rem' }} />;
+function catIcon(cat: string): React.ReactElement | null {
+  switch (cat) {
+    case 'Factorization': return <Search sx={{ fontSize: '1.1rem' }} />;
+    case 'Partial Key / Lattice': return <GridOn sx={{ fontSize: '1.1rem' }} />;
+    case 'Message / Protocol': return <Send sx={{ fontSize: '1.1rem' }} />;
+    case 'Oracle': return <Visibility sx={{ fontSize: '1.1rem' }} />;
+    case 'Advanced': return <Science sx={{ fontSize: '1.1rem' }} />;
     default: return null;
   }
-};
+}
+
+function modIcon(id: string): React.ReactNode {
+  switch (id) {
+    case 'instructions': return <MenuBook sx={{ fontSize: '1.1rem' }} />;
+    case 'magic': return <AutoFixHigh sx={{ fontSize: '1.1rem' }} />;
+    case 'proofs': return <MenuBook sx={{ fontSize: '1.1rem' }} />;
+    case 'format-converter': return <SwapHoriz sx={{ fontSize: '1.1rem' }} />;
+    case 'pem': return <VpnKey sx={{ fontSize: '1.1rem' }} />;
+    default: return null;
+  }
+}
+
+function calcIcon(mode: string): React.ReactNode {
+  switch (mode) {
+    case 'rsa': return <VpnKey sx={{ fontSize: '1.1rem' }} />;
+    case 'aes': return <Lock sx={{ fontSize: '1.1rem' }} />;
+    case 'ecc': return <Hub sx={{ fontSize: '1.1rem' }} />;
+    case 'hash': return <Tag sx={{ fontSize: '1.1rem' }} />;
+    case 'dh': return <Security sx={{ fontSize: '1.1rem' }} />;
+    default: return null;
+  }
+}
 
 const sidebarActiveSx = {
-  borderLeft: `3px solid ${draculaColors.purple}`,
-  backgroundColor: draculaColors.background,
-  '&:hover': { backgroundColor: draculaColors.background },
+  backgroundColor: 'rgba(255,255,255,0.08)',
+  '&:hover': { backgroundColor: 'rgba(255,255,255,0.12)' },
 } as const;
 const sidebarInactiveSx = {
-  borderLeft: '3px solid transparent',
   backgroundColor: 'transparent',
-  // Hover uses `background` (darker than the Drawer's `currentLine` background)
-  // so the hover state is actually visible. Using `currentLine` here would
-  // produce no visible change against the sidebar paper.
-  '&:hover': { backgroundColor: draculaColors.background },
+  '&:hover': { backgroundColor: 'rgba(255,255,255,0.08)' },
 } as const;
 
 export function Sidebar() {
@@ -200,11 +217,17 @@ export function Sidebar() {
           },
         }}
       >
-      <Box sx={{ p: 2 }}>
-        <Typography variant="h5" sx={{ color: draculaColors.purple, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <LockOpen sx={{ fontSize: '1.2rem', color: draculaColors.purple }} /> RSA CTF Tool
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', px: 2, py: 2 }}>
+        <Box sx={{
+          width: 64, height: 64, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          backgroundColor: draculaColors.background, mb: 1,
+        }}>
+          <LockOpen sx={{ fontSize: '2rem', color: draculaColors.purple }} />
+        </Box>
+        <Typography sx={{ color: draculaColors.purple, fontWeight: 700, fontSize: '1.1rem', lineHeight: 1.6, fontFamily: MONO_FAMILY }}>
+          RSA CTF Tool
         </Typography>
-        <Typography variant="caption" sx={{ color: draculaColors.comment }}>
+        <Typography variant="caption" sx={{ color: draculaColors.comment, fontSize: '0.65rem', lineHeight: 1.66, fontFamily: MONO_FAMILY }}>
           SageMath Powered
         </Typography>
       </Box>
@@ -216,14 +239,14 @@ export function Sidebar() {
           <Box key={cat}>
             <ListItemButton
               onClick={() => toggleCat(cat)}
-              sx={{ px: 2 }}
+              sx={{ px: 2, minHeight: 40 }}
               aria-expanded={expandedCats.has(cat)}
               aria-controls={`sidebar-cat-${cat}`}
             >
-              <Typography sx={{ color: draculaColors.cyan, fontWeight: 600, fontSize: '0.85rem', flex: 1 }}>
+              <Typography sx={{ color: draculaColors.foreground, fontWeight: 600, fontSize: '0.75rem', flex: 1, fontFamily: MONO_FAMILY }}>
                 {cat}
               </Typography>
-              {expandedCats.has(cat) ? <ExpandLess sx={{ color: draculaColors.comment }} /> : <ExpandMore sx={{ color: draculaColors.comment }} />}
+              {expandedCats.has(cat) ? <ExpandLess sx={{ color: draculaColors.comment, fontSize: '1rem' }} /> : <ExpandMore sx={{ color: draculaColors.comment, fontSize: '1rem' }} />}
             </ListItemButton>
             <Collapse in={expandedCats.has(cat)} unmountOnExit id={`sidebar-cat-${cat}`}>
               <List component="div" disablePadding>
@@ -235,12 +258,16 @@ export function Sidebar() {
                     data-testid={`attack-${attack.id}`}
                     sx={{
                       pl: 4,
+                      minHeight: 36,
                       ...(isAttackActive(attack.id) ? sidebarActiveSx : sidebarInactiveSx),
                     }}
                   >
+                    <Box sx={{ width: 28, minWidth: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', color: draculaColors.comment }}>
+                      {catIcon(cat)}
+                    </Box>
                     <ListItemText
                       primary={attack.name}
-                      slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.75rem' } } }}
+                      slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.75rem', fontFamily: MONO_FAMILY } } }}
                     />
                   </ListItemButton>
                 ))}
@@ -252,14 +279,14 @@ export function Sidebar() {
         <Box key="Calculators">
           <ListItemButton
             onClick={() => toggleCat('Calculators')}
-            sx={{ px: 2 }}
+            sx={{ px: 2, minHeight: 40 }}
             aria-expanded={expandedCats.has('Calculators')}
             aria-controls="sidebar-cat-Calculators"
           >
-            <Typography sx={{ color: draculaColors.cyan, fontWeight: 600, fontSize: '0.85rem', flex: 1 }}>
+            <Typography sx={{ color: draculaColors.foreground, fontWeight: 600, fontSize: '0.75rem', flex: 1, fontFamily: MONO_FAMILY }}>
               Calculators
             </Typography>
-            {expandedCats.has('Calculators') ? <ExpandLess sx={{ color: draculaColors.comment }} /> : <ExpandMore sx={{ color: draculaColors.comment }} />}
+            {expandedCats.has('Calculators') ? <ExpandLess sx={{ color: draculaColors.comment, fontSize: '1rem' }} /> : <ExpandMore sx={{ color: draculaColors.comment, fontSize: '1rem' }} />}
           </ListItemButton>
           <Collapse in={expandedCats.has('Calculators')} unmountOnExit id="sidebar-cat-Calculators">
             <List component="div" disablePadding>
@@ -270,13 +297,16 @@ export function Sidebar() {
                   onClick={() => { setViewMode('calculator'); setCalculatorMode(item.calculatorMode); }}
                   sx={{
                     pl: 4,
+                    minHeight: 36,
                     ...(viewMode === 'calculator' && calculatorMode === item.calculatorMode ? sidebarActiveSx : sidebarInactiveSx),
                   }}
                 >
-                  {calculatorIcon(item.calculatorMode)}
+                  <Box sx={{ width: 28, minWidth: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {calcIcon(item.calculatorMode)}
+                  </Box>
                   <ListItemText
                     primary={item.label}
-                    slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.85rem' } } }}
+                    slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.85rem', fontFamily: MONO_FAMILY } } }}
                   />
                 </ListItemButton>
               ))}
@@ -286,83 +316,26 @@ export function Sidebar() {
 
         <Divider sx={{ borderColor: draculaColors.comment, my: 1 }} />
 
-        <ListItemButton
-          id="sidebar-view-instructions"
-          onClick={() => setViewMode('instructions')}
-          sx={{
-            pl: 4,
-            ...(isViewActive('instructions') ? sidebarActiveSx : sidebarInactiveSx),
-          }}
-        >
-          <MenuBook sx={{ color: draculaColors.green, mr: 1, fontSize: '1.1rem' }} />
-          <ListItemText
-            primary="Instructions"
-            slotProps={{ primary: { sx: { color: draculaColors.green, fontSize: '0.85rem' } } }}
-          />
-        </ListItemButton>
-
-        <ListItemButton
-          id="sidebar-view-magic"
-          onClick={() => setViewMode('magic')}
-          sx={{
-            pl: 4,
-            ...(isViewActive('magic') ? sidebarActiveSx : sidebarInactiveSx),
-          }}
-        >
-          <AutoFixHigh sx={{ color: draculaColors.purple, mr: 1, fontSize: '1.1rem' }} />
-          <ListItemText
-            primary="Magic"
-            slotProps={{ primary: { sx: { color: draculaColors.purple, fontSize: '0.85rem' } } }}
-          />
-        </ListItemButton>
-
-        <ListItemButton
-          id="sidebar-view-proofs"
-          onClick={() => setViewMode('proofs')}
-          sx={{
-            pl: 4,
-            mt: 0.5,
-            ...(isViewActive('proofs') ? sidebarActiveSx : sidebarInactiveSx),
-          }}
-        >
-          <MenuBook sx={{ color: draculaColors.foreground, mr: 1, fontSize: '1.1rem' }} />
-          <ListItemText
-            primary="Attack Index"
-            slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.85rem' } } }}
-          />
-        </ListItemButton>
-
-        <ListItemButton
-          id="sidebar-view-format-converter"
-          onClick={() => setViewMode('format-converter')}
-          sx={{
-            pl: 4,
-            mt: 0.5,
-            ...(isViewActive('format-converter') ? sidebarActiveSx : sidebarInactiveSx),
-          }}
-        >
-          <SwapHoriz sx={{ color: draculaColors.orange, mr: 1, fontSize: '1.1rem' }} />
-          <ListItemText
-            primary="Converter"
-            slotProps={{ primary: { sx: { color: draculaColors.orange, fontSize: '0.85rem' } } }}
-          />
-        </ListItemButton>
-
-        <ListItemButton
-          id="sidebar-view-pem"
-          onClick={() => setViewMode('pem')}
-          sx={{
-            pl: 4,
-            mt: 0.5,
-            ...(isViewActive('pem') ? sidebarActiveSx : sidebarInactiveSx),
-          }}
-        >
-          <VpnKey sx={{ color: draculaColors.yellow, mr: 1, fontSize: '1.1rem' }} />
-          <ListItemText
-            primary="PEM Decryptor"
-            slotProps={{ primary: { sx: { color: draculaColors.yellow, fontSize: '0.85rem' } } }}
-          />
-        </ListItemButton>
+        {SIDEBAR_MODULES.map(mod => (
+          <ListItemButton
+            key={mod.id}
+            id={`sidebar-view-${mod.mode}`}
+            onClick={() => setViewMode(mod.mode as 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter' | 'instructions' | 'pem')}
+            sx={{
+              pl: 4,
+              minHeight: 36,
+              ...(isViewActive(mod.mode) ? sidebarActiveSx : sidebarInactiveSx),
+            }}
+          >
+            <Box sx={{ width: 28, minWidth: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              {modIcon(mod.id)}
+            </Box>
+            <ListItemText
+              primary={mod.label}
+              slotProps={{ primary: { sx: { color: draculaColors.foreground, fontSize: '0.85rem', fontFamily: MONO_FAMILY } } }}
+            />
+          </ListItemButton>
+        ))}
 
         <Divider sx={{ borderColor: draculaColors.comment, my: 1 }} />
 
