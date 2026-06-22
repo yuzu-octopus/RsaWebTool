@@ -207,17 +207,18 @@ export function Sidebar() {
           },
         }}
       >
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', px: 2, py: 2 }}>
+      <Box sx={{ textAlign: 'center', px: 2, pt: 3, pb: 2 }}>
         <Box sx={{
-          width: 64, height: 64, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          backgroundColor: draculaColors.background, mb: 1,
+          width: 72, height: 72, mx: 'auto', mb: 2,
+          borderRadius: '50%', backgroundColor: draculaColors.background,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           <LockOpen sx={{ fontSize: '2rem', color: draculaColors.purple }} />
         </Box>
-        <Typography sx={{ color: draculaColors.purple, fontWeight: 700, fontSize: '1.1rem', lineHeight: 1.6, fontFamily: MONO_FAMILY }}>
+        <Typography sx={{ color: draculaColors.purple, fontWeight: 700, fontSize: '1.05rem', lineHeight: 1.5 }}>
           RSA CTF Tool
         </Typography>
-        <Typography variant="caption" sx={{ color: draculaColors.comment, fontSize: '0.65rem', lineHeight: 1.66, fontFamily: MONO_FAMILY }}>
+        <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', lineHeight: 1.66 }}>
           SageMath Powered
         </Typography>
       </Box>
