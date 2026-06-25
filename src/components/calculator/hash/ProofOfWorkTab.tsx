@@ -415,7 +415,7 @@ export default function ProofOfWorkTab() {
               </IconButton>
             </Tooltip>
           </Box>
-          <Box sx={outputBoxSx}>
+          <Box sx={outputBoxSx()}>
             <Box
               sx={{
                 fontFamily: MONO_FAMILY,

@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { useAppContext } from './useAppContext';
-import { useCommandPalette } from './useCommandPalette';
 import { attacks } from '../attacks';
 import { ALL_SIDEBAR_ITEMS } from '../config/sidebarItems';
 
 export function useKeyboardShortcuts() {
   const { selectedAttack, setSelectedAttack, setViewMode, setCalculatorMode, viewMode, calculatorMode } = useAppContext();
-  const { toggle } = useCommandPalette();
+  const { commandPaletteOpen, setCommandPaletteOpen } = useAppContext();
+  const toggle = () => setCommandPaletteOpen(!commandPaletteOpen);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -121,5 +121,5 @@ export function useKeyboardShortcuts() {
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [setViewMode, setCalculatorMode, toggle, selectedAttack, setSelectedAttack, viewMode, calculatorMode]);
+  }, [setViewMode, setCalculatorMode, selectedAttack, setSelectedAttack, viewMode, calculatorMode]);
 }

@@ -80,7 +80,7 @@ export function RsaEncryptTab() {
       >
         Encrypt
       </Button>
-      {out.result && <Box sx={outputBoxSx}>{out.result}</Box>}
+      {out.result && <Box sx={outputBoxSx()}>{out.result}</Box>}
       {out.error && (
         <Typography
           sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}

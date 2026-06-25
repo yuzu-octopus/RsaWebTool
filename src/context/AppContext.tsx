@@ -1,6 +1,7 @@
-import { useState, useCallback, useRef, useMemo, type ReactNode } from 'react';
+import { createContext, useState, useCallback, useRef, useMemo, type ReactNode } from 'react';
 import type { AppContextType, HistoryEntry, NotificationState } from '../types';
-import { AppContext } from './ctx';
+
+export const AppContext = createContext<AppContextType | null>(null);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [app, setApp] = useState({

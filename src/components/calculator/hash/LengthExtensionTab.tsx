@@ -249,7 +249,7 @@ export default function LengthExtensionTab() {
               <Typography variant="caption" sx={{ color: draculaColors.green }}>New Hash {secretUnknown ? '(for secret_len=1)' : `(secret_len=${secretLen})`}:</Typography>
               <Tooltip title="Copy new hash"><IconButton size="small" onClick={handleCopyHash} sx={{ color: draculaColors.cyan }}><ContentCopy fontSize="small" /></IconButton></Tooltip>
             </Box>
-            <Box sx={outputBoxSx}><Box sx={{ fontFamily: MONO_FAMILY, wordBreak:'break-all' }}>{result.newHash}</Box></Box>
+            <Box sx={outputBoxSx()}><Box sx={{ fontFamily: MONO_FAMILY, wordBreak:'break-all' }}>{result.newHash}</Box></Box>
           </Box>
           {results.length > 1 && (
             <Box sx={{ mt:2 }}>

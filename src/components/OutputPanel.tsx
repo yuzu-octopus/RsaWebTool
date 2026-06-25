@@ -19,25 +19,8 @@ import type { HistoryEntry } from '../types';
 import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useDragResize } from '../hooks/useDragResize';
-import { useNotepad } from '../hooks/useNotepad';
 import { ghostBtnSx, MONO_FAMILY } from '../styles/shared';
 import { EmptyState } from './_shared/EmptyState';
-
-const notepadBaseStyle: React.CSSProperties = {
-  width: '100%',
-  resize: 'none',
-  marginTop: '8px',
-  padding: '8px 12px',
-  backgroundColor: draculaColors.currentLine,
-  color: draculaColors.foreground,
-  fontFamily: MONO_FAMILY,
-  fontSize: '0.8rem',
-  border: `1px solid ${draculaColors.comment}`,
-  borderRadius: '4px',
-  outline: 'none',
-  boxShadow: 'none',
-  boxSizing: 'border-box',
-};
 
 function HistoryListItem({ entry, isSelected, onClick }: { entry: HistoryEntry; isSelected: boolean; onClick: () => void }) {
   return (
@@ -85,7 +68,6 @@ export function OutputPanel() {
   const handleHistoryClick = useCallback((_entry: HistoryEntry, key: string) => {
     setUi(prev => ({ ...prev, historySelectedKey: key }));
   }, []);
-  const { notepadOpen, setNotepadOpen, notepadText, handleNotepadChange, notepadHeight, handleNotepadResizeMouseDown } = useNotepad();
   const getMaxOutputWidth = useCallback(() => Math.min(600, window.innerWidth - 620), []);
 
   const [maxOutputWidth, setMaxOutputWidth] = useState(getMaxOutputWidth);
@@ -211,54 +193,6 @@ export function OutputPanel() {
         {!displayResult && !outputError && !ui.historySelectedKey && (
           <EmptyState title="Run an attack to see results here" padding={4} />
         )}
-      </Box>
-
-      <Box
-        onMouseDown={handleNotepadResizeMouseDown}
-        sx={{
-          height: '4px',
-          cursor: 'row-resize',
-          display: 'flex',
-          alignItems: 'center',
-          '&::after': {
-            content: '""',
-            display: 'block',
-            width: '100%',
-            height: '1px',
-            backgroundColor: draculaColors.comment,
-            transition: 'background-color 0.15s',
-          },
-          '&:hover::after': { backgroundColor: draculaColors.purple },
-        }}
-      />
-
-      <Box sx={{ px: 2, pb: 2 }}>
-        <Button
-          fullWidth
-          onClick={() => setNotepadOpen(!notepadOpen)}
-          sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, justifyContent: 'space-between' }}
-          endIcon={notepadOpen ? <ExpandLess /> : <ExpandMore />}
-        >
-          Notepad
-        </Button>
-
-        <Collapse in={notepadOpen}>
-          <textarea
-            value={notepadText}
-            onChange={e => handleNotepadChange(e.target.value)}
-            placeholder="Take notes here..."
-            aria-label="Notepad"
-            style={{ ...notepadBaseStyle, height: `${notepadHeight}px` }}
-            onFocus={e => {
-              e.target.style.borderColor = draculaColors.purple;
-              e.target.style.boxShadow = `0 0 0 2px ${draculaColors.purple}40`;
-            }}
-            onBlur={e => {
-              e.target.style.borderColor = draculaColors.comment;
-              e.target.style.boxShadow = 'none';
-            }}
-          />
-        </Collapse>
       </Box>
 
       <Divider sx={{ borderColor: draculaColors.comment }} />

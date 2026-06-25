@@ -60,7 +60,7 @@ export const centeredPanelSx = {
 };
 
 // ─── Output boxes ───────────────────────────────────────────────────────
-export const outputBoxSx = {
+export const outputBoxSx = (maxHeight = '150px') => ({
   mt: 2,
   p: 1,
   borderRadius: 1,
@@ -71,27 +71,9 @@ export const outputBoxSx = {
   color: draculaColors.foreground,
   whiteSpace: 'pre-wrap' as const,
   wordBreak: 'break-all' as const,
-  maxHeight: '150px',
+  maxHeight,
   overflow: 'auto',
-};
-
-/** Compact output box (small inline results). maxHeight: 200px */
-export const compactOutputSx = {
-  ...outputBoxSx,
-  maxHeight: '200px',
-};
-
-/** Medium output box (single-algorithm results). maxHeight: 300px */
-export const mediumOutputSx = {
-  ...outputBoxSx,
-  maxHeight: '300px',
-};
-
-/** Tall output box (verbose results with multiple steps). maxHeight: 50vh */
-export const tallOutputSx = {
-  ...outputBoxSx,
-  maxHeight: '50vh',
-};
+});
 
 // ─── Tabs ───────────────────────────────────────────────────────────────
 export const tabSx = {
@@ -167,3 +149,32 @@ export const subTitleSx = {
   fontSize: '0.85rem',
   mb: 1,
 } as const;
+
+// ─── Input fields ────────────────────────────────────────────────────
+
+export const inputSx = {
+  '& .MuiOutlinedInput-root': {
+    backgroundColor: draculaColors.currentLine,
+    color: draculaColors.foreground,
+    fontFamily: MONO_FAMILY,
+    '& fieldset': { borderColor: draculaColors.comment },
+    '&:hover fieldset': { borderColor: draculaColors.purple },
+    '&.Mui-focused fieldset': { borderColor: draculaColors.purple },
+  },
+  '& .MuiInputLabel-root': {
+    color: draculaColors.comment,
+    fontFamily: MONO_FAMILY,
+    '&.Mui-focused': { color: draculaColors.purple },
+  },
+  '& .MuiInputBase-input': {
+    fontFamily: MONO_FAMILY,
+  },
+  '& .MuiFormHelperText-root': {
+    color: draculaColors.comment,
+    fontFamily: MONO_FAMILY,
+    fontSize: '0.7rem',
+    marginLeft: 0,
+    marginTop: '2px',
+  },
+};
+

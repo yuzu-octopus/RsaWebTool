@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import {
   Drawer,
   List,
@@ -9,26 +9,19 @@ import {
   Box,
   Divider,
   Link,
-  IconButton,
-  useMediaQuery,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, CheckCircle, ErrorOutlined, VpnKey, Lock, Hub, Tag, Security, Menu } from '@mui/icons-material';
+
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, VpnKey, Lock, Hub, Tag, Security } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { LogoIcon } from './_shared/LogoIcon';
-import { pulse, MONO_FAMILY, ICON_SIZES } from '../styles/shared';
+import { MONO_FAMILY, ICON_SIZES } from '../styles/shared';
 import { CATEGORIES, attacksByCategory } from '../attacks';
 import { CALCULATOR_ITEMS, SIDEBAR_MODULES } from '../config/sidebarItems';
 import type { Attack } from '../types';
 import { useAppContext } from '../hooks/useAppContext';
-import env from '../config/env';
+
 
 const drawerWidth = 220;
-
-interface ServiceStatus {
-  factordb: 'checking' | 'ok' | 'error';
-  sagecell: 'checking' | 'ok' | 'error';
-}
 
 function modIcon(id: string, color: string): React.ReactNode {
   switch (id) {
@@ -67,72 +60,6 @@ const sidebarInactiveSx = {
 export function Sidebar() {
   const { selectedAttack, setSelectedAttack, setViewMode, viewMode, calculatorMode, setCalculatorMode } = useAppContext();
   const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set([...CATEGORIES, 'Calculators']));
-  const [status, setStatus] = useState<ServiceStatus>({
-    factordb: 'checking',
-    sagecell: typeof window !== 'undefined' && window.sagecell ? 'ok' : 'checking',
-  });
-  const sageCellChecked = useRef(false);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    const abortController = new AbortController();
-    let factorDbTimeout: ReturnType<typeof setTimeout> | undefined;
-
-    if (env.factordbProxyUrl) {
-      fetch(`${env.factordbProxyUrl}?query=15`, { signal: abortController.signal })
-        .then(r => r.json())
-        .then(() => {
-          if (factorDbTimeout) clearTimeout(factorDbTimeout);
-          setStatus(prev => ({ ...prev, factordb: 'ok' }));
-        })
-        .catch(() => {
-          if (!abortController.signal.aborted) {
-            if (factorDbTimeout) clearTimeout(factorDbTimeout);
-            setStatus(prev => ({ ...prev, factordb: 'error' }));
-          }
-        });
-      factorDbTimeout = setTimeout(() => {
-        if (!abortController.signal.aborted) {
-          abortController.abort();
-          setStatus(prev => ({ ...prev, factordb: 'error' }));
-        }
-      }, 5000);
-    } else {
-      queueMicrotask(() => setStatus(prev => ({ ...prev, factordb: 'error' })));
-    }
-
-    return () => {
-      abortController.abort();
-      if (factorDbTimeout) clearTimeout(factorDbTimeout);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (sageCellChecked.current) return;
-
-    const timer = setInterval(() => {
-      if (window.sagecell) {
-        clearInterval(timer);
-        clearTimeout(timeout);
-        sageCellChecked.current = true;
-        setStatus(prev => ({ ...prev, sagecell: 'ok' }));
-      }
-    }, 200);
-    const timeout = setTimeout(() => {
-      clearInterval(timer);
-      sageCellChecked.current = true;
-      if (!window.sagecell) {
-        setStatus(prev => ({ ...prev, sagecell: 'error' }));
-      }
-    }, 10000);
-
-    return () => {
-      clearInterval(timer);
-      clearTimeout(timeout);
-    };
-  }, []);
 
   const toggleCat = (cat: string) => {
     setExpandedCats(prev => {
@@ -154,49 +81,10 @@ export function Sidebar() {
   const isAttackActive = (id: string) => viewMode === 'attack' && selectedAttack?.id === id;
   const isViewActive = (mode: string) => viewMode === mode;
 
-  // Scroll sidebar to center the active item
-  useEffect(() => {
-    let el: HTMLElement | null = null;
-    if (viewMode === 'attack' && selectedAttack) {
-      el = document.getElementById(`sidebar-attack-${selectedAttack.id}`);
-    } else if (viewMode === 'calculator') {
-      el = document.getElementById(`sidebar-calc-${calculatorMode}`);
-    } else if (viewMode !== 'attack') {
-      el = document.getElementById(`sidebar-view-${viewMode}`);
-    }
-    if (el) {
-      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    }
-  }, [selectedAttack, viewMode, calculatorMode]);
-
   return (
     <>
-      {/* Mobile-only hamburger toggle (rendered into a portal by App.tsx normally,
-          but inline here for simplicity — hidden on md+ viewports and when the
-          Drawer is already open, since the Drawer's own backdrop handles close). */}
-      {isMobile && !mobileOpen && (
-        <IconButton
-          onClick={() => setMobileOpen(true)}
-          aria-label="Open navigation"
-          sx={{
-            position: 'fixed',
-            top: 8,
-            left: 8,
-            zIndex: 1300,
-            color: draculaColors.purple,
-            backgroundColor: draculaColors.background,
-            border: `1px solid ${draculaColors.comment}`,
-            '&:hover': { backgroundColor: draculaColors.currentLine },
-          }}
-        >
-          <Menu />
-        </IconButton>
-      )}
       <Drawer
-        variant={isMobile ? 'temporary' : 'permanent'}
-        open={isMobile ? mobileOpen : true}
-        onClose={() => setMobileOpen(false)}
-        ModalProps={{ keepMounted: true }}
+        variant="permanent"
         sx={{
           width: drawerWidth,
           flexShrink: 0,
@@ -336,45 +224,6 @@ export function Sidebar() {
           );
         })}
 
-        <Divider sx={{ borderColor: draculaColors.comment, my: 1 }} />
-
-        <Box sx={{ px: 2, py: 1 }}>
-          <Typography variant="caption" sx={{ color: draculaColors.comment, fontWeight: 600, fontSize: '0.7rem', display: 'block', mb: 0.5 }}>
-            SERVICE STATUS
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            {status.factordb === 'ok' ? (
-              <CheckCircle sx={{ color: draculaColors.green, fontSize: ICON_SIZES.sm }} />
-            ) : status.factordb === 'error' ? (
-              <ErrorOutlined sx={{ color: draculaColors.red, fontSize: ICON_SIZES.sm }} />
-            ) : (
-              <Box sx={{
-                width: '0.9rem', height: '0.9rem', borderRadius: '50%',
-                border: `2px solid ${draculaColors.comment}`,
-                animation: `${pulse} 1.4s ease-in-out infinite`,
-              }} />
-            )}
-            <Typography variant="caption" sx={{ color: draculaColors.foreground, fontSize: '0.7rem' }}>
-              FactorDB
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {status.sagecell === 'ok' ? (
-              <CheckCircle sx={{ color: draculaColors.green, fontSize: ICON_SIZES.sm }} />
-            ) : status.sagecell === 'error' ? (
-              <ErrorOutlined sx={{ color: draculaColors.red, fontSize: ICON_SIZES.sm }} />
-            ) : (
-              <Box sx={{
-                width: '0.9rem', height: '0.9rem', borderRadius: '50%',
-                border: `2px solid ${draculaColors.comment}`,
-                animation: `${pulse} 1.4s ease-in-out infinite`,
-              }} />
-            )}
-            <Typography variant="caption" sx={{ color: draculaColors.foreground, fontSize: '0.7rem' }}>
-              SageMathCell
-            </Typography>
-          </Box>
-        </Box>
       </List>
 
       <Divider sx={{ borderColor: draculaColors.comment }} />

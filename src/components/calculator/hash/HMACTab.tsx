@@ -137,7 +137,7 @@ export default function HMACTab() {
             <Typography variant="caption" sx={{ color: draculaColors.green }}>HMAC-{selectedAlg?.label ?? algorithm}:</Typography>
             <Tooltip title="Copy HMAC"><IconButton size="small" onClick={handleCopy} sx={{ color: draculaColors.cyan }}><ContentCopy fontSize="small" /></IconButton></Tooltip>
           </Box>
-          <Box sx={outputBoxSx}><Box sx={{ fontFamily: MONO_FAMILY, wordBreak: 'break-all' }}>{result}</Box></Box>
+          <Box sx={outputBoxSx()}><Box sx={{ fontFamily: MONO_FAMILY, wordBreak: 'break-all' }}>{result}</Box></Box>
         </Box>
       )}
       {error && (<Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>{error}</Typography>)}

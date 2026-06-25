@@ -2,13 +2,7 @@ import { useCallback } from 'react';
 import { Box, Typography, IconButton, Tooltip } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { draculaColors } from '../../../theme/dracula';
-import {
-  compactOutputSx,
-  mediumOutputSx,
-  outputBoxSx,
-  tallOutputSx,
-  MONO_FAMILY,
-} from '../../../styles/shared';
+import { outputBoxSx, MONO_FAMILY } from '../../../styles/shared';
 import { useCopyToClipboard } from '../../../hooks/useCopyToClipboard';
 
 export type ResultBoxVariant = 'compact' | 'medium' | 'tall' | 'default';
@@ -51,10 +45,10 @@ export function ResultBox({
 
   // Pick the base sx by variant, then override maxHeight if provided.
   const baseSx =
-    variant === 'compact' ? compactOutputSx
-    : variant === 'medium' ? mediumOutputSx
-    : variant === 'tall' ? tallOutputSx
-    : outputBoxSx;
+    variant === 'compact' ? outputBoxSx('200px')
+    : variant === 'medium' ? outputBoxSx('300px')
+    : variant === 'tall' ? outputBoxSx('50vh')
+    : outputBoxSx();
 
   const sx = maxHeight !== undefined ? { ...baseSx, maxHeight } : baseSx;
 
