@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { rsaNeeds, coppersmithLatticePython } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'simple-lattice',
@@ -15,8 +15,8 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'SIMPLE_LATTICE',
     useGuard: false,
-    body: `        n = Integer(${vals.n})
-        nearp = Integer(${vals.nearp})
+    body: `        n = Integer(${validateNumeric(vals.n, 'n')})
+        nearp = Integer(${validateNumeric(vals.nearp, 'nearp')})
         found = False
         if n <= 0 or nearp <= 0:
             out.append("SIMPLE_LATTICE=FAILED: invalid input values")
@@ -42,41 +42,8 @@ export const attack: Attack = {
             out.append("n is even — cannot apply lattice attack")
             out.append("SIMPLE_LATTICE=FAILED: even modulus")
         else:
-            # Manual Coppersmith lattice (same shifts as Sage's small_roots).
-            # Checks ALL LLL rows to bypass Sage's Row-0 (degree-1) bug.
-            x = ZZ['x'].gen()
-            f_ZZ = nearp + x
-            X = n.nth_root(4, truncate_mode=True)[0] + 1
-            m = 5; t = 5; dim = m + t
-            shifts = []
-            for i in range(m):
-                shifts.append(n^(m - i) * f_ZZ^i)
-            for k in range(t):
-                shifts.append(f_ZZ^m * x^k)
-            M_mat = matrix(ZZ, dim, dim)
-            for i, shift in enumerate(shifts):
-                for j, c in enumerate(shift.list()):
-                    M_mat[i, j] = c * X^j
-            B = M_mat.LLL()
-            found_p = None
-            for k in range(dim):
-                row = B[k]
-                a0 = Integer(row[0]); a1 = Integer(row[1])
-                if a1 == 0:
-                    continue
-                # g(y) = sum row[i] * y^i, y = r/X.
-                # g(r/X) = 0 → two-term: r ≈ -a0 * X / a1.
-                # Error from higher terms: |r/X|^2 ≪ 1 → accurate within 1.
-                r_approx = -QQ(a0) * QQ(X) / QQ(a1)
-                for delta in range(-2, 3):
-                    r = Integer(floor(r_approx)) + delta
-                    if abs(r) < X:
-                        candidate = nearp + r
-                        if n % candidate == 0:
-                            found_p = candidate
-                            break
-                if found_p:
-                    break
+            # Coppersmith lattice: degree-1, checks ALL LLL rows (bypasses Sage Row-0 bug).
+${coppersmithLatticePython('nearp + x')}
             if found_p:
                 q = n // found_p
                 out.append("Simple Lattice")

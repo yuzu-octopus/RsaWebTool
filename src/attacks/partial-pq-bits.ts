@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { rsaNeeds, coppersmithLatticePython } from './_rsaHelpers';
 import { generateKeyPair } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric, sanitizePython} from './guard';
 
 export const attack: Attack = {
   id: 'partial-pq-bits',
@@ -15,9 +15,9 @@ export const attack: Attack = {
   ],
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'PARTIAL_PQ_BITS',
-    n: vals.n,
-    body: `        knownBits = Integer(${vals.knownBits})
-        bitPosition = "${vals.bitPosition}"
+    n: validateNumeric(vals.n, 'n'),
+    body: `        knownBits = Integer(${validateNumeric(vals.knownBits, 'knownBits')})
+        bitPosition = "${sanitizePython(vals.bitPosition)}"
         found = False
         if n <= 0 or knownBits < 0:
             out.append("PARTIAL_PQ_BITS=FAILED: invalid input values")
@@ -28,38 +28,8 @@ export const attack: Attack = {
             if k <= 0:
                 out.append("PARTIAL_PQ_BITS=FAILED: not enough unknown bits for Coppersmith")
             else:
-                # Manual Coppersmith lattice for degree-1, checking ALL LLL rows.
-                # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
-                x = ZZ['x'].gen()
-                f_ZZ = (knownBits << k) + x
-                X = n.nth_root(4, truncate_mode=True)[0] + 1
-                m = 5; t = 5; dim = m + t
-                shifts = []
-                for i in range(m):
-                    shifts.append(n**(m - i) * f_ZZ**i)
-                for kk in range(t):
-                    shifts.append(f_ZZ**m * x**kk)
-                M = matrix(ZZ, dim, dim)
-                for i, shift in enumerate(shifts):
-                    for j, c in enumerate(shift.list()):
-                        M[i, j] = c * X**j
-                B = M.LLL()
-                found_p = None
-                for row_idx in range(dim):
-                    row = B[row_idx]
-                    a0 = Integer(row[0]); a1 = Integer(row[1])
-                    if a1 == 0:
-                        continue
-                    r_approx = -QQ(a0) * QQ(X) / QQ(a1)
-                    for delta in range(-2, 3):
-                        r = Integer(floor(r_approx)) + delta
-                        if abs(r) < X:
-                            candidate = (knownBits << k) + r
-                            if n % candidate == 0:
-                                found_p = candidate
-                                break
-                    if found_p:
-                        break
+                # Coppersmith lattice: degree-1, checks ALL LLL rows (bypasses Sage Row-0 bug).
+${coppersmithLatticePython('(knownBits << k) + x')}
                 if found_p:
                     q = n // found_p
                     out.append("Partial PQ Bits")
@@ -82,38 +52,8 @@ export const attack: Attack = {
             if m <= 0:
                 out.append("PARTIAL_PQ_BITS=FAILED: knownBits is zero")
             else:
-                # Manual Coppersmith lattice for degree-1, checking ALL LLL rows.
-                # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
-                x = ZZ['x'].gen()
-                f_ZZ = (2**m) * x + knownBits
-                X = n.nth_root(4, truncate_mode=True)[0] + 1
-                mm = 5; tt = 5; dim = mm + tt
-                shifts = []
-                for i in range(mm):
-                    shifts.append(n**(mm - i) * f_ZZ**i)
-                for kk in range(tt):
-                    shifts.append(f_ZZ**mm * x**kk)
-                M = matrix(ZZ, dim, dim)
-                for i, shift in enumerate(shifts):
-                    for j, c in enumerate(shift.list()):
-                        M[i, j] = c * X**j
-                B = M.LLL()
-                found_p = None
-                for row_idx in range(dim):
-                    row = B[row_idx]
-                    a0 = Integer(row[0]); a1 = Integer(row[1])
-                    if a1 == 0:
-                        continue
-                    r_approx = -QQ(a0) * QQ(X) / QQ(a1)
-                    for delta in range(-2, 3):
-                        r = Integer(floor(r_approx)) + delta
-                        if abs(r) < X:
-                            candidate = r * (2**m) + knownBits
-                            if n % candidate == 0:
-                                found_p = candidate
-                                break
-                    if found_p:
-                        break
+                # Coppersmith lattice: degree-1, checks ALL LLL rows (bypasses Sage Row-0 bug).
+${coppersmithLatticePython('(2**m) * x + knownBits')}
                 if found_p:
                     q = n // found_p
                     out.append("Partial PQ Bits")

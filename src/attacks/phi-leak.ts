@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generatePhiLeakTestcase } from '../utils/testcases/core';
 import { isqrt } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'phi-leak',
@@ -13,6 +13,14 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'phi', label: 'phi(n) (Euler totient)', placeholder: 'Enter phi(n)...', multiline: true, rows: 3, required: false, tooltip: 'Enter the leaked φ(n) value, if known from side-channel or other leakage' },
   ],
+  usageGuide: `Use when Euler's totient φ(n) is known.
+
+How to use:
+1. Provide n and the leaked φ(n) value
+2. From φ(n) = (p-1)(q-1) and n = pq, solve the quadratic: p + q = n - φ(n) + 1
+3. The factors are roots of x^2 - (p+q)x + n = 0
+
+Tip: Instant factorization once φ(n) is known. φ(n) can leak from CRT-based implementations or side-channel attacks on the decryption process.`,
   sageTemplate: (vals: Record<string, string>) => {
     const nStr = vals.n ?? '';
     const phiStr = vals.phi ?? '';
@@ -20,12 +28,12 @@ export const attack: Attack = {
       return 'print("ERROR: Missing required input: n")\nprint("PHI_LEAK=FAILED")';
     }
     if (!phiStr.trim()) {
-      return `print("This attack requires a leaked φ(n) value.")\nprint("Found n: ${vals.n} but φ(n) is missing.")\nprint("With n alone, the modulus cannot be factored. The φ(n) value must be provided as a second input.")\nprint("PHI_LEAK=FAILED")`;
+      return `print("This attack requires a leaked φ(n) value.")\nprint("Found n: ${validateNumeric(vals.n, 'n')} but φ(n) is missing.")\nprint("With n alone, the modulus cannot be factored. The φ(n) value must be provided as a second input.")\nprint("PHI_LEAK=FAILED")`;
     }
     return wrapSageTemplate({
       token: 'PHI_LEAK',
-      n: vals.n,
-      body: `        phi = Integer(${vals.phi})
+      n: validateNumeric(vals.n, 'n'),
+      body: `        phi = Integer(${validateNumeric(vals.phi, 'phi')})
         found = False
         # For n = p*q: phi(n) = (p-1)(q-1) = pq - p - q + 1 = n - p - q + 1
         # So: p + q = n - phi + 1
@@ -104,7 +112,8 @@ export const attack: Attack = {
         ``,
         `PHI_LEAK=SUCCESS`,
       ].join('\n');
-    } catch {
+    } catch (e) {
+      console.warn('[phi-leak] frontendCheck error:', e);
       return null;
     }
   },

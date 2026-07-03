@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { modPow, modInverse } from '../utils/bigint';
-import { wrapSageTemplate, sanitizePython } from './guard';
+import { wrapSageTemplate, sanitizePython, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'homomorphic-forgery',
@@ -23,9 +23,9 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
     return wrapSageTemplate({
       token: 'HOMOMORPHIC_FORGERY',
       useGuard: false,
-      body: `        n = Integer(${vals.n})
-        e = Integer(${vals.e})
-        target_m = Integer(${vals.target_m})
+      body: `        n = Integer(${validateNumeric(vals.n, 'n')})
+        e = Integer(${validateNumeric(vals.e, 'e')})
+        target_m = Integer(${validateNumeric(vals.target_m, 'target_m')})
         found = True
         if n < 3 or e < 2:
             out.append("ERROR: Invalid n or e")
@@ -204,7 +204,7 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
         }
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[homomorphic-forgery] frontendCheck error:', e); return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} Textbook RSA signatures are multiplicatively homomorphic: the product of signatures signs the product of messages.
 

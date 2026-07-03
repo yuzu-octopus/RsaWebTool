@@ -137,3 +137,12 @@ export function sanitizePython(value: string): string {
     .replace(/\n/g, '\\n')
     .replace(/\r/g, '\\r');
 }
+
+export function validateNumeric(value: string, fieldName: string): string {
+  const trimmed = value.trim();
+  if (trimmed === '') return '';
+  if (!/^-?\d+$/.test(trimmed)) {
+    throw new Error(`${fieldName} must be a valid integer, got: "${trimmed.slice(0, 50)}"`);
+  }
+  return trimmed;
+}

@@ -57,3 +57,52 @@ export const rsaNeeds = {
  */
 export const noopSageTemplate = (token: string = 'ATTACK'): string =>
   `This attack runs entirely in the browser via frontendCheck. No SageMath execution is needed.\n\nSee the proof panel for the algorithm and the result panel for the computed output.\n\n${token}=NOT_APPLICABLE`;
+
+/**
+ * Generates Python code for Coppersmith lattice construction, LLL reduction,
+ * row scanning for two-term polynomials, and root recovery.
+ *
+ * Used by simple-lattice, partial-key-exposure, and partial-pq-bits attacks.
+ * @param f - Python expression for the polynomial (e.g., "nearp + x" or "(knownBits << k) + x")
+ * @param n - Python expression for the modulus variable (default "n")
+ * @param m - Lattice parameter m (default 5)
+ * @param t - Lattice parameter t (default 5)
+ */
+export function coppersmithLatticePython(
+  f: string,
+  n = 'n',
+  m = 5,
+  t = 5,
+): string {
+  return `            # Coppersmith lattice: degree-1, checks ALL LLL rows (bypasses Sage Row-0 bug).
+            x = ZZ['x'].gen()
+            f_ZZ = ${f}
+            X = ${n}.nth_root(4, truncate_mode=True)[0] + 1
+            dim = ${m} + ${t}
+            shifts = []
+            for i in range(${m}):
+                shifts.append(${n}^(${m} - i) * f_ZZ^i)
+            for kk in range(${t}):
+                shifts.append(f_ZZ^${m} * x^kk)
+            M_mat = matrix(ZZ, dim, dim)
+            for i, shift in enumerate(shifts):
+                for j, c in enumerate(shift.list()):
+                    M_mat[i, j] = c * X^j
+            B = M_mat.LLL()
+            found_p = None
+            for kk in range(dim):
+                row = B[kk]
+                a0 = Integer(row[0]); a1 = Integer(row[1])
+                if a1 == 0:
+                    continue
+                r_approx = -QQ(a0) * QQ(X) / QQ(a1)
+                for delta in range(-2, 3):
+                    r = Integer(floor(r_approx)) + delta
+                    if abs(r) < X:
+                        candidate = ${f.replace(/\bx\b/g, 'r')}
+                        if ${n} % candidate == 0:
+                            found_p = candidate
+                            break
+                if found_p:
+                    break`;
+}

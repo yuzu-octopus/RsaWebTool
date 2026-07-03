@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { modPow, iroot } from '../utils/bigint';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
-import { wrapSageTemplate, sanitizePython } from './guard';
+import { wrapSageTemplate, sanitizePython, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'known-plaintext',
@@ -16,6 +16,14 @@ export const attack: Attack = {
     { name: 'known_prefix', label: 'Known plaintext prefix', placeholder: 'e.g., flag{', multiline: false },
     { name: 'unknown_bits', label: 'Unknown bits after prefix', placeholder: '24', multiline: false },
   ],
+  usageGuide: `Use when the plaintext is small (m^e < n) or partially known.
+
+How to use:
+1. Provide n, e, c, and optionally a known prefix and number of unknown bits
+2. If m^e < n: the integer e-th root of c directly gives m (no modular reduction)
+3. If a prefix is known: brute-force the remaining unknown bits (up to ~24 bits)
+
+Tip: The e-th root attack works when encryption doesn't apply full modular reduction. The prefix brute-force is practical for short unknowns (URLs, filenames with known prefixes).`,
   sageTemplate: (vals: Record<string, string>) => {
     if (!vals.n || !vals.c) {
       return `print("ERROR: n and c are required")
@@ -24,10 +32,10 @@ print("KNOWN_PLAINTEXT=FAILED")`;
     return wrapSageTemplate({
       token: 'KNOWN_PLAINTEXT',
       useGuard: false,
-      body: `        n = Integer(${vals.n})
-        e_val = "${vals.e}".strip()
+      body: `        n = Integer(${validateNumeric(vals.n, 'n')})
+        e_val = ${validateNumeric(vals.e, 'e')}
         e = Integer(e_val) if e_val else Integer(65537)
-        c = Integer(${vals.c})
+        c = Integer(${validateNumeric(vals.c, 'c')})
         known_prefix = "${sanitizePython(vals.known_prefix || '')}"
         unknown_bits = Integer("${(vals.unknown_bits || '24').trim()}")
         out.append(f"Known Plaintext Attack")
@@ -193,7 +201,8 @@ print("KNOWN_PLAINTEXT=FAILED")`;
         return Promise.resolve(null); // too large for brute-force, fall through to SageCell
       }
       return Promise.resolve(null);
-    } catch {
+    } catch (e) {
+      console.warn('[known-plaintext] frontendCheck error:', e);
       return Promise.resolve(null);
     }
   },

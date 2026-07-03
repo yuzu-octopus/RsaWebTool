@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
-import { wrapSageTemplate, sanitizePython } from './guard';
+import { wrapSageTemplate, sanitizePython, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'bleichenbacher-sig',
@@ -21,8 +21,8 @@ print("BLEICHENBACHER_SIG=FAILED")`;
     return wrapSageTemplate({
       token: 'BLEICHENBACHER_SIG',
       useGuard: false,
-      body: `        n = Integer(${vals.n})
-        e = Integer(${vals.e || '3'})
+      body: `        n = Integer(${validateNumeric(vals.n, 'n')})
+        e = Integer(${validateNumeric(vals.e || '3', 'e')})
         hash_hex = "${sanitizePython(vals.hash_hex)}".strip()
         found = True
         if not hash_hex:

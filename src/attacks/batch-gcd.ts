@@ -12,6 +12,14 @@ export const attack: Attack = {
   inputs: [
     { name: 'n_values', label: 'Moduli (one per line or comma-separated)', placeholder: 'n1\\nn2\\nn3...', multiline: true, rows: 5 },
   ],
+  usageGuide: `Use when you have many RSA moduli and suspect some share prime factors.
+
+How to use:
+1. Enter multiple moduli, one per line or comma-separated
+2. The attack computes gcd(n_i, product_of_others) for each modulus
+3. Any gcd > 1 reveals a shared prime factor
+
+Tip: More efficient than pairwise GCD for large sets. O(k) GCD operations instead of O(k^2). Common in mass-key-generation failure scenarios.`,
   frontendCheck: (vals: Record<string, string>) => {
     try {
       const raw = (vals.n_values || '').trim();
@@ -69,7 +77,8 @@ export const attack: Attack = {
 
       lines.push('BATCH_GCD=SUCCESS');
       return lines.join('\n');
-    } catch {
+    } catch (e) {
+      console.warn('[batch-gcd] frontendCheck error:', e);
       return null;
     }
   },

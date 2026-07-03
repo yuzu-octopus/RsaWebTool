@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'ecm2',
@@ -11,9 +11,17 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use for complete factorization when n may have 3+ prime factors.
+
+How to use:
+1. Provide n (the modulus)
+2. ECM finds one factor at a time; the algorithm recursively factors the cofactor
+3. Works for multi-prime RSA or when other methods find only partial factors
+
+Tip: ECM excels at finding medium-sized factors. For very large prime factors, combine with other methods.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'ECM2',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     body: `        try:
             from sage.libs.libecm import ecmfactor
             _has_ecm = True

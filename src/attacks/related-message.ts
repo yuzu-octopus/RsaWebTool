@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd, modInverse, modPow } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'related-message',
@@ -20,18 +20,18 @@ export const attack: Attack = {
     { name: 'b2', label: 'b2 (second linear offset)', placeholder: '0', multiline: false },
   ],
   sageTemplate: (vals: Record<string, string>) => {
-    const body: string = `        n = Integer(${vals.n})
-        e_val = "${vals.e}".strip()
+    const body: string = `        n = Integer(${validateNumeric(vals.n, 'n')})
+        e_val = ${validateNumeric(vals.e, 'e')}
         e = Integer(e_val) if e_val else Integer(65537)
-        c1 = Integer(${vals.c1})
-        c2 = Integer(${vals.c2})
-        a1_val = "${vals.a1 || ''}".strip()
+        c1 = Integer(${validateNumeric(vals.c1, 'c1')})
+        c2 = Integer(${validateNumeric(vals.c2, 'c2')})
+        a1_val = "${validateNumeric(vals.a1 || '', 'a1')}".strip()
         a1 = Integer(a1_val) if a1_val else Integer(1)
-        b1_val = "${vals.b1 || ''}".strip()
+        b1_val = "${validateNumeric(vals.b1 || '', 'b1')}".strip()
         b1 = Integer(b1_val) if b1_val else Integer(0)
-        a2_val = "${vals.a2 || ''}".strip()
+        a2_val = "${validateNumeric(vals.a2 || '', 'a2')}".strip()
         a2 = Integer(a2_val) if a2_val else Integer(2)
-        b2_val = "${vals.b2 || ''}".strip()
+        b2_val = "${validateNumeric(vals.b2 || '', 'b2')}".strip()
         b2 = Integer(b2_val) if b2_val else Integer(0)
         found = True
         if n < 2 or e < 2 or c1 < 0 or c2 < 0:
@@ -248,7 +248,7 @@ export const attack: Attack = {
         return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na1 = ${a1}\nb1 = ${b1}\na2 = ${a2}\nb2 = ${b2}\n\nResults:\nm = ${m_orig}\n\nVerification: (a1*m+b1)^e mod n = ${v1}, (a2*m+b2)^e mod n = ${v2}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[related-message] frontendCheck error:', e); return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} Given $c_1 \\equiv (a_1 m + b_1)^e \\pmod{n}$ and $c_2 \\equiv (a_2 m + b_2)^e \\pmod{n}$ with known $a_1, b_1, a_2, b_2$ and $\\gcd(a_1, n) = 1$, recover $m$ by computing $\\gcd((a_1 x + b_1)^e - c_1, (a_2 x + b_2)^e - c_2)$.
 

@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'williams-p1',
@@ -13,14 +13,22 @@ export const attack: Attack = {
     { name: 'B', label: 'B1 (stage 1 bound, optional)', placeholder: '10000', required: false, multiline: false },
     { name: 'B2', label: 'B2 (stage 2 bound, optional)', placeholder: '0 (disabled)', required: false, multiline: false },
   ],
+  usageGuide: `Use when Pollard p-1 fails and p+1 might be smooth.
+
+How to use:
+1. Provide n and optionally B1 (default 10000) and B2 (stage 2 bound)
+2. Uses Lucas sequences V_k(P,1) instead of simple exponentiation
+3. Stage 2 extends to catch one larger prime factor beyond B1
+
+Tip: Complementary to Pollard p-1. If p-1 is smooth, p-1 works; if p+1 is smooth, this works. Try both.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'WILLIAMS_P1',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     useGuard: true,
     body: `        #
         # Handle B1 parameter: default to 10000 if not provided or invalid
         try:
-            B1 = Integer(${vals.B || '10000'})
+            B1 = Integer(${validateNumeric(vals.B || '10000', 'B')})
             if B1 < 2:
                 B1 = 10000
         except:
@@ -28,7 +36,7 @@ export const attack: Attack = {
         #
         # Handle B2 parameter: default to 0 (disabled) if not provided or invalid
         try:
-            B2 = Integer(${vals.B2 || '0'})
+            B2 = Integer(${validateNumeric(vals.B2 || '0', 'B2')})
             if B2 < 0:
                 B2 = 0
         except:

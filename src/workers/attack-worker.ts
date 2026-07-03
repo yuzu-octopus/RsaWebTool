@@ -18,7 +18,7 @@
  *   Returns JSON-stringified PoWResult on success.
  */
 
-import { attacks } from '../attacks';
+import { attacksById } from '../attacks';
 import env from '../config/env';
 import { setFactorDBProxy } from '../utils/factordb';
 import { solvePoW } from './pow-worker';
@@ -119,7 +119,7 @@ self.onmessage = (e: MessageEvent<CancelMessage | WorkerRequest>) => {
   }
 
   // Standard attack handler
-  const attack = attacks.find(a => a.id === attackId);
+  const attack = attacksById.get(attackId);
   if (!attack?.frontendCheck) {
     if (!cancelledIds.has(id)) {
       self.postMessage({ id, result: null } satisfies WorkerResponse);

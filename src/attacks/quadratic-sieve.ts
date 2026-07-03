@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 import { randomPrime } from '../utils/testcases/core';
 
 export const attack: Attack = {
@@ -11,9 +11,17 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use for semiprimes up to about 100 digits with roughly equal-sized factors.
+
+How to use:
+1. Provide n (the RSA modulus)
+2. The algorithm builds a factor base of small primes, sieves for smooth values, and finds congruent squares via linear algebra
+3. Works best when both factors are similar in size
+
+Tip: For numbers larger than 100 digits, try ECM or other methods. For very small numbers (< 40 bits), trial division is faster.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'QUADRATIC_SIEVE',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     useGuard: true,
     body: `        bits = n.nbits()
         out.append("Quadratic Sieve")

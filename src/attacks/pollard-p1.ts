@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 import { generatePollardTestcase } from '../utils/testcases/core';
 import { gcd, modPow } from '../utils/bigint';
 
@@ -14,14 +14,22 @@ export const attack: Attack = {
     { name: 'B', label: 'B1 (stage 1 bound, optional)', placeholder: '10000', required: false, multiline: false },
     { name: 'B2', label: 'B2 (stage 2 bound, optional)', placeholder: '0 (disabled)', required: false, multiline: false },
   ],
+  usageGuide: `Use when a prime factor p has p-1 with only small prime factors (smooth).
+
+How to use:
+1. Provide n and optionally B1 (stage 1 bound, default 10000) and B2 (stage 2 bound)
+2. Stage 1 computes a^(lcm(1..B1)) mod n; if p-1 | lcm(1..B1), gcd reveals p
+3. Stage 2 catches factors where p-1 has one prime factor between B1 and B2
+
+Tip: Try increasing B1 if stage 1 fails. RSA key generators sometimes use weak RNG that produces smooth p-1.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'POLLARD_P1',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     imports: ['import math'],
-    body: `        B1 = int(Integer(${vals.B || '10000'}))
+    body: `        B1 = int(Integer(${validateNumeric(vals.B || '10000', 'B')}))
         if B1 < 2:
             B1 = 10000
-        B2 = int(Integer(${vals.B2 || '0'}))
+        B2 = int(Integer(${validateNumeric(vals.B2 || '0', 'B2')}))
         if B2 < 0:
             B2 = 0
         out.append("Pollard's p-1 Method")
@@ -198,7 +206,8 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
 
       onProgress?.(100);
       return Promise.resolve(null);
-    } catch {
+    } catch (e) {
+      console.warn('[pollard-p1] frontendCheck error:', e);
       return Promise.resolve(null);
     }
   },

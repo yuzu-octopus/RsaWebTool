@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { isqrt } from '../utils/bigint';
 import { generateFermatTestcase } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'close-prime',
@@ -12,9 +12,17 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use when the two prime factors are close to each other (|p - q| is small).
+
+How to use:
+1. Provide n (the modulus)
+2. Fermat's method tries to express n as a difference of squares: n = a^2 - b^2
+3. If Fermat iteration doesn't converge quickly, Londahl's BSGS fallback is used
+
+Tip: Very fast when primes are close (|p-q| < 2^20). Common in CTF challenges where p and q are generated with similar bit-lengths and close values.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'CLOSE_PRIME',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     imports: ['import math'],
     body: `        n_int = int(n)
         found = False
@@ -133,7 +141,7 @@ export const attack: Attack = {
         a++;
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[close-prime] frontendCheck error:', e); return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} Factor $n = pq$ when $|p-q|$ is small via Fermat's difference-of-squares iteration, extended by Londahl's BSGS to larger gaps.
 

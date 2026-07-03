@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateHastadTestcase, generateKeyPair, randomPrime } from '../utils/testcases/core';
 import { modPow, iroot } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'coppersmith-short-pad',
@@ -21,12 +21,12 @@ export const attack: Attack = {
     }
     return wrapSageTemplate({
       token: 'COPPERSMITH_SHORT_PAD',
-      n: vals.n,
-      body: `        n = Integer(${vals.n})
-        e = Integer(${vals.e})
+      n: validateNumeric(vals.n, 'n'),
+      body: `        n = Integer(${validateNumeric(vals.n, 'n')})
+        e = Integer(${validateNumeric(vals.e, 'e')})
         e_int = int(e)
-        c1 = Integer(${vals.c1})
-        c2 = Integer(${vals.c2})
+        c1 = Integer(${validateNumeric(vals.c1, 'c1')})
+        c2 = Integer(${validateNumeric(vals.c2, 'c2')})
         # Pure Python integer e-th root via binary search
         # Avoids SageCell's flaky nth_root when possible
         def integer_root(val, exp):
@@ -130,7 +130,7 @@ export const attack: Attack = {
         }
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[coppersmith-short-pad] frontendCheck error:', e); return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} Given two ciphertexts $c_1 \\equiv m_1^e \\pmod{n}$, $c_2 \\equiv m_2^e \\pmod{n}$ where $e$ is small (e.g. $e = 3, 5$), recover $m$ via integer root extraction. For $|m| < n^{1/e^2}$, Coppersmith's lattice extension applies.
 

@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'squfof',
@@ -11,9 +11,17 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use for numbers up to about 10^14 (roughly 47 bits).
+
+How to use:
+1. Provide n (the modulus)
+2. SQUFOF searches for a square form in the cycle of reduced binary quadratic forms
+3. Very fast for its range — no lattice or smoothness search needed
+
+Tip: Limited to n < 10^14. For larger numbers, use Pollard's rho or ECM. Works best when factors are roughly equal in size.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'SQUFOF',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     imports: ['import math'],
     useGuard: true,
     body: `        out.append("SQUFOF")

@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateWienerTestcase } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'boneh-durfee',
@@ -12,10 +12,19 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use when the private exponent d is unusually small relative to n.
+
+How to use:
+1. Provide n and e from the RSA public key
+2. The attack tries Wiener's continued fraction method first (d < n^0.25)
+3. If Wiener fails, it falls back to the Boneh-Durfee lattice attack (d < n^0.260)
+4. If d is large, neither method will succeed
+
+Tip: This attack works when d is small due to poor key generation. Common in CTF challenges with deliberately weak keys.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'BONEH_DURFEE',
-    n: vals.n,
-    body: `        e = Integer(${vals.e})
+    n: validateNumeric(vals.n, 'n'),
+    body: `        e = Integer(${validateNumeric(vals.e, 'e')})
         found = False
         if e < 2:
             out.append("Boneh-Durfee Attack")

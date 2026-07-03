@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateHastadTestcase } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const K_BOUND_DEFAULT = 100000;
 
@@ -24,11 +24,11 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
     return wrapSageTemplate({
       token: 'SMALL_PUBLIC_EXP',
       useGuard: false,
-      body: `        n = Integer(${vals.n})
-        e_val = "${vals.e}".strip()
+      body: `        n = Integer(${validateNumeric(vals.n, 'n')})
+        e_val = ${validateNumeric(vals.e, 'e')}
         e = Integer(e_val) if e_val else Integer(3)
-        c = Integer(${vals.c})
-        k_bound_val = "${vals.k_bound}".strip() if "${vals.k_bound}" else "100000"
+        c = Integer(${validateNumeric(vals.c, 'c')})
+        k_bound_val = ${validateNumeric(vals.k_bound, 'k_bound')} if "${vals.k_bound}" else "100000"
         k_bound = Integer(k_bound_val) if k_bound_val else Integer(100000)
         out.append("Small Public Exponent")
         out.append(f"n = {n}")

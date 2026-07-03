@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
 import { gcd, extendedGcd, modPow, modInverse } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'common-modulus',
@@ -16,6 +16,14 @@ export const attack: Attack = {
     { name: 'c1', label: 'c1 (first ciphertext)', placeholder: 'Enter ciphertext c1...', multiline: true, rows: 3 },
     { name: 'c2', label: 'c2 (second ciphertext)', placeholder: 'Enter ciphertext c2...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use when the same message is encrypted with two different exponents under the same modulus.
+
+How to use:
+1. Provide n, e1, e2, c1, and c2
+2. Compute Bezout coefficients: a*e1 + b*e2 = 1 (since gcd(e1,e2) = 1)
+3. Recover m = c1^a * c2^b mod n
+
+Tip: Requires gcd(e1, e2) = 1. Common CTF scenario where RSA is used with multiple public exponents. Very fast once you have the two ciphertexts.`,
   sageTemplate: (vals: Record<string, string>) => {
     if (!vals.n || !vals.e1 || !vals.e2 || !vals.c1 || !vals.c2) {
       return `print("ERROR: Missing required inputs (n, e1, e2, c1, c2)")
@@ -24,11 +32,11 @@ print("COMMON_MODULUS=FAILED")`;
     return wrapSageTemplate({
       token: 'COMMON_MODULUS',
       useGuard: false,
-      body: `        n = Integer(${vals.n})
-        e1 = Integer(${vals.e1})
-        e2 = Integer(${vals.e2})
-        c1 = Integer(${vals.c1})
-        c2 = Integer(${vals.c2})
+      body: `        n = Integer(${validateNumeric(vals.n, 'n')})
+        e1 = Integer(${validateNumeric(vals.e1, 'e1')})
+        e2 = Integer(${validateNumeric(vals.e2, 'e2')})
+        c1 = Integer(${validateNumeric(vals.c1, 'c1')})
+        c2 = Integer(${validateNumeric(vals.c2, 'c2')})
         # Check gcd(e1, e2) first
         out.append("Common Modulus Attack")
         out.append(f"n = {n}")
@@ -96,7 +104,8 @@ print("COMMON_MODULUS=FAILED")`;
         return Promise.resolve(`Common Modulus Attack\nn = ${n}\ne1 = ${e1}\ne2 = ${e2}\nc1 = ${c1}\nc2 = ${c2}\n\nResults:\nm = ${m}\n\nVerification: a*e1 + b*e2 = ${x * e1 + y * e2}\n\nCOMMON_MODULUS=SUCCESS`);
       }
       return Promise.resolve(null);
-    } catch {
+    } catch (e) {
+      console.warn('[common-modulus] frontendCheck error:', e);
       return Promise.resolve(null);
     }
   },

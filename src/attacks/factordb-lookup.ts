@@ -27,6 +27,14 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use as the first step for any unknown RSA modulus.
+
+How to use:
+1. Provide n (the modulus)
+2. The attack queries the FactorDB online database for known factorizations
+3. Returns the status (FF, CF, CP, C, etc.) and any known factors
+
+Tip: Always try this first — it's instant if the factorization is already known. FactorDB is a community-maintained database of integer factorizations.`,
   frontendCheck: async (vals: Record<string, string>) => {
     const n = (vals.n || '').trim();
     if (!n) return null;
@@ -61,10 +69,11 @@ export const attack: Attack = {
       }
 
       lines.push(``);
-      lines.push(result.status === 'FF' ? 'FACTORDB_LOOKUP=SUCCESS' : 'FACTORDB_LOOKUP=RESULT');
+      lines.push(result.status === 'FF' ? 'FACTORDB_LOOKUP=SUCCESS' : 'FACTORDB_LOOKUP=FAILED');
 
       return lines.join('\n');
     } catch (e) {
+      console.warn('[factordb-lookup] frontendCheck error:', e);
       return `FactorDB Lookup\n\nERROR: ${e instanceof Error ? e.message : String(e)}\n\nFACTORDB_LOOKUP=FAILED`;
     }
   },

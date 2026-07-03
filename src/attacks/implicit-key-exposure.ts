@@ -16,6 +16,14 @@ export const attack: Attack = {
     { name: 'a', label: 'a (base)', placeholder: 'Enter base a...', multiline: false },
     { name: 'leak', label: 'leak (a^p mod n)', placeholder: 'Enter leaked value...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use when a^p mod n has been leaked through a side channel.
+
+How to use:
+1. Provide n, a (base), and the leaked value a^p mod n
+2. By Fermat's Little Theorem, a^p ≡ a (mod p), so gcd(a - leak, n) = p
+3. Both factors are recovered from the GCD
+
+Tip: This is extremely fast — a single GCD. The leak often occurs from timing side-channels in modular exponentiation implementations.`,
   proof: `\\textbf{Theorem:} If $a^p \\bmod n$ is leaked, recover $p$ via $\\gcd(a - \\text{leak}, n)$ using Fermat's Little Theorem.
 
 \\textbf{Setup:}
@@ -64,7 +72,8 @@ p &= \\gcd(\\text{leak} - a, n) \\qed
         ].join('\n');
       }
       return null;
-    } catch {
+    } catch (e) {
+      console.warn('[implicit-key-exposure] frontendCheck error:', e);
       return null;
     }
   },

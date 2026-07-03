@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { modPow, modInverse, gcd } from '../utils/bigint';
-import { wrapSageTemplate, sanitizePython } from './guard';
+import { wrapSageTemplate, sanitizePython, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'rsa-crt-fault',
@@ -24,10 +24,10 @@ print("RSA_CRT_FAULT=FAILED")`;
     return wrapSageTemplate({
       token: 'RSA_CRT_FAULT',
       useGuard: false,
-      body: `        n = Integer(${vals.n})
-        e = Integer(${vals.e})
-        m = Integer(${vals.m})
-        sig_faulty = Integer(${vals.sig_faulty})
+      body: `        n = Integer(${validateNumeric(vals.n, 'n')})
+        e = Integer(${validateNumeric(vals.e, 'e')})
+        m = Integer(${validateNumeric(vals.m, 'm')})
+        sig_faulty = Integer(${validateNumeric(vals.sig_faulty, 'sig_faulty')})
         sig_valid_str = "${sanitizePython((vals.sig_valid || '').trim())}"
         if sig_valid_str:
             sig_valid = Integer(sig_valid_str)
@@ -69,7 +69,8 @@ print("RSA_CRT_FAULT=FAILED")`;
         return Promise.resolve(`RSA-CRT Fault Attack (Bellcore)\nn = ${n}\ne = ${e}\nm = ${m}\nsig_faulty = ${vals.sig_faulty}\n\nResults:\np = ${g_}\nq = ${qq}\n\nVerification: p * q = ${g_ * qq}\n\nRSA_CRT_FAULT=SUCCESS`);
       }
       return Promise.resolve(null);
-    } catch {
+    } catch (e) {
+      console.warn('[rsa-crt-fault] frontendCheck error:', e);
       return Promise.resolve(null);
     }
   },

@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { isqrt } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 const numGcd = (a: number, b: number): number => {
   while (b) { [a, b] = [b, a % b]; }
@@ -26,7 +26,7 @@ export const attack: Attack = {
   ],
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'SMALL_FRACTION',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     useGuard: true,
     body: `        #
         # Small fraction attack: p/q ≈ a/b for small a, b
@@ -139,7 +139,7 @@ export const attack: Attack = {
         }
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[small-fraction] frontendCheck error:', e); return Promise.resolve(null); }
   },
   usageGuide: 'This attack factors n when the ratio of its two prime factors p/q is close to a simple fraction a/b with small denominator (≤ 100).\n\nHow it works:\n1. For each coprime pair (a,b) with 1 ≤ b ≤ 100 and 1 ≤ a ≤ b, estimate q₀ ≈ √(n·b/a)\n2. Test q₀ ± 2000 for divisibility: if q | n then p = n/q recovers both factors\n3. Since n is odd (product of two odd primes), even q can never divide n — a single-bit (q & 1) check skips ~50% of BigInt divisions\n4. Precomputed offset BigInts avoid per-iteration allocation overhead\n\nTip: Works in-browser (frontendCheck) for any n. Falls back to SageMathCell for larger systematic searches. Testcase generated with a=3, b=5 for immediate verification.',
   proof: `\\textbf{Theorem:} If $p/q \\approx a/b$ for small coprime $a, b$, then $q \\approx \\sqrt{nb/a}$ and parity-optimized trial division near $q_0$ recovers the factor.

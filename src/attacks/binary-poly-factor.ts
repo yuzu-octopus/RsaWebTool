@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'binary-poly-factor',
@@ -10,9 +10,17 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use when n's binary representation factors cleanly as a polynomial.
+
+How to use:
+1. Provide n (the modulus)
+2. Convert n to binary, treat as polynomial f(x) over Z[x]
+3. Factor f(x) and evaluate each factor at x=2 to get the integer factors
+
+Tip: Works when the multiplication of p and q in binary has no carries — i.e., the binary convolution is clean. Rare in practice but common in constructed CTF challenges.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'BINARY_POLY_FACTOR',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     body: `        out.append("Binary Polynomial Factoring")
         out.append(f"n = {n}")
         out.append("")

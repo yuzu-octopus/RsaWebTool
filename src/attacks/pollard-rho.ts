@@ -1,8 +1,8 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { gcd } from '../utils/bigint';
-import { randomPrime, isPrimeMR } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { randomPrime } from '../utils/testcases/core';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'pollard-rho',
@@ -12,9 +12,17 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use for general-purpose factorization of medium-sized numbers.
+
+How to use:
+1. Provide n (the modulus)
+2. The algorithm uses Brent's cycle detection with batched GCD for efficiency
+3. Multiple random starting points are tried for robustness
+
+Tip: Expected runtime is O(n^{1/4}) per factor. Good for factors up to ~30 digits. For larger factors, try ECM.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'POLLARD_RHO',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     imports: ['import math'],
     useGuard: true,
     body: `        out.append("Pollard's Rho (Brent variant)")
@@ -140,7 +148,7 @@ export const attack: Attack = {
         }
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[pollard-rho] frontendCheck error:', e); return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} Pollard's rho algorithm with Brent's cycle detection and batched GCD finds a non-trivial factor in expected $O(n^{1/4})$ time.
 
@@ -178,14 +186,8 @@ export const generateTestcase = (): Record<string, string> => {
   // converges within SageCell timeout. generatePollardTestcase produces
   // TESTCASE_BITS-sized primes (512-bit) which would time out, so we keep
   // custom construction with a 34-bit small factor.
-  let p: bigint;
-  do {
-    p = (1n << 33n) | 1n | (BigInt(Math.floor(Math.random() * (1 << 33))) & ((1n << 33n) - 1n));
-  } while (!isPrimeMR(p));
-  let q: bigint;
-  do {
-    q = randomPrime(512);
-  } while (q === p);
+  const p = randomPrime(34);
+  const q = randomPrime(512);
   const n = p * q;
   return { n: n.toString(), p: p.toString() };
 };

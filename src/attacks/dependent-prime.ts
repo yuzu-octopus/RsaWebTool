@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { modInverse, isqrt } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'dependent-prime',
@@ -15,10 +15,10 @@ export const attack: Attack = {
   ],
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'DEPENDENT_PRIME',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     imports: ['import math'],
     useGuard: true,
-    body: `        e = Integer(${vals.e})
+    body: `        e = Integer(${validateNumeric(vals.e, 'e')})
         if e < 2:
             out.append("DEPENDENT_PRIME=FAILED: e must be >= 2")
         else:
@@ -86,7 +86,7 @@ export const attack: Attack = {
         }
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[dependent-prime] frontendCheck error:', e); return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} If $qe \\equiv 1 \\pmod{p}$, solve $kp^2 + p - ne = 0$ for $p$ by iterating $k$.
 

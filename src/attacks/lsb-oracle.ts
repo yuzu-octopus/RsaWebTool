@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
-import { wrapSageTemplate, sanitizePython } from './guard';
+import { wrapSageTemplate, sanitizePython, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'lsb-oracle',
@@ -19,10 +19,10 @@ export const attack: Attack = {
       token: 'LSB_ORACLE',
       useGuard: false,
       body: `        valid = True
-        if not "${vals.n}".strip():
+        if not ${validateNumeric(vals.n, 'n')}:
             out.append("ERROR: n is required")
             valid = False
-        if not "${vals.c}".strip():
+        if not ${validateNumeric(vals.c, 'c')}:
             out.append("ERROR: c is required")
             valid = False
         responses_raw = """${sanitizePython(vals.oracle_responses || '')}""".strip()
@@ -30,10 +30,10 @@ export const attack: Attack = {
             out.append("ERROR: oracle_responses is required")
             valid = False
         if valid:
-            n = Integer(${vals.n})
-            e_val = "${vals.e}".strip()
+            n = Integer(${validateNumeric(vals.n, 'n')})
+            e_val = ${validateNumeric(vals.e, 'e')}
             e = Integer(e_val) if e_val else Integer(65537)
-            c = Integer(${vals.c})
+            c = Integer(${validateNumeric(vals.c, 'c')})
             orig_c = c
             oracle_bits = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
             two_e = pow(2, int(e), int(n))
@@ -108,7 +108,7 @@ export const attack: Attack = {
         }
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[lsb-oracle] frontendCheck error:', e); return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} An exact LSB oracle recovers $m$ in exactly $\\log_2 n$ queries via binary fraction accumulation.
 

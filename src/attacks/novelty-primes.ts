@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'novelty-primes',
@@ -11,9 +11,17 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use for CTF challenges where primes are crafted near known constants.
+
+How to use:
+1. Provide n (the modulus)
+2. The attack tests divisibility by primes near powers of 2 (±1000) and constants like e, π, φ
+3. If a factor is near a recognizable number, it is found quickly
+
+Tip: Common CTF trope — primes like 2^512 + k for small k. Check this early if the challenge hints at "novelty" or "special" primes.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'NOVELTY_PRIMES',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     body: `        out.append("Novelty Primes")
         out.append(f"n = {n}")
         out.append("")
@@ -103,7 +111,7 @@ export const attack: Attack = {
         }
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[novelty-primes] frontendCheck error:', e); return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} If $p$ is a prime near a power of two or a mathematical constant, a windowed trial division search finds it.
 

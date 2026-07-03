@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
-import { wrapSageTemplate, sanitizePython } from './guard';
+import { wrapSageTemplate, sanitizePython, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'manger',
@@ -19,13 +19,13 @@ export const attack: Attack = {
       token: 'MANGER',
       useGuard: false,
       body: `        valid = True
-        if not "${vals.n}".strip():
+        if not ${validateNumeric(vals.n, 'n')}:
             out.append("ERROR: n is required")
             valid = False
-        if not "${vals.e}".strip():
+        if not ${validateNumeric(vals.e, 'e')}:
             out.append("ERROR: e is required")
             valid = False
-        if not "${vals.c}".strip():
+        if not ${validateNumeric(vals.c, 'c')}:
             out.append("ERROR: c is required")
             valid = False
         responses_raw = """${sanitizePython(vals.oracle_responses || '')}""".strip()
@@ -33,9 +33,9 @@ export const attack: Attack = {
             out.append("ERROR: oracle_responses is required")
             valid = False
         if valid:
-            n = Integer(${vals.n})
-            e = Integer(${vals.e})
-            c = Integer(${vals.c})
+            n = Integer(${validateNumeric(vals.n, 'n')})
+            e = Integer(${validateNumeric(vals.e, 'e')})
+            c = Integer(${validateNumeric(vals.c, 'c')})
             oracle_list = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
             oracle_idx = [0]
             def oracle():
@@ -201,7 +201,7 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{rn+B}{s} \\right) \\\
         );
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[manger] frontendCheck error:', e); return Promise.resolve(null); }
   },
   priority: 'medium',
   applicableCheck: rsaNeeds.nECOracleResponses,

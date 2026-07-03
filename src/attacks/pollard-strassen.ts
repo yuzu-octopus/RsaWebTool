@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'pollard-strassen',
@@ -11,9 +11,17 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use when n has a factor no larger than n^{1/4}.
+
+How to use:
+1. Provide n (the modulus)
+2. The algorithm computes products of integers in intervals and takes GCD with n
+3. If a factor ≤ n^{1/4} exists, it is found
+
+Tip: Faster than trial division for finding small factors. The n^{1/4} bound means a 1024-bit n can have factors up to 256 bits.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'POLLARD_STRASSEN',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     imports: ['import math'],
     useGuard: true,
     body: `        out.append("Pollard-Strassen's Algorithm")

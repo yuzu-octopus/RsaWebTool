@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
-import { wrapSageTemplate, sanitizePython } from './guard';
+import { wrapSageTemplate, sanitizePython, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'biased-lsb',
@@ -19,26 +19,26 @@ export const attack: Attack = {
       token: 'BIASED_LSB',
       useGuard: false,
       body: `        valid = True
-        if not "${vals.n}".strip():
+        if not ${validateNumeric(vals.n, 'n')}:
             out.append("ERROR: n is required")
             valid = False
-        if not "${vals.e}".strip():
+        if not ${validateNumeric(vals.e, 'e')}:
             out.append("ERROR: e is required")
             valid = False
-        if not "${vals.c}".strip():
+        if not ${validateNumeric(vals.c, 'c')}:
             out.append("ERROR: c is required")
             valid = False
-        if not """${vals.oracle_runs}""".strip():
+        if not """${sanitizePython(vals.oracle_runs)}""".strip():
             out.append("ERROR: oracle_runs is required")
             valid = False
         if valid:
-            n = Integer(${vals.n})
-            e_val = "${vals.e}".strip()
+            n = Integer(${validateNumeric(vals.n, 'n')})
+            e_val = ${validateNumeric(vals.e, 'e')}
             e = Integer(e_val) if e_val else Integer(65537)
-            orig_c = Integer(${vals.c})
+            orig_c = Integer(${validateNumeric(vals.c, 'c')})
             two_e = pow(2, int(e), int(n))
             two_e_sage = Integer(two_e)
-            c = (Integer(${vals.c}) * Integer(two_e)) % n
+            c = (Integer(${validateNumeric(vals.c, 'c')}) * Integer(two_e)) % n
             runs_str = """${sanitizePython(vals.oracle_runs)}""".strip()
             runs = []
             for line in runs_str.split('\\n'):
@@ -145,7 +145,7 @@ export const attack: Attack = {
         }
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[biased-lsb] frontendCheck error:', e); return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} A noisy LSB oracle with bias $p > 1/2$ recovers $m$ via majority voting and binary fraction accumulation.
 

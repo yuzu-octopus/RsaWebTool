@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateHastadBroadcastTestcase } from '../utils/testcases/core';
 import { modPow, modInverse, iroot, gcd } from '../utils/bigint';
-import { wrapSageTemplate, sanitizePython } from './guard';
+import { wrapSageTemplate, sanitizePython, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'hastad-broadcast',
@@ -21,7 +21,7 @@ print("HASTAD_BROADCAST=FAILED")`;
     return wrapSageTemplate({
       token: 'HASTAD_BROADCAST',
       useGuard: false,
-      body: `        e = Integer(${vals.e})
+      body: `        e = Integer(${validateNumeric(vals.e, 'e')})
         out.append(f"Hastad's Broadcast Attack")
         out.append(f"Public exponent: e = {e}")
         if e < 2:
@@ -137,7 +137,7 @@ print("HASTAD_BROADCAST=FAILED")`;
         return Promise.resolve(`Hastad's Broadcast Attack\nPublic exponent: e = ${e}\nNumber of ciphertexts: ${pairs.length}\n\nResults:\nm = ${lo}\n\nVerification: m^e mod product(n_i) = CRT(c_i)\n\nHASTAD_BROADCAST=SUCCESS`);
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[hastad-broadcast] frontendCheck error:', e); return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} If the same plaintext $m$ is encrypted under $e$ distinct moduli with the same exponent $e$, CRT recovers $m^e$ over $\\mathbb{Z}$ and $m = \\sqrt[e]{m^e}$.
 

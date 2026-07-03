@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateMultiPrimeTestcase } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'multi-prime',
@@ -11,9 +11,17 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use when n has 3 or more prime factors (multi-prime RSA).
+
+How to use:
+1. Provide n (the modulus)
+2. Trial division finds small factors, then Sage's factor() handles the rest
+3. All prime factors are returned
+
+Tip: Multi-prime RSA uses CRT for faster decryption but is weaker against factorization. If you see n with more than 2 factors, this is the right tool.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'MULTI_PRIME',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     body: `        n_int = int(n)
         def factor_all(m):
             fac = []

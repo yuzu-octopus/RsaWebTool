@@ -15,6 +15,14 @@ export const attack: Attack = {
     { name: 'n1', label: 'n1 (first modulus)', placeholder: 'Enter n1...', multiline: true, rows: 3 },
     { name: 'n2', label: 'n2 (second modulus)', placeholder: 'Enter n2...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use when two RSA moduli may have been generated with a shared prime factor.
+
+How to use:
+1. Provide both moduli n1 and n2
+2. The attack computes gcd(n1, n2) to find the shared prime
+3. Both moduli are then fully factored
+
+Tip: This happens when RNG failures cause the same prime to be reused across key generations. Very fast — a single GCD call.`,
   proof: `\\textbf{Theorem:} If $n_1 = p \\cdot q_1$ and $n_2 = p \\cdot q_2$ share a prime $p$, then $\\gcd(n_1, n_2) = p$.
 
 \\textbf{Setup:}
@@ -68,7 +76,8 @@ The GCD extracts the shared prime directly — no factorization of either modulu
         ].join('\n');
       }
       return null;
-    } catch {
+    } catch (e) {
+      console.warn('[common-prime-rsa] frontendCheck error:', e);
       return null;
     }
   },

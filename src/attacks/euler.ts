@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { isqrt, gcd } from '../utils/bigint';
 import { randomPrime } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'euler',
@@ -12,9 +12,17 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use when both prime factors are ≡ 1 (mod 4).
+
+How to use:
+1. Provide n (the modulus)
+2. The attack searches for two representations of n as a sum of two squares
+3. From a^2+b^2 = c^2+d^2 = n, the factors are gcd(a*c - b*d, n) and gcd(a*c + b*d, n)
+
+Tip: Only works when both primes ≡ 1 (mod 4). If either prime ≡ 3 (mod 4), use another method. Slow for large n due to the search.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'EULER',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     imports: ['import math'],
     body: `        n_int = int(n)
         out.append("Euler Factorization")
@@ -124,7 +132,8 @@ export const attack: Attack = {
       if (p * q !== n) q = n / p;
       onProgress?.(100);
       return Promise.resolve(`Euler Factorization\nn = ${n}\n\nResults:\np = ${p}\nq = ${q}\n\nVerification: p * q = ${p * q}\n\nEULER=SUCCESS`);
-    } catch {
+    } catch (e) {
+      console.warn('[euler] frontendCheck error:', e);
       return Promise.resolve(null);
     }
   },

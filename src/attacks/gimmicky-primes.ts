@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'gimmicky-primes',
@@ -11,9 +11,17 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use for CTF challenges with primes from well-known families.
+
+How to use:
+1. Provide n (the modulus)
+2. The attack tests divisibility by Mersenne primes (2^p - 1), primorials, Fermat numbers, Fibonacci primes, repunits, and other special forms
+3. Reports which family the factor belongs to
+
+Tip: Broadest special-form detector. Try this early in CTFs when the challenge hints at "special" or "gimmicky" primes. Covers many common CTF prime constructions.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'GIMMICKY_PRIMES',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     imports: ['import math'],
     body: `        try:
             n_int = int(n)
@@ -251,7 +259,7 @@ export const attack: Attack = {
         );
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[gimmicky-primes] frontendCheck error:', e); return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} If $p$ is a special-form prime from a known set $\\mathcal{S}$, trial division against $\\mathcal{S}$ finds $p$ in $O(|\\mathcal{S}| \\cdot \\log^2 n)$.
 

@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { randomPrime, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
 import { rsaNeeds } from './_rsaHelpers';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'non-coprime-exp',
@@ -27,11 +27,11 @@ print("NON_COPRIME_EXP=FAILED")`;
     return wrapSageTemplate({
       token: 'NON_COPRIME_EXP',
       useGuard: false,
-      body: `        n = Integer(${vals.n})
-        e = Integer(${vals.e})
-        c = Integer(${vals.c})
-        p = Integer(${vals.p})
-        q = Integer(${vals.q})
+      body: `        n = Integer(${validateNumeric(vals.n, 'n')})
+        e = Integer(${validateNumeric(vals.e, 'e')})
+        c = Integer(${validateNumeric(vals.c, 'c')})
+        p = Integer(${validateNumeric(vals.p, 'p')})
+        q = Integer(${validateNumeric(vals.q, 'q')})
         out.append("Non-Coprime Exponent Attack")
         out.append(f"n = {n}")
         out.append(f"e = {e}")

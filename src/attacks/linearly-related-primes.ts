@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { isqrt } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'linearly-related-primes',
@@ -15,10 +15,10 @@ export const attack: Attack = {
   ],
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'LINEARLY_RELATED_PRIMES',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     imports: ['import math'],
     useGuard: true,
-    body: `        k = Integer(${vals.k})
+    body: `        k = Integer(${validateNumeric(vals.k, 'k')})
         if k <= 0:
             out.append("LINEARLY_RELATED_PRIMES=FAILED: k must be positive")
         else:
@@ -85,7 +85,7 @@ export const attack: Attack = {
         }
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[linearly-related-primes] frontendCheck error:', e); return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} If $q = kp + \\delta$ for known $k$ and small $|\\delta| < 10^6$, solve $kp^2 + \\delta p - n = 0$ to recover $p$.
 

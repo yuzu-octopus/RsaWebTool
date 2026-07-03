@@ -14,6 +14,14 @@ export const attack: Attack = {
   inputs: [
     { name: 'n_values', label: 'Moduli (one per line)', placeholder: 'Enter multiple moduli, one per line...', multiline: true, rows: 6 },
   ],
+  usageGuide: `Use when you need to find which specific pairs of moduli share prime factors.
+
+How to use:
+1. Enter multiple moduli, one per line
+2. The attack computes GCD for every pair and reports which moduli share factors
+3. Unlike batch-gcd, this explicitly identifies the sharing pairs
+
+Tip: Use batch-gcd for speed with many moduli; use this when you need to know exactly which pairs share primes.`,
   proof: `\\textbf{Theorem:} Pairwise GCD among a set of RSA moduli reveals shared prime factors and identifies which moduli share them.
 
 \\textbf{Setup:}
@@ -108,7 +116,8 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{
       lines.push('');
       lines.push('MULTI_PRIME_GCD=SUCCESS');
       return lines.join('\n');
-    } catch {
+    } catch (e) {
+      console.warn('[multi-prime-gcd] frontendCheck error:', e);
       return null;
     }
   },

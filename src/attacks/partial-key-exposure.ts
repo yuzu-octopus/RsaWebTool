@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { rsaNeeds, coppersmithLatticePython } from './_rsaHelpers';
 import { generateKeyPair } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'partial-key-exposure',
@@ -12,10 +12,18 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'p_msb', label: 'p (known high bits)', placeholder: 'Enter known high bits of p...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use when you know the upper half or more of one prime factor p.
+
+How to use:
+1. Provide n and the known high bits of p (MSBs)
+2. Coppersmith's method finds the remaining low bits using lattice reduction
+3. Requires knowing at least n/4 bits of p for the lattice to succeed
+
+Tip: This exploits the fact that small roots of polynomials mod p can be found efficiently. Side-channel attacks that leak partial key information make this practical.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'PARTIAL_KEY_EXPOSURE',
-    n: vals.n,
-    body: `        p_msb = Integer(${vals.p_msb})
+    n: validateNumeric(vals.n, 'n'),
+    body: `        p_msb = Integer(${validateNumeric(vals.p_msb, 'p_msb')})
         found = False
         if n < 2 or p_msb < 2:
             out.append("PARTIAL_KEY_EXPOSURE=FAILED: invalid input values")
@@ -41,38 +49,8 @@ export const attack: Attack = {
         else:
             # p = p_msb + x, where x has unknown bits = nbits/2 - p_msb_bits
             k = n.nbits() // 2 - p_msb.nbits()
-            # Manual Coppersmith lattice for degree-1, checking ALL LLL rows.
-            # Sage's small_roots only checks Row 0 (Row-0 bug for degree-1).
-            x = ZZ['x'].gen()
-            f_ZZ = p_msb + x
-            X = n.nth_root(4, truncate_mode=True)[0] + 1
-            m = 5; t = 5; dim = m + t
-            shifts = []
-            for i in range(m):
-                shifts.append(n^(m - i) * f_ZZ^i)
-            for k in range(t):
-                shifts.append(f_ZZ^m * x^k)
-            M = matrix(ZZ, dim, dim)
-            for i, shift in enumerate(shifts):
-                for j, c in enumerate(shift.list()):
-                    M[i, j] = c * X^j
-            B = M.LLL()
-            found_p = None
-            for k in range(dim):
-                row = B[k]
-                a0 = Integer(row[0]); a1 = Integer(row[1])
-                if a1 == 0:
-                    continue
-                r_approx = -QQ(a0) * QQ(X) / QQ(a1)
-                for delta in range(-2, 3):
-                    r = Integer(floor(r_approx)) + delta
-                    if abs(r) < X:
-                        candidate = p_msb + r
-                        if n % candidate == 0:
-                            found_p = candidate
-                            break
-                if found_p:
-                    break
+            # Coppersmith lattice: degree-1, checks ALL LLL rows (bypasses Sage Row-0 bug).
+${coppersmithLatticePython('p_msb + x')}
             if found_p:
                 q = n // found_p
                 out.append("Partial Key Exposure")

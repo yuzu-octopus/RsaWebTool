@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd, modPow } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'dp-dq-leak',
@@ -53,7 +53,8 @@ export const attack: Attack = {
       }
 
       return null;
-    } catch {
+    } catch (e) {
+      console.warn('[dp-dq-leak] frontendCheck error:', e);
       return null;
     }
   },
@@ -61,7 +62,7 @@ export const attack: Attack = {
     // FLT-based GCD: p | 2^(e*dp - 1) - 1 in a single modPow, ~10^4x faster
     // than the k-iteration approach. Mirrors the frontendCheck logic.
     const dpBlock = vals.dp ? `
-        dp_val = int(Integer(${vals.dp}))
+        dp_val = int(Integer(${validateNumeric(vals.dp, 'dp')}))
         if dp_val > 0:
             exp = dp_val * e_int - 1
             if exp > 0:
@@ -86,7 +87,7 @@ export const attack: Attack = {
 
     const dqBlock = vals.dq ? `
         if not found:
-            dq_val = int(Integer(${vals.dq}))
+            dq_val = int(Integer(${validateNumeric(vals.dq, 'dq')}))
             if dq_val > 0:
                 exp = dq_val * e_int - 1
                 if exp > 0:
@@ -111,8 +112,8 @@ export const attack: Attack = {
 
     return wrapSageTemplate({
       token: 'DP_DQ_LEAK',
-      n: vals.n,
-      body: `        e = Integer(${vals.e})
+      n: validateNumeric(vals.n, 'n'),
+      body: `        e = Integer(${validateNumeric(vals.e, 'e')})
         if n <= 0 or e <= 0:
             out.append("DP_DQ_LEAK=FAILED: invalid input values")
             out.append("DP_DQ_LEAK=FAILED")

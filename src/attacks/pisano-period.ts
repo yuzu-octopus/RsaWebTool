@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { modPow, gcd, isqrt } from '../utils/bigint';
 import { randomPrime } from '../utils/testcases/core';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 function multiplicativeOrder2(p: bigint): bigint {
   const trialPrimes = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n];
@@ -50,9 +50,17 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
+  usageGuide: `Use for small moduli (under 64 bits) when other methods are overkill.
+
+How to use:
+1. Provide n (the modulus)
+2. The attack finds the multiplicative order of 2 mod n via birthday collision
+3. The period reveals factor information through GCD
+
+Tip: Fast for small moduli. For larger numbers, use Pollard's rho, ECM, or other general-purpose methods.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'PISANO_PERIOD',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     useGuard: true,
     body: `        out.append("Pisano Period Factorization")
         out.append(f"n = {n}")
@@ -176,7 +184,7 @@ export const attack: Attack = {
         pow_val = (pow_val * 2n) % n;
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[pisano-period] frontendCheck error:', e); return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} Factor $n = pq$ via birthday collision on the sequence $f(i) = 2^i - 1 \\pmod{n}$, revealing $\\lambda(n)$.
 

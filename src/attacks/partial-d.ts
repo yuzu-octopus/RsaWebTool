@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateSmallDTestcase } from '../utils/testcases/core';
 import { isqrt } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'partial-d',
@@ -16,10 +16,10 @@ export const attack: Attack = {
   ],
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'PARTIAL_D',
-    n: vals.n,
+    n: validateNumeric(vals.n, 'n'),
     imports: ['import math'],
-    body: `        e = Integer(${vals.e})
-        dLow = Integer(${vals.dLow})
+    body: `        e = Integer(${validateNumeric(vals.e, 'e')})
+        dLow = Integer(${validateNumeric(vals.dLow, 'dLow')})
         if n <= 0 or e <= 0 or dLow < 0:
             out.append("PARTIAL_D=FAILED: invalid input values")
         else:
@@ -125,7 +125,7 @@ export const attack: Attack = {
         }
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[partial-d] frontendCheck error:', e); return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} If low $m$ bits of $d$ are known, recover $d$ by iterating $k$ in the key equation $ed = k\\varphi(n)+1$.
 

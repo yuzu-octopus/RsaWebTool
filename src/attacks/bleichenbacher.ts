@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
-import { wrapSageTemplate, sanitizePython } from './guard';
+import { wrapSageTemplate, sanitizePython, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'bleichenbacher',
@@ -19,13 +19,13 @@ export const attack: Attack = {
       token: 'BLEICHENBACHER',
       useGuard: false,
       body: `        valid = True
-        if not "${vals.n}".strip():
+        if not ${validateNumeric(vals.n, 'n')}:
             out.append("ERROR: n is required")
             valid = False
-        if not "${vals.e}".strip():
+        if not ${validateNumeric(vals.e, 'e')}:
             out.append("ERROR: e is required")
             valid = False
-        if not "${vals.c}".strip():
+        if not ${validateNumeric(vals.c, 'c')}:
             out.append("ERROR: c is required")
             valid = False
         responses_raw = """${sanitizePython(vals.oracle_responses || '')}""".strip()
@@ -33,10 +33,10 @@ export const attack: Attack = {
             out.append("ERROR: oracle_responses is required")
             valid = False
         if valid:
-            n = Integer(${vals.n})
-            e = Integer(${vals.e})
-            c = Integer(${vals.c})
-            orig_c = Integer(${vals.c})
+            n = Integer(${validateNumeric(vals.n, 'n')})
+            e = Integer(${validateNumeric(vals.e, 'e')})
+            c = Integer(${validateNumeric(vals.c, 'c')})
+            orig_c = Integer(${validateNumeric(vals.c, 'c')})
             oracle_bits = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
             out.append("Bleichenbacher PKCS#1 v1.5")
             out.append(f"n = {n}")
@@ -184,7 +184,7 @@ export const attack: Attack = {
         }
       }
       return Promise.resolve(null);
-    } catch { return Promise.resolve(null); }
+    } catch (e) { console.warn('[bleichenbacher] frontendCheck error:', e); return Promise.resolve(null); }
   },
   proof: `\\textbf{Theorem:} A PKCS#1 v1.5 padding oracle decrypts any RSA ciphertext in approximately $2^{17}$ adaptive queries.
 

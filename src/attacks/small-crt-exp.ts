@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd, modPow } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric} from './guard';
 
 const BATCH_SIZE = 5000n;
 
@@ -20,9 +20,9 @@ export const attack: Attack = {
     token: 'SMALL_CRT_EXP',
     imports: ['import math'],
     useGuard: false,
-    body: `        n = Integer(${vals.n})
-        e = Integer(${vals.e})
-        bound = ${vals.bound ? `Integer(${vals.bound})` : 'Integer(5000000)'}
+    body: `        n = Integer(${validateNumeric(vals.n, 'n')})
+        e = Integer(${validateNumeric(vals.e, 'e')})
+        bound = ${vals.bound ? `Integer(${validateNumeric(vals.bound, 'bound')})` : 'Integer(5000000)'}
         if n <= 0 or e <= 0 or bound <= 0:
             out.append("SMALL_CRT_EXP=FAILED: invalid input values")
         else:
@@ -128,7 +128,8 @@ export const attack: Attack = {
       }
 
       return Promise.resolve(null);
-    } catch {
+    } catch (e) {
+      console.warn('[small-crt-exp] frontendCheck error:', e);
       return Promise.resolve(null);
     }
   },
