@@ -17,7 +17,7 @@ import { useWorkerPool } from '../hooks/useWorkerPool';
 import { useAttackExecution } from '../hooks/useAttackExecution';
 import { ProofRenderer } from './ProofRenderer';
 import { EmptyState } from './_shared/EmptyState';
-import { inputSx } from '../styles/inputSx';
+import { inputSx } from '../styles/shared';
 import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, hourglassSpin, pageTitleSx, MONO_FAMILY, PROSE_FAMILY } from '../styles/shared';
 import Prism from 'prismjs';
 import '../styles/draculaPrism.css';

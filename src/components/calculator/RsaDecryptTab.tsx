@@ -3,7 +3,7 @@ import { Box, Typography, TextField, Button } from '@mui/material';
 import { draculaColors } from '../../theme/dracula';
 import { modPow, modInverse } from '../../utils/bigint';
 import { parseBigInt, toHex, toAscii, isPrintableAscii } from '../../utils/rsaCalc';
-import { inputSx } from '../../styles/inputSx';
+import { inputSx } from '../../styles/shared';
 import { outputBoxSx, primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 

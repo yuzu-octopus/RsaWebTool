@@ -13,7 +13,7 @@ import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { convertFormat } from '../utils/converters';
 import type { Format } from '../utils/converters';
-import { inputSx } from '../styles/inputSx';
+import { inputSx } from '../styles/shared';
 import { colFlexSx, centeredPanelSx, MONO_FAMILY } from '../styles/shared';
 
 const FORMATS: { value: Format; label: string }[] = [
@@ -179,3 +179,5 @@ export function FormatConverter() {
     </Box>
   );
 }
+
+export default FormatConverter;

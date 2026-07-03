@@ -18,7 +18,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { useMagicExecution, type MagicJob } from '../hooks/useMagicExecution';
 import { attacks } from '../attacks';
 import { detectFormat, parsePEM } from '../utils/converters';
-import { inputSx } from '../styles/inputSx';
+import { inputSx } from '../styles/shared';
 import { colFlexSx, centeredPanelSx, colorGhostBtn, hourglassSpin, MONO_FAMILY } from '../styles/shared';
 import type { Attack } from '../types';
 
@@ -468,3 +468,5 @@ export function MagicPanel() {
     </Box>
   );
 }
+
+export default MagicPanel;

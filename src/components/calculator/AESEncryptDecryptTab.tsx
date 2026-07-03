@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { Box, TextField, Button, Select, MenuItem, FormControl, InputLabel, Radio, RadioGroup, FormControlLabel, Typography } from '@mui/material';
 import { PlayArrow } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
-import { inputSx } from '../../styles/inputSx';
+import { inputSx } from '../../styles/shared';
 import { primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { ResultBox } from './_shared/ResultBox';

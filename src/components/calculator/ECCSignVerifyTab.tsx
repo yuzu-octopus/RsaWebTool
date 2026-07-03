@@ -3,7 +3,7 @@ import { Box, FormControl, InputLabel, Select, MenuItem, Radio, RadioGroup, Form
 import { PlayArrow } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
 import { primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
-import { inputSx } from '../../styles/inputSx';
+import { inputSx } from '../../styles/shared';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { ResultBox } from './_shared/ResultBox';
 import { CURVES, parseMsg } from '../../utils/eccCurves';

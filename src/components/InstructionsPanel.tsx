@@ -115,3 +115,5 @@ export function InstructionsPanel() {
     </Box>
   );
 }
+
+export default InstructionsPanel;

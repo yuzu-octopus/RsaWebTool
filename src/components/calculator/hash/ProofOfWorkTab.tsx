@@ -1,11 +1,11 @@
+import { draculaColors } from '../../../theme/dracula';
 import { useState, useRef, useCallback } from 'react';
 import {
   Box, Typography, TextField, Button, IconButton, Tooltip, LinearProgress, Collapse, FormControl,
   InputLabel, Select, MenuItem,
 } from '@mui/material';
 import { Stop, PlayArrow, HourglassEmpty, ContentCopy, ExpandMore, ExpandLess } from '@mui/icons-material';
-import { draculaColors } from '../../../theme/dracula';
-import { inputSx } from '../../../styles/inputSx';
+import { inputSx } from '../../../styles/shared';
 import { outputBoxSx, colorGhostBtn, hourglassSpin, MONO_FAMILY } from '../../../styles/shared';
 import { useWorkerPool } from '../../../hooks/useWorkerPool';
 import { ProgressEstimator } from '../../../utils/progressEstimator';
@@ -297,9 +297,9 @@ export default function ProofOfWorkTab() {
           resize: 'vertical',
           fontFamily: MONO_FAMILY,
           fontSize: '0.8rem',
-          backgroundColor: '#282a36',
-          color: '#f8f8f2',
-          border: '1px solid #44475a',
+          backgroundColor: draculaColors.background,
+          color: draculaColors.foreground,
+          border: `1px solid ${draculaColors.currentLine}`,
           borderRadius: '4px',
           p: 1,
           outline: 'none',

@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import { PlayArrow, UploadFile, ContentCopy } from '@mui/icons-material';
 import { draculaColors } from '../../../theme/dracula';
-import { inputSx } from '../../../styles/inputSx';
+import { inputSx } from '../../../styles/shared';
 import { outputBoxSx, colorGhostBtn, primaryBtnSx, MONO_FAMILY } from '../../../styles/shared';
 import { sha256, sha384, sha512 } from '@noble/hashes/sha2.js';
 import { md5, sha1 } from '@noble/hashes/legacy.js';

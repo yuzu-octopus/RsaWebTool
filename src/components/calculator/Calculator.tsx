@@ -84,3 +84,5 @@ export function Calculator() {
     </Box>
   );
 }
+
+export default Calculator;

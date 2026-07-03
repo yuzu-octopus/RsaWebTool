@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo, useReducer } from 'react';
 import { Box, TextField, Button, Select, MenuItem, FormControl, InputLabel, Typography } from '@mui/material';
 import { PlayArrow } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
-import { inputSx } from '../../styles/inputSx';
+import { inputSx } from '../../styles/shared';
 import { primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
 import { xorBytes, expandKey, fmtRounds } from '../../utils/aesCrypto';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';

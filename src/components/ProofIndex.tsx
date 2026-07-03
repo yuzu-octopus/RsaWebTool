@@ -14,7 +14,7 @@ import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { attacks } from '../attacks';
 import { colFlexSx, MONO_FAMILY, PROSE_FAMILY, ICON_SIZES } from '../styles/shared';
-import { inputSx } from '../styles/inputSx';
+import { inputSx } from '../styles/shared';
 
 function AttackListItem({
   attack,
@@ -136,3 +136,5 @@ export function ProofIndex() {
     </Box>
   );
 }
+
+export default ProofIndex;

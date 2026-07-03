@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, TextField, Button, Typography } from '@mui/material';
 import { PlayArrow } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
-import { inputSx } from '../../styles/inputSx';
+import { inputSx } from '../../styles/shared';
 import { primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { useSageMath, DEFAULT_SAGE_TIMEOUT } from '../../hooks/useSageMath';

@@ -27,6 +27,7 @@ jobs:
       - run: bun install
       - run: bun run typecheck
       - run: bun run lint
+      - run: bun run test:unit
       - run: bun run build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { VpnKey, ContentCopy, Send } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
-import { inputSx } from '../styles/inputSx';
+import { inputSx } from '../styles/shared';
 import { colFlexSx, centeredPanelSx, MONO_FAMILY, colorGhostBtn, ICON_SIZES } from '../styles/shared';
 import { useAppContext } from '../hooks/useAppContext';
 import { parsePEM, decryptPEM } from '../utils/pemParser';
@@ -405,3 +405,5 @@ MIIEpAIBAAKCAQEA...
     </Box>
   );
 }
+
+export default PemDecryptor;

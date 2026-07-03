@@ -3,7 +3,7 @@ import { Box, FormControl, InputLabel, Select, MenuItem, TextField, Button, Typo
 import { PlayArrow, ContentCopy } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
 import { primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
-import { inputSx } from '../../styles/inputSx';
+import { inputSx } from '../../styles/shared';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import { RFC3526_GROUPS, generatePrivateKey, parseHex } from '../../utils/dhCrypto';

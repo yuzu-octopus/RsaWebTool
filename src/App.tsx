@@ -1,16 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { ThemeProvider, CssBaseline, Box, Snackbar } from '@mui/material';
 import { draculaTheme, draculaColors } from './theme/dracula';
 import { Sidebar } from './components/Sidebar';
 import { AppProvider } from './context/AppContext';
 import { InputPanel } from './components/InputPanel';
 import { OutputPanel } from './components/OutputPanel';
-import { MagicPanel } from './components/MagicPanel';
-import { ProofIndex } from './components/ProofIndex';
-import { Calculator } from './components/calculator/Calculator';
-import { FormatConverter } from './components/FormatConverter';
-import { InstructionsPanel } from './components/InstructionsPanel';
-import { PemDecryptor } from './components/PemDecryptor';
+const MagicPanel = lazy(() => import('./components/MagicPanel'));
+const ProofIndex = lazy(() => import('./components/ProofIndex'));
+const Calculator = lazy(() => import('./components/calculator/Calculator'));
+const FormatConverter = lazy(() => import('./components/FormatConverter'));
+const InstructionsPanel = lazy(() => import('./components/InstructionsPanel'));
+const PemDecryptor = lazy(() => import('./components/PemDecryptor'));
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { CommandPalette } from './components/CommandPalette';
 import { flexPanelSx, MONO_FAMILY } from './styles/shared';
@@ -46,12 +46,14 @@ function AppContent() {
           <ErrorBoundary>
             <Box sx={flexPanelSx}>
               <InputPanel />
-              <MagicPanel />
-              <ProofIndex />
-              <Calculator />
-              <FormatConverter />
-              <InstructionsPanel />
-              <PemDecryptor />
+              <Suspense fallback={null}>
+                <MagicPanel />
+                <ProofIndex />
+                <Calculator />
+                <FormatConverter />
+                <InstructionsPanel />
+                <PemDecryptor />
+              </Suspense>
             </Box>
           </ErrorBoundary>
           <ErrorBoundary>
