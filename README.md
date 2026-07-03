@@ -38,7 +38,6 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 - **PEM Decryptor** — Parse and decrypt PKCS#1/PKCS#8/encrypted PEM keys, feed params to Calculator or Attacks
 - **Instructions Panel** — Always-visible reference guide
 - **"Continue to Input" CTA** — after viewing an attack explanation, jump directly to the input form
-- **Notepad** — Drag-resizable scratchpad with localStorage persistence (1h expiry)
 - **Prism.js syntax highlighting** — replaces react-syntax-highlighter, 33% smaller bundle
 - **Dracula theme** — dark, developer-friendly UI
 - **Consistent content width** — all panels use `maxWidth: 640` for readable line lengths
@@ -139,7 +138,7 @@ Select an attack from the sidebar. The Input Panel shows:
 Click the wand icon in the sidebar. Paste all known RSA parameters — the tool auto-detects values via regex, shows which attacks apply, and runs them all in parallel (up to 3 at a time) via Web Workers and SageCell slots. Stops at first success.
 
 ### Progress Bars
-Iterative frontendCheck attacks (close-prime, euler, pollard-p1, small-crt-exp, dependent-prime, etc.) show a determinate progress bar with live iteration variable and count below the Run button. Works through both Web Workers and main-thread fallback.
+Iterative frontendCheck attacks (close-prime, euler, pollard-p1, small-crt-exp, dependent-prime, etc.) show a determinate progress bar with live iteration variable and count below the Run button. Works through Web Workers.
 
 ### Output Panel
 Results appear in the Output Panel on the right. Features:
@@ -147,7 +146,6 @@ Results appear in the Output Panel on the right. Features:
 - Copy button
 - Clickable history (last 50 results)
 - Viewport-aware max width: adapts to `Math.min(600, window.innerWidth - 620)`, re-evaluated on resize
-- Resizable notepad (drag from bottom, 80-200px)
 
 ### Attack Output Format
 Every attack produces a standardized output:
@@ -212,7 +210,7 @@ All runtime settings are accessible via the `env` object in the browser console.
 env.workerPoolSize       // 3
 env.workerPoolSize = 5   // persisted, takes effect on next page load
 env.DOCS                 // descriptions of all properties
-env.reset()              // clears ALL localStorage + reloads
+env.reset()              // clears env config from localStorage + reloads
 ```
 
 | Property | Default | Description |
@@ -247,7 +245,7 @@ src/
       _shared/       CalculatorHeader.tsx, ResultBox.tsx
       hash/          ExplanationTab, HashFunctionsTab, HMACTab, LengthExtensionTab, ProofOfWorkTab
   config/            env.ts (console-accessible Env class), sidebarItems.ts
-  context/           AppContext provider, ctx.ts (createContext barrel)
+  context/           AppContext provider (includes AppContext create)
   hooks/             12 hooks: useAppContext, useAttackExecution, useCalculatorOutput,
                      useCommandPalette, useCopyToClipboard, useDragResize,
                      useKeyboardShortcuts, useMagicExecution, useNotepad,
@@ -320,14 +318,13 @@ Auto-lookup via Cloudflare Worker CORS proxy (20s timeout). When a Factorization
 
 ```bash
 bun run build
-git add -f docs/       # docs/ is gitignored — force-add
 git add -A
-git commit --no-verify -m "deploy: description"
+git commit -m "deploy: description"
 git push origin main
 ```
 
 ### CI/CD
-GitHub Actions on push to `main`: lint → build → deploy to GitHub Pages.
+GitHub Actions on push to `main`: typecheck → lint → test → build → deploy to GitHub Pages.
 
 **Cache caveat:** GitHub Pages sets `cache-control: max-age=600` (10 min). After deploy, users may need a hard refresh to get the latest bundle.
 

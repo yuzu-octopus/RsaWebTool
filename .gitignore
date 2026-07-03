@@ -27,6 +27,7 @@ pnpm-debug.log*
 
 # Agent config (local — not part of the web app)
 .opencode/
+src/attacks/.opencode/
 .playwright-mcp/
 opencode.json
 AGENTS.md
@@ -40,7 +41,7 @@ AGENTS.md
 # and is what lifted the baseline react-doctor score from 44 to 68.)
 doctor.config.*
 
-# Test infrastructure (scripts + artifacts, tracked separately)
+# Test infrastructure (scripts + artifacts, not deployed)
 scripts/
 test-results/
 
