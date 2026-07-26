@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
-import { gcd, extendedGcd, modPow, modInverse } from '../utils/bigint';
+import { extendedGcd, modPow, modInverse, iroot } from '../utils/bigint';
 import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
@@ -45,17 +45,24 @@ print("COMMON_MODULUS=FAILED")`;
         out.append(f"c1 = {c1}")
         out.append(f"c2 = {c2}")
         g = gcd(e1, e2)
-        if g != 1:
-            out.append(f"ERROR: gcd(e1, e2) = {g} != 1. Exponents must be coprime.")
-            out.append("COMMON_MODULUS=FAILED")
+        # Extended GCD finds a, b such that a*e1 + b*e2 = g
+        _, a, b = xgcd(e1, e2)
+        # power_mod handles negative exponents when the ciphertext is invertible.
+        part1 = power_mod(c1, a, n)
+        part2 = power_mod(c2, b, n)
+        m_g = (part1 * part2) % n
+        out.append(f"gcd(e1, e2) = {g}")
+        if g == 1:
+            m = m_g
+            recovered = True
         else:
-            # Extended GCD to find a, b such that a*e1 + b*e2 = 1
-            _, a, b = xgcd(e1, e2)
-            # Compute m = c1^a * c2^b mod n (power_mod handles negative exponents)
-            part1 = power_mod(c1, a, n)
-            part2 = power_mod(c2, b, n)
-            m = (part1 * part2) % n
-            # Verify
+            m, exact = m_g.nth_root(g, truncate_mode=True)
+            recovered = exact
+            if not exact:
+                out.append(f"Non-recovery: recovered m^{g} mod n = {m_g}, which is not an exact integer {g}-th power.")
+                out.append("A modular root may be ambiguous or require factoring n.")
+        # Re-encryption confirms an exact integer root is the original message.
+        if recovered:
             v1 = power_mod(m, e1, n)
             v2 = power_mod(m, e2, n)
             out.append("")
@@ -67,7 +74,9 @@ print("COMMON_MODULUS=FAILED")`;
                 out.append("")
                 out.append("COMMON_MODULUS=SUCCESS")
             else:
-                out.append("COMMON_MODULUS=FAILED")`,
+                out.append("COMMON_MODULUS=FAILED")
+        else:
+            out.append("COMMON_MODULUS=FAILED")`
     });
   },
   frontendCheck: (vals) => {
@@ -78,9 +87,7 @@ print("COMMON_MODULUS=FAILED")`;
       const e2 = BigInt(vals.e2);
       const c1 = BigInt(vals.c1);
       const c2 = BigInt(vals.c2);
-      const g = gcd(e1, e2);
-      if (g !== 1n) return Promise.resolve(null);
-      const { x, y } = extendedGcd(e1, e2);
+      const { gcd: exponentGcd, x, y } = extendedGcd(e1, e2);
       let part1: bigint;
       if (x < 0n) {
         const inv = modInverse(c1, n);
@@ -97,7 +104,14 @@ print("COMMON_MODULUS=FAILED")`;
       } else {
         part2 = modPow(c2, y, n);
       }
-      const m = (part1 * part2) % n;
+      const mG = (part1 * part2) % n;
+      let m = mG;
+      if (exponentGcd > 1n) {
+        m = iroot(mG, exponentGcd);
+        if (m ** exponentGcd !== mG) {
+          return Promise.resolve(`Common Modulus Attack\nn = ${n}\ne1 = ${e1}\ne2 = ${e2}\nc1 = ${c1}\nc2 = ${c2}\n\ngcd(e1, e2) = ${exponentGcd}\nNon-recovery: recovered m^${exponentGcd} mod n = ${mG}, which is not an exact integer ${exponentGcd}-th power.\nA modular root may be ambiguous or require factoring n.\n\nCOMMON_MODULUS=FAILED`);
+        }
+      }
       const v1 = modPow(m, e1, n);
       const v2 = modPow(m, e2, n);
       if (v1 === c1 && v2 === c2) {
@@ -127,7 +141,7 @@ c_1^a \\cdot c_2^b &\\equiv (m^{e_1})^a \\cdot (m^{e_2})^b \\pmod{n} \\\\
 \\end{align*}
 When $a < 0$, compute $c_1^a = (c_1^{-1})^{|a|} \\pmod{n}$. Same for $b < 0$.
 
-\\textbf{Explanation:} Bezout's identity guarantees integers $a, b$ satisfying $a e_1 + b e_2 = 1$ because $\\gcd(e_1, e_2) = 1$. Multiplying $c_1^a \\cdot c_2^b$ yields $m^{a e_1 + b e_2} = m$. This is why coprime exponents are essential: if $\\gcd(e_1, e_2) = g > 1$, we recover $m^g \\bmod n$, then take the $g$-th root.
+\\textbf{Explanation:} Bezout's identity guarantees integers $a, b$ satisfying $a e_1 + b e_2 = 1$ when $\\gcd(e_1, e_2) = 1$. Multiplying $c_1^a \\cdot c_2^b$ yields $m^{a e_1 + b e_2} = m$. If $\\gcd(e_1, e_2) = g > 1$, it yields only $m^g \\bmod n$. This implementation recovers $m$ in that case only when this value is an exact integer $g$-th power and re-encryption verifies both ciphertexts; otherwise modular roots may be ambiguous or require factoring $n$.
 
 \\textbf{References:} Simmons & Norris, 1977; Boneh, "Twenty Years of Attacks on RSA," 1999`,
   priority: 'high',

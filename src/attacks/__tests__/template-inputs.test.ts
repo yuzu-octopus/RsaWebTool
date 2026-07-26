@@ -5,6 +5,9 @@ import { attack as knownPlaintext } from '../known-plaintext';
 import { attack as lsbOracle } from '../lsb-oracle';
 import { attack as relatedMessage } from '../related-message';
 import { attack as smallPublicExp } from '../small-public-exp';
+import { attack as commonModulus } from '../common-modulus';
+import { attack as hastadBroadcast } from '../hastad-broadcast';
+import { attack as multiPrimeGcd } from '../multi-prime-gcd';
 
 const requiredBlankCases = [
   [biasedLsb, { n: '', e: '', c: '', oracle_runs: '' }, 'BIASED_LSB'],
@@ -55,5 +58,38 @@ describe('batch GCD limits', () => {
     const oversized = '9'.repeat(256 * 1024 + 1);
 
     expect(batchGcd.frontendCheck?.({ n_values: oversized })).toContain('safe limit');
+  });
+});
+
+describe('RSA frontend hardening', () => {
+  test('recovers a small common-modulus message when shared-exponent root is exact', async () => {
+    const result = await commonModulus.frontendCheck?.({ n: '101', e1: '6', e2: '9', c1: '64', c2: '7' });
+
+    expect(result).toContain('m = 2');
+    expect(result).toContain('COMMON_MODULUS=SUCCESS');
+  });
+
+  test('does not return a common-modulus candidate when the shared-exponent result wraps modulo n', async () => {
+    const result = await commonModulus.frontendCheck?.({ n: '101', e1: '6', e2: '9', c1: '71', c2: '88' });
+
+    expect(result).toContain('Non-recovery:');
+    expect(result).toContain('COMMON_MODULUS=FAILED');
+    expect(result).not.toContain('\nResults:\nm =');
+  });
+
+  test('rejects oversized Hastad input before pairwise GCD work', async () => {
+    const ciphertexts = Array.from({ length: 129 }, () => '1, 101').join('\n');
+
+    expect(await hastadBroadcast.frontendCheck?.({ e: '129', ciphertexts })).toContain('safe limit');
+  });
+
+  test('rejects oversized multi-prime input before multiplying moduli', () => {
+    const oversized = Array.from({ length: 129 }, () => '15').join('\n');
+
+    expect(multiPrimeGcd.frontendCheck?.({ n_values: oversized })).toContain('safe limit');
+  });
+
+  test('rejects invalid small public exponent without throwing', () => {
+    return expect(smallPublicExp.frontendCheck?.({ n: '101', e: '0', c: '1', k_bound: '0' })).resolves.toBeNull();
   });
 });

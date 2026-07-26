@@ -37,6 +37,8 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
         out.append(f"c = {c}")
         out.append("")
         out.append("Results:")
+        if e < 2:
+            raise ValueError("e must be >= 2")
         # Modular residue pre-filter for e-th powers
         if e <= 100:
             p = Integer(e + 1)
@@ -89,6 +91,7 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
     const n = BigInt(vals.n);
     const e = BigInt(vals.e || '3');
     const c = BigInt(vals.c);
+    if (e < 2n) return Promise.resolve(null);
     if (e > 1000n) return Promise.resolve(null); // Delegate to Sage for large e
     const kBound = BigInt(vals.k_bound || '100000');
     if (kBound < 0n) return Promise.resolve(null);

@@ -3,6 +3,9 @@ import { rsaNeeds, noopSageTemplate } from './_rsaHelpers';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd } from '../utils/bigint';
 
+const MAX_MODULI = 128;
+const MAX_INPUT_BYTES = 256 * 1024;
+
 export const attack: Attack = {
   // This attack runs entirely in the browser via frontendCheck — no SageMath needed.
   // The sageTemplate is a no-op that returns a clear message if ever triggered.
@@ -52,11 +55,17 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{
     try {
       const raw = (vals.n_values || '').trim();
       if (!raw) return 'ERROR: Missing required input: n_values\nMULTI_PRIME_GCD=FAILED';
+      if (new TextEncoder().encode(raw).length > MAX_INPUT_BYTES) {
+        return `ERROR: Multi-Prime GCD input exceeds safe limit of ${MAX_INPUT_BYTES} bytes\nMULTI_PRIME_GCD=FAILED`;
+      }
 
-      const moduli = raw.split('\n')
+      const values = raw.split('\n')
         .map(s => s.trim())
-        .filter(s => s.length > 0)
-        .map(s => BigInt(s));
+        .filter(s => s.length > 0);
+      if (values.length > MAX_MODULI) {
+        return `ERROR: Multi-Prime GCD input exceeds safe limit of ${MAX_MODULI} moduli\nMULTI_PRIME_GCD=FAILED`;
+      }
+      const moduli = values.map(s => BigInt(s));
 
       if (moduli.length < 2) {
         return null;

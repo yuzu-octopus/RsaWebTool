@@ -4,6 +4,9 @@ import { generateHastadBroadcastTestcase } from '../utils/testcases/core';
 import { modPow, modInverse, iroot, gcd } from '../utils/bigint';
 import { wrapSageTemplate, sanitizePython, validateNumeric} from './guard';
 
+const MAX_RECIPIENTS = 128;
+const MAX_INPUT_BYTES = 256 * 1024;
+
 export const attack: Attack = {
   id: 'hastad-broadcast',
   name: "Hastad's Broadcast Attack",
@@ -29,11 +32,24 @@ print("HASTAD_BROADCAST=FAILED")`;
             out.append("HASTAD_BROADCAST=FAILED")
         else:
             lines_str = """${sanitizePython(vals.ciphertexts)}""".strip()
+            if e > ${MAX_RECIPIENTS}:
+                out.append("ERROR: Hastad Broadcast input exceeds safe limit of ${MAX_RECIPIENTS} recipients")
+                out.append("HASTAD_BROADCAST=FAILED")
+                print("\\n".join(out))
+                return
+            if len(lines_str.encode('utf-8')) > ${MAX_INPUT_BYTES}:
+                out.append("ERROR: Hastad Broadcast input exceeds safe limit of ${MAX_INPUT_BYTES} bytes")
+                out.append("HASTAD_BROADCAST=FAILED")
+                print("\\n".join(out))
+                return
+            raw_lines = [line.strip() for line in lines_str.split('\\n') if line.strip()]
+            if len(raw_lines) > ${MAX_RECIPIENTS}:
+                out.append("ERROR: Hastad Broadcast input exceeds safe limit of ${MAX_RECIPIENTS} recipients")
+                out.append("HASTAD_BROADCAST=FAILED")
+                print("\\n".join(out))
+                return
             pairs = []
-            for line in lines_str.split('\\n'):
-                line = line.strip()
-                if not line:
-                    continue
+            for line in raw_lines:
                 parts = line.split(',')
                 if len(parts) < 2:
                     continue
@@ -102,7 +118,18 @@ print("HASTAD_BROADCAST=FAILED")`;
     if (!vals.e || !vals.ciphertexts) return Promise.resolve(null);
     try {
       const e = BigInt(vals.e);
-      const lines = vals.ciphertexts.split('\n').filter(l => l.trim());
+      const ciphertexts = vals.ciphertexts.trim();
+      if (e < 2n) return Promise.resolve(null);
+      if (new TextEncoder().encode(ciphertexts).length > MAX_INPUT_BYTES) {
+        return Promise.resolve(`ERROR: Hastad Broadcast input exceeds safe limit of ${MAX_INPUT_BYTES} bytes\nHASTAD_BROADCAST=FAILED`);
+      }
+      if (e > BigInt(MAX_RECIPIENTS)) {
+        return Promise.resolve(`ERROR: Hastad Broadcast input exceeds safe limit of ${MAX_RECIPIENTS} recipients\nHASTAD_BROADCAST=FAILED`);
+      }
+      const lines = ciphertexts.split('\n').filter(l => l.trim());
+      if (lines.length > MAX_RECIPIENTS) {
+        return Promise.resolve(`ERROR: Hastad Broadcast input exceeds safe limit of ${MAX_RECIPIENTS} recipients\nHASTAD_BROADCAST=FAILED`);
+      }
       if (lines.length < Number(e)) return Promise.resolve(null);
       const pairs = lines.slice(0, Number(e)).map(l => {
         const [c, n] = l.split(',').map(x => BigInt(x.trim()));
