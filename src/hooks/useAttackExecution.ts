@@ -41,6 +41,10 @@ type RunAttackFn = (
 ) => Promise<string | null>;
 type CancelRunFn = () => void;
 
+export function shouldContinueRun(runId: number, currentRunId: number, signal: AbortSignal): boolean {
+  return runId === currentRunId && !signal.aborted;
+}
+
 export function useAttackExecution(
   execute: ExecuteFn,
   runAttack: RunAttackFn,
@@ -56,6 +60,7 @@ export function useAttackExecution(
   const progressDetail = progressState.detail;
   const abortControllerRef = useRef<AbortController | null>(null);
   const attackIdRef = useRef<string | null>(null);
+  const runIdRef = useRef(0);
   const [testcaseMsg, setTestcaseMsg] = useState<string | null>(null);
   const mountedRef = useRef(true);
   const timeoutIdsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -84,6 +89,7 @@ export function useAttackExecution(
   }, [viewMode]);
 
   const handleStop = () => {
+    runIdRef.current++;
     abortControllerRef.current?.abort();
     cancelCurrentRun();
     dispatchProgress({ type: 'DONE' });
@@ -108,7 +114,9 @@ export function useAttackExecution(
 
   const handleRun = async (attack: Attack, inputValues: Record<string, string>) => {
     setTestcaseMsg(null);
+    const currentRunId = ++runIdRef.current;
     abortControllerRef.current?.abort();
+    cancelCurrentRun();
     const controller = new AbortController();
     abortControllerRef.current = controller;
     dispatchProgress({ type: 'START' });
@@ -157,8 +165,8 @@ export function useAttackExecution(
           }
         };
         const preResult = await runAttack(attack.id, vals, handleProgress);
+        if (!shouldContinueRun(currentRunId, runIdRef.current, controller.signal)) return;
         if (preResult !== null) {
-          if (attackIdRef.current !== currentAttackId) return;
           let displayPreResult = preResult;
           displayPreResult += '\nMETHOD=TYPESCRIPT';
           const decryptedPre = autoDecrypt(attack, vals, preResult);
@@ -177,6 +185,7 @@ export function useAttackExecution(
       }
 
       const code = attack.sageTemplate?.(vals);
+      if (!shouldContinueRun(currentRunId, runIdRef.current, controller.signal)) return;
       if (!code) {
         if (!mountedRef.current) return;
         if (attack.frontendCheck) {
@@ -186,9 +195,9 @@ export function useAttackExecution(
         }
         return;
       }
-      if (attackIdRef.current !== currentAttackId) return;
+      if (!shouldContinueRun(currentRunId, runIdRef.current, controller.signal)) return;
       const result = await execute(code, DEFAULT_SAGE_TIMEOUT, controller.signal);
-      if (attackIdRef.current !== currentAttackId) return;
+      if (!shouldContinueRun(currentRunId, runIdRef.current, controller.signal)) return;
       if (result.success) {
         let displayStdout = result.stdout;
         displayStdout += '\nMETHOD=SAGEMATHCELL';
@@ -211,7 +220,7 @@ export function useAttackExecution(
         addToHistory(attack.id, attack.name, result.error || 'SageCell execution failed with no specific error. Check that all required inputs are filled.', false);
       }
     } catch (err: unknown) {
-      if (attackIdRef.current !== currentAttackId) { return; }
+      if (!shouldContinueRun(currentRunId, runIdRef.current, controller.signal)) return;
       const message = err instanceof Error ? err.message : 'Execution failed';
       if (!mountedRef.current) return;
       if (ownershipRef.current !== 'input') return;
@@ -219,12 +228,15 @@ export function useAttackExecution(
       if (!mountedRef.current) return;
       addToHistory(attack.id, attack.name, message, false);
     } finally {
-      // Same cleanup as manual Stop — single code path for all exits
-      handleStop();
-      if (attackIdRef.current === currentAttackId && ownershipRef.current === 'input') {
+      if (currentRunId === runIdRef.current) {
+        dispatchProgress({ type: 'DONE' });
+        setEta(null);
+        timer.stop();
         abortControllerRef.current = null;
-        ownershipRef.current = null;
-        setOutputSource(null);
+        if (ownershipRef.current === 'input') {
+          ownershipRef.current = null;
+          setOutputSource(null);
+        }
       }
     }
   };

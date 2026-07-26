@@ -69,6 +69,17 @@ function buildErrorInsights(
   return errParts.length > 0 ? errParts.join(', ') : null;
 }
 
+export function deriveSageRemaining(
+  attacksToRun: Attack[],
+  preCheckResults: ({ result?: string; error?: string; isSuccess?: boolean } | null | undefined)[],
+): { attack: Attack; originalIndex: number }[] {
+  return attacksToRun.flatMap((attack, originalIndex) =>
+    preCheckResults[originalIndex] === undefined
+      ? [{ attack, originalIndex }]
+      : [],
+  );
+}
+
 // --- Hook ---
 
 export function useMagicExecution(
@@ -360,15 +371,7 @@ export function useMagicExecution(
       return;
     }
 
-    // Build remaining list (attacks that need SageCell)
-    // Only include attacks whose frontendCheck was cancelled (still 'running')
-    // — not those that completed with a non-success result.
-    const remaining: { attack: Attack; originalIndex: number }[] = [];
-    for (let i = 0; i < attacksToRun.length; i++) {
-      if (!preCheckResults[i] && jobs[i]?.status === 'running') {
-        remaining.push({ attack: attacksToRun[i], originalIndex: i });
-      }
-    }
+    const remaining = deriveSageRemaining(attacksToRun, preCheckResults);
 
     // If all attacks resolved by frontendCheck (no success), short-circuit
     if (remaining.length === 0) {

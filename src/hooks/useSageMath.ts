@@ -29,6 +29,22 @@ declare global {
 // Default timeout: 10s for SageCell script load + 110s for execution
 export const DEFAULT_SAGE_TIMEOUT = env.sagecellTimeout * 1000;
 
+export function mergeAbortSignals(signals: AbortSignal[]): AbortSignal | undefined {
+  if (signals.length === 0) return undefined;
+  if (signals.length === 1) return signals[0];
+  if (typeof AbortSignal.any === 'function') return AbortSignal.any(signals);
+
+  const controller = new AbortController();
+  for (const signal of signals) {
+    if (signal.aborted) {
+      controller.abort();
+      break;
+    }
+    signal.addEventListener('abort', () => controller.abort(), { once: true });
+  }
+  return controller.signal;
+}
+
 function createOffscreenContainer(): HTMLDivElement {
   const id = `sagecell-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
   const el = document.createElement('div');
@@ -302,7 +318,7 @@ export function useSageMath() {
     if (lifecycleSignal) signals.push(lifecycleSignal);
     if (signal) signals.push(signal);
 
-    const combinedSignal = AbortSignal.any(signals);
+    const combinedSignal = mergeAbortSignals(signals);
 
     return executor.execute(code, timeoutMs, combinedSignal);
   };
@@ -338,7 +354,7 @@ export function useSageMathParallel() {
     // Merge lifecycle signal with controller signal so that
     // both component unmount and manual/early-stop abort trigger cancellation.
     const lifecycleSignal = lifecycleRef.current?.signal;
-    const combinedSignal = AbortSignal.any(lifecycleSignal ? [controller.signal, lifecycleSignal] : [controller.signal]);
+    const combinedSignal = mergeAbortSignals(lifecycleSignal ? [controller.signal, lifecycleSignal] : [controller.signal]);
 
     return new Promise((resolve) => {
       const { execute } = createSageMathExecutor();

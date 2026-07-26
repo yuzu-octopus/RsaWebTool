@@ -85,7 +85,9 @@ export function useWorkerPool(poolSize: number = env.workerPoolSize) {
           pt.reject(new Error('Web Worker crashed'));
         }
       }
+      worker.terminate();
       currentTaskIdRef.current[i] = null;
+      workersRef.current[i] = createWorker(i);
       freeRef.current.push(i);
       busyRef.current[i] = false;
       processQueue();
