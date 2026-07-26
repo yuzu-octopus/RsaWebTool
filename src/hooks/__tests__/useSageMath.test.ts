@@ -3,7 +3,7 @@ import { mergeAbortSignals } from '../useSageMath';
 
 describe('mergeAbortSignals', () => {
   test('uses a merged signal when AbortSignal.any is unavailable', () => {
-    const original = AbortSignal.any;
+    const original = Object.getOwnPropertyDescriptor(AbortSignal, 'any');
     Object.defineProperty(AbortSignal, 'any', { configurable: true, value: undefined });
 
     try {
@@ -15,12 +15,13 @@ describe('mergeAbortSignals', () => {
       second.abort();
       expect(merged?.aborted).toBe(true);
     } finally {
-      Object.defineProperty(AbortSignal, 'any', { configurable: true, value: original });
+      if (original) Object.defineProperty(AbortSignal, 'any', original);
+      else Reflect.deleteProperty(AbortSignal, 'any');
     }
   });
 
   test('removes fallback listeners when cleanup runs without an abort', () => {
-    const original = AbortSignal.any;
+    const original = Object.getOwnPropertyDescriptor(AbortSignal, 'any');
     Object.defineProperty(AbortSignal, 'any', { configurable: true, value: undefined });
 
     try {
@@ -42,12 +43,13 @@ describe('mergeAbortSignals', () => {
       expect(removed).toBe(2);
       expect(merged?.aborted).toBe(false);
     } finally {
-      Object.defineProperty(AbortSignal, 'any', { configurable: true, value: original });
+      if (original) Object.defineProperty(AbortSignal, 'any', original);
+      else Reflect.deleteProperty(AbortSignal, 'any');
     }
   });
 
   test('removes every fallback listener for duplicate signals', () => {
-    const original = AbortSignal.any;
+    const original = Object.getOwnPropertyDescriptor(AbortSignal, 'any');
     Object.defineProperty(AbortSignal, 'any', { configurable: true, value: undefined });
 
     try {
@@ -64,7 +66,8 @@ describe('mergeAbortSignals', () => {
 
       expect(removed).toBe(2);
     } finally {
-      Object.defineProperty(AbortSignal, 'any', { configurable: true, value: original });
+      if (original) Object.defineProperty(AbortSignal, 'any', original);
+      else Reflect.deleteProperty(AbortSignal, 'any');
     }
   });
 });
