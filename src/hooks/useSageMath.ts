@@ -37,10 +37,10 @@ export function mergeAbortSignals(signals: AbortSignal[]): MergedAbortSignal | u
   if (typeof AbortSignal.any === 'function') return AbortSignal.any(signals);
 
   const controller = new AbortController();
-  const listeners = new Map<AbortSignal, () => void>();
+  const listeners: [AbortSignal, () => void][] = [];
   const cleanup = () => {
     for (const [signal, listener] of listeners) signal.removeEventListener('abort', listener);
-    listeners.clear();
+    listeners.length = 0;
   };
   for (const signal of signals) {
     if (signal.aborted) {
@@ -49,7 +49,7 @@ export function mergeAbortSignals(signals: AbortSignal[]): MergedAbortSignal | u
       break;
     }
     const listener = () => controller.abort();
-    listeners.set(signal, listener);
+    listeners.push([signal, listener]);
     signal.addEventListener('abort', listener, { once: true });
   }
   return Object.assign(controller.signal, { cleanup });

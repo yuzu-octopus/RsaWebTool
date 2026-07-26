@@ -45,5 +45,27 @@ describe('mergeAbortSignals', () => {
       Object.defineProperty(AbortSignal, 'any', { configurable: true, value: original });
     }
   });
+
+  test('removes every fallback listener for duplicate signals', () => {
+    const original = AbortSignal.any;
+    Object.defineProperty(AbortSignal, 'any', { configurable: true, value: undefined });
+
+    try {
+      const controller = new AbortController();
+      let removed = 0;
+      const remove = controller.signal.removeEventListener.bind(controller.signal);
+      controller.signal.removeEventListener = ((...args: Parameters<AbortSignal['removeEventListener']>) => {
+        if (args[0] === 'abort') removed++;
+        remove(...args);
+      }) as typeof controller.signal.removeEventListener;
+
+      const merged = mergeAbortSignals([controller.signal, controller.signal]);
+      merged!.cleanup!();
+
+      expect(removed).toBe(2);
+    } finally {
+      Object.defineProperty(AbortSignal, 'any', { configurable: true, value: original });
+    }
+  });
 });
 
