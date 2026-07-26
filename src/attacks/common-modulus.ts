@@ -20,10 +20,10 @@ export const attack: Attack = {
 
 How to use:
 1. Provide n, e1, e2, c1, and c2
-2. Compute Bezout coefficients: a*e1 + b*e2 = 1 (since gcd(e1,e2) = 1)
+2. With coprime exponents, compute Bezout coefficients: a*e1 + b*e2 = 1
 3. Recover m = c1^a * c2^b mod n
 
-Tip: Requires gcd(e1, e2) = 1. Common CTF scenario where RSA is used with multiple public exponents. Very fast once you have the two ciphertexts.`,
+Tip: gcd(e1, e2) = 1 recovers m directly. For gcd(e1, e2) = g > 1, recovery is possible only when the recovered residue is an exact integer g-th power and re-encryption verifies both ciphertexts.`,
   sageTemplate: (vals: Record<string, string>) => {
     if (!vals.n || !vals.e1 || !vals.e2 || !vals.c1 || !vals.c2) {
       return `print("ERROR: Missing required inputs (n, e1, e2, c1, c2)")

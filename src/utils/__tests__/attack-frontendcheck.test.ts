@@ -29,6 +29,6 @@ describe('Attack frontendCheck', () => {
           expect(r).toMatch(/=(SUCCESS|FAILED|RESULT|NOT_APPLICABLE)/);
         }
       });
-    }, 30_000); // some frontendChecks (small-crt-exp) are inherently slow
+    }, 30_000); // frontend checks must complete within the CI test limit
   }
 });

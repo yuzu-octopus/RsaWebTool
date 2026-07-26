@@ -168,13 +168,8 @@ export const attack: Attack = {
 
 export const generateTestcase = (): Record<string, string> => {
   const e = 65537n;
-  // Backward construction: pick a small d_p, then derive p from the CRT equation
-  // d_p * e - 1 = k * (p-1) → p = (d_p * e - 1) / k + 1
-  // Using dp in 40M-50M range produces p ≈ (dp*e+1)/2 ≈ 1.6T (~41 bits, k=2).
-  // Previous dp range [3, 10000] produced only p ≈ 16-30 bits. q is a full
-  // 256-bit prime, giving n ≈ 297 bits — still small enough for the attack
-  // to find dp (searches up to bound=50M) but much larger than before.
-  const startDp = 40000000n;
+  // Keep the generated browser testcase small enough for CI and the default UI bound.
+  const startDp = 100000n;
   for (let dp = startDp; dp < startDp + 1000000n; dp++) {
     const num = dp * e - 1n;
     for (let k = 1n; k <= e; k++) {
@@ -182,7 +177,7 @@ export const generateTestcase = (): Record<string, string> => {
       const p = num / k + 1n;
       if (p > 2n && isPrimeMR(p)) {
         const q = randomPrime(TESTCASE_BITS.q);
-        return { n: (p * q).toString(), e: e.toString(), bound: '50000000' };
+        return { n: (p * q).toString(), e: e.toString(), bound: dp.toString() };
       }
     }
   }
