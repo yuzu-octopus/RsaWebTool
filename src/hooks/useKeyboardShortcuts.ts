@@ -2,20 +2,28 @@ import { useEffect } from 'react';
 import { useAppContext } from './useAppContext';
 
 export function useKeyboardShortcuts() {
-  const { viewMode, setCommandPaletteOpen } = useAppContext();
+  const { viewMode, commandPaletteOpen, setCommandPaletteOpen } = useAppContext();
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      if (e.isComposing) return;
+
       const mod = e.metaKey || e.ctrlKey;
-
-      if (e.key === 'Tab') return;
-
       if (!mod) return;
 
+      if (e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setCommandPaletteOpen(open => !open);
+        return;
+      }
+
+      const target = e.target;
+      const isEditable = target instanceof Element && (
+        target.matches('input, textarea, select, [contenteditable]') ||
+        Boolean(target.closest('[contenteditable]'))
+      );
+      if (commandPaletteOpen || isEditable) return;
+
       switch (e.key.toLowerCase()) {
-        case 'k':
-          e.preventDefault();
-          setCommandPaletteOpen(open => !open);
-          break;
         case '1':
           e.preventDefault();
           if (viewMode === 'calculator') {
@@ -69,5 +77,5 @@ export function useKeyboardShortcuts() {
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [viewMode, setCommandPaletteOpen]);
+  }, [viewMode, commandPaletteOpen, setCommandPaletteOpen]);
 }

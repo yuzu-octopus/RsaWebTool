@@ -1,5 +1,5 @@
-import { useEffect, lazy, Suspense } from 'react';
-import { ThemeProvider, CssBaseline, Box, Snackbar } from '@mui/material';
+import { useEffect, lazy, Suspense, useState } from 'react';
+import { ThemeProvider, CssBaseline, Box, Snackbar, Button, IconButton } from '@mui/material';
 import { draculaTheme, draculaColors } from './theme/dracula';
 import { Sidebar } from './components/Sidebar';
 import { AppProvider } from './context/AppContext';
@@ -18,6 +18,7 @@ import { setFactorDBProxy } from './utils/factordb';
 import env from './config/env';
 import { useAppContext } from './hooks/useAppContext';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { Menu, Search } from '@mui/icons-material';
 
 const severityBorder: Record<string, string> = {
   success: draculaColors.green,
@@ -26,7 +27,8 @@ const severityBorder: Record<string, string> = {
 };
 
 function AppContent() {
-  const { notification, showNotification } = useAppContext();
+  const { notification, showNotification, setCommandPaletteOpen } = useAppContext();
+  const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
   const borderColor = notification?.severity ? severityBorder[notification.severity] : draculaColors.currentLine;
 
   useEffect(() => {
@@ -39,10 +41,25 @@ function AppContent() {
 
   return (
     <>
+      <Box
+        component="a"
+        href="#main-workspace"
+        sx={{ position: 'fixed', top: -48, left: 8, zIndex: theme => theme.zIndex.modal + 1, px: 2, py: 1, color: draculaColors.background, backgroundColor: draculaColors.cyan, fontFamily: MONO_FAMILY, '&:focus': { top: 8 } }}
+      >
+        Skip navigation
+      </Box>
       <CommandPalette />
-      <Box sx={{ display: 'flex', height: '100vh' }}>
-        <Sidebar />
-        <Box sx={flexPanelSx}>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, height: '100vh' }}>
+        <Box component="header" sx={{ display: { xs: 'flex', sm: 'none' }, height: 56, minHeight: 56, alignItems: 'center', justifyContent: 'space-between', px: 1, backgroundColor: draculaColors.currentLine, borderBottom: `1px solid ${draculaColors.comment}` }}>
+          <IconButton aria-label="Open navigation" onClick={() => setMobileNavigationOpen(true)} sx={{ color: draculaColors.cyan }}>
+            <Menu />
+          </IconButton>
+          <Button startIcon={<Search />} onClick={() => setCommandPaletteOpen(true)} sx={{ color: draculaColors.foreground, fontFamily: MONO_FAMILY }}>
+            Search commands
+          </Button>
+        </Box>
+        <Sidebar mobileOpen={mobileNavigationOpen} onMobileClose={() => setMobileNavigationOpen(false)} />
+        <Box component="main" id="main-workspace" tabIndex={-1} sx={{ ...flexPanelSx, outline: 'none' }}>
           <ErrorBoundary>
             <Box sx={flexPanelSx}>
               <InputPanel />

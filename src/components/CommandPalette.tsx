@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, startTransition, type KeyboardEvent } from 'react';
 import {
   Dialog, DialogContent, TextField, List, ListItemButton, ListItemText,
-  Typography, Box, Chip,
+  ListSubheader, Typography, Box, Chip,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import MenuBook from '@mui/icons-material/MenuBook';
@@ -63,6 +63,7 @@ interface CommandPaletteItemProps {
   secondary?: string;
   chips: ChipSpec[];
   isSelected: boolean;
+  optionId: string;
   onClick: () => void;
   onMouseEnter: () => void;
 }
@@ -75,10 +76,13 @@ interface CommandPaletteItemProps {
  * a new entry type.
  */
 function CommandPaletteItem({
-  Icon, primary, secondary, chips, isSelected, onClick, onMouseEnter,
+  Icon, primary, secondary, chips, isSelected, optionId, onClick, onMouseEnter,
 }: CommandPaletteItemProps) {
   return (
     <ListItemButton
+      id={optionId}
+      role="option"
+      aria-selected={isSelected}
       selected={isSelected}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
@@ -218,7 +222,15 @@ export function CommandPalette() {
       return item.label.toLowerCase().includes(q);
     });
 
-    for (const item of filteredSidebarItems) {
+    const orderedSidebarItems = q
+      ? filteredSidebarItems
+      : [
+        ...filteredSidebarItems.filter(item => item.type === 'module'),
+        ...filteredSidebarItems.filter(item => item.type === 'calculator-tab'),
+        ...filteredSidebarItems.filter(item => item.type === 'attack'),
+      ];
+
+    for (const item of orderedSidebarItems) {
       if (item.type === 'attack') {
         const attack = attacksMap.get(item.id);
         if (attack) items.push({ type: 'attack', attack, index: idx++ });
@@ -234,6 +246,11 @@ export function CommandPalette() {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        close();
+        return;
+      }
       if (allItems.length === 0) return;
 
       switch (e.key) {
@@ -245,23 +262,89 @@ export function CommandPalette() {
           e.preventDefault();
           setSelectedIndex(prev => (prev - 1 + allItems.length) % allItems.length);
           break;
-        case 'Enter':
+        case 'Enter': {
           e.preventDefault();
-          if (selectedIndex < allItems.length) {
-            const item = allItems[selectedIndex];
-            if (item.type === 'view') selectView(item.module.mode);
-            else if (item.type === 'calculator-tab') selectCalculatorTab(item.calculatorMode);
-            else selectAttack(item.attack);
-          }
+          const item = allItems[selectedIndex];
+          if (item.type === 'view') selectView(item.module.mode);
+          else if (item.type === 'calculator-tab') selectCalculatorTab(item.calculatorMode);
+          else selectAttack(item.attack);
           break;
-        case 'Escape':
-          e.preventDefault();
-          close();
-          break;
+        }
       }
     },
     [allItems, selectedIndex, selectView, selectAttack, selectCalculatorTab, close],
   );
+
+  const itemGroups = useMemo(() => {
+    if (query.trim()) return [{ label: 'Results', items: allItems }];
+    return [
+      { label: 'Modules', items: allItems.filter(item => item.type === 'view') },
+      { label: 'Calculators', items: allItems.filter(item => item.type === 'calculator-tab') },
+      { label: 'Attacks', items: allItems.filter(item => item.type === 'attack') },
+    ].filter(group => group.items.length > 0);
+  }, [allItems, query]);
+
+  const resultStatus = allItems.length === 0
+    ? 'No results.'
+    : `${allItems.length} result${allItems.length === 1 ? '' : 's'} available.`;
+
+  const renderItem = (item: (typeof allItems)[number]) => {
+    const isSelected = item.index === selectedIndex;
+    const optionId = `command-palette-option-${item.index}`;
+    if (item.type === 'view') {
+      const Icon = MODULE_ICONS[item.module.mode] ?? MenuBook;
+      return (
+        <CommandPaletteItem
+          key={`view-${item.module.id}`}
+          Icon={Icon}
+          primary={item.module.label}
+          chips={[{ label: 'Module', color: draculaColors.comment, variant: 'outlined' }]}
+          isSelected={isSelected}
+          optionId={optionId}
+          onClick={() => selectView(item.module.mode)}
+          onMouseEnter={() => setSelectedIndex(item.index)}
+        />
+      );
+    }
+    if (item.type === 'calculator-tab') {
+      const Icon = CALCULATOR_ICONS[item.calculatorMode];
+      return (
+        <CommandPaletteItem
+          key={`calc-${item.calculatorMode}`}
+          Icon={Icon}
+          primary={item.label}
+          chips={[{ label: 'Calculator', color: draculaColors.cyan, variant: 'outlined' }]}
+          isSelected={isSelected}
+          optionId={optionId}
+          onClick={() => selectCalculatorTab(item.calculatorMode)}
+          onMouseEnter={() => setSelectedIndex(item.index)}
+        />
+      );
+    }
+    const attack = item.attack;
+    const categoryColor = CATEGORY_COLORS[attack.category];
+    const hasFrontendCheck = !!attack.frontendCheck;
+    return (
+      <CommandPaletteItem
+        key={attack.id}
+        Icon={HourglassEmpty}
+        primary={attack.name}
+        secondary={attack.id}
+        chips={[
+          { label: attack.category, color: categoryColor, variant: 'filled' },
+          {
+            label: hasFrontendCheck ? 'Local' : 'SageMath',
+            color: hasFrontendCheck ? draculaColors.green : draculaColors.orange,
+            variant: 'outlined',
+          },
+        ]}
+        isSelected={isSelected}
+        optionId={optionId}
+        onClick={() => selectAttack(attack)}
+        onMouseEnter={() => setSelectedIndex(item.index)}
+      />
+    );
+  };
 
   return (
     <Dialog
@@ -303,6 +386,16 @@ export function CommandPalette() {
           onKeyDown={handleKeyDown}
           placeholder="Search attacks, calculators, and views..."
           slotProps={{
+            htmlInput: {
+              role: 'combobox',
+              'aria-expanded': commandPaletteOpen,
+              'aria-label': 'Search commands',
+              'aria-autocomplete': 'list',
+              'aria-controls': 'command-palette-results',
+              'aria-activedescendant': allItems.length > 0
+                ? `command-palette-option-${selectedIndex}`
+                : undefined,
+            },
             input: {
               startAdornment: (
                 <SearchIcon sx={{ color: draculaColors.comment, mr: 1, fontSize: ICON_SIZES.lg }} />
@@ -321,64 +414,27 @@ export function CommandPalette() {
             },
           }}
         />
+        <Box role="status" aria-live="polite" sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>
+          {resultStatus}
+        </Box>
       </Box>
       <DialogContent sx={{ p: 0, overflow: 'auto', bgcolor: draculaColors.background, pb: '20vh' }}>
-        <List dense>
-          {allItems.map((item) => {
-            const isSelected = item.index === selectedIndex;
-            if (item.type === 'view') {
-              const Icon = MODULE_ICONS[item.module.mode] ?? MenuBook;
-              return (
-                <CommandPaletteItem
-                  key={`view-${item.module.id}`}
-                  Icon={Icon}
-                  primary={item.module.label}
-                  chips={[{ label: 'Module', color: draculaColors.comment, variant: 'outlined' }]}
-                  isSelected={isSelected}
-                  onClick={() => selectView(item.module.mode)}
-                  onMouseEnter={() => setSelectedIndex(item.index)}
-                />
-              );
-            }
-            if (item.type === 'calculator-tab') {
-              const Icon = CALCULATOR_ICONS[item.calculatorMode];
-              return (
-                <CommandPaletteItem
-                  key={`calc-${item.calculatorMode}`}
-                  Icon={Icon}
-                  primary={item.label}
-                  chips={[{ label: 'Calculator', color: draculaColors.cyan, variant: 'outlined' }]}
-                  isSelected={isSelected}
-                  onClick={() => selectCalculatorTab(item.calculatorMode)}
-                  onMouseEnter={() => setSelectedIndex(item.index)}
-                />
-              );
-            }
-            const attack = item.attack;
-            const categoryColor = CATEGORY_COLORS[attack.category];
-            const hasFrontendCheck = !!attack.frontendCheck;
-            return (
-              <CommandPaletteItem
-                key={attack.id}
-                Icon={HourglassEmpty}
-                primary={attack.name}
-                secondary={attack.id}
-                chips={[
-                  { label: attack.category, color: categoryColor, variant: 'filled' },
-                  {
-                    label: hasFrontendCheck ? 'Local' : 'SageMath',
-                    color: hasFrontendCheck ? draculaColors.green : draculaColors.orange,
-                    variant: 'outlined',
-                  },
-                ]}
-                isSelected={isSelected}
-                onClick={() => selectAttack(attack)}
-                onMouseEnter={() => setSelectedIndex(item.index)}
-              />
-            );
-          })}
-          {query.trim() && allItems.length === 0 && (
-            <Box sx={{ p: 3, textAlign: 'center' }}>
+        <List dense id="command-palette-results" role="listbox" aria-label="Command results">
+          {itemGroups.map(group => (
+            <Box component="li" key={group.label} role="group" aria-label={group.label} sx={{ listStyle: 'none' }}>
+              {!query.trim() && (
+                <ListSubheader
+                  component="div"
+                  sx={{ bgcolor: draculaColors.background, color: draculaColors.comment, fontFamily: MONO_FAMILY, fontSize: '0.7rem', lineHeight: '28px' }}
+                >
+                  {group.label}
+                </ListSubheader>
+              )}
+              {group.items.map(renderItem)}
+            </Box>
+          ))}
+          {allItems.length === 0 && (
+            <Box component="li" sx={{ listStyle: 'none', p: 3, textAlign: 'center' }}>
               <Typography
                 sx={{
                   color: draculaColors.comment,
@@ -386,7 +442,7 @@ export function CommandPalette() {
                   fontSize: '0.8rem',
                 }}
               >
-                No matches for &quot;{query}&quot;
+                {query.trim() ? `No matches for "${query}"` : 'No commands available'}
               </Typography>
             </Box>
           )}

@@ -9,11 +9,10 @@ import {
   Box,
   Divider,
   Link,
-  IconButton,
+  Button,
   useMediaQuery,
 } from '@mui/material';
-
-import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, VpnKey, Lock, Hub, Tag, Security, Menu } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, VpnKey, Lock, Hub, Tag, Security, Search } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { LogoIcon } from './_shared/LogoIcon';
 import { MONO_FAMILY, ICON_SIZES } from '../styles/shared';
@@ -59,11 +58,18 @@ const sidebarInactiveSx = {
   '&:focus-visible': { outline: `2px solid ${draculaColors.cyan}`, outlineOffset: -2 },
 } as const;
 
-export function Sidebar() {
-  const { selectedAttack, setSelectedAttack, setViewMode, viewMode, calculatorMode, setCalculatorMode } = useAppContext();
+interface SidebarProps {
+  mobileOpen: boolean;
+  onMobileClose: () => void;
+}
+
+export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
+  const { selectedAttack, setSelectedAttack, setViewMode, viewMode, calculatorMode, setCalculatorMode, setCommandPaletteOpen } = useAppContext();
   const isMobile = useMediaQuery('(max-width:599.95px)');
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set([...CATEGORIES, 'Calculators']));
+  const [expandedCats, setExpandedCats] = useState<Set<string>>(() => new Set([CATEGORIES[0], 'Calculators']));
+  const activeExpandedCats = selectedAttack
+    ? new Set(expandedCats).add(selectedAttack.category)
+    : expandedCats;
 
   const toggleCat = (cat: string) => {
     setExpandedCats(prev => {
@@ -77,10 +83,15 @@ export function Sidebar() {
     });
   };
 
+  const focusWorkspace = () => {
+    requestAnimationFrame(() => document.getElementById('main-workspace')?.focus());
+  };
+
   const handleAttackClick = (attack: Attack) => {
-    if (isMobile) setMobileOpen(false);
+    if (isMobile) onMobileClose();
     setSelectedAttack(attack);
     setViewMode('attack');
+    focusWorkspace();
   };
 
   const isAttackActive = (id: string) => viewMode === 'attack' && selectedAttack?.id === id;
@@ -88,17 +99,10 @@ export function Sidebar() {
 
   return (
     <>
-      <IconButton
-        aria-label="Open navigation"
-        onClick={() => setMobileOpen(true)}
-        sx={{ display: { xs: 'flex', sm: 'none' }, position: 'fixed', top: 8, left: 8, zIndex: theme => theme.zIndex.drawer + 1, color: draculaColors.cyan }}
-      >
-        <Menu />
-      </IconButton>
       <Drawer
         variant={isMobile ? 'temporary' : 'permanent'}
         open={isMobile ? mobileOpen : true}
-        onClose={() => setMobileOpen(false)}
+        onClose={onMobileClose}
         ModalProps={{ keepMounted: true }}
         sx={{
           width: drawerWidth,
@@ -129,6 +133,17 @@ export function Sidebar() {
         </Typography>
       </Box>
 
+      <Box sx={{ px: 2, py: 1.5 }}>
+        <Button
+          fullWidth
+          startIcon={<Search />}
+          onClick={() => { if (isMobile) onMobileClose(); setCommandPaletteOpen(true); }}
+          sx={{ color: draculaColors.foreground, borderColor: draculaColors.comment, fontFamily: MONO_FAMILY, justifyContent: 'space-between' }}
+          variant="outlined"
+        >
+          Search commands{!isMobile && '  ⌘K'}
+        </Button>
+      </Box>
       <Divider sx={{ borderColor: draculaColors.comment }} />
 
       <List sx={{ flex: 1, overflow: 'auto' }}>
@@ -137,15 +152,15 @@ export function Sidebar() {
             <ListItemButton
               onClick={() => toggleCat(cat)}
               sx={{ px: 2, minHeight: 40, '&:hover': { backgroundColor: draculaColors.background } }}
-              aria-expanded={expandedCats.has(cat)}
+              aria-expanded={activeExpandedCats.has(cat)}
               aria-controls={`sidebar-cat-${cat}`}
             >
               <Typography sx={{ color: draculaColors.cyan, fontWeight: 600, fontSize: '0.85rem', flex: 1, fontFamily: MONO_FAMILY }}>
                 {cat}
               </Typography>
-              {expandedCats.has(cat) ? <ExpandLess sx={{ color: draculaColors.comment, fontSize: ICON_SIZES.md }} /> : <ExpandMore sx={{ color: draculaColors.comment, fontSize: ICON_SIZES.md }} />}
+              {activeExpandedCats.has(cat) ? <ExpandLess sx={{ color: draculaColors.comment, fontSize: ICON_SIZES.md }} /> : <ExpandMore sx={{ color: draculaColors.comment, fontSize: ICON_SIZES.md }} />}
             </ListItemButton>
-            <Collapse in={expandedCats.has(cat)} unmountOnExit id={`sidebar-cat-${cat}`}>
+            <Collapse in={activeExpandedCats.has(cat)} unmountOnExit id={`sidebar-cat-${cat}`}>
               <List component="div" disablePadding>
                 {(attacksByCategory.get(cat) || []).map(attack => (
                   <ListItemButton
@@ -153,6 +168,7 @@ export function Sidebar() {
                     id={`sidebar-attack-${attack.id}`}
                     onClick={() => handleAttackClick(attack)}
                     data-testid={`attack-${attack.id}`}
+                    aria-current={isAttackActive(attack.id) ? 'page' : undefined}
                     sx={{
                       pl: 4,
                       minHeight: 36,
@@ -188,24 +204,25 @@ export function Sidebar() {
                 const calcColors: Record<string, string> = { rsa: draculaColors.cyan, aes: draculaColors.purple, ecc: draculaColors.green, hash: draculaColors.orange, dh: draculaColors.pink };
                 const calcColor = calcColors[item.calculatorMode] || draculaColors.foreground;
                 return (
-                <ListItemButton
-                  key={item.id}
-                  id={`sidebar-calc-${item.calculatorMode}`}
-                  onClick={() => { setViewMode('calculator'); setCalculatorMode(item.calculatorMode); if (isMobile) setMobileOpen(false); }}
-                  sx={{
-                    pl: 4,
-                    minHeight: 36,
-                    ...(viewMode === 'calculator' && calculatorMode === item.calculatorMode ? sidebarActiveSx : sidebarInactiveSx),
-                  }}
-                >
-                  <Box sx={{ width: 28, minWidth: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {calcIcon(item.calculatorMode)}
-                  </Box>
-                  <ListItemText
-                    primary={item.label}
-                    slotProps={{ primary: { sx: { color: calcColor, fontSize: '0.85rem', fontFamily: MONO_FAMILY } } }}
-                  />
-                </ListItemButton>
+                  <ListItemButton
+                    key={item.id}
+                    id={`sidebar-calc-${item.calculatorMode}`}
+                    onClick={() => { setViewMode('calculator'); setCalculatorMode(item.calculatorMode); if (isMobile) onMobileClose(); focusWorkspace(); }}
+                    aria-current={viewMode === 'calculator' && calculatorMode === item.calculatorMode ? 'page' : undefined}
+                    sx={{
+                      pl: 4,
+                      minHeight: 36,
+                      ...(viewMode === 'calculator' && calculatorMode === item.calculatorMode ? sidebarActiveSx : sidebarInactiveSx),
+                    }}
+                  >
+                    <Box sx={{ width: 28, minWidth: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {calcIcon(item.calculatorMode)}
+                    </Box>
+                    <ListItemText
+                      primary={item.label}
+                      slotProps={{ primary: { sx: { color: calcColor, fontSize: '0.85rem', fontFamily: MONO_FAMILY } } }}
+                    />
+                  </ListItemButton>
                 );
               })}
             </List>
@@ -221,7 +238,8 @@ export function Sidebar() {
           <ListItemButton
             key={mod.id}
             id={`sidebar-view-${mod.mode}`}
-            onClick={() => { setViewMode(mod.mode as 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter' | 'instructions' | 'pem'); if (isMobile) setMobileOpen(false); }}
+            onClick={() => { setViewMode(mod.mode as 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter' | 'instructions' | 'pem'); if (isMobile) onMobileClose(); focusWorkspace(); }}
+            aria-current={isViewActive(mod.mode) ? 'page' : undefined}
             sx={{
               pl: 4,
               minHeight: 36,

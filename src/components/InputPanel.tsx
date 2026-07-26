@@ -54,12 +54,12 @@ export function InputPanel() {
   // Keyboard shortcut: ⌘+Enter to run attack, ⌘+Shift+C to copy output
   useEffect(() => {
     const runHandler = () => {
-      if (selectedAttack && !isRunning) {
+      if (viewMode === 'attack' && selectedAttack && !isRunning) {
         void handleRun(selectedAttack, inputValues);
       }
     };
     const copyHandler = () => {
-      if (outputResult) {
+      if (viewMode === 'attack' && outputResult) {
         void navigator.clipboard.writeText(outputResult);
       }
     };
@@ -69,7 +69,7 @@ export function InputPanel() {
       window.removeEventListener('rsa-run-attack', runHandler);
       window.removeEventListener('rsa-copy-output', copyHandler);
     };
-  }, [handleRun, inputValues, isRunning, outputResult, selectedAttack]);
+  }, [handleRun, inputValues, isRunning, outputResult, selectedAttack, viewMode]);
 
   // Load raw source for the Source tab, extracting only the frontendCheck function.
   // All setState calls happen inside .then()/.catch() — never synchronously in the effect body.
