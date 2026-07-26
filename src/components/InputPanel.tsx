@@ -140,8 +140,14 @@ function AttackPanel({ attack }: { attack: Attack }) {
   const hasFrontend = !!attack.frontendCheck;
   const pythonCode = useMemo(() => {
     if (!attack.sageTemplate) return '';
-    return attack.sageTemplate(Object.fromEntries(attack.inputs.map(f => [f.name, f.name])));
-  }, [attack]);
+    // Placeholder values keep strict numeric templates syntactically valid before form entry.
+    const sourceValues = Object.fromEntries(attack.inputs.map(field => [field.name, inputValues[field.name]?.trim() || '1']));
+    try {
+      return attack.sageTemplate(sourceValues);
+    } catch {
+      return '# Enter valid inputs to preview generated SageMath code.';
+    }
+  }, [attack, inputValues]);
 
   const effectiveSourceMode = !hasSage ? 'frontend' : !hasFrontend ? 'sage' : sourceMode;
   // handleCopySource is a useCallback — must be defined before any early returns (Rules of Hooks)

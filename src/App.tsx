@@ -1,16 +1,16 @@
-import { useEffect, lazy, Suspense, useState } from 'react';
-import { ThemeProvider, CssBaseline, Box, Snackbar, Button, IconButton } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { ThemeProvider, CssBaseline, Box, Snackbar, IconButton } from '@mui/material';
 import { draculaTheme, draculaColors } from './theme/dracula';
 import { Sidebar } from './components/Sidebar';
 import { AppProvider } from './context/AppContext';
 import { InputPanel } from './components/InputPanel';
 import { OutputPanel } from './components/OutputPanel';
 import { Calculator } from './components/calculator/Calculator';
-const MagicPanel = lazy(() => import('./components/MagicPanel'));
-const ProofIndex = lazy(() => import('./components/ProofIndex'));
-const FormatConverter = lazy(() => import('./components/FormatConverter'));
-const InstructionsPanel = lazy(() => import('./components/InstructionsPanel'));
-const PemDecryptor = lazy(() => import('./components/PemDecryptor'));
+import { MagicPanel } from './components/MagicPanel';
+import { ProofIndex } from './components/ProofIndex';
+import { FormatConverter } from './components/FormatConverter';
+import { InstructionsPanel } from './components/InstructionsPanel';
+import { PemDecryptor } from './components/PemDecryptor';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { CommandPalette } from './components/CommandPalette';
 import { flexPanelSx, MONO_FAMILY } from './styles/shared';
@@ -18,7 +18,7 @@ import { setFactorDBProxy } from './utils/factordb';
 import env from './config/env';
 import { useAppContext } from './hooks/useAppContext';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
-import { Menu, Search } from '@mui/icons-material';
+import { Menu } from '@mui/icons-material';
 
 const severityBorder: Record<string, string> = {
   success: draculaColors.green,
@@ -27,7 +27,7 @@ const severityBorder: Record<string, string> = {
 };
 
 function AppContent() {
-  const { notification, showNotification, setCommandPaletteOpen } = useAppContext();
+  const { notification, showNotification } = useAppContext();
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
   const borderColor = notification?.severity ? severityBorder[notification.severity] : draculaColors.currentLine;
 
@@ -54,9 +54,6 @@ function AppContent() {
           <IconButton aria-label="Open navigation" onClick={() => setMobileNavigationOpen(true)} sx={{ color: draculaColors.cyan }}>
             <Menu />
           </IconButton>
-          <Button startIcon={<Search />} onClick={() => setCommandPaletteOpen(true)} sx={{ color: draculaColors.foreground, fontFamily: MONO_FAMILY }}>
-            Search commands
-          </Button>
         </Box>
         <Sidebar mobileOpen={mobileNavigationOpen} onMobileClose={() => setMobileNavigationOpen(false)} />
         <Box component="main" id="main-workspace" tabIndex={-1} sx={{ ...flexPanelSx, outline: 'none' }}>
@@ -64,13 +61,11 @@ function AppContent() {
             <Box sx={flexPanelSx}>
               <InputPanel />
               <Calculator />
-              <Suspense fallback={null}>
-                <MagicPanel />
-                <ProofIndex />
-                <FormatConverter />
-                <InstructionsPanel />
-                <PemDecryptor />
-              </Suspense>
+              <MagicPanel />
+              <ProofIndex />
+              <FormatConverter />
+              <InstructionsPanel />
+              <PemDecryptor />
             </Box>
           </ErrorBoundary>
           <ErrorBoundary>

@@ -9,10 +9,9 @@ import {
   Box,
   Divider,
   Link,
-  Button,
   useMediaQuery,
 } from '@mui/material';
-import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, VpnKey, Lock, Hub, Tag, Security, Search } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, VpnKey, Lock, Hub, Tag, Security } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { LogoIcon } from './_shared/LogoIcon';
 import { MONO_FAMILY, ICON_SIZES } from '../styles/shared';
@@ -64,7 +63,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
-  const { selectedAttack, setSelectedAttack, setViewMode, viewMode, calculatorMode, setCalculatorMode, setCommandPaletteOpen } = useAppContext();
+  const { selectedAttack, setSelectedAttack, setViewMode, viewMode, calculatorMode, setCalculatorMode } = useAppContext();
   const isMobile = useMediaQuery('(max-width:599.95px)');
   const [expandedCats, setExpandedCats] = useState<Set<string>>(() => new Set([CATEGORIES[0], 'Calculators']));
   const activeExpandedCats = selectedAttack
@@ -133,18 +132,6 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         </Typography>
       </Box>
 
-      <Box sx={{ px: 2, py: 1.5 }}>
-        <Button
-          fullWidth
-          startIcon={<Search />}
-          onClick={() => { if (isMobile) onMobileClose(); setCommandPaletteOpen(true); }}
-          sx={{ color: draculaColors.foreground, borderColor: draculaColors.comment, fontFamily: MONO_FAMILY, justifyContent: 'space-between' }}
-          variant="outlined"
-        >
-          Search commands{!isMobile && '  ⌘K'}
-        </Button>
-      </Box>
-      <Divider sx={{ borderColor: draculaColors.comment }} />
 
       <List sx={{ flex: 1, overflow: 'auto' }}>
         {CATEGORIES.map(cat => (
