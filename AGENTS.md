@@ -74,7 +74,7 @@ scripts/            Test scripts
 .github/workflows/deploy.yml
 ```
 
-**Stable filenames** (`vite.config.ts`): entry JS at `assets/index.js` (no content hash). Prevents blank page when cached HTML references vanished hashed file.
+**Hashed entry assets** (`vite.config.ts`): HTML and entry JS share a content hash. Prevents a fresh HTML document from loading a mismatched cached entry after GitHub Pages deploys. Calculator components are statically bundled with that entry; do not reintroduce calculator lazy-import chunks without a cache-safe deploy strategy.
 
 ## UI Conventions
 

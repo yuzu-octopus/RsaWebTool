@@ -8,7 +8,7 @@ export default defineConfig({
     outDir: 'docs',
     rolldownOptions: {
       output: {
-        entryFileNames: 'assets/index.js',
+        entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name][extname]',
       },

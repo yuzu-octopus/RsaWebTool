@@ -326,7 +326,7 @@ git push origin main
 ### CI/CD
 GitHub Actions on push to `main`: typecheck → lint → test → build → deploy to GitHub Pages.
 
-**Cache caveat:** GitHub Pages sets `cache-control: max-age=600` (10 min). After deploy, users may need a hard refresh to get the latest bundle.
+**Cache contract:** production HTML references a content-hashed entry asset. The entry bundles calculator modules directly, so a fresh navigation always receives a matching calculator implementation. A browser that already cached the legacy stable `assets/index.js` may need one hard refresh after this migration.
 
 ## Development
 

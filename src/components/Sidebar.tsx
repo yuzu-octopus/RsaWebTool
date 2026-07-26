@@ -177,7 +177,7 @@ export function Sidebar() {
             aria-expanded={expandedCats.has('Calculators')}
             aria-controls="sidebar-cat-Calculators"
           >
-            <Typography sx={{ color: draculaColors.foreground, fontWeight: 600, fontSize: '0.75rem', flex: 1, fontFamily: MONO_FAMILY }}>
+            <Typography sx={{ color: draculaColors.cyan, fontWeight: 600, fontSize: '0.75rem', flex: 1, fontFamily: MONO_FAMILY }}>
               Calculators
             </Typography>
             {expandedCats.has('Calculators') ? <ExpandLess sx={{ color: draculaColors.comment, fontSize: ICON_SIZES.md }} /> : <ExpandMore sx={{ color: draculaColors.comment, fontSize: ICON_SIZES.md }} />}

@@ -5,9 +5,9 @@ import { Sidebar } from './components/Sidebar';
 import { AppProvider } from './context/AppContext';
 import { InputPanel } from './components/InputPanel';
 import { OutputPanel } from './components/OutputPanel';
+import { Calculator } from './components/calculator/Calculator';
 const MagicPanel = lazy(() => import('./components/MagicPanel'));
 const ProofIndex = lazy(() => import('./components/ProofIndex'));
-const Calculator = lazy(() => import('./components/calculator/Calculator'));
 const FormatConverter = lazy(() => import('./components/FormatConverter'));
 const InstructionsPanel = lazy(() => import('./components/InstructionsPanel'));
 const PemDecryptor = lazy(() => import('./components/PemDecryptor'));
@@ -46,10 +46,10 @@ function AppContent() {
           <ErrorBoundary>
             <Box sx={flexPanelSx}>
               <InputPanel />
+              <Calculator />
               <Suspense fallback={null}>
                 <MagicPanel />
                 <ProofIndex />
-                <Calculator />
                 <FormatConverter />
                 <InstructionsPanel />
                 <PemDecryptor />

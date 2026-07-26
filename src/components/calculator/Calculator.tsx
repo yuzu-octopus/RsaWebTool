@@ -1,16 +1,15 @@
-import { lazy, Suspense, useEffect } from 'react';
-import { Box, Skeleton, Tabs, Tab } from '@mui/material';
+import { useEffect } from 'react';
+import { Box, Tabs, Tab } from '@mui/material';
 import { Calculate, Lock, Hub, Tag, Security } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
 import { useAppContext } from '../../hooks/useAppContext';
 import { colFlexSx, tabSx } from '../../styles/shared';
 import type { CalculatorMode } from '../../types';
-
-const RSACalculator = lazy(() => import('./RSACalculator'));
-const AESCalculator = lazy(() => import('./AESCalculator'));
-const ECCCalculator = lazy(() => import('./ECCCalculator'));
-const HashCalculator = lazy(() => import('./HashCalculator'));
-const DHCalculator = lazy(() => import('./DHCalculator'));
+import RSACalculator from './RSACalculator';
+import AESCalculator from './AESCalculator';
+import ECCCalculator from './ECCCalculator';
+import HashCalculator from './HashCalculator';
+import DHCalculator from './DHCalculator';
 
 const MODE_BY_INDEX: CalculatorMode[] = ['rsa', 'aes', 'ecc', 'hash', 'dh'];
 
@@ -70,17 +69,7 @@ export function Calculator() {
           <Tab key={t.mode} label={t.label} icon={t.icon} iconPosition="start" />
         ))}
       </Tabs>
-      <Suspense
-        fallback={
-          <Skeleton
-            variant="rectangular"
-            height={200}
-            sx={{ borderRadius: 1, bgcolor: draculaColors.currentLine }}
-          />
-        }
-      >
-        <ActiveComponent />
-      </Suspense>
+      <ActiveComponent />
     </Box>
   );
 }
