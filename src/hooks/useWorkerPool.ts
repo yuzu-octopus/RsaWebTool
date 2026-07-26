@@ -87,7 +87,21 @@ export function useWorkerPool(poolSize: number = env.workerPoolSize) {
       }
       worker.terminate();
       currentTaskIdRef.current[i] = null;
-      workersRef.current[i] = createWorker(i);
+      try {
+        workersRef.current[i] = createWorker(i);
+      } catch (error) {
+        console.warn('useWorkerPool: failed to replace Worker, falling back to main thread:', error);
+        for (const worker of workersRef.current) worker.terminate();
+        fallbackRef.current = true;
+        workersRef.current = [];
+        busyRef.current = [];
+        currentTaskIdRef.current = [];
+        freeRef.current = [];
+        for (const [, task] of pending) task.reject(new Error('Web Worker replacement failed'));
+        pending.clear();
+        queueRef.current = [];
+        return;
+      }
       freeRef.current.push(i);
       busyRef.current[i] = false;
       processQueue();

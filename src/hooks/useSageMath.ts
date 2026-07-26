@@ -29,20 +29,30 @@ declare global {
 // Default timeout: 10s for SageCell script load + 110s for execution
 export const DEFAULT_SAGE_TIMEOUT = env.sagecellTimeout * 1000;
 
-export function mergeAbortSignals(signals: AbortSignal[]): AbortSignal | undefined {
+export type MergedAbortSignal = AbortSignal & { cleanup?: () => void };
+
+export function mergeAbortSignals(signals: AbortSignal[]): MergedAbortSignal | undefined {
   if (signals.length === 0) return undefined;
   if (signals.length === 1) return signals[0];
   if (typeof AbortSignal.any === 'function') return AbortSignal.any(signals);
 
   const controller = new AbortController();
+  const listeners = new Map<AbortSignal, () => void>();
+  const cleanup = () => {
+    for (const [signal, listener] of listeners) signal.removeEventListener('abort', listener);
+    listeners.clear();
+  };
   for (const signal of signals) {
     if (signal.aborted) {
       controller.abort();
+      cleanup();
       break;
     }
-    signal.addEventListener('abort', () => controller.abort(), { once: true });
+    const listener = () => controller.abort();
+    listeners.set(signal, listener);
+    signal.addEventListener('abort', listener, { once: true });
   }
-  return controller.signal;
+  return Object.assign(controller.signal, { cleanup });
 }
 
 function createOffscreenContainer(): HTMLDivElement {
@@ -320,7 +330,7 @@ export function useSageMath() {
 
     const combinedSignal = mergeAbortSignals(signals);
 
-    return executor.execute(code, timeoutMs, combinedSignal);
+    return executor.execute(code, timeoutMs, combinedSignal).finally(() => combinedSignal?.cleanup?.());
   };
 
   return { execute };
@@ -356,7 +366,7 @@ export function useSageMathParallel() {
     const lifecycleSignal = lifecycleRef.current?.signal;
     const combinedSignal = mergeAbortSignals(lifecycleSignal ? [controller.signal, lifecycleSignal] : [controller.signal]);
 
-    return new Promise((resolve) => {
+    return new Promise<(SageResult & { index: number })[]>((resolve) => {
       const { execute } = createSageMathExecutor();
 
       const processNext = () => {
@@ -392,7 +402,7 @@ export function useSageMathParallel() {
       };
 
       processNext();
-    });
+    }).finally(() => combinedSignal?.cleanup?.());
   }, []);
 
   return { executeAll, createController: () => new AbortController() };
