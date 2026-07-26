@@ -73,7 +73,7 @@ export async function solvePoW(
     check = (hashHex: string) => {
       // Convert hex back to bytes for the bit-level check
       const bytes = new Uint8Array(
-        hashHex.match(/.{2}/g)!.map(b => parseInt(b, 16)),
+        hashHex.match(/.{2}/g)?.map(b => parseInt(b, 16)) ?? [],
       );
       return checkLeadingZeros(bytes, difficulty);
     };

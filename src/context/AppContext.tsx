@@ -1,4 +1,4 @@
-import { createContext, useState, useCallback, useRef, useMemo, type ReactNode } from 'react';
+import { createContext, useState, useCallback, useRef, useMemo, useEffect, type ReactNode } from 'react';
 import type { AppContextType, HistoryEntry, NotificationState } from '../types';
 
 export const AppContext = createContext<AppContextType | null>(null);
@@ -32,23 +32,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const keyCounter = useRef(0);
 
   const addToHistory = useCallback((attackId: string, attackName: string, result: string, success: boolean) => {
-    setHistory(prev => {
-      const truncatedResult = result.length > 200 ? result.slice(0, 200) + '…' : result;
-      const entry: HistoryEntry = { id: crypto.randomUUID(), attackId, attackName, timestamp: new Date(), result: truncatedResult, success };
-      const updated = [entry, ...prev].slice(0, 50);
-      // Persist to localStorage (truncate result to 200 chars to stay under quota)
-      try {
-        const stored = updated.map(e => ({ ...e, result: e.result.length > 200 ? e.result.slice(0, 200) + '...' : e.result }));
-        localStorage.setItem('rsa-history:v1', JSON.stringify(stored));
-      } catch { /* localStorage full or unavailable — silently ignore */ }
-      return updated;
-    });
+    const truncatedResult = result.length > 200 ? result.slice(0, 200) + '…' : result;
+    const entry: HistoryEntry = { id: crypto.randomUUID(), attackId, attackName, timestamp: new Date(), result: truncatedResult, success };
+    setHistory(prev => [entry, ...prev].slice(0, 50));
   }, []);
+
+  useEffect(() => {
+    try {
+      if (history.length === 0) {
+        localStorage.removeItem('rsa-history:v1');
+        localStorage.removeItem('rsa-history');
+        return;
+      }
+      const stored = history.map(e => ({ ...e, result: e.result.length > 200 ? e.result.slice(0, 200) + '...' : e.result }));
+      localStorage.setItem('rsa-history:v1', JSON.stringify(stored));
+    } catch { /* localStorage full or unavailable — silently ignore */ }
+  }, [history]);
 
   const clearHistory = useCallback(() => {
     setHistory([]);
-    localStorage.removeItem('rsa-history:v1');
-    localStorage.removeItem('rsa-history');
   }, []);
 
   const showNotification = useCallback((message: string, severity?: 'success' | 'error' | 'info') => {

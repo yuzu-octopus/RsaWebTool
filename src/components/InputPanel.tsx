@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -31,10 +31,6 @@ export function InputPanel() {
   const [tab, setTab] = useState(0);
   const [sourceMode, setSourceMode] = useState<'sage' | 'frontend'>('sage');
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
-  // Ref so event listeners always read latest inputValues without re-registration
-  const inputValuesRef = useRef(inputValues);
-  // eslint-disable-next-line react-hooks/refs
-  inputValuesRef.current = inputValues;
   const [frontendCode, setFrontendCode] = useState('');
   const [copied, setCopied] = useState(false);
   const { runAttack, cancelCurrentRun } = useWorkerPool();
@@ -42,10 +38,6 @@ export function InputPanel() {
     execute, runAttack, cancelCurrentRun,
     { setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification, setInputValues },
   );
-  // Ref so event listeners always read latest handleRun without re-registration
-  const handleRunRef = useRef(handleRun);
-  // eslint-disable-next-line react-hooks/refs
-  handleRunRef.current = handleRun;
 
   // Keyboard shortcut: ⌘/Ctrl+1/2/3 switches tabs within the attack view
   useEffect(() => {
@@ -63,7 +55,7 @@ export function InputPanel() {
   useEffect(() => {
     const runHandler = () => {
       if (selectedAttack && !isRunning) {
-        void handleRunRef.current(selectedAttack, inputValuesRef.current);
+        void handleRun(selectedAttack, inputValues);
       }
     };
     const copyHandler = () => {
@@ -77,7 +69,7 @@ export function InputPanel() {
       window.removeEventListener('rsa-run-attack', runHandler);
       window.removeEventListener('rsa-copy-output', copyHandler);
     };
-  }, [selectedAttack, isRunning, outputResult]);
+  }, [handleRun, inputValues, isRunning, outputResult, selectedAttack]);
 
   // Load raw source for the Source tab, extracting only the frontendCheck function.
   // All setState calls happen inside .then()/.catch() — never synchronously in the effect body.
