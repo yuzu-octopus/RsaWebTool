@@ -9,9 +9,11 @@ import {
   Box,
   Divider,
   Link,
+  IconButton,
+  useMediaQuery,
 } from '@mui/material';
 
-import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, VpnKey, Lock, Hub, Tag, Security } from '@mui/icons-material';
+import { ExpandLess, ExpandMore, AutoFixHigh, MenuBook, SwapHoriz, VpnKey, Lock, Hub, Tag, Security, Menu } from '@mui/icons-material';
 import { draculaColors } from '../theme/dracula';
 import { LogoIcon } from './_shared/LogoIcon';
 import { MONO_FAMILY, ICON_SIZES } from '../styles/shared';
@@ -59,6 +61,8 @@ const sidebarInactiveSx = {
 
 export function Sidebar() {
   const { selectedAttack, setSelectedAttack, setViewMode, viewMode, calculatorMode, setCalculatorMode } = useAppContext();
+  const isMobile = useMediaQuery('(max-width:600px)');
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set([...CATEGORIES, 'Calculators']));
 
   const toggleCat = (cat: string) => {
@@ -74,6 +78,7 @@ export function Sidebar() {
   };
 
   const handleAttackClick = (attack: Attack) => {
+    if (isMobile) setMobileOpen(false);
     setSelectedAttack(attack);
     setViewMode('attack');
   };
@@ -83,8 +88,18 @@ export function Sidebar() {
 
   return (
     <>
+      <IconButton
+        aria-label="Open navigation"
+        onClick={() => setMobileOpen(true)}
+        sx={{ display: { xs: 'flex', sm: 'none' }, position: 'fixed', top: 8, left: 8, zIndex: theme => theme.zIndex.drawer + 1, color: draculaColors.cyan }}
+      >
+        <Menu />
+      </IconButton>
       <Drawer
-        variant="permanent"
+        variant={isMobile ? 'temporary' : 'permanent'}
+        open={isMobile ? mobileOpen : true}
+        onClose={() => setMobileOpen(false)}
+        ModalProps={{ keepMounted: true }}
         sx={{
           width: drawerWidth,
           flexShrink: 0,
@@ -176,7 +191,7 @@ export function Sidebar() {
                 <ListItemButton
                   key={item.id}
                   id={`sidebar-calc-${item.calculatorMode}`}
-                  onClick={() => { setViewMode('calculator'); setCalculatorMode(item.calculatorMode); }}
+                  onClick={() => { setViewMode('calculator'); setCalculatorMode(item.calculatorMode); if (isMobile) setMobileOpen(false); }}
                   sx={{
                     pl: 4,
                     minHeight: 36,
@@ -206,7 +221,7 @@ export function Sidebar() {
           <ListItemButton
             key={mod.id}
             id={`sidebar-view-${mod.mode}`}
-            onClick={() => setViewMode(mod.mode as 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter' | 'instructions' | 'pem')}
+            onClick={() => { setViewMode(mod.mode as 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter' | 'instructions' | 'pem'); if (isMobile) setMobileOpen(false); }}
             sx={{
               pl: 4,
               minHeight: 36,
