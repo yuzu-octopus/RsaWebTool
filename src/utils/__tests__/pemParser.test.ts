@@ -53,13 +53,13 @@ describe('parsePEM', () => {
 });
 
 describe('decryptPEM', () => {
-  test('rejects PBES2 DES-CBC before attempting AES decryption', async () => {
+  test('rejects PBES2 DES-CBC before attempting AES decryption', () => {
     const der = Buffer.from(
       '3041303506092a864886f70d01050d3028301306092a864886f70d01050c3006040100020101301106052b0e0302070408000000000000000004080000000000000000',
       'hex',
     );
     const pem = `-----BEGIN ENCRYPTED PRIVATE KEY-----\n${der.toString('base64')}\n-----END ENCRYPTED PRIVATE KEY-----`;
 
-    await expect(decryptPEM(parsePEM(pem), 'passphrase')).rejects.toThrow(/unsupported.*DES-CBC/i);
+    return expect(decryptPEM(parsePEM(pem), 'passphrase')).rejects.toThrow(/unsupported.*DES-CBC/i);
   });
 });
