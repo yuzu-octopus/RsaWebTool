@@ -14,9 +14,14 @@ const requiredBlankCases = [
   [smallPublicExp, { n: '', e: '', c: '', k_bound: '' }, 'SMALL_PUBLIC_EXP'],
 ] as const;
 
+function sageTemplateFor(attack: { id: string; sageTemplate?: (vals: Record<string, string>) => string }, vals: Record<string, string>): string {
+  if (!attack.sageTemplate) throw new Error(`${attack.id} is missing a Sage template`);
+  return attack.sageTemplate(vals);
+}
+
 describe('attack template numeric input handling', () => {
   test.each(requiredBlankCases)('%s emits a valid failure template for blank required inputs', (attack, vals, token) => {
-    const template = attack.sageTemplate(vals);
+    const template = sageTemplateFor(attack, vals);
 
     expect(template).not.toContain('if not :');
     expect(template).not.toMatch(/=\s*\n/);
@@ -24,10 +29,10 @@ describe('attack template numeric input handling', () => {
   });
 
   test('optional blank exponents use documented defaults through quoted text', () => {
-    const lsbTemplate = lsbOracle.sageTemplate({ n: '3233', e: '', c: '42', oracle_responses: '0,1' });
-    const knownTemplate = knownPlaintext.sageTemplate({ n: '3233', e: '', c: '42' });
-    const relatedTemplate = relatedMessage.sageTemplate({ n: '3233', e: '', c1: '1', c2: '8' });
-    const publicExpTemplate = smallPublicExp.sageTemplate({ n: '3233', e: '', c: '42', k_bound: '' });
+    const lsbTemplate = sageTemplateFor(lsbOracle, { n: '3233', e: '', c: '42', oracle_responses: '0,1' });
+    const knownTemplate = sageTemplateFor(knownPlaintext, { n: '3233', e: '', c: '42' });
+    const relatedTemplate = sageTemplateFor(relatedMessage, { n: '3233', e: '', c1: '1', c2: '8' });
+    const publicExpTemplate = sageTemplateFor(smallPublicExp, { n: '3233', e: '', c: '42', k_bound: '' });
 
     for (const template of [lsbTemplate, knownTemplate, relatedTemplate, publicExpTemplate]) {
       expect(template).toMatch(/e_val = ""\.strip\(\)/);
