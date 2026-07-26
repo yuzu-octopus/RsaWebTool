@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { type ChangeEvent, useState, useEffect, useEffectEvent, useMemo, useCallback, useRef } from 'react';
+import type { Attack } from '../types';
 import {
   Box,
   Typography,
@@ -15,6 +16,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { useSageMath } from '../hooks/useSageMath';
 import { useWorkerPool } from '../hooks/useWorkerPool';
 import { useAttackExecution } from '../hooks/useAttackExecution';
+import { useCopyToClipboard } from '../hooks/useCopyToClipboard';
 import { ProofRenderer } from './ProofRenderer';
 import { EmptyState } from './_shared/EmptyState';
 import { inputSx } from '../styles/shared';
@@ -26,18 +28,40 @@ import 'prismjs/components/prism-python';
 import { getAttackSource, extractFrontendCheck, dedent } from '../attacks/rawSources';
 
 export function InputPanel() {
-  const { selectedAttack, viewMode, outputResult, setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification } = useAppContext();
+  const { selectedAttack, viewMode } = useAppContext();
+
+  if (viewMode !== 'attack') return null;
+
+  if (!selectedAttack) {
+    return (
+      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0 }}>
+        <EmptyState title="Select an attack from the sidebar" padding={4} />
+      </Box>
+    );
+  }
+
+  return <AttackPanel key={selectedAttack.id} attack={selectedAttack} />;
+}
+
+function AttackPanel({ attack }: { attack: Attack }) {
+  const { viewMode, outputResult, setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification } = useAppContext();
   const { execute } = useSageMath();
   const [tab, setTab] = useState(0);
   const [sourceMode, setSourceMode] = useState<'sage' | 'frontend'>('sage');
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const inputRefs = useRef<Record<string, HTMLInputElement | HTMLTextAreaElement | null>>({});
   const [frontendCode, setFrontendCode] = useState('');
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useCopyToClipboard();
   const { runAttack, cancelCurrentRun } = useWorkerPool();
   const { handleRun, handleStop, handleGenerateTestcase, testcaseMsg, isRunning, progress, progressDetail, timer, eta } = useAttackExecution(
     execute, runAttack, cancelCurrentRun,
     { setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification, setInputValues },
   );
+  const handleCopy = useCallback(async (text: string) => {
+    if (!await copy(text)) showNotification('Could not copy to clipboard.', 'error');
+  }, [copy, showNotification]);
+
 
   // Keyboard shortcut: ⌘/Ctrl+1/2/3 switches tabs within the attack view
   useEffect(() => {
@@ -51,32 +75,45 @@ export function InputPanel() {
     return () => window.removeEventListener('rsa-switch-tab', handler);
   }, []);
 
+  const handleValidatedRun = useCallback((values: Record<string, string>) => {
+    const missingFields = attack.inputs.filter(field => field.required !== false && !values[field.name]?.trim());
+    if (missingFields.length === 0) {
+      void handleRun(attack, values);
+      return;
+    }
+
+    setFieldErrors(Object.fromEntries(missingFields.map(field => [field.name, `${field.label} is required.`])));
+    setOutputError('Complete the highlighted required fields before running this attack.');
+    requestAnimationFrame(() => inputRefs.current[missingFields[0].name]?.focus());
+  }, [attack, handleRun, setOutputError]);
+
   // Keyboard shortcut: ⌘+Enter to run attack, ⌘+Shift+C to copy output
+  const runShortcut = useEffectEvent(() => {
+    if (viewMode === 'attack' && !isRunning) {
+      handleValidatedRun(inputValues);
+    }
+  });
+  const copyShortcut = useEffectEvent(() => {
+    if (viewMode === 'attack' && outputResult) {
+      void handleCopy(outputResult);
+    }
+  });
   useEffect(() => {
-    const runHandler = () => {
-      if (viewMode === 'attack' && selectedAttack && !isRunning) {
-        void handleRun(selectedAttack, inputValues);
-      }
-    };
-    const copyHandler = () => {
-      if (viewMode === 'attack' && outputResult) {
-        void navigator.clipboard.writeText(outputResult);
-      }
-    };
-    window.addEventListener('rsa-run-attack', runHandler);
-    window.addEventListener('rsa-copy-output', copyHandler);
+    window.addEventListener('rsa-run-attack', runShortcut);
+    window.addEventListener('rsa-copy-output', copyShortcut);
     return () => {
-      window.removeEventListener('rsa-run-attack', runHandler);
-      window.removeEventListener('rsa-copy-output', copyHandler);
+      window.removeEventListener('rsa-run-attack', runShortcut);
+      window.removeEventListener('rsa-copy-output', copyShortcut);
     };
-  }, [handleRun, inputValues, isRunning, outputResult, selectedAttack, viewMode]);
+  }, []);
 
   // Load raw source for the Source tab, extracting only the frontendCheck function.
   // All setState calls happen inside .then()/.catch() — never synchronously in the effect body.
   useEffect(() => {
-    if (!selectedAttack?.frontendCheck) return;
+    const frontendCheck = attack.frontendCheck;
+    if (!frontendCheck) return;
     let cancelled = false;
-    getAttackSource(selectedAttack.id)
+    getAttackSource(attack.id)
       .then(src => {
         if (cancelled) return;
         if (src) {
@@ -85,48 +122,41 @@ export function InputPanel() {
             setFrontendCode(extracted);
           } else {
             // Fallback: use toString if extraction fails
-            setFrontendCode(dedent(selectedAttack.frontendCheck!.toString()));
+            setFrontendCode(dedent(frontendCheck.toString()));
           }
         } else {
           // Fallback: use toString if raw source unavailable
-          setFrontendCode(dedent(selectedAttack.frontendCheck!.toString()));
+            setFrontendCode(dedent(frontendCheck.toString()));
         }
       })
       .catch(() => {
         if (cancelled) return;
-        setFrontendCode(dedent(selectedAttack.frontendCheck!.toString()));
+        setFrontendCode(dedent(frontendCheck.toString()));
       });
     return () => { cancelled = true; };
-  }, [selectedAttack]);
+  }, [attack]);
 
-  const hasSage = !!selectedAttack?.sageTemplate;
-  const hasFrontend = !!selectedAttack?.frontendCheck;
+  const hasSage = !!attack.sageTemplate;
+  const hasFrontend = !!attack.frontendCheck;
   const pythonCode = useMemo(() => {
-    if (!hasSage) return '';
-    return selectedAttack.sageTemplate!(Object.fromEntries(selectedAttack.inputs.map(f => [f.name, f.name])));
-  }, [hasSage, selectedAttack]);
+    if (!attack.sageTemplate) return '';
+    return attack.sageTemplate(Object.fromEntries(attack.inputs.map(f => [f.name, f.name])));
+  }, [attack]);
 
   const effectiveSourceMode = !hasSage ? 'frontend' : !hasFrontend ? 'sage' : sourceMode;
   // handleCopySource is a useCallback — must be defined before any early returns (Rules of Hooks)
   const handleCopySource = useCallback(() => {
     const code = effectiveSourceMode === 'sage' ? pythonCode : frontendCode;
-    void navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [effectiveSourceMode, pythonCode, frontendCode]);
+    void handleCopy(code);
+  }, [effectiveSourceMode, frontendCode, handleCopy, pythonCode]);
 
-  if (viewMode !== 'attack') return null;
 
-  if (!selectedAttack) {
-    return (
-      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0 }}>
-        <EmptyState title="Select an attack from the sidebar" padding={4} />
-      </Box>
-    );
-  }
-
-  const handleInputChange = (name: string, value: string) => {
-    setInputValues(prev => ({ ...prev, [name]: value }));
+  const handleInputChange = (name: string, value: string, multiline: boolean) => {
+    const normalizedValue = multiline ? value : value.replace(/\s/g, '');
+    setInputValues(prev => ({ ...prev, [name]: normalizedValue }));
+    if (normalizedValue.trim()) {
+      setFieldErrors(({ [name]: _error, ...rest }) => rest);
+    }
   };
 
   return (
@@ -144,23 +174,23 @@ export function InputPanel() {
           '& .MuiTabs-indicator': { backgroundColor: draculaColors.purple },
         }}
       >
-        <Tab label="Explanation" />
-        <Tab label="Input" data-testid="input-tab" />
-        <Tab label="Source" data-testid="source-tab" />
+        <Tab id="attack-tab-0" aria-controls="attack-tabpanel-0" label="Explanation" />
+        <Tab id="attack-tab-1" aria-controls="attack-tabpanel-1" label="Input" data-testid="input-tab" />
+        <Tab id="attack-tab-2" aria-controls="attack-tabpanel-2" label="Source" data-testid="source-tab" />
       </Tabs>
 
       {/* Explanation tab - left aligned */}
       {tab === 0 && (
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2, pb: '20vh' }}>
-          {selectedAttack.proof ? (
-            <ProofRenderer latex={selectedAttack.proof} />
+        <Box role="tabpanel" id="attack-tabpanel-0" aria-labelledby="attack-tab-0" sx={{ flex: 1, overflow: 'auto', p: 2, pb: '20vh' }}>
+          {attack.proof ? (
+            <ProofRenderer latex={attack.proof} />
           ) : (
             <Typography variant="body2" sx={{ color: draculaColors.comment, fontStyle: 'italic' }}>
               No proof available.
             </Typography>
           )}
 
-          {selectedAttack.usageGuide && (
+          {attack.usageGuide && (
             <>
               <Divider sx={{ borderColor: draculaColors.comment, my: 2 }} />
               <Typography
@@ -172,7 +202,7 @@ export function InputPanel() {
               <Typography
                 sx={{ color: draculaColors.foreground, fontSize: '0.85rem', whiteSpace: 'pre-wrap', fontFamily: MONO_FAMILY, lineHeight: 1.6 }}
               >
-                {selectedAttack.usageGuide}
+                {attack.usageGuide}
               </Typography>
             </>
           )}
@@ -189,30 +219,31 @@ export function InputPanel() {
 
       {/* Input tab - center aligned */}
       {tab === 1 && (
-        <Box sx={{ ...centeredPanelSx, p: 2 }}>
+        <Box role="tabpanel" id="attack-tabpanel-1" aria-labelledby="attack-tab-1" sx={{ ...centeredPanelSx, p: 2 }}>
           <Box sx={{ width: '100%', maxWidth: 640 }}>
             <Typography variant="h3" sx={pageTitleSx}>
-              {selectedAttack.name}
+              {attack.name}
             </Typography>
             <Typography variant="caption" sx={{ color: draculaColors.pink, display: 'block', mb: 1, fontSize: '0.7rem' }}>
-              {selectedAttack.frontendCheck ? 'Runs locally in browser' : 'Executed via SageMathCell'}
+              {attack.frontendCheck ? 'Runs locally in browser' : 'Executed via SageMathCell'}
             </Typography>
             <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 3, fontFamily: PROSE_FAMILY }}>
-              {selectedAttack.description}
+              {attack.description}
             </Typography>
 
-            {selectedAttack.inputs.map(field => (
+            {attack.inputs.map(field => (
               <Box key={field.name} sx={{ mb: 2 }}>
                 <TextField
                   fullWidth
                   label={field.required === false ? `${field.label} (optional)` : field.label}
                   placeholder={field.placeholder}
                   value={inputValues[field.name] || ''}
-                  onChange={e => handleInputChange(field.name, e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => handleInputChange(field.name, e.target.value, field.multiline === true)}
+                  inputRef={(node: HTMLInputElement | HTMLTextAreaElement | null) => { inputRefs.current[field.name] = node; }}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !field.multiline && !isRunning && selectedAttack) {
+                    if (e.key === 'Enter' && !field.multiline && !isRunning) {
                       e.preventDefault();
-                      void handleRun(selectedAttack, inputValues);
+                      handleValidatedRun(inputValues);
                     }
                   }}
                   multiline={field.multiline}
@@ -220,7 +251,8 @@ export function InputPanel() {
                   required={field.required !== false}
                   variant="outlined"
                   size="small"
-                  helperText={field.tooltip}
+                  error={Boolean(fieldErrors[field.name])}
+                  helperText={fieldErrors[field.name] || field.tooltip}
                   sx={inputSx}
                 />
               </Box>
@@ -240,7 +272,7 @@ export function InputPanel() {
               <Button
                 fullWidth
                 variant="outlined"
-                onClick={isRunning ? handleStop : () => { void handleRun(selectedAttack, inputValues); }}
+                onClick={isRunning ? handleStop : () => handleValidatedRun(inputValues)}
                 data-testid={isRunning ? 'stop-attack' : 'run-attack'}
                 sx={colorGhostBtn(isRunning ? draculaColors.red : draculaColors.purple)}
                 startIcon={isRunning ? <Stop /> : undefined}
@@ -288,7 +320,7 @@ export function InputPanel() {
 
       {/* Source tab */}
       {tab === 2 && (
-        <Box sx={{ flex: 1, overflow: 'auto', p: 2, pb: '20vh' }}>
+        <Box role="tabpanel" id="attack-tabpanel-2" aria-labelledby="attack-tab-2" sx={{ flex: 1, overflow: 'auto', p: 2, pb: '20vh' }}>
     <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
       {hasSage && (
         <Button

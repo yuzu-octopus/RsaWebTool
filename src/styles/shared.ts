@@ -28,6 +28,12 @@ export const hourglassSpin = keyframes`
   100% { transform: rotate(360deg); }
 `;
 
+/** Hourglass animation with system motion preference respected. */
+export const hourglassSpinSx = {
+  animation: `${hourglassSpin} 3s ease-in-out infinite`,
+  '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+} as const;
+
 /** Pulse keyframe for indeterminate status (e.g., service health checks). */
 export const pulse = keyframes`
   0%, 100% { opacity: 1; }

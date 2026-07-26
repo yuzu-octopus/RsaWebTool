@@ -3,8 +3,8 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 export interface UseCopyToClipboardResult {
   /** True for `resetMs` after a successful copy — use to show "Copied!" feedback. */
   copied: boolean;
-  /** Write text to the clipboard. Failures are silently swallowed (matches existing inline behavior). */
-  copy: (text: string) => Promise<void>;
+  /** Write text to clipboard. Returns whether the write succeeded. */
+  copy: (text: string) => Promise<boolean>;
 }
 
 /**
@@ -17,11 +17,11 @@ export interface UseCopyToClipboardResult {
  */
 export function useCopyToClipboard(resetMs = 2000): UseCopyToClipboardResult {
   const [copied, setCopied] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      clearTimeout(timerRef.current);
     };
   }, []);
 
@@ -30,12 +30,11 @@ export function useCopyToClipboard(resetMs = 2000): UseCopyToClipboardResult {
       try {
         await navigator.clipboard.writeText(text);
         setCopied(true);
-        if (timerRef.current) clearTimeout(timerRef.current);
-        timerRef.current = setTimeout(() => setCopied(false), resetMs);
+        clearTimeout(timerRef.current);
+        timerRef.current = window.setTimeout(() => setCopied(false), resetMs);
+        return true;
       } catch {
-        // Match existing inline behavior: silently swallow clipboard errors
-        // (browser may block writeText if not in a secure context or if
-        // the user denied permission).
+        return false;
       }
     },
     [resetMs],

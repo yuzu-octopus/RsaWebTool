@@ -2,6 +2,14 @@ import { createContext, useState, useCallback, useRef, useMemo, useEffect, type 
 import type { AppContextType, HistoryEntry, NotificationState } from '../types';
 
 export const AppContext = createContext<AppContextType | null>(null);
+const HISTORY_PREVIEW_LENGTH = 200;
+
+function toHistoryPreview(result: string): string {
+  const normalized = result.endsWith('...') ? `${result.slice(0, -3)}…` : result;
+  return normalized.length > HISTORY_PREVIEW_LENGTH
+    ? `${normalized.slice(0, HISTORY_PREVIEW_LENGTH)}…`
+    : normalized;
+}
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [app, setApp] = useState({
@@ -19,8 +27,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const entries = JSON.parse(stored) as HistoryEntry[];
       const cutoff = Date.now() - 86_400_000; // 24 hours
       return entries.reduce<HistoryEntry[]>((acc, e) => {
-        const t = new Date(e.timestamp);
-        if (t.getTime() > cutoff) acc.push({ ...e, timestamp: t });
+        const timestamp = new Date(e.timestamp);
+        if (timestamp.getTime() > cutoff) acc.push({ ...e, timestamp, result: toHistoryPreview(e.result) });
         return acc;
       }, []);
     } catch {
@@ -32,8 +40,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const keyCounter = useRef(0);
 
   const addToHistory = useCallback((attackId: string, attackName: string, result: string, success: boolean) => {
-    const truncatedResult = result.length > 200 ? result.slice(0, 200) + '…' : result;
-    const entry: HistoryEntry = { id: crypto.randomUUID(), attackId, attackName, timestamp: new Date(), result: truncatedResult, success };
+    const entry: HistoryEntry = { id: crypto.randomUUID(), attackId, attackName, timestamp: new Date(), result: toHistoryPreview(result), success };
     setHistory(prev => [entry, ...prev].slice(0, 50));
   }, []);
 
@@ -44,7 +51,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem('rsa-history');
         return;
       }
-      const stored = history.map(e => ({ ...e, result: e.result.length > 200 ? e.result.slice(0, 200) + '...' : e.result }));
+      const stored = history.map(e => ({ ...e, result: toHistoryPreview(e.result) }));
       localStorage.setItem('rsa-history:v1', JSON.stringify(stored));
     } catch { /* localStorage full or unavailable — silently ignore */ }
   }, [history]);

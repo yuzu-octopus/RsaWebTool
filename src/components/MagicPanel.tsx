@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, memo } from 'react';
+import { useState, useEffect, useMemo, memo, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -20,7 +20,7 @@ import { useMagicExecution, type MagicJob } from '../hooks/useMagicExecution';
 import { attacks } from '../attacks';
 import { detectFormat, parsePEM } from '../utils/converters';
 import { inputSx } from '../styles/shared';
-import { colFlexSx, centeredPanelSx, colorGhostBtn, hourglassSpin, MONO_FAMILY } from '../styles/shared';
+import { colFlexSx, centeredPanelSx, colorGhostBtn, hourglassSpinSx, MONO_FAMILY } from '../styles/shared';
 import type { Attack } from '../types';
 
 const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
@@ -93,7 +93,7 @@ function statusIcon(status: MagicJob['status']) {
   if (status === 'error') return <Cancel sx={{ color: draculaColors.red, fontSize: '1rem', mr: 0.5 }} />;
   if (status === 'cancelled') return <Stop sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5 }} />;
   if (status === 'aborted') return <SkipNext sx={{ color: draculaColors.comment, fontSize: '1rem', mr: 0.5 }} />;
-  return <HourglassEmpty sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5, animation: `${hourglassSpin} 3s ease-in-out infinite` }} />;
+  return <HourglassEmpty sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5, ...hourglassSpinSx }} />;
 }
 
 
@@ -102,13 +102,15 @@ function statusIcon(status: MagicJob['status']) {
 
 const JobListItem = memo(function JobListItem({
   job,
+  attackId,
   expanded,
   onToggle,
-  attackId,
+  onCopy,
 }: {
   job: MagicJob;
   expanded: boolean;
   onToggle: (id: string) => void;
+  onCopy: (value: string) => void;
   attackId: string;
 }) {
   const primaryContent = useMemo(() => (
@@ -126,7 +128,7 @@ const JobListItem = memo(function JobListItem({
   const secondaryContent = useMemo(() =>
     job.error && !expanded ? (
       <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: MONO_FAMILY }}>
-        {job.error.length > 80 ? `${job.error.slice(0, 77)}...` : job.error}
+        {job.error.length > 80 ? `${job.error.slice(0, 77)}…` : job.error}
       </Typography>
     ) : null,
     [job.error, expanded]
@@ -162,8 +164,8 @@ const JobListItem = memo(function JobListItem({
           {completed && (
             <IconButton
               size="small"
-              aria-label="Copy result"
-              onClick={() => { void navigator.clipboard.writeText(job.result || job.error || ''); }}
+              aria-label="Copy full result"
+              onClick={() => onCopy(job.result || job.error || '')}
               sx={{ position: 'absolute', top: 2, right: 2, color: draculaColors.comment, zIndex: 1 }}
             >
               <ContentCopy sx={{ fontSize: '0.8rem' }} />
@@ -178,22 +180,57 @@ const JobListItem = memo(function JobListItem({
   );
 });
 
-const ExtractedParams = memo(function ExtractedParams({ params }: { params: Record<string, string> }) {
+const ExtractedParams = memo(function ExtractedParams({
+  params,
+  onCopy,
+}: {
+  params: Record<string, string>;
+  onCopy: (value: string) => void;
+}) {
+  const [expandedKey, setExpandedKey] = useState<string | null>(null);
+
   return (
     <Box sx={{ mt: 2, p: 1.5, borderRadius: 1, backgroundColor: draculaColors.currentLine, border: `1px solid ${draculaColors.comment}` }}>
       <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: MONO_FAMILY, mb: 0.75 }}>
         Extracted parameters
       </Typography>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-        {Object.entries(params).map(([key, value]) => (
-          <Box key={key} sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.25, backgroundColor: draculaColors.background, borderRadius: 0.5, px: 0.75, py: 0.25 }}>
-            <Typography sx={{ color: draculaColors.purple, fontSize: '0.7rem', fontFamily: MONO_FAMILY }}>{key}</Typography>
-            <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: MONO_FAMILY }}>=</Typography>
-            <Typography sx={{ color: value.length > 50 ? draculaColors.orange : draculaColors.foreground, fontSize: '0.7rem', fontFamily: MONO_FAMILY, maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {value.length > 50 ? `${value.slice(0, 47)}...` : value}
-            </Typography>
-          </Box>
-        ))}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+        {Object.entries(params).map(([key, value]) => {
+          const isPreview = value.length > 50;
+          const isExpanded = expandedKey === key;
+          const contentId = `magic-param-${key}`;
+          return (
+            <Box key={key} sx={{ backgroundColor: draculaColors.background, borderRadius: 0.5, px: 0.75, py: 0.25 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, minWidth: 0 }}>
+                <Typography sx={{ color: draculaColors.purple, fontSize: '0.7rem', fontFamily: MONO_FAMILY }}>{key}</Typography>
+                <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: MONO_FAMILY }}>=</Typography>
+                <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: MONO_FAMILY, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {isPreview ? `${value.slice(0, 47)}…` : value}
+                </Typography>
+                {isPreview && (
+                  <Button
+                    size="small"
+                    onClick={() => setExpandedKey(isExpanded ? null : key)}
+                    aria-expanded={isExpanded}
+                    aria-controls={contentId}
+                    sx={{ minWidth: 0, px: 0.5, color: draculaColors.cyan, fontSize: '0.6rem', fontFamily: MONO_FAMILY, textTransform: 'none' }}
+                  >
+                    {isExpanded ? 'Hide' : 'Preview'}
+                  </Button>
+                )}
+                <IconButton size="small" aria-label={`Copy full ${key}`} onClick={() => onCopy(value)} sx={{ p: 0.25, color: draculaColors.comment }}>
+                  <ContentCopy sx={{ fontSize: '0.7rem' }} />
+                </IconButton>
+              </Box>
+              {isPreview && <Typography component="span" sx={{ color: draculaColors.comment, fontSize: '0.6rem', fontFamily: MONO_FAMILY }}> preview</Typography>}
+              <Collapse in={isExpanded} id={contentId}>
+                <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: MONO_FAMILY, mt: 0.5, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                  {value}
+                </Typography>
+              </Collapse>
+            </Box>
+          );
+        })}
       </Box>
     </Box>
   );
@@ -233,7 +270,7 @@ const ErrorInsightBox = memo(function ErrorInsightBox({ insights }: { insights: 
 
 
 export function MagicPanel() {
-  const { viewMode } = useAppContext();
+  const { viewMode, showNotification } = useAppContext();
   const [rawInput, setRawInput] = useState('');
   const [showApplicable, setShowApplicable] = useState(false);
 
@@ -270,6 +307,14 @@ export function MagicPanel() {
     }
     return grouped;
   }, [applicablePreview]);
+
+  const canCrack = Boolean(extractedParams && applicablePreview.length > 0);
+  const handleCopy = useCallback((value: string) => {
+    navigator.clipboard.writeText(value).then(
+      () => showNotification('Copied to clipboard', 'success'),
+      () => showNotification('Failed to copy to clipboard', 'error'),
+    );
+  }, [showNotification]);
 
   const {
     running, earlyStop, errorInsights,
@@ -315,7 +360,7 @@ export function MagicPanel() {
             fullWidth
             multiline
             rows={8}
-            label="Raw input (PEM, hex, decimal, key=value pairs...)"
+            label="Raw input (PEM, hex, decimal, key=value pairs…)"
             value={rawInput}
             onChange={e => setRawInput(e.target.value)}
             variant="outlined"
@@ -334,16 +379,26 @@ export function MagicPanel() {
                 <div style={{ color: draculaColors.comment }}>/ or PEM public key /</div>
                 <div style={{ color: draculaColors.comment }}>-----BEGIN RSA PUBLIC KEY-----</div>
                 <div style={{ color: draculaColors.comment }}>/ or just hex/decimal n /</div>
-                <div style={{ color: draculaColors.comment }}>00c3a7...</div>
+                <div style={{ color: draculaColors.comment }}>00c3a7…</div>
                 <div style={{ color: draculaColors.comment }}>/ or JSON /</div>
-                <div style={{ color: draculaColors.cyan }}>{`{"n": "0x...", "e": 65537, "ct": "..."}`}</div>
+                <div style={{ color: draculaColors.cyan }}>{`{"n": "0x…", "e": 65537, "ct": "…"}`}</div>
               </Box>
             </Box>
           )}
 
           {/* Extracted params preview */}
           {extractedParams && !running && (
-            <ExtractedParams params={extractedParams} />
+            <ExtractedParams params={extractedParams} onCopy={handleCopy} />
+          )}
+
+          {rawInput.trim() && !running && (
+            <Typography role="status" aria-live="polite" sx={{ color: canCrack ? draculaColors.green : draculaColors.comment, mt: 1, fontSize: '0.7rem', fontFamily: MONO_FAMILY }}>
+              {!extractedParams
+                ? 'No supported parameters found. Use n = …, a PEM RSA key, hex/decimal n, or JSON such as {"n":"…","e":65537}.'
+                : applicablePreview.length === 0
+                  ? `Recognized ${Object.keys(extractedParams).join(', ')}. No supported attacks for these values; add relevant RSA parameters.`
+                  : `Recognized ${Object.keys(extractedParams).join(', ')}. ${applicablePreview.length} attacks available.`}
+            </Typography>
           )}
 
           {/* Applicable preview */}
@@ -397,7 +452,7 @@ export function MagicPanel() {
                 fullWidth
                 variant="outlined"
                 onClick={() => { void handleCrack(); }}
-                disabled={!rawInput.trim()}
+                disabled={!canCrack}
                 sx={{ ...colorGhostBtn(draculaColors.purple), '&:disabled': { borderColor: draculaColors.comment, color: draculaColors.comment } }}
               >
                 <Science sx={{ mr: 1 }} /> Crack It
@@ -424,8 +479,8 @@ export function MagicPanel() {
                   '& .MuiLinearProgress-bar': { backgroundColor: draculaColors.purple },
                 }}
               />
-              <Typography variant="body2" sx={{ color: draculaColors.purple, mt: 1, textAlign: 'center', fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                <HourglassEmpty sx={{ fontSize: '1rem', animation: `${hourglassSpin} 3s ease-in-out infinite` }} />
+              <Typography role="status" aria-live="polite" variant="body2" sx={{ color: draculaColors.purple, mt: 1, textAlign: 'center', fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                <HourglassEmpty sx={{ fontSize: '1rem', ...hourglassSpinSx }} />
                 Elapsed: {timer.formatted} / {jobs.filter(j => j.status !== 'running').length}/{jobs.length} completed
               </Typography>
             </Box>
@@ -467,6 +522,7 @@ export function MagicPanel() {
                     job={job}
                     expanded={expandedJob === job.attackId}
                     onToggle={handleToggleJob}
+                    onCopy={handleCopy}
                     attackId={job.attackId}
                   />
                 ))}

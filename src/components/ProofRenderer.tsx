@@ -163,10 +163,12 @@ export function ProofRenderer({ latex }: { latex: string }) {
 
   return (
     <Box sx={{ overflow: 'auto', flex: 1 }}>
-        <Box
+      <Box
           sx={{
             color: draculaColors.foreground,
             fontFamily: PROSE_FAMILY,
+            maxWidth: '72ch',
+            mx: 'auto',
             lineHeight: 1.8,
             '& .katex-display': {
               margin: '1.2em 0',
@@ -259,11 +261,18 @@ export function ProofRenderer({ latex }: { latex: string }) {
                   break;
                 }
                 if (headingMatch) {
+                  const isTopLevelHeading = /^(theorem|section|appendix)/i.test(headingMatch[1]);
                   rendered.push(
-                    <Typography key={j} variant="body1" sx={{ my: 1 }}>
-                      <strong>{headingMatch[1]}:</strong>{' '}
-                      <InlineMath text={headingMatch[2]} />
-                    </Typography>
+                    <Box key={j} sx={{ my: 1.5 }}>
+                      <Typography
+                        component={isTopLevelHeading ? 'h2' : 'h3'}
+                        variant={isTopLevelHeading ? 'h5' : 'h6'}
+                        sx={{ color: draculaColors.pink, fontFamily: MONO_FAMILY, fontWeight: 700, mb: headingMatch[2] ? 0.5 : 0 }}
+                      >
+                        {headingMatch[1]}:
+                      </Typography>
+                      {headingMatch[2] && <Typography variant="body1"><InlineMath text={headingMatch[2]} /></Typography>}
+                    </Box>
                   );
                 } else {
                   rendered.push(
