@@ -203,23 +203,26 @@ export default function ProofOfWorkTab() {
 
       {/* Documentation / Examples — collapsible */}
       <Box sx={{ mb: 2 }}>
-        <Box
-          onClick={() => setDocsOpen(!docsOpen)}
+        <Button
+          variant="text"
+          onClick={() => setDocsOpen(open => !open)}
+          aria-expanded={docsOpen}
+          aria-controls="pow-check-examples"
           sx={{
             display: 'flex',
             alignItems: 'center',
-            cursor: 'pointer',
             color: draculaColors.comment,
             fontFamily: MONO_FAMILY,
             fontSize: '0.8rem',
-            userSelect: 'none',
-            '&:hover': { color: draculaColors.foreground },
+            textTransform: 'none',
+            p: 0,
+            '&:hover': { color: draculaColors.foreground, backgroundColor: 'transparent' },
           }}
         >
           {docsOpen ? <ExpandLess sx={{ fontSize: '1rem', mr: 0.5 }} /> : <ExpandMore sx={{ fontSize: '1rem', mr: 0.5 }} />}
           Check function examples
-        </Box>
-        <Collapse in={docsOpen}>
+        </Button>
+        <Collapse in={docsOpen} id="pow-check-examples">
           <Box
             sx={{
               mt: 1,

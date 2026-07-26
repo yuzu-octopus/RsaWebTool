@@ -68,7 +68,7 @@ export function OutputPanel() {
   const handleHistoryClick = useCallback((_entry: HistoryEntry, key: string) => {
     setUi(prev => ({ ...prev, historySelectedKey: key }));
   }, []);
-  const getMaxOutputWidth = useCallback(() => Math.min(600, window.innerWidth - 620), []);
+  const getMaxOutputWidth = useCallback(() => Math.max(200, Math.min(600, window.innerWidth - 620)), []);
 
   const [maxOutputWidth, setMaxOutputWidth] = useState(getMaxOutputWidth);
 
@@ -82,9 +82,10 @@ export function OutputPanel() {
     axis: 'x',
     min: 200,
     max: maxOutputWidth,
-    defaultValue: 300,
+    defaultValue: Math.min(300, maxOutputWidth),
     storageKey: 'outputPanelWidth',
   });
+  const outputWidth = Math.min(width, maxOutputWidth);
 
   const handleCopy = () => {
     if (displayResult) {
@@ -95,7 +96,7 @@ export function OutputPanel() {
   };
 
   return (
-    <Box sx={{ width, flexShrink: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', pl: 2, position: 'relative' }}>
+    <Box sx={{ width: outputWidth, flexShrink: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', pl: 2, position: 'relative', '@media (max-width: 600px)': { width: '100%', pl: 0 } }}>
       <Box
         sx={{
           position: 'absolute',

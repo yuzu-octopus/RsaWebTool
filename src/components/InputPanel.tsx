@@ -218,7 +218,7 @@ export function InputPanel() {
                   value={inputValues[field.name] || ''}
                   onChange={e => handleInputChange(field.name, e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !isRunning && selectedAttack) {
+                    if (e.key === 'Enter' && !field.multiline && !isRunning && selectedAttack) {
                       e.preventDefault();
                       void handleRun(selectedAttack, inputValues);
                     }

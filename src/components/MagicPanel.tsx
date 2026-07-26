@@ -7,6 +7,7 @@ import {
   IconButton,
   List,
   ListItem,
+  ListItemButton,
   ListItemText,
   Divider,
   Collapse,
@@ -131,25 +132,34 @@ const JobListItem = memo(function JobListItem({
     [job.error, expanded]
   );
 
+  const completed = Boolean(job.result || job.error);
+  const contentId = `magic-job-${attackId}`;
+
   return (
     <ListItem sx={{ px: 0, flexDirection: 'column', alignItems: 'stretch' }}>
-      <Box
-        onClick={() => onToggle(attackId)}
-        sx={{ display: 'flex', alignItems: 'center', cursor: (job.result || job.error) ? 'pointer' : 'default', width: '100%' }}
-      >
-        <ListItemText
-          primary={primaryContent}
-          secondary={secondaryContent}
-        />
-        {(job.result || job.error) && (
-          <Typography sx={{ color: draculaColors.comment, display: 'flex', alignItems: 'center', mr: 1 }}>
+      {completed ? (
+        <ListItemButton
+          onClick={() => onToggle(attackId)}
+          aria-expanded={expanded}
+          aria-controls={contentId}
+          sx={{ px: 0, display: 'flex', alignItems: 'center', width: '100%' }}
+        >
+          <ListItemText
+            primary={primaryContent}
+            secondary={secondaryContent}
+          />
+          <Typography component="span" sx={{ color: draculaColors.comment, display: 'flex', alignItems: 'center', mr: 1 }}>
             {expanded ? <ExpandLess sx={{ fontSize: '1rem' }} /> : <ExpandMore sx={{ fontSize: '1rem' }} />}
           </Typography>
-        )}
-      </Box>
-      <Collapse in={expanded}>
+        </ListItemButton>
+      ) : (
+        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+          <ListItemText primary={primaryContent} secondary={secondaryContent} />
+        </Box>
+      )}
+      <Collapse in={expanded} id={contentId}>
         <Box sx={{ ml: 2, mt: 0.5, p: 1, borderRadius: 1, backgroundColor: draculaColors.background, maxHeight: 200, overflow: 'auto', position: 'relative' }}>
-          {(job.result || job.error) && (
+          {completed && (
             <IconButton
               size="small"
               aria-label="Copy result"

@@ -41,8 +41,11 @@ export const pulse = keyframes`
 export const flexPanelSx = {
   flex: 1,
   display: 'flex',
-  minWidth: 400,
+  minWidth: 0,
   overflow: 'hidden',
+  '@media (max-width: 600px)': {
+    flexDirection: 'column',
+  },
 } as const;
 
 export const colFlexSx = {
