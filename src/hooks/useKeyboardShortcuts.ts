@@ -61,11 +61,13 @@ export function useKeyboardShortcuts() {
           }
           break;
         case 'enter':
-          e.preventDefault();
-          window.dispatchEvent(new CustomEvent('rsa-run-attack'));
+          if (viewMode === 'attack') {
+            e.preventDefault();
+            window.dispatchEvent(new CustomEvent('rsa-run-attack'));
+          }
           break;
         case 'c':
-          if (e.shiftKey) {
+          if (e.shiftKey && viewMode === 'attack') {
             e.preventDefault();
             window.dispatchEvent(new CustomEvent('rsa-copy-output'));
           }
