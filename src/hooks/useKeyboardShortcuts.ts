@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useAppContext } from './useAppContext';
 
 export function useKeyboardShortcuts() {
-  const { selectedAttack, setSelectedAttack, setViewMode, setCalculatorMode, viewMode, calculatorMode, commandPaletteOpen, setCommandPaletteOpen } = useAppContext();
+  const { viewMode, commandPaletteOpen, setCommandPaletteOpen } = useAppContext();
   const commandPaletteOpenRef = useRef(commandPaletteOpen);
   commandPaletteOpenRef.current = commandPaletteOpen;
   useEffect(() => {

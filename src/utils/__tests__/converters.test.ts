@@ -23,6 +23,11 @@ describe('convertFormat', () => {
   test('text to hex', () => {
     expect(convertFormat('Hello', 'text', 'hex')).toBe('0x48656c6c6f');
   });
+  test('round-trips UTF-8 text through hex', () => {
+    const hex = convertFormat('€', 'text', 'hex');
+    expect(hex).toBe('0xe282ac');
+    expect(convertFormat(hex, 'hex', 'text')).toBe('€');
+  });
   test('same format returns trimmed input', () => {
     expect(convertFormat('  0xff  ', 'hex', 'hex')).toBe('0xff');
   });

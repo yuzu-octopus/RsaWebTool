@@ -332,7 +332,10 @@ function parsePbes2Params(root: Asn1Node, encryptedData: Uint8Array): Pbes2Param
   const encScheme = parseSequence(children[1]);
   const cipherOid = parseOid(encScheme[0]);
 
-  const cipherName = OID_NAMES[cipherOid] || 'AES-256-CBC';
+  const cipherName = OID_NAMES[cipherOid];
+  if (cipherName !== 'AES-128-CBC' && cipherName !== 'AES-192-CBC' && cipherName !== 'AES-256-CBC') {
+    throw new Error(`PBES2: unsupported cipher ${cipherName || cipherOid}`);
+  }
   const keyLengthBits = cipherName === 'AES-128-CBC' ? 128 : cipherName === 'AES-192-CBC' ? 192 : 256;
 
   // Get IV
@@ -379,7 +382,7 @@ export async function decryptPEM(parsed: ParsedPEM, passphrase: string): Promise
   }
 
   const encryptedData = children[1].value;
-  const params = parsePbes2Params(children[0], encryptedData);
+  const params = parsePbes2Params(parseSequence(children[0])[1], encryptedData);
 
   // Derive key using PBKDF2
   const keyMaterial = await crypto.subtle.importKey(

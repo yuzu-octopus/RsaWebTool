@@ -43,6 +43,9 @@ export function decodeLength(data: Uint8Array, offset: number): [number, number]
   if (numBytes > 4) {
     throw new Error(`DER: length too large (${numBytes} bytes)`);
   }
+  if (offset + 1 + numBytes > data.length) {
+    throw new Error(`DER: truncated long-form length (${numBytes} bytes)`);
+  }
   let length = 0;
   for (let i = 0; i < numBytes; i++) {
     length = (length << 8) | data[offset + 1 + i];

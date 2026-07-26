@@ -31,8 +31,8 @@ export function RsaEncryptTab() {
       out.dispatchError('e must be positive');
       return;
     }
-    if (mn >= nn) {
-      out.dispatchError('m must be < n');
+    if (mn < 0n || mn >= nn) {
+      out.dispatchError('m must be >= 0 and < n');
       return;
     }
 

@@ -29,6 +29,9 @@ describe('decodeLength (long form)', () => {
     expect(len).toBe(256);
     expect(newOffset).toBe(3);
   });
+  test('rejects truncated length bytes', () => {
+    expect(() => decodeDer(new Uint8Array([0x30, 0x82]))).toThrow(/length/i);
+  });
 });
 
 describe('parseInteger', () => {

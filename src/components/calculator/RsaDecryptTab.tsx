@@ -52,8 +52,8 @@ export function RsaDecryptTab() {
       out.dispatchError('n must be > 1');
       return;
     }
-    if (cn >= nn) {
-      out.dispatchError('c must be < n');
+    if (cn < 0n || cn >= nn) {
+      out.dispatchError('c must be >= 0 and < n');
       return;
     }
 

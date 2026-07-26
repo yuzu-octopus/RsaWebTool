@@ -84,7 +84,7 @@ export function bsgsSubgroup(g: bigint, y: bigint, p: bigint, r: bigint): bigint
     if (!baby.has(cur.toString())) baby.set(cur.toString(), j);
     cur = (cur * g) % p;
   }
-  const factor = modPow(g, (r - 1n - sqrtR + r) % r, p);
+  const factor = modPow(g, (r - sqrtR) % r, p);
   if (factor === null) return null;
   let gamma = y;
   for (let i = 0n; i < sqrtR; i++) {

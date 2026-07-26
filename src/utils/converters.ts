@@ -26,13 +26,6 @@ function parseBase64ToBytes(b64: string): Uint8Array {
   for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
   return bytes;
 }
-
-function parseTextToBytes(text: string): Uint8Array {
-  const bytes = new Uint8Array(text.length);
-  for (let i = 0; i < text.length; i++) bytes[i] = text.charCodeAt(i);
-  return bytes;
-}
-
 function formatBytesAsHex(bytes: Uint8Array): string {
   const parts: string[] = [];
   for (const b of bytes) parts.push(b.toString(16).padStart(2, '0'));
@@ -50,13 +43,6 @@ function formatBytesAsBase64(bytes: Uint8Array): string {
   for (const b of bytes) binary += String.fromCharCode(b);
   return btoa(binary);
 }
-
-function formatBytesAsText(bytes: Uint8Array): string {
-  let text = '';
-  for (const b of bytes) text += String.fromCharCode(b);
-  return text;
-}
-
 export function convertFormat(input: string, from: Format, to: Format): string {
   if (!input) return '';
   if (from === to) return input.trim();
@@ -65,14 +51,14 @@ export function convertFormat(input: string, from: Format, to: Format): string {
       case 'hex': return parseHexToBytes(input);
       case 'dec': return parseDecToBytes(input);
       case 'base64': return parseBase64ToBytes(input);
-      case 'text': return parseTextToBytes(input);
+      case 'text': return new TextEncoder().encode(input);
     }
   })();
   switch (to) {
     case 'hex': return formatBytesAsHex(bytes);
     case 'dec': return formatBytesAsDec(bytes);
     case 'base64': return formatBytesAsBase64(bytes);
-    case 'text': return formatBytesAsText(bytes);
+    case 'text': return new TextDecoder().decode(bytes);
   }
 }
 
