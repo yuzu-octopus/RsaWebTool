@@ -18,11 +18,14 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
       token: 'LSB_ORACLE',
       useGuard: false,
-      body: `        valid = True
-        if not ${validateNumeric(vals.n, 'n')}:
+      body: `        n_val = "${validateNumeric(vals.n, 'n')}".strip()
+        e_val = "${validateNumeric(vals.e, 'e')}".strip()
+        c_val = "${validateNumeric(vals.c, 'c')}".strip()
+        valid = True
+        if not n_val:
             out.append("ERROR: n is required")
             valid = False
-        if not ${validateNumeric(vals.c, 'c')}:
+        if not c_val:
             out.append("ERROR: c is required")
             valid = False
         responses_raw = """${sanitizePython(vals.oracle_responses || '')}""".strip()
@@ -30,10 +33,9 @@ export const attack: Attack = {
             out.append("ERROR: oracle_responses is required")
             valid = False
         if valid:
-            n = Integer(${validateNumeric(vals.n, 'n')})
-            e_val = ${validateNumeric(vals.e, 'e')}
+            n = Integer(n_val)
             e = Integer(e_val) if e_val else Integer(65537)
-            c = Integer(${validateNumeric(vals.c, 'c')})
+            c = Integer(c_val)
             orig_c = c
             oracle_bits = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
             two_e = pow(2, int(e), int(n))

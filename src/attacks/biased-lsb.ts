@@ -18,27 +18,29 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
       token: 'BIASED_LSB',
       useGuard: false,
-      body: `        valid = True
-        if not ${validateNumeric(vals.n, 'n')}:
+      body: `        n_val = "${validateNumeric(vals.n, 'n')}".strip()
+        e_val = "${validateNumeric(vals.e, 'e')}".strip()
+        c_val = "${validateNumeric(vals.c, 'c')}".strip()
+        valid = True
+        if not n_val:
             out.append("ERROR: n is required")
             valid = False
-        if not ${validateNumeric(vals.e, 'e')}:
+        if not e_val:
             out.append("ERROR: e is required")
             valid = False
-        if not ${validateNumeric(vals.c, 'c')}:
+        if not c_val:
             out.append("ERROR: c is required")
             valid = False
         if not """${sanitizePython(vals.oracle_runs)}""".strip():
             out.append("ERROR: oracle_runs is required")
             valid = False
         if valid:
-            n = Integer(${validateNumeric(vals.n, 'n')})
-            e_val = ${validateNumeric(vals.e, 'e')}
-            e = Integer(e_val) if e_val else Integer(65537)
-            orig_c = Integer(${validateNumeric(vals.c, 'c')})
+            n = Integer(n_val)
+            e = Integer(e_val)
+            orig_c = Integer(c_val)
             two_e = pow(2, int(e), int(n))
             two_e_sage = Integer(two_e)
-            c = (Integer(${validateNumeric(vals.c, 'c')}) * Integer(two_e)) % n
+            c = (Integer(c_val) * Integer(two_e)) % n
             runs_str = """${sanitizePython(vals.oracle_runs)}""".strip()
             runs = []
             for line in runs_str.split('\\n'):

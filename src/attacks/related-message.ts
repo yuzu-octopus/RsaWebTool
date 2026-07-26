@@ -20,11 +20,18 @@ export const attack: Attack = {
     { name: 'b2', label: 'b2 (second linear offset)', placeholder: '0', multiline: false },
   ],
   sageTemplate: (vals: Record<string, string>) => {
-    const body: string = `        n = Integer(${validateNumeric(vals.n, 'n')})
-        e_val = ${validateNumeric(vals.e, 'e')}
+    if (!vals.n || !vals.c1 || !vals.c2) {
+      return `print("ERROR: n, c1, and c2 are required")
+print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")`;
+    }
+    const body: string = `        n_val = "${validateNumeric(vals.n, 'n')}".strip()
+        e_val = "${validateNumeric(vals.e, 'e')}".strip()
+        c1_val = "${validateNumeric(vals.c1, 'c1')}".strip()
+        c2_val = "${validateNumeric(vals.c2, 'c2')}".strip()
+        n = Integer(n_val)
         e = Integer(e_val) if e_val else Integer(65537)
-        c1 = Integer(${validateNumeric(vals.c1, 'c1')})
-        c2 = Integer(${validateNumeric(vals.c2, 'c2')})
+        c1 = Integer(c1_val)
+        c2 = Integer(c2_val)
         a1_val = "${validateNumeric(vals.a1 || '', 'a1')}".strip()
         a1 = Integer(a1_val) if a1_val else Integer(1)
         b1_val = "${validateNumeric(vals.b1 || '', 'b1')}".strip()

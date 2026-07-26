@@ -3,6 +3,9 @@ import { rsaNeeds, noopSageTemplate } from './_rsaHelpers';
 import { randomPrime, TESTCASE_BITS } from '../utils/testcases/core';
 import { gcd } from '../utils/bigint';
 
+const MAX_MODULI = 128;
+const MAX_INPUT_BYTES = 256 * 1024;
+
 export const attack: Attack = {
   sageTemplate: (_) => noopSageTemplate('BATCH_GCD'),
   id: 'batch-gcd',
@@ -24,11 +27,17 @@ Tip: More efficient than pairwise GCD for large sets. O(k) GCD operations instea
     try {
       const raw = (vals.n_values || '').trim();
       if (!raw) return 'ERROR: Missing required input: n_values (comma-separated moduli)\nBATCH_GCD=FAILED';
+      if (new TextEncoder().encode(raw).length > MAX_INPUT_BYTES) {
+        return `ERROR: Batch GCD input exceeds safe limit of ${MAX_INPUT_BYTES} bytes\nBATCH_GCD=FAILED`;
+      }
 
       const moduli = raw.split(/[\n,]+/)
         .map(s => s.trim())
         .filter(s => s.length > 0)
         .map(s => BigInt(s));
+      if (moduli.length > MAX_MODULI) {
+        return `ERROR: Batch GCD input exceeds safe limit of ${MAX_MODULI} moduli\nBATCH_GCD=FAILED`;
+      }
 
       if (moduli.length < 2) {
         return null;

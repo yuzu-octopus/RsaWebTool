@@ -24,11 +24,13 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
     return wrapSageTemplate({
       token: 'SMALL_PUBLIC_EXP',
       useGuard: false,
-      body: `        n = Integer(${validateNumeric(vals.n, 'n')})
-        e_val = ${validateNumeric(vals.e, 'e')}
+      body: `        n_val = "${validateNumeric(vals.n, 'n')}".strip()
+        e_val = "${validateNumeric(vals.e, 'e')}".strip()
+        c_val = "${validateNumeric(vals.c, 'c')}".strip()
+        k_bound_val = "${validateNumeric(vals.k_bound, 'k_bound')}".strip()
+        n = Integer(n_val)
         e = Integer(e_val) if e_val else Integer(3)
-        c = Integer(${validateNumeric(vals.c, 'c')})
-        k_bound_val = ${validateNumeric(vals.k_bound, 'k_bound')} if "${vals.k_bound}" else "100000"
+        c = Integer(c_val)
         k_bound = Integer(k_bound_val) if k_bound_val else Integer(100000)
         out.append("Small Public Exponent")
         out.append(f"n = {n}")

@@ -32,10 +32,12 @@ print("KNOWN_PLAINTEXT=FAILED")`;
     return wrapSageTemplate({
       token: 'KNOWN_PLAINTEXT',
       useGuard: false,
-      body: `        n = Integer(${validateNumeric(vals.n, 'n')})
-        e_val = ${validateNumeric(vals.e, 'e')}
+      body: `        n_val = "${validateNumeric(vals.n, 'n')}".strip()
+        e_val = "${validateNumeric(vals.e, 'e')}".strip()
+        c_val = "${validateNumeric(vals.c, 'c')}".strip()
+        n = Integer(n_val)
         e = Integer(e_val) if e_val else Integer(65537)
-        c = Integer(${validateNumeric(vals.c, 'c')})
+        c = Integer(c_val)
         known_prefix = "${sanitizePython(vals.known_prefix || '')}"
         unknown_bits = Integer("${(vals.unknown_bits || '24').trim()}")
         out.append(f"Known Plaintext Attack")
