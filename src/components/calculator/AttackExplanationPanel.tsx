@@ -19,9 +19,9 @@ export function AttackExplanationPanel({ data }: { data: AttackExplanationData }
     <Box
       sx={{
         mb: 2,
-        maxHeight: '40vh',
-        overflow: 'auto',
-        pr: 1,
+        maxHeight: { xs: 'none', sm: '40vh' },
+        overflow: { xs: 'visible', sm: 'auto' },
+        pr: { xs: 0, sm: 1 },
         '&::-webkit-scrollbar': { width: '8px' },
         '&::-webkit-scrollbar-thumb': {
           background: draculaColors.currentLine,

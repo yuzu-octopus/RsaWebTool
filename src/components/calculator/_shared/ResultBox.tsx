@@ -59,18 +59,24 @@ export function ResultBox({
           <Typography variant="caption" sx={{ color: labelColor ?? draculaColors.green }}>
             {label}
             {copied && showCopy && (
-              <Box component="span" sx={{ ml: 1, color: draculaColors.cyan, fontSize: '0.65rem' }}>
+              <Box
+                component="span"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+                sx={{ ml: 1, color: draculaColors.cyan, fontSize: '0.65rem' }}
+              >
                 Copied!
               </Box>
             )}
           </Typography>
           {showCopy && (
-            <Tooltip title="Copy to clipboard">
+            <Tooltip title={`Copy ${label}`}>
               <IconButton
                 size="small"
                 onClick={handleCopy}
-                sx={{ color: draculaColors.cyan, p: 0.25 }}
-                aria-label="Copy to clipboard"
+                sx={{ color: draculaColors.cyan, minWidth: 44, minHeight: 44, p: 1 }}
+                aria-label={`Copy ${label}`}
               >
                 <ContentCopyIcon fontSize="small" />
               </IconButton>
@@ -78,7 +84,7 @@ export function ResultBox({
           )}
         </Box>
       )}
-      <Box sx={sx}>
+      <Box sx={sx} role="status" aria-live="polite" aria-atomic="true">
         <Box
           sx={{
             fontFamily: MONO_FAMILY,

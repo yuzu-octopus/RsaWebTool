@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, TextField, Button, Typography } from '@mui/material';
 import { PlayArrow } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
@@ -27,10 +27,15 @@ export function ECCAttacksTab() {
   const [pyVal, setPyVal] = useState('');
   const [pairsMultiline, setPairsMultiline] = useState('');
   const [kbitsVal, setKbitsVal] = useState('64');
+  const [isRunning, setIsRunning] = useState(false);
+  const runningRef = useRef(false);
   const out = useCalculatorOutput({ category: 'calculator-ecc' });
   const { execute } = useSageMath();
 
   const run = useCallback(async () => {
+    if (runningRef.current) return;
+    runningRef.current = true;
+    setIsRunning(true);
     out.clear();
     try {
       switch (attack) {
@@ -276,6 +281,9 @@ print('\\\\n'.join(out)); print('TOKEN=SUCCESS')`;
       }
     } catch (e) {
       out.dispatchError(e instanceof Error ? e.message : String(e));
+    } finally {
+      runningRef.current = false;
+      setIsRunning(false);
     }
   }, [attack, h1, h2, r1, s1, s2, nHex, aVal, bVal, pVal, xVal, yVal, pxVal, pyVal, pairsMultiline, kbitsVal, execute, out]);
 
@@ -389,17 +397,24 @@ print('\\\\n'.join(out)); print('TOKEN=SUCCESS')`;
 
   return (
     <Box>
-      <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
+      <FormControl fullWidth disabled={isRunning} sx={{ ...inputSx, mb: 2 }}>
         <InputLabel>Attack</InputLabel>
         <Select value={attack} label="Attack" onChange={e => setAttack(e.target.value)}>
           {ECC_ATTACKS.map(a => (<MenuItem key={a.value} value={a.value}>{a.label}</MenuItem>))}
         </Select>
       </FormControl>
-      {ECC_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={ECC_ATTACK_EXPLANATIONS[attack]} />}
-      {attackFields}
-      <Button variant="contained" startIcon={<PlayArrow />} onClick={() => { void run(); }} fullWidth sx={primaryBtnSx}>
-        Run Attack
+      <Box component="fieldset" disabled={isRunning} sx={{ border: 0, m: 0, p: 0, minWidth: 0, pointerEvents: isRunning ? 'none' : 'auto' }}>
+        {ECC_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={ECC_ATTACK_EXPLANATIONS[attack]} />}
+        {attackFields}
+      </Box>
+      <Button variant="contained" startIcon={<PlayArrow />} onClick={() => { void run(); }} disabled={isRunning} fullWidth sx={primaryBtnSx}>
+        {isRunning ? 'Running attack…' : 'Run Attack'}
       </Button>
+      {isRunning && (
+        <Typography role="status" aria-live="polite" sx={{ color: draculaColors.comment, mt: 1, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>
+          Running attack…
+        </Typography>
+      )}
       {out.result && <Box sx={{ mt: 2 }}><ResultBox value={out.result} label="Result" variant="medium" /></Box>}
       {out.error && (
         <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>

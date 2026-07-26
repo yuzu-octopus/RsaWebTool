@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Box, Typography, TextField, Button } from '@mui/material';
+import { Typography, TextField, Button } from '@mui/material';
 import { draculaColors } from '../../theme/dracula';
 import { modPow } from '../../utils/bigint';
 import { parseBigInt, toHex, toAscii, isPrintableAscii } from '../../utils/rsaCalc';
-import { inputSx } from '../../styles/shared';
-import { outputBoxSx, primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
+import { inputSx, primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
+import { ResultBox } from './_shared/ResultBox';
 
 export function RsaEncryptTab() {
   const [m, setM] = useState('');
@@ -80,9 +80,12 @@ export function RsaEncryptTab() {
       >
         Encrypt
       </Button>
-      {out.result && <Box sx={outputBoxSx()}>{out.result}</Box>}
+      {out.result && <ResultBox value={out.result} label="RSA ciphertext" />}
       {out.error && (
         <Typography
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
           sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}
         >
           {out.error}

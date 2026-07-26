@@ -6,7 +6,7 @@ import {
 } from '@mui/material';
 import { Stop, PlayArrow, HourglassEmpty, ContentCopy } from '@mui/icons-material';
 import { inputSx } from '../../../styles/shared';
-import { outputBoxSx, colorGhostBtn, hourglassSpin, MONO_FAMILY } from '../../../styles/shared';
+import { outputBoxSx, colorGhostBtn, hourglassSpinSx, MONO_FAMILY } from '../../../styles/shared';
 import { useWorkerPool } from '../../../hooks/useWorkerPool';
 import { ProgressEstimator } from '../../../utils/progressEstimator';
 import { useAppContext } from '../../../hooks/useAppContext';
@@ -192,7 +192,7 @@ export default function ProofOfWorkTab() {
 
       {/* Running: hourglass + progress bar + ETA */}
       {running && (
-        <>
+        <Box role="status" aria-live="polite" aria-atomic="true">
           <Typography
             variant="body2"
             sx={{
@@ -209,7 +209,7 @@ export default function ProofOfWorkTab() {
               sx={{
                 color: draculaColors.orange,
                 fontSize: '1rem',
-                animation: `${hourglassSpin} 3s ease-in-out infinite`,
+                ...hourglassSpinSx,
               }}
             />
             Searching&hellip;
@@ -220,6 +220,7 @@ export default function ProofOfWorkTab() {
               <LinearProgress
                 variant="determinate"
                 value={progress}
+                aria-label="Proof-of-work progress"
                 sx={{
                   height: 6,
                   borderRadius: 3,
@@ -257,21 +258,21 @@ export default function ProofOfWorkTab() {
               )}
             </Box>
           )}
-        </>
+        </Box>
       )}
 
       {/* Success result */}
       {result && (
-        <Box>
+        <Box role="status" aria-live="polite" aria-atomic="true">
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
             <Typography variant="caption" sx={{ color: draculaColors.green }}>
               Nonce found:
             </Typography>
             <Tooltip title="Copy result">
               <IconButton
-                size="small"
+                aria-label="Copy proof-of-work result"
                 onClick={handleCopyResult}
-                sx={{ color: draculaColors.cyan }}
+                sx={{ color: draculaColors.cyan, width: 44, height: 44 }}
               >
                 <ContentCopy fontSize="small" />
               </IconButton>
@@ -291,9 +292,9 @@ export default function ProofOfWorkTab() {
         </Box>
       )}
 
-      {/* Error output */}
       {error && (
         <Typography
+          role="alert"
           sx={{
             color: draculaColors.red,
             mt: 2,

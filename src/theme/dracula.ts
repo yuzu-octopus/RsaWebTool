@@ -5,6 +5,7 @@ export const draculaColors = {
   currentLine: '#44475a',
   foreground: '#f8f8f2',
   comment: '#6272a4',
+  muted: '#a9b4d0',
   cyan: '#8be9fd',
   green: '#50fa7b',
   orange: '#ffb86c',
@@ -32,7 +33,7 @@ export const draculaTheme = createTheme({
     },
     text: {
       primary: draculaColors.foreground,
-      secondary: draculaColors.comment,
+      secondary: draculaColors.muted,
     },
   },
   typography: {

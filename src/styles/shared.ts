@@ -86,7 +86,7 @@ export const outputBoxSx = (maxHeight = '150px') => ({
 
 // ─── Tabs ───────────────────────────────────────────────────────────────
 export const tabSx = {
-  color: draculaColors.comment,
+  color: draculaColors.muted,
   fontFamily: MONO_FAMILY,
   fontSize: '0.85rem',
   minHeight: 40,
@@ -153,7 +153,7 @@ export const pageTitleSx = {
 
 /** Sub-section title — quieter, used for tertiary headings. */
 export const subTitleSx = {
-  color: draculaColors.comment,
+  color: draculaColors.muted,
   fontFamily: MONO_FAMILY,
   fontSize: '0.85rem',
   mb: 1,
@@ -171,7 +171,7 @@ export const inputSx = {
     '&.Mui-focused fieldset': { borderColor: draculaColors.purple },
   },
   '& .MuiInputLabel-root': {
-    color: draculaColors.comment,
+    color: draculaColors.muted,
     fontFamily: MONO_FAMILY,
     '&.Mui-focused': { color: draculaColors.purple },
   },
@@ -179,7 +179,7 @@ export const inputSx = {
     fontFamily: MONO_FAMILY,
   },
   '& .MuiFormHelperText-root': {
-    color: draculaColors.comment,
+    color: draculaColors.muted,
     fontFamily: MONO_FAMILY,
     fontSize: '0.7rem',
     marginLeft: 0,

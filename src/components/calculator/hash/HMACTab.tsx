@@ -132,15 +132,15 @@ export default function HMACTab() {
         Compute HMAC
       </Button>
       {result && (
-        <Box>
+        <Box role="status" aria-live="polite" aria-atomic="true">
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
             <Typography variant="caption" sx={{ color: draculaColors.green }}>HMAC-{selectedAlg?.label ?? algorithm}:</Typography>
-            <Tooltip title="Copy HMAC"><IconButton size="small" onClick={handleCopy} sx={{ color: draculaColors.cyan }}><ContentCopy fontSize="small" /></IconButton></Tooltip>
+            <Tooltip title="Copy HMAC"><IconButton aria-label={`Copy HMAC-${selectedAlg?.label ?? algorithm}`} onClick={handleCopy} sx={{ color: draculaColors.cyan, width: 44, height: 44 }}><ContentCopy fontSize="small" /></IconButton></Tooltip>
           </Box>
           <Box sx={outputBoxSx()}><Box sx={{ fontFamily: MONO_FAMILY, wordBreak: 'break-all' }}>{result}</Box></Box>
         </Box>
       )}
-      {error && (<Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>{error}</Typography>)}
+      {error && (<Typography role="alert" sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>{error}</Typography>)}
     </Box>
   );
 }

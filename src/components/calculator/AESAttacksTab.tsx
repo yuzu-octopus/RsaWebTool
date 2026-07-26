@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useReducer } from 'react';
+import { useState, useCallback, useMemo, useReducer, useRef } from 'react';
 import { Box, TextField, Button, Select, MenuItem, FormControl, InputLabel, Typography } from '@mui/material';
 import { PlayArrow } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
@@ -28,10 +28,14 @@ export function AESAttacksTab() {
   const [loading, dispatchLoading] = useReducer((_s: boolean, action: 'start' | 'stop') => action === 'start', false);
   const isRunning = loading;
   const out = useCalculatorOutput({ category: 'calculator-aes' });
+  const runningRef = useRef(false);
 
-  const run = useCallback(() => {
-    out.clear();
+  const run = useCallback(async () => {
+    if (runningRef.current) return;
+    runningRef.current = true;
     dispatchLoading('start');
+    await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+    out.clear();
     try {
       switch (attack) {
         case 'ctr-nonce': {
@@ -133,6 +137,7 @@ export function AESAttacksTab() {
     } catch (e) {
       out.dispatchError(e instanceof Error ? e.message : String(e));
     } finally {
+      runningRef.current = false;
       dispatchLoading('stop');
     }
   }, [attack, ct1, ct2, knownPt, ivHex, blockIdx, targetText, currentPtHex, cts, gcmCt1, gcmPt1, gcmCt2, scheduleKey, out]);
@@ -141,25 +146,25 @@ export function AESAttacksTab() {
     switch (attack) {
       case 'ctr-nonce': return (
         <>
-          <TextField fullWidth label="Ciphertext 1 (hex)" value={ct1} onChange={e => setCt1(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Hex CT1" spellCheck={false} />
-          <TextField fullWidth label="Ciphertext 2 (hex)" value={ct2} onChange={e => setCt2(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Hex CT2" spellCheck={false} />
-          <TextField fullWidth label="Known PT (hex)" value={knownPt} onChange={e => setKnownPt(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Known plaintext for CT1" spellCheck={false} />
+          <TextField fullWidth disabled={isRunning} label="Ciphertext 1 (hex)" value={ct1} onChange={e => setCt1(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Hex CT1" spellCheck={false} />
+          <TextField fullWidth disabled={isRunning} label="Ciphertext 2 (hex)" value={ct2} onChange={e => setCt2(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Hex CT2" spellCheck={false} />
+          <TextField fullWidth disabled={isRunning} label="Known PT (hex)" value={knownPt} onChange={e => setKnownPt(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Known plaintext for CT1" spellCheck={false} />
         </>
       );
       case 'cbc-bitflip': return (
         <>
-          <TextField fullWidth label="Ciphertext (hex)" value={ct1} onChange={e => setCt1(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Hex CT" spellCheck={false} />
-          <TextField fullWidth label="IV (hex)" value={ivHex} onChange={e => setIvHex(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Hex IV" spellCheck={false} />
-          <TextField fullWidth label="Block index" value={blockIdx} onChange={e => setBlockIdx(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="0" />
-          <TextField fullWidth label="Current Plaintext (hex)" value={currentPtHex} onChange={e => setCurrentPtHex(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Current plaintext block in hex" spellCheck={false} />
-          <TextField fullWidth label="Target text" value={targetText} onChange={e => setTargetText(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Desired plaintext" />
+          <TextField fullWidth disabled={isRunning} label="Ciphertext (hex)" value={ct1} onChange={e => setCt1(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Hex CT" spellCheck={false} />
+          <TextField fullWidth disabled={isRunning} label="IV (hex)" value={ivHex} onChange={e => setIvHex(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Hex IV" spellCheck={false} />
+          <TextField fullWidth disabled={isRunning} label="Block index" value={blockIdx} onChange={e => setBlockIdx(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="0" />
+          <TextField fullWidth disabled={isRunning} label="Current Plaintext (hex)" value={currentPtHex} onChange={e => setCurrentPtHex(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Current plaintext block in hex" spellCheck={false} />
+          <TextField fullWidth disabled={isRunning} label="Target text" value={targetText} onChange={e => setTargetText(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Desired plaintext" />
         </>
       );
       case 'ecb-detect': return (
-        <TextField fullWidth multiline minRows={3} maxRows={8} label="Ciphertexts (one hex/line)" value={cts} onChange={e => setCts(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Hex CT per line" spellCheck={false} />
+        <TextField fullWidth disabled={isRunning} multiline minRows={3} maxRows={8} label="Ciphertexts (one hex/line)" value={cts} onChange={e => setCts(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Hex CT per line" spellCheck={false} />
       );
       case 'ecb-cutpaste': return (
-        <TextField fullWidth label="Ciphertext (hex)" value={ct1} onChange={e => setCt1(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Multiples of 16 bytes" spellCheck={false} />
+        <TextField fullWidth disabled={isRunning} label="Ciphertext (hex)" value={ct1} onChange={e => setCt1(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Multiples of 16 bytes" spellCheck={false} />
       );
       case 'ecb-byte': return (
         <Box sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, fontSize: '0.85rem', p: 2, border: `1px solid ${draculaColors.currentLine}`, borderRadius: '4px' }}>
@@ -173,23 +178,23 @@ export function AESAttacksTab() {
       );
       case 'gcm-nonce': return (
         <>
-          <TextField fullWidth label="CT1" value={gcmCt1} onChange={e => setGcmCt1(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="CT1 hex" spellCheck={false} />
-          <TextField fullWidth label="PT1" value={gcmPt1} onChange={e => setGcmPt1(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="PT1 hex" spellCheck={false} />
-          <TextField fullWidth label="CT2" value={gcmCt2} onChange={e => setGcmCt2(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="CT2 hex" spellCheck={false} />
+          <TextField fullWidth disabled={isRunning} label="CT1" value={gcmCt1} onChange={e => setGcmCt1(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="CT1 hex" spellCheck={false} />
+          <TextField fullWidth disabled={isRunning} label="PT1" value={gcmPt1} onChange={e => setGcmPt1(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="PT1 hex" spellCheck={false} />
+          <TextField fullWidth disabled={isRunning} label="CT2" value={gcmCt2} onChange={e => setGcmCt2(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="CT2 hex" spellCheck={false} />
         </>
       );
       case 'key-schedule': return (
-        <TextField fullWidth label="AES Key (hex)" value={scheduleKey} onChange={e => setScheduleKey(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="32/48/64 hex chars" spellCheck={false} />
+        <TextField fullWidth disabled={isRunning} label="AES Key (hex)" value={scheduleKey} onChange={e => setScheduleKey(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="32/48/64 hex chars" spellCheck={false} />
       );
       default: return null;
     }
-  }, [attack, ct1, ct2, knownPt, ivHex, blockIdx, targetText, currentPtHex, cts, gcmCt1, gcmPt1, gcmCt2, scheduleKey]);
+  }, [attack, ct1, ct2, knownPt, ivHex, blockIdx, targetText, currentPtHex, cts, gcmCt1, gcmPt1, gcmCt2, scheduleKey, isRunning]);
 
   return (
     <Box>
       <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
         <InputLabel>Attack</InputLabel>
-        <Select value={attack} label="Attack" onChange={e => setAttack(e.target.value)}>
+        <Select value={attack} label="Attack" onChange={e => setAttack(e.target.value)} disabled={isRunning}>
           {AES_ATTACKS.map(a => (
             <MenuItem key={a.value} value={a.value}>{a.label}</MenuItem>
           ))}
@@ -205,8 +210,13 @@ export function AESAttacksTab() {
         fullWidth
         sx={primaryBtnSx}
       >
-        Run Attack
+        {isRunning ? 'Running attack…' : 'Run Attack'}
       </Button>
+      {isRunning && (
+        <Typography role="status" aria-live="polite" sx={{ color: draculaColors.comment, mt: 1, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>
+          Running attack…
+        </Typography>
+      )}
       {out.result && <Box sx={{ mt: 2 }}><ResultBox value={out.result} label="Result" variant="medium" /></Box>}
       {out.error && (
         <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>

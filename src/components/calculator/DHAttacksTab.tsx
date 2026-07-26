@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem, TextField, Button, Typography } from '@mui/material';
 import { PlayArrow } from '@mui/icons-material';
 import { draculaColors } from '../../theme/dracula';
@@ -17,10 +17,15 @@ export function DHAttacksTab() {
   const [pVal, setPVal] = useState('');
   const [gVal, setGVal] = useState('');
   const [yVal, setYVal] = useState('');
+  const [isRunning, setIsRunning] = useState(false);
+  const runningRef = useRef(false);
   const out = useCalculatorOutput({ category: 'calculator-dh' });
   const { execute } = useSageMath();
 
   const run = useCallback(async () => {
+    if (runningRef.current) return;
+    runningRef.current = true;
+    setIsRunning(true);
     out.clear();
     try {
       const p = parseHex(pVal);
@@ -171,32 +176,42 @@ except Exception as e:
       }
     } catch (e) {
       out.dispatchError(e instanceof Error ? e.message : String(e));
+    } finally {
+      runningRef.current = false;
+      setIsRunning(false);
     }
   }, [attack, pVal, gVal, yVal, execute, out]);
 
   return (
     <Box>
-      <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
+      <FormControl fullWidth disabled={isRunning} sx={{ ...inputSx, mb: 2 }}>
         <InputLabel>Attack</InputLabel>
         <Select value={attack} label="Attack" onChange={e => setAttack(e.target.value)}>
           {DH_ATTACKS.map(a => (<MenuItem key={a.value} value={a.value}>{a.label}</MenuItem>))}
         </Select>
       </FormControl>
 
-      {DH_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={DH_ATTACK_EXPLANATIONS[attack]} />}
+      <Box component="fieldset" disabled={isRunning} sx={{ border: 0, m: 0, p: 0, minWidth: 0, pointerEvents: isRunning ? 'none' : 'auto' }}>
+        {DH_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={DH_ATTACK_EXPLANATIONS[attack]} />}
 
-      <TextField fullWidth label="p (prime, hex)" value={pVal} onChange={e => setPVal(e.target.value)}
-        variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Prime modulus" spellCheck={false} />
-      <Box sx={{ display: 'flex', gap: 1 }}>
-        <TextField fullWidth label="g (decimal)" value={gVal} onChange={e => setGVal(e.target.value)}
-          variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Generator" spellCheck={false} />
-        <TextField fullWidth label="y (Alice public, hex)" value={yVal} onChange={e => setYVal(e.target.value)}
-          variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="y = g^a mod p" spellCheck={false} />
+        <TextField fullWidth label="p (prime, hex)" value={pVal} onChange={e => setPVal(e.target.value)}
+          variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Prime modulus" spellCheck={false} />
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <TextField fullWidth label="g (decimal)" value={gVal} onChange={e => setGVal(e.target.value)}
+            variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Generator" spellCheck={false} />
+          <TextField fullWidth label="y (Alice public, hex)" value={yVal} onChange={e => setYVal(e.target.value)}
+            variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="y = g^a mod p" spellCheck={false} />
+        </Box>
       </Box>
 
-      <Button variant="contained" startIcon={<PlayArrow />} onClick={() => { void run(); }} fullWidth sx={primaryBtnSx}>
-        Run Attack
+      <Button variant="contained" startIcon={<PlayArrow />} onClick={() => { void run(); }} disabled={isRunning} fullWidth sx={primaryBtnSx}>
+        {isRunning ? 'Running attack…' : 'Run Attack'}
       </Button>
+      {isRunning && (
+        <Typography role="status" aria-live="polite" sx={{ color: draculaColors.comment, mt: 1, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>
+          Running attack…
+        </Typography>
+      )}
 
       {out.result && <Box sx={{ mt: 2 }}><ResultBox value={out.result} label="Result" variant="medium" /></Box>}
       {out.error && (

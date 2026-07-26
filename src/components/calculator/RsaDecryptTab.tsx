@@ -3,9 +3,9 @@ import { Box, Typography, TextField, Button } from '@mui/material';
 import { draculaColors } from '../../theme/dracula';
 import { modPow, modInverse } from '../../utils/bigint';
 import { parseBigInt, toHex, toAscii, isPrintableAscii } from '../../utils/rsaCalc';
-import { inputSx } from '../../styles/shared';
-import { outputBoxSx, primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
+import { inputSx, primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
+import { ResultBox } from './_shared/ResultBox';
 
 export function RsaDecryptTab() {
   const [form, setForm] = useState({ c: '', n: '', d: '', p: '', q: '', e: '' });
@@ -86,56 +86,75 @@ export function RsaDecryptTab() {
 
   return (
     <>
-      <TextField
-        fullWidth
-        label="c (ciphertext)"
-        value={form.c}
-        onChange={e => setForm(prev => ({ ...prev, c: e.target.value }))}
-        variant="outlined"
-        sx={{ ...inputSx, mb: 2 }}
-      />
-      <TextField
-        fullWidth
-        label="n (modulus)"
-        value={form.n}
-        onChange={e => setForm(prev => ({ ...prev, n: e.target.value }))}
-        variant="outlined"
-        sx={{ ...inputSx, mb: 2 }}
-      />
-      <TextField
-        fullWidth
-        label="d (private exponent, optional)"
-        value={form.d}
-        onChange={e => setForm(prev => ({ ...prev, d: e.target.value }))}
-        variant="outlined"
-        sx={{ ...inputSx, mb: 2 }}
-      />
-      <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+      <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 2 }}>
+        Enter every value as decimal or with a <code>0x</code> hexadecimal prefix.
+      </Typography>
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="subtitle2" sx={{ color: draculaColors.foreground, mb: 1 }}>
+          Ciphertext and modulus
+        </Typography>
         <TextField
           fullWidth
-          label="p (optional)"
-          value={form.p}
-          onChange={e => setForm(prev => ({ ...prev, p: e.target.value }))}
+          label="c (ciphertext)"
+          helperText="Ciphertext to decrypt, in decimal or 0x hexadecimal."
+          value={form.c}
+          onChange={e => setForm(prev => ({ ...prev, c: e.target.value }))}
           variant="outlined"
-          sx={inputSx}
+          sx={{ ...inputSx, mb: 2 }}
         />
         <TextField
           fullWidth
-          label="q (optional)"
-          value={form.q}
-          onChange={e => setForm(prev => ({ ...prev, q: e.target.value }))}
+          label="n (modulus)"
+          helperText="Required unless both p and q are supplied."
+          value={form.n}
+          onChange={e => setForm(prev => ({ ...prev, n: e.target.value }))}
           variant="outlined"
           sx={inputSx}
         />
       </Box>
-      <TextField
-        fullWidth
-        label="e (optional)"
-        value={form.e}
-        onChange={e => setForm(prev => ({ ...prev, e: e.target.value }))}
-        variant="outlined"
-        sx={{ ...inputSx, mb: 2 }}
-      />
+      <Box sx={{ mb: 2 }}>
+        <Typography variant="subtitle2" sx={{ color: draculaColors.foreground, mb: 1 }}>
+          Private exponent or key factors
+        </Typography>
+        <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 2 }}>
+          Provide d directly, or provide p, q, and e so d can be derived.
+        </Typography>
+        <TextField
+          fullWidth
+          label="d (private exponent)"
+          helperText="Optional when p, q, and e are provided."
+          value={form.d}
+          onChange={e => setForm(prev => ({ ...prev, d: e.target.value }))}
+          variant="outlined"
+          sx={{ ...inputSx, mb: 2 }}
+        />
+        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+          <TextField
+            fullWidth
+            label="p (prime factor)"
+            value={form.p}
+            onChange={e => setForm(prev => ({ ...prev, p: e.target.value }))}
+            variant="outlined"
+            sx={inputSx}
+          />
+          <TextField
+            fullWidth
+            label="q (prime factor)"
+            value={form.q}
+            onChange={e => setForm(prev => ({ ...prev, q: e.target.value }))}
+            variant="outlined"
+            sx={inputSx}
+          />
+        </Box>
+        <TextField
+          fullWidth
+          label="e (public exponent)"
+          value={form.e}
+          onChange={e => setForm(prev => ({ ...prev, e: e.target.value }))}
+          variant="outlined"
+          sx={inputSx}
+        />
+      </Box>
       <Button
         fullWidth
         variant="contained"
@@ -145,9 +164,12 @@ export function RsaDecryptTab() {
       >
         Decrypt
       </Button>
-      {out.result && <Box sx={outputBoxSx()}>{out.result}</Box>}
+      {out.result && <ResultBox value={out.result} label="Decrypted RSA plaintext" />}
       {out.error && (
         <Typography
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
           sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}
         >
           {out.error}
