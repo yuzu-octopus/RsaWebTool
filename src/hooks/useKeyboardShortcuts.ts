@@ -1,10 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useAppContext } from './useAppContext';
 
 export function useKeyboardShortcuts() {
-  const { viewMode, commandPaletteOpen, setCommandPaletteOpen } = useAppContext();
-  const commandPaletteOpenRef = useRef(commandPaletteOpen);
-  commandPaletteOpenRef.current = commandPaletteOpen;
+  const { viewMode, setCommandPaletteOpen } = useAppContext();
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const mod = e.metaKey || e.ctrlKey;
@@ -16,8 +14,7 @@ export function useKeyboardShortcuts() {
       switch (e.key.toLowerCase()) {
         case 'k':
           e.preventDefault();
-          commandPaletteOpenRef.current = !commandPaletteOpenRef.current;
-          setCommandPaletteOpen(commandPaletteOpenRef.current);
+          setCommandPaletteOpen(open => !open);
           break;
         case '1':
           e.preventDefault();
