@@ -175,20 +175,16 @@ q_0 &= \\left\\lfloor\\sqrt{\\frac{nb}{a}}\\right\\rfloor \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Need p/q close to a small rational a/b. Construct: pick small a, b, then generate q, set p ≈ q * a/b.
-  const a = BigInt(3);
-  const b = BigInt(5);
-  const q = randomPrime(TESTCASE_BITS.q);
-  const pTarget = (q * a) / b;
-  let p = pTarget;
-  for (let delta = 0n; delta < 500n; delta += 1n) {
-    const candidate1 = pTarget + delta;
-    if (candidate1 > 1n && isPrimeMR(candidate1)) { p = candidate1; break; }
-    const candidate2 = pTarget - delta;
-    if (candidate2 > 1n && isPrimeMR(candidate2)) { p = candidate2; break; }
+  // Bound retries so a pathological random source produces a diagnostic instead of hanging Generate.
+  for (let attempt = 0; attempt < 10_000; attempt++) {
+    const q = randomPrime(TESTCASE_BITS.q);
+    const pTarget = (q * 3n) / 5n;
+    for (let delta = 0n; delta <= 2000n; delta += 1n) {
+      const candidate1 = pTarget + delta;
+      if (isPrimeMR(candidate1)) return { n: (candidate1 * q).toString() };
+      const candidate2 = pTarget - delta;
+      if (candidate2 > 1n && isPrimeMR(candidate2)) return { n: (candidate2 * q).toString() };
+    }
   }
-  if (!isPrimeMR(p)) {
-    throw new Error('No prime found in ±500 of pTarget — retry');
-  }
-  return { n: (p * q).toString() };
+  throw new Error('small-fraction: unable to construct a testcase within 10,000 attempts');
 };
