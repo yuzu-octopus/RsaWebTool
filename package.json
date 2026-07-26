@@ -19,7 +19,7 @@
     "test:attacks:fail": "bun scripts/test-attacks.ts -- --fail",
     "test:attacks:json": "bun scripts/test-attacks.ts -- --json",
     "test:attacks:sage": "bun scripts/test-sage-docker.ts",
-    "doctor": "npx react-doctor@latest"
+    "doctor": "react-doctor"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

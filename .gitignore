@@ -6,9 +6,8 @@ docs
 
 # Environment
 .env
-.env.local
-.env.*.local
-
+.env*
+!.env.example
 # IDE / Editor
 .vscode/*
 !.vscode/extensions.json
@@ -41,12 +40,13 @@ AGENTS.md
 # and is what lifted the baseline react-doctor score from 44 to 68.)
 doctor.config.*
 
-# Test infrastructure (scripts + artifacts, not deployed)
-scripts/
+# Test infrastructure artifacts
+scripts/test-results/
 test-results/
 
-# Cloudflare Worker (deployed separately)
-/workers/
+# Cloudflare Worker artifacts and dependencies
+workers/node_modules/
+workers/.wrangler/
 
 # Internal test page (not deployed)
 public/test-api-suite.html
