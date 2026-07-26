@@ -11,11 +11,8 @@
  *   Worker → Main: { id: number, result: string | null, error?: string }
  *   Worker → Main: { type: 'progress', id: number, pct: number, detail?: string }
  *
- * Special attackId '__pow__' runs the PoW solver:
- *   params.challenge — the challenge string
- *   params.difficulty — number of leading zero bits required (>= 1, fallback)
- *   params.checkCode — optional JS check function body (receives hex `hash`, returns bool)
- *   Returns JSON-stringified PoWResult on success.
+ * Special attackId '__pow__' runs the PoW solver with leading-zero difficulty.
+ * Returns JSON-stringified PoWResult on success.
  */
 
 import { attacksById } from '../attacks';
@@ -57,6 +54,14 @@ interface WorkerProgress {
 const cancelledIds = new Set<number>();
 
 // AbortControllers for PoW tasks keyed by task ID — enables proper AbortSignal propagation
+const HASH_BITS: Record<string, number> = {
+  'SHA-256': 256,
+  'SHA-384': 384,
+  'SHA-512': 512,
+  'SHA-1': 160,
+  MD5: 128,
+};
+
 const powControllers = new Map<number, AbortController>();
 
 self.onmessage = (e: MessageEvent<CancelMessage | WorkerRequest>) => {
@@ -86,10 +91,10 @@ self.onmessage = (e: MessageEvent<CancelMessage | WorkerRequest>) => {
   // Special handler: Proof-of-Work computation (attackId === '__pow__')
   if (attackId === '__pow__') {
     const challenge = params.challenge;
-    const difficulty = parseInt(params.difficulty, 10);
-    if (!challenge || isNaN(difficulty) || difficulty < 1) {
+    const difficulty = Number(params.difficulty);
+    if (!challenge || !/^(?:[1-9]\d*)$/.test(params.difficulty) || !Number.isSafeInteger(difficulty) || difficulty < 1 || difficulty > (HASH_BITS[params.hashAlgorithm] ?? 0)) {
       if (!cancelledIds.has(id)) {
-        self.postMessage({ id, result: null, error: 'Invalid PoW params: challenge and difficulty (>= 1) required' } satisfies WorkerResponse);
+        self.postMessage({ id, result: null, error: 'Invalid PoW params: challenge and difficulty must fit the selected hash' } satisfies WorkerResponse);
       }
       return;
     }
@@ -103,7 +108,7 @@ self.onmessage = (e: MessageEvent<CancelMessage | WorkerRequest>) => {
             self.postMessage({ type: 'progress', id, pct, detail } satisfies WorkerProgress);
           }
         };
-        const result = await solvePoW({ challenge, difficulty, checkCode: params.checkCode, hashAlgorithm: params.hashAlgorithm }, abortController.signal, onProgress);
+        const result = await solvePoW({ challenge, difficulty, hashAlgorithm: params.hashAlgorithm }, abortController.signal, onProgress);
         if (!cancelledIds.has(id)) {
           self.postMessage({ id, result: result ? JSON.stringify(result) : null } satisfies WorkerResponse);
         }

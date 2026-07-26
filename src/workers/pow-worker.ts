@@ -9,8 +9,7 @@
 
 export interface PoWInput {
   challenge: string;
-  difficulty: number; // number of leading zero bits required (fallback when no checkCode)
-  checkCode?: string; // optional JavaScript code for the check function: (hash: string) => boolean
+  difficulty: number; // number of leading zero bits required
   hashAlgorithm?: string; // hash algorithm name (default: SHA-256)
 }
 
@@ -54,30 +53,18 @@ export async function solvePoW(
   signal?: AbortSignal,
   onProgress?: (pct: number, detail?: string) => void,
 ): Promise<PoWResult | null> {
-  const { challenge, difficulty, checkCode, hashAlgorithm = 'SHA-256' } = input;
+  const { challenge, difficulty, hashAlgorithm = 'SHA-256' } = input;
   const encoder = new TextEncoder();
   let nonce = 0;
   const maxAttempts = 1 << 24; // ~16.7M attempts cap
   const reportInterval = Math.max(1, Math.floor(maxAttempts / 100));
 
-  // Build check function from user code, or fallback to leading-zero-bits
-  let check: (hashHex: string) => boolean;
-  if (checkCode) {
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-implied-eval
-      check = new Function('hash', checkCode) as (hashHex: string) => boolean;
-    } catch (e) {
-      throw new Error(`Invalid check function: ${e instanceof Error ? e.message : String(e)}`, { cause: e });
-    }
-  } else {
-    check = (hashHex: string) => {
-      // Convert hex back to bytes for the bit-level check
-      const bytes = new Uint8Array(
-        hashHex.match(/.{2}/g)?.map(b => parseInt(b, 16)) ?? [],
-      );
-      return checkLeadingZeros(bytes, difficulty);
-    };
-  }
+  const check = (hashHex: string) => {
+    const bytes = new Uint8Array(
+      hashHex.match(/.{2}/g)?.map(b => parseInt(b, 16)) ?? [],
+    );
+    return checkLeadingZeros(bytes, difficulty);
+  };
 
   while (nonce < maxAttempts) {
     if (signal?.aborted) return null;

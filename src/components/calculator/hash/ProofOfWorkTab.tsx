@@ -1,10 +1,10 @@
 import { draculaColors } from '../../../theme/dracula';
 import { useState, useRef, useCallback } from 'react';
 import {
-  Box, Typography, TextField, Button, IconButton, Tooltip, LinearProgress, Collapse, FormControl,
+  Box, Typography, TextField, Button, IconButton, Tooltip, LinearProgress, FormControl,
   InputLabel, Select, MenuItem,
 } from '@mui/material';
-import { Stop, PlayArrow, HourglassEmpty, ContentCopy, ExpandMore, ExpandLess } from '@mui/icons-material';
+import { Stop, PlayArrow, HourglassEmpty, ContentCopy } from '@mui/icons-material';
 import { inputSx } from '../../../styles/shared';
 import { outputBoxSx, colorGhostBtn, hourglassSpin, MONO_FAMILY } from '../../../styles/shared';
 import { useWorkerPool } from '../../../hooks/useWorkerPool';
@@ -19,47 +19,14 @@ const HASH_ALGORITHMS = [
   { value: 'MD5', label: 'MD5 (128-bit)' },
 ];
 
-/** Default check function: require first 20 hex chars of hash to be '0' (80 leading bits). */
-const DEFAULT_CHECK_CODE = "return hash.startsWith('0'.repeat(20));";
-
-/** Docs examples shown in the collapsible section. */
-const DOCS_EXAMPLES = [
-  {
-    label: 'Leading zeros (hex chars)',
-    code: "return hash.startsWith('0'.repeat(20));",
-  },
-  {
-    label: 'Leading zeros (bits)',
-    code: [
-      "// Convert hex to binary, count leading zeros",
-      "const bits = BigInt('0x' + hash).toString(2);",
-      "return bits.startsWith('0'.repeat(20));",
-    ].join('\n'),
-  },
-  {
-    label: 'Contains substring',
-    code: "return hash.includes('deadbeef');",
-  },
-  {
-    label: 'Ends with pattern',
-    code: "return hash.endsWith('cafe');",
-  },
-  {
-    label: 'Custom byte sum',
-    code: [
-      "const bytes = new Uint8Array(hash.match(/.{2}/g).map(b => parseInt(b, 16)));",
-      "return ((bytes[0] + bytes[1]) & 0xff) === 0x00;",
-    ].join('\n'),
-  },
-];
+const DEFAULT_DIFFICULTY = 20;
 
 /* ---------- component ---------- */
 
 export default function ProofOfWorkTab() {
   const [prefix, setPrefix] = useState('');
   const [hashAlgo, setHashAlgo] = useState('SHA-256');
-  const [checkCode, setCheckCode] = useState(DEFAULT_CHECK_CODE);
-  const [docsOpen, setDocsOpen] = useState(false);
+  const [difficulty, setDifficulty] = useState(String(DEFAULT_DIFFICULTY));
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [progressDetail, setProgressDetail] = useState('');
@@ -96,8 +63,7 @@ export default function ProofOfWorkTab() {
     try {
       const workerResult = await runAttack('__pow__', {
         challenge: prefix,
-        difficulty: '20',
-        checkCode,
+        difficulty,
         hashAlgorithm: hashAlgo,
       }, (pct: number, detail?: string) => {
         setProgress(pct);
@@ -143,16 +109,12 @@ export default function ProofOfWorkTab() {
       setProgressDetail('');
       setEta(null);
     }
-  }, [prefix, checkCode, hashAlgo, runAttack, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
+  }, [prefix, difficulty, hashAlgo, runAttack, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
 
   const handleCopyResult = useCallback(() => {
     if (result) navigator.clipboard.writeText(result).catch(() => {});
   }, [result]);
 
-  /** Insert an example into the code editor. */
-  const insertExample = useCallback((code: string) => {
-    setCheckCode(code);
-  }, []);
 
   /* ---- render ---- */
   return (
@@ -201,119 +163,15 @@ export default function ProofOfWorkTab() {
         placeholder="Text to prefix before nonce (e.g., block_data_)"
       />
 
-      {/* Documentation / Examples — collapsible */}
-      <Box sx={{ mb: 2 }}>
-        <Button
-          variant="text"
-          onClick={() => setDocsOpen(open => !open)}
-          aria-expanded={docsOpen}
-          aria-controls="pow-check-examples"
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            color: draculaColors.comment,
-            fontFamily: MONO_FAMILY,
-            fontSize: '0.8rem',
-            textTransform: 'none',
-            p: 0,
-            '&:hover': { color: draculaColors.foreground, backgroundColor: 'transparent' },
-          }}
-        >
-          {docsOpen ? <ExpandLess sx={{ fontSize: '1rem', mr: 0.5 }} /> : <ExpandMore sx={{ fontSize: '1rem', mr: 0.5 }} />}
-          Check function examples
-        </Button>
-        <Collapse in={docsOpen} id="pow-check-examples">
-          <Box
-            sx={{
-              mt: 1,
-              p: 1.5,
-              backgroundColor: draculaColors.background,
-              border: `1px solid ${draculaColors.currentLine}`,
-              borderRadius: '4px',
-              fontFamily: MONO_FAMILY,
-              fontSize: '0.75rem',
-              color: draculaColors.comment,
-              whiteSpace: 'pre-wrap',
-            }}
-          >
-            {DOCS_EXAMPLES.map((example, i) => (
-              <Box key={i} sx={{ mb: i < DOCS_EXAMPLES.length - 1 ? 1.5 : 0 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.25 }}>
-                  <Typography
-                    variant="caption"
-                    sx={{ color: draculaColors.cyan, fontFamily: MONO_FAMILY, fontSize: '0.7rem' }}
-                  >
-                    {example.label}
-                  </Typography>
-                  <Button
-                    size="small"
-                    variant="text"
-                    onClick={() => insertExample(example.code)}
-                    sx={{
-                      minWidth: 0,
-                      fontSize: '0.65rem',
-                      color: draculaColors.purple,
-                      fontFamily: MONO_FAMILY,
-                      textTransform: 'none',
-                      p: 0,
-                      '&:hover': { color: draculaColors.foreground, backgroundColor: 'transparent' },
-                    }}
-                  >
-                    Use
-                  </Button>
-                </Box>
-                <Box
-                  sx={{
-                    p: 0.75,
-                    backgroundColor: draculaColors.currentLine,
-                    borderRadius: '2px',
-                    color: draculaColors.foreground,
-                    fontFamily: MONO_FAMILY,
-                    fontSize: '0.72rem',
-                    whiteSpace: 'pre-wrap',
-                    overflowX: 'auto',
-                  }}
-                >
-                  {example.code}
-                </Box>
-              </Box>
-            ))}
-          </Box>
-        </Collapse>
-      </Box>
-
-      {/* Check function editor */}
-      <Typography
-        variant="caption"
-        sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, mb: 0.5, display: 'block' }}
-      >
-        Check function: receives <Box component="code" sx={{ color: draculaColors.cyan }}>hash</Box> (hex string), returns <Box component="code" sx={{ color: draculaColors.green }}>true</Box> when condition met.
-      </Typography>
-      <Box
-        component="textarea"
-        value={checkCode}
-        onChange={e => setCheckCode(e.target.value)}
-        spellCheck={false}
-        sx={{
-          width: '100%',
-          height: 120,
-          resize: 'vertical',
-          fontFamily: MONO_FAMILY,
-          fontSize: '0.8rem',
-          backgroundColor: draculaColors.background,
-          color: draculaColors.foreground,
-          border: `1px solid ${draculaColors.currentLine}`,
-          borderRadius: '4px',
-          p: 1,
-          outline: 'none',
-          '&:focus': {
-            borderColor: draculaColors.purple,
-          },
-          '&::placeholder': {
-            color: draculaColors.comment,
-          },
-        }}
-        placeholder="return hash.startsWith('0'.repeat(20));"
+      <TextField
+        fullWidth
+        label="Difficulty (leading zero bits)"
+        value={difficulty}
+        onChange={e => setDifficulty(e.target.value)}
+        slotProps={{ htmlInput: { inputMode: 'numeric', min: 1, max: 128 } }}
+        error={!/^(?:[1-9]\d?|1[01]\d|12[0-8])$/.test(difficulty)}
+        helperText="1–128 bits"
+        sx={{ ...inputSx, mb: 2 }}
       />
 
       {/* Run / Stop morphing button */}
@@ -321,6 +179,7 @@ export default function ProofOfWorkTab() {
         fullWidth
         variant="outlined"
         onClick={running ? handleStop : () => { void handleRun(); }}
+        disabled={!/^(?:[1-9]\d?|1[01]\d|12[0-8])$/.test(difficulty)}
         sx={{
           ...colorGhostBtn(running ? draculaColors.red : draculaColors.purple),
           mt: 2,
