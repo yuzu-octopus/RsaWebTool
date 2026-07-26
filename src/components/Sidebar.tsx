@@ -61,7 +61,7 @@ const sidebarInactiveSx = {
 
 export function Sidebar() {
   const { selectedAttack, setSelectedAttack, setViewMode, viewMode, calculatorMode, setCalculatorMode } = useAppContext();
-  const isMobile = useMediaQuery('(max-width:600px)');
+  const isMobile = useMediaQuery('(max-width:599.95px)');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set([...CATEGORIES, 'Calculators']));
 
