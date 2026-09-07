@@ -44,7 +44,7 @@ describe('crypto-math audit fixes', () => {
   });
 
   test('partial-pq-bits LSB template uses the monic polynomial', () => {
-    const tpl = partialPqBits.sageTemplate({ n: '3233', knownBits: '42', bitPosition: 'lsb' });
+    const tpl = partialPqBits.sageTemplate!({ n: '3233', knownBits: '42', bitPosition: 'lsb' });
     expect(tpl).toContain('inverse_mod');
     expect(partialPqBits.usageGuide).toContain('shift');
   });
@@ -56,61 +56,61 @@ describe('crypto-math audit fixes', () => {
 
   test('coppersmith-short-pad still recovers its testcase', async () => {
     const tc = shortPadTestcase();
-    const r = await shortPad.frontendCheck(tc);
+    const r = await shortPad.frontendCheck!(tc);
     expect(r).toContain('COPPERSMITH_SHORT_PAD=SUCCESS');
   });
 
   test('partial-d exposes explicit known-bit count m', async () => {
     expect(partialD.inputs.find((i) => i.name === 'm')?.required).toBe(false);
-    const tpl = partialD.sageTemplate({ n: '10807', e: '57077', dLow: '13', m: '8' });
+    const tpl = partialD.sageTemplate!({ n: '10807', e: '57077', dLow: '13', m: '8' });
     expect(tpl).toContain('m_str');
     expect(partialD.proof).toContain('LSB-only');
     expect(partialD.usageGuide).toContain('lattice');
     // n=101*103, phi=10200, e=57077, d=13, k=70: dLow bit-length alone
     // caps kBound at 64, so explicit m=8 (kBound 1024) is required.
-    const pre = await partialD.frontendCheck({ n: '10807', e: '57077', dLow: '13' });
+    const pre = await partialD.frontendCheck!({ n: '10807', e: '57077', dLow: '13' });
     expect(pre).toBeNull();
-    const post = await partialD.frontendCheck({ n: '10807', e: '57077', dLow: '13', m: '8' });
+    const post = await partialD.frontendCheck!({ n: '10807', e: '57077', dLow: '13', m: '8' });
     expect(post).toContain('PARTIAL_D=SUCCESS');
     expect(post).toContain('p = 101');
   });
 
   test('dp-dq-leak tries multiple bases and handles g == n', async () => {
-    const tpl = dpdqLeak.sageTemplate({ n: '15', e: '3', dp: '3', dq: '' });
+    const tpl = dpdqLeak.sageTemplate!({ n: '15', e: '3', dp: '3', dq: '' });
     expect(tpl).toContain('[2, 3, 5]');
     // n=15, e=3, dp=3: base 2 gives gcd 15 == n, base 3 splits 5 * 3.
-    const r = await dpdqLeak.frontendCheck({ n: '15', e: '3', dp: '3' });
+    const r = await dpdqLeak.frontendCheck!({ n: '15', e: '3', dp: '3' });
     expect(r).toContain('DP_DQ_LEAK=SUCCESS');
     expect(r).toContain('p = 5');
-    const reg = await dpdqLeak.frontendCheck(dpdqTestcase());
+    const reg = await dpdqLeak.frontendCheck!(dpdqTestcase());
     expect(reg).toContain('DP_DQ_LEAK=SUCCESS');
   });
 
   test('phi-leak returns p = q on square discriminant', async () => {
     // n=13^2=169 with square-consistent phi=(13-1)^2=144: disc == 0.
-    const r = await phiLeak.frontendCheck({ n: '169', phi: '144' });
+    const r = await phiLeak.frontendCheck!({ n: '169', phi: '144' });
     expect(r).toContain('PHI_LEAK=SUCCESS');
     expect(r).toContain('p = 13');
-    const tpl = phiLeak.sageTemplate({ n: '169', phi: '144' });
+    const tpl = phiLeak.sageTemplate!({ n: '169', phi: '144' });
     expect(tpl).not.toContain('not valid RSA');
   });
 
   test('phi-leak documents non-square discriminant instead of silent null', async () => {
     // n=15, phi=6: disc=40, not a square.
-    const r = await phiLeak.frontendCheck({ n: '15', phi: '6' });
+    const r = await phiLeak.frontendCheck!({ n: '15', phi: '6' });
     expect(r).toContain('PHI_LEAK=FAILED');
     expect(phiLeak.proof).toContain('Miller-Rabin');
   });
 
   test('bleichenbacher-sig enforces cube < n and hash-at-offset', () => {
-    const tpl = bleichSig.sageTemplate({ n: '3233', e: '3', hash_hex: 'ab' });
+    const tpl = bleichSig.sageTemplate!({ n: '3233', e: '3', hash_hex: 'ab' });
     expect(tpl).toContain('cube >= n');
     expect(tpl).toContain('hash_got');
   });
 
   test('common-modulus factors via ciphertext gcd fast-path', async () => {
     // m=61 shares a factor with n=61*53; Bezout needs inverses that do not exist.
-    const r = await commonModulus.frontendCheck({
+    const r = await commonModulus.frontendCheck!({
       n: '3233',
       e1: '17',
       e2: '19',
@@ -119,14 +119,14 @@ describe('crypto-math audit fixes', () => {
     });
     expect(r).toContain('COMMON_MODULUS=SUCCESS');
     expect(r).toContain('p = 61');
-    const tpl = commonModulus.sageTemplate({ n: '3233', e1: '17', e2: '19', c1: '610', c2: '244' });
+    const tpl = commonModulus.sageTemplate!({ n: '3233', e1: '17', e2: '19', c1: '610', c2: '244' });
     expect(tpl).toContain('gcd(ci, n)');
     expect(commonModulus.proof).toContain('e1 = 1');
   });
 
   test('related-message flags proportional inputs like Sage', async () => {
     // b1=b2=0: a2^e*c1 == a1^e*c2, every m satisfies both equations.
-    const r = await relatedMessage.frontendCheck({
+    const r = await relatedMessage.frontendCheck!({
       n: '3233',
       e: '3',
       c1: '125',
@@ -142,7 +142,7 @@ describe('crypto-math audit fixes', () => {
 
   test('related-message surfaces factors on denominator gcd', async () => {
     // denom=2440 shares factor 61 with n=3233; the CRT division is undefined mod 61.
-    const r = await relatedMessage.frontendCheck({
+    const r = await relatedMessage.frontendCheck!({
       n: '3233',
       e: '3',
       c1: '2962',

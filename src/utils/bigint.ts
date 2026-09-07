@@ -62,7 +62,7 @@ export function extendedGcd(a: bigint, b: bigint): { gcd: bigint; x: bigint; y: 
  * m must be non-zero; a negative m is normalized via |m|.
  */
 export function modInverse(a: bigint, m: bigint): bigint | null {
-  if (m === 0n) throw new RangeError('modInverse: modulus must be positive');
+  if (m === 0n) throw new RangeError('modInverse: modulus must be non-zero');
   const M = m < 0n ? -m : m;
   const { gcd, x } = extendedGcd(((a % M) + M) % M, M);
   if (gcd !== 1n) return null;
