@@ -14,6 +14,7 @@ import { attack as binaryPolyFactor, generateTestcase as genBinaryPolyFactor } f
 import { attack as smallFraction, generateTestcase as genSmallFraction } from './small-fraction';
 import { attack as batchGcd, generateTestcase as genBatchGcd } from './batch-gcd';
 import { attack as multiPrime, generateTestcase as genMultiPrime } from './multi-prime';
+import { attack as smallPrimeCrt, generateTestcase as genSmallPrimeCrt } from './small-prime-crt';
 import { attack as gimmickyPrimes, generateTestcase as genGimmickyPrimes } from './gimmicky-primes';
 import { attack as closePrime, generateTestcase as genClosePrime } from './close-prime';
 import { attack as noveltyPrimes, generateTestcase as genNoveltyPrimes } from './novelty-primes';
@@ -63,7 +64,7 @@ import { attack as pisanoPeriod, generateTestcase as genPisanoPeriod } from './p
 // Public exports
 export const attacks: Attack[] = [
   bonehDurfee, ecm2, pollardP1, pollardRho, williamsP1,
-  quadraticSieve, squfof, binaryPolyFactor, smallFraction, batchGcd, multiPrime,
+  quadraticSieve, squfof, binaryPolyFactor, smallFraction, batchGcd, multiPrime, smallPrimeCrt,
   gimmickyPrimes, closePrime, noveltyPrimes, euler, pollardStrassen, pisanoPeriod,
   simpleLattice, partialD, partialPqBits, smallCrtExp, dpDqLeak,
   linearlyRelatedPrimes, dependentPrime,
@@ -89,6 +90,7 @@ export const testcaseGenerators: Record<string, () => Record<string, string>> = 
   'small-fraction': genSmallFraction,
   'batch-gcd': genBatchGcd,
   'multi-prime': genMultiPrime,
+  'small-prime-crt': genSmallPrimeCrt,
   'gimmicky-primes': genGimmickyPrimes,
   'close-prime': genClosePrime,
   'novelty-primes': genNoveltyPrimes,
