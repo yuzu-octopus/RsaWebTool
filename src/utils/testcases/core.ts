@@ -137,29 +137,50 @@ export function generateHastadTestcase(): RSAKeyPair & { m: bigint; c: bigint } 
 export function generateHastadBroadcastTestcase(): { n1: bigint; n2: bigint; n3: bigint; e: bigint; c1: bigint; c2: bigint; c3: bigint } {
   // Hastad's broadcast attack: same m encrypted to k=3 recipients with the same e=3.
   // The attack uses CRT on the 3 ciphertexts to recover m^3, then takes the cube root.
+  // Each modulus comes from generateHastadTestcase, which rejects p/q = 1 mod 3 so
+  // that gcd(3, phi) = 1 and e=3 is genuine key material (generateKeyPair would
+  // otherwise silently bump e to 5, 7, ... while we still encrypt with 3).
+  // Moduli must also be pairwise distinct, otherwise the CRT is degenerate.
   const m = 12345n;
   const e = 3n;
-  const kp1 = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q, e);
-  const kp2 = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q, e);
-  const kp3 = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q, e);
-  const c1 = modPow(m, e, kp1.n);
-  const c2 = modPow(m, e, kp2.n);
-  const c3 = modPow(m, e, kp3.n);
-  return { n1: kp1.n, n2: kp2.n, n3: kp3.n, e, c1, c2, c3 };
+  const ns: bigint[] = [];
+  for (let i = 0; i < 3; i++) {
+    let kp = generateHastadTestcase();
+    let guard = 0;
+    while (ns.includes(kp.n)) {
+      if (++guard > 10) throw new Error('generateHastadBroadcastTestcase: duplicate modulus');
+      kp = generateHastadTestcase();
+    }
+    ns.push(kp.n);
+  }
+  const n1 = ns[0], n2 = ns[1], n3 = ns[2];
+  const c1 = modPow(m, e, n1);
+  const c2 = modPow(m, e, n2);
+  const c3 = modPow(m, e, n3);
+  return { n1, n2, n3, e, c1, c2, c3 };
 }
 
 /** Generate a Wiener-vulnerable testcase: d < n^(1/4)/3. */
-export function generateWienerTestcase(): RSAKeyPair {
+export function generateWienerTestcase(maxRetries = 10): RSAKeyPair {
   // Start with a small d, then solve for e = d^-1 mod phi.
+  // d is a fresh random prime, so gcd(d, phi) !== 1 (d divides p-1 or q-1)
+  // is possible in principle -- resample d instead of throwing (flaky throw).
   const p = randomPrime(TESTCASE_BITS.p);
   const q = randomPrime(TESTCASE_BITS.q);
   const phi = (p - 1n) * (q - 1n);
-  // d = 256 bits (well under n^1/4 ≈ 256 bits for 1024-bit n)
-  const d = randomPrime(200); // Safe margin under n^(1/4)/3 for 1024-bit n
-  const e = modInverse(d, phi);
-  if (e === null) throw new Error('modInverse failed — d not coprime to phi');
   const n = p * q;
-  return { p, q, n, e, d, phi };
+  const nBits = n.toString(2).length;
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    // d = 200 bits (well under n^1/4, about 256 bits for 1024-bit n)
+    const d = randomPrime(200); // Safe margin under n^(1/4)/3 for 1024-bit n
+    const e = modInverse(d, phi);
+    if (e === null) continue;
+    // Small d inverts to a full-size e (close to phi). A degenerate tiny e
+    // would not exercise the Wiener path (continued fractions on e/n).
+    if (e.toString(2).length < nBits - 8) continue;
+    return { p, q, n, e, d, phi };
+  }
+  throw new Error('generateWienerTestcase: no suitable d after maxRetries attempts');
 }
 
 /** Generate a multi-prime testcase: n = p * q * r. */
@@ -204,18 +225,32 @@ export function generatePhiLeakTestcase(): { n: bigint; phi: bigint; p: bigint; 
  * It's specifically for attacks that need a very small d so k = (ed-1)/phi
  * is reachable within a small kBound (e.g. partial-d key exposure).
  */
-export function generateSmallDTestcase(bound: bigint = 10100n): RSAKeyPair {
+export function generateSmallDTestcase(bound: bigint = 10100n, maxRetries = 100): RSAKeyPair {
+  if (bound <= 101n) throw new Error('generateSmallDTestcase: bound must exceed 101');
   const p = randomPrime(TESTCASE_BITS.p);
   const q = randomPrime(TESTCASE_BITS.q);
   const phi = (p - 1n) * (q - 1n);
-  // Pick small d in [100, bound] and derive e from it
-  let d = 100n + BigInt(Math.floor(Math.random() * Number(bound - 100n)));
-  while (modInverse(d, phi) === null) {
-    d += 1n;
-  }
-  const e = modInverse(d, phi)!;
   const n = p * q;
-  return { p, q, n, e, d, phi };
+  // Rejection-sample d uniformly from [100, bound) with crypto randomness.
+  // Range-sized masking keeps this BigInt-safe for huge bounds (no Number()
+  // precision loss); the retry cap bounds rejection for unlucky phi.
+  const range = bound - 100n;
+  const rangeBits = range.toString(2).length;
+  const numBytes = Math.ceil(rangeBits / 8);
+  const mask = (1n << BigInt(rangeBits)) - 1n;
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const bytes = new Uint8Array(numBytes);
+    crypto.getRandomValues(bytes);
+    let r = 0n;
+    for (let i = 0; i < numBytes; i++) r = (r << 8n) | BigInt(bytes[i]);
+    r &= mask;
+    if (r >= range) continue;
+    const d = 100n + r;
+    const e = modInverse(d, phi);
+    if (e === null) continue;
+    return { p, q, n, e, d, phi };
+  }
+  throw new Error('generateSmallDTestcase: no coprime d after maxRetries attempts');
 }
 
 /**
@@ -223,31 +258,57 @@ export function generateSmallDTestcase(bound: bigint = 10100n): RSAKeyPair {
  * small factors) so Pollard's p-1 algorithm can find it in O(B) steps.
  * Returns {n, p, q} — attacks use the public n and recover p, q.
  */
-export function generatePollardTestcase(): { n: bigint; p: bigint; q: bigint } {
-  // S = product of first 11 primes ≈ 2^37. p-1 must be a multiple of S
-  // (i.e. p ≡ 1 mod S) for Pollard p-1 to find p in O(B) steps.
-  const smallPrimes = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n];
-  let S = 1n;
-  for (const pr of smallPrimes) S *= pr;
-  // Search p = S*t + 1 at TESTCASE_BITS size, checking primality
-  let p: bigint;
+export function generatePollardTestcase(maxRetries = 10000): { n: bigint; p: bigint; q: bigint } {
+  // p - 1 must be B-powersmooth for B = 10000 (the harness bound): every
+  // *prime power* dividing p - 1 is <= B, so p - 1 divides lcm(1..B) and
+  // stage 1 of Pollard's p-1 with bound B is guaranteed to find p.
+  // (Plain B-smoothness is NOT enough: a factor like 2^30 slips past the
+  // stage-1 prime-power cap and the browser check returns null.)
+  // A uniform random 512-bit prime is smooth with negligible probability,
+  // so p is built as p = t + 1 where t accumulates prime powers q^e <= B
+  // until t reaches TESTCASE_BITS size. n is ~1024-bit like every other
+  // testcase. (pollard-rho keeps its own custom 34-bit construction --
+  // Brent rho needs a genuinely small factor to converge in the browser.)
+  const B = 10000;
+  const primePowers: Array<{ q: bigint; maxE: number }> = [];
+  const isComposite = new Uint8Array(B + 1);
+  for (let i = 2; i <= B; i++) {
+    if (isComposite[i] === 1) continue;
+    for (let j = i * i; j <= B; j += i) isComposite[j] = 1;
+    let maxE = 1;
+    let pw = BigInt(i);
+    while (pw * BigInt(i) <= BigInt(B)) {
+      pw *= BigInt(i);
+      maxE++;
+    }
+    primePowers.push({ q: BigInt(i), maxE });
+  }
+  const targetBits = TESTCASE_BITS.p;
   let attempts = 0;
   while (true) {
-    if (attempts++ > 10000) throw new Error('Failed to find B-smooth prime');
-    // p-1 must be B-smooth (all prime factors ≤ B=10000) for Pollard's p-1 to work.
-    // S = product of primes ≤ 31 ≈ 2^37. Multiply by random small primes (≤ 10000)
-    // to grow p-1 while keeping it smooth, then p = p-1 + 1.
-    const smoothPool = [37n, 41n, 43n, 47n, 53n, 59n, 61n, 67n, 71n, 73n, 79n, 83n, 89n, 97n, 101n];
-    let pMinus1 = S;
-    const extraCount = Math.floor(Math.random() * 3) + 5; // 5-7 extra primes, giving ~70 bits total
-    for (let i = 0; i < extraCount; i++) {
-      pMinus1 *= smoothPool[Math.floor(Math.random() * smoothPool.length)];
+    if (attempts++ > maxRetries) throw new Error('Failed to find B-smooth prime');
+    // Seed with 2 so t stays even (p odd); each prime's total exponent stays
+    // within its q^E <= B budget, keeping every prime power factor of p - 1
+    // under the stage-1 cap.
+    let t = 2n;
+    const used = new Map<bigint, number>();
+    while (t.toString(2).length < targetBits - 1) {
+      const pick = primePowers[Math.floor(Math.random() * primePowers.length)];
+      const u = used.get(pick.q) ?? 0;
+      if (u >= pick.maxE) continue;
+      const e = 1 + Math.floor(Math.random() * (pick.maxE - u));
+      let factor = 1n;
+      for (let k = 0; k < e; k++) factor *= pick.q;
+      t *= factor;
+      used.set(pick.q, u + e);
     }
-    p = pMinus1 + 1n;
-    if (isPrimeMR(p)) break;
+    if (t.toString(2).length > targetBits + 8) continue; // overshoot -- resample
+    const p = t + 1n;
+    if (!isPrimeMR(p)) continue;
+    const q = randomPrime(TESTCASE_BITS.q);
+    if (q === p) continue;
+    return { n: p * q, p, q };
   }
-  const q = randomPrime(TESTCASE_BITS.q);
-  return { n: p * q, p, q };
 }
 
 /**

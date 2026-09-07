@@ -216,9 +216,9 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  // Use the shared Pollard generator for a semiprime with p-1 B-smooth
-  // (p ≡ 1 mod prod(first 11 primes) ≈ 2^37). The B/B2 bounds tell the
-  // attack how far to search; 10000 covers all prime factors of p-1.
+  // Use the shared Pollard generator: full-size p with (B=10000)-powersmooth p-1
+  // (p - 1 divides lcm(1..10000), so stage-1 Pollard p-1 with B=10000 finds p).
+  // attack how far to search; stage 1 with B=10000 is guaranteed to find p.
   const { n, p } = generatePollardTestcase();
   return { n: n.toString(), p: p.toString(), B: '10000', B2: '0' };
 };

@@ -17,6 +17,12 @@
  *   scripts/test-results/results.json       — machine-readable results
  *   scripts/test-results/templates/*.sage   — per-attack SageMath templates
  *   stdout — formatted summary table
+ *
+ * L3 Sage-only gap: frontendCheck() exercises the *browser* attack path only.
+ * Full Sage verification (L4, scripts/test-sage-docker.ts) is NOT run in CI --
+ * Sage has no headless executor here -- so L3 pass means "browser path agrees",
+ * not "Sage template solves". Lattice/Coppersmith attacks are Sage-only by
+ * design; their L3 rows stay skip and their math is covered by L4 templates.
  */
 
 import { attacks, testcaseGenerators } from '../src/attacks/index';
@@ -181,7 +187,13 @@ const L2B_SEMANTIC_VALIDATORS: Record<string, SemanticValidator> = {
     if (a2 < 1n || a2 > 5n) return { status: 'fail', detail: `a2=${a2} out of range [1,5]` };
     if (b1 < 0n || b1 > 4n) return { status: 'fail', detail: `b1=${b1} out of range [0,4]` };
     if (b2 < 0n || b2 > 4n) return { status: 'fail', detail: `b2=${b2} out of range [0,4]` };
-    return { status: 'pass', detail: `a1=${a1}, b1=${b1}, a2=${a2}, b2=${b2} in expected ranges` };
+    if (a1 === a2 && b1 === b2) return { status: 'fail', detail: 'transforms identical (attack needs distinct polynomials)' };
+    const n = BigInt(vals.n);
+    const c1 = BigInt(vals.c1);
+    const c2 = BigInt(vals.c2);
+    if (c1 <= 0n || c1 >= n || c2 <= 0n || c2 >= n) return { status: 'fail', detail: 'c1/c2 not in (0, n)' };
+    if (c1 === c2) return { status: 'fail', detail: 'c1 == c2 (distinct transforms should differ)' };
+    return { status: 'pass', detail: `a1=${a1}, b1=${b1}, a2=${a2}, b2=${b2} in range; c1 != c2, both < n` };
   },
 
   'coppersmith-short-pad': (vals) => {
@@ -191,7 +203,10 @@ const L2B_SEMANTIC_VALIDATORS: Record<string, SemanticValidator> = {
     const nBits = n.toString(2).length;
     if (nBits > 512) return { status: 'fail', detail: `n is ${nBits} bits (> 512 may timeout in SageCell)` };
     if (nBits < 20) return { status: 'fail', detail: `n is only ${nBits} bits (too small)` };
-    return { status: 'pass', detail: `e=3, n=${nBits} bits` };
+    const cc1 = BigInt(vals.c1);
+    const cc2 = BigInt(vals.c2);
+    if (cc1 <= 0n || cc1 >= n || cc2 <= 0n || cc2 >= n) return { status: 'fail', detail: 'c1/c2 not in (0, n)' };
+    return { status: 'pass', detail: `e=3, n=${nBits} bits; c1, c2 < n` };
   },
 
   'small-public-exp': (vals) => {
@@ -334,17 +349,26 @@ const L2B_SEMANTIC_VALIDATORS: Record<string, SemanticValidator> = {
     if (!vals.ciphertexts) return { status: 'fail', detail: 'Missing ciphertexts' };
     const lines = vals.ciphertexts.split('\n').filter((s) => s.trim());
     if (lines.length < 3) return { status: 'fail', detail: `Need >= 3 ciphertexts, got ${lines.length}` };
+    const pairs: Array<readonly [bigint, bigint]> = [];
     try {
       for (let i = 0; i < lines.length; i++) {
         const parts = lines[i].split(',');
         if (parts.length < 2) return { status: 'fail', detail: `Line ${i + 1}: expected c,n format` };
-        BigInt(parts[0].trim());
-        BigInt(parts[1].trim());
+        pairs.push([BigInt(parts[0].trim()), BigInt(parts[1].trim())] as const);
       }
     } catch {
       return { status: 'fail', detail: 'Invalid BigInt in ciphertexts' };
     }
-    return { status: 'pass', detail: `${lines.length} valid ciphertext,n pairs` };
+    const moduli = pairs.map(([, n]) => n);
+    if (new Set(moduli).size !== moduli.length) return { status: 'fail', detail: 'duplicate moduli (CRT is degenerate)' };
+    for (let i = 0; i < pairs.length; i++) {
+      const [c, n] = pairs[i];
+      if (c <= 0n || c >= n) return { status: 'fail', detail: `Line ${i + 1}: c not in (0, n)` };
+      for (let j = i + 1; j < pairs.length; j++) {
+        if (gcd(n, pairs[j][1]) !== 1n) return { status: 'fail', detail: `moduli ${i + 1} and ${j + 1} share a factor` };
+      }
+    }
+    return { status: 'pass', detail: `${lines.length} valid ciphertext,n pairs; c < n, distinct pairwise-coprime moduli` };
   },
 
   'hastad-linear-pad': (vals) => {
@@ -355,14 +379,15 @@ const L2B_SEMANTIC_VALIDATORS: Record<string, SemanticValidator> = {
       for (let i = 0; i < lines.length; i++) {
         const parts = lines[i].split(',');
         if (parts.length < 3) return { status: 'fail', detail: `Line ${i + 1}: expected n,c,a format` };
-        BigInt(parts[0].trim());
-        BigInt(parts[1].trim());
+        const tn = BigInt(parts[0].trim());
+        const tc = BigInt(parts[1].trim());
         BigInt(parts[2].trim());
+        if (tc <= 0n || tc >= tn) return { status: 'fail', detail: `Line ${i + 1}: c not in (0, n)` };
       }
     } catch {
       return { status: 'fail', detail: 'Invalid BigInt in triples' };
     }
-    return { status: 'pass', detail: `${lines.length} valid triples` };
+    return { status: 'pass', detail: `${lines.length} valid triples; c < n` };
   },
 
   // ── Oracle attacks (binary response format) ─────────────────────
@@ -428,6 +453,23 @@ const L2B_SEMANTIC_VALIDATORS: Record<string, SemanticValidator> = {
     } catch {
       return { status: 'fail', detail: 'Invalid BigInt in oracle_pairs' };
     }
+    if (vals.n && vals.e) {
+      const fn = BigInt(vals.n);
+      const fe = BigInt(vals.e);
+      const ms: bigint[] = [];
+      for (let i = 0; i < lines.length; i++) {
+        const parts = lines[i].split(',');
+        const m = BigInt(parts[0].trim());
+        const sig = BigInt(parts[1].trim());
+        if (modPow(sig, fe, fn) !== m) return { status: 'fail', detail: `Pair ${i + 1}: sig^e mod n != m` };
+        ms.push(m);
+      }
+      if (vals.target_m && ms.length === 2) {
+        const want = (ms[0] * ms[1]) % fn;
+        if (want !== BigInt(vals.target_m)) return { status: 'fail', detail: 'target_m != m1*m2 mod n' };
+      }
+      return { status: 'pass', detail: `${lines.length} oracle sigs verify; target consistent` };
+    }
     return { status: 'pass', detail: `${lines.length} valid oracle pairs` };
   },
 
@@ -452,6 +494,11 @@ const L2B_SEMANTIC_VALIDATORS: Record<string, SemanticValidator> = {
   'non-coprime-exp': (vals) => {
     const e = BigInt(vals.e);
     if (e !== 2n) return { status: 'fail', detail: `Expected e=2, got e=${e}` };
+    if (vals.n && vals.p && vals.q) {
+      if (BigInt(vals.p) * BigInt(vals.q) !== BigInt(vals.n))
+        return { status: 'fail', detail: 'p * q != n' };
+      return { status: 'pass', detail: 'e=2 (non-coprime); p * q == n' };
+    }
     return { status: 'pass', detail: 'e=2 (non-coprime)' };
   },
 
@@ -466,6 +513,36 @@ const L2B_SEMANTIC_VALIDATORS: Record<string, SemanticValidator> = {
     const base = BigInt(vals.base);
     if (base <= 0n) return { status: 'fail', detail: 'base must be positive' };
     return { status: 'pass', detail: `base=${base}` };
+  },
+
+  // Factoring edge cases: the leaked factor must divide n (cheap exact check)
+  'pollard-p1': (vals) => {
+    if (!vals.p) return { status: 'fail', detail: 'Missing p' };
+    const n = BigInt(vals.n);
+    const p = BigInt(vals.p);
+    if (p <= 1n || p >= n) return { status: 'fail', detail: 'p not in (1, n)' };
+    if (n % p !== 0n) return { status: 'fail', detail: 'p does not divide n' };
+    return { status: 'pass', detail: 'p divides n (B-smooth factor present)' };
+  },
+
+  'pollard-rho': (vals) => {
+    if (!vals.p) return { status: 'fail', detail: 'Missing p' };
+    const n = BigInt(vals.n);
+    const p = BigInt(vals.p);
+    if (p <= 1n || p >= n) return { status: 'fail', detail: 'p not in (1, n)' };
+    if (n % p !== 0n) return { status: 'fail', detail: 'p does not divide n' };
+    return { status: 'pass', detail: 'p divides n (small factor present)' };
+  },
+
+  // RSA-CRT fault: the valid signature verifies, the faulty one must differ
+  'rsa-crt-fault': (vals) => {
+    if (!vals.m || !vals.sig_valid || !vals.sig_faulty) return { status: 'fail', detail: 'Missing m, sig_valid, or sig_faulty' };
+    const n = BigInt(vals.n);
+    const e = BigInt(vals.e);
+    const m = BigInt(vals.m);
+    if (modPow(BigInt(vals.sig_valid), e, n) !== m) return { status: 'fail', detail: 'sig_valid^e mod n != m' };
+    if (vals.sig_faulty === vals.sig_valid) return { status: 'fail', detail: 'sig_faulty == sig_valid (no fault injected)' };
+    return { status: 'pass', detail: 'sig_valid verifies; faulty sig differs' };
   },
 };
 
@@ -519,6 +596,72 @@ function l2bEIsSane(vals: Record<string, string>): LayerResult {
     }
   }
   return { status: 'pass', detail: 'All e values are > 1 and odd' };
+}
+
+// Cross-checks live encryption/signature material. Applied to every testcase;
+// returns skip when the testcase exposes no checkable (m, c) pair.
+function l2bAssertEncrypts(vals: Record<string, string>): LayerResult {
+  try {
+    // Direct (m, e, n, c) exposure.
+    if (vals.m && vals.e && vals.n && vals.c) {
+      const ok = modPow(BigInt(vals.m), BigInt(vals.e), BigInt(vals.n)) === BigInt(vals.c);
+      return ok
+        ? { status: 'pass', detail: 'm^e mod n == c' }
+        : { status: 'fail', detail: 'm^e mod n != c' };
+    }
+    // RSA-CRT fault: the *valid* signature must verify.
+    if (vals.m && vals.e && vals.n && vals.sig_valid) {
+      const ok = modPow(BigInt(vals.sig_valid), BigInt(vals.e), BigInt(vals.n)) === BigInt(vals.m);
+      return ok
+        ? { status: 'pass', detail: 'sig_valid^e mod n == m' }
+        : { status: 'fail', detail: 'sig_valid^e mod n != m' };
+    }
+    // Homomorphic forgery: every oracle (m, sig) pair must verify.
+    if (vals.oracle_pairs && vals.e && vals.n) {
+      let lines = vals.oracle_pairs.split('\n').filter((s) => s.trim());
+      if (lines.length < 2) lines = vals.oracle_pairs.split(';').filter((s) => s.trim());
+      const n = BigInt(vals.n);
+      const e = BigInt(vals.e);
+      for (let i = 0; i < lines.length; i++) {
+        const parts = lines[i].split(',');
+        if (parts.length < 2) return { status: 'skip', detail: 'oracle_pairs unreadable -- skipping encrypt check' };
+        if (modPow(BigInt(parts[1].trim()), e, n) !== BigInt(parts[0].trim()))
+          return { status: 'fail', detail: `oracle pair ${i + 1}: sig^e mod n != m` };
+      }
+      return { status: 'pass', detail: `${lines.length} oracle sigs verify` };
+    }
+    // Common modulus: both ciphertexts encrypt the same m (c1^e2 == c2^e1).
+    if (vals.n && vals.e1 && vals.e2 && vals.c1 && vals.c2) {
+      const n = BigInt(vals.n);
+      const ok =
+        modPow(BigInt(vals.c1), BigInt(vals.e2), n) === modPow(BigInt(vals.c2), BigInt(vals.e1), n);
+      return ok
+        ? { status: 'pass', detail: 'c1^e2 == c2^e1 mod n (same m)' }
+        : { status: 'fail', detail: 'c1^e2 != c2^e1 mod n' };
+    }
+    return { status: 'skip', detail: 'No m/c material to cross-check' };
+  } catch {
+    return { status: 'fail', detail: 'assertEncrypts: unparsable BigInt' };
+  }
+}
+
+// Every bare ciphertext/signature field must be a live residue mod n.
+// Skips testcases without a single n (broadcast formats check this per-line).
+function l2bCIsSane(vals: Record<string, string>): LayerResult {
+  if (!vals.n) return { status: 'skip', detail: 'No single n field' };
+  const keys = ['c', 'c1', 'c2', 'sig_valid', 'sig_faulty'];
+  const present = keys.filter((k) => vals[k]);
+  if (present.length === 0) return { status: 'skip', detail: 'No c fields' };
+  try {
+    const n = BigInt(vals.n);
+    for (const k of present) {
+      const v = BigInt(vals[k]);
+      if (v <= 0n || v >= n) return { status: 'fail', detail: `${k} not in (0, n)` };
+    }
+    return { status: 'pass', detail: `${present.join(',')} < n` };
+  } catch {
+    return { status: 'fail', detail: 'c/n unparsable' };
+  }
 }
 
 // ── FrontendCheck with timeout ────────────────────────────────────────
@@ -616,7 +759,7 @@ async function main(): Promise<void> {
         if (!vals || typeof vals !== 'object' || Object.keys(vals).length === 0) {
           result.l2 = { status: 'fail', detail: 'generateTestcase returned empty or invalid' };
         } else {
-          const expected = attack.inputs.map((i) => i.name);
+          const expected = attack.inputs.filter((i) => i.required !== false).map((i) => i.name);
           const missing = expected.filter((k) => !(k in vals));
           if (missing.length > 0) {
             result.l2 = {
@@ -648,7 +791,7 @@ async function main(): Promise<void> {
 
     if (result.l2.status === 'pass' && genVals) {
       // Run shared checks
-      const sharedChecks = [l2bAllValuesParseable(genVals), l2bNIsSane(genVals), l2bEIsSane(genVals)];
+      const sharedChecks = [l2bAllValuesParseable(genVals), l2bNIsSane(genVals), l2bEIsSane(genVals), l2bAssertEncrypts(genVals), l2bCIsSane(genVals)];
       const sharedFails = sharedChecks.filter((c) => c.status === 'fail');
 
       // Run attack-specific validator if one exists
