@@ -11,13 +11,13 @@ export const attack: Attack = {
   description: 'Recovers m from two ciphertexts with arbitrary linear relations via polynomial GCD. Use when c1 = (a₁·m + b₁)^e and c2 = (a₂·m + b₂)^e mod n with known a₁,b₁,a₂,b₂. Defaults: a₁=1, b₁=0 (standard Franklin-Reiter).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
-    { name: 'e', label: 'e (public exponent)', placeholder: '65537', multiline: false },
+    { name: 'e', label: 'e (public exponent)', placeholder: '65537', multiline: false, required: false },
     { name: 'c1', label: 'c1 (ciphertext of a₁·m + b₁)', placeholder: 'Enter c1...', multiline: true, rows: 3 },
     { name: 'c2', label: 'c2 (ciphertext of a₂·m + b₂)', placeholder: 'Enter c2...', multiline: true, rows: 3 },
-    { name: 'a1', label: 'a1 (first linear coefficient)', placeholder: '1', multiline: false },
-    { name: 'b1', label: 'b1 (first linear offset)', placeholder: '0', multiline: false },
-    { name: 'a2', label: 'a2 (second linear coefficient)', placeholder: '2', multiline: false },
-    { name: 'b2', label: 'b2 (second linear offset)', placeholder: '0', multiline: false },
+    { name: 'a1', label: 'a1 (first linear coefficient)', placeholder: '1', multiline: false, required: false },
+    { name: 'b1', label: 'b1 (first linear offset)', placeholder: '0', multiline: false, required: false },
+    { name: 'a2', label: 'a2 (second linear coefficient)', placeholder: '2', multiline: false, required: false },
+    { name: 'b2', label: 'b2 (second linear offset)', placeholder: '0', multiline: false, required: false },
   ],
   sageTemplate: (vals: Record<string, string>) => {
     if (!vals.n || !vals.c1 || !vals.c2) {

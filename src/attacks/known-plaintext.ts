@@ -11,10 +11,10 @@ export const attack: Attack = {
   description: 'Recovers m via integer e-th root when m^e < n, or via known-prefix brute-force for up to 24 unknown bits. Use when plaintext is small or partially known.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
-    { name: 'e', label: 'e (public exponent)', placeholder: '65537', multiline: false },
+    { name: 'e', label: 'e (public exponent)', placeholder: '65537', multiline: false, required: false },
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
-    { name: 'known_prefix', label: 'Known plaintext prefix', placeholder: 'e.g., flag{', multiline: false },
-    { name: 'unknown_bits', label: 'Unknown bits after prefix', placeholder: '24', multiline: false },
+    { name: 'known_prefix', label: 'Known plaintext prefix', placeholder: 'e.g., flag{', multiline: false, required: false },
+    { name: 'unknown_bits', label: 'Unknown bits after prefix', placeholder: '24', multiline: false, required: false },
   ],
   usageGuide: `Use when the plaintext is small (m^e < n) or partially known.
 
@@ -29,6 +29,12 @@ Tip: The e-th root attack works when encryption doesn't apply full modular reduc
       return `print("ERROR: n and c are required")
 print("KNOWN_PLAINTEXT=FAILED")`;
     }
+    const ubRaw = (vals.unknown_bits ?? '24').trim() || '24';
+    const ubValidated = validateNumeric(ubRaw, 'unknown_bits');
+    const ubInt = Number(ubValidated);
+    if (!Number.isSafeInteger(ubInt) || ubInt < 0 || ubInt > 1000000) {
+      throw new Error(`unknown_bits out of range: "${ubRaw.slice(0, 50)}"`);
+    }
     return wrapSageTemplate({
       token: 'KNOWN_PLAINTEXT',
       useGuard: false,
@@ -39,7 +45,7 @@ print("KNOWN_PLAINTEXT=FAILED")`;
         e = Integer(e_val) if e_val else Integer(65537)
         c = Integer(c_val)
         known_prefix = "${sanitizePython(vals.known_prefix || '')}"
-        unknown_bits = Integer("${(vals.unknown_bits || '24').trim()}")
+        unknown_bits = Integer(${ubValidated})
         out.append(f"Known Plaintext Attack")
         out.append(f"n = {n}")
         out.append(f"e = {e}")

@@ -32,14 +32,14 @@ const kvParamNames = [
   // Lattice / partial key
   'dLow', 'nearp', 'bound', 'B2', 'B', 'a', 'b', 'e1', 'e2', 'c1', 'c2',
   // Broadcast / related messages
-  'ciphertexts', 'hash_hex', 'target_m', 'sig_valid', 'sig_faulty', 'k_phi',
+  'ciphertexts', 'hash_hex', 'target_m', 'sig_valid', 'sig_faulty', 'k_phi', 'n1', 'n2', 'k',
   // Advanced / Coppersmith
   'base', 'bitOffset', 'bitLength', 'num_primes', 'knownBits', 'bitPosition',
   // Oracle / protocol
   'oracle_responses', 'oracle_runs', 'phi', 'moduli_list', 'n_values',
   'pairs', 'triples', 'oracle_pairs', 'known_prefix', 'p_msb', 'leak', 'unknown_bits',
 ];
-const kvRegex = new RegExp(`(?<name>${kvParamNames.join('|')})\\s*=\\s*(?<value>[0-9a-fA-FxX\\n]+)`, 'g');
+const kvRegex = new RegExp(`(?<name>${kvParamNames.join('|')})\\s*=\\s*(?<value>[0-9a-fA-FxX\\n,\\-]+)`, 'g');
 
 // Common JSON key aliases for structured input
 const KEY_ALIASES: Record<string, string> = {
@@ -48,7 +48,7 @@ const KEY_ALIASES: Record<string, string> = {
   plaintext: 'm', plain: 'm', message: 'm', msg: 'm',
 };
 
-function extractParams(input: string): Record<string, string> {
+export function extractParams(input: string): Record<string, string> {
   const trimmed = input.trim();
   const params: Record<string, string> = {};
   let match;

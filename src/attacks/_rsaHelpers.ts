@@ -46,7 +46,7 @@ export const rsaNeeds = {
   moduliList: (p: Record<string, string>) => {
     const vals = (p.n_values || '').trim();
     if (!vals) return false;
-    return vals.split('\n').filter(x => x.trim()).length >= 2;
+    return vals.split(/[\n,]+/).filter(x => x.trim()).length >= 2;
   },
 } as const;
 

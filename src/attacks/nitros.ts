@@ -2,7 +2,7 @@ import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { isPrimeMR } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
-import { wrapSageTemplate } from './guard';
+import { wrapSageTemplate, validateNumeric } from './guard';
 
 export const attack: Attack = {
   id: 'nitros',
@@ -21,8 +21,8 @@ export const attack: Attack = {
     }
     return wrapSageTemplate({
       token: 'NITROS',
-      n: nStr,
-      body: `        base_val = "${baseStr}".strip()
+      n: validateNumeric(nStr, 'n'),
+      body: `        base_val = "${validateNumeric(baseStr, 'base')}".strip()
         base = Integer(base_val) if base_val else Integer(65537)
         found = False
         # Guard handles n<2, n%2, n.is_prime(), n.is_square()

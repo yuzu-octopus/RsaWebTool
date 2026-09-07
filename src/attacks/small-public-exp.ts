@@ -12,7 +12,7 @@ export const attack: Attack = {
   description: 'Recovers plaintext m via integer e-th root (m = (c + k*n)^(1/e)) with modular residue pre-filter. Use when e is small (e.g., 3, 5, 17).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
-    { name: 'e', label: 'e (public exponent)', placeholder: '3' },
+    { name: 'e', label: 'e (public exponent)', placeholder: '3', required: false },
     { name: 'c', label: 'c (ciphertext)', placeholder: 'Enter ciphertext c...', multiline: true, rows: 3 },
     { name: 'k_bound', label: 'k bound (c + k*n iterations)', placeholder: String(K_BOUND_DEFAULT), required: false },
   ],

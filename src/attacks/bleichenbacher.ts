@@ -18,14 +18,17 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
       token: 'BLEICHENBACHER',
       useGuard: false,
-      body: `        valid = True
-        if not ${validateNumeric(vals.n, 'n')}:
+      body: `        n_val = "${validateNumeric(vals.n, 'n')}".strip()
+        e_val = "${validateNumeric(vals.e, 'e')}".strip()
+        c_val = "${validateNumeric(vals.c, 'c')}".strip()
+        valid = True
+        if not n_val:
             out.append("ERROR: n is required")
             valid = False
-        if not ${validateNumeric(vals.e, 'e')}:
+        if not e_val:
             out.append("ERROR: e is required")
             valid = False
-        if not ${validateNumeric(vals.c, 'c')}:
+        if not c_val:
             out.append("ERROR: c is required")
             valid = False
         responses_raw = """${sanitizePython(vals.oracle_responses || '')}""".strip()
@@ -33,10 +36,10 @@ export const attack: Attack = {
             out.append("ERROR: oracle_responses is required")
             valid = False
         if valid:
-            n = Integer(${validateNumeric(vals.n, 'n')})
-            e = Integer(${validateNumeric(vals.e, 'e')})
-            c = Integer(${validateNumeric(vals.c, 'c')})
-            orig_c = Integer(${validateNumeric(vals.c, 'c')})
+            n = Integer(n_val)
+            e = Integer(e_val)
+            c = Integer(c_val)
+            orig_c = Integer(c_val)
             oracle_bits = [int(x.strip()) for x in responses_raw.split(',') if x.strip()]
             out.append("Bleichenbacher PKCS#1 v1.5")
             out.append(f"n = {n}")

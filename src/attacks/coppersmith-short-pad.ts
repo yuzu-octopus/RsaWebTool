@@ -21,7 +21,6 @@ export const attack: Attack = {
     }
     return wrapSageTemplate({
       token: 'COPPERSMITH_SHORT_PAD',
-      n: validateNumeric(vals.n, 'n'),
       body: `        n = Integer(${validateNumeric(vals.n, 'n')})
         e = Integer(${validateNumeric(vals.e, 'e')})
         e_int = int(e)

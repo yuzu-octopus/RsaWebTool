@@ -121,8 +121,6 @@ export const attack: Attack = {
             n_int = int(n)
             e_int = int(e)
             found = False${dpBlock}${dqBlock}
-            if not found:
-                out.append("DP_DQ_LEAK=FAILED: no valid factor found")
         if not found:
             out.append("DP_DQ_LEAK=FAILED")`,
       useGuard: true,

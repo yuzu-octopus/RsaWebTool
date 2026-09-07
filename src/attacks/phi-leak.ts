@@ -137,7 +137,7 @@ p, q &= \\frac{s \\pm \\sqrt{\\Delta}}{2} \\qed
 
 \\textbf{References:} Rivest, Shamir, Adleman, "A Method for Obtaining Digital Signatures and Public-Key Cryptosystems", 1978; Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2`,
   priority: 'high',
-  applicableCheck: rsaNeeds.n,
+  applicableCheck: rsaNeeds.nPhi,
 };
 
 export const generateTestcase = (): Record<string, string> => {
