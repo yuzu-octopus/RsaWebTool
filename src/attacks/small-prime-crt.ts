@@ -109,6 +109,14 @@ Tip: Prime powers p^k are handled as single CRT moduli with phi p^k - p^(k-1). I
       for (const { base: p, exp } of factors) {
         const q = p ** BigInt(exp);
         const phi = q - q / p;
+        if (phi === 1n) {
+          // q = 2: the multiplicative group is trivial, so c ≡ m (mod 2).
+          const mi = c % q;
+          remainders.push(mi);
+          moduli.push(q);
+          lines.push(`factor: ${p}${exp > 1 ? `^${exp}` : ''} (m_i = ${mi})`);
+          continue;
+        }
         const d = modInverse(e % phi, phi);
         if (d === null) {
           return `ERROR: e is not invertible modulo phi(${p}${exp > 1 ? `^${exp}` : ''}) — per-factor decryption is undefined\nSMALL_PRIME_CRT=FAILED`;

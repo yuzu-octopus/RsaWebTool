@@ -52,6 +52,26 @@ describe('small-prime-crt', () => {
     expect(out).toBeNull();
   });
 
+  test('recovers even plaintext when a factor is q=2 (phi=1 edge)', () => {
+    // n = 2*3 = 6, e = 5, m = 4 -> c = 4^5 mod 6 = 4.
+    // phi(2) = 1, so per-factor decryption must use c mod 2 directly.
+    const out = attack.frontendCheck?.({ n: '6', e: '5', c: '4' });
+    expect(out).toContain('SMALL_PRIME_CRT=SUCCESS');
+    expect(out).toContain('m = 4');
+  });
+
+  test('recovers an even modulus with odd plaintext (factor 2 present)', () => {
+    // n = 2*7 = 14, e = 5, m = 9 -> c = 9^5 mod 14 = 11
+    const n = 14n;
+    const e = 5n;
+    const m = 9n;
+    const c = modPow(m, e, n);
+    expect(c).toBe(11n);
+    const out = attack.frontendCheck?.({ n: n.toString(), e: e.toString(), c: c.toString() });
+    expect(out).toContain('SMALL_PRIME_CRT=SUCCESS');
+    expect(out).toContain('m = 9');
+  });
+
   test('emits FAILED when e is not invertible modulo a factor phi', () => {
     // n = 3*5, e = 2 shares gcd 2 with phi(3) = 2.
     const out = attack.frontendCheck?.({ n: '15', e: '2', c: '7' });
