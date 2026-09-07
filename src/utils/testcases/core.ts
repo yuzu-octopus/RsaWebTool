@@ -291,7 +291,9 @@ export function generatePollardTestcase(maxRetries = 10000): { n: bigint; p: big
     // within its q^E <= B budget, keeping every prime power factor of p - 1
     // under the stage-1 cap.
     let t = 2n;
-    const used = new Map<bigint, number>();
+    // The seed contributes one factor of 2 -- record it so later q=2 draws
+    // stay within the 2^E <= B budget (2^13 = 8192 <= B < 2^14 = 16384).
+    const used = new Map<bigint, number>([[2n, 1]]);
     while (t.toString(2).length < targetBits - 1) {
       const pick = primePowers[Math.floor(Math.random() * primePowers.length)];
       const u = used.get(pick.q) ?? 0;

@@ -76,4 +76,45 @@ describe('generatePollardTestcase', () => {
     }
     expect(rest).toBe(1n);
   }, 120_000);
+
+  it('counts the seeded factor of 2 against the q=2 budget (2-adic bound)', () => {
+    // Regression: t was seeded at 2n with `used` starting empty, so a later
+    // q=2 draw could add up to 2^13 more, reaching 2^14 = 16384 > B and
+    // breaking t | lcm(1..B). Force that draw (pick q=2, take max e), then
+    // replay the remainder on a seeded RNG so the case is deterministic.
+    const origRandom = Math.random;
+    try {
+      let calls = 0;
+      let a = 115 >>> 0;
+      const rng = () => {
+        a |= 0;
+        a = (a + 0x6d2b79f5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+      Math.random = () => {
+        if (calls === 0) {
+          calls++;
+          return 0; // pick primePowers[0] (q=2)
+        }
+        if (calls === 1) {
+          calls++;
+          return 0.999999; // take the max remaining exponent
+        }
+        return rng();
+      };
+      const { p } = generatePollardTestcase();
+      let rest = p - 1n;
+      let e = 0;
+      while (rest % 2n === 0n) {
+        rest /= 2n;
+        e++;
+      }
+      // 2^13 = 8192 <= B < 16384 = 2^14: at most 13 factors of 2 fit.
+      expect(e).toBeLessThanOrEqual(13);
+    } finally {
+      Math.random = origRandom;
+    }
+  }, 120_000);
 });
