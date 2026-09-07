@@ -75,6 +75,7 @@ Open `http://localhost:5173` in your browser.
 | pollard-strassen | Pollard-Strassen algorithm | — |
 | quadratic-sieve | Quadratic sieve | — |
 | small-fraction | Continued fraction attack on e/n | ✓ |
+| small-prime-crt | CRT decrypt of smooth moduli (small prime factors) | ✓ |
 | squfof | SQUFOF algorithm | — |
 | williams-p1 | Williams' p+1 factorization | — |
 
