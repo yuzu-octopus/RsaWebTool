@@ -47,7 +47,7 @@ describe('attack template numeric input handling', () => {
     [coppersmithShortPad, { n: '', e: '', c1: '', c2: '' }, 'COPPERSMITH_SHORT_PAD'],
     [manger, { n: '', e: '', c: '', oracle_responses: '' }, 'MANGER'],
   ])('%s emits a valid failure template for blank required inputs', (attack, vals, token) => {
-    const template = sageTemplateFor(attack, vals as Record<string, string>);
+    const template = sageTemplateFor(attack, vals);
 
     expect(template).not.toContain('if not :');
     expect(template).not.toMatch(/=\s*\n/);

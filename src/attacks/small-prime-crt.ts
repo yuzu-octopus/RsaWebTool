@@ -178,7 +178,7 @@ export const generateTestcase = (): Record<string, string> => {
   let e = 65537n;
   while (gcd(e, phi) !== 1n) e += 2n;
   const nBits = n.toString(2).length;
-  let m = 0n;
+  let m: bigint;
   do {
     const bytes = new Uint8Array(Math.ceil(nBits / 8));
     crypto.getRandomValues(bytes);
