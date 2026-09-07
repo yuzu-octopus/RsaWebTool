@@ -13,6 +13,7 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
     { name: 'dLow', label: 'dLow (low bits of d)', placeholder: 'Enter known low bits of d...', multiline: true, rows: 3 },
+    { name: 'm', label: 'm (known low-bit count)', placeholder: 'e.g. 20 (optional; defaults to dLow bit-length)', required: false, multiline: false },
   ],
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'PARTIAL_D',
@@ -27,8 +28,14 @@ export const attack: Attack = {
             n_int = int(n)
             e_int = int(e)
             dLow_int = int(dLow)
-            m = dLow_int.bit_length()
-            kBound = 1 << min(m + 2, 24)
+            m_str = "${validateNumeric(vals.m || '', 'm')}".strip()
+            # Explicit m when dLow has leading zeros (bit_length would undercount
+            # the known bits and shrink both mask and kBound); else default.
+            m = int(m_str) if m_str else dLow_int.bit_length()
+            if m < 1 or dLow_int >= (1 << m):
+                out.append("PARTIAL_D=FAILED: m must be positive with dLow < 2^m")
+                m = 0
+            kBound = 1 << min(m + 2, 24) if m > 0 else 0
             # Incremental d_approx update (avoid BigInt division per iteration)
             q = n_int // e_int
             r = n_int % e_int
@@ -80,10 +87,13 @@ export const attack: Attack = {
       const e = BigInt(vals.e);
       const dLow = BigInt(vals.dLow);
 
-      // Infer mask from bit length of dLow; bound k by dLow bit-length
-      const dLowBits = dLow.toString(2).length;
-      const kBound = 1n << BigInt(Math.min(dLowBits + 2, 24)); // bound at ~16M max
-      const mask = (1n << BigInt(dLowBits)) - 1n;
+      // Known-bit count m: explicit input when dLow has leading zeros (its
+      // bit-length would then undercount); defaults to dLow bit-length.
+      const rawM = (vals.m || '').trim();
+      const m = rawM ? BigInt(rawM) : BigInt(dLow.toString(2).length);
+      if (m < 1n || m > 1024n || dLow >= (1n << m)) return Promise.resolve(null);
+      const kBound = 1n << BigInt(Math.min(Number(m) + 2, 24)); // bound at ~16M max
+      const mask = (1n << m) - 1n;
 
       // Precompute once
       const q = n / e;
@@ -132,7 +142,7 @@ export const attack: Attack = {
 \\textbf{Setup:}
 \\begin{itemize}
 \\item $ed \\equiv 1 \\pmod{\\varphi(n)}$, so $ed - 1 = k\\varphi(n)$ for some $k \\in [1, e]$
-\\item $d_{\\text{low}} = d \\bmod 2^m$ known, $m = \\text{bit-length of } d_{\\text{low}}$
+\\item $d_{\\text{low}} = d \\bmod 2^m$ known, $m$ = explicit known-bit count input (defaults to bit-length of $dLow$; pass it explicitly when $dLow$ has leading zeros)
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -151,8 +161,10 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\\\implies p,q \\qed
 \\item \\textbf{Incremental }$d_{\\text{approx}}$\\textbf{ update:} Instead of recomputing $d_{\\text{approx}} = \\lfloor (kn+1)/e \\rfloor$ from scratch each iteration (costly BigInt division), maintains a running quotient/remainder: increments $d_{\\text{approx}}$ by the constant $q = n \\div e$ per step (since $d_{\\text{approx}}$ for $k+1$ equals $d_{\\text{approx}}$ for $k$ plus $n/e$), and tracks a running remainder that handles the floor division.
 \\end{itemize}
 
+\\textbf{Scope:} LSB-only: $dLow = d \\bmod 2^m$ must be the low $m$ bits of $d$. The $k$-iteration reaches $k < 2^{m+2}$ (capped at $\\sim 16\\times 10^6$); full-size $d$ needs the Boneh-Durfee-Frankel lattice (Coppersmith on the key equation mod $2^m$), which is not implemented here.
+
 \\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,
-  usageGuide: 'This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.\n\nHow to use:\n1. You have modulus n, public exponent e, and dLow (the low-order bits of d)\n2. Provide n, e, and dLow\n3. The attack iterates k in ed = kphi(n) + 1, checking if d_approx has matching low bits\n4. For each matching candidate, it computes phi(n) and solves the quadratic for p,q\n\nTip: The attack works best when e is small (smaller k search space). The kBound is computed from dLow bit-length (max ~16M iterations). Uses incremental d_approx update (avoiding BigInt division per iteration) for performance.',
+  usageGuide: 'This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.\n\nHow to use:\n1. You have modulus n, public exponent e, and dLow (the low-order bits of d)\n2. Provide n, e, dLow, and m (the known low-bit count; optional when dLow has no leading zeros)\n3. The attack iterates k in ed = kphi(n) + 1, checking if d_approx has matching low bits\n4. For each matching candidate, it computes phi(n) and solves the quadratic for p,q\n\nTip: The attack works best when e is small (smaller k search space). The kBound is 2^(m+2) (max ~16M iterations). LSB-only scope: only low bits are supported — full-size d needs a Coppersmith lattice (Boneh-Durfee-Frankel), not implemented here. Uses incremental d_approx update (avoiding BigInt division per iteration) for performance.',
   priority: 'high',
   applicableCheck: rsaNeeds.nEDLow,
 };

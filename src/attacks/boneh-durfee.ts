@@ -7,7 +7,7 @@ export const attack: Attack = {
   id: 'boneh-durfee',
   name: 'Boneh-Durfee Attack',
   category: 'Factorization',
-  description: 'Recovers d when d < n^0.260 via Wiener continued fractions (d < n^0.25) or Boneh-Durfee lattice (d < n^0.260). Use for unbalanced private exponents.',
+  description: 'Recovers d when d < n^0.292 via Wiener continued fractions (d < n^0.25) or the Boneh-Durfee lattice heuristic (implemented escalation targets d < n^0.260). Use for unbalanced private exponents.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -17,7 +17,7 @@ export const attack: Attack = {
 How to use:
 1. Provide n and e from the RSA public key
 2. The attack tries Wiener's continued fraction method first (d < n^0.25)
-3. If Wiener fails, it falls back to the Boneh-Durfee lattice attack (d < n^0.260)
+3. If Wiener fails, it falls back to the Boneh-Durfee lattice heuristic (theory: d < n^0.292; the implemented (m, t) escalation targets d < n^0.260)
 4. If d is large, neither method will succeed
 
 Tip: This attack works when d is small due to poor key generation. Common in CTF challenges with deliberately weak keys.`,
@@ -187,12 +187,12 @@ Tip: This attack works when d is small due to poor key generation. Common in CTF
             out.append("BONEH_DURFEE=FAILED")`,
     useGuard: true,
   }),
-  proof: `\\textbf{Theorem:} Find $d$ when $d < n^{0.260}$ using Wiener's continued fractions ($d < n^{0.25}$) or Boneh-Durfee's lattice ($d < n^{0.260}$).
+  proof: `\\textbf{Theorem:} Find $d$ when $d < n^{0.292}$ using Wiener's continued fractions ($d < n^{0.25}$) or Boneh-Durfee's lattice heuristic ($d < n^{0.292}$ in theory; the implemented escalation targets $d < n^{0.260}$).
 
 \\textbf{Setup:}
 \\begin{itemize}
 \\item $ed \\equiv 1 \\pmod{\\phi(n)}$ with unknown $d$, $k$, $\\phi(n)$
-\\item $e \\approx n$ and $d < n^{\\delta}$ with $\\delta < 0.5$
+\\item $e \\approx n$ and $d < n^{\\delta}$ with $\\delta < 0.292$
 \\end{itemize}
 
 \\textbf{Proof:}
@@ -202,11 +202,11 @@ Tip: This attack works when d is small due to poor key generation. Common in CTF
 p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2}
 \\end{align*}
 
-\\textbf{Explanation:} Wiener's attack exploits the fact that when $d$ is small, $e/n$ approximates $k/d$ so closely that $k/d$ appears as a convergent in the continued fraction expansion of $e/n$. The Boneh-Durfee lattice uses Coppersmith's method with a bivariate polynomial $f(x,y) = x(A+y)-1$ to extend the bound to $d < n^{0.260}$ by finding short vectors via LLL.
+\\textbf{Explanation:} Wiener's attack exploits the fact that when $d$ is small, $e/n$ approximates $k/d$ so closely that $k/d$ appears as a convergent in the continued fraction expansion of $e/n$. The Boneh-Durfee lattice uses Coppersmith's method with a bivariate polynomial $f(x,y) = x(A+y)-1$ to extend the bound toward $d < n^{0.292}$ (heuristic; the implemented (m, t) escalation targets $\\delta \\approx 0.260$) by finding short vectors via LLL.
 
 \\textbf{Optimizations:}
 \\begin{itemize}
-\\item \\textbf{Two-phase execution:} Phase 1 runs Wiener's continued fraction attack ($d < n^{0.25}$) — a fast $O(\\log n)$ check using $e/n$ convergents that immediately succeeds for small $d$ without invoking lattice reduction. Phase 2 runs the Herrmann-May Coppersmith lattice ($d < n^{0.260}$) with Sage native resultant for bivariate root recovery, only when Wiener fails.
+\\item \\textbf{Two-phase execution:} Phase 1 runs Wiener's continued fraction attack ($d < n^{0.25}$) — a fast $O(\\log n)$ check using $e/n$ convergents that immediately succeeds for small $d$ without invoking lattice reduction. Phase 2 runs the Herrmann-May Coppersmith lattice with (m, t) escalation ((3,1) up to (8,3)) and Sage native resultant for bivariate root recovery, succeeding heuristically for $d < n^{0.260}$ and approaching the $0.292$ bound as (m, t) grow, only when Wiener fails.
 \\end{itemize}
 
 \\textbf{References:} M. Wiener, CRYPTO 1990; D. Boneh, G. Durfee, CRYPTO 1999`,

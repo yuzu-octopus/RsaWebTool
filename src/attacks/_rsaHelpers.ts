@@ -64,18 +64,25 @@ export const noopSageTemplate = (token: string = 'ATTACK'): string =>
  * row scanning for two-term polynomials, and root recovery.
  *
  * Used by simple-lattice, partial-key-exposure, and partial-pq-bits attacks.
- * @param f - Python expression for the polynomial (e.g., "nearp + x" or "(knownBits << k) + x")
+ * @param f - Python expression for the monic polynomial (e.g., "nearp + x" or "p_msb + x")
  * @param n - Python expression for the modulus variable (default "n")
  * @param m - Lattice parameter m (default 5)
  * @param t - Lattice parameter t (default 5)
+ * @param recover - Python expression for the factor candidate from root r.
+ * LSB monic polynomials pass "(2**m) * r + knownBits" so the original
+ * non-monic form is what gets divisibility-tested.
+ * Scope: hardcoded X = n^1/4; callers need |x0| <= n^1/4.
  */
 export function coppersmithLatticePython(
   f: string,
   n = 'n',
   m = 5,
   t = 5,
+  recover?: string,
 ): string {
+  const recoverExpr = recover ?? f.replace(/\bx\b/g, 'r');
   return `            # Coppersmith lattice: degree-1, checks ALL LLL rows (bypasses Sage Row-0 bug).
+            # X = n^1/4 below: sound only when the unknown satisfies |x0| <= X.
             x = ZZ['x'].gen()
             f_ZZ = ${f}
             X = ${n}.nth_root(4, truncate_mode=True)[0] + 1
@@ -97,10 +104,13 @@ export function coppersmithLatticePython(
                 if a1 == 0:
                     continue
                 r_approx = -QQ(a0) * QQ(X) / QQ(a1)
+                # +-2 window: LLL yields an approximation, so the true integer root
+                # can sit ~2 away from the rounded estimate; each candidate is
+                # divisibility-verified, so widening cannot cause a false positive.
                 for delta in range(-2, 3):
                     r = Integer(floor(r_approx)) + delta
-                    if abs(r) < X:
-                        candidate = ${f.replace(/\bx\b/g, 'r')}
+                    if abs(r) <= X:
+                        candidate = ${recoverExpr}
                         if ${n} % candidate == 0:
                             found_p = candidate
                             break

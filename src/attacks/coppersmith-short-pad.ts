@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateHastadTestcase, generateKeyPair, randomPrime } from '../utils/testcases/core';
-import { modPow, iroot } from '../utils/bigint';
+import { modPow, exactNthRoot } from '../utils/bigint';
 import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
@@ -103,10 +103,10 @@ export const attack: Attack = {
       const e = BigInt(vals.e);
       const c1 = BigInt(vals.c1);
       const c2 = BigInt(vals.c2);
-      const m1Root = iroot(c1, e);
-      const m2Root = iroot(c2, e);
-      let m1: bigint | null = m1Root ** e === c1 ? m1Root : null;
-      let m2: bigint | null = m2Root ** e === c2 ? m2Root : null;
+      // Degenerate integer-root case only: exact roots or nothing (plus the
+      // small-delta brute force below); no lattice is attempted here.
+      let m1: bigint | null = exactNthRoot(c1, e);
+      let m2: bigint | null = exactNthRoot(c2, e);
       if (m1 === null && m2 !== null) {
         for (let d = 1n; d < 4096n; d++) {
           if ((m2 - d) ** e === c1) {
@@ -131,7 +131,7 @@ export const attack: Attack = {
       return Promise.resolve(null);
     } catch (e) { console.warn('[coppersmith-short-pad] frontendCheck error:', e); return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} Given two ciphertexts $c_1 \\equiv m_1^e \\pmod{n}$, $c_2 \\equiv m_2^e \\pmod{n}$ where $e$ is small (e.g. $e = 3, 5$), recover $m$ via integer root extraction. For $|m| < n^{1/e^2}$, Coppersmith's lattice extension applies.
+  proof: `\\textbf{Theorem:} Given two ciphertexts $c_1 \\equiv m_1^e \\pmod{n}$, $c_2 \\equiv m_2^e \\pmod{n}$ where $e$ is small (e.g. $e = 3, 5$), recover $m$ via integer root extraction in the degenerate case $m_i^e < n$ (no modular wrap-around). The Coppersmith lattice for $|m| < n^{1/e^2}$ is NOT implemented here.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -148,7 +148,7 @@ m &= m_1 - r_1 = m_2 - r_2
 \\qed\\\\
 \\end{align*}
 
-\\textbf{Explanation:} When $m^e < n$, the ciphertext is an exact $e$-th power in the integers (no modular wrap-around). Integer $e$-th root directly recovers $m_1$ and $m_2$. If only one root is found, brute-force the small pad difference $\\Delta$ (at most 255). The full Coppersmith short-pad attack using polynomial resultants handles the general case where $m^e \\ge n$ and $|\\Delta| < n^{1/e^2}$, but requires lattice reduction not shown here.
+\\textbf{Explanation:} When $m^e < n$, the ciphertext is an exact $e$-th power in the integers (no modular wrap-around). Integer $e$-th root directly recovers $m_1$ and $m_2$. If only one root is found, brute-force the small pad difference $\\Delta$ (at most 4096, matching the implemented delta bound). The full Coppersmith short-pad attack using polynomial resultants handles the general case where $m^e \\ge n$ and $|\\Delta| < n^{1/e^2}$, but requires lattice reduction and is NOT implemented here: this attack covers only the degenerate integer-root case above.
 
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Bivariate Integer Equation", J. Cryptology, 1997; D. Boneh, "Twenty Years of Attacks on RSA", 1999`,
   usageGuide: 'Recovers small messages via integer e-th root (degenerate case where m^e < n). NOT the full Coppersmith lattice attack.\n\nHow to use:\n1. You have two ciphertexts c1, c2 of the same plaintext m with small pads r1, r2\n2. The pads are small (|r1|, |r2| < n^(1/e)) so m^e < n (no modular wrap-around)\n3. Provide n, e, c1, c2\n4. The attack uses integer e-th root to recover the messages and pads\n\nTip: Works best with e=3 and small messages. For convenience, paste into Magic Mode which auto-detects.',

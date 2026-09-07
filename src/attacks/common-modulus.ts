@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS, encrypt } from '../utils/testcases/core';
-import { extendedGcd, modPow, modInverse, iroot } from '../utils/bigint';
+import { extendedGcd, modPow, modInverse, exactNthRoot, gcd } from '../utils/bigint';
 import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
@@ -23,7 +23,7 @@ How to use:
 2. With coprime exponents, compute Bezout coefficients: a*e1 + b*e2 = 1
 3. Recover m = c1^a * c2^b mod n
 
-Tip: gcd(e1, e2) = 1 recovers m directly. For gcd(e1, e2) = g > 1, recovery is possible only when the recovered residue is an exact integer g-th power and re-encryption verifies both ciphertexts.`,
+Tip: gcd(e1, e2) = 1 recovers m directly. For gcd(e1, e2) = g > 1, recovery is possible only when the recovered residue is an exact integer g-th power and re-encryption verifies both ciphertexts. If gcd(c1, n) or gcd(c2, n) exceeds 1, that value already factors n (m shares the factor), short-circuiting the Bezout path.`,
   sageTemplate: (vals: Record<string, string>) => {
     if (!vals.n || !vals.e1 || !vals.e2 || !vals.c1 || !vals.c2) {
       return `print("ERROR: Missing required inputs (n, e1, e2, c1, c2)")
@@ -37,6 +37,28 @@ print("COMMON_MODULUS=FAILED")`;
         e2 = Integer(${validateNumeric(vals.e2, 'e2')})
         c1 = Integer(${validateNumeric(vals.c1, 'c1')})
         c2 = Integer(${validateNumeric(vals.c2, 'c2')})
+        # Fast path: a ciphertext sharing a factor with n factors n immediately
+        # (m shares the factor too, so the Bezout inverses below would not exist).
+        for ci in [c1, c2]:
+            gi = gcd(ci, n)
+            if 1 < gi < n:
+                pi = gi
+                qi = n // pi
+                print("Common Modulus Attack")
+                print(f"n = {n}")
+                print(f"e1 = {e1}")
+                print(f"e2 = {e2}")
+                print(f"c1 = {c1}")
+                print(f"c2 = {c2}")
+                print("")
+                print("Results:")
+                print(f"p = {pi}")
+                print(f"q = {qi}")
+                print("")
+                print(f"Verification: p * q = {pi * qi}")
+                print("")
+                print("COMMON_MODULUS=SUCCESS")
+                return
         # Check gcd(e1, e2) first
         out.append("Common Modulus Attack")
         out.append(f"n = {n}")
@@ -87,6 +109,13 @@ print("COMMON_MODULUS=FAILED")`;
       const e2 = BigInt(vals.e2);
       const c1 = BigInt(vals.c1);
       const c2 = BigInt(vals.c2);
+      for (const ci of [c1, c2]) {
+        const gi = gcd(ci, n);
+        if (gi > 1n && gi < n) {
+          const q = n / gi;
+          return Promise.resolve(`Common Modulus Attack\nn = ${n}\ne1 = ${e1}\ne2 = ${e2}\nc1 = ${c1}\nc2 = ${c2}\n\nResults:\np = ${gi}\nq = ${q}\n\nVerification: p * q = ${gi * q}\n\nCOMMON_MODULUS=SUCCESS`);
+        }
+      }
       const { gcd: exponentGcd, x, y } = extendedGcd(e1, e2);
       let part1: bigint;
       if (x < 0n) {
@@ -107,10 +136,11 @@ print("COMMON_MODULUS=FAILED")`;
       const mG = (part1 * part2) % n;
       let m = mG;
       if (exponentGcd > 1n) {
-        m = iroot(mG, exponentGcd);
-        if (m ** exponentGcd !== mG) {
+        const root = exactNthRoot(mG, exponentGcd);
+        if (root === null) {
           return Promise.resolve(`Common Modulus Attack\nn = ${n}\ne1 = ${e1}\ne2 = ${e2}\nc1 = ${c1}\nc2 = ${c2}\n\ngcd(e1, e2) = ${exponentGcd}\nNon-recovery: recovered m^${exponentGcd} mod n = ${mG}, which is not an exact integer ${exponentGcd}-th power.\nA modular root may be ambiguous or require factoring n.\n\nCOMMON_MODULUS=FAILED`);
         }
+        m = root;
       }
       const v1 = modPow(m, e1, n);
       const v2 = modPow(m, e2, n);
@@ -141,7 +171,7 @@ c_1^a \\cdot c_2^b &\\equiv (m^{e_1})^a \\cdot (m^{e_2})^b \\pmod{n} \\\\
 \\end{align*}
 When $a < 0$, compute $c_1^a = (c_1^{-1})^{|a|} \\pmod{n}$. Same for $b < 0$.
 
-\\textbf{Explanation:} Bezout's identity guarantees integers $a, b$ satisfying $a e_1 + b e_2 = 1$ when $\\gcd(e_1, e_2) = 1$. Multiplying $c_1^a \\cdot c_2^b$ yields $m^{a e_1 + b e_2} = m$. If $\\gcd(e_1, e_2) = g > 1$, it yields only $m^g \\bmod n$. This implementation recovers $m$ in that case only when this value is an exact integer $g$-th power and re-encryption verifies both ciphertexts; otherwise modular roots may be ambiguous or require factoring $n$.
+\\textbf{Explanation:} Bezout's identity guarantees integers $a, b$ satisfying $a e_1 + b e_2 = 1$ when $\\gcd(e_1, e_2) = 1$. Multiplying $c_1^a \\cdot c_2^b$ yields $m^{a e_1 + b e_2} = m$. If $\\gcd(e_1, e_2) = g > 1$, it yields only $m^g \\bmod n$. This implementation recovers $m$ in that case only when this value is an exact integer $g$-th power and re-encryption verifies both ciphertexts; otherwise modular roots may be ambiguous or require factoring $n$. If either ciphertext shares a factor with $n$, that factor splits $n$ immediately, since $m$ shares it too. With e1 = 1, Bezout gives $a = 1, b = 0$ and $m = c_1$ directly, no inverses needed.
 
 \\textbf{References:} Simmons & Norris, 1977; Boneh, "Twenty Years of Attacks on RSA," 1999`,
   priority: 'high',

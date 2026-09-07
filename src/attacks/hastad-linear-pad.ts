@@ -161,7 +161,7 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
 \\begin{itemize}
 \\item $c_i \\equiv (a_i m + b_i)^e \\pmod{n_i}$ with $\\gcd(n_i, n_j) = 1$ for $i \\neq j$
 \\item $k \\geq e$, affine transforms $(a_i, b_i)$ known for each modulus
-\\item $m < \\min_i(n_i^{1/e})$ (message is small enough for Coppersmith)
+\\item $|m| < N^{1/e}$ with $N = \\prod n_i$ (message is small relative to the combined modulus, which is what Coppersmith needs)
 \\end{itemize}
 
 \\textbf{Proof:}

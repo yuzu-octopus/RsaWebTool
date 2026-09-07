@@ -45,11 +45,26 @@ Tip: Instant factorization once φ(n) is known. φ(n) can leak from CRT-based im
         # Solve quadratic: x^2 - sum_pq * x + n = 0
         discriminant = sum_pq**2 - 4*n
         if discriminant < 0:
-            out.append("PHI_LEAK=FAILED: Negative discriminant. phi(n) is inconsistent with n.")
+            out.append("PHI_LEAK=FAILED: Negative discriminant. phi(n) is inconsistent with n (phi-multiple Miller-Rabin-style randomized factoring is not implemented here).")
             out.append("PHI_LEAK=FAILED")
         elif discriminant == 0:
-            out.append("PHI_LEAK=FAILED: p = q. n is a perfect square (not valid RSA).")
-            out.append("PHI_LEAK=FAILED")
+            # Square discriminant: p = q = sum_pq / 2 with n a perfect square.
+            p = sum_pq // 2
+            if p * p == n:
+                out.append(f"n = {n}")
+                out.append(f"phi = {phi}")
+                out.append("")
+                out.append("Results:")
+                out.append(f"p = {p}")
+                out.append(f"q = {p}")
+                out.append("")
+                out.append(f"Verification: p * q = {p * p}")
+                out.append("")
+                out.append("PHI_LEAK=SUCCESS")
+                found = True
+            else:
+                out.append("PHI_LEAK=FAILED: square discriminant but (s/2)^2 != n.")
+                out.append("PHI_LEAK=FAILED")
         else:
             sqrt_disc = isqrt(discriminant)
             if sqrt_disc**2 == discriminant:
@@ -67,7 +82,7 @@ Tip: Instant factorization once φ(n) is known. φ(n) can leak from CRT-based im
                 out.append("PHI_LEAK=SUCCESS")
                 found = True
             else:
-                out.append(f"PHI_LEAK=FAILED: discriminant is not a perfect square")
+                out.append(f"PHI_LEAK=FAILED: discriminant is not a perfect square (phi may belong to a multi-prime n or be inconsistent; phi-multiple Miller-Rabin-style randomized factoring is not implemented here)")
                 out.append("PHI_LEAK=FAILED")
         if not found:
             out.append("PHI_LEAK=FAILED")`,
@@ -84,12 +99,31 @@ Tip: Instant factorization once φ(n) is known. φ(n) can leak from CRT-based im
       const discriminant = sum_pq * sum_pq - 4n * n;
 
       if (discriminant < 0n) {
-        return null;
+        return [
+          `Phi(n) Leak`,
+          `n = ${n}`,
+          `phi = ${phi}`,
+          ``,
+          `No factorization: negative discriminant, so phi(n) is inconsistent with n.`,
+          `A phi-multiple Miller-Rabin-style randomized factorisation is not implemented here.`,
+          ``,
+          `PHI_LEAK=FAILED`,
+        ].join('\n');
       }
 
       const sqrt_disc = isqrt(discriminant);
       if (sqrt_disc * sqrt_disc !== discriminant) {
-        return null;
+        return [
+          `Phi(n) Leak`,
+          `n = ${n}`,
+          `phi = ${phi}`,
+          ``,
+          `No factorization: discriminant ${discriminant} is not a perfect square.`,
+          `phi may belong to a multi-prime n or be inconsistent; phi-multiple`,
+          `Miller-Rabin-style randomized factoring is not implemented here.`,
+          ``,
+          `PHI_LEAK=FAILED`,
+        ].join('\n');
       }
 
       const p = (sum_pq - sqrt_disc) / 2n;
@@ -134,6 +168,8 @@ p, q &= \\frac{s \\pm \\sqrt{\\Delta}}{2} \\qed
 \\end{align*}
 
 \\textbf{Explanation:} Given both $n = pq$ and $\\phi(n) = (p-1)(q-1)$, we know both the sum $p+q = n - \\phi(n) + 1$ and the product $pq = n$. By Vieta's formulas, $p$ and $q$ are the roots of $x^2 - (p+q)x + pq = 0$. Computing the discriminant $\\Delta = (p+q)^2 - 4n = (p-q)^2$ and taking its square root yields $p$ and $q$ directly via the quadratic formula. This is a single-shot deterministic attack with no iteration.
+
+\\textbf{Scope:} If $\\Delta = 0$ then $p = q = s/2$ with $n$ a perfect square, returned directly via $\\sqrt{n}$. A non-square $\\Delta$ means $\\phi(n)$ is inconsistent with a two-prime $n$ (wrong leak or multi-prime modulus): the attack reports FAILED rather than guessing. Recovering factors from a mere multiple of $\\phi(n)$ needs Miller-Rabin-style randomized factoring, which is not implemented here.
 
 \\textbf{References:} Rivest, Shamir, Adleman, "A Method for Obtaining Digital Signatures and Public-Key Cryptosystems", 1978; Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2`,
   priority: 'high',

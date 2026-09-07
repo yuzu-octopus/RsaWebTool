@@ -186,6 +186,17 @@ print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")`;
       // Only supports e=3 in frontendCheck (polynomial GCD over composite n is not feasible in JS)
       if (e !== 3n) return Promise.resolve(null);
 
+      // Non-proportional guard (mirrors the Sage branch): with b1 = b2 = 0 the
+      // two equations are proportional exactly when a2^e*c1 == a1^e*c2 mod n,
+      // in which case every m satisfies both and m is unrecoverable.
+      if (b1 === 0n && b2 === 0n) {
+        const ratioCheck = (modPow(a2, e, n) * c1) % n;
+        const altRatio = (modPow(a1, e, n) * c2) % n;
+        if (ratioCheck === altRatio) {
+          return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na1 = ${a1}\nb1 = ${b1}\na2 = ${a2}\nb2 = ${b2}\n\nDiagnostic: a2^e * c1 mod n = ${ratioCheck}\nDiagnostic: a1^e * c2 mod n = ${altRatio}\nDiagnostic: match? true\n\nWARNING: b1=b2=0 and a2^e*c1 == a1^e*c2. Any m satisfies both equations.\nCannot recover m uniquely. Try using non-zero b1 or b2.\n\nFRANKLIN_REITER_RELATED_MESSAGE=FAILED`);
+        }
+      }
+
       // General transformation: if a1 != 1 or b1 != 0, transform to standard form
       // y = a1*m + b1  =>  m = a1^(-1)*(y - b1)
       // c1 = y^3
@@ -224,11 +235,19 @@ print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")`;
       const C = ((workB * workB * workB) - workC2 + (workA * workA * workA % n) * workC1) % n;
       const nMod = ((C % n) + n) % n;
 
-      if (A === 0n && B === 0n) return Promise.resolve(null);
+      // Degenerate elimination (mirrors the Sage branch): A = B = 0 collapses the
+      // quadratic, so C decides between underdetermined and contradictory.
+      if (A === 0n && B === 0n) {
+        const diag = nMod === 0n
+          ? `Degenerate: any m satisfies both equations (b1=b2=0 case).`
+          : `Contradiction: ${nMod} != 0. a1/b1/a2/b2 values produce inconsistent equations.`;
+        return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na1 = ${a1}\nb1 = ${b1}\na2 = ${a2}\nb2 = ${b2}\n\nAlgebraic elimination: 0*m^2 + 0*m + ${nMod} = 0 (mod n)\n\n${diag}\n\nFRANKLIN_REITER_RELATED_MESSAGE=FAILED`);
+      }
       if (A === 0n) {
-        if (B === 0n) return Promise.resolve(null);
         const invB = modInverse(B, n);
-        if (invB === null) return Promise.resolve(null);
+        if (invB === null) {
+          return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na1 = ${a1}\nb1 = ${b1}\na2 = ${a2}\nb2 = ${b2}\n\nAlgebraic elimination: 0*m^2 + ${B}*m + ${nMod} = 0 (mod n)\n\nLinear fallback failed (B not invertible mod n).\n\nFRANKLIN_REITER_RELATED_MESSAGE=FAILED`);
+        }
         const m = ((-nMod % n) + n) % n * invB % n;
         const m_orig = invA1 !== null ? (((invA1 * ((m - b1) % n)) % n + n) % n) : m;
         if (modPow((a1 * m_orig + b1) % n, e, n) === c1 && modPow((a2 * m_orig + b2) % n, e, n) === c2) {
@@ -244,9 +263,25 @@ print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")`;
       const denom = ((A * nMod - B * B) % n + n) % n;
       const numer = ((B * nMod - A * A % n * workC1) % n + n) % n;
 
-      if (denom === 0n) return Promise.resolve(null);
+      // Resultant denominator guards (mirror the Sage branch): denom = 0 is
+      // degenerate or contradictory; a denom sharing a factor gd with n splits n,
+      // but the CRT division is undefined modulo gd (denom vanishes there), so m
+      // stays unrecovered while the factors are reported.
+      if (denom === 0n) {
+        const diag = numer === 0n
+          ? `Degenerate: 0*m = 0 (mod n); m is not uniquely determined.`
+          : `Contradiction: 0*m = ${numer} (mod n) with ${numer} != 0.`;
+        return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na1 = ${a1}\nb1 = ${b1}\na2 = ${a2}\nb2 = ${b2}\n\nDenominator (A*C - B^2): ${denom}\n\n${diag}\n\nFRANKLIN_REITER_RELATED_MESSAGE=FAILED`);
+      }
       const invDenom = modInverse(denom, n);
-      if (invDenom === null) return Promise.resolve(null);
+      if (invDenom === null) {
+        const gd = gcd(denom, n);
+        if (gd > 1n && gd < n) {
+          const q1 = n / gd;
+          return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na1 = ${a1}\nb1 = ${b1}\na2 = ${a2}\nb2 = ${b2}\n\nDenominator (A*C - B^2): ${denom}\nDenominator shares factor ${gd} with n.\n\nResults:\np = ${gd}\nq = ${q1}\n\nVerification: p * q = ${gd * q1}\n\nThe CRT division is undefined modulo ${gd}, so m is unrecovered.\n\nFRANKLIN_REITER_RELATED_MESSAGE=FAILED`);
+        }
+        return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\nc1 = ${c1}\nc2 = ${c2}\na1 = ${a1}\nb1 = ${b1}\na2 = ${a2}\nb2 = ${b2}\n\nDenominator (A*C - B^2): ${denom}\n\nQuadratic fallback failed (denominator not invertible mod n).\n\nFRANKLIN_REITER_RELATED_MESSAGE=FAILED`);
+      }
       const m = (numer * invDenom) % n;
       const m_orig = invA1 !== null ? (((invA1 * ((m - b1) % n)) % n + n) % n) : m;
       if (modPow((a1 * m_orig + b1) % n, e, n) === c1 && modPow((a2 * m_orig + b2) % n, e, n) === c2) {
@@ -278,10 +313,10 @@ m &= -g[0] \\cdot g[1]^{-1} \\pmod{n}
 
 \\textbf{Generalization (e=3):} When $a_1=1, b_1=0$, this reduces to the classical Franklin-Reiter form $c_1=m^e, c_2=(am+b)^e$. For arbitrary $a_1, b_1$ with $\\gcd(a_1, n)=1$, substitute $y = a_1 m + b_1$ to get $c_1=y^e$, $c_2=(a_2 a_1^{-1} y + (b_2 - a_2 a_1^{-1} b_1))^e$, reducing to the standard case.
 
-\\textbf{Explanation:} Both polynomials share $m$ as a root modulo $n$. The polynomial GCD extracts their common linear factor $(x - m)$. For $e = 3$, a closed-form algebraic elimination is available. When $a_1$ is not invertible modulo $n$, $\\gcd(a_1, n)$ immediately reveals a factor of $n$.
+\\textbf{Explanation:} Both polynomials share $m$ as a root modulo $n$. The polynomial GCD extracts their common linear factor $(x - m)$. For $e = 3$, a closed-form algebraic elimination is available. When $a_1$ is not invertible modulo $n$, $\\gcd(a_1, n)$ immediately reveals a factor of $n$. When $b_1 = b_2 = 0$ with proportional equations, or when the $e = 3$ resultant denominator vanishes or shares a factor with $n$, the browser path reports the diagnosis (and any factors found) instead of a wrong $m$.
 
 \\textbf{References:} Franklin & Reiter, 1996; Boneh, "Twenty Years of Attacks on RSA," 1999`,
-  usageGuide: 'This attack recovers m when two ciphertexts of the SAME message under different linear transforms are encrypted with the same public key.\n\nHow to use:\n1. You have two ciphertexts c1, c2 encrypted under the same (n, e)\n2. The plaintexts are: m1 = a1*m + b1, m2 = a2*m + b2 for known a1,b1,a2,b2\n3. Provide n, e, c1, c2, a1, b1, a2, and b2\n4. The attack computes gcd((a1*x+b1)^e - c1, (a2*x+b2)^e - c2) to recover m\n\nDefaults: a1=1, b1=0 (standard Franklin-Reiter where c1 = m^e)\n\nTip: The attack requires e = 3 for reliable algebraic recovery in the browser; e = 5 or higher uses SageMathCell (may timeout). If a1 shares a factor with n, the attack immediately factors n. For convenience, paste into Magic Mode which auto-detects the parameters.',
+  usageGuide: 'This attack recovers m when two ciphertexts of the SAME message under different linear transforms are encrypted with the same public key.\n\nHow to use:\n1. You have two ciphertexts c1, c2 encrypted under the same (n, e)\n2. The plaintexts are: m1 = a1*m + b1, m2 = a2*m + b2 for known a1,b1,a2,b2\n3. Provide n, e, c1, c2, a1, b1, a2, and b2\n4. The attack computes gcd((a1*x+b1)^e - c1, (a2*x+b2)^e - c2) to recover m\n\nDefaults: a1=1, b1=0 (standard Franklin-Reiter where c1 = m^e)\n\nTip: The attack requires e = 3 for reliable algebraic recovery in the browser; e = 5 or higher uses SageMathCell (may timeout). If a1 shares a factor with n, the attack immediately factors n. For convenience, paste into Magic Mode which auto-detects the parameters. Proportional inputs (b1=b2=0 with a2^e*c1 == a1^e*c2) are diagnosed as unrecoverable, and a resultant denominator sharing a factor with n reports the factors.',
   priority: 'high',
   applicableCheck: rsaNeeds.nC1C2,
 };
