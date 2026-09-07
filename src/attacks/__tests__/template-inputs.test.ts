@@ -9,6 +9,8 @@ import { attack as smallPublicExp } from '../small-public-exp';
 import { attack as commonModulus } from '../common-modulus';
 import { attack as hastadBroadcast } from '../hastad-broadcast';
 import { attack as multiPrimeGcd } from '../multi-prime-gcd';
+import { attack as manger } from '../manger';
+import { validateNumeric } from '../guard';
 import { attack as nitros } from '../nitros';
 import { attack as phiLeak } from '../phi-leak';
 import { attack as coppersmithShortPad } from '../coppersmith-short-pad';
@@ -43,6 +45,7 @@ describe('attack template numeric input handling', () => {
     [nitros, { n: '', base: '' }, 'NITROS'],
     [phiLeak, { n: '', phi: '' }, 'PHI_LEAK'],
     [coppersmithShortPad, { n: '', e: '', c1: '', c2: '' }, 'COPPERSMITH_SHORT_PAD'],
+    [manger, { n: '', e: '', c: '', oracle_responses: '' }, 'MANGER'],
   ])('%s emits a valid failure template for blank required inputs', (attack, vals, token) => {
     const template = sageTemplateFor(attack, vals as Record<string, string>);
 
@@ -96,6 +99,34 @@ describe('attack template numeric input handling', () => {
 
     expect(template).not.toContain('no valid factor found');
     expect(template).toContain('DP_DQ_LEAK=FAILED');
+  });
+
+  test('multi-prime-gcd accepts comma-separated moduli', () => {
+    const result = multiPrimeGcd.frontendCheck?.({ n_values: '15,35' });
+
+    expect(result).toContain('p = 5');
+    expect(result).toContain('MULTI_PRIME_GCD=SUCCESS');
+  });
+
+  test('magic paste keeps newline-separated keys apart', () => {
+    expect(extractParams('n=15\ne=3')).toMatchObject({ n: '15', e: '3' });
+    expect(extractParams('n_values=15\n21')).toMatchObject({ n_values: '15\n21' });
+    expect(extractParams('n=ab\ncd')).toMatchObject({ n: 'ab\ncd' });
+  });
+
+  test('numeric guard tolerates wrapped multiline pastes', () => {
+    expect(validateNumeric('15\n21', 'n')).toBe('1521');
+    expect(validateNumeric('  42  ', 'e')).toBe('42');
+  });
+
+  test('defaulted-e attacks are discoverable without e', () => {
+    expect(knownPlaintext.applicableCheck({ n: '3233', c: '42' })).toBe(true);
+    expect(smallPublicExp.applicableCheck({ n: '3233', c: '42' })).toBe(true);
+    expect(lsbOracle.applicableCheck({ n: '3233', c: '42', oracle_responses: '1,0' })).toBe(true);
+  });
+
+  test('phi input is required', () => {
+    expect(phiLeak.inputs.find((i) => i.name === 'phi')?.required).toBe(true);
   });
 
   test('coppersmith-short-pad template defines n once', () => {

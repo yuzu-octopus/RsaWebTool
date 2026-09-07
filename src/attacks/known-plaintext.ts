@@ -242,7 +242,7 @@ Feasible for $k \\leq 24$ (approx. 16 million modular exponentiations in the bro
 
 \\textbf{References:} D. Coppersmith, 1997; May, "Attacks on RSA with Small Parameters," 2003`,
   priority: 'medium',
-  applicableCheck: rsaNeeds.nEC,
+  applicableCheck: rsaNeeds.nC,
 };
 
 export const generateTestcase = (): Record<string, string> => {

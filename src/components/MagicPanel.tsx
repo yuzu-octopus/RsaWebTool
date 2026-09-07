@@ -39,7 +39,7 @@ const kvParamNames = [
   'oracle_responses', 'oracle_runs', 'phi', 'moduli_list', 'n_values',
   'pairs', 'triples', 'oracle_pairs', 'known_prefix', 'p_msb', 'leak', 'unknown_bits',
 ];
-const kvRegex = new RegExp(`(?<name>${kvParamNames.join('|')})\\s*=\\s*(?<value>[0-9a-fA-FxX\\n,\\-]+)`, 'g');
+const kvRegex = new RegExp(`(?<name>${kvParamNames.join('|')})\\s*=\\s*(?<value>[0-9a-fA-FxX,\\-]+(?:[ \\t]*\\r?\\n[ \\t]*(?![A-Za-z_][A-Za-z0-9_]*\\s*=)[0-9a-fA-FxX,\\-]+)*)`, 'g');
 
 // Common JSON key aliases for structured input
 const KEY_ALIASES: Record<string, string> = {
@@ -54,7 +54,7 @@ export function extractParams(input: string): Record<string, string> {
   let match;
   while ((match = kvRegex.exec(input)) !== null) {
     if (match.groups?.name && match.groups?.value) {
-      params[match.groups.name] = match.groups.value.replace(/\s/g, '');
+      params[match.groups.name] = match.groups.value.replace(/[ \t\r]/g, '');
     }
   }
   // JSON structured input support ({ "n": "0x...", "e": "65537", "ct": "..." })

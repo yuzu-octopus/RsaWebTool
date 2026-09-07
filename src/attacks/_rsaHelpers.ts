@@ -21,6 +21,7 @@ export const rsaNeeds = {
   nC1C2: (p: Record<string, string>) => !!p.n && !!p.c1 && !!p.c2,
   // ─── Oracle-based patterns ──────────────────────────────────────────────
   nECOracleResponses: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_responses,
+  nCOracleResponses: (p: Record<string, string>) => !!p.n && !!p.c && !!p.oracle_responses,
   nEOracleRuns: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.oracle_runs,
   nETargetMOraclePairs: (p: Record<string, string>) => !!p.n && !!p.e && !!p.target_m && !!p.oracle_pairs,
   // ─── Signature-based patterns ───────────────────────────────────────────

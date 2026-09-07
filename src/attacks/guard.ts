@@ -139,10 +139,10 @@ export function sanitizePython(value: string): string {
 }
 
 export function validateNumeric(value: string, fieldName: string): string {
-  const trimmed = value.trim();
-  if (trimmed === '') return '';
-  if (!/^-?\d+$/.test(trimmed)) {
-    throw new Error(`${fieldName} must be a valid integer, got: "${trimmed.slice(0, 50)}"`);
+  const stripped = value.replace(/\s/g, '');
+  if (stripped === '') return '';
+  if (!/^-?\d+$/.test(stripped)) {
+    throw new Error(`${fieldName} must be a valid integer, got: "${stripped.slice(0, 50)}"`);
   }
-  return trimmed;
+  return stripped;
 }

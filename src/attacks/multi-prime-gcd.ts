@@ -59,7 +59,7 @@ n_i &= g_{ij} \\cdot \\frac{n_i}{g_{ij}},\\; n_j = g_{ij} \\cdot \\frac{n_j}{g_{
         return `ERROR: Multi-Prime GCD input exceeds safe limit of ${MAX_INPUT_BYTES} bytes\nMULTI_PRIME_GCD=FAILED`;
       }
 
-      const values = raw.split('\n')
+      const values = raw.split(/[\n,]+/)
         .map(s => s.trim())
         .filter(s => s.length > 0);
       if (values.length > MAX_MODULI) {

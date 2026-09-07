@@ -11,7 +11,7 @@ export const attack: Attack = {
   description: 'Factors n immediately when φ(n) has been leaked, via quadratic formula. Use when Euler\'s totient φ(n) is known from side-channel leakage.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
-    { name: 'phi', label: 'phi(n) (Euler totient)', placeholder: 'Enter phi(n)...', multiline: true, rows: 3, required: false, tooltip: 'Enter the leaked φ(n) value, if known from side-channel or other leakage' },
+    { name: 'phi', label: 'phi(n) (Euler totient)', placeholder: 'Enter phi(n)...', multiline: true, rows: 3, required: true, tooltip: 'Enter the leaked φ(n) value, if known from side-channel or other leakage' },
   ],
   usageGuide: `Use when Euler's totient φ(n) is known.
 
