@@ -17,7 +17,7 @@ const SECTIONS: Section[] = [
   {
     title: 'Getting Started',
     content: [
-      'RSA Web Tool is a browser-only toolkit for RSA CTF challenges with 47 attacks across 5 categories.',
+      'RSA Web Tool is a browser-only toolkit for RSA CTF challenges with 48 attacks across 5 categories.',
       'To use it: select an attack from the sidebar, fill in the required inputs, then click Run (or Generate for test data).',
       'Output shows SUCCESS or FAILED markers. On success, factors are auto-submitted to FactorDB and decryption is attempted automatically.',
     ],

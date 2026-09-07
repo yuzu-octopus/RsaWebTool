@@ -1,6 +1,6 @@
 # RSA Web Tool
 
-A browser-only RSA CTF tool with 47 cryptographic attacks across 5 categories, plus 5 built-in calculators (RSA, AES, ECC, Hash, DH).
+A browser-only RSA CTF tool with 48 cryptographic attacks across 5 categories, plus 5 built-in calculators (RSA, AES, ECC, Hash, DH).
 
 **Live at:** [yuzu-octopus.github.io/RsaWebTool](https://yuzu-octopus.github.io/RsaWebTool/)
 
@@ -10,10 +10,10 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 
 ### Cryptographic Attacks
 
-- **47 attacks** — Factorization (19), Lattice/Partial Key (11), Message/Protocol (9), Oracle (4), and Advanced (4) categories
-- **31 browser-side checks** — instant results via native BigInt (no SageCell needed), with live progress bars showing iteration variable + count on longer-running attacks
+- **48 attacks** — Factorization (20), Lattice/Partial Key (11), Message/Protocol (9), Oracle (4), and Advanced (4) categories
+- **32 browser-side checks** — instant results via native BigInt (no SageCell needed), with live progress bars showing iteration variable + count on longer-running attacks
 - **3 concurrent Web Workers** — parallel frontendCheck execution across attacks
-- **SageMathCell integration** — 42 attacks with SageMath backstop (5 are pure-JS only), 3 concurrent slots, 30s stall detection, immediate error element reporting
+- **SageMathCell integration** — 42 attacks with SageMath backstop (6 are pure-JS only), 3 concurrent slots, 30s stall detection, immediate error element reporting
 - **FactorDB lookup** — auto-queries FactorDB and auto-submits discovered factorizations
 - **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution (3 concurrent) with early-stop on first true success
 - **Console Environment** — `window.env` exposes all config (workers, timeouts, FactorDB proxy) with localStorage persistence; `env.reset()` clears all stored state
@@ -30,10 +30,10 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 
 - **Calculator Switcher Tabs** — 5-tab bar (RSA / AES / ECC / Hash / DH) with icons, keyboard shortcuts (⌘1-⌘5), scrollable on narrow screens
 - **Format Converter** — live Hex / Decimal / Base64 / Binary conversion
-- **Attack Index** — searchable catalog of all 47 attack proofs with KaTeX rendering
+- **Attack Index** — searchable catalog of all 48 attack proofs with KaTeX rendering
 - **METHOD indicator** — every output shows `METHOD=TYPESCRIPT` or `METHOD=SAGEMATHCELL`
 - **Standardized output format** — all attacks produce consistent `Attack Name → Inputs → Results → Verification → TOKEN → METHOD` output
-- **Command Palette** — ⌘/Ctrl+K fuzzy search across all 47 attacks + calculators + views
+- **Command Palette** — ⌘/Ctrl+K fuzzy search across all 48 attacks + calculators + views
 - **Keyboard Shortcuts** — ⌘Enter (run), ⌘1-5 (calculator tabs), ⌘Shift+C (copy), Tab/Shift+Tab (cycle)
 - **PEM Decryptor** — Parse and decrypt PKCS#1/PKCS#8/encrypted PEM keys, feed params to Calculator or Attacks
 - **Instructions Panel** — Always-visible reference guide
@@ -54,7 +54,7 @@ Open `http://localhost:5173` in your browser.
 
 ## Attack Catalog
 
-### Factorization (19)
+### Factorization (20)
 
 | Attack | Description | Frontend |
 |--------|-------------|----------|
@@ -238,7 +238,7 @@ env.reset()              // clears env config from localStorage + reloads
 
 ```
 src/
-  attacks/           47 attack files + guard.ts + index.ts + rawSources.ts + _rsaHelpers.ts
+  attacks/           48 attack files + guard.ts + index.ts + rawSources.ts + _rsaHelpers.ts
   components/        React components (40 .tsx files)
     _shared/         EmptyState.tsx
     calculator/      Calculator shell + 5 calculators with sub-tabs (21 files)
