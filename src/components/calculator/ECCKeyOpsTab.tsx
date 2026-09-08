@@ -1,14 +1,21 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Box, FormControl, InputLabel, Select, MenuItem, Radio, RadioGroup, FormControlLabel, Typography, TextField, Button } from '@mui/material';
-import { PlayArrow } from '@mui/icons-material';
-import { draculaColors } from '../../theme/dracula';
-import { primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
-import { inputSx } from '../../styles/shared';
+import { Stack } from '@astryxdesign/core/Stack';
+import { TextInput } from '@astryxdesign/core/TextInput';
+import { Button } from '@astryxdesign/core/Button';
+import { Selector } from '@astryxdesign/core/Selector';
+import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { Banner } from '@astryxdesign/core/Banner';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { ResultBox } from './_shared/ResultBox';
 import { CURVES, KEY_OPS, curveForOp, type KeyOp } from '../../utils/eccCurves';
 import { x25519 } from '@noble/curves/ed25519.js';
 import { bytesToHex, hexToBytes } from '@noble/curves/utils.js';
+
+const OP_LABELS: Record<KeyOp, string> = {
+  generate: 'Generate Keypair',
+  pubkey: 'Public from Private',
+  ecdh: 'ECDH Shared Secret',
+};
 
 export function ECCKeyOpsTab() {
   const [curve, setCurve] = useState('secp256k1');
@@ -78,46 +85,28 @@ export function ECCKeyOpsTab() {
   }, [isX25519]);
 
   return (
-    <Box>
-      <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
-        <InputLabel>Curve</InputLabel>
-        <Select value={curve} label="Curve" onChange={e => { setCurve(e.target.value); out.clear(); }}>
-          {CURVES.map(c => (<MenuItem key={c.id} value={c.id}>{c.label}</MenuItem>))}
-        </Select>
-      </FormControl>
-      <FormControl sx={{ mb: 2 }}>
-        <RadioGroup row value={op} onChange={e => setOp(e.target.value as KeyOp)}>
-          {availOps.map(o => (
-            <FormControlLabel
-              key={o}
-              value={o}
-              control={<Radio sx={{ color: draculaColors.comment, '&.Mui-checked': { color: draculaColors.green } }} />}
-              label={
-                <Typography sx={{ color: draculaColors.foreground, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>
-                  {o === 'generate' ? 'Generate Keypair' : o === 'pubkey' ? 'Public from Private' : 'ECDH Shared Secret'}
-                </Typography>
-              }
-            />
-          ))}
-        </RadioGroup>
-      </FormControl>
+    <Stack direction="vertical" gap={2}>
+      <Selector
+        label="Curve"
+        options={CURVES.map(c => ({ value: c.id, label: c.label }))}
+        value={curve}
+        onChange={v => { setCurve(v); out.clear(); }}
+        width="100%"
+      />
+      <SegmentedControl label="Key operation" value={op} onChange={v => setOp(v as KeyOp)}>
+        {availOps.map(o => (
+          <SegmentedControlItem key={o} value={o} label={OP_LABELS[o]} />
+        ))}
+      </SegmentedControl>
       {(op === 'pubkey' || op === 'ecdh') && (
-        <TextField fullWidth label="Private key (hex)" value={privHex} onChange={e => setPrivHex(e.target.value)} variant="outlined"
-          sx={{ ...inputSx, mb: 2 }} placeholder="Hex private key" spellCheck={false} />
+        <TextInput label="Private key (hex)" value={privHex} onChange={setPrivHex} placeholder="Hex private key" width="100%" />
       )}
       {op === 'ecdh' && (
-        <TextField fullWidth label="Peer public key (hex)" value={peerPubHex} onChange={e => setPeerPubHex(e.target.value)} variant="outlined"
-          sx={{ ...inputSx, mb: 2 }} placeholder="Hex public key" spellCheck={false} />
+        <TextInput label="Peer public key (hex)" value={peerPubHex} onChange={setPeerPubHex} placeholder="Hex public key" width="100%" />
       )}
-      <Button variant="contained" startIcon={<PlayArrow />} onClick={handleRun} fullWidth sx={primaryBtnSx}>
-        Run
-      </Button>
-      {out.result && <Box sx={{ mt: 2 }}><ResultBox value={out.result} label="Output" variant="compact" /></Box>}
-      {out.error && (
-        <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>
-          {out.error}
-        </Typography>
-      )}
-    </Box>
+      <Button label="Run" variant="primary" width="100%" onClick={handleRun} />
+      {out.result && <ResultBox value={out.result} label="Output" variant="compact" />}
+      {out.error && <Banner status="error" title={out.error} />}
+    </Stack>
   );
 }

@@ -1,9 +1,15 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Box, FormControl, InputLabel, Select, MenuItem, TextField, Button, Typography, IconButton, Tooltip } from '@mui/material';
-import { PlayArrow, ContentCopy } from '@mui/icons-material';
-import { draculaColors } from '../../theme/dracula';
-import { primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
-import { inputSx } from '../../styles/shared';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Text } from '@astryxdesign/core/Text';
+import { TextInput } from '@astryxdesign/core/TextInput';
+import { Button } from '@astryxdesign/core/Button';
+import { Selector } from '@astryxdesign/core/Selector';
+import { Banner } from '@astryxdesign/core/Banner';
+import { Card } from '@astryxdesign/core/Card';
+import { Grid } from '@astryxdesign/core/Grid';
+import { IconButton } from '@astryxdesign/core/IconButton';
+import { Icon } from '@astryxdesign/core/Icon';
+import { Heading } from '@astryxdesign/core/Heading';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import { RFC3526_GROUPS, generatePrivateKey, parseHex } from '../../utils/dhCrypto';
@@ -72,118 +78,138 @@ export function DHKeyExchangeTab() {
   }, [bobPriv, alicePub, p, out]);
 
   return (
-    <Box>
-      <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
-        <InputLabel>DH Group</InputLabel>
-        <Select value={group} label="DH Group" onChange={e => { setGroup(e.target.value); out.clear(); }}>
-          <MenuItem value="group5">RFC 3526 Group 5 (1536-bit)</MenuItem>
-          <MenuItem value="group14">RFC 3526 Group 14 (2048-bit)</MenuItem>
-          <MenuItem value="group16">RFC 3526 Group 16 (4096-bit)</MenuItem>
-          <MenuItem value="custom">Custom</MenuItem>
-        </Select>
-      </FormControl>
+    <Stack direction="vertical" gap={2}>
+      <Selector
+        label="DH Group"
+        options={[
+          { value: 'group5', label: 'RFC 3526 Group 5 (1536-bit)' },
+          { value: 'group14', label: 'RFC 3526 Group 14 (2048-bit)' },
+          { value: 'group16', label: 'RFC 3526 Group 16 (4096-bit)' },
+          { value: 'custom', label: 'Custom' },
+        ]}
+        value={group}
+        onChange={v => { setGroup(v); out.clear(); }}
+        width="100%"
+      />
 
       {group === 'custom' && (
-        <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-          <TextField fullWidth label="p (hex)" value={customP} onChange={e => setCustomP(e.target.value)}
-            variant="outlined" sx={{ ...inputSx }} placeholder="Prime modulus" spellCheck={false} />
-          <TextField fullWidth label="g (decimal)" value={customG} onChange={e => setCustomG(e.target.value)}
-            variant="outlined" sx={{ ...inputSx }} placeholder="Generator" spellCheck={false} />
-        </Box>
+        <Stack direction="horizontal" gap={1}>
+          <TextInput label="p (hex)" value={customP} onChange={setCustomP} placeholder="Prime modulus" width="100%" />
+          <TextInput label="g (decimal)" value={customG} onChange={setCustomG} placeholder="Generator" width="100%" />
+        </Stack>
       )}
 
-      {/* Alice panel */}
-      <Box sx={{
-        border: `1px solid ${draculaColors.comment}`, borderRadius: 1, p: 2, mb: 2,
-        backgroundColor: draculaColors.background,
-      }}>
-        <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mb: 1 }}>Alice</Typography>
-        <Button variant="contained" startIcon={<PlayArrow />} onClick={genAlice} fullWidth sx={primaryBtnSx}>
-          Generate
-        </Button>
-        {alicePriv !== null && (
-          <Box sx={{ mt: 1, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-            <Typography variant="caption" sx={{ color: draculaColors.comment, flex: 1, wordBreak: 'break-all', fontFamily: MONO_FAMILY }}>
-              Private: 0x{alicePriv.toString(16)}
-            </Typography>
-            <Tooltip title={copied ? 'Copied!' : 'Copy'}><IconButton size="small" onClick={() => { void copy(`0x${alicePriv.toString(16)}`); }} sx={{ color: draculaColors.cyan }}><ContentCopy fontSize="inherit" /></IconButton></Tooltip>
-          </Box>
-        )}
-        {alicePub !== null && (
-          <Box sx={{ mt: 0.5, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-            <Typography variant="caption" sx={{ color: draculaColors.comment, flex: 1, wordBreak: 'break-all', fontFamily: MONO_FAMILY }}>
-              Public: <Box component="span" sx={{ color: draculaColors.green }}>0x{alicePub.toString(16)}</Box>
-            </Typography>
-            <Tooltip title={copied ? 'Copied!' : 'Copy'}><IconButton size="small" onClick={() => { void copy(`0x${alicePub.toString(16)}`); }} sx={{ color: draculaColors.cyan }}><ContentCopy fontSize="inherit" /></IconButton></Tooltip>
-          </Box>
-        )}
-      </Box>
+      <Grid columns={{ minWidth: 280 }} gap={2}>
+        {/* Alice panel */}
+        <Card>
+          <Stack direction="vertical" gap={1}>
+            <Heading level={5}>Alice</Heading>
+            <Button label="Generate" variant="primary" width="100%" onClick={genAlice} />
+            {alicePriv !== null && (
+              <Stack direction="horizontal" gap={1} vAlign="start">
+                <Text type="supporting" wordBreak="break-all">
+                  Private: 0x{alicePriv.toString(16)}
+                </Text>
+                <IconButton
+                  label="Copy Alice private key"
+                  icon={<Icon icon="copy" />}
+                  tooltip={copied ? 'Copied!' : 'Copy'}
+                  onClick={() => { void copy(`0x${alicePriv.toString(16)}`); }}
+                />
+              </Stack>
+            )}
+            {alicePub !== null && (
+              <Stack direction="horizontal" gap={1} vAlign="start">
+                <Text type="supporting" wordBreak="break-all">
+                  Public: 0x{alicePub.toString(16)}
+                </Text>
+                <IconButton
+                  label="Copy Alice public key"
+                  icon={<Icon icon="copy" />}
+                  tooltip={copied ? 'Copied!' : 'Copy'}
+                  onClick={() => { void copy(`0x${alicePub.toString(16)}`); }}
+                />
+              </Stack>
+            )}
+          </Stack>
+        </Card>
 
-      {/* Bob panel */}
-      <Box sx={{
-        border: `1px solid ${draculaColors.comment}`, borderRadius: 1, p: 2, mb: 2,
-        backgroundColor: draculaColors.background,
-      }}>
-        <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mb: 1 }}>Bob</Typography>
-        <Button variant="contained" startIcon={<PlayArrow />} onClick={genBob} fullWidth sx={primaryBtnSx}>
-          Generate
-        </Button>
-        {bobPriv !== null && (
-          <Box sx={{ mt: 1, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-            <Typography variant="caption" sx={{ color: draculaColors.comment, flex: 1, wordBreak: 'break-all', fontFamily: MONO_FAMILY }}>
-              Private: 0x{bobPriv.toString(16)}
-            </Typography>
-            <Tooltip title={copied ? 'Copied!' : 'Copy'}><IconButton size="small" onClick={() => { void copy(`0x${bobPriv.toString(16)}`); }} sx={{ color: draculaColors.cyan }}><ContentCopy fontSize="inherit" /></IconButton></Tooltip>
-          </Box>
-        )}
-        {bobPub !== null && (
-          <Box sx={{ mt: 0.5, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-            <Typography variant="caption" sx={{ color: draculaColors.comment, flex: 1, wordBreak: 'break-all', fontFamily: MONO_FAMILY }}>
-              Public: <Box component="span" sx={{ color: draculaColors.green }}>0x{bobPub.toString(16)}</Box>
-            </Typography>
-            <Tooltip title={copied ? 'Copied!' : 'Copy'}><IconButton size="small" onClick={() => { void copy(`0x${bobPub.toString(16)}`); }} sx={{ color: draculaColors.cyan }}><ContentCopy fontSize="inherit" /></IconButton></Tooltip>
-          </Box>
-        )}
-      </Box>
+        {/* Bob panel */}
+        <Card>
+          <Stack direction="vertical" gap={1}>
+            <Heading level={5}>Bob</Heading>
+            <Button label="Generate" variant="primary" width="100%" onClick={genBob} />
+            {bobPriv !== null && (
+              <Stack direction="horizontal" gap={1} vAlign="start">
+                <Text type="supporting" wordBreak="break-all">
+                  Private: 0x{bobPriv.toString(16)}
+                </Text>
+                <IconButton
+                  label="Copy Bob private key"
+                  icon={<Icon icon="copy" />}
+                  tooltip={copied ? 'Copied!' : 'Copy'}
+                  onClick={() => { void copy(`0x${bobPriv.toString(16)}`); }}
+                />
+              </Stack>
+            )}
+            {bobPub !== null && (
+              <Stack direction="horizontal" gap={1} vAlign="start">
+                <Text type="supporting" wordBreak="break-all">
+                  Public: 0x{bobPub.toString(16)}
+                </Text>
+                <IconButton
+                  label="Copy Bob public key"
+                  icon={<Icon icon="copy" />}
+                  tooltip={copied ? 'Copied!' : 'Copy'}
+                  onClick={() => { void copy(`0x${bobPub.toString(16)}`); }}
+                />
+              </Stack>
+            )}
+          </Stack>
+        </Card>
+      </Grid>
 
       {/* Shared Secret panel */}
-      <Box sx={{
-        border: `1px solid ${draculaColors.comment}`, borderRadius: 1, p: 2, mb: 2,
-        backgroundColor: draculaColors.background,
-      }}>
-        <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mb: 1 }}>Shared Secret</Typography>
-        <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-          <Button variant="contained" onClick={computeAlice} fullWidth sx={{ ...primaryBtnSx, fontSize: '0.75rem' }}>
-            Alice computes
-          </Button>
-          <Button variant="contained" onClick={computeBob} fullWidth sx={{ ...primaryBtnSx, fontSize: '0.75rem' }}>
-            Bob computes
-          </Button>
-        </Box>
-        {sharedAlice !== null && (
-          <Box sx={{ mt: 1, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-            <Typography variant="caption" sx={{ color: draculaColors.comment, flex: 1, wordBreak: 'break-all', fontFamily: MONO_FAMILY }}>
-              Alice shared: <Box component="span" sx={{ color: draculaColors.green }}>0x{sharedAlice.toString(16)}</Box>
-            </Typography>
-            <Tooltip title={copied ? 'Copied!' : 'Copy'}><IconButton size="small" onClick={() => { void copy(`0x${sharedAlice.toString(16)}`); }} sx={{ color: draculaColors.cyan }}><ContentCopy fontSize="inherit" /></IconButton></Tooltip>
-          </Box>
-        )}
-        {sharedBob !== null && (
-          <Box sx={{ mt: 0.5, display: 'flex', alignItems: 'flex-start', gap: 0.5 }}>
-            <Typography variant="caption" sx={{ color: draculaColors.comment, flex: 1, wordBreak: 'break-all', fontFamily: MONO_FAMILY }}>
-              Bob shared: <Box component="span" sx={{ color: draculaColors.green }}>0x{sharedBob.toString(16)}</Box>
-            </Typography>
-            <Tooltip title={copied ? 'Copied!' : 'Copy'}><IconButton size="small" onClick={() => { void copy(`0x${sharedBob.toString(16)}`); }} sx={{ color: draculaColors.cyan }}><ContentCopy fontSize="inherit" /></IconButton></Tooltip>
-          </Box>
-        )}
-        {sharedAlice !== null && sharedBob !== null && (
-          <Typography variant="caption" sx={{ color: sharedAlice === sharedBob ? draculaColors.green : draculaColors.red, mt: 1, display: 'block' }}>
-            {sharedAlice === sharedBob ? '✓ Shared secrets match!' : '✗ Shared secrets differ!'}
-          </Typography>
-        )}
-      </Box>
+      <Card>
+        <Stack direction="vertical" gap={1}>
+          <Heading level={5}>Shared Secret</Heading>
+          <Stack direction="horizontal" gap={1}>
+            <Button label="Alice computes" variant="primary" width="100%" onClick={computeAlice} />
+            <Button label="Bob computes" variant="primary" width="100%" onClick={computeBob} />
+          </Stack>
+          {sharedAlice !== null && (
+            <Stack direction="horizontal" gap={1} vAlign="start">
+              <Text type="supporting" wordBreak="break-all">
+                Alice shared: 0x{sharedAlice.toString(16)}
+              </Text>
+              <IconButton
+                label="Copy Alice shared secret"
+                icon={<Icon icon="copy" />}
+                tooltip={copied ? 'Copied!' : 'Copy'}
+                onClick={() => { void copy(`0x${sharedAlice.toString(16)}`); }}
+              />
+            </Stack>
+          )}
+          {sharedBob !== null && (
+            <Stack direction="horizontal" gap={1} vAlign="start">
+              <Text type="supporting" wordBreak="break-all">
+                Bob shared: 0x{sharedBob.toString(16)}
+              </Text>
+              <IconButton
+                label="Copy Bob shared secret"
+                icon={<Icon icon="copy" />}
+                tooltip={copied ? 'Copied!' : 'Copy'}
+                onClick={() => { void copy(`0x${sharedBob.toString(16)}`); }}
+              />
+            </Stack>
+          )}
+          {sharedAlice !== null && sharedBob !== null && (
+            <Text>{sharedAlice === sharedBob ? '✓ Shared secrets match!' : '✗ Shared secrets differ!'}</Text>
+          )}
+        </Stack>
+      </Card>
 
-      {out.error && <Typography sx={{ color: draculaColors.red, mt: 1, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>{out.error}</Typography>}
-    </Box>
+      {out.error && <Banner status="error" title={out.error} />}
+    </Stack>
   );
 }

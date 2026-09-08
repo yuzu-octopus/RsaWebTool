@@ -1,16 +1,18 @@
 import { useState, useCallback } from 'react';
-import {
-  Box, Typography, TextField, Button, Select, MenuItem,
-  FormControl, InputLabel, IconButton, Tooltip, Slider,
-} from '@mui/material';
-import { PlayArrow, ContentCopy, WarningAmber } from '@mui/icons-material';
-import { draculaColors } from '../../../theme/dracula';
-import { inputSx } from '../../../styles/shared';
-import { outputBoxSx, primaryBtnSx, MONO_FAMILY } from '../../../styles/shared';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Text } from '@astryxdesign/core/Text';
+import { TextInput } from '@astryxdesign/core/TextInput';
+import { TextArea } from '@astryxdesign/core/TextArea';
+import { NumberInput } from '@astryxdesign/core/NumberInput';
+import { Button } from '@astryxdesign/core/Button';
+import { Selector } from '@astryxdesign/core/Selector';
+import { Banner } from '@astryxdesign/core/Banner';
+import { Table, proportional, pixel } from '@astryxdesign/core/Table';
 import { sha256, sha512 } from '@noble/hashes/sha2.js';
 import { sha1, md5 } from '@noble/hashes/legacy.js';
 import { bytesToHex } from '@noble/hashes/utils.js';
 import { useAppContext } from '../../../hooks/useAppContext';
+import { ResultBox } from '../_shared/ResultBox';
 
 interface AlgInfo {
   value: string;
@@ -136,6 +138,11 @@ function lengthExtend(
   return { extendedMessage: extMsg, newHash: bytesToHex(hash.digest()) };
 }
 
+interface CandidateRow extends Record<string, unknown> {
+  secretLen: number;
+  hash: string;
+}
+
 export default function LengthExtensionTab() {
   const [algorithm, setAlgorithm] = useState('sha256');
   const [originalHash, setOriginalHash] = useState('');
@@ -187,84 +194,103 @@ export default function LengthExtensionTab() {
     }
   }, [originalHash, originalMessage, secretLen, secretUnknown, secretRangeEnd, appendData, alg, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
 
-  const handleCopyHash = useCallback(() => { if (result?.newHash) navigator.clipboard.writeText(result.newHash).catch(() => {}); }, [result]);
-  const handleCopyMsg = useCallback(() => { if (result?.extendedMsg) navigator.clipboard.writeText(result.extendedMsg).catch(() => {}); }, [result]);
-
   return (
-    <Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, p: 1, borderRadius: 1, border: `1px solid ${draculaColors.orange}`, backgroundColor: 'rgba(255,184,108,0.08)' }}>
-        <WarningAmber sx={{ color: draculaColors.orange, fontSize: 20 }} />
-        <Typography variant="caption" sx={{ color: draculaColors.orange }}>
-          Length extension on Merkle-Damgård hashes (SHA-256, SHA-1, MD5, SHA-512).
-          Given H(secret || message), computes H(secret||message||pad||append) without the secret.
-        </Typography>
-      </Box>
-      <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
-        <InputLabel>Algorithm</InputLabel>
-        <Select value={algorithm} label="Algorithm" onChange={e => setAlgorithm(e.target.value)}>
-          {ALGORITHMS.map(a => (<MenuItem key={a.value} value={a.value}>{a.label}</MenuItem>))}
-        </Select>
-      </FormControl>
-      <TextField fullWidth label="Original Hash (hex)" value={originalHash} onChange={e => setOriginalHash(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Original hash output (e.g., from H(secret || message))" />
-      <TextField fullWidth multiline minRows={2} maxRows={6} label="Original Message (known part)" value={originalMessage} onChange={e => setOriginalMessage(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Hex or plaintext — known message after the secret prefix" />
-      <Box sx={{ mb: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-          <Typography variant="body2" sx={{ color: draculaColors.foreground, minWidth: 120 }}>Secret Length:</Typography>
+    <Stack direction="vertical" gap={2}>
+      <Banner
+        status="warning"
+        title="Length extension attack"
+        description="Length extension on Merkle-Damgård hashes (SHA-256, SHA-1, MD5, SHA-512). Given H(secret || message), computes H(secret||message||pad||append) without the secret."
+      />
+      <Selector
+        label="Algorithm"
+        options={ALGORITHMS.map(a => ({ value: a.value, label: a.label }))}
+        value={algorithm}
+        onChange={setAlgorithm}
+        width="100%"
+      />
+      <TextInput label="Original Hash (hex)" value={originalHash} onChange={setOriginalHash} placeholder="Original hash output (e.g., from H(secret || message))" width="100%" />
+      <TextArea
+        label="Original Message (known part)"
+        value={originalMessage}
+        onChange={setOriginalMessage}
+        rows={2}
+        placeholder="Hex or plaintext — known message after the secret prefix"
+      />
+      <Stack direction="vertical" gap={1}>
+        <Stack direction="horizontal" gap={2} vAlign="center">
+          <Text type="label">Secret Length:</Text>
           {secretUnknown ? (
-            <Typography variant="body2" sx={{ color: draculaColors.orange }}>Brute-force 1 – {secretRangeEnd} bytes</Typography>
+            <Text type="supporting">Brute-force 1 – {secretRangeEnd} bytes</Text>
           ) : (
-            <Typography variant="body2" sx={{ color: draculaColors.cyan }}>{secretLen} bytes</Typography>
+            <Text type="supporting">{secretLen} bytes</Text>
           )}
-          <Button size="small" variant="text" onClick={() => setSecretUnknown(!secretUnknown)} sx={{ color: draculaColors.purple, fontFamily: MONO_FAMILY, fontSize: '0.7rem', textTransform: 'none' }}>
-            {secretUnknown ? 'Fixed' : 'Unknown'}
-          </Button>
-        </Box>
+          <Button
+            label={secretUnknown ? 'Fixed' : 'Unknown'}
+            variant="ghost"
+            size="sm"
+            onClick={() => setSecretUnknown(!secretUnknown)}
+          />
+        </Stack>
         {secretUnknown ? (
-          <TextField fullWidth type="number" label="Max secret length (bytes)" value={secretRangeEnd}
-            onChange={e => setSecretRangeEnd(Math.max(1, parseInt(e.target.value) || 1))} variant="outlined"
-            sx={inputSx} slotProps={{ htmlInput: { min: 1, max: 256 } }} />
+          <NumberInput
+            label="Max secret length (bytes)"
+            value={secretRangeEnd}
+            onChange={v => setSecretRangeEnd(Math.max(1, v))}
+            min={1}
+            max={256}
+            width="100%"
+          />
         ) : (
-          <Box sx={{ px:1 }}>
-            <Slider value={secretLen} onChange={(_,v) => setSecretLen(v)} min={1} max={128} step={1}
-              sx={{ color: draculaColors.cyan, '& .MuiSlider-thumb': { backgroundColor: draculaColors.cyan }, '& .MuiSlider-track': { backgroundColor: draculaColors.cyan } }} />
-          </Box>
+          <NumberInput
+            label="Secret length (bytes)"
+            value={secretLen}
+            onChange={setSecretLen}
+            min={1}
+            max={128}
+            step={1}
+            width="100%"
+          />
         )}
-      </Box>
-      <TextField fullWidth multiline minRows={2} maxRows={6} label="Append Data" value={appendData} onChange={e => setAppendData(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Data to append (hex or plaintext)" />
-      <Button variant="contained" startIcon={<PlayArrow />} onClick={handleRun} disabled={!originalHash.trim()||!originalMessage.trim()||!appendData.trim()} fullWidth
-        sx={primaryBtnSx}>
-        {secretUnknown ? 'Brute-force & Compute' : 'Compute Extension'}
-      </Button>
+      </Stack>
+      <TextArea
+        label="Append Data"
+        value={appendData}
+        onChange={setAppendData}
+        rows={2}
+        placeholder="Data to append (hex or plaintext)"
+      />
+      <Button
+        label={secretUnknown ? 'Brute-force & Compute' : 'Compute Extension'}
+        variant="primary"
+        width="100%"
+        onClick={handleRun}
+        isDisabled={!originalHash.trim() || !originalMessage.trim() || !appendData.trim()}
+      />
       {result && (
-        <Box>
-          <Box sx={{ mb:1.5 }}>
-            <Typography variant="caption" sx={{ color: draculaColors.comment, mb:0.5, display:'block' }}>Extended Message (original || glue_padding || append):</Typography>
-            <Box sx={{ display:'flex', alignItems:'flex-start', gap:1 }}>
-              <Box sx={{ ...outputBoxSx, flex:1, maxHeight:200, fontSize:'0.75rem' }}>{result.extendedMsg}</Box>
-              <Tooltip title="Copy extended message"><IconButton size="small" onClick={handleCopyMsg} sx={{ color: draculaColors.cyan, mt:0.5 }}><ContentCopy fontSize="small" /></IconButton></Tooltip>
-            </Box>
-          </Box>
-          <Box>
-            <Box sx={{ display:'flex', alignItems:'center', gap:1, mb:0.5 }}>
-              <Typography variant="caption" sx={{ color: draculaColors.green }}>New Hash {secretUnknown ? '(for secret_len=1)' : `(secret_len=${secretLen})`}:</Typography>
-              <Tooltip title="Copy new hash"><IconButton size="small" onClick={handleCopyHash} sx={{ color: draculaColors.cyan }}><ContentCopy fontSize="small" /></IconButton></Tooltip>
-            </Box>
-            <Box sx={outputBoxSx()}><Box sx={{ fontFamily: MONO_FAMILY, wordBreak:'break-all' }}>{result.newHash}</Box></Box>
-          </Box>
+        <Stack direction="vertical" gap={2}>
+          <ResultBox value={result.extendedMsg} label="Extended Message (original || glue_padding || append):" variant="compact" />
+          <ResultBox
+            value={result.newHash}
+            label={secretUnknown ? 'New Hash (for secret_len=1):' : `New Hash (secret_len=${secretLen}):`}
+          />
           {results.length > 1 && (
-            <Box sx={{ mt:2 }}>
-              <Typography variant="caption" sx={{ color: draculaColors.comment, mb:0.5, display:'block' }}>All candidates ({results.length} lengths):</Typography>
-              <Box sx={{ maxHeight:200, overflow:'auto', backgroundColor: draculaColors.currentLine, borderRadius:1, p:1 }}>
-                <table style={{ width:'100%', borderCollapse:'collapse', fontSize:'0.75rem', fontFamily: MONO_FAMILY }}>
-                  <thead><tr><th style={{ color: draculaColors.cyan, textAlign:'left', padding:'2px 8px', borderBottom: `1px solid ${draculaColors.comment}` }}>Len</th><th style={{ color: draculaColors.cyan, textAlign:'left', padding:'2px 8px', borderBottom: `1px solid ${draculaColors.comment}` }}>Hash</th></tr></thead>
-                  <tbody>{results.map(r => (<tr key={r.secretLen}><td style={{ color: draculaColors.foreground, padding:'2px 8px' }}>{r.secretLen}</td><td style={{ color: draculaColors.foreground, padding:'2px 8px', wordBreak:'break-all' }}>{r.hash}</td></tr>))}</tbody>
-                </table>
-              </Box>
-            </Box>
+            <Stack direction="vertical" gap={1}>
+              <Text type="label">All candidates ({results.length} lengths):</Text>
+              <Table<CandidateRow>
+                data={results}
+                columns={[
+                  { key: 'secretLen', header: 'Len', width: pixel(80) },
+                  { key: 'hash', header: 'Hash', width: proportional(1) },
+                ]}
+                idKey="secretLen"
+                density="compact"
+                textOverflow="truncate"
+              />
+            </Stack>
           )}
-        </Box>
+        </Stack>
       )}
-      {error && (<Typography sx={{ color: draculaColors.red, mt:2, fontFamily: MONO_FAMILY, fontSize:'0.85rem' }}>{error}</Typography>)}
-    </Box>
+      {error && <Banner status="error" title={error} />}
+    </Stack>
   );
 }

@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
-import { Box, Typography, Tabs, Tab } from '@mui/material';
-import { draculaColors } from '../../../theme/dracula';
-import { tabSx } from '../../../styles/shared';
+import { useState } from 'react';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Heading } from '@astryxdesign/core/Heading';
+import { TabList, Tab } from '@astryxdesign/core/TabList';
 import { ProofRenderer } from '../../ProofRenderer';
 
 const TABS = [
@@ -26,29 +26,18 @@ const TAB_CONTENT: Record<string, string> = {
 
 export default function ExplanationTab() {
   const [tab, setTab] = useState('properties');
-  const tabIdx = TABS.findIndex(t => t.id === tab);
-
-  const handleChange = useCallback((_e: React.SyntheticEvent, idx: number) => {
-    if (idx >= 0 && idx < TABS.length) setTab(TABS[idx].id);
-  }, []);
 
   return (
-    <Box>
-      <Typography variant="h6" sx={{ color: draculaColors.cyan, mb: 1 }}>Hash Function Reference</Typography>
-      <Tabs value={tabIdx >= 0 ? tabIdx : 0} onChange={handleChange}
-        sx={{ mb: 2, borderBottom: `1px solid ${draculaColors.comment}`, minHeight: 40,
-          '& .MuiTab-root': { ...tabSx, px: 2, fontSize: '0.75rem', minHeight: 40 },
-          '& .MuiTabs-indicator': { backgroundColor: draculaColors.cyan },
-          '& .Mui-selected': { color: `${draculaColors.cyan} !important` },
-        }} variant="scrollable" scrollButtons="auto">
-        {TABS.map(t => (<Tab key={t.id} label={t.label} />))}
-      </Tabs>
-      <Box sx={{ maxHeight: '60vh', overflow: 'auto', pr: 1, 
-        '&::-webkit-scrollbar': { width: '8px' },
-        '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' },
-      }}>
+    <Stack direction="vertical" gap={2}>
+      <Heading level={4}>Hash Function Reference</Heading>
+      <TabList value={tab} onChange={setTab} hasDivider>
+        {TABS.map(t => (
+          <Tab key={t.id} value={t.id} label={t.label} />
+        ))}
+      </TabList>
+      <Stack direction="vertical" isScrollable>
         <ProofRenderer latex={TAB_CONTENT[tab] ?? ''} />
-      </Box>
-    </Box>
+      </Stack>
+    </Stack>
   );
 }

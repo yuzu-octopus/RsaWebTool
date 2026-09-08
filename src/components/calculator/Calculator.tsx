@@ -1,9 +1,7 @@
 import { useEffect } from 'react';
-import { Box, Tabs, Tab } from '@mui/material';
-import { Calculate, Lock, Hub, Tag, Security } from '@mui/icons-material';
-import { draculaColors } from '../../theme/dracula';
+import { TabList, Tab } from '@astryxdesign/core/TabList';
+import { Stack } from '@astryxdesign/core/Stack';
 import { useAppContext } from '../../hooks/useAppContext';
-import { colFlexSx, tabSx } from '../../styles/shared';
 import type { CalculatorMode } from '../../types';
 import RSACalculator from './RSACalculator';
 import AESCalculator from './AESCalculator';
@@ -13,12 +11,12 @@ import DHCalculator from './DHCalculator';
 
 const MODE_BY_INDEX: CalculatorMode[] = ['rsa', 'aes', 'ecc', 'hash', 'dh'];
 
-const CALCULATOR_TABS: { mode: CalculatorMode; label: string; icon: React.ReactElement }[] = [
-  { mode: 'rsa', label: 'RSA', icon: <Calculate /> },
-  { mode: 'aes', label: 'AES', icon: <Lock /> },
-  { mode: 'ecc', label: 'ECC', icon: <Hub /> },
-  { mode: 'hash', label: 'Hash', icon: <Tag /> },
-  { mode: 'dh', label: 'DH', icon: <Security /> },
+const CALCULATOR_TABS: { mode: CalculatorMode; label: string }[] = [
+  { mode: 'rsa', label: 'RSA' },
+  { mode: 'aes', label: 'AES' },
+  { mode: 'ecc', label: 'ECC' },
+  { mode: 'hash', label: 'Hash' },
+  { mode: 'dh', label: 'DH' },
 ];
 
 const COMPONENTS = [RSACalculator, AESCalculator, ECCCalculator, HashCalculator, DHCalculator];
@@ -44,33 +42,20 @@ export function Calculator() {
   const ActiveComponent = COMPONENTS[tabIndex];
 
   return (
-    <Box sx={colFlexSx}>
+    <Stack direction="vertical">
       {/* Calculator mode switcher */}
-      <Tabs
-        value={tabIndex < 0 ? 0 : tabIndex}
-        onChange={(_e, value) => setCalculatorMode(MODE_BY_INDEX[value as number])}
-        variant="scrollable"
-        scrollButtons="auto"
-        sx={{
-          borderBottom: `1px solid ${draculaColors.comment}`,
-          backgroundColor: draculaColors.background,
-          '& .MuiTabs-flexContainer': { justifyContent: 'center' },
-          '& .MuiTab-root': {
-            ...tabSx,
-            minHeight: 48,
-            px: 3,
-            '&:hover': { backgroundColor: draculaColors.currentLine },
-          },
-          '& .Mui-selected': { color: draculaColors.purple },
-          '& .MuiTabs-indicator': { backgroundColor: draculaColors.purple },
-        }}
+      <TabList
+        value={tabIndex < 0 ? MODE_BY_INDEX[0] : MODE_BY_INDEX[tabIndex]}
+        onChange={value => setCalculatorMode(value as CalculatorMode)}
+        layout="fill"
+        hasDivider
       >
         {CALCULATOR_TABS.map(t => (
-          <Tab key={t.mode} label={t.label} icon={t.icon} iconPosition="start" />
+          <Tab key={t.mode} value={t.mode} label={t.label} />
         ))}
-      </Tabs>
+      </TabList>
       <ActiveComponent />
-    </Box>
+    </Stack>
   );
 }
 

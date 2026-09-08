@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Typography, TextField, Button } from '@mui/material';
-import { draculaColors } from '../../theme/dracula';
+import { Stack } from '@astryxdesign/core/Stack';
+import { TextInput } from '@astryxdesign/core/TextInput';
+import { Button } from '@astryxdesign/core/Button';
+import { Banner } from '@astryxdesign/core/Banner';
 import { modInverse } from '../../utils/bigint';
 import { parseBigInt } from '../../utils/rsaCalc';
-import { inputSx, primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { ResultBox } from './_shared/ResultBox';
 
@@ -43,51 +44,19 @@ export function RsaKeyGenTab() {
   };
 
   return (
-    <>
-      <TextField
-        fullWidth
-        label="p (prime)"
-        value={p}
-        onChange={e => setP(e.target.value)}
-        variant="outlined"
-        sx={{ ...inputSx, mb: 2 }}
-      />
-      <TextField
-        fullWidth
-        label="q (prime)"
-        value={q}
-        onChange={e => setQ(e.target.value)}
-        variant="outlined"
-        sx={{ ...inputSx, mb: 2 }}
-      />
-      <TextField
-        fullWidth
-        label="e (public exponent)"
-        value={e}
-        onChange={e => setE(e.target.value)}
-        variant="outlined"
-        sx={{ ...inputSx, mb: 2 }}
-      />
+    <Stack direction="vertical" gap={2}>
+      <TextInput label="p (prime)" value={p} onChange={setP} width="100%" />
+      <TextInput label="q (prime)" value={q} onChange={setQ} width="100%" />
+      <TextInput label="e (public exponent)" value={e} onChange={setE} width="100%" />
       <Button
-        fullWidth
-        variant="contained"
+        label="Compute"
+        variant="primary"
+        width="100%"
         onClick={handleKeyGen}
-        disabled={!p.trim() || !q.trim()}
-        sx={primaryBtnSx}
-      >
-        Compute
-      </Button>
+        isDisabled={!p.trim() || !q.trim()}
+      />
       {out.result && <ResultBox value={out.result} label="Generated RSA key material" />}
-      {out.error && (
-        <Typography
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
-          sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}
-        >
-          {out.error}
-        </Typography>
-      )}
-    </>
+      {out.error && <Banner status="error" title={out.error} />}
+    </Stack>
   );
 }

@@ -1,11 +1,7 @@
 import type { ReactNode } from 'react';
-import { Box, Typography } from '@mui/material';
-import {
-  colFlexSx,
-  centeredPanelSx,
-  pageTitleSx,
-  subTitleSx,
-} from '../../../styles/shared';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Text } from '@astryxdesign/core/Text';
 import { CalculatorSubTabs } from '../CalculatorSubTabs';
 
 export interface CalculatorHeaderTab {
@@ -47,7 +43,7 @@ export type CalculatorHeaderProps = CalculatorHeaderWithTabs | CalculatorHeaderW
 
 /**
  * Standard shell for every calculator (RSA, AES, ECC, DH, Hash).
- * Eliminates the 5x-duplicated outer Box + title + subtitle + tab bar + scrollable body.
+ * Eliminates the 5x-duplicated outer Stack + title + subtitle + tab bar + scrollable body.
  *
  * @example
  *   <CalculatorHeader
@@ -66,25 +62,19 @@ export function CalculatorHeader(props: CalculatorHeaderProps) {
   const activeTab = 'activeTab' in props ? props.activeTab : undefined;
   const onTabChange = 'onTabChange' in props ? props.onTabChange : undefined;
   return (
-    <Box sx={colFlexSx}>
-      <Box sx={{ ...centeredPanelSx, pt: 2, px: 2 }}>
-        <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Typography variant="h3" sx={pageTitleSx}>
-            {title}
-          </Typography>
-          {subtitle && (
-            <Typography variant="body2" sx={subTitleSx}>
-              {subtitle}
-            </Typography>
-          )}
-          {tabs && activeTab !== undefined && onTabChange && (
-            <CalculatorSubTabs tabs={tabs} activeTab={activeTab} onChange={onTabChange} />
-          )}
-          <Box sx={{ flex: { sm: 1 }, overflow: { xs: 'visible', sm: 'auto' }, px: 0.5, pt: 1, pb: '20vh' }}>
-            {children}
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+    <Stack direction="vertical" hAlign="center" padding={2}>
+      <Stack direction="vertical" gap={2} width="100%" maxWidth={640}>
+        <Stack direction="vertical" gap={1}>
+          <Heading level={3}>{title}</Heading>
+          {subtitle && <Text type="supporting">{subtitle}</Text>}
+        </Stack>
+        {tabs && activeTab !== undefined && onTabChange && (
+          <CalculatorSubTabs tabs={tabs} activeTab={activeTab} onChange={onTabChange} />
+        )}
+        <Stack direction="vertical" gap={2} isScrollable>
+          {children}
+        </Stack>
+      </Stack>
+    </Stack>
   );
 }

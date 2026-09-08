@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { MenuBook, Functions, Key, LinearScale, Bolt } from '@mui/icons-material';
 import { CalculatorHeader } from './_shared/CalculatorHeader';
 import HashFunctionsTab from './hash/HashFunctionsTab';
 import HMACTab from './hash/HMACTab';
@@ -9,11 +8,11 @@ import ProofOfWorkTab from './hash/ProofOfWorkTab';
 import { useAppContext } from '../../hooks/useAppContext';
 
 const SUB_TABS = [
-  { id: 'explanation', label: 'Explanation', icon: <MenuBook fontSize="small" /> },
-  { id: 'hash-functions', label: 'Hash Functions', icon: <Functions fontSize="small" /> },
-  { id: 'hmac', label: 'HMAC', icon: <Key fontSize="small" /> },
-  { id: 'length-ext', label: 'Length Ext.', icon: <LinearScale fontSize="small" /> },
-  { id: 'pow', label: 'PoW', icon: <Bolt fontSize="small" /> },
+  { id: 'explanation', label: 'Explanation' },
+  { id: 'hash-functions', label: 'Hash Functions' },
+  { id: 'hmac', label: 'HMAC' },
+  { id: 'length-ext', label: 'Length Ext.' },
+  { id: 'pow', label: 'PoW' },
 ];
 
 export default function HashCalculator() {

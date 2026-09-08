@@ -1,15 +1,16 @@
-import { draculaColors } from '../../../theme/dracula';
 import { useState, useRef, useCallback } from 'react';
-import {
-  Box, Typography, TextField, Button, IconButton, Tooltip, LinearProgress, FormControl,
-  InputLabel, Select, MenuItem,
-} from '@mui/material';
-import { Stop, PlayArrow, HourglassEmpty, ContentCopy } from '@mui/icons-material';
-import { inputSx } from '../../../styles/shared';
-import { outputBoxSx, colorGhostBtn, hourglassSpinSx, MONO_FAMILY } from '../../../styles/shared';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Text } from '@astryxdesign/core/Text';
+import { TextInput } from '@astryxdesign/core/TextInput';
+import { Button } from '@astryxdesign/core/Button';
+import { Selector } from '@astryxdesign/core/Selector';
+import { ProgressBar } from '@astryxdesign/core/ProgressBar';
+import { EmptyState } from '@astryxdesign/core/EmptyState';
+import { Banner } from '@astryxdesign/core/Banner';
 import { useWorkerPool } from '../../../hooks/useWorkerPool';
 import { ProgressEstimator } from '../../../utils/progressEstimator';
 import { useAppContext } from '../../../hooks/useAppContext';
+import { ResultBox } from '../_shared/ResultBox';
 
 const HASH_ALGORITHMS = [
   { value: 'SHA-256', label: 'SHA-256 (256-bit)' },
@@ -20,6 +21,7 @@ const HASH_ALGORITHMS = [
 ];
 
 const DEFAULT_DIFFICULTY = 20;
+const DIFFICULTY_RE = /^(?:[1-9]\d?|1[01]\d|12[0-8])$/;
 
 /* ---------- component ---------- */
 
@@ -38,6 +40,8 @@ export default function ProofOfWorkTab() {
   const estimatorRef = useRef<ProgressEstimator | null>(null);
   if (estimatorRef.current === null) estimatorRef.current = new ProgressEstimator();
   const { runAttack, cancelCurrentRun } = useWorkerPool();
+
+  const difficultyValid = DIFFICULTY_RE.test(difficulty);
 
   const handleStop = useCallback(() => {
     cancelCurrentRun();
@@ -111,200 +115,88 @@ export default function ProofOfWorkTab() {
     }
   }, [prefix, difficulty, hashAlgo, runAttack, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
 
-  const handleCopyResult = useCallback(() => {
-    if (result) navigator.clipboard.writeText(result).catch(() => {});
-  }, [result]);
-
 
   /* ---- render ---- */
   return (
-    <Box>
-      <Typography variant="caption" sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, mb: 1, display: 'block' }}>
+    <Stack direction="vertical" gap={2}>
+      <Text type="supporting">
         {hashAlgo} Proof of Work — find a nonce where {hashAlgo}(challenge + nonce) satisfies your check function.
-      </Typography>
+      </Text>
 
       {/* Hash Algorithm dropdown */}
-      <FormControl fullWidth sx={{ mb: 2 }}>
-        <InputLabel sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>
-          Hash Algorithm
-        </InputLabel>
-        <Select
-          value={hashAlgo}
-          label="Hash Algorithm"
-          onChange={e => setHashAlgo(e.target.value)}
-          sx={{
-            fontFamily: MONO_FAMILY,
-            fontSize: '0.85rem',
-            color: draculaColors.foreground,
-            backgroundColor: draculaColors.background,
-            border: `1px solid ${draculaColors.currentLine}`,
-            borderRadius: '4px',
-            '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-            '&:hover': { borderColor: draculaColors.purple },
-            '&.Mui-focused': { borderColor: draculaColors.purple },
-          }}
-        >
-          {HASH_ALGORITHMS.map(algo => (
-            <MenuItem key={algo.value} value={algo.value} sx={{ fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>
-              {algo.label}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
-      {/* Prefix / Challenge */}
-      <TextField
-        fullWidth
-        label="Prefix / Challenge"
-        value={prefix}
-        onChange={e => setPrefix(e.target.value)}
-        variant="outlined"
-        sx={{ ...inputSx, mb: 2 }}
-        placeholder="Text to prefix before nonce (e.g., block_data_)"
+      <Selector
+        label="Hash Algorithm"
+        options={HASH_ALGORITHMS}
+        value={hashAlgo}
+        onChange={setHashAlgo}
+        width="100%"
       />
 
-      <TextField
-        fullWidth
+      {/* Prefix / Challenge */}
+      <TextInput
+        label="Prefix / Challenge"
+        value={prefix}
+        onChange={setPrefix}
+        placeholder="Text to prefix before nonce (e.g., block_data_)"
+        width="100%"
+      />
+
+      <TextInput
         label="Difficulty (leading zero bits)"
+        description="1–128 bits"
         value={difficulty}
-        onChange={e => setDifficulty(e.target.value)}
-        slotProps={{ htmlInput: { inputMode: 'numeric', min: 1, max: 128 } }}
-        error={!/^(?:[1-9]\d?|1[01]\d|12[0-8])$/.test(difficulty)}
-        helperText="1–128 bits"
-        sx={{ ...inputSx, mb: 2 }}
+        onChange={setDifficulty}
+        width="100%"
+        status={difficultyValid ? undefined : { type: 'error', message: 'Enter 1–128 bits' }}
       />
 
       {/* Run / Stop morphing button */}
       <Button
-        fullWidth
-        variant="outlined"
+        label={running ? 'Stop' : 'Run'}
+        variant="secondary"
+        width="100%"
         onClick={running ? handleStop : () => { void handleRun(); }}
-        disabled={!/^(?:[1-9]\d?|1[01]\d|12[0-8])$/.test(difficulty)}
-        sx={{
-          ...colorGhostBtn(running ? draculaColors.red : draculaColors.purple),
-          mt: 2,
-          mb: 2,
-        }}
-        startIcon={running ? <Stop /> : <PlayArrow />}
-      >
-        {running ? 'Stop' : 'Run'}
-      </Button>
+        isDisabled={!difficultyValid}
+      />
 
-      {/* Running: hourglass + progress bar + ETA */}
+      {/* Running: progress bar + ETA */}
       {running && (
-        <Box role="status" aria-live="polite" aria-atomic="true">
-          <Typography
-            variant="body2"
-            sx={{
-              color: draculaColors.orange,
-              mb: 1,
-              textAlign: 'center',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 1,
-            }}
-          >
-            <HourglassEmpty
-              sx={{
-                color: draculaColors.orange,
-                fontSize: '1rem',
-                ...hourglassSpinSx,
-              }}
-            />
-            Searching&hellip;
-          </Typography>
-
-          {progress > 0 && (
-            <Box sx={{ mb: 2 }}>
-              <LinearProgress
-                variant="determinate"
-                value={progress}
-                aria-label="Proof-of-work progress"
-                sx={{
-                  height: 6,
-                  borderRadius: 3,
-                  bgcolor: draculaColors.currentLine,
-                  '& .MuiLinearProgress-bar': {
-                    bgcolor: draculaColors.orange,
-                    borderRadius: 3,
-                  },
-                }}
-              />
-              <Typography
-                variant="caption"
-                sx={{
-                  color: draculaColors.orange,
-                  mt: 0.5,
-                  textAlign: 'center',
-                  display: 'block',
-                  fontFamily: MONO_FAMILY,
-                }}
-              >
-                {progressDetail}
-              </Typography>
-              {eta && (
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: draculaColors.comment,
-                    mt: 0.5,
-                    textAlign: 'center',
-                    display: 'block',
-                  }}
-                >
-                  ETA: {eta}
-                </Typography>
-              )}
-            </Box>
+        <Stack direction="vertical" gap={1} role="status" aria-live="polite" aria-atomic="true">
+          <ProgressBar
+            label="Searching for nonce"
+            value={progress}
+            max={100}
+            hasValueLabel
+            variant="accent"
+          />
+          {progressDetail && (
+            <Text type="supporting" justify="center">
+              {progressDetail}
+            </Text>
           )}
-        </Box>
+          {eta && (
+            <Text type="supporting" justify="center">
+              ETA: {eta}
+            </Text>
+          )}
+        </Stack>
+      )}
+
+      {/* Idle: no result yet */}
+      {!running && !result && !error && (
+        <EmptyState
+          title="No nonce yet"
+          description="Set a prefix and difficulty, then run the search to find a valid nonce."
+          isCompact
+        />
       )}
 
       {/* Success result */}
       {result && (
-        <Box role="status" aria-live="polite" aria-atomic="true">
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            <Typography variant="caption" sx={{ color: draculaColors.green }}>
-              Nonce found:
-            </Typography>
-            <Tooltip title="Copy result">
-              <IconButton
-                aria-label="Copy proof-of-work result"
-                onClick={handleCopyResult}
-                sx={{ color: draculaColors.cyan, width: 44, height: 44 }}
-              >
-                <ContentCopy fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          </Box>
-          <Box sx={outputBoxSx()}>
-            <Box
-              sx={{
-                fontFamily: MONO_FAMILY,
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-all',
-              }}
-            >
-              {result}
-            </Box>
-          </Box>
-        </Box>
+        <ResultBox value={result} label="Nonce found:" />
       )}
 
-      {error && (
-        <Typography
-          role="alert"
-          sx={{
-            color: draculaColors.red,
-            mt: 2,
-            fontFamily: MONO_FAMILY,
-            fontSize: '0.85rem',
-          }}
-        >
-          {error}
-        </Typography>
-      )}
-    </Box>
+      {error && <Banner status="error" title={error} />}
+    </Stack>
   );
 }

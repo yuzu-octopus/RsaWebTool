@@ -1,9 +1,11 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Box, TextField, Button, Select, MenuItem, FormControl, InputLabel, Radio, RadioGroup, FormControlLabel, Typography } from '@mui/material';
-import { PlayArrow } from '@mui/icons-material';
-import { draculaColors } from '../../theme/dracula';
-import { inputSx } from '../../styles/shared';
-import { primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
+import { Stack } from '@astryxdesign/core/Stack';
+import { TextInput } from '@astryxdesign/core/TextInput';
+import { TextArea } from '@astryxdesign/core/TextArea';
+import { Button } from '@astryxdesign/core/Button';
+import { Selector } from '@astryxdesign/core/Selector';
+import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { Banner } from '@astryxdesign/core/Banner';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { ResultBox } from './_shared/ResultBox';
 import { decodeInput } from '../../utils/aesCrypto';
@@ -67,101 +69,63 @@ export function AESEncryptDecryptTab() {
   }, [mode, keyHex, ivHex, aadHex, inputText, inputEnc, op, needsIv, needsAad, out]);
 
   return (
-    <Box>
-      <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
-        <InputLabel>Mode</InputLabel>
-        <Select value={mode} label="Mode" onChange={e => setMode(e.target.value)}>
-          {AES_MODES.map(m => (
-            <MenuItem key={m} value={m}>{m}</MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <TextField
-        fullWidth
+    <Stack direction="vertical" gap={2}>
+      <Selector label="Mode" options={[...AES_MODES]} value={mode} onChange={setMode} width="100%" />
+      <TextInput
         label={keyLabel}
         value={keyHex}
-        onChange={e => setKeyHex(e.target.value)}
-        variant="outlined"
-        sx={{ ...inputSx, mb: 2 }}
+        onChange={setKeyHex}
         placeholder="32/48/64 hex chars"
-        spellCheck={false}
+        width="100%"
       />
       {needsIv && (
-        <TextField
-          fullWidth
+        <TextInput
           label={`${mode === 'GCM' ? 'Nonce' : 'IV'} (hex)`}
           value={ivHex}
-          onChange={e => setIvHex(e.target.value)}
-          variant="outlined"
-          sx={{ ...inputSx, mb: 2 }}
+          onChange={setIvHex}
           placeholder={mode === 'GCM' ? '12+ byte nonce' : '32 hex chars'}
-          spellCheck={false}
+          width="100%"
         />
       )}
       {needsAad && (
-        <TextField
-          fullWidth
+        <TextInput
           label="AAD (hex, opt)"
           value={aadHex}
-          onChange={e => setAadHex(e.target.value)}
-          variant="outlined"
-          sx={{ ...inputSx, mb: 2 }}
+          onChange={setAadHex}
           placeholder="Additional authenticated data"
-          spellCheck={false}
+          width="100%"
         />
       )}
-      <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'flex-start' }}>
-        <FormControl sx={{ ...inputSx, minWidth: 100 }}>
-          <InputLabel>Encoding</InputLabel>
-          <Select value={inputEnc} label="Encoding" onChange={e => setInputEnc(e.target.value)}>
-            {ENCODINGS.map(e => (
-              <MenuItem key={e.value} value={e.value}>{e.label}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <TextField
-          fullWidth
-          multiline
-          minRows={3}
-          maxRows={8}
-          label="Input"
-          value={inputText}
-          onChange={e => setInputText(e.target.value)}
-          variant="outlined"
-          sx={inputSx}
-          placeholder={inputEnc === 'text' ? 'Plaintext...' : `${inputEnc.toUpperCase()} data...`}
+      <Stack direction="horizontal" gap={1} vAlign="start">
+        <Selector
+          label="Encoding"
+          options={ENCODINGS.map(e => ({ value: e.value, label: e.label }))}
+          value={inputEnc}
+          onChange={setInputEnc}
         />
-      </Box>
-      <FormControl sx={{ mb: 2 }}>
-        <RadioGroup row value={op} onChange={e => setOp(e.target.value)}>
-          <FormControlLabel
-            value="encrypt"
-            control={<Radio sx={{ color: draculaColors.comment, '&.Mui-checked': { color: draculaColors.green } }} />}
-            label={<Typography sx={{ color: draculaColors.foreground, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>Encrypt</Typography>}
+        <Stack direction="vertical" width="100%">
+          <TextArea
+            label="Input"
+            value={inputText}
+            onChange={setInputText}
+            rows={3}
+            placeholder={inputEnc === 'text' ? 'Plaintext...' : `${inputEnc.toUpperCase()} data...`}
           />
-          <FormControlLabel
-            value="decrypt"
-            control={<Radio sx={{ color: draculaColors.comment, '&.Mui-checked': { color: draculaColors.cyan } }} />}
-            label={<Typography sx={{ color: draculaColors.foreground, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>Decrypt</Typography>}
-          />
-        </RadioGroup>
-      </FormControl>
+        </Stack>
+      </Stack>
+      <SegmentedControl label="Operation" value={op} onChange={setOp}>
+        <SegmentedControlItem value="encrypt" label="Encrypt" />
+        <SegmentedControlItem value="decrypt" label="Decrypt" />
+      </SegmentedControl>
       <Button
-        variant="contained"
-        startIcon={<PlayArrow />}
+        label={op === 'encrypt' ? 'Encrypt' : 'Decrypt'}
+        variant="primary"
+        width="100%"
         onClick={handleRun}
-        disabled={!keyHex.trim() || !inputText.trim()}
-        fullWidth
-        sx={primaryBtnSx}
-      >
-        {op === 'encrypt' ? 'Encrypt' : 'Decrypt'}
-      </Button>
-      {out.result && <Box sx={{ mt: 2 }}><ResultBox value={out.result} label={`Output (${mode})`} variant="default" /></Box>}
-      {out.error && (
-        <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>
-          {out.error}
-        </Typography>
-      )}
-    </Box>
+        isDisabled={!keyHex.trim() || !inputText.trim()}
+      />
+      {out.result && <ResultBox value={out.result} label={`Output (${mode})`} variant="default" />}
+      {out.error && <Banner status="error" title={out.error} />}
+    </Stack>
   );
 }

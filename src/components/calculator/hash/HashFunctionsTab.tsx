@@ -1,12 +1,10 @@
 import { useState, useRef, useCallback } from 'react';
-import {
-  Box, Typography, TextField, Button, Select, MenuItem,
-  FormControl, InputLabel, IconButton, Tooltip,
-} from '@mui/material';
-import { PlayArrow, UploadFile, ContentCopy } from '@mui/icons-material';
-import { draculaColors } from '../../../theme/dracula';
-import { inputSx } from '../../../styles/shared';
-import { outputBoxSx, colorGhostBtn, primaryBtnSx, MONO_FAMILY } from '../../../styles/shared';
+import { Stack } from '@astryxdesign/core/Stack';
+import { TextInput } from '@astryxdesign/core/TextInput';
+import { TextArea } from '@astryxdesign/core/TextArea';
+import { Button } from '@astryxdesign/core/Button';
+import { Selector } from '@astryxdesign/core/Selector';
+import { Banner } from '@astryxdesign/core/Banner';
 import { sha256, sha384, sha512 } from '@noble/hashes/sha2.js';
 import { md5, sha1 } from '@noble/hashes/legacy.js';
 import { blake2b, blake2s } from '@noble/hashes/blake2.js';
@@ -14,6 +12,7 @@ import { blake3 } from '@noble/hashes/blake3.js';
 import { sha3_256, sha3_512, keccak_256, keccak_512 } from '@noble/hashes/sha3.js';
 import { bytesToHex } from '@noble/hashes/utils.js';
 import { useAppContext } from '../../../hooks/useAppContext';
+import { ResultBox } from '../_shared/ResultBox';
 
 const ALGORITHMS = [
   { value: 'sha256', label: 'SHA-256' },
@@ -124,42 +123,36 @@ export default function HashFunctionsTab() {
     reader.readAsArrayBuffer(file);
   }, [algorithm, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
 
-  const handleCopy = useCallback(() => { if (result) navigator.clipboard.writeText(result).catch(() => {}); }, [result]);
-
   return (
-    <Box>
-      <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
-        <InputLabel>Algorithm</InputLabel>
-        <Select value={algorithm} label="Algorithm" onChange={e => setAlgorithm(e.target.value)}>
-          {ALGORITHMS.map(a => (<MenuItem key={a.value} value={a.value}>{a.label}</MenuItem>))}
-        </Select>
-      </FormControl>
-      <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
-        <InputLabel>Input Encoding</InputLabel>
-        <Select value={encoding} label="Input Encoding" onChange={e => setEncoding(e.target.value)}>
-          {ENCODINGS.map(e => (<MenuItem key={e.value} value={e.value}>{e.label}</MenuItem>))}
-        </Select>
-      </FormControl>
-      <TextField fullWidth multiline={encoding === 'utf8'} minRows={encoding === 'utf8' ? 3 : 1} maxRows={12}
-        label={encoding === 'utf8' ? 'Input Text' : `Input (${encoding.toUpperCase()})`}
-        value={input} onChange={e => setInput(e.target.value)} variant="outlined" sx={{ ...inputSx, mb: 2 }}
-        placeholder={encoding === 'hex' ? 'Hex string (e.g., 48656c6c6f)' : encoding === 'base64' ? 'Base64 string (e.g., SGVsbG8=)' : 'Enter text to hash...'} />
-      <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-        <Button variant="contained" startIcon={<PlayArrow />} onClick={handleCompute} disabled={!input.trim()}
-          sx={primaryBtnSx}>Compute Hash</Button>
-        <Button variant="outlined" startIcon={<UploadFile />} onClick={() => fileRef.current?.click()} sx={colorGhostBtn(draculaColors.cyan)}>Hash File</Button>
-        <input ref={fileRef} type="file" hidden onChange={handleFile} aria-label="Select a file to hash" />
-      </Box>
-      {result && (
-        <Box role="status" aria-live="polite" aria-atomic="true">
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            <Typography variant="caption" sx={{ color: draculaColors.green }}>{algorithm.toUpperCase()} hash ({encoding.toUpperCase()} input):</Typography>
-            <Tooltip title="Copy hash"><IconButton aria-label={`Copy ${algorithm.toUpperCase()} hash`} onClick={handleCopy} sx={{ color: draculaColors.cyan, width: 44, height: 44 }}><ContentCopy fontSize="small" /></IconButton></Tooltip>
-          </Box>
-          <Box sx={outputBoxSx()}><Box sx={{ fontFamily: MONO_FAMILY, wordBreak: 'break-all' }}>{result}</Box></Box>
-        </Box>
+    <Stack direction="vertical" gap={2}>
+      <Selector label="Algorithm" options={ALGORITHMS} value={algorithm} onChange={setAlgorithm} width="100%" />
+      <Selector label="Input Encoding" options={ENCODINGS} value={encoding} onChange={setEncoding} width="100%" />
+      {encoding === 'utf8' ? (
+        <TextArea
+          label="Input Text"
+          value={input}
+          onChange={setInput}
+          rows={3}
+          placeholder="Enter text to hash..."
+        />
+      ) : (
+        <TextInput
+          label={`Input (${encoding.toUpperCase()})`}
+          value={input}
+          onChange={setInput}
+          placeholder={encoding === 'hex' ? 'Hex string (e.g., 48656c6c6f)' : 'Base64 string (e.g., SGVsbG8=)'}
+          width="100%"
+        />
       )}
-      {error && (<Typography role="alert" sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>{error}</Typography>)}
-    </Box>
+      <Stack direction="horizontal" gap={1}>
+        <Button label="Compute Hash" variant="primary" onClick={handleCompute} isDisabled={!input.trim()} />
+        <Button label="Hash File" variant="secondary" onClick={() => fileRef.current?.click()} />
+        <input ref={fileRef} type="file" hidden onChange={handleFile} aria-label="Select a file to hash" />
+      </Stack>
+      {result && (
+        <ResultBox value={result} label={`${algorithm.toUpperCase()} hash (${encoding.toUpperCase()} input):`} />
+      )}
+      {error && <Banner status="error" title={error} />}
+    </Stack>
   );
 }

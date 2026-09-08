@@ -1,9 +1,10 @@
 import { useState, useCallback, useRef } from 'react';
-import { Box, FormControl, InputLabel, Select, MenuItem, TextField, Button, Typography } from '@mui/material';
-import { PlayArrow } from '@mui/icons-material';
-import { draculaColors } from '../../theme/dracula';
-import { inputSx } from '../../styles/shared';
-import { primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Text } from '@astryxdesign/core/Text';
+import { TextInput } from '@astryxdesign/core/TextInput';
+import { Button } from '@astryxdesign/core/Button';
+import { Selector } from '@astryxdesign/core/Selector';
+import { Banner } from '@astryxdesign/core/Banner';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { useSageMath, DEFAULT_SAGE_TIMEOUT } from '../../hooks/useSageMath';
 import { ResultBox } from './_shared/ResultBox';
@@ -183,42 +184,40 @@ except Exception as e:
   }, [attack, pVal, gVal, yVal, execute, out]);
 
   return (
-    <Box>
-      <FormControl fullWidth disabled={isRunning} sx={{ ...inputSx, mb: 2 }}>
-        <InputLabel>Attack</InputLabel>
-        <Select value={attack} label="Attack" onChange={e => setAttack(e.target.value)}>
-          {DH_ATTACKS.map(a => (<MenuItem key={a.value} value={a.value}>{a.label}</MenuItem>))}
-        </Select>
-      </FormControl>
+    <Stack direction="vertical" gap={2}>
+      <Selector
+        label="Attack"
+        options={DH_ATTACKS.map(a => ({ value: a.value, label: a.label }))}
+        value={attack}
+        onChange={setAttack}
+        width="100%"
+        isDisabled={isRunning}
+      />
 
-      <Box component="fieldset" disabled={isRunning} sx={{ border: 0, m: 0, p: 0, minWidth: 0, pointerEvents: isRunning ? 'none' : 'auto' }}>
-        {DH_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={DH_ATTACK_EXPLANATIONS[attack]} />}
+      {DH_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={DH_ATTACK_EXPLANATIONS[attack]} />}
 
-        <TextField fullWidth label="p (prime, hex)" value={pVal} onChange={e => setPVal(e.target.value)}
-          variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Prime modulus" spellCheck={false} />
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <TextField fullWidth label="g (decimal)" value={gVal} onChange={e => setGVal(e.target.value)}
-            variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="Generator" spellCheck={false} />
-          <TextField fullWidth label="y (Alice public, hex)" value={yVal} onChange={e => setYVal(e.target.value)}
-            variant="outlined" sx={{ ...inputSx, mb: 2 }} placeholder="y = g^a mod p" spellCheck={false} />
-        </Box>
-      </Box>
+      <TextInput label="p (prime, hex)" value={pVal} onChange={setPVal} placeholder="Prime modulus" width="100%" isDisabled={isRunning} />
+      <Stack direction="horizontal" gap={1}>
+        <TextInput label="g (decimal)" value={gVal} onChange={setGVal} placeholder="Generator" width="100%" isDisabled={isRunning} />
+        <TextInput label="y (Alice public, hex)" value={yVal} onChange={setYVal} placeholder="y = g^a mod p" width="100%" isDisabled={isRunning} />
+      </Stack>
 
-      <Button variant="contained" startIcon={<PlayArrow />} onClick={() => { void run(); }} disabled={isRunning} fullWidth sx={primaryBtnSx}>
-        {isRunning ? 'Running attack…' : 'Run Attack'}
-      </Button>
+      <Button
+        label={isRunning ? 'Running attack…' : 'Run Attack'}
+        variant="primary"
+        width="100%"
+        onClick={() => { void run(); }}
+        isDisabled={isRunning}
+        isLoading={isRunning}
+      />
       {isRunning && (
-        <Typography role="status" aria-live="polite" sx={{ color: draculaColors.comment, mt: 1, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>
+        <Text role="status" aria-live="polite">
           Running attack…
-        </Typography>
+        </Text>
       )}
 
-      {out.result && <Box sx={{ mt: 2 }}><ResultBox value={out.result} label="Result" variant="medium" /></Box>}
-      {out.error && (
-        <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>
-          {out.error}
-        </Typography>
-      )}
-    </Box>
+      {out.result && <ResultBox value={out.result} label="Result" variant="medium" />}
+      {out.error && <Banner status="error" title={out.error} />}
+    </Stack>
   );
 }

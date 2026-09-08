@@ -1,12 +1,10 @@
 import { useState, useCallback } from 'react';
-import {
-  Box, Typography, TextField, Button, Select, MenuItem,
-  FormControl, InputLabel, IconButton, Tooltip,
-} from '@mui/material';
-import { PlayArrow, ContentCopy } from '@mui/icons-material';
-import { draculaColors } from '../../../theme/dracula';
-import { inputSx } from '../../../styles/shared';
-import { outputBoxSx, primaryBtnSx, MONO_FAMILY } from '../../../styles/shared';
+import { Stack } from '@astryxdesign/core/Stack';
+import { TextInput } from '@astryxdesign/core/TextInput';
+import { TextArea } from '@astryxdesign/core/TextArea';
+import { Button } from '@astryxdesign/core/Button';
+import { Selector } from '@astryxdesign/core/Selector';
+import { Banner } from '@astryxdesign/core/Banner';
 import { sha256, sha384, sha512 } from '@noble/hashes/sha2.js';
 import { md5, sha1 } from '@noble/hashes/legacy.js';
 import { blake2b, blake2s } from '@noble/hashes/blake2.js';
@@ -16,6 +14,7 @@ import { hmac } from '@noble/hashes/hmac.js';
 import { bytesToHex } from '@noble/hashes/utils.js';
 import type { CHash } from '@noble/hashes/utils.js';
 import { useAppContext } from '../../../hooks/useAppContext';
+import { ResultBox } from '../_shared/ResultBox';
 
 const ENCODINGS: { value: string; label: string }[] = [
   { value: 'utf8', label: 'UTF-8' },
@@ -96,51 +95,41 @@ export default function HMACTab() {
     }
   }, [algorithm, keyEncoding, msgEncoding, key, message, getAlgorithms, setCtxOutput, setCtxError, setOutputSource, addToHistory]);
 
-  const handleCopy = useCallback(() => { if (result) navigator.clipboard.writeText(result).catch(() => {}); }, [result]);
-
   const algs = getAlgorithms();
   const selectedAlg = algs.find(a => a.value === algorithm);
 
   return (
-    <Box>
-      <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
-        <InputLabel>Algorithm</InputLabel>
-        <Select value={algorithm} label="Algorithm" onChange={e => setAlgorithm(e.target.value)}>
-          {algs.map(a => (<MenuItem key={a.value} value={a.value}>{a.label}</MenuItem>))}
-        </Select>
-      </FormControl>
-      <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'flex-start' }}>
-        <FormControl sx={{ ...inputSx, minWidth: 100 }}>
-          <InputLabel>Key Enc.</InputLabel>
-          <Select value={keyEncoding} label="Key Enc." onChange={e => setKeyEncoding(e.target.value)}>
-            {ENCODINGS.map(e => (<MenuItem key={e.value} value={e.value}>{e.label}</MenuItem>))}
-          </Select>
-        </FormControl>
-        <TextField fullWidth label="Key" value={key} onChange={e => setKey(e.target.value)} variant="outlined" sx={inputSx} placeholder="HMAC secret key..." />
-      </Box>
-      <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'flex-start' }}>
-        <FormControl sx={{ ...inputSx, minWidth: 100 }}>
-          <InputLabel>Msg Enc.</InputLabel>
-          <Select value={msgEncoding} label="Msg Enc." onChange={e => setMsgEncoding(e.target.value)}>
-            {ENCODINGS.map(e => (<MenuItem key={e.value} value={e.value}>{e.label}</MenuItem>))}
-          </Select>
-        </FormControl>
-        <TextField fullWidth multiline minRows={3} maxRows={8} label="Message" value={message} onChange={e => setMessage(e.target.value)} variant="outlined" sx={inputSx} placeholder="Message to authenticate..." />
-      </Box>
-      <Button variant="contained" startIcon={<PlayArrow />} onClick={handleCompute} disabled={!key.trim() || !message.trim()} fullWidth
-        sx={primaryBtnSx}>
-        Compute HMAC
-      </Button>
+    <Stack direction="vertical" gap={2}>
+      <Selector
+        label="Algorithm"
+        options={algs.map(a => ({ value: a.value, label: a.label }))}
+        value={algorithm}
+        onChange={setAlgorithm}
+        width="100%"
+      />
+      <Stack direction="horizontal" gap={1} vAlign="start">
+        <Selector label="Key Enc." options={ENCODINGS} value={keyEncoding} onChange={setKeyEncoding} />
+        <Stack direction="vertical" width="100%">
+          <TextInput label="Key" value={key} onChange={setKey} placeholder="HMAC secret key..." width="100%" />
+        </Stack>
+      </Stack>
+      <Stack direction="horizontal" gap={1} vAlign="start">
+        <Selector label="Msg Enc." options={ENCODINGS} value={msgEncoding} onChange={setMsgEncoding} />
+        <Stack direction="vertical" width="100%">
+          <TextArea label="Message" value={message} onChange={setMessage} rows={3} placeholder="Message to authenticate..." />
+        </Stack>
+      </Stack>
+      <Button
+        label="Compute HMAC"
+        variant="primary"
+        width="100%"
+        onClick={handleCompute}
+        isDisabled={!key.trim() || !message.trim()}
+      />
       {result && (
-        <Box role="status" aria-live="polite" aria-atomic="true">
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            <Typography variant="caption" sx={{ color: draculaColors.green }}>HMAC-{selectedAlg?.label ?? algorithm}:</Typography>
-            <Tooltip title="Copy HMAC"><IconButton aria-label={`Copy HMAC-${selectedAlg?.label ?? algorithm}`} onClick={handleCopy} sx={{ color: draculaColors.cyan, width: 44, height: 44 }}><ContentCopy fontSize="small" /></IconButton></Tooltip>
-          </Box>
-          <Box sx={outputBoxSx()}><Box sx={{ fontFamily: MONO_FAMILY, wordBreak: 'break-all' }}>{result}</Box></Box>
-        </Box>
+        <ResultBox value={result} label={`HMAC-${selectedAlg?.label ?? algorithm}:`} />
       )}
-      {error && (<Typography role="alert" sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>{error}</Typography>)}
-    </Box>
+      {error && <Banner status="error" title={error} />}
+    </Stack>
   );
 }

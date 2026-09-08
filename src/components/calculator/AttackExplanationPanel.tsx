@@ -1,9 +1,7 @@
-import { Box, Typography } from '@mui/material';
-import { draculaColors } from '../../theme/dracula';
-import { MONO_FAMILY } from '../../styles/shared';
-import Prism from 'prismjs';
-import 'prismjs/components/prism-python';
-import '../../styles/draculaPrism.css';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Text } from '@astryxdesign/core/Text';
+import { CodeBlock } from '@astryxdesign/core/CodeBlock';
 
 export interface AttackExplanationData {
   title: string;
@@ -16,82 +14,42 @@ export interface AttackExplanationData {
 
 export function AttackExplanationPanel({ data }: { data: AttackExplanationData }) {
   return (
-    <Box
-      sx={{
-        mb: 2,
-        maxHeight: { xs: 'none', sm: '40vh' },
-        overflow: { xs: 'visible', sm: 'auto' },
-        pr: { xs: 0, sm: 1 },
-        '&::-webkit-scrollbar': { width: '8px' },
-        '&::-webkit-scrollbar-thumb': {
-          background: draculaColors.currentLine,
-          borderRadius: '4px',
-        },
-      }}
-    >
-      <Typography variant="subtitle1" sx={{ color: draculaColors.pink, mb: 1 }}>
-        {data.title}
-      </Typography>
+    <Stack direction="vertical" gap={2} isScrollable>
+      <Heading level={4}>{data.title}</Heading>
 
-      <Typography variant="body2" sx={{ color: draculaColors.foreground, mb: 1, lineHeight: 1.7 }}>
-        {data.description}
-      </Typography>
+      <Text>{data.description}</Text>
 
-      <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mt: 1.5, mb: 0.5 }}>
-        When to use
-      </Typography>
+      <Stack direction="vertical" gap={1}>
+        <Text type="label" weight="semibold">
+          When to use
+        </Text>
+        <Text>{data.whenToUse}</Text>
+      </Stack>
 
-      <Typography variant="body2" sx={{ color: draculaColors.foreground, mb: 1, lineHeight: 1.7 }}>
-        {data.whenToUse}
-      </Typography>
+      <Stack direction="vertical" gap={1}>
+        <Text type="label" weight="semibold">
+          Algorithm
+        </Text>
+        <CodeBlock
+          code={data.algorithm.join('\n')}
+          language="plaintext"
+          hasCopyButton={false}
+          isWrapped
+          width="100%"
+        />
+      </Stack>
 
-      <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mt: 1.5, mb: 0.5 }}>
-        Algorithm
-      </Typography>
-
-      <Box
-        sx={{
-          backgroundColor: draculaColors.background,
-          border: `1px solid ${draculaColors.currentLine}`,
-          borderRadius: '4px',
-          p: 1.5,
-          fontFamily: MONO_FAMILY,
-          fontSize: '0.75rem',
-          lineHeight: 1.6,
-          color: draculaColors.foreground,
-          whiteSpace: 'pre',
-          overflow: 'auto',
-          mb: 1.5,
-        }}
-      >
-        {data.algorithm.join('\n')}
-      </Box>
-
-      <Typography variant="subtitle2" sx={{ color: draculaColors.cyan, mt: 1.5, mb: 0.5 }}>
-        Python Script
-      </Typography>
-
-      <Box
-        sx={{
-          backgroundColor: draculaColors.background,
-          border: `1px solid ${draculaColors.currentLine}`,
-          borderRadius: '4px',
-          p: 1.5,
-          fontFamily: MONO_FAMILY,
-          fontSize: '0.75rem',
-          lineHeight: 1.6,
-          whiteSpace: 'pre',
-          overflow: 'auto',
-          maxHeight: '400px',
-          mb: 1.5,
-        }}
-        // SAFE: Prism.highlight returns syntax-highlighted HTML containing only
-        // <span> tags with class names — no executable script, no user-supplied
-        // HTML. The Python source is bundled with each attack (not user input).
-        dangerouslySetInnerHTML={{
-          __html: Prism.highlight(data.python, Prism.languages.python, 'python'),
-        }}
-      />
-    </Box>
+      <Stack direction="vertical" gap={1}>
+        <Text type="label" weight="semibold">
+          Python Script
+        </Text>
+        <CodeBlock
+          code={data.python}
+          language="python"
+          width="100%"
+          maxHeight={400}
+        />
+      </Stack>
+    </Stack>
   );
 }

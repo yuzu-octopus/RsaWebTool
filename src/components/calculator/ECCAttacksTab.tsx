@@ -1,9 +1,11 @@
 import { useState, useCallback, useMemo, useRef } from 'react';
-import { Box, FormControl, InputLabel, Select, MenuItem, TextField, Button, Typography } from '@mui/material';
-import { PlayArrow } from '@mui/icons-material';
-import { draculaColors } from '../../theme/dracula';
-import { inputSx } from '../../styles/shared';
-import { primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Text } from '@astryxdesign/core/Text';
+import { TextInput } from '@astryxdesign/core/TextInput';
+import { TextArea } from '@astryxdesign/core/TextArea';
+import { Button } from '@astryxdesign/core/Button';
+import { Selector } from '@astryxdesign/core/Selector';
+import { Banner } from '@astryxdesign/core/Banner';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { useSageMath, DEFAULT_SAGE_TIMEOUT } from '../../hooks/useSageMath';
 import { AttackExplanationPanel } from './AttackExplanationPanel';
@@ -290,137 +292,125 @@ print('\\\\n'.join(out)); print('TOKEN=SUCCESS')`;
   const attackFields = useMemo(() => {
     switch (attack) {
       case 'nonce-reuse': return (
-        <>
-          <TextField fullWidth label="Curve order n (hex)" value={nHex} onChange={e => setNHex(e.target.value)} variant="outlined"
-            sx={{ ...inputSx, mb: 2 }} placeholder="secp256k1 order" spellCheck={false} />
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField fullWidth label="Hash 1 (hex)" value={h1} onChange={e => setH1(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="h1" spellCheck={false} />
-            <TextField fullWidth label="Hash 2 (hex)" value={h2} onChange={e => setH2(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="h2" spellCheck={false} />
-          </Box>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField fullWidth label="r (hex)" value={r1} onChange={e => setR1(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="r" spellCheck={false} />
-            <TextField fullWidth label="s1 (hex)" value={s1} onChange={e => setS1(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="s1" spellCheck={false} />
-            <TextField fullWidth label="s2 (hex)" value={s2} onChange={e => setS2(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="s2" spellCheck={false} />
-          </Box>
-        </>
+        <Stack direction="vertical" gap={2}>
+          <TextInput label="Curve order n (hex)" value={nHex} onChange={setNHex} placeholder="secp256k1 order" width="100%" isDisabled={isRunning} />
+          <Stack direction="horizontal" gap={1}>
+            <TextInput label="Hash 1 (hex)" value={h1} onChange={setH1} placeholder="h1" width="100%" isDisabled={isRunning} />
+            <TextInput label="Hash 2 (hex)" value={h2} onChange={setH2} placeholder="h2" width="100%" isDisabled={isRunning} />
+          </Stack>
+          <Stack direction="horizontal" gap={1}>
+            <TextInput label="r (hex)" value={r1} onChange={setR1} placeholder="r" width="100%" isDisabled={isRunning} />
+            <TextInput label="s1 (hex)" value={s1} onChange={setS1} placeholder="s1" width="100%" isDisabled={isRunning} />
+            <TextInput label="s2 (hex)" value={s2} onChange={setS2} placeholder="s2" width="100%" isDisabled={isRunning} />
+          </Stack>
+        </Stack>
       );
       case 'point-validation': return (
-        <>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField fullWidth label="a (hex)" value={aVal} onChange={e => setAVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="a param" spellCheck={false} />
-            <TextField fullWidth label="b (hex)" value={bVal} onChange={e => setBVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="b param" spellCheck={false} />
-          </Box>
-          <TextField fullWidth label="p (prime, hex)" value={pVal} onChange={e => setPVal(e.target.value)} variant="outlined"
-            sx={{ ...inputSx, mb: 2 }} placeholder="Field prime" spellCheck={false} />
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField fullWidth label="x (hex)" value={xVal} onChange={e => setXVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="x coord" spellCheck={false} />
-            <TextField fullWidth label="y (hex)" value={yVal} onChange={e => setYVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="y coord" spellCheck={false} />
-          </Box>
-        </>
+        <Stack direction="vertical" gap={2}>
+          <Stack direction="horizontal" gap={1}>
+            <TextInput label="a (hex)" value={aVal} onChange={setAVal} placeholder="a param" width="100%" isDisabled={isRunning} />
+            <TextInput label="b (hex)" value={bVal} onChange={setBVal} placeholder="b param" width="100%" isDisabled={isRunning} />
+          </Stack>
+          <TextInput label="p (prime, hex)" value={pVal} onChange={setPVal} placeholder="Field prime" width="100%" isDisabled={isRunning} />
+          <Stack direction="horizontal" gap={1}>
+            <TextInput label="x (hex)" value={xVal} onChange={setXVal} placeholder="x coord" width="100%" isDisabled={isRunning} />
+            <TextInput label="y (hex)" value={yVal} onChange={setYVal} placeholder="y coord" width="100%" isDisabled={isRunning} />
+          </Stack>
+        </Stack>
       );
       case 'biased-nonce': return (
-        <>
-          <TextField fullWidth label="Curve order n (hex)" value={nHex} onChange={e => setNHex(e.target.value)} variant="outlined"
-            sx={{ ...inputSx, mb: 2 }} placeholder="secp256k1 order" spellCheck={false} />
-          <TextField fullWidth label="kbits (unknown nonce bits)" value={kbitsVal} onChange={e => setKbitsVal(e.target.value)} variant="outlined"
-            sx={{ ...inputSx, mb: 2 }} placeholder="64" spellCheck={false} helperText="Lower = easier (e.g., kbits=64 means k &lt; 2^64)" />
-          <TextField fullWidth multiline minRows={4} maxRows={8} label="Signature pairs (r,s,h hex, one per line)" value={pairsMultiline}
-            onChange={e => setPairsMultiline(e.target.value)} variant="outlined"
-            sx={{ ...inputSx, mb: 2 }} placeholder={'r1,s1,h1\nr2,s2,h2\n...'} spellCheck={false} />
-        </>
+        <Stack direction="vertical" gap={2}>
+          <TextInput label="Curve order n (hex)" value={nHex} onChange={setNHex} placeholder="secp256k1 order" width="100%" isDisabled={isRunning} />
+          <TextInput
+            label="kbits (unknown nonce bits)"
+            description="Lower = easier (e.g., kbits=64 means k < 2^64)"
+            value={kbitsVal}
+            onChange={setKbitsVal}
+            placeholder="64"
+            width="100%"
+            isDisabled={isRunning}
+          />
+          <TextArea
+            label="Signature pairs (r,s,h hex, one per line)"
+            value={pairsMultiline}
+            onChange={setPairsMultiline}
+            rows={4}
+            placeholder={'r1,s1,h1\nr2,s2,h2\n...'}
+            isDisabled={isRunning}
+          />
+        </Stack>
       );
       case 'invalid-curve': return (
-        <>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField fullWidth label="a (hex)" value={aVal} onChange={e => setAVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="a param" spellCheck={false} />
-            <TextField fullWidth label="b (hex)" value={bVal} onChange={e => setBVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="b param" spellCheck={false} />
-          </Box>
-          <TextField fullWidth label="p (prime, hex)" value={pVal} onChange={e => setPVal(e.target.value)} variant="outlined"
-            sx={{ ...inputSx, mb: 2 }} placeholder="Field prime" spellCheck={false} />
-        </>
+        <Stack direction="vertical" gap={2}>
+          <Stack direction="horizontal" gap={1}>
+            <TextInput label="a (hex)" value={aVal} onChange={setAVal} placeholder="a param" width="100%" isDisabled={isRunning} />
+            <TextInput label="b (hex)" value={bVal} onChange={setBVal} placeholder="b param" width="100%" isDisabled={isRunning} />
+          </Stack>
+          <TextInput label="p (prime, hex)" value={pVal} onChange={setPVal} placeholder="Field prime" width="100%" isDisabled={isRunning} />
+        </Stack>
       );
       case 'mov': return (
-        <>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField fullWidth label="a (hex)" value={aVal} onChange={e => setAVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="a param" spellCheck={false} />
-            <TextField fullWidth label="b (hex)" value={bVal} onChange={e => setBVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="b param" spellCheck={false} />
-          </Box>
-          <TextField fullWidth label="p (prime, hex)" value={pVal} onChange={e => setPVal(e.target.value)} variant="outlined"
-            sx={{ ...inputSx, mb: 2 }} placeholder="Field prime" spellCheck={false} />
-        </>
+        <Stack direction="vertical" gap={2}>
+          <Stack direction="horizontal" gap={1}>
+            <TextInput label="a (hex)" value={aVal} onChange={setAVal} placeholder="a param" width="100%" isDisabled={isRunning} />
+            <TextInput label="b (hex)" value={bVal} onChange={setBVal} placeholder="b param" width="100%" isDisabled={isRunning} />
+          </Stack>
+          <TextInput label="p (prime, hex)" value={pVal} onChange={setPVal} placeholder="Field prime" width="100%" isDisabled={isRunning} />
+        </Stack>
       );
       case 'anomalous': return (
-        <>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField fullWidth label="a (hex)" value={aVal} onChange={e => setAVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="a param" spellCheck={false} />
-            <TextField fullWidth label="b (hex)" value={bVal} onChange={e => setBVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="b param" spellCheck={false} />
-          </Box>
-          <TextField fullWidth label="p (prime, hex)" value={pVal} onChange={e => setPVal(e.target.value)} variant="outlined"
-            sx={{ ...inputSx, mb: 2 }} placeholder="Field prime" spellCheck={false} />
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField fullWidth label="Qx (hex)" value={pxVal} onChange={e => setPxVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="Target point x" spellCheck={false} />
-            <TextField fullWidth label="Qy (hex)" value={pyVal} onChange={e => setPyVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="Target point y" spellCheck={false} />
-          </Box>
-        </>
+        <Stack direction="vertical" gap={2}>
+          <Stack direction="horizontal" gap={1}>
+            <TextInput label="a (hex)" value={aVal} onChange={setAVal} placeholder="a param" width="100%" isDisabled={isRunning} />
+            <TextInput label="b (hex)" value={bVal} onChange={setBVal} placeholder="b param" width="100%" isDisabled={isRunning} />
+          </Stack>
+          <TextInput label="p (prime, hex)" value={pVal} onChange={setPVal} placeholder="Field prime" width="100%" isDisabled={isRunning} />
+          <Stack direction="horizontal" gap={1}>
+            <TextInput label="Qx (hex)" value={pxVal} onChange={setPxVal} placeholder="Target point x" width="100%" isDisabled={isRunning} />
+            <TextInput label="Qy (hex)" value={pyVal} onChange={setPyVal} placeholder="Target point y" width="100%" isDisabled={isRunning} />
+          </Stack>
+        </Stack>
       );
       case 'singular': return (
-        <>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField fullWidth label="a (hex)" value={aVal} onChange={e => setAVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="a param" spellCheck={false} />
-            <TextField fullWidth label="b (hex)" value={bVal} onChange={e => setBVal(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="b param" spellCheck={false} />
-          </Box>
-          <TextField fullWidth label="p (prime, hex)" value={pVal} onChange={e => setPVal(e.target.value)} variant="outlined"
-            sx={{ ...inputSx, mb: 2 }} placeholder="Field prime" spellCheck={false} />
-        </>
+        <Stack direction="vertical" gap={2}>
+          <Stack direction="horizontal" gap={1}>
+            <TextInput label="a (hex)" value={aVal} onChange={setAVal} placeholder="a param" width="100%" isDisabled={isRunning} />
+            <TextInput label="b (hex)" value={bVal} onChange={setBVal} placeholder="b param" width="100%" isDisabled={isRunning} />
+          </Stack>
+          <TextInput label="p (prime, hex)" value={pVal} onChange={setPVal} placeholder="Field prime" width="100%" isDisabled={isRunning} />
+        </Stack>
       );
+      default: return null;
     }
-  }, [attack, h1, h2, r1, s1, s2, nHex, aVal, bVal, pVal, xVal, yVal, pxVal, pyVal, pairsMultiline, kbitsVal]);
+  }, [attack, h1, h2, r1, s1, s2, nHex, aVal, bVal, pVal, xVal, yVal, pxVal, pyVal, pairsMultiline, kbitsVal, isRunning]);
 
   return (
-    <Box>
-      <FormControl fullWidth disabled={isRunning} sx={{ ...inputSx, mb: 2 }}>
-        <InputLabel>Attack</InputLabel>
-        <Select value={attack} label="Attack" onChange={e => setAttack(e.target.value)}>
-          {ECC_ATTACKS.map(a => (<MenuItem key={a.value} value={a.value}>{a.label}</MenuItem>))}
-        </Select>
-      </FormControl>
-      <Box component="fieldset" disabled={isRunning} sx={{ border: 0, m: 0, p: 0, minWidth: 0, pointerEvents: isRunning ? 'none' : 'auto' }}>
-        {ECC_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={ECC_ATTACK_EXPLANATIONS[attack]} />}
-        {attackFields}
-      </Box>
-      <Button variant="contained" startIcon={<PlayArrow />} onClick={() => { void run(); }} disabled={isRunning} fullWidth sx={primaryBtnSx}>
-        {isRunning ? 'Running attack…' : 'Run Attack'}
-      </Button>
+    <Stack direction="vertical" gap={2}>
+      <Selector
+        label="Attack"
+        options={ECC_ATTACKS.map(a => ({ value: a.value, label: a.label }))}
+        value={attack}
+        onChange={setAttack}
+        width="100%"
+        isDisabled={isRunning}
+      />
+      {ECC_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={ECC_ATTACK_EXPLANATIONS[attack]} />}
+      {attackFields}
+      <Button
+        label={isRunning ? 'Running attack…' : 'Run Attack'}
+        variant="primary"
+        width="100%"
+        onClick={() => { void run(); }}
+        isDisabled={isRunning}
+        isLoading={isRunning}
+      />
       {isRunning && (
-        <Typography role="status" aria-live="polite" sx={{ color: draculaColors.comment, mt: 1, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>
+        <Text role="status" aria-live="polite">
           Running attack…
-        </Typography>
+        </Text>
       )}
-      {out.result && <Box sx={{ mt: 2 }}><ResultBox value={out.result} label="Result" variant="medium" /></Box>}
-      {out.error && (
-        <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>
-          {out.error}
-        </Typography>
-      )}
-    </Box>
+      {out.result && <ResultBox value={out.result} label="Result" variant="medium" />}
+      {out.error && <Banner status="error" title={out.error} />}
+    </Stack>
   );
 }

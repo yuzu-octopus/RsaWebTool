@@ -1,25 +1,15 @@
-import { Box, Typography } from '@mui/material';
-import { draculaColors } from '../../theme/dracula';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Heading } from '@astryxdesign/core/Heading';
 import { ProofRenderer } from '../ProofRenderer';
 import { AES_PROOF } from '../../data/attackExplanations/aes';
 
 export function AESExplanationTab() {
   return (
-    <Box>
-      <Typography variant="h6" sx={{ color: draculaColors.cyan, mb: 1 }}>
-        AES Block Cipher Reference
-      </Typography>
-      <Box
-        sx={{
-          maxHeight: '60vh',
-          overflow: 'auto',
-          pr: 1,
-          '&::-webkit-scrollbar': { width: '8px' },
-          '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' },
-        }}
-      >
+    <Stack direction="vertical" gap={1}>
+      <Heading level={4}>AES Block Cipher Reference</Heading>
+      <Stack direction="vertical" isScrollable>
         <ProofRenderer latex={AES_PROOF} />
-      </Box>
-    </Box>
+      </Stack>
+    </Stack>
   );
 }

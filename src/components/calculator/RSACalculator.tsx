@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
-import { Box, Typography } from '@mui/material';
-import { MenuBook, AutoAwesome, Lock, LockOpen } from '@mui/icons-material';
-import { draculaColors } from '../../theme/dracula';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Heading } from '@astryxdesign/core/Heading';
 import { CalculatorHeader } from './_shared/CalculatorHeader';
 import { RsaKeyGenTab } from './RsaKeyGenTab';
 import { RsaEncryptTab } from './RsaEncryptTab';
@@ -10,10 +9,10 @@ import { ProofRenderer } from '../ProofRenderer';
 import { useAppContext } from '../../hooks/useAppContext';
 
 const SUB_TABS = [
-  { id: 'explanation', label: 'Explanation', icon: <MenuBook fontSize="small" /> },
-  { id: 'key-gen', label: 'Key Gen', icon: <AutoAwesome fontSize="small" /> },
-  { id: 'encrypt', label: 'Encrypt', icon: <Lock fontSize="small" /> },
-  { id: 'decrypt', label: 'Decrypt', icon: <LockOpen fontSize="small" /> },
+  { id: 'explanation', label: 'Explanation' },
+  { id: 'key-gen', label: 'Key Gen' },
+  { id: 'encrypt', label: 'Encrypt' },
+  { id: 'decrypt', label: 'Decrypt' },
 ];
 
 const EXPLANATION_LATEX =
@@ -39,7 +38,7 @@ const EXPLANATION_LATEX =
 'Decrypt: $m_p = c^{d_p} \\bmod p$, $m_q = c^{d_q} \\bmod q$, then $m = m_q + q \\cdot ((q_{\\text{inv}} \\cdot (m_p - m_q)) \\bmod p)$.\n\n' +
 '\\textbf{PKCS\\#1 v1.5 Padding:}\n\n' +
 '$\\text{EM} = \\texttt{0x00} \\parallel \\texttt{0x02} \\parallel \\text{PS} \\parallel \\texttt{0x00} \\parallel M$\n\n' +
-'PS is $k-3-|M|$ random non-zero bytes. The leading $\texttt{0x00}$ ensures the padded message is less than $n$.\n\n' +
+'PS is $k-3-|M|$ random non-zero bytes. The leading $\\texttt{0x00}$ ensures the padded message is less than $n$.\n\n' +
 '\\textbf{OAEP Padding:}\n\n' +
 'Optimal Asymmetric Encryption Padding uses a Feistel network with a hash function $G$ and $H$ (MGF1):\n\n' +
 '$\\text{EM} = \\text{mask\\_seed} \\parallel \\text{masked\\_DB}$' +
@@ -56,18 +55,12 @@ const EXPLANATION_LATEX =
 
 function ExplanationTab() {
   return (
-    <Box>
-      <Typography variant="h6" sx={{ color: draculaColors.cyan, mb: 1 }}>
-        RSA Reference
-      </Typography>
-      <Box sx={{
-        maxHeight: '60vh', overflow: 'auto', pr: 1,
-        '&::-webkit-scrollbar': { width: '8px' },
-        '&::-webkit-scrollbar-thumb': { background: draculaColors.currentLine, borderRadius: '4px' },
-      }}>
+    <Stack direction="vertical" gap={1}>
+      <Heading level={4}>RSA Reference</Heading>
+      <Stack direction="vertical" isScrollable>
         <ProofRenderer latex={EXPLANATION_LATEX} />
-      </Box>
-    </Box>
+      </Stack>
+    </Stack>
   );
 }
 

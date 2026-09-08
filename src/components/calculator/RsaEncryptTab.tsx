@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Typography, TextField, Button } from '@mui/material';
-import { draculaColors } from '../../theme/dracula';
+import { Stack } from '@astryxdesign/core/Stack';
+import { TextInput } from '@astryxdesign/core/TextInput';
+import { Button } from '@astryxdesign/core/Button';
+import { Banner } from '@astryxdesign/core/Banner';
 import { modPow } from '../../utils/bigint';
 import { parseBigInt, toHex, toAscii, isPrintableAscii } from '../../utils/rsaCalc';
-import { inputSx, primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { ResultBox } from './_shared/ResultBox';
 
@@ -46,51 +47,19 @@ export function RsaEncryptTab() {
   };
 
   return (
-    <>
-      <TextField
-        fullWidth
-        label="m (message)"
-        value={m}
-        onChange={e => setM(e.target.value)}
-        variant="outlined"
-        sx={{ ...inputSx, mb: 2 }}
-      />
-      <TextField
-        fullWidth
-        label="n (modulus)"
-        value={n}
-        onChange={e => setN(e.target.value)}
-        variant="outlined"
-        sx={{ ...inputSx, mb: 2 }}
-      />
-      <TextField
-        fullWidth
-        label="e (public exponent)"
-        value={e}
-        onChange={e => setE(e.target.value)}
-        variant="outlined"
-        sx={{ ...inputSx, mb: 2 }}
-      />
+    <Stack direction="vertical" gap={2}>
+      <TextInput label="m (message)" value={m} onChange={setM} width="100%" />
+      <TextInput label="n (modulus)" value={n} onChange={setN} width="100%" />
+      <TextInput label="e (public exponent)" value={e} onChange={setE} width="100%" />
       <Button
-        fullWidth
-        variant="contained"
+        label="Encrypt"
+        variant="primary"
+        width="100%"
         onClick={handleEncrypt}
-        disabled={!m.trim() || !n.trim()}
-        sx={primaryBtnSx}
-      >
-        Encrypt
-      </Button>
+        isDisabled={!m.trim() || !n.trim()}
+      />
       {out.result && <ResultBox value={out.result} label="RSA ciphertext" />}
-      {out.error && (
-        <Typography
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
-          sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}
-        >
-          {out.error}
-        </Typography>
-      )}
-    </>
+      {out.error && <Banner status="error" title={out.error} />}
+    </Stack>
   );
 }

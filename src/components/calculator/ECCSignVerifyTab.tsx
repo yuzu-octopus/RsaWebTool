@@ -1,9 +1,10 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Box, FormControl, InputLabel, Select, MenuItem, Radio, RadioGroup, FormControlLabel, Typography, TextField, Button } from '@mui/material';
-import { PlayArrow } from '@mui/icons-material';
-import { draculaColors } from '../../theme/dracula';
-import { primaryBtnSx, MONO_FAMILY } from '../../styles/shared';
-import { inputSx } from '../../styles/shared';
+import { Stack } from '@astryxdesign/core/Stack';
+import { TextInput } from '@astryxdesign/core/TextInput';
+import { Button } from '@astryxdesign/core/Button';
+import { Selector } from '@astryxdesign/core/Selector';
+import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { Banner } from '@astryxdesign/core/Banner';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { ResultBox } from './_shared/ResultBox';
 import { CURVES, parseMsg } from '../../utils/eccCurves';
@@ -55,48 +56,39 @@ export function ECCSignVerifyTab() {
   const signCurves = CURVES.filter(c => c.hasSign);
 
   return (
-    <Box>
-      <FormControl fullWidth sx={{ ...inputSx, mb: 2 }}>
-        <InputLabel>Curve</InputLabel>
-        <Select value={curve} label="Curve" onChange={e => { setCurve(e.target.value); out.clear(); }}>
-          {signCurves.map(c => (<MenuItem key={c.id} value={c.id}>{c.label}</MenuItem>))}
-        </Select>
-      </FormControl>
-      <FormControl sx={{ mb: 2 }}>
-        <RadioGroup row value={op} onChange={e => setOp(e.target.value as 'sign' | 'verify')}>
-          <FormControlLabel value="sign" control={<Radio sx={{ color: draculaColors.comment, '&.Mui-checked': { color: draculaColors.green } }} />}
-            label={<Typography sx={{ color: draculaColors.foreground, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>Sign</Typography>} />
-          <FormControlLabel value="verify" control={<Radio sx={{ color: draculaColors.comment, '&.Mui-checked': { color: draculaColors.cyan } }} />}
-            label={<Typography sx={{ color: draculaColors.foreground, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>Verify</Typography>} />
-        </RadioGroup>
-      </FormControl>
-      <TextField fullWidth label="Message (text or hex)" value={msg} onChange={e => setMsg(e.target.value)} variant="outlined"
-        sx={{ ...inputSx, mb: 2 }} placeholder="Message to sign / verify" spellCheck={false} />
+    <Stack direction="vertical" gap={2}>
+      <Selector
+        label="Curve"
+        options={signCurves.map(c => ({ value: c.id, label: c.label }))}
+        value={curve}
+        onChange={v => { setCurve(v); out.clear(); }}
+        width="100%"
+      />
+      <SegmentedControl label="Operation" value={op} onChange={v => setOp(v as 'sign' | 'verify')}>
+        <SegmentedControlItem value="sign" label="Sign" />
+        <SegmentedControlItem value="verify" label="Verify" />
+      </SegmentedControl>
+      <TextInput label="Message (text or hex)" value={msg} onChange={setMsg} placeholder="Message to sign / verify" width="100%" />
       {op === 'sign' && (
-        <TextField fullWidth label="Private key (hex)" value={privHex} onChange={e => setPrivHex(e.target.value)} variant="outlined"
-          sx={{ ...inputSx, mb: 2 }} placeholder="Hex private key" spellCheck={false} />
+        <TextInput label="Private key (hex)" value={privHex} onChange={setPrivHex} placeholder="Hex private key" width="100%" />
       )}
       {op === 'verify' && (
         <>
-          <TextField fullWidth label="Public key (hex)" value={pubHex} onChange={e => setPubHex(e.target.value)} variant="outlined"
-            sx={{ ...inputSx, mb: 2 }} placeholder="Hex public key" spellCheck={false} />
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <TextField fullWidth label="r (hex)" value={sigR} onChange={e => setSigR(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="Signature r" spellCheck={false} />
-            <TextField fullWidth label="s (hex)" value={sigS} onChange={e => setSigS(e.target.value)} variant="outlined"
-              sx={{ ...inputSx, mb: 2 }} placeholder="Signature s" spellCheck={false} />
-          </Box>
+          <TextInput label="Public key (hex)" value={pubHex} onChange={setPubHex} placeholder="Hex public key" width="100%" />
+          <Stack direction="horizontal" gap={1}>
+            <TextInput label="r (hex)" value={sigR} onChange={setSigR} placeholder="Signature r" width="100%" />
+            <TextInput label="s (hex)" value={sigS} onChange={setSigS} placeholder="Signature s" width="100%" />
+          </Stack>
         </>
       )}
-      <Button variant="contained" startIcon={<PlayArrow />} onClick={handleRun} fullWidth sx={primaryBtnSx}>
-        {op === 'sign' ? 'Sign' : 'Verify'}
-      </Button>
-      {out.result && <Box sx={{ mt: 2 }}><ResultBox value={out.result} label="Output" variant="compact" /></Box>}
-      {out.error && (
-        <Typography sx={{ color: draculaColors.red, mt: 2, fontFamily: MONO_FAMILY, fontSize: '0.85rem' }}>
-          {out.error}
-        </Typography>
-      )}
-    </Box>
+      <Button
+        label={op === 'sign' ? 'Sign' : 'Verify'}
+        variant="primary"
+        width="100%"
+        onClick={handleRun}
+      />
+      {out.result && <ResultBox value={out.result} label="Output" variant="compact" />}
+      {out.error && <Banner status="error" title={out.error} />}
+    </Stack>
   );
 }
