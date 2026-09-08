@@ -32,10 +32,10 @@ Trivial tasks (single-line fix, simple question, build+commit) can skip this wor
 |-------|------|
 | Framework | React 19.2 + TypeScript 6.0 |
 | Build | Vite 8.0 + Rolldown |
-| UI | Material UI 9.0 (Dracula themed) |
+| UI | Astryx (@astryxdesign/core) + astryx-dracula brand theme (dark-only) |
 | Math Engine | SageMathCell (embedded makeSagecell JS) |
 | Math Rendering | KaTeX 0.17 via ProofRenderer |
-| Code Highlighting | Prism.js + draculaPrism.css |
+| Code Highlighting | CodeBlock dracula preset (theme-bundled) |
 | External API | FactorDB (Cloudflare Worker CORS proxy) |
 | Hosting | GitHub Pages |
 | CI | GitHub Actions (lint → build → deploy) |
@@ -55,8 +55,7 @@ src/
   config/           env.ts (console-accessible Env class), sidebarItems.ts — shared sidebar item definitions
   context/          AppContext provider, ctx.ts (createContext barrel)
   hooks/            12 hooks (see below)
-  styles/           shared.ts (style objects + keyframes + MONO_FAMILY/PROSE_FAMILY + inputSx), draculaPrism.css
-  theme/            dracula.ts — full Dracula palette
+  theme/            brand entry only (main.tsx wraps app in Astryx Theme; tokens live in astryx-dracula kit)
   types/            index.ts — Attack (sageTemplate optional, usageGuide optional), InputField, HistoryEntry, NotificationState, AppContextType, CalculatorMode, AttackCategory
   utils/            bigint.ts, converters.ts, aesCrypto.ts, dhCrypto.ts, eccCurves.ts, factordb.ts, sageOutput.ts, rsaCalc.ts, pemParser.ts, asn1.ts, progressEstimator.ts
     testcases/      core.ts — prime generation, testcase utilities, TESTCASE_BITS
@@ -79,11 +78,11 @@ scripts/            Test scripts
 ## UI Conventions
 
 - Dracula palette: `#282a36` bg, `#44475a` currentLine, `#f8f8f2` fg, `#6272a4` comment, `#8be9fd` cyan, `#50fa7b` green, `#ffb86c` orange, `#ff79c0` pink, `#bd93f9` purple, `#ff5555` red, `#f1fa8c` yellow
-- JetBrains Mono (400, 500, 700) — no emojis, Material Icons only
+- JetBrains Mono (400, 500, 700) — no emojis, Lucide-vendored Icon registry only
 - NO box-shadows — borders + bg colors
-- MUI `sx` only — no CSS files
-- `cssVariables: true` in `createTheme()`
-- Scrollbar: 12px, `border: 2px solid transparent`, `backgroundClip: padding-box`
+- Astryx components only (Card/Text/Link/Stack/Grid/…) — no raw div/span/a for layout
+- Brand tokens verbatim (`var(--color-*)`, `var(--dracula-*)`) — no raw hex, no `:root` overrides
+- Scrollbar: kit dracula scrollbars (tokens.css)
 - Sidebar: 220px fixed, currentLine bg
 - OutputPanel: 200-600px drag-resize, viewport-aware max width (`Math.min(600, window.innerWidth - 620)`, re-evaluated on resize), localStorage persisted
 - Snackbar toast: top-center, 3s auto-dismiss, Dracula bg + 2px colored border per severity
@@ -170,7 +169,7 @@ TESTCASE_BITS: `{ p: 512, q: 512 }` → n ≈ 1024-bit.
 ### Shared Calculator Components
 - `CalculatorHeader` — unified shell for all calculators: icon, title, subtitle, sub-tab navigation
 - `ResultBox` — output display with copy-to-clipboard, 4 size variants
-- `AttackExplanationPanel` — reusable attack explanation panel with Prism.js code highlighting
+- `AttackExplanationPanel` — reusable attack explanation panel with CodeBlock highlighting
 - `CalculatorSubTabs` — shared sub-tab navigation bar
 - `EmptyState` — standard empty-state placeholder for all panels
 
@@ -202,10 +201,8 @@ TESTCASE_BITS: `{ p: 512, q: 512 }` → n ≈ 1024-bit.
 |---------|---------|---------|
 | react | ^19.2.6 | UI framework |
 | react-dom | ^19.2.6 | DOM renderer |
-| @mui/material | ^9.0.1 | UI components (Dracula themed) |
-| @mui/icons-material | ^9.0.1 | Material Icons |
-| @emotion/react | ^11.14.0 | CSS-in-JS runtime (MUI peer dep) |
-| @emotion/styled | ^11.14.1 | Styled components (MUI peer dep) |
+| @astryxdesign/core | ^0.5.4 | Astryx UI components (Button label, Heading level, Grid columns) |
+| astryx-dracula | ^0.1.2 | Shared Dracula brand theme + tokens + fonts |
 | @noble/ciphers | ^2.2.0 | AES encrypt/decrypt (ECB, CBC, CTR, GCM, OFB, CFB) |
 | @noble/curves | ^2.2.0 | Elliptic curve ops, ECDSA, ECDH (secp256k1, P-256, P-384, P-521, Ed25519, X25519) |
 | @noble/hashes | ^2.2.0 | 14 hash algorithms, HMAC, SHAKE, Keccak, BLAKE2/3 |
@@ -224,7 +221,7 @@ TESTCASE_BITS: `{ p: 512, q: 512 }` → n ≈ 1024-bit.
 | CalculatorSubTabs | CalculatorSubTabs.tsx | 47 | Shared sub-tab navigation bar |
 | CalculatorHeader | calculator/_shared/CalculatorHeader.tsx | 90 | Unified calculator header with title, subtitle, sub-tab nav |
 | ResultBox | calculator/_shared/ResultBox.tsx | 100 | Output display with copy, 4 size variants |
-| AttackExplanationPanel | calculator/AttackExplanationPanel.tsx | 97 | Attack explanation with Prism.js code highlighting |
+| AttackExplanationPanel | calculator/AttackExplanationPanel.tsx | 97 | Attack explanation with CodeBlock highlighting |
 | InputPanel | InputPanel.tsx | 364 | Attack form: Explanation tab (KaTeX proof) / Input tab (form + Generate + Run/Stop) / Source tab, "Continue to Input" CTA |
 | MagicPanel | MagicPanel.tsx | 469 | Paste-all auto-detect parallel execution |
 | OutputPanel | OutputPanel.tsx | ~290 | Results display + copy + useReducer + history (cap 50), viewport-aware max width |

@@ -38,7 +38,7 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 - **PEM Decryptor** — Parse and decrypt PKCS#1/PKCS#8/encrypted PEM keys, feed params to Calculator or Attacks
 - **Instructions Panel** — Always-visible reference guide
 - **"Continue to Input" CTA** — after viewing an attack explanation, jump directly to the input form
-- **Prism.js syntax highlighting** — replaces react-syntax-highlighter, 33% smaller bundle
+- **Theme-bundled code highlighting** — CodeBlock dracula preset, no highlighter dep
 - **Dracula theme** — dark, developer-friendly UI
 - **Consistent content width** — all panels use `maxWidth: 640` for readable line lengths
 - **Viewport-aware OutputPanel** — max output width adapts to `Math.min(600, window.innerWidth - 620)`, re-evaluated on resize
@@ -227,9 +227,9 @@ env.reset()              // clears env config from localStorage + reloads
 
 | Layer | Technology |
 |-------|------------|
-| UI | React 19.2 + TypeScript 6.0 + Material UI 9.0 |
+| UI | React 19.2 + TypeScript 6.0 + Astryx (@astryxdesign/core) + astryx-dracula brand |
 | Build | Vite 8.0 + Rolldown |
-| Syntax Highlighting | Prism.js |
+| Syntax Highlighting | CodeBlock dracula preset (theme-bundled) |
 | Math | SageMathCell (embedded JS), KaTeX 0.17 |
 | Crypto | @noble/ciphers 2.2 (AES), @noble/curves 2.2 (ECC), @noble/hashes 2.2 (hash), bigint-gcd 1.0 |
 | External | FactorDB (via Cloudflare Worker CORS proxy) |
@@ -251,9 +251,7 @@ src/
                      useCommandPalette, useCopyToClipboard, useDragResize,
                      useKeyboardShortcuts, useMagicExecution, useNotepad,
                      useSageMath, useTimer, useWorkerPool
-  styles/            shared.ts (16 style objects + keyframes + FONT_FAMILY),
-                     inputSx.ts, draculaPrism.css
-  theme/             dracula.ts — full Dracula palette
+  theme/             brand entry only (main.tsx wraps app in Astryx Theme; tokens live in astryx-dracula kit)
   types/             index.ts — Attack (sageTemplate optional, usageGuide optional),
                      InputField, HistoryEntry, NotificationState,
                      AppContextType, CalculatorMode, AttackCategory
