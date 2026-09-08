@@ -67,7 +67,7 @@ function AppContent() {
   }, [notification, showToast]);
 
   return (
-    <Stack direction="vertical" gap={0} width="100%" height="100vh">
+    <Stack direction="vertical" gap={0} width="100%" height="100vh" style={{ backgroundColor: 'var(--color-background)' }}>
       <Link
         href="#main-workspace"
         isStandalone
@@ -96,7 +96,7 @@ function AppContent() {
         <Stack direction="horizontal" gap={0} width="100%" height="100%">
           <Sidebar mobileOpen={mobileNavigationOpen} onMobileClose={() => setMobileNavigationOpen(false)} />
           <StackItem size="fill">
-            <Stack as="main" id="main-workspace" tabIndex={-1} direction="vertical" gap={0} width="100%" height="100%" isScrollable>
+            <Stack as="main" id="main-workspace" tabIndex={-1} direction={isMobile ? 'vertical' : 'horizontal'} gap={0} width="100%" height="100%" isScrollable>
               <ErrorBoundary>
                 <InputPanel />
                 <Calculator />

@@ -301,7 +301,16 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   }
 
   return (
-    <SideNav header={heading} footer={footer}>
+    <SideNav
+      header={heading}
+      footer={footer}
+      style={{
+        width: 220,
+        flexShrink: 0,
+        backgroundColor: 'var(--dracula-selection)',
+        borderRight: '1px solid var(--dracula-comment)',
+      }}
+    >
       {navContent}
     </SideNav>
   );
