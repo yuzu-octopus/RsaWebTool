@@ -1,138 +1,112 @@
-import { useState, useEffect, useMemo, useCallback, startTransition, type KeyboardEvent } from 'react';
+import { useState, useEffect, useMemo, useCallback, startTransition } from 'react';
 import {
-  Dialog, DialogContent, TextField, List, ListItemButton, ListItemText,
-  ListSubheader, Typography, Box, Chip,
-} from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import MenuBook from '@mui/icons-material/MenuBook';
-import AutoFixHigh from '@mui/icons-material/AutoFixHigh';
-import SwapHoriz from '@mui/icons-material/SwapHoriz';
-import HourglassEmpty from '@mui/icons-material/HourglassEmpty';
-import VpnKey from '@mui/icons-material/VpnKey';
-import Lock from '@mui/icons-material/Lock';
-import Hub from '@mui/icons-material/Hub';
-import Tag from '@mui/icons-material/Tag';
-import Security from '@mui/icons-material/Security';
+  CommandPalette as AstryxCommandPalette,
+  CommandPaletteInput,
+} from '@astryxdesign/core/CommandPalette';
+import { Badge } from '@astryxdesign/core/Badge';
+import { Text } from '@astryxdesign/core/Text';
+import { Stack } from '@astryxdesign/core/Stack';
+import type { SearchableItem, SearchSource } from '@astryxdesign/core/Typeahead';
 import { useAppContext } from '../hooks/useAppContext';
 import { attacks } from '../attacks';
 import { SIDEBAR_MODULES, ALL_SIDEBAR_ITEMS } from '../config/sidebarItems';
-import { draculaColors } from '../theme/dracula';
-import { MONO_FAMILY, ICON_SIZES } from '../styles/shared';
 import type { Attack, AttackCategory, CalculatorMode } from '../types';
 
-const MODULE_ICONS: Record<string, React.ElementType> = {
-  instructions: MenuBook,
-  magic: AutoFixHigh,
-  proofs: MenuBook,
-  'format-converter': SwapHoriz,
-  pem: VpnKey,
-};
-
-const CALCULATOR_ICONS: Record<CalculatorMode, React.ElementType> = {
-  rsa: VpnKey,
-  aes: Lock,
-  ecc: Hub,
-  hash: Tag,
-  dh: Security,
-};
-
-const CATEGORY_COLORS: Record<AttackCategory, string> = {
-  Factorization: draculaColors.green,
-  'Partial Key / Lattice': draculaColors.purple,
-  'Message / Protocol': draculaColors.cyan,
-  Oracle: draculaColors.orange,
-  Advanced: draculaColors.yellow,
-  Symmetric: draculaColors.pink,
-  Hash: draculaColors.cyan,
-  ECC: draculaColors.purple,
+// Badge color variants follow brand semantics: tinted color variants for
+// category tags, never the loud solid status variants (success/warning/error
+// are reserved for system state demanding attention).
+const CATEGORY_BADGE_VARIANTS: Record<AttackCategory, 'green' | 'purple' | 'cyan' | 'orange' | 'yellow' | 'pink'> = {
+  Factorization: 'green',
+  'Partial Key / Lattice': 'purple',
+  'Message / Protocol': 'cyan',
+  Oracle: 'orange',
+  Advanced: 'yellow',
+  Symmetric: 'pink',
+  Hash: 'cyan',
+  ECC: 'purple',
 };
 
 const VIEW_MODES = ['attack', 'magic', 'proofs', 'calculator', 'format-converter', 'instructions', 'pem'] as const;
 type ViewMode = typeof VIEW_MODES[number];
 
-interface ChipSpec {
-  label: string;
-  color: string;
-  /** 'filled' = solid 12% bg, 'outlined' = transparent bg with colored border. */
-  variant: 'filled' | 'outlined';
+interface PaletteAux {
+  group: 'Modules' | 'Calculators' | 'Attacks';
+  kind: 'view' | 'attack' | 'calculator-tab';
+  mode?: string;
+  moduleId?: string;
+  calculatorMode?: CalculatorMode;
+  attack?: Attack;
+  keywords: string[];
 }
 
-interface CommandPaletteItemProps {
-  Icon: React.ElementType;
-  primary: string;
-  secondary?: string;
-  chips: ChipSpec[];
-  isSelected: boolean;
-  optionId: string;
-  onClick: () => void;
-  onMouseEnter: () => void;
-}
+type PaletteEntry = SearchableItem<PaletteAux>;
 
 /**
- * Single base component used for every row in the command palette.
- * The previous version had 3 inline render branches (view / calculator-tab /
- * attack) that duplicated the ListItemButton sx, hover state, and chip layout.
- * Centralising it here keeps styling consistent and makes it trivial to add
- * a new entry type.
+ * Two orders, matching the previous behavior exactly: the palette opens on
+ * modules, then calculator tabs, then attacks; once a query is typed,
+ * results follow sidebar order (attacks by category, calculators, modules).
  */
-function CommandPaletteItem({
-  Icon, primary, secondary, chips, isSelected, optionId, onClick, onMouseEnter,
-}: CommandPaletteItemProps) {
-  return (
-    <ListItemButton
-      id={optionId}
-      role="option"
-      aria-selected={isSelected}
-      selected={isSelected}
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      sx={{
-        px: 2,
-        py: 0.75,
-        backgroundColor: isSelected ? draculaColors.currentLine : 'transparent',
-        '&:hover': { backgroundColor: draculaColors.currentLine },
-        borderLeft: `3px solid ${isSelected ? draculaColors.purple : 'transparent'}`,
-      }}
-    >
-      <Icon sx={{ color: draculaColors.comment, mr: 1.5, fontSize: ICON_SIZES.lg }} />
-      <ListItemText
-        primary={primary}
-        secondary={secondary}
-        slotProps={{
-          primary: {
-            sx: {
-              color: draculaColors.foreground,
-              fontFamily: MONO_FAMILY,
-              fontSize: '0.8rem',
-            },
-          },
-          secondary: {
-            sx: {
-              color: draculaColors.comment,
-              fontFamily: MONO_FAMILY,
-              fontSize: '0.7rem',
-            },
-          },
-        }}
-      />
-      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-        {chips.map((chip, i) => (
-          <Chip
-            key={i}
-            label={chip.label}
-            size="small"
-            sx={{
-              color: chip.color,
-              fontSize: '0.6rem',
-              height: 18,
-              bgcolor: chip.variant === 'filled' ? `${chip.color}20` : 'transparent',
-              border: chip.variant === 'outlined' ? `1px solid ${chip.color}` : 'none',
-            }}
-          />
-        ))}
-      </Box>
-    </ListItemButton>
-  );
+function buildEntries(): { bootstrap: PaletteEntry[]; sidebar: PaletteEntry[] } {
+  const attacksMap = new Map(attacks.map(a => [a.id, a]));
+  const modulesMap = new Map(SIDEBAR_MODULES.map(m => [m.id, m]));
+  const entries: PaletteEntry[] = [];
+
+  for (const item of ALL_SIDEBAR_ITEMS) {
+    if (item.type === 'attack') {
+      const attack = attacksMap.get(item.id);
+      if (!attack) continue;
+      entries.push({
+        id: attack.id,
+        label: attack.name,
+        auxiliaryData: {
+          group: 'Attacks',
+          kind: 'attack',
+          attack,
+          keywords: [attack.id, attack.category],
+        },
+      });
+    } else if (item.type === 'calculator-tab') {
+      entries.push({
+        id: `calc-${item.calculatorMode}`,
+        label: item.label,
+        auxiliaryData: {
+          group: 'Calculators',
+          kind: 'calculator-tab',
+          calculatorMode: item.calculatorMode,
+          keywords: [item.calculatorMode, item.id],
+        },
+      });
+    } else {
+      const mod = modulesMap.get(item.id);
+      if (!mod) continue;
+      entries.push({
+        id: `view-${mod.mode}`,
+        label: mod.label,
+        auxiliaryData: {
+          group: 'Modules',
+          kind: 'view',
+          mode: mod.mode,
+          moduleId: mod.id,
+          keywords: [mod.mode, mod.id],
+        },
+      });
+    }
+  }
+
+  const rank = (group: PaletteAux['group']) =>
+    group === 'Modules' ? 0 : group === 'Calculators' ? 1 : 2;
+  return {
+    bootstrap: entries.toSorted(
+      (a, b) => rank(a.auxiliaryData!.group) - rank(b.auxiliaryData!.group),
+    ),
+    sidebar: entries,
+  };
+}
+
+function matchesQuery(entry: PaletteEntry, q: string): boolean {
+  if (!q) return true;
+  if (entry.label.toLowerCase().includes(q)) return true;
+  return entry.auxiliaryData!.keywords.some(kw => kw.toLowerCase().includes(q));
 }
 
 export function CommandPalette() {
@@ -144,310 +118,128 @@ export function CommandPalette() {
     setCalculatorMode,
   } = useAppContext();
   const [query, setQuery] = useState('');
-  const [selectedIndex, setSelectedIndex] = useState(0);
 
-  // Reset query and selection when palette opens
+  // Reset the query when the palette opens.
   useEffect(() => {
     if (commandPaletteOpen) {
       startTransition(() => {
         setQuery('');
-        setSelectedIndex(0);
       });
     }
   }, [commandPaletteOpen]);
 
-  const close = useCallback(() => {
-    setCommandPaletteOpen(false);
-  }, [setCommandPaletteOpen]);
+  const { bootstrap, sidebar } = useMemo(() => buildEntries(), []);
+  const entryById = useMemo(() => new Map(sidebar.map(e => [e.id, e])), [sidebar]);
+
+  // Custom source (instead of createStaticSource) to preserve the previous
+  // ordering contract: grouped modules/calculators/attacks when empty,
+  // sidebar order when filtering. Substring matching covers the label plus
+  // the id/category/mode keywords, as before.
+  const searchSource = useMemo<SearchSource<PaletteEntry>>(
+    () => ({
+      search: rawQuery => {
+        const q = rawQuery.toLowerCase().trim();
+        if (!q) return bootstrap;
+        return sidebar.filter(e => matchesQuery(e, q));
+      },
+      bootstrap: () => bootstrap,
+    }),
+    [bootstrap, sidebar],
+  );
 
   const selectView = useCallback(
     (mode: string) => {
       if (VIEW_MODES.includes(mode as ViewMode)) {
         setViewMode(mode as ViewMode);
       }
-      close();
     },
-    [setViewMode, close],
+    [setViewMode],
   );
 
   const selectCalculatorTab = useCallback(
     (calculatorMode: CalculatorMode) => {
       setViewMode('calculator');
       setCalculatorMode(calculatorMode);
-      close();
     },
-    [setViewMode, setCalculatorMode, close],
+    [setViewMode, setCalculatorMode],
   );
 
   const selectAttack = useCallback(
     (attack: Attack) => {
       setSelectedAttack(attack);
       setViewMode('attack');
-      close();
     },
-    [setSelectedAttack, setViewMode, close],
+    [setSelectedAttack, setViewMode],
   );
 
-  // Combine views and attacks into a single list. All three item types
-  // (attacks, calculator tabs, modules) are filtered by query — the previous
-  // version only filtered attacks, so the 5 calculator tabs + 5 modules
-  // always showed through regardless of the query string.
-  const allItems = useMemo(() => {
-    type PaletteItem =
-      | { type: 'view'; module: typeof SIDEBAR_MODULES[number]; index: number }
-      | { type: 'attack'; attack: Attack; index: number }
-      | { type: 'calculator-tab'; calculatorMode: CalculatorMode; label: string; index: number };
-
-    const q = query.toLowerCase().trim();
-    const items: PaletteItem[] = [];
-    let idx = 0;
-
-    // Build maps once; the filter and the loop both need to look up by id.
-    const attacksMap = new Map(attacks.map(a => [a.id, a]));
-    const modulesMap = new Map(SIDEBAR_MODULES.map(m => [m.id, m]));
-
-    const filteredSidebarItems = ALL_SIDEBAR_ITEMS.filter(item => {
-      if (!q) return true;
-      if (item.type === 'attack') {
-        const attack = attacksMap.get(item.id);
-        if (!attack) return false;
-        return attack.name.toLowerCase().includes(q) ||
-          attack.category.toLowerCase().includes(q) ||
-          attack.id.toLowerCase().includes(q);
-      }
-      if (item.type === 'calculator-tab') {
-        return item.label.toLowerCase().includes(q);
-      }
-      // module
-      return item.label.toLowerCase().includes(q);
-    });
-
-    const orderedSidebarItems = q
-      ? filteredSidebarItems
-      : [
-        ...filteredSidebarItems.filter(item => item.type === 'module'),
-        ...filteredSidebarItems.filter(item => item.type === 'calculator-tab'),
-        ...filteredSidebarItems.filter(item => item.type === 'attack'),
-      ];
-
-    for (const item of orderedSidebarItems) {
-      if (item.type === 'attack') {
-        const attack = attacksMap.get(item.id);
-        if (attack) items.push({ type: 'attack', attack, index: idx++ });
-      } else if (item.type === 'calculator-tab') {
-        items.push({ type: 'calculator-tab', calculatorMode: item.calculatorMode, label: item.label, index: idx++ });
-      } else {
-        const mod = modulesMap.get(item.id);
-        if (mod) items.push({ type: 'view', module: mod, index: idx++ });
-      }
-    }
-    return items;
-  }, [query]);
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        close();
-        return;
-      }
-      if (allItems.length === 0) return;
-
-      switch (e.key) {
-        case 'ArrowDown':
-          e.preventDefault();
-          setSelectedIndex(prev => (prev + 1) % allItems.length);
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          setSelectedIndex(prev => (prev - 1 + allItems.length) % allItems.length);
-          break;
-        case 'Enter': {
-          e.preventDefault();
-          const item = allItems[selectedIndex];
-          if (item.type === 'view') selectView(item.module.mode);
-          else if (item.type === 'calculator-tab') selectCalculatorTab(item.calculatorMode);
-          else selectAttack(item.attack);
-          break;
-        }
-      }
+  const handleValueChange = useCallback(
+    (value: string) => {
+      const entry = entryById.get(value);
+      if (!entry?.auxiliaryData) return;
+      const aux = entry.auxiliaryData;
+      if (aux.kind === 'view' && aux.mode) selectView(aux.mode);
+      else if (aux.kind === 'calculator-tab' && aux.calculatorMode) selectCalculatorTab(aux.calculatorMode);
+      else if (aux.kind === 'attack' && aux.attack) selectAttack(aux.attack);
     },
-    [allItems, selectedIndex, selectView, selectAttack, selectCalculatorTab, close],
+    [entryById, selectView, selectCalculatorTab, selectAttack],
   );
 
-  const itemGroups = useMemo(() => {
-    if (query.trim()) return [{ label: 'Results', items: allItems }];
-    return [
-      { label: 'Modules', items: allItems.filter(item => item.type === 'view') },
-      { label: 'Calculators', items: allItems.filter(item => item.type === 'calculator-tab') },
-      { label: 'Attacks', items: allItems.filter(item => item.type === 'attack') },
-    ].filter(group => group.items.length > 0);
-  }, [allItems, query]);
-
-  const resultStatus = allItems.length === 0
-    ? 'No results.'
-    : `${allItems.length} result${allItems.length === 1 ? '' : 's'} available.`;
-
-  const renderItem = (item: (typeof allItems)[number]) => {
-    const isSelected = item.index === selectedIndex;
-    const optionId = `command-palette-option-${item.index}`;
-    if (item.type === 'view') {
-      const Icon = MODULE_ICONS[item.module.mode] ?? MenuBook;
-      return (
-        <CommandPaletteItem
-          key={`view-${item.module.id}`}
-          Icon={Icon}
-          primary={item.module.label}
-          chips={[{ label: 'Module', color: draculaColors.comment, variant: 'outlined' }]}
-          isSelected={isSelected}
-          optionId={optionId}
-          onClick={() => selectView(item.module.mode)}
-          onMouseEnter={() => setSelectedIndex(item.index)}
-        />
-      );
+  const renderItem = useCallback((item: PaletteEntry) => {
+    const aux = item.auxiliaryData!;
+    const chips: { label: string; variant: 'neutral' | 'blue' | 'cyan' | 'green' | 'orange' | 'pink' | 'purple' | 'yellow' }[] = [];
+    let secondary: string | undefined;
+    if (aux.kind === 'view') {
+      chips.push({ label: 'Module', variant: 'neutral' });
+    } else if (aux.kind === 'calculator-tab') {
+      chips.push({ label: 'Calculator', variant: 'blue' });
+    } else if (aux.attack) {
+      secondary = aux.attack.id;
+      chips.push({ label: aux.attack.category, variant: CATEGORY_BADGE_VARIANTS[aux.attack.category] });
+      chips.push({
+        label: aux.attack.frontendCheck ? 'Local' : 'SageMath',
+        variant: aux.attack.frontendCheck ? 'green' : 'orange',
+      });
     }
-    if (item.type === 'calculator-tab') {
-      const Icon = CALCULATOR_ICONS[item.calculatorMode];
-      return (
-        <CommandPaletteItem
-          key={`calc-${item.calculatorMode}`}
-          Icon={Icon}
-          primary={item.label}
-          chips={[{ label: 'Calculator', color: draculaColors.cyan, variant: 'outlined' }]}
-          isSelected={isSelected}
-          optionId={optionId}
-          onClick={() => selectCalculatorTab(item.calculatorMode)}
-          onMouseEnter={() => setSelectedIndex(item.index)}
-        />
-      );
-    }
-    const attack = item.attack;
-    const categoryColor = CATEGORY_COLORS[attack.category];
-    const hasFrontendCheck = !!attack.frontendCheck;
     return (
-      <CommandPaletteItem
-        key={attack.id}
-        Icon={HourglassEmpty}
-        primary={attack.name}
-        secondary={attack.id}
-        chips={[
-          { label: attack.category, color: categoryColor, variant: 'filled' },
-          {
-            label: hasFrontendCheck ? 'Local' : 'SageMath',
-            color: hasFrontendCheck ? draculaColors.green : draculaColors.orange,
-            variant: 'outlined',
-          },
-        ]}
-        isSelected={isSelected}
-        optionId={optionId}
-        onClick={() => selectAttack(attack)}
-        onMouseEnter={() => setSelectedIndex(item.index)}
-      />
+      <Stack
+        direction="horizontal"
+        gap={2}
+        vAlign="center"
+        width="100%"
+        data-testid={`command-palette-option-${item.id}`}
+      >
+        <Stack direction="vertical" gap={1}>
+          <Text type="code">{item.label}</Text>
+          {secondary && <Text type="supporting">{secondary}</Text>}
+        </Stack>
+        <Stack direction="horizontal" gap={1} vAlign="center">
+          {chips.map(chip => (
+            <Badge key={chip.label} label={chip.label} variant={chip.variant} />
+          ))}
+        </Stack>
+      </Stack>
     );
-  };
+  }, []);
 
   return (
-    <Dialog
-      open={commandPaletteOpen}
-      onClose={close}
-      maxWidth={false}
-      slotProps={{
-        backdrop: {
-          sx: {
-            backdropFilter: 'blur(4px)',
-            backgroundColor: 'rgba(0,0,0,0.5)',
-          },
-        },
-        paper: {
-          sx: {
-            bgcolor: draculaColors.background,
-            color: draculaColors.foreground,
-            width: 480,
-            maxHeight: 400,
-            borderRadius: '12px',
-            overflow: 'hidden',
-            margin: 0,
-            border: `1px solid ${draculaColors.currentLine}`,
-            boxShadow: 'none',
-          },
-        },
-      }}
-    >
-      <Box sx={{ p: 1.5, pb: 0, bgcolor: draculaColors.background }}>
-        <TextField
-          fullWidth
-          autoFocus
-          variant="standard"
-          value={query}
-          onChange={e => {
-            setQuery(e.target.value);
-            setSelectedIndex(0);
-          }}
-          onKeyDown={handleKeyDown}
+    <AstryxCommandPalette
+      isOpen={commandPaletteOpen}
+      onOpenChange={setCommandPaletteOpen}
+      searchSource={searchSource}
+      renderItem={renderItem}
+      input={
+        <CommandPaletteInput
           placeholder="Search attacks, calculators, and views..."
-          slotProps={{
-            htmlInput: {
-              role: 'combobox',
-              'aria-expanded': commandPaletteOpen,
-              'aria-label': 'Search commands',
-              'aria-autocomplete': 'list',
-              'aria-controls': 'command-palette-results',
-              'aria-activedescendant': allItems.length > 0
-                ? `command-palette-option-${selectedIndex}`
-                : undefined,
-            },
-            input: {
-              startAdornment: (
-                <SearchIcon sx={{ color: draculaColors.comment, mr: 1, fontSize: ICON_SIZES.lg }} />
-              ),
-              disableUnderline: true,
-              sx: {
-                color: draculaColors.foreground,
-                fontSize: '1rem',
-                fontFamily: MONO_FAMILY,
-                bgcolor: draculaColors.currentLine,
-                borderRadius: '8px',
-                px: 1.5,
-                py: 0.75,
-                border: `1px solid ${draculaColors.currentLine}`,
-              },
-            },
-          }}
+          label="Search commands"
+          value={query}
+          onValueChange={setQuery}
         />
-        <Box role="status" aria-live="polite" sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>
-          {resultStatus}
-        </Box>
-      </Box>
-      <DialogContent sx={{ p: 0, overflow: 'auto', bgcolor: draculaColors.background, pb: '20vh' }}>
-        <List dense id="command-palette-results" role="listbox" aria-label="Command results">
-          {itemGroups.map(group => (
-            <Box component="li" key={group.label} role="group" aria-label={group.label} sx={{ listStyle: 'none' }}>
-              {!query.trim() && (
-                <ListSubheader
-                  component="div"
-                  sx={{ bgcolor: draculaColors.background, color: draculaColors.comment, fontFamily: MONO_FAMILY, fontSize: '0.7rem', lineHeight: '28px' }}
-                >
-                  {group.label}
-                </ListSubheader>
-              )}
-              {group.items.map(renderItem)}
-            </Box>
-          ))}
-          {allItems.length === 0 && (
-            <Box component="li" sx={{ listStyle: 'none', p: 3, textAlign: 'center' }}>
-              <Typography
-                sx={{
-                  color: draculaColors.comment,
-                  fontFamily: MONO_FAMILY,
-                  fontSize: '0.8rem',
-                }}
-              >
-                {query.trim() ? `No matches for "${query}"` : 'No commands available'}
-              </Typography>
-            </Box>
-          )}
-        </List>
-      </DialogContent>
-    </Dialog>
+      }
+      emptySearchText={query.trim() ? `No matches for "${query}"` : 'No commands available'}
+      label="Command palette"
+      width={480}
+      maxHeight={400}
+      onValueChange={handleValueChange}
+    />
   );
 }

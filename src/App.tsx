@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ThemeProvider, CssBaseline, Box, Snackbar, IconButton } from '@mui/material';
-import { draculaTheme, draculaColors } from './theme/dracula';
-import { Sidebar } from './components/Sidebar';
+import { Stack, StackItem } from '@astryxdesign/core/Stack';
+import { TopNav, TopNavHeading } from '@astryxdesign/core/TopNav';
+import { IconButton } from '@astryxdesign/core/IconButton';
+import { Icon } from '@astryxdesign/core/Icon';
+import { Link } from '@astryxdesign/core/Link';
+import { useToast } from '@astryxdesign/core/Toast';
+import { Sidebar, useIsMobile } from './components/Sidebar';
 import { AppProvider } from './context/AppContext';
 import { InputPanel } from './components/InputPanel';
 import { OutputPanel } from './components/OutputPanel';
@@ -13,23 +17,33 @@ import { InstructionsPanel } from './components/InstructionsPanel';
 import { PemDecryptor } from './components/PemDecryptor';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { CommandPalette } from './components/CommandPalette';
-import { flexPanelSx, MONO_FAMILY } from './styles/shared';
 import { setFactorDBProxy } from './utils/factordb';
 import env from './config/env';
 import { useAppContext } from './hooks/useAppContext';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
-import { Menu } from '@mui/icons-material';
 
-const severityBorder: Record<string, string> = {
-  success: draculaColors.green,
-  error: draculaColors.red,
-  info: draculaColors.cyan,
-};
+// Canonical visually-hidden clip (same values as core VisuallyHidden). The skip
+// link cannot live inside VisuallyHidden itself: that primitive is permanently
+// clipped with pointer events removed and forbids interactive children. Instead
+// the clip is applied until the link takes keyboard focus, then released.
+const skipLinkHiddenStyle = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  margin: -1,
+  padding: 0,
+  overflow: 'hidden',
+  clip: 'rect(0, 0, 0, 0)',
+  whiteSpace: 'nowrap',
+  borderStyle: 'none',
+} as const;
 
 function AppContent() {
-  const { notification, showNotification } = useAppContext();
+  const { notification } = useAppContext();
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
-  const borderColor = notification?.severity ? severityBorder[notification.severity] : draculaColors.currentLine;
+  const [skipLinkFocused, setSkipLinkFocused] = useState(false);
+  const isMobile = useIsMobile();
+  const showToast = useToast();
 
   useEffect(() => {
     if (env.factordbProxyUrl) {
@@ -39,72 +53,75 @@ function AppContent() {
 
   useKeyboardShortcuts();
 
+  // Snackbar re-expressed as a Toast: Toast only has info/error types, so
+  // success maps to info. The toast self-dismisses; nothing to clear.
+  useEffect(() => {
+    if (notification?.message) {
+      showToast({
+        body: notification.message,
+        type: notification.severity === 'error' ? 'error' : 'info',
+        autoHideDuration: 3000,
+        uniqueID: String(notification.key),
+      });
+    }
+  }, [notification, showToast]);
+
   return (
-    <>
-      <Box
-        component="a"
+    <Stack direction="vertical" gap={0} width="100%" height="100vh">
+      <Link
         href="#main-workspace"
-        sx={{ position: 'fixed', top: -48, left: 8, zIndex: theme => theme.zIndex.modal + 1, px: 2, py: 1, color: draculaColors.background, backgroundColor: draculaColors.cyan, fontFamily: MONO_FAMILY, '&:focus': { top: 8 } }}
+        isStandalone
+        onFocus={() => setSkipLinkFocused(true)}
+        onBlur={() => setSkipLinkFocused(false)}
+        style={skipLinkFocused ? undefined : skipLinkHiddenStyle}
       >
         Skip navigation
-      </Box>
+      </Link>
       <CommandPalette />
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, height: '100vh' }}>
-        <Box component="header" sx={{ display: { xs: 'flex', sm: 'none' }, height: 56, minHeight: 56, alignItems: 'center', justifyContent: 'space-between', px: 1, backgroundColor: draculaColors.currentLine, borderBottom: `1px solid ${draculaColors.comment}` }}>
-          <IconButton aria-label="Open navigation" onClick={() => setMobileNavigationOpen(true)} sx={{ color: draculaColors.cyan }}>
-            <Menu />
-          </IconButton>
-        </Box>
-        <Sidebar mobileOpen={mobileNavigationOpen} onMobileClose={() => setMobileNavigationOpen(false)} />
-        <Box component="main" id="main-workspace" tabIndex={-1} sx={{ ...flexPanelSx, outline: 'none' }}>
-          <ErrorBoundary>
-            <Box sx={flexPanelSx}>
-              <InputPanel />
-              <Calculator />
-              <MagicPanel />
-              <ProofIndex />
-              <FormatConverter />
-              <InstructionsPanel />
-              <PemDecryptor />
-            </Box>
-          </ErrorBoundary>
-          <ErrorBoundary>
-            <OutputPanel />
-          </ErrorBoundary>
-        </Box>
-      </Box>
-      <Snackbar
-        open={!!notification}
-        autoHideDuration={3000}
-        onClose={() => showNotification('')}
-        message={notification?.message ?? ''}
-        key={notification?.key}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        slotProps={{
-          content: {
-            sx: {
-              backgroundColor: draculaColors.background,
-              border: `2px solid ${borderColor}`,
-              borderRadius: '4px',
-              color: draculaColors.foreground,
-              fontFamily: MONO_FAMILY,
-              fontSize: '0.8rem',
-            },
-          },
-        }}
-      />
-    </>
+      {isMobile && (
+        <TopNav
+          label="Mobile navigation"
+          heading={<TopNavHeading heading="RSA CTF Tool" />}
+          startContent={
+            <IconButton
+              label="Open navigation"
+              variant="ghost"
+              icon={<Icon icon="menu" />}
+              onClick={() => setMobileNavigationOpen(true)}
+            />
+          }
+        />
+      )}
+      <StackItem size="fill">
+        <Stack direction="horizontal" gap={0} width="100%" height="100%">
+          <Sidebar mobileOpen={mobileNavigationOpen} onMobileClose={() => setMobileNavigationOpen(false)} />
+          <StackItem size="fill">
+            <Stack as="main" id="main-workspace" tabIndex={-1} direction="vertical" gap={0} width="100%" height="100%" isScrollable>
+              <ErrorBoundary>
+                <InputPanel />
+                <Calculator />
+                <MagicPanel />
+                <ProofIndex />
+                <FormatConverter />
+                <InstructionsPanel />
+                <PemDecryptor />
+              </ErrorBoundary>
+              <ErrorBoundary>
+                <OutputPanel />
+              </ErrorBoundary>
+            </Stack>
+          </StackItem>
+        </Stack>
+      </StackItem>
+    </Stack>
   );
 }
 
 function App() {
   return (
-    <ThemeProvider theme={draculaTheme}>
-      <CssBaseline />
-      <AppProvider>
-        <AppContent />
-      </AppProvider>
-    </ThemeProvider>
+    <AppProvider>
+      <AppContent />
+    </AppProvider>
   );
 }
 
