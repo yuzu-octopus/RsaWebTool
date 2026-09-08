@@ -1,17 +1,20 @@
-import { type ChangeEvent, useState, useEffect, useEffectEvent, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useEffectEvent, useMemo, useCallback, useRef } from 'react';
 import type { Attack } from '../types';
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Tabs,
-  Tab,
-  LinearProgress,
-  Divider,
-} from '@mui/material';
-import { Stop, Casino, ContentCopy, HourglassEmpty, ArrowForward } from '@mui/icons-material';
-import { draculaColors } from '../theme/dracula';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Text } from '@astryxdesign/core/Text';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Button } from '@astryxdesign/core/Button';
+import { IconButton } from '@astryxdesign/core/IconButton';
+import { Icon } from '@astryxdesign/core/Icon';
+import { TabList, Tab } from '@astryxdesign/core/TabList';
+import { TextInput } from '@astryxdesign/core/TextInput';
+import { TextArea } from '@astryxdesign/core/TextArea';
+import { ProgressBar } from '@astryxdesign/core/ProgressBar';
+import { Spinner } from '@astryxdesign/core/Spinner';
+import { Divider } from '@astryxdesign/core';
+import { CodeBlock } from '@astryxdesign/core/CodeBlock';
+import { dracula } from '@astryxdesign/core/theme/syntax';
+import { Dices, ChevronRight } from 'lucide-react';
 import { useAppContext } from '../hooks/useAppContext';
 import { useSageMath } from '../hooks/useSageMath';
 import { useWorkerPool } from '../hooks/useWorkerPool';
@@ -19,13 +22,20 @@ import { useAttackExecution } from '../hooks/useAttackExecution';
 import { useCopyToClipboard } from '../hooks/useCopyToClipboard';
 import { ProofRenderer } from './ProofRenderer';
 import { EmptyState } from './_shared/EmptyState';
-import { inputSx } from '../styles/shared';
-import { colFlexSx, centeredPanelSx, tabSx, colorGhostBtn, ghostBtnSx, hourglassSpin, pageTitleSx, MONO_FAMILY, PROSE_FAMILY } from '../styles/shared';
-import Prism from 'prismjs';
-import '../styles/draculaPrism.css';
-import 'prismjs/components/prism-typescript';
-import 'prismjs/components/prism-python';
 import { getAttackSource, extractFrontendCheck, dedent } from '../attacks/rawSources';
+
+// Dracula brand tokens (verbatim kit names — never raw hex).
+const c = {
+  purple: 'var(--dracula-purple)',
+  green: 'var(--dracula-green)',
+  red: 'var(--dracula-red)',
+  orange: 'var(--dracula-orange)',
+  cyan: 'var(--dracula-cyan)',
+  pink: 'var(--dracula-pink)',
+  comment: 'var(--dracula-comment)',
+};
+
+const flexFill = { flex: 1, minWidth: 0, minHeight: 0 } as const;
 
 export function InputPanel() {
   const { selectedAttack, viewMode } = useAppContext();
@@ -34,9 +44,9 @@ export function InputPanel() {
 
   if (!selectedAttack) {
     return (
-      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 0 }}>
+      <Stack direction="vertical" hAlign="center" vAlign="center" style={flexFill}>
         <EmptyState title="Select an attack from the sidebar" padding={4} />
-      </Box>
+      </Stack>
     );
   }
 
@@ -166,257 +176,208 @@ function AttackPanel({ attack }: { attack: Attack }) {
   };
 
   return (
-    <Box sx={colFlexSx}>
+    <Stack direction="vertical" style={flexFill}>
       {/* Tabs at top-left */}
-      <Tabs
-        value={tab}
-        onChange={(_, v) => setTab(v as number)}
-        sx={{
-          minHeight: 48,
-          px: 2,
-          '& .MuiTabs-flexContainer': { justifyContent: 'flex-start' },
-          '& .MuiTab-root': { ...tabSx, px: 3 },
-          '& .Mui-selected': { color: draculaColors.purple },
-          '& .MuiTabs-indicator': { backgroundColor: draculaColors.purple },
-        }}
+      <TabList
+        value={String(tab)}
+        onChange={(v) => setTab(Number(v))}
+        role="tablist"
+        hasDivider
       >
-        <Tab id="attack-tab-0" aria-controls="attack-tabpanel-0" label="Explanation" />
-        <Tab id="attack-tab-1" aria-controls="attack-tabpanel-1" label="Input" data-testid="input-tab" />
-        <Tab id="attack-tab-2" aria-controls="attack-tabpanel-2" label="Source" data-testid="source-tab" />
-      </Tabs>
+        <Tab value="0" label="Explanation" id="attack-tab-0" panelId="attack-tabpanel-0" />
+        <Tab value="1" label="Input" id="attack-tab-1" panelId="attack-tabpanel-1" data-testid="input-tab" />
+        <Tab value="2" label="Source" id="attack-tab-2" panelId="attack-tabpanel-2" data-testid="source-tab" />
+      </TabList>
 
       {/* Explanation tab - left aligned */}
       {tab === 0 && (
-        <Box role="tabpanel" id="attack-tabpanel-0" aria-labelledby="attack-tab-0" sx={{ flex: 1, overflow: 'auto', p: 2, pb: '20vh' }}>
+        <Stack direction="vertical" gap={2} padding={2} isScrollable role="tabpanel" id="attack-tabpanel-0" aria-labelledby="attack-tab-0" style={flexFill}>
           {attack.proof ? (
             <ProofRenderer latex={attack.proof} />
           ) : (
-            <Typography variant="body2" sx={{ color: draculaColors.comment, fontStyle: 'italic' }}>
+            <Text type="body" style={{ color: c.comment, fontStyle: 'italic' }}>
               No proof available.
-            </Typography>
+            </Text>
           )}
 
           {attack.usageGuide && (
             <>
-              <Divider sx={{ borderColor: draculaColors.comment, my: 2 }} />
-              <Typography
-                variant="h5"
-                sx={{ color: draculaColors.cyan, mb: 1, fontFamily: MONO_FAMILY }}
-              >
+              <Divider />
+              <Heading level={5} style={{ color: c.cyan }}>
                 How to Use
-              </Typography>
-              <Typography
-                sx={{ color: draculaColors.foreground, fontSize: '0.85rem', whiteSpace: 'pre-wrap', fontFamily: MONO_FAMILY, lineHeight: 1.6 }}
-              >
+              </Heading>
+              <Text type="code" style={{ whiteSpace: 'pre-wrap' }}>
                 {attack.usageGuide}
-              </Typography>
+              </Text>
             </>
           )}
-          <Button
-            endIcon={<ArrowForward />}
-            onClick={() => setTab(1)}
-            sx={{ mt: 2, color: draculaColors.purple, borderColor: draculaColors.purple, '&:hover': { borderColor: draculaColors.purple, backgroundColor: `${draculaColors.purple}22` } }}
-            variant="outlined"
-          >
-            Continue to Input
-          </Button>
-        </Box>
+          <Stack direction="horizontal">
+            <Button
+              label="Continue to Input"
+              variant="ghost"
+              onClick={() => setTab(1)}
+              endContent={<Icon icon={ChevronRight} size="sm" />}
+            />
+          </Stack>
+        </Stack>
       )}
 
       {/* Input tab - center aligned */}
       {tab === 1 && (
-        <Box role="tabpanel" id="attack-tabpanel-1" aria-labelledby="attack-tab-1" sx={{ ...centeredPanelSx, p: 2 }}>
-          <Box sx={{ width: '100%', maxWidth: 640 }}>
-            <Typography variant="h3" sx={pageTitleSx}>
+        <Stack direction="vertical" hAlign="center" padding={2} isScrollable role="tabpanel" id="attack-tabpanel-1" aria-labelledby="attack-tab-1" style={flexFill}>
+          <Stack direction="vertical" gap={2} width="100%" style={{ maxWidth: '40rem' }}>
+            <Heading level={3} style={{ color: c.purple }}>
               {attack.name}
-            </Typography>
-            <Typography variant="caption" sx={{ color: draculaColors.pink, display: 'block', mb: 1, fontSize: '0.7rem' }}>
+            </Heading>
+            <Text type="supporting" style={{ color: c.pink }}>
               {attack.frontendCheck ? 'Runs locally in browser' : 'Executed via SageMathCell'}
-            </Typography>
-            <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 3, fontFamily: PROSE_FAMILY }}>
+            </Text>
+            <Text type="body" style={{ color: c.comment }}>
               {attack.description}
-            </Typography>
+            </Text>
 
-            {attack.inputs.map(field => (
-              <Box key={field.name} sx={{ mb: 2 }}>
-                <TextField
-                  fullWidth
-                  label={field.required === false ? `${field.label} (optional)` : field.label}
+            {attack.inputs.map(field => {
+              const error = fieldErrors[field.name];
+              const label = field.required === false ? `${field.label} (optional)` : field.label;
+              const status = error ? { type: 'error' as const, message: error } : undefined;
+              const description = error ? undefined : field.tooltip;
+              if (field.multiline === true) {
+                return (
+                  <TextArea
+                    key={field.name}
+                    label={label}
+                    placeholder={field.placeholder}
+                    value={inputValues[field.name] || ''}
+                    onChange={(value) => handleInputChange(field.name, value, true)}
+                    ref={(node) => { inputRefs.current[field.name] = node; }}
+                    rows={field.rows ?? 3}
+                    isRequired={field.required !== false}
+                    status={status}
+                    description={description}
+                    width="100%"
+                  />
+                );
+              }
+              return (
+                <TextInput
+                  key={field.name}
+                  size="sm"
+                  label={label}
                   placeholder={field.placeholder}
                   value={inputValues[field.name] || ''}
-                  onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => handleInputChange(field.name, e.target.value, field.multiline === true)}
-                  inputRef={(node: HTMLInputElement | HTMLTextAreaElement | null) => { inputRefs.current[field.name] = node; }}
+                  onChange={(value) => handleInputChange(field.name, value, false)}
+                  ref={(node) => { inputRefs.current[field.name] = node; }}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !field.multiline && !isRunning) {
+                    if (e.key === 'Enter' && !isRunning) {
                       e.preventDefault();
                       handleValidatedRun(inputValues);
                     }
                   }}
-                  multiline={field.multiline}
-                  rows={field.rows || 1}
-                  required={field.required !== false}
-                  variant="outlined"
-                  size="small"
-                  error={Boolean(fieldErrors[field.name])}
-                  helperText={fieldErrors[field.name] || field.tooltip}
-                  sx={inputSx}
+                  isRequired={field.required !== false}
+                  status={status}
+                  description={description}
+                  width="100%"
                 />
-              </Box>
-            ))}
+              );
+            })}
 
-            <Box sx={{ display: 'flex', gap: 1, mt: 2, mb: 2 }}>
+            <Stack direction="horizontal" gap={1} width="100%">
               <Button
-                fullWidth
-                variant="outlined"
+                label="Generate"
+                variant="ghost"
+                width="100%"
                 onClick={handleGenerateTestcase}
                 data-testid="generate-testcase"
-                sx={colorGhostBtn(draculaColors.cyan)}
-                startIcon={<Casino sx={{ fontSize: '1rem' }} />}
-              >
-                Generate
-              </Button>
+                icon={<Icon icon={Dices} size="sm" />}
+              />
               <Button
-                fullWidth
-                variant="outlined"
+                label={isRunning ? 'Stop' : 'Run'}
+                variant={isRunning ? 'destructive' : 'primary'}
+                width="100%"
                 onClick={isRunning ? handleStop : () => handleValidatedRun(inputValues)}
                 data-testid={isRunning ? 'stop-attack' : 'run-attack'}
-                sx={colorGhostBtn(isRunning ? draculaColors.red : draculaColors.purple)}
-                startIcon={isRunning ? <Stop /> : undefined}
-              >
-                {isRunning ? 'Stop' : 'Run'}
-              </Button>
-            </Box>
+                isLoading={isRunning}
+                isInterruptible
+                icon={isRunning ? <Icon icon="stop" size="sm" /> : undefined}
+              />
+            </Stack>
 
             {isRunning ? (
-              <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, mb: 2, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                <HourglassEmpty data-testid="loading-spinner" sx={{ color: draculaColors.orange, fontSize: '1rem', animation: `${hourglassSpin} 3s ease-in-out infinite` }} />
-                Running… {timer.formatted}
-              </Typography>
+              <Stack direction="horizontal" gap={1} hAlign="center" vAlign="center">
+                <Spinner size="sm" data-testid="loading-spinner" aria-label="Attack running" />
+                <Text type="body" style={{ color: c.orange }}>
+                  Running… {timer.formatted}
+                </Text>
+              </Stack>
             ) : testcaseMsg ? (
-              <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, mb: 2, textAlign: 'center' }}>
+              <Text type="body" justify="center" style={{ color: c.orange }}>
                 {testcaseMsg}
-              </Typography>
+              </Text>
             ) : null}
 
             {isRunning && progress > 0 && (
-              <Box sx={{ mt: 1.5, width: '100%', maxWidth: 300, mx: 'auto' }}>
-                <LinearProgress
-                  variant="determinate"
+              <Stack direction="vertical" gap={1} width="100%" style={{ maxWidth: '19rem', marginInline: 'auto' }}>
+                <ProgressBar
+                  label="Attack progress"
                   value={progress}
-                  sx={{
-                    height: 6,
-                    borderRadius: 3,
-                    bgcolor: draculaColors.currentLine,
-                    '& .MuiLinearProgress-bar': { bgcolor: draculaColors.orange, borderRadius: 3 },
-                  }}
+                  variant="warning"
+                  hasValueLabel
+                  formatValueLabel={(v) => `${v}%${progressDetail ? ` — ${progressDetail}` : ''}`}
                 />
-                <Typography variant="caption" sx={{ color: draculaColors.orange, mt: 0.5, textAlign: 'center', display: 'block' }}>
-                  {progress}%{progressDetail ? ` — ${progressDetail}` : ''}
-                </Typography>
                 {eta && (
-                  <Typography variant="caption" sx={{ color: draculaColors.orange, mt: 0.5, textAlign: 'center', display: 'block' }}>
+                  <Text type="supporting" justify="center" style={{ color: c.orange }}>
                     {eta} remaining
-                  </Typography>
+                  </Text>
                 )}
-              </Box>
+              </Stack>
             )}
-          </Box>
-        </Box>
+          </Stack>
+        </Stack>
       )}
 
       {/* Source tab */}
       {tab === 2 && (
-        <Box role="tabpanel" id="attack-tabpanel-2" aria-labelledby="attack-tab-2" sx={{ flex: 1, overflow: 'auto', p: 2, pb: '20vh' }}>
-    <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-      {hasSage && (
-        <Button
-          size="small"
-          variant="outlined"
-          onClick={() => setSourceMode('sage')}
-          sx={{
-            fontFamily: MONO_FAMILY,
-            fontSize: '0.75rem',
-            textTransform: 'none',
-            color: effectiveSourceMode === 'sage' ? draculaColors.purple : draculaColors.comment,
-            borderColor: effectiveSourceMode === 'sage' ? draculaColors.purple : draculaColors.comment,
-            backgroundColor: effectiveSourceMode === 'sage' ? draculaColors.currentLine : 'transparent',
-            '&:hover': {
-              borderColor: draculaColors.purple,
-              color: draculaColors.purple,
-              backgroundColor: draculaColors.currentLine,
-            },
-          }}
-        >
-          SageMath (Python)
-        </Button>
-      )}
-      {hasFrontend && (
-        <Button
-          size="small"
-          variant="outlined"
-          onClick={() => setSourceMode('frontend')}
-          sx={{
-            fontFamily: MONO_FAMILY,
-            fontSize: '0.75rem',
-            textTransform: 'none',
-            color: effectiveSourceMode === 'frontend' ? draculaColors.purple : draculaColors.comment,
-            borderColor: effectiveSourceMode === 'frontend' ? draculaColors.purple : draculaColors.comment,
-            backgroundColor: effectiveSourceMode === 'frontend' ? draculaColors.currentLine : 'transparent',
-            '&:hover': {
-              borderColor: draculaColors.purple,
-              color: draculaColors.purple,
-              backgroundColor: draculaColors.currentLine,
-            },
-          }}
-        >
-          Frontend (TypeScript)
-        </Button>
-      )}
-    </Box>
-          <Box sx={{
-            borderRadius: 1,
-            border: `1px solid ${draculaColors.comment}`,
-            overflow: 'hidden',
-          }}>
-            <Box
-              component="pre"
-              sx={{
-                margin: 0,
-                borderRadius: 'inherit',
-                fontSize: '0.8rem',
-                fontFamily: MONO_FAMILY,
-                maxHeight: '50vh',
-                overflow: 'auto',
-                p: 1.5,
-                lineHeight: '1.5',
-              }}
-              // SAFE: Prism.highlight returns syntax-highlighted HTML containing
-              // only <span> tags with class names — no executable script, no
-              // user-supplied HTML. Source code is bundled with each attack
-              // definition (not arbitrary user input).
-              dangerouslySetInnerHTML={{
-                __html: Prism.highlight(
-                  effectiveSourceMode === 'sage' ? pythonCode : frontendCode,
-                  effectiveSourceMode === 'sage' ? Prism.languages.python : Prism.languages.typescript,
-                  effectiveSourceMode === 'sage' ? 'python' : 'typescript'
-                ),
-              }}
-            />
-          </Box>
+        <Stack direction="vertical" gap={2} padding={2} isScrollable role="tabpanel" id="attack-tabpanel-2" aria-labelledby="attack-tab-2" style={flexFill}>
+          <Stack direction="horizontal" gap={1}>
+            {hasSage && (
+              <Button
+                label="SageMath (Python)"
+                size="sm"
+                variant={effectiveSourceMode === 'sage' ? 'secondary' : 'ghost'}
+                onClick={() => setSourceMode('sage')}
+              />
+            )}
+            {hasFrontend && (
+              <Button
+                label="Frontend (TypeScript)"
+                size="sm"
+                variant={effectiveSourceMode === 'frontend' ? 'secondary' : 'ghost'}
+                onClick={() => setSourceMode('frontend')}
+              />
+            )}
+          </Stack>
+          <CodeBlock
+            code={effectiveSourceMode === 'sage' ? pythonCode : frontendCode}
+            language={effectiveSourceMode === 'sage' ? 'python' : 'typescript'}
+            syntaxTheme={dracula}
+            width="100%"
+            isWrapped
+            maxHeight="50vh"
+            hasCopyButton={false}
+          />
 
-          <Box sx={{ mt: 1.5 }}>
-            <Button
-              size="small"
-              variant="outlined"
+          <Stack direction="horizontal">
+            <IconButton
+              label={copied ? 'Copied' : 'Copy source'}
+              tooltip={copied ? 'Copied!' : 'Copy source'}
+              variant="ghost"
+              size="sm"
               onClick={handleCopySource}
-              sx={ghostBtnSx}
-              startIcon={<ContentCopy />}
-            >
-              {copied ? 'Copied!' : 'Copy'}
-            </Button>
-          </Box>
-        </Box>
+              icon={<Icon icon={copied ? 'check' : 'copy'} size="sm" />}
+            />
+          </Stack>
+        </Stack>
       )}
-    </Box>
+    </Stack>
   );
 }

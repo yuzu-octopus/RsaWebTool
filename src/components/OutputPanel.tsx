@@ -1,54 +1,49 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  Collapse,
-  List,
-  ListItemButton,
-  ListItemText,
-  Divider,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-} from '@mui/material';
-import { ExpandLess, ExpandMore, ContentCopy, CheckCircle, Cancel, History as HistoryIcon, ArrowBack } from '@mui/icons-material';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Text } from '@astryxdesign/core/Text';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Button } from '@astryxdesign/core/Button';
+import { IconButton } from '@astryxdesign/core/IconButton';
+import { Icon } from '@astryxdesign/core/Icon';
+import { List, ListItem } from '@astryxdesign/core/List';
+import { Divider } from '@astryxdesign/core';
+import { Dialog, DialogHeader } from '@astryxdesign/core/Dialog';
+import { CodeBlock } from '@astryxdesign/core/CodeBlock';
+import { dracula } from '@astryxdesign/core/theme/syntax';
+import { History } from 'lucide-react';
 import type { HistoryEntry } from '../types';
-import { draculaColors } from '../theme/dracula';
 import { useAppContext } from '../hooks/useAppContext';
 import { useCopyToClipboard } from '../hooks/useCopyToClipboard';
 import { useDragResize } from '../hooks/useDragResize';
-import { ghostBtnSx, MONO_FAMILY } from '../styles/shared';
 import { EmptyState } from './_shared/EmptyState';
+
+// Dracula brand tokens (verbatim kit names — never raw hex).
+const c = {
+  green: 'var(--dracula-green)',
+  red: 'var(--dracula-red)',
+  purple: 'var(--dracula-purple)',
+  cyan: 'var(--dracula-cyan)',
+  comment: 'var(--dracula-comment)',
+  currentLine: 'var(--dracula-current-line)',
+};
 
 function HistoryListItem({ entry, isSelected, onClick }: { entry: HistoryEntry; isSelected: boolean; onClick: () => void }) {
   return (
-    <ListItemButton
-      selected={isSelected}
+    <ListItem
+      isSelected={isSelected}
       onClick={onClick}
-      sx={{
-        px: 1,
-        cursor: 'pointer',
-        borderRadius: 1,
-        border: `1px solid ${isSelected ? draculaColors.comment : 'transparent'}`,
-        '&:hover': { borderColor: draculaColors.comment },
-      }}
-    >
-      <ListItemText
-        primary={
-          <Typography sx={{ display: 'flex', alignItems: 'center', color: entry.success ? draculaColors.green : draculaColors.red, fontSize: '0.75rem', fontFamily: MONO_FAMILY }}>
-            {entry.success ? <CheckCircle sx={{ fontSize: '1rem', mr: 0.5 }} /> : <Cancel sx={{ fontSize: '1rem', mr: 0.5 }} />} {entry.attackName}
-          </Typography>
-        }
-        secondary={
-          <Typography sx={{ color: draculaColors.comment, fontSize: '0.75rem' }}>
-            Preview · {entry.timestamp.toLocaleTimeString()}
-          </Typography>
-        }
-      />
-    </ListItemButton>
+      startContent={<Icon icon={entry.success ? 'success' : 'error'} color={entry.success ? 'success' : 'error'} size="sm" />}
+      label={
+        <Text type="code" style={{ color: entry.success ? c.green : c.red }}>
+          {entry.attackName}
+        </Text>
+      }
+      description={
+        <Text type="supporting">
+          Preview · {entry.timestamp.toLocaleTimeString()}
+        </Text>
+      }
+    />
   );
 }
 
@@ -68,9 +63,13 @@ export function OutputPanel() {
   const getMaxOutputWidth = useCallback(() => Math.max(200, Math.min(600, window.innerWidth - 620)), []);
 
   const [maxOutputWidth, setMaxOutputWidth] = useState(getMaxOutputWidth);
+  const [isNarrow, setIsNarrow] = useState(() => window.innerWidth <= 600);
 
   useEffect(() => {
-    const handleResize = () => setMaxOutputWidth(getMaxOutputWidth());
+    const handleResize = () => {
+      setMaxOutputWidth(getMaxOutputWidth());
+      setIsNarrow(window.innerWidth <= 600);
+    };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [getMaxOutputWidth]);
@@ -89,203 +88,172 @@ export function OutputPanel() {
     if (!await copy(displayResult)) showNotification('Could not copy to clipboard.', 'error');
   };
 
-  return (
-    <Box sx={{ width: outputWidth, flexShrink: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden', pl: 2, position: 'relative', '@media (max-width: 600px)': { width: '100%', pl: 0, overflow: 'visible', flexShrink: 1 } }}>
-      <Box
-        sx={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: '6px',
-          cursor: 'col-resize',
-          zIndex: 10,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          '&::after': {
-            content: '""',
-            display: 'block',
-            width: '1px',
-            height: '100%',
-            backgroundColor: draculaColors.currentLine,
-            transition: 'background-color 0.15s',
-          },
-          '&:hover::after, &.active::after': { backgroundColor: draculaColors.purple },
-          '@media (max-width: 600px)': { display: 'none', pointerEvents: 'none' },
-        }}
-        onMouseDown={handleMouseDown}
-      />
+  const [handleHover, setHandleHover] = useState(false);
 
-      <Box sx={{ p: 2, overflow: 'auto', flex: 1, pb: '20vh', '@media (max-width: 600px)': { overflow: 'visible', flex: 'none', pb: 2 } }}>
-        <Typography variant="h5" sx={{ color: draculaColors.purple, fontWeight: 600, mb: 2, fontFamily: MONO_FAMILY }}>
+  return (
+    <Stack
+      direction="vertical"
+      style={isNarrow ? { width: '100%' } : { width: outputWidth, flexShrink: 0, overflow: 'hidden', position: 'relative' }}
+    >
+      {!isNarrow && (
+        <Stack
+          direction="horizontal"
+          hAlign="end"
+          vAlign="stretch"
+          onMouseDown={handleMouseDown}
+          onMouseEnter={() => setHandleHover(true)}
+          onMouseLeave={() => setHandleHover(false)}
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: '0.375rem',
+            cursor: 'col-resize',
+            zIndex: 10,
+          }}
+        >
+          <Stack direction="vertical" style={{ width: '0.0625rem', height: '100%', backgroundColor: handleHover ? c.purple : c.currentLine }} />
+        </Stack>
+      )}
+
+      <Stack direction="vertical" gap={2} padding={2} isScrollable style={isNarrow ? {} : { flex: 1, minHeight: 0, paddingLeft: 'var(--space-gap)' }}>
+        <Heading level={5} style={{ color: c.purple }}>
           Results
-        </Typography>
+        </Heading>
 
         {ui.historySelectedKey && (
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, gap: 1 }}>
-            <HistoryIcon sx={{ fontSize: '1rem', color: draculaColors.cyan }} />
-            <Typography sx={{ color: draculaColors.cyan, fontSize: '0.75rem', fontFamily: MONO_FAMILY, flex: 1 }}>
+          <Stack direction="horizontal" gap={1} vAlign="center">
+            <Icon icon={History} size="sm" color="accent" />
+            <Text type="code" style={{ color: c.cyan }}>
               Preview: {history.find(h => h.id === ui.historySelectedKey)?.attackName ?? ''}
-            </Typography>
+            </Text>
             <Button
-              size="small"
-              variant="outlined"
-              startIcon={<ArrowBack fontSize="small" />}
+              label="Back"
+              size="sm"
+              variant="ghost"
               onClick={() => { setUi(prev => ({ ...prev, historySelectedKey: null })); }}
-              sx={{ borderColor: draculaColors.comment, color: draculaColors.comment, fontSize: '0.65rem', fontFamily: MONO_FAMILY, '&:hover': { backgroundColor: draculaColors.currentLine } }}
-            >
-              Back
-            </Button>
-          </Box>
+              icon={<Icon icon="chevronLeft" size="sm" />}
+            />
+          </Stack>
         )}
 
         {displayResult && (
           <>
-            <Box data-testid="output-result" aria-describedby={ui.historySelectedKey ? 'history-preview-guidance' : undefined} sx={{
-              maxHeight: '50vh',
-              overflow: 'auto',
-              borderRadius: 1,
-              border: `1px solid ${draculaColors.comment}`,
-              '@media (max-width: 600px)': { maxHeight: 'none', overflow: 'visible' },
-            }}>
-              <Box
-                component="pre"
-                sx={{
-                  margin: 0,
-                  borderRadius: 'inherit',
-                  fontSize: '0.8rem',
-                  fontFamily: MONO_FAMILY,
-                  backgroundColor: draculaColors.background,
-                  color: draculaColors.foreground,
-                  p: 1.5,
-                  lineHeight: '1.5',
-                  whiteSpace: 'pre-wrap',
-                  overflowWrap: 'anywhere',
-                  wordBreak: 'break-word',
-                }}
-              >
-                {displayResult}
-              </Box>
-            </Box>
+            <CodeBlock
+              code={displayResult}
+              language="plaintext"
+              syntaxTheme={dracula}
+              width="100%"
+              isWrapped
+              maxHeight="50vh"
+              data-testid="output-result"
+              aria-describedby={ui.historySelectedKey ? 'history-preview-guidance' : undefined}
+            />
 
             {ui.historySelectedKey && (
-              <Typography id="history-preview-guidance" variant="caption" sx={{ display: 'block', color: draculaColors.comment, fontSize: '0.7rem', mt: 1 }}>
+              <Text id="history-preview-guidance" type="supporting" style={{ color: c.comment }}>
                 Preview only. Select original inputs and rerun this attack to view complete output.
-              </Typography>
+              </Text>
             )}
-            <Box sx={{ display: 'flex', gap: 1, mt: 2, flexWrap: 'wrap' }}>
-              <Button size="small" variant="outlined" onClick={() => { void handleCopy(); }} sx={ghostBtnSx} startIcon={<ContentCopy />}>
-                Copy
-              </Button>
+            <Stack direction="horizontal" gap={1} vAlign="center">
+              <IconButton
+                label="Copy result"
+                tooltip="Copy result"
+                variant="ghost"
+                size="sm"
+                onClick={() => { void handleCopy(); }}
+                icon={<Icon icon="copy" size="sm" />}
+              />
               {copied && (
-                <Typography variant="caption" aria-live="polite" sx={{ color: draculaColors.green, fontSize: '0.7rem', alignSelf: 'center' }}>
+                <Text type="supporting" aria-live="polite" style={{ color: c.green }}>
                   Copied to clipboard!
-                </Typography>
+                </Text>
               )}
-            </Box>
+            </Stack>
           </>
         )}
 
         {outputError && (
-          <Typography data-testid="output-error" sx={{ color: draculaColors.red, fontFamily: MONO_FAMILY, fontSize: '0.85rem', whiteSpace: 'pre-wrap' }}>
+          <Text type="code" data-testid="output-error" style={{ color: c.red, whiteSpace: 'pre-wrap' }}>
             {outputError}
-          </Typography>
+          </Text>
         )}
 
         {!displayResult && !outputError && !ui.historySelectedKey && (
           <EmptyState title="Run an attack to see results here" padding={4} />
         )}
-      </Box>
+      </Stack>
 
-      <Divider sx={{ borderColor: draculaColors.comment }} />
+      <Divider />
 
-      <Box sx={{ px: 2, pb: 2 }}>
+      <Stack direction="vertical" padding={2} paddingBlockStart={0}>
         <Button
-          fullWidth
+          label={`History (${history.length})`}
+          variant="ghost"
+          width="100%"
           onClick={() => setUi(prev => ({ ...prev, historyOpen: !prev.historyOpen }))}
-          sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, justifyContent: 'space-between' }}
-          endIcon={ui.historyOpen ? <ExpandLess /> : <ExpandMore />}
-        >
-          History ({history.length})
-        </Button>
+          endContent={<Icon icon={ui.historyOpen ? 'arrowUp' : 'chevronDown'} size="sm" />}
+        />
 
-        <Collapse in={ui.historyOpen}>
-          <List dense sx={{ maxHeight: '200px', overflow: 'auto', '@media (max-width: 600px)': { maxHeight: 'none', overflow: 'visible' } }}>
-            {history.map((entry) => {
-              const key = entry.id;
-              const selected = ui.historySelectedKey === key;
-              return (
-                <HistoryListItem
-                  key={key}
-                  entry={entry}
-                  isSelected={selected}
-                  onClick={() => handleHistoryClick(key)}
-                />
-              );
-            })}
-          </List>
-          <Box sx={{ mt: 1, display: 'flex', justifyContent: 'center' }}>
-            <Button
-              size="small"
-              variant="outlined"
-              onClick={() => setUi(prev => ({ ...prev, confirmOpen: true }))}
-              disabled={history.length === 0}
-              sx={{
-                borderColor: draculaColors.red,
-                color: draculaColors.red,
-                fontSize: '0.7rem',
-                fontFamily: MONO_FAMILY,
-                '&:hover': { backgroundColor: 'rgba(255,85,85,0.1)' },
-                '&:disabled': { borderColor: draculaColors.comment, color: draculaColors.comment },
-              }}
-            >
-              Clear All
-            </Button>
-          </Box>
-        </Collapse>
-      </Box>
+        {ui.historyOpen && (
+          <>
+            <List density="compact">
+              {history.map((entry) => {
+                const key = entry.id;
+                const selected = ui.historySelectedKey === key;
+                return (
+                  <HistoryListItem
+                    key={key}
+                    entry={entry}
+                    isSelected={selected}
+                    onClick={() => handleHistoryClick(key)}
+                  />
+                );
+              })}
+            </List>
+            <Stack direction="horizontal" hAlign="center">
+              <Button
+                label="Clear All"
+                size="sm"
+                variant="destructive"
+                onClick={() => setUi(prev => ({ ...prev, confirmOpen: true }))}
+                isDisabled={history.length === 0}
+              />
+            </Stack>
+          </>
+        )}
+      </Stack>
 
       <Dialog
-        open={ui.confirmOpen}
-        onClose={() => setUi(prev => ({ ...prev, confirmOpen: false }))}
-        slotProps={{
-          paper: {
-            sx: {
-              backgroundColor: draculaColors.background,
-              border: `1px solid ${draculaColors.comment}`,
-              borderRadius: 2,
-            },
-          },
-        }}
+        isOpen={ui.confirmOpen}
+        onOpenChange={(open) => setUi(prev => ({ ...prev, confirmOpen: open }))}
       >
-        <DialogTitle sx={{ color: draculaColors.foreground, fontFamily: MONO_FAMILY }}>
-          Clear History?
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY }}>
+        <DialogHeader
+          title="Clear History?"
+          onOpenChange={(open) => setUi(prev => ({ ...prev, confirmOpen: open }))}
+        />
+        <Stack direction="vertical" gap={2} padding={2}>
+          <Text type="body" style={{ color: c.comment }}>
             This will permanently delete all {history.length} history entries.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button
-            onClick={() => setUi(prev => ({ ...prev, confirmOpen: false }))}
-            sx={{ borderColor: draculaColors.comment, color: draculaColors.comment }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={() => {
-              clearHistory();
-              setUi(prev => ({ ...prev, confirmOpen: false, historySelectedKey: null }));
-            }}
-            sx={{ borderColor: draculaColors.red, color: draculaColors.red }}
-            variant="outlined"
-          >
-            Clear All
-          </Button>
-        </DialogActions>
+          </Text>
+          <Stack direction="horizontal" gap={1} hAlign="end">
+            <Button
+              label="Cancel"
+              variant="ghost"
+              onClick={() => setUi(prev => ({ ...prev, confirmOpen: false }))}
+            />
+            <Button
+              label="Clear All"
+              variant="destructive"
+              onClick={() => {
+                clearHistory();
+                setUi(prev => ({ ...prev, confirmOpen: false, historySelectedKey: null }));
+              }}
+            />
+          </Stack>
+        </Stack>
       </Dialog>
-    </Box>
+    </Stack>
   );
 }

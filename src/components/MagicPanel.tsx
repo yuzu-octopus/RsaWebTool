@@ -1,27 +1,36 @@
 import { useState, useEffect, useMemo, memo, useCallback } from 'react';
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Divider,
-  Collapse,
-  LinearProgress,
-} from '@mui/material';
-import { AutoFixHigh, Science, CheckCircle, Cancel, HourglassEmpty, SkipNext, Stop, ExpandMore, ExpandLess, Casino, ContentCopy } from '@mui/icons-material';
-import { draculaColors } from '../theme/dracula';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Text } from '@astryxdesign/core/Text';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Button } from '@astryxdesign/core/Button';
+import { IconButton } from '@astryxdesign/core/IconButton';
+import { Icon } from '@astryxdesign/core/Icon';
+import { List, ListItem } from '@astryxdesign/core/List';
+import { Divider } from '@astryxdesign/core';
+import { Card } from '@astryxdesign/core/Card';
+import { TextArea } from '@astryxdesign/core/TextArea';
+import { ProgressBar } from '@astryxdesign/core/ProgressBar';
+import { Spinner } from '@astryxdesign/core/Spinner';
+import { CodeBlock } from '@astryxdesign/core/CodeBlock';
+import { dracula } from '@astryxdesign/core/theme/syntax';
+import { Dices, FlaskConical, Sparkles, SkipForward } from 'lucide-react';
 import { useAppContext } from '../hooks/useAppContext';
 import { useMagicExecution, type MagicJob } from '../hooks/useMagicExecution';
 import { attacks } from '../attacks';
 import { detectFormat, parsePEM } from '../utils/converters';
-import { inputSx } from '../styles/shared';
-import { colFlexSx, centeredPanelSx, colorGhostBtn, hourglassSpinSx, MONO_FAMILY } from '../styles/shared';
 import type { Attack } from '../types';
+
+// Dracula brand tokens (verbatim kit names — never raw hex).
+const c = {
+  purple: 'var(--dracula-purple)',
+  green: 'var(--dracula-green)',
+  red: 'var(--dracula-red)',
+  orange: 'var(--dracula-orange)',
+  cyan: 'var(--dracula-cyan)',
+  comment: 'var(--dracula-comment)',
+};
+
+const flexFill = { flex: 1, minWidth: 0, minHeight: 0 } as const;
 
 const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
 
@@ -89,11 +98,18 @@ export function extractParams(input: string): Record<string, string> {
 
 // Status icon render function extracted outside component
 function statusIcon(status: MagicJob['status']) {
-  if (status === 'success') return <CheckCircle sx={{ color: draculaColors.green, fontSize: '1rem', mr: 0.5 }} />;
-  if (status === 'error') return <Cancel sx={{ color: draculaColors.red, fontSize: '1rem', mr: 0.5 }} />;
-  if (status === 'cancelled') return <Stop sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5 }} />;
-  if (status === 'aborted') return <SkipNext sx={{ color: draculaColors.comment, fontSize: '1rem', mr: 0.5 }} />;
-  return <HourglassEmpty sx={{ color: draculaColors.orange, fontSize: '1rem', mr: 0.5, ...hourglassSpinSx }} />;
+  if (status === 'success') return <Icon icon="success" color="success" size="sm" />;
+  if (status === 'error') return <Icon icon="error" color="error" size="sm" />;
+  if (status === 'cancelled') return <Icon icon="stop" color="warning" size="sm" />;
+  if (status === 'aborted') return <Icon icon={SkipForward} color="disabled" size="sm" />;
+  return <Spinner size="sm" aria-label="Attack running" />;
+}
+
+function statusColor(status: MagicJob['status']) {
+  if (status === 'success') return c.green;
+  if (status === 'error') return c.red;
+  if (status === 'cancelled') return c.orange;
+  return c.orange;
 }
 
 
@@ -113,70 +129,48 @@ const JobListItem = memo(function JobListItem({
   onCopy: (value: string) => void;
   attackId: string;
 }) {
-  const primaryContent = useMemo(() => (
-    <Typography sx={{
-      display: 'flex',
-      alignItems: 'center',
-      fontFamily: MONO_FAMILY,
-      fontSize: '0.8rem',
-      color: job.status === 'success' ? draculaColors.green : job.status === 'error' ? draculaColors.red : job.status === 'cancelled' ? draculaColors.orange : draculaColors.orange,
-    }}>
-      {statusIcon(job.status)} {job.attackName}
-    </Typography>
-  ), [job.status, job.attackName]);
-
-  const secondaryContent = useMemo(() =>
-    job.error && !expanded ? (
-      <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: MONO_FAMILY }}>
-        {job.error.length > 80 ? `${job.error.slice(0, 77)}…` : job.error}
-      </Typography>
-    ) : null,
-    [job.error, expanded]
-  );
-
   const completed = Boolean(job.result || job.error);
   const contentId = `magic-job-${attackId}`;
 
   return (
-    <ListItem sx={{ px: 0, flexDirection: 'column', alignItems: 'stretch' }}>
-      {completed ? (
-        <ListItemButton
-          onClick={() => onToggle(attackId)}
-          aria-expanded={expanded}
-          aria-controls={contentId}
-          sx={{ px: 0, display: 'flex', alignItems: 'center', width: '100%' }}
-        >
-          <ListItemText
-            primary={primaryContent}
-            secondary={secondaryContent}
-          />
-          <Typography component="span" sx={{ color: draculaColors.comment, display: 'flex', alignItems: 'center', mr: 1 }}>
-            {expanded ? <ExpandLess sx={{ fontSize: '1rem' }} /> : <ExpandMore sx={{ fontSize: '1rem' }} />}
-          </Typography>
-        </ListItemButton>
-      ) : (
-        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
-          <ListItemText primary={primaryContent} secondary={secondaryContent} />
-        </Box>
+    <>
+      <ListItem
+        label={
+          <Text type="code" style={{ color: statusColor(job.status) }}>
+            {job.attackName}
+          </Text>
+        }
+        description={
+          job.error && !expanded ? (
+            <Text type="code" maxLines={1} style={{ color: c.comment }}>
+              {job.error}
+            </Text>
+          ) : undefined
+        }
+        startContent={statusIcon(job.status)}
+        endContent={completed ? <Icon icon={expanded ? 'arrowUp' : 'chevronDown'} size="sm" /> : undefined}
+        onClick={completed ? () => onToggle(attackId) : undefined}
+        aria-expanded={completed ? expanded : undefined}
+        aria-controls={completed ? contentId : undefined}
+      />
+      {completed && (
+        <ListItem
+          id={contentId}
+          label={
+            <CodeBlock
+              code={job.result || job.error || ''}
+              language="plaintext"
+              syntaxTheme={dracula}
+              width="100%"
+              isWrapped
+              maxHeight="12.5rem"
+              onCopy={() => onCopy(job.result || job.error || '')}
+            />
+          }
+          style={expanded ? undefined : { display: 'none' }}
+        />
       )}
-      <Collapse in={expanded} id={contentId}>
-        <Box sx={{ ml: 2, mt: 0.5, p: 1, borderRadius: 1, backgroundColor: draculaColors.background, maxHeight: 200, overflow: 'auto', position: 'relative' }}>
-          {completed && (
-            <IconButton
-              size="small"
-              aria-label="Copy full result"
-              onClick={() => onCopy(job.result || job.error || '')}
-              sx={{ position: 'absolute', top: 2, right: 2, color: draculaColors.comment, zIndex: 1 }}
-            >
-              <ContentCopy sx={{ fontSize: '0.8rem' }} />
-            </IconButton>
-          )}
-          <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: MONO_FAMILY, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-            {job.result || job.error || ''}
-          </Typography>
-        </Box>
-      </Collapse>
-    </ListItem>
+    </>
   );
 });
 
@@ -190,81 +184,89 @@ const ExtractedParams = memo(function ExtractedParams({
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
 
   return (
-    <Box sx={{ mt: 2, p: 1.5, borderRadius: 1, backgroundColor: draculaColors.currentLine, border: `1px solid ${draculaColors.comment}` }}>
-      <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: MONO_FAMILY, mb: 0.75 }}>
-        Extracted parameters
-      </Typography>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+    <Card variant="muted">
+      <Stack direction="vertical" gap={1}>
+        <Text type="code" style={{ color: c.comment }}>
+          Extracted parameters
+        </Text>
         {Object.entries(params).map(([key, value]) => {
           const isPreview = value.length > 50;
           const isExpanded = expandedKey === key;
           const contentId = `magic-param-${key}`;
           return (
-            <Box key={key} sx={{ backgroundColor: draculaColors.background, borderRadius: 0.5, px: 0.75, py: 0.25 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, minWidth: 0 }}>
-                <Typography sx={{ color: draculaColors.purple, fontSize: '0.7rem', fontFamily: MONO_FAMILY }}>{key}</Typography>
-                <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: MONO_FAMILY }}>=</Typography>
-                <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: MONO_FAMILY, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {isPreview ? `${value.slice(0, 47)}…` : value}
-                </Typography>
+            <Stack key={key} direction="vertical" gap={0}>
+              <Stack direction="horizontal" gap={1} vAlign="center">
+                <Text type="code" style={{ color: c.purple }}>{key}</Text>
+                <Text type="code">=</Text>
+                <Text type="code" maxLines={1} style={{ flex: 1, minWidth: 0 }}>
+                  {value}
+                </Text>
                 {isPreview && (
                   <Button
-                    size="small"
+                    label={isExpanded ? 'Hide' : 'Preview'}
+                    size="sm"
+                    variant="ghost"
                     onClick={() => setExpandedKey(isExpanded ? null : key)}
                     aria-expanded={isExpanded}
                     aria-controls={contentId}
-                    sx={{ minWidth: 0, px: 0.5, color: draculaColors.cyan, fontSize: '0.6rem', fontFamily: MONO_FAMILY, textTransform: 'none' }}
-                  >
-                    {isExpanded ? 'Hide' : 'Preview'}
-                  </Button>
+                  />
                 )}
-                <IconButton size="small" aria-label={`Copy full ${key}`} onClick={() => onCopy(value)} sx={{ p: 0.25, color: draculaColors.comment }}>
-                  <ContentCopy sx={{ fontSize: '0.7rem' }} />
-                </IconButton>
-              </Box>
-              {isPreview && <Typography component="span" sx={{ color: draculaColors.comment, fontSize: '0.6rem', fontFamily: MONO_FAMILY }}> preview</Typography>}
-              <Collapse in={isExpanded} id={contentId}>
-                <Typography sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: MONO_FAMILY, mt: 0.5, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                <IconButton
+                  label={`Copy full ${key}`}
+                  tooltip={`Copy full ${key}`}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onCopy(value)}
+                  icon={<Icon icon="copy" size="sm" />}
+                />
+              </Stack>
+              {isPreview && (
+                <Text type="supporting" style={{ color: c.comment }}> preview</Text>
+              )}
+              {isPreview && isExpanded && (
+                <Text id={contentId} type="code" textWrap="wrap" wordBreak="break-all">
                   {value}
-                </Typography>
-              </Collapse>
-            </Box>
+                </Text>
+              )}
+            </Stack>
           );
         })}
-      </Box>
-    </Box>
+      </Stack>
+    </Card>
   );
 });
 
 const ApplicableList = memo(function ApplicableList({ byCategory }: { byCategory: Record<string, Attack[]> }) {
   return (
-    <>
+    <Stack direction="vertical" gap={1}>
       {Object.entries(byCategory).map(([cat, catAttacks]) => (
-        <Box key={cat} sx={{ mb: 1 }}>
-          <Typography sx={{ color: draculaColors.cyan, fontSize: '0.65rem', fontFamily: MONO_FAMILY, mb: 0.5 }}>
+        <Stack key={cat} direction="vertical" gap={0}>
+          <Text type="code" style={{ color: c.cyan }}>
             {cat}
-          </Typography>
+          </Text>
           {catAttacks.map(a => (
-            <Typography key={a.id} sx={{ color: draculaColors.foreground, fontSize: '0.7rem', fontFamily: MONO_FAMILY, py: 0.25 }}>
-              {a.name} <Typography component="span" sx={{ color: draculaColors.comment }}>({a.priority})</Typography>
-            </Typography>
+            <Text key={a.id} type="code">
+              {a.name} <Text style={{ color: c.comment }}>({a.priority})</Text>
+            </Text>
           ))}
-        </Box>
+        </Stack>
       ))}
-    </>
+    </Stack>
   );
 });
 
 const ErrorInsightBox = memo(function ErrorInsightBox({ insights }: { insights: string }) {
   return (
-    <Box sx={{ mt: 1.5, p: 1, borderRadius: 1, backgroundColor: draculaColors.currentLine, border: `1px solid ${draculaColors.comment}` }}>
-      <Typography sx={{ color: draculaColors.orange, fontSize: '0.7rem', fontFamily: MONO_FAMILY }}>
-        No attack succeeded: {insights}
-      </Typography>
-      <Typography sx={{ color: draculaColors.comment, fontSize: '0.65rem', fontFamily: MONO_FAMILY, mt: 0.5 }}>
-        Try checking parameter names, using a PEM key, or selecting a specific attack from the sidebar
-      </Typography>
-    </Box>
+    <Card variant="muted">
+      <Stack direction="vertical" gap={1}>
+        <Text type="code" style={{ color: c.orange }}>
+          No attack succeeded: {insights}
+        </Text>
+        <Text type="code" style={{ color: c.comment }}>
+          Try checking parameter names, using a PEM key, or selecting a specific attack from the sidebar
+        </Text>
+      </Stack>
+    </Card>
   );
 });
 
@@ -346,44 +348,43 @@ export function MagicPanel() {
   if (viewMode !== 'magic') return null;
 
   return (
-    <Box sx={colFlexSx}>
-      <Box sx={{ ...centeredPanelSx, p: 2 }}>
-        <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Typography variant="h3" sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <AutoFixHigh sx={{ fontSize: 'inherit' }} /> Magic Cracker
-          </Typography>
-          <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 3 }}>
-            Paste everything you have: we'll figure out which attacks to try
-          </Typography>
+    <Stack direction="vertical" style={flexFill}>
+      <Stack direction="vertical" hAlign="center" padding={2} isScrollable style={flexFill}>
+        <Stack direction="vertical" gap={2} width="100%" style={{ maxWidth: '40rem' }}>
+          <Heading level={3} style={{ color: c.purple }}>
+            <Icon icon={Sparkles} size="sm" /> Magic Cracker
+          </Heading>
+          <Text type="body" style={{ color: c.comment }}>
+            Paste everything you have: we&apos;ll figure out which attacks to try
+          </Text>
 
-          <TextField
-            fullWidth
-            multiline
-            rows={8}
+          <TextArea
             label="Raw input (PEM, hex, decimal, key=value pairs…)"
             value={rawInput}
-            onChange={e => setRawInput(e.target.value)}
-            variant="outlined"
-            sx={inputSx}
+            onChange={setRawInput}
+            rows={8}
+            width="100%"
           />
 
           {/* Empty state — show format examples */}
           {!rawInput.trim() && !running && jobs.length === 0 && (
-            <Box sx={{ mt: 2, p: 2, borderRadius: 1, backgroundColor: draculaColors.currentLine, border: `1px solid ${draculaColors.comment}` }}>
-              <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', fontFamily: MONO_FAMILY, mb: 1 }}>
-                Paste any of these formats:
-              </Typography>
-              <Box sx={{ fontFamily: MONO_FAMILY, fontSize: '0.7rem', color: draculaColors.foreground, '& div': { mb: 0.5 } }}>
-                <div>n = <span style={{ color: draculaColors.cyan }}>1234567890abcdef…</span></div>
-                <div>e = <span style={{ color: draculaColors.cyan }}>65537</span></div>
-                <div style={{ color: draculaColors.comment }}>/ or PEM public key /</div>
-                <div style={{ color: draculaColors.comment }}>-----BEGIN RSA PUBLIC KEY-----</div>
-                <div style={{ color: draculaColors.comment }}>/ or just hex/decimal n /</div>
-                <div style={{ color: draculaColors.comment }}>00c3a7…</div>
-                <div style={{ color: draculaColors.comment }}>/ or JSON /</div>
-                <div style={{ color: draculaColors.cyan }}>{`{"n": "0x…", "e": 65537, "ct": "…"}`}</div>
-              </Box>
-            </Box>
+            <Card variant="muted">
+              <Stack direction="vertical" gap={1}>
+                <Text type="code" style={{ color: c.comment }}>
+                  Paste any of these formats:
+                </Text>
+                <Stack direction="vertical" gap={0}>
+                  <Text type="code">n = <Text style={{ color: c.cyan }}>1234567890abcdef…</Text></Text>
+                  <Text type="code">e = <Text style={{ color: c.cyan }}>65537</Text></Text>
+                  <Text type="code" style={{ color: c.comment }}>/ or PEM public key /</Text>
+                  <Text type="code" style={{ color: c.comment }}>-----BEGIN RSA PUBLIC KEY-----</Text>
+                  <Text type="code" style={{ color: c.comment }}>/ or just hex/decimal n /</Text>
+                  <Text type="code" style={{ color: c.comment }}>00c3a7…</Text>
+                  <Text type="code" style={{ color: c.comment }}>/ or JSON /</Text>
+                  <Text type="code" style={{ color: c.cyan }}>{`{"n": "0x…", "e": 65537, "ct": "…"}`}</Text>
+                </Stack>
+              </Stack>
+            </Card>
           )}
 
           {/* Extracted params preview */}
@@ -392,119 +393,103 @@ export function MagicPanel() {
           )}
 
           {rawInput.trim() && !running && (
-            <Typography role="status" aria-live="polite" sx={{ color: canCrack ? draculaColors.green : draculaColors.comment, mt: 1, fontSize: '0.7rem', fontFamily: MONO_FAMILY }}>
+            <Text role="status" aria-live="polite" type="code" style={{ color: canCrack ? c.green : c.comment }}>
               {!extractedParams
                 ? 'No supported parameters found. Use n = …, a PEM RSA key, hex/decimal n, or JSON such as {"n":"…","e":65537}.'
                 : applicablePreview.length === 0
                   ? `Recognized ${Object.keys(extractedParams).join(', ')}. No supported attacks for these values; add relevant RSA parameters.`
                   : `Recognized ${Object.keys(extractedParams).join(', ')}. ${applicablePreview.length} attacks available.`}
-            </Typography>
+            </Text>
           )}
 
           {/* Applicable preview */}
           {rawInput.trim() && !running && (
-            <Box sx={{ mt: 1 }}>
+            <Stack direction="vertical" gap={0}>
               <Button
-                fullWidth
+                label={`${applicablePreview.length} attacks applicable`}
+                variant="ghost"
+                width="100%"
                 onClick={() => setShowApplicable(!showApplicable)}
-                sx={{
-                  color: draculaColors.comment,
-                  fontFamily: MONO_FAMILY,
-                  fontSize: '0.75rem',
-                  justifyContent: 'space-between',
-                  px: 1,
-                  py: 0.5,
-                  '&:hover': { backgroundColor: draculaColors.background },
-                }}
-                endIcon={showApplicable ? <ExpandLess sx={{ fontSize: '1rem' }} /> : <ExpandMore sx={{ fontSize: '1rem' }} />}
-              >
-                {applicablePreview.length} attacks applicable
-              </Button>
-              <Collapse in={showApplicable}>
+                endContent={<Icon icon={showApplicable ? 'arrowUp' : 'chevronDown'} size="sm" />}
+              />
+              {showApplicable && (
                 <ApplicableList byCategory={applicableByCategory} />
-              </Collapse>
-            </Box>
+              )}
+            </Stack>
           )}
 
           {/* Generate Testcase + Run/Stop buttons */}
-          <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+          <Stack direction="horizontal" gap={1} width="100%">
             <Button
-              fullWidth
-              variant="outlined"
+              label="Generate Testcase"
+              variant="ghost"
+              width="100%"
               onClick={handleGenerateTestcase}
-              sx={colorGhostBtn(draculaColors.cyan)}
-              startIcon={<Casino sx={{ fontSize: '1rem' }} />}
-            >
-              Generate Testcase
-            </Button>
+              icon={<Icon icon={Dices} size="sm" />}
+            />
 
             {running ? (
               <Button
-                fullWidth
-                variant="outlined"
+                label="Stop"
+                variant="destructive"
+                width="100%"
                 onClick={handleStop}
-                sx={colorGhostBtn(draculaColors.red)}
-              >
-                <Stop sx={{ mr: 1 }} /> Stop
-              </Button>
+                icon={<Icon icon="stop" size="sm" />}
+              />
             ) : (
               <Button
-                fullWidth
-                variant="outlined"
+                label="Crack It"
+                variant="primary"
+                width="100%"
                 onClick={() => { void handleCrack(); }}
-                disabled={!canCrack}
-                sx={{ ...colorGhostBtn(draculaColors.purple), '&:disabled': { borderColor: draculaColors.comment, color: draculaColors.comment } }}
-              >
-                <Science sx={{ mr: 1 }} /> Crack It
-              </Button>
+                isDisabled={!canCrack}
+                icon={<Icon icon={FlaskConical} size="sm" />}
+              />
             )}
-          </Box>
+          </Stack>
 
           {testcaseMsg && (
-            <Typography variant="body2" sx={{ color: draculaColors.orange, mt: 1, textAlign: 'center', fontSize: '0.75rem' }}>
+            <Text type="body" justify="center" style={{ color: c.orange }}>
               {testcaseMsg}
-            </Typography>
+            </Text>
           )}
 
           {/* Progress bar and status */}
           {running && (
-            <Box sx={{ mt: 2, width: '100%' }}>
-              <LinearProgress
-                variant="determinate"
+            <Stack direction="vertical" gap={1} width="100%">
+              <ProgressBar
+                label="Magic cracker progress"
                 value={displayedPct}
-                sx={{
-                  height: 6,
-                  borderRadius: 3,
-                  backgroundColor: draculaColors.currentLine,
-                  '& .MuiLinearProgress-bar': { backgroundColor: draculaColors.purple },
-                }}
+                variant="accent"
               />
-              <Typography role="status" aria-live="polite" variant="body2" sx={{ color: draculaColors.purple, mt: 1, textAlign: 'center', fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                <HourglassEmpty sx={{ fontSize: '1rem', ...hourglassSpinSx }} />
-                Elapsed: {timer.formatted} / {jobs.filter(j => j.status !== 'running').length}/{jobs.length} completed
-              </Typography>
-            </Box>
+              <Stack direction="horizontal" gap={1} hAlign="center" vAlign="center" role="status" aria-live="polite">
+                <Spinner size="sm" aria-label="Cracking in progress" />
+                <Text type="body" style={{ color: c.purple }}>
+                  Elapsed: {timer.formatted} / {jobs.filter(j => j.status !== 'running').length}/{jobs.length} completed
+                </Text>
+              </Stack>
+            </Stack>
           )}
 
           {earlyStop && (
-            <Typography variant="body2" sx={{ color: draculaColors.green, mt: 1, textAlign: 'center' }}>
+            <Text type="body" justify="center" style={{ color: c.green }}>
               Found result: stopping early
-            </Typography>
+            </Text>
           )}
 
           {/* Results summary */}
           {!running && jobs.length > 0 && (
-            <Typography variant="body2" sx={{ color: draculaColors.comment, mt: 1, textAlign: 'center', fontSize: '0.75rem' }}>
-              <Typography component="span" sx={{ color: draculaColors.green }}>{jobs.filter(j => j.status === 'success').length} succeeded</Typography>
+            <Text type="body" justify="center" style={{ color: c.comment }}>
+              <Text style={{ color: c.green }}>{jobs.filter(j => j.status === 'success').length} succeeded</Text>
               {', '}
-              <Typography component="span" sx={{ color: draculaColors.red }}>{jobs.filter(j => j.status === 'error').length} failed</Typography>
+              <Text style={{ color: c.red }}>{jobs.filter(j => j.status === 'error').length} failed</Text>
               {jobs.filter(j => j.status === 'aborted').length > 0 && (
-                <>, <Typography component="span" sx={{ color: draculaColors.comment }}>{jobs.filter(j => j.status === 'aborted').length} skipped</Typography></>
+                <>, <Text style={{ color: c.comment }}>{jobs.filter(j => j.status === 'aborted').length} skipped</Text></>
               )}
               {jobs.filter(j => j.status === 'cancelled').length > 0 && (
-                <>, <Typography component="span" sx={{ color: draculaColors.orange }}>{jobs.filter(j => j.status === 'cancelled').length} cancelled</Typography></>
+                <>, <Text style={{ color: c.orange }}>{jobs.filter(j => j.status === 'cancelled').length} cancelled</Text></>
               )}
-            </Typography>
+            </Text>
           )}
 
           {/* Error insights */}
@@ -514,8 +499,8 @@ export function MagicPanel() {
 
           {jobs.length > 0 && (
             <>
-              <Divider sx={{ borderColor: draculaColors.comment, my: 2 }} />
-              <List dense>
+              <Divider />
+              <List density="compact">
                 {jobs.map(job => (
                   <JobListItem
                     key={job.attackId}
@@ -529,9 +514,9 @@ export function MagicPanel() {
               </List>
             </>
           )}
-        </Box>
-      </Box>
-    </Box>
+        </Stack>
+      </Stack>
+    </Stack>
   );
 }
 
