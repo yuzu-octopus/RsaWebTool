@@ -1,18 +1,17 @@
 import { useState, useCallback } from 'react';
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Paper,
-  LinearProgress,
-  Tooltip,
-  IconButton,
-} from '@mui/material';
-import { VpnKey, ContentCopy, Send } from '@mui/icons-material';
-import { draculaColors } from '../theme/dracula';
-import { inputSx } from '../styles/shared';
-import { colFlexSx, centeredPanelSx, MONO_FAMILY, colorGhostBtn, ICON_SIZES } from '../styles/shared';
+import { Stack, StackItem } from '@astryxdesign/core/Stack';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Text } from '@astryxdesign/core/Text';
+import { TextArea } from '@astryxdesign/core/TextArea';
+import { TextInput } from '@astryxdesign/core/TextInput';
+import { Button } from '@astryxdesign/core/Button';
+import { IconButton } from '@astryxdesign/core/IconButton';
+import { Icon } from '@astryxdesign/core/Icon';
+import { Card } from '@astryxdesign/core/Card';
+import { Banner } from '@astryxdesign/core/Banner';
+import { Tooltip } from '@astryxdesign/core/Tooltip';
+import { ProgressBar } from '@astryxdesign/core/ProgressBar';
+import { CodeBlock } from '@astryxdesign/core/CodeBlock';
 import { useAppContext } from '../hooks/useAppContext';
 import { parsePEM, decryptPEM } from '../utils/pemParser';
 import type { ParsedPEM } from '../utils/pemParser';
@@ -22,6 +21,10 @@ function truncateHex(hex: string, keepLen = 16): string {
   if (hex.length <= keepLen * 2 + 3) return hex;
   return `${hex.slice(0, keepLen)}...${hex.slice(-keepLen)}`;
 }
+
+const PEM_EXAMPLE = `-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA...
+-----END RSA PRIVATE KEY-----`;
 
 export function PemDecryptor() {
   const { viewMode, setViewMode, setCalculatorMode, showNotification } = useAppContext();
@@ -91,290 +94,157 @@ export function PemDecryptor() {
   if (viewMode !== 'pem') return null;
 
   return (
-    <Box sx={colFlexSx}>
-      <Box sx={{ ...centeredPanelSx, p: 2 }}>
-        <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Typography
-            variant="h3"
-            sx={{
-              color: draculaColors.purple,
-              mb: 1,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-            }}
-          >
-            <VpnKey sx={{ fontSize: 'inherit' }} /> PEM Key Decryptor
-          </Typography>
+    <Stack>
+      <Stack hAlign="center" padding={2}>
+        <Stack width="100%" maxWidth={640} gap={2}>
+          <Heading level={3}>PEM Key Decryptor</Heading>
 
-          <Typography
-            variant="body2"
-            sx={{
-              color: draculaColors.comment,
-              fontFamily: MONO_FAMILY,
-              fontSize: '0.75rem',
-              mb: 3,
-            }}
-          >
+          <Text type="supporting">
             Parse and decrypt PEM private keys in PKCS#1 and PKCS#8 formats
-          </Typography>
+          </Text>
 
           {/* PEM Input */}
-          <TextField
-            fullWidth
-            multiline
+          <TextArea
+            label="PEM private key"
             rows={6}
             value={pemInput}
-            onChange={(e) => setPemInput(e.target.value)}
+            onChange={(value) => setPemInput(value)}
             placeholder="Paste a PEM private key here..."
-            variant="outlined"
-            sx={{ ...inputSx, mb: 1 }}
           />
 
           {/* PEM Format Example */}
-          <Box sx={{
-            fontFamily: MONO_FAMILY, fontSize: '0.75rem',
-            color: draculaColors.comment, mt: 0, p: 1,
-            border: `1px solid ${draculaColors.currentLine}`, borderRadius: '4px',
-            whiteSpace: 'pre-wrap', mb: 2,
-          }}>
-{`-----BEGIN RSA PRIVATE KEY-----
-MIIEpAIBAAKCAQEA...
------END RSA PRIVATE KEY-----`}
-          </Box>
+          <CodeBlock
+            code={PEM_EXAMPLE}
+            language="plaintext"
+            width="100%"
+          />
 
           {/* Parse Button */}
-          <Button
-            variant="outlined"
-            onClick={handleParse}
-            disabled={!pemInput.trim()}
-            startIcon={<VpnKey />}
-            sx={{
-              borderColor: draculaColors.purple,
-              color: draculaColors.purple,
-              fontFamily: MONO_FAMILY,
-              fontSize: '0.8rem',
-              mb: 2,
-              '&:hover': {
-                backgroundColor: draculaColors.purple,
-                color: draculaColors.background,
-              },
-            }}
-          >
-            Parse Key
-          </Button>
+          <Stack direction="horizontal">
+            <Button
+              label="Parse Key"
+              variant="secondary"
+              onClick={handleParse}
+              isDisabled={!pemInput.trim()}
+            />
+          </Stack>
 
           {/* Error Display */}
           {error && (
-            <Typography
-              variant="body2"
-              sx={{
-                color: draculaColors.red,
-                fontFamily: MONO_FAMILY,
-                fontSize: '0.75rem',
-                mb: 2,
-                p: 1,
-                backgroundColor: 'rgba(255,85,85,0.1)',
-                borderRadius: 1,
-              }}
-            >
-              {error}
-            </Typography>
+            <Banner status="error" title={error} />
           )}
 
           {/* Passphrase + Decrypt (only for encrypted keys) */}
           {parsed?.encrypted && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-              <TextField
-                type="password"
-                size="small"
-                value={passphrase}
-                onChange={(e) => setPassphrase(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && passphrase && !decrypting) {
-                    e.preventDefault();
-                    void handleDecrypt();
-                  }
-                }}
-                placeholder="Passphrase"
-                variant="outlined"
-                disabled={decrypting}
-                sx={{
-                  flex: 1,
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: draculaColors.currentLine,
-                    color: draculaColors.foreground,
-                    fontFamily: MONO_FAMILY,
-                    '& fieldset': { borderColor: draculaColors.comment },
-                    '&:hover fieldset': { borderColor: draculaColors.purple },
-                    '&.Mui-focused fieldset': { borderColor: draculaColors.purple },
-                  },
-                }}
-              />
+            <Stack direction="horizontal" gap={1} vAlign="center">
+              <StackItem size="fill">
+                <TextInput
+                  label="Passphrase"
+                  isLabelHidden
+                  type="password"
+                  value={passphrase}
+                  onChange={(value) => setPassphrase(value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && passphrase && !decrypting) {
+                      e.preventDefault();
+                      void handleDecrypt();
+                    }
+                  }}
+                  placeholder="Passphrase"
+                  isDisabled={decrypting}
+                  width="100%"
+                />
+              </StackItem>
               <Button
-                variant="outlined"
+                label="Decrypt"
+                variant="secondary"
                 onClick={() => { void handleDecrypt(); }}
-                disabled={!passphrase || decrypting}
-                startIcon={<VpnKey />}
-                sx={{
-                  borderColor: draculaColors.green,
-                  color: draculaColors.green,
-                  fontFamily: MONO_FAMILY,
-                  fontSize: '0.8rem',
-                  whiteSpace: 'nowrap',
-                  '&:hover': {
-                    backgroundColor: draculaColors.green,
-                    color: draculaColors.background,
-                  },
-                }}
-              >
-                Decrypt
-              </Button>
-            </Box>
+                isDisabled={!passphrase || decrypting}
+              />
+            </Stack>
           )}
 
           {decrypting && (
-            <Box sx={{ mb: 2 }}>
-              <LinearProgress
-                sx={{
-                  backgroundColor: draculaColors.currentLine,
-                  '& .MuiLinearProgress-bar': {
-                    backgroundColor: draculaColors.green,
-                  },
-                }}
-              />
-              <Typography
-                variant="caption"
-                sx={{
-                  color: draculaColors.comment,
-                  fontFamily: MONO_FAMILY,
-                  mt: 0.5,
-                  display: 'block',
-                }}
-              >
+            <Stack gap={1}>
+              <ProgressBar label="Decrypting key" isIndeterminate />
+              <Text type="supporting">
                 Decrypting key...
-              </Typography>
-            </Box>
+              </Text>
+            </Stack>
           )}
 
           {/* Extracted Parameters */}
           {parsed && (
-            <Paper
-              variant="outlined"
-              sx={{
-                p: 2,
-                mb: 2,
-                backgroundColor: draculaColors.currentLine,
-                borderColor: parsed.encrypted ? draculaColors.orange : draculaColors.green,
-                borderRadius: 1,
-              }}
-            >
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  color: parsed.encrypted ? draculaColors.orange : draculaColors.green,
-                  fontFamily: MONO_FAMILY,
-                  mb: 1.5,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                }}
-              >
-                <VpnKey sx={{ fontSize: '1rem' }} />
-                {parsed.format}
-                {parsed.encryptionAlgorithm && (
-                  <Typography
-                    component="span"
-                    variant="caption"
-                    sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY }}
-                  >
-                    ({parsed.encryptionAlgorithm})
-                  </Typography>
-                )}
-              </Typography>
+            <Card>
+              <Stack gap={2}>
+                <Stack direction="horizontal" gap={1} vAlign="center">
+                  <Text weight="semibold">
+                    {parsed.format}
+                  </Text>
+                  {parsed.encryptionAlgorithm && (
+                    <Text type="supporting">
+                      ({parsed.encryptionAlgorithm})
+                    </Text>
+                  )}
+                </Stack>
 
-              {parsed.keyParams ? (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.8 }}>
-                  {Object.entries(parsed.keyParams).flatMap(([key, value]) => {
-                    if (['dp', 'dq', 'qInv'].includes(key) || !value || value === '0') return [];
-                    const display = truncateHex(value);
-                    return [
-                      <Box
-                        key={key}
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5,
-                        }}
-                      >
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            color: draculaColors.purple,
-                            fontFamily: MONO_FAMILY,
-                            fontSize: '0.7rem',
-                            fontWeight: 600,
-                            minWidth: 32,
-                            textTransform: 'uppercase',
-                          }}
+                {parsed.keyParams ? (
+                  <Stack gap={1}>
+                    {Object.entries(parsed.keyParams).flatMap(([key, value]) => {
+                      if (['dp', 'dq', 'qInv'].includes(key) || !value || value === '0') return [];
+                      const display = truncateHex(value);
+                      return [
+                        <Stack
+                          key={key}
+                          direction="horizontal"
+                          gap={1}
+                          vAlign="center"
                         >
-                          {key}:
-                        </Typography>
-                        <Tooltip title={value} arrow placement="top">
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              color: draculaColors.foreground,
-                              fontFamily: MONO_FAMILY,
-                              fontSize: '0.7rem',
-                              wordBreak: 'break-all',
-                              '&:hover': { color: draculaColors.cyan },
+                          <Text type="label" weight="semibold">
+                            {key}:
+                          </Text>
+                          <Tooltip content={value}>
+                            <Text type="code" wordBreak="break-all">
+                              {display}
+                            </Text>
+                          </Tooltip>
+                          <IconButton
+                            label={`Copy ${key}`}
+                            tooltip={`Copy ${key}`}
+                            icon={<Icon icon="copy" size="sm" />}
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              navigator.clipboard.writeText(value).catch(() => {});
+                              showNotification(`Copied ${key}`, 'info');
                             }}
-                          >
-                            {display}
-                          </Typography>
-                        </Tooltip>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            navigator.clipboard.writeText(value).catch(() => {});
-                            showNotification(`Copied ${key}`, 'info');
-                          }}
-                          sx={{ color: draculaColors.comment, p: '2px' }}
-                          aria-label={`Copy ${key}`}
-                        >
-                          <ContentCopy sx={{ fontSize: ICON_SIZES.xs }} />
-                        </IconButton>
-                      </Box>,
-                    ];
-                  })}
-                </Box>
-              ) : (
-                <Typography
-                  variant="body2"
-                  sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, fontSize: '0.75rem' }}
-                >
-                  No parameters extracted (encrypted key — decrypt first)
-                </Typography>
-              )}
-            </Paper>
+                          />
+                        </Stack>,
+                      ];
+                    })}
+                  </Stack>
+                ) : (
+                  <Text type="supporting">
+                    No parameters extracted (encrypted key — decrypt first)
+                  </Text>
+                )}
+              </Stack>
+            </Card>
           )}
 
           {/* Action Buttons */}
           {parsed?.keyParams && !parsed.encrypted && (
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Stack direction="horizontal" gap={1} wrap="wrap">
               <Button
-                variant="outlined"
-                startIcon={<ContentCopy />}
+                label="Copy All Params"
+                variant="ghost"
+                icon={<Icon icon="copy" size="sm" />}
                 onClick={handleCopyParams}
-                sx={colorGhostBtn(draculaColors.purple)}
-              >
-                Copy All Params
-              </Button>
+              />
 
               <Button
-                variant="outlined"
-                startIcon={<VpnKey />}
+                label="Switch to Calculator"
+                variant="ghost"
                 onClick={() => {
                   const { n: nVal, e: eVal } = parsed.keyParams!;
                   if (!nVal || nVal === '0') return;
@@ -385,24 +255,18 @@ MIIEpAIBAAKCAQEA...
                   }));
                   showNotification('Prefilled RSA Calculator with key parameters', 'success');
                 }}
-                sx={colorGhostBtn(draculaColors.cyan)}
-              >
-                Switch to Calculator
-              </Button>
+              />
 
               <Button
-                variant="outlined"
-                startIcon={<Send />}
+                label="Feed to Attacks"
+                variant="ghost"
                 onClick={handleFeedAttacks}
-                sx={colorGhostBtn(draculaColors.green)}
-              >
-                Feed to Attacks
-              </Button>
-            </Box>
+              />
+            </Stack>
           )}
-        </Box>
-      </Box>
-    </Box>
+        </Stack>
+      </Stack>
+    </Stack>
   );
 }
 

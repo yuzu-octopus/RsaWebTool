@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { Box, Typography } from '@mui/material';
-import { draculaColors } from '../theme/dracula';
-import { MONO_FAMILY, PROSE_FAMILY } from '../styles/shared';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Text } from '@astryxdesign/core/Text';
 interface ProofSegment {
   type: 'text' | 'displayMath' | 'list';
   content: string;
@@ -162,35 +162,9 @@ export function ProofRenderer({ latex }: { latex: string }) {
   const segments = useMemo(() => parseProof(latex), [latex]);
 
   return (
-    <Box sx={{ overflow: 'auto', flex: 1 }}>
-      <Box
-          sx={{
-            color: draculaColors.foreground,
-            fontFamily: PROSE_FAMILY,
-            maxWidth: '72ch',
-            mx: 'auto',
-            lineHeight: 1.8,
-            '& .katex-display': {
-              margin: '1.2em 0',
-              overflowX: 'auto',
-              overflowY: 'hidden',
-              padding: '0.5em 0',
-            },
-            '& .katex': {
-              fontSize: '1.1em',
-            },
-            '& ul, & ol': {
-              margin: '0.75em 0',
-              paddingLeft: '1.5em',
-            },
-            '& li': {
-              marginBottom: '0.35em',
-            },
-            '& p': {
-              margin: '0.75em 0',
-            },
-          }}
-        >
+    <Stack isScrollable>
+      <Stack hAlign="center">
+        <Stack width="100%" maxWidth="72ch" gap={2} padding={2}>
           {segments.map((segment) => {
             if (segment.type === 'displayMath') {
               // Re-wrap content in the original environment for proper alignment parsing
@@ -206,23 +180,25 @@ export function ProofRenderer({ latex }: { latex: string }) {
                   displayMode: true,
                 });
                 return (
-                  <Box key={'dm-' + segment.content.slice(0, 20)} sx={{ my: 2 }}>
-                    {/* SAFE: katex.renderToString produces sanitized HTML (KaTeX
-                        escapes user input internally). Input is bundled proof
-                        LaTeX. */}
-                    <Box component="div" dangerouslySetInnerHTML={{ __html: html }} />
+                  <Stack key={'dm-' + segment.content.slice(0, 20)} gap={1}>
+                    <Stack isScrollable>
+                      {/* SAFE: katex.renderToString produces sanitized HTML (KaTeX
+                          escapes user input internally). Input is bundled proof
+                          LaTeX. */}
+                      <span dangerouslySetInnerHTML={{ __html: html }} />
+                    </Stack>
                     {hasQed && (
-                      <Box component="span" sx={{ float: 'right', mr: 2, fontSize: '1.2em' }}>
-                        ∎
-                      </Box>
+                      <Stack direction="horizontal" justify="end">
+                        <Text>∎</Text>
+                      </Stack>
                     )}
-                  </Box>
+                  </Stack>
                 );
               } catch {
                 return (
-                  <Box key={'dm-err-' + segment.content.slice(0, 20)} sx={{ my: 2, color: draculaColors.red, fontFamily: MONO_FAMILY, fontSize: '0.8rem' }}>
+                  <Text key={'dm-err-' + segment.content.slice(0, 20)}>
                     Math render error
-                  </Box>
+                  </Text>
                 );
               }
             }
@@ -236,13 +212,13 @@ export function ProofRenderer({ latex }: { latex: string }) {
                   return cleaned;
                 });
               return (
-                <Box key={'list-' + segment.content.slice(0, 20)} component="ul" sx={{ my: 1, pl: 2 }}>
+                <ul key={'list-' + segment.content.slice(0, 20)}>
                   {items.map((item) => (
-                    <Box key={'li-' + item.slice(0, 20).replace(/\s+/g, '_')} component="li" sx={{ mb: 0.5, color: draculaColors.foreground }}>
+                    <li key={'li-' + item.slice(0, 20).replace(/\s+/g, '_')}>
                       <InlineMath text={item} />
-                    </Box>
+                    </li>
                   ))}
-                </Box>
+                </ul>
               );
             }
 
@@ -263,31 +239,28 @@ export function ProofRenderer({ latex }: { latex: string }) {
                 if (headingMatch) {
                   const isTopLevelHeading = /^(theorem|section|appendix)/i.test(headingMatch[1]);
                   rendered.push(
-                    <Box key={j} sx={{ my: 1.5 }}>
-                      <Typography
-                        component={isTopLevelHeading ? 'h2' : 'h3'}
-                        variant={isTopLevelHeading ? 'h5' : 'h6'}
-                        sx={{ color: draculaColors.pink, fontFamily: MONO_FAMILY, fontWeight: 700, mb: headingMatch[2] ? 0.5 : 0 }}
-                      >
+                    <Stack key={j} gap={1}>
+                      <Heading level={isTopLevelHeading ? 2 : 3}>
                         {headingMatch[1]}:
-                      </Typography>
-                      {headingMatch[2] && <Typography variant="body1"><InlineMath text={headingMatch[2]} /></Typography>}
-                    </Box>
+                      </Heading>
+                      {headingMatch[2] && <Text as="p"><InlineMath text={headingMatch[2]} /></Text>}
+                    </Stack>
                   );
                 } else {
                   rendered.push(
-                    <Typography key={j} variant="body1" sx={{ my: 1 }}>
+                    <Text key={j} as="p">
                       <InlineMath text={para} />
-                    </Typography>
+                    </Text>
                   );
                 }
               }
-              return skipRest && rendered.length === 0 ? null : <Box key={'text-' + segment.content.slice(0, 20)}>{rendered}</Box>;
+              return skipRest && rendered.length === 0 ? null : <Stack key={'text-' + segment.content.slice(0, 20)} gap={1}>{rendered}</Stack>;
             }
 
             return null;
           })}
-        </Box>
-    </Box>
+        </Stack>
+      </Stack>
+    </Stack>
   );
 }

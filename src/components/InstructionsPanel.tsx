@@ -1,11 +1,7 @@
-import {
-  Box,
-  Typography,
-  Divider,
-} from '@mui/material';
-import { MenuBook } from '@mui/icons-material';
-import { draculaColors } from '../theme/dracula';
-import { colFlexSx, MONO_FAMILY } from '../styles/shared';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Text } from '@astryxdesign/core/Text';
+import { Divider } from '@astryxdesign/core/Divider';
 import { useAppContext } from '../hooks/useAppContext';
 
 interface Section {
@@ -54,65 +50,41 @@ const SECTIONS: Section[] = [
   },
 ];
 
-const sectionContentSx = {
-  px: 2,
-  pb: 0.5,
-} as const;
-
-const bulletSx = {
-  color: draculaColors.foreground,
-  fontFamily: MONO_FAMILY,
-  fontSize: '0.85rem',
-  lineHeight: 1.6,
-  mb: 0.25,
-} as const;
-
 export function InstructionsPanel() {
   const { viewMode } = useAppContext();
 
   if (viewMode !== 'instructions') return null;
 
   return (
-    <Box sx={colFlexSx}>
-      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Typography variant="h3" sx={{ color: draculaColors.purple, mb: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <MenuBook sx={{ fontSize: 'inherit' }} /> Instructions
-          </Typography>
-        </Box>
-      </Box>
+    <Stack>
+      <Stack hAlign="center" padding={2}>
+        <Stack width="100%" maxWidth={640}>
+          <Heading level={3}>Instructions</Heading>
+        </Stack>
+      </Stack>
 
-      <Divider sx={{ borderColor: draculaColors.comment }} />
+      <Divider />
 
-      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center', pb: '20vh' }}>
-        <Box sx={{ width: '100%', maxWidth: 640 }}>
+      <Stack hAlign="center" isScrollable>
+        <Stack width="100%" maxWidth={640} gap={2} padding={2}>
           {SECTIONS.map((section) => (
-            <Box key={section.title} sx={{ mb: 1.5 }}>
-              <Box sx={{ px: 2, pt: 1, pb: 0.25 }}>
-                <Typography
-                  variant="h5"
-                  sx={{
-                    color: draculaColors.cyan,
-                    fontFamily: MONO_FAMILY,
-                    fontWeight: 700,
-                  }}
-                >
-                  {section.title}
-                </Typography>
-              </Box>
+            <Stack key={section.title} gap={1}>
+              <Heading level={5}>
+                {section.title}
+              </Heading>
 
-              <Box sx={sectionContentSx}>
+              <Stack gap={1}>
                 {section.content.map((line, i) => (
-                  <Typography key={i} sx={bulletSx}>
+                  <Text key={i} as="p">
                     {line}
-                  </Typography>
+                  </Text>
                 ))}
-              </Box>
-            </Box>
+              </Stack>
+            </Stack>
           ))}
-        </Box>
-      </Box>
-    </Box>
+        </Stack>
+      </Stack>
+    </Stack>
   );
 }
 

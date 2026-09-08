@@ -1,8 +1,12 @@
 import type { ReactNode, ElementType } from 'react';
-import { Box, Typography } from '@mui/material';
-import { draculaColors } from '../../theme/dracula';
-import { MONO_FAMILY } from '../../styles/shared';
+import { EmptyState as AstryxEmptyState } from '@astryxdesign/core/EmptyState';
+import { Stack } from '@astryxdesign/core/Stack';
 
+/**
+ * Props stay compatible with every existing call site (InputPanel,
+ * OutputPanel): icon component type, string-or-rich hint, rich children,
+ * and MUI-era numeric padding.
+ */
 export interface EmptyStateProps {
   /** Optional icon component to render above the title (e.g., `Calculate`, `HourglassEmpty`). */
   icon?: ElementType;
@@ -17,7 +21,7 @@ export interface EmptyStateProps {
    *   - Anything beyond a single line of text
    */
   children?: ReactNode;
-  /** Vertical padding. Defaults to 4. Set 0 when embedded inline in another container. */
+  /** Compact rendering when 0 (embedded inline); comfortable otherwise. Defaults to 4. */
   padding?: number;
 }
 
@@ -38,10 +42,8 @@ export interface EmptyStateProps {
  *
  *   // With rich example content (MagicPanel-style):
  *   <EmptyState title="Paste any of these formats:">
- *     <Box sx={{ fontFamily: MONO_FAMILY, fontSize: '0.7rem' }}>
- *       <div>n = 0x1234...</div>
- *       <div>e = 65537</div>
- *     </Box>
+ *     <Text type="code">n = 0x1234...</Text>
+ *     <Text type="code">e = 65537</Text>
  *   </EmptyState>
  */
 export function EmptyState({
@@ -51,49 +53,19 @@ export function EmptyState({
   children,
   padding = 4,
 }: EmptyStateProps) {
+  // Core description only accepts plain strings; rich hints render below.
+  const description = typeof hint === 'string' ? hint : undefined;
+  const richHint = typeof hint === 'string' ? undefined : hint;
   return (
-    <Box
-      sx={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        textAlign: 'center',
-        p: padding,
-        color: draculaColors.comment,
-      }}
-    >
-      {Icon && (
-        <Icon
-          sx={{
-            fontSize: '2.5rem',
-            mb: 1.5,
-            color: draculaColors.comment,
-            opacity: 0.5,
-          }}
-        />
-      )}
-      <Typography
-        variant="body1"
-        sx={{
-          color: draculaColors.comment,
-          fontStyle: 'italic',
-          fontFamily: MONO_FAMILY,
-          mb: hint || children ? 1 : 0,
-        }}
-      >
-        {title}
-      </Typography>
-      {hint && (
-        <Typography
-          variant="body2"
-          sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, mb: 1 }}
-        >
-          {hint}
-        </Typography>
-      )}
+    <Stack hAlign="center" vAlign="center" height="100%" gap={1} padding={2}>
+      <AstryxEmptyState
+        title={title}
+        description={description}
+        icon={Icon ? <Icon /> : undefined}
+        isCompact={padding === 0}
+      />
+      {richHint}
       {children}
-    </Box>
+    </Stack>
   );
 }

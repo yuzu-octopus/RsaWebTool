@@ -1,20 +1,14 @@
 import { useState, useMemo, useCallback } from 'react';
-import {
-  Box,
-  Typography,
-  TextField,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Divider,
-} from '@mui/material';
-import { Computer, Cloud, MenuBook } from '@mui/icons-material';
-import { draculaColors } from '../theme/dracula';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Text } from '@astryxdesign/core/Text';
+import { TextInput } from '@astryxdesign/core/TextInput';
+import { List, ListItem } from '@astryxdesign/core/List';
+import { Badge } from '@astryxdesign/core/Badge';
+import { Divider } from '@astryxdesign/core/Divider';
 import { useAppContext } from '../hooks/useAppContext';
 import { attacks } from '../attacks';
-import { colFlexSx, MONO_FAMILY, PROSE_FAMILY, ICON_SIZES } from '../styles/shared';
-import { inputSx } from '../styles/shared';
+import { EmptyState } from './_shared/EmptyState';
 
 function AttackListItem({
   attack,
@@ -23,44 +17,18 @@ function AttackListItem({
   attack: typeof attacks[0];
   onClick: (attack: typeof attacks[0]) => void;
 }) {
-  const primaryContent = (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-      <Typography sx={{ color: draculaColors.cyan, fontFamily: MONO_FAMILY, fontWeight: 600 }}>
-        {attack.name}
-      </Typography>
-      {attack.frontendCheck
-        ? <Computer sx={{ color: draculaColors.green, fontSize: ICON_SIZES.sm }} />
-        : <Cloud sx={{ color: draculaColors.orange, fontSize: ICON_SIZES.sm }} />}
-      <Typography
-        component="span"
-        sx={{
-          color: attack.frontendCheck ? draculaColors.green : draculaColors.orange,
-          fontSize: '0.65rem',
-          fontFamily: MONO_FAMILY,
-        }}
-      >
-        ({attack.frontendCheck ? 'Local' : 'SageMath'})
-      </Typography>
-    </Box>
-  );
-  const secondaryContent = (
-    <Typography sx={{ color: draculaColors.comment, fontFamily: PROSE_FAMILY, fontSize: '0.75rem' }}>
-      [{attack.category}] {attack.description}
-    </Typography>
-  );
   return (
-    <ListItem disablePadding sx={{ mb: 1 }}>
-      <ListItemButton
-        onClick={() => onClick(attack)}
-        sx={{
-          borderRadius: 1,
-          border: `1px solid ${draculaColors.comment}`,
-          '&:hover': { backgroundColor: draculaColors.background, borderColor: draculaColors.purple },
-        }}
-      >
-        <ListItemText primary={primaryContent} secondary={secondaryContent} />
-      </ListItemButton>
-    </ListItem>
+    <ListItem
+      label={attack.name}
+      description={`[${attack.category}] ${attack.description}`}
+      endContent={
+        <Badge
+          variant={attack.frontendCheck ? 'green' : 'orange'}
+          label={attack.frontendCheck ? 'Local' : 'SageMath'}
+        />
+      }
+      onClick={() => onClick(attack)}
+    />
   );
 }
 
@@ -92,48 +60,45 @@ export function ProofIndex() {
   if (viewMode !== 'proofs') return null;
 
   return (
-    <Box sx={colFlexSx}>
-      <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Typography variant="h3" sx={{ color: draculaColors.purple, fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <MenuBook sx={{ fontSize: 'inherit' }} /> Attack Index
-          </Typography>
+    <Stack>
+      <Stack hAlign="center" padding={2}>
+        <Stack width="100%" maxWidth={640} gap={2}>
+          <Heading level={3}>Attack Index</Heading>
 
-          <TextField
-            fullWidth
-            label="Search proofs..."
+          <TextInput
+            label="Search proofs"
+            isLabelHidden
+            placeholder="Search proofs..."
+            startIcon="search"
+            hasClear
             value={search}
-            onChange={e => setSearch(e.target.value)}
-            variant="outlined"
-            size="small"
-            sx={{ ...inputSx, mb: 2 }}
+            onChange={(value) => setSearch(value)}
+            width="100%"
           />
 
-          <Typography variant="body2" sx={{ color: draculaColors.comment, mb: 1 }}>
+          <Text type="supporting">
             {filtered.length} of {attacks.length} attacks
-          </Typography>
-        </Box>
-      </Box>
+          </Text>
+        </Stack>
+      </Stack>
 
-      <Divider sx={{ borderColor: draculaColors.comment }} />
+      <Divider />
 
-      <Box sx={{ flex: 1, overflow: 'auto', display: 'flex', justifyContent: 'center', pb: '20vh' }}>
+      <Stack hAlign="center" isScrollable>
         {filtered.length === 0 && search ? (
-          <Box sx={{ textAlign: 'center', mt: 4, px: 2 }}>
-            <Typography sx={{ color: draculaColors.comment, fontSize: '0.85rem', fontFamily: MONO_FAMILY }}>
-              No proofs match &quot;{search}&quot;
-            </Typography>
-            <Typography sx={{ color: draculaColors.comment, fontSize: '0.7rem', mt: 1, fontFamily: MONO_FAMILY }}>
-              Try a different search term or clear the search field
-            </Typography>
-          </Box>
+          <EmptyState
+            title={`No proofs match "${search}"`}
+            hint="Try a different search term or clear the search field"
+          />
         ) : (
-          <List sx={{ width: '100%', maxWidth: 640, px: 2 }}>
-            {attackItems}
-          </List>
+          <Stack width="100%" maxWidth={640} padding={2}>
+            <List hasDividers>
+              {attackItems}
+            </List>
+          </Stack>
         )}
-      </Box>
-    </Box>
+      </Stack>
+    </Stack>
   );
 }
 

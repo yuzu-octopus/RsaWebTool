@@ -1,7 +1,9 @@
 import { Component, Fragment, type ErrorInfo, type ReactNode } from 'react';
-import { Box, Button, Typography } from '@mui/material';
-import { draculaColors } from '../theme/dracula';
-import { MONO_FAMILY } from '../styles/shared';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Text } from '@astryxdesign/core/Text';
+import { Button } from '@astryxdesign/core/Button';
+import { CodeBlock } from '@astryxdesign/core/CodeBlock';
 
 interface Props {
   children: ReactNode;
@@ -35,23 +37,25 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
       return (
-        <Box sx={{ flex: 1, p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <Typography variant="h6" sx={{ color: draculaColors.red, mb: 1, fontFamily: MONO_FAMILY }}>
+        <Stack hAlign="center" vAlign="center" gap={2} padding={4} height="100%">
+          <Heading level={2}>
             This part of the workspace could not load
-          </Typography>
-          <Typography variant="body2" sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, textAlign: 'center', mb: 2 }}>
+          </Heading>
+          <Text justify="center">
             Try again. If this keeps happening, reload the page.
-          </Typography>
-          <Button variant="outlined" color="inherit" onClick={this.handleReset} sx={{ color: draculaColors.cyan, borderColor: draculaColors.cyan, fontFamily: MONO_FAMILY }}>
-            Try again
-          </Button>
-          <Box component="details" sx={{ mt: 2, color: draculaColors.comment, fontFamily: MONO_FAMILY, maxWidth: '100%' }}>
-            <Box component="summary" sx={{ cursor: 'pointer' }}>Technical details</Box>
-            <Box component="pre" sx={{ m: 0, mt: 1, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-              {this.state.error?.message ?? 'Unknown error'}
-            </Box>
-          </Box>
-        </Box>
+          </Text>
+          <Button label="Try again" variant="secondary" onClick={this.handleReset} />
+          <details>
+            <summary>
+              <Text>Technical details</Text>
+            </summary>
+            <CodeBlock
+              code={this.state.error?.message ?? 'Unknown error'}
+              language="plaintext"
+              width="100%"
+            />
+          </details>
+        </Stack>
       );
     }
     return <Fragment key={this.state.resetKey}>{this.props.children}</Fragment>;

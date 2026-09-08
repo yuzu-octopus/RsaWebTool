@@ -1,20 +1,12 @@
 import { useState, useMemo } from 'react';
-import {
-  Box,
-  Typography,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from '@mui/material';
-import { SwapHoriz } from '@mui/icons-material';
-import { draculaColors } from '../theme/dracula';
+import { Stack } from '@astryxdesign/core/Stack';
+import { Heading } from '@astryxdesign/core/Heading';
+import { Text } from '@astryxdesign/core/Text';
+import { TextArea } from '@astryxdesign/core/TextArea';
+import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
 import { useAppContext } from '../hooks/useAppContext';
 import { convertFormat } from '../utils/converters';
 import type { Format } from '../utils/converters';
-import { inputSx } from '../styles/shared';
-import { colFlexSx, centeredPanelSx, MONO_FAMILY } from '../styles/shared';
 
 const FORMATS: { value: Format; label: string }[] = [
   { value: 'hex', label: 'Hex' },
@@ -22,36 +14,6 @@ const FORMATS: { value: Format; label: string }[] = [
   { value: 'base64', label: 'Base64' },
   { value: 'text', label: 'Text' },
 ];
-
-const selectSx = {
-  mb: 1,
-  '& .MuiOutlinedInput-root': {
-    backgroundColor: draculaColors.currentLine,
-    color: draculaColors.foreground,
-    fontFamily: MONO_FAMILY,
-    '& fieldset': { borderColor: draculaColors.comment },
-    '&:hover fieldset': { borderColor: draculaColors.purple },
-    '&.Mui-focused fieldset': { borderColor: draculaColors.purple },
-  },
-  '& .MuiInputLabel-root': {
-    color: draculaColors.comment,
-    fontFamily: MONO_FAMILY,
-    '&.Mui-focused': { color: draculaColors.purple },
-  },
-  '& .MuiSvgIcon-root': {
-    color: draculaColors.foreground,
-  },
-};
-
-const readOnlySx = {
-  ...inputSx,
-  '& .MuiInputBase-root': {
-    backgroundColor: draculaColors.background,
-    color: draculaColors.foreground,
-    fontFamily: MONO_FAMILY,
-    '& fieldset': { borderColor: draculaColors.comment },
-  },
-};
 
 export function FormatConverter() {
   const { viewMode } = useAppContext();
@@ -71,112 +33,58 @@ export function FormatConverter() {
   if (viewMode !== 'format-converter') return null;
 
   return (
-    <Box sx={colFlexSx}>
-      <Box sx={{ ...centeredPanelSx, p: 2 }}>
-        <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <Typography
-            variant="h3"
-            sx={{ color: draculaColors.purple, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}
-          >
-            <SwapHoriz sx={{ fontSize: 'inherit' }} /> Format Converter
-          </Typography>
+    <Stack>
+      <Stack hAlign="center" padding={2}>
+        <Stack width="100%" maxWidth={640} gap={2}>
+          <Heading level={3}>Format Converter</Heading>
 
-          <Typography variant="body2" sx={{ color: draculaColors.comment, fontFamily: MONO_FAMILY, fontSize: '0.75rem', mb: 3 }}>
+          <Text type="supporting">
             Convert between Hex, Decimal, Base64, and Text
-          </Typography>
+          </Text>
 
-          <FormControl fullWidth size="small" sx={selectSx}>
-            <InputLabel id="input-format-label">Input Format</InputLabel>
-            <Select
-              labelId="input-format-label"
-              value={inputFormat}
-              label="Input Format"
-              onChange={(e) => setInputFormat(e.target.value)}
-              MenuProps={{
-                slotProps: {
-                  paper: {
-                    sx: {
-                      backgroundColor: draculaColors.background,
-                    },
-                  },
-                },
-              }}
-            >
-              {FORMATS.map((f) => (
-                <MenuItem
-                  key={f.value}
-                  value={f.value}
-                  sx={{
-                    fontFamily: MONO_FAMILY,
-                    color: draculaColors.foreground,
-                    '&:hover': { backgroundColor: draculaColors.currentLine },
-                    '&.Mui-selected': { backgroundColor: draculaColors.comment, '&:hover': { backgroundColor: draculaColors.comment } },
-                  }}
-                >
-                  {f.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <SegmentedControl
+            label="Input format"
+            value={inputFormat}
+            onChange={(value) => setInputFormat(value as Format)}
+            layout="fill"
+          >
+            {FORMATS.map((f) => (
+              <SegmentedControlItem key={f.value} value={f.value} label={f.label} />
+            ))}
+          </SegmentedControl>
 
-          <TextField
-            fullWidth
-            multiline
+          <TextArea
+            label="Converter input"
+            isLabelHidden
             rows={6}
             value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
+            onChange={(value) => setInputText(value)}
             placeholder="Paste input here..."
-            variant="outlined"
-            sx={{ ...inputSx, mb: 2 }}
           />
 
-          <FormControl fullWidth size="small" sx={selectSx}>
-            <InputLabel id="output-format-label">Output Format</InputLabel>
-            <Select
-              labelId="output-format-label"
-              value={outputFormat}
-              label="Output Format"
-              onChange={(e) => setOutputFormat(e.target.value)}
-              MenuProps={{
-                slotProps: {
-                  paper: {
-                    sx: {
-                      backgroundColor: draculaColors.background,
-                    },
-                  },
-                },
-              }}
-            >
-              {FORMATS.map((f) => (
-                <MenuItem
-                  key={f.value}
-                  value={f.value}
-                  sx={{
-                    fontFamily: MONO_FAMILY,
-                    color: draculaColors.foreground,
-                    '&:hover': { backgroundColor: draculaColors.currentLine },
-                    '&.Mui-selected': { backgroundColor: draculaColors.comment, '&:hover': { backgroundColor: draculaColors.comment } },
-                  }}
-                >
-                  {f.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <SegmentedControl
+            label="Output format"
+            value={outputFormat}
+            onChange={(value) => setOutputFormat(value as Format)}
+            layout="fill"
+          >
+            {FORMATS.map((f) => (
+              <SegmentedControlItem key={f.value} value={f.value} label={f.label} />
+            ))}
+          </SegmentedControl>
 
-          <TextField
-            fullWidth
-            multiline
+          <TextArea
+            label="Converted output"
+            isLabelHidden
             rows={6}
             value={outputText}
-            variant="outlined"
+            onChange={() => {}}
             placeholder="Output appears here..."
-            slotProps={{ input: { readOnly: true } }}
-            sx={readOnlySx}
+            isReadOnly
           />
-        </Box>
-      </Box>
-    </Box>
+        </Stack>
+      </Stack>
+    </Stack>
   );
 }
 
