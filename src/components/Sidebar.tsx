@@ -148,6 +148,15 @@ function calcGlyph(mode: string) {
   }
 }
 
+/** Tinted count badges per attack category (mirrors the command palette). */
+const CATEGORY_BADGE_VARIANTS: Record<string, 'green' | 'purple' | 'cyan' | 'orange' | 'yellow'> = {
+  Factorization: 'green',
+  'Partial Key / Lattice': 'purple',
+  'Message / Protocol': 'cyan',
+  Oracle: 'orange',
+  Advanced: 'yellow',
+};
+
 interface SidebarProps {
   mobileOpen: boolean;
   onMobileClose: () => void;
@@ -226,7 +235,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
               isCollapsed: !activeExpandedCats.has(cat),
               onCollapsedChange: collapsed => setCatCollapsed(cat, collapsed),
             }}
-            endContent={<Badge label={catAttacks.length} variant="neutral" />}
+            endContent={<Badge label={catAttacks.length} variant={CATEGORY_BADGE_VARIANTS[cat] ?? 'neutral'} />}
           >
             {catAttacks.map(attack => (
               <SideNavItem
@@ -248,7 +257,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           isCollapsed: !expandedCats.has('Calculators'),
           onCollapsedChange: collapsed => setCatCollapsed('Calculators', collapsed),
         }}
-        endContent={<Badge label={CALCULATOR_ITEMS.length} variant="neutral" />}
+        endContent={<Badge label={CALCULATOR_ITEMS.length} variant="blue" />}
       >
         {CALCULATOR_ITEMS.map(item => (
           <SideNavItem

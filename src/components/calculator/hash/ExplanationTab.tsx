@@ -29,7 +29,7 @@ export default function ExplanationTab() {
 
   return (
     <Stack direction="vertical" gap={2}>
-      <Heading level={4}>Hash Function Reference</Heading>
+      <Heading level={4} style={{ color: 'var(--dracula-cyan)' }}>Hash Function Reference</Heading>
       <TabList value={tab} onChange={setTab} hasDivider>
         {TABS.map(t => (
           <Tab key={t.id} value={t.id} label={t.label} />

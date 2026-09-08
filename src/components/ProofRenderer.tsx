@@ -196,7 +196,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
                 );
               } catch {
                 return (
-                  <Text key={'dm-err-' + segment.content.slice(0, 20)}>
+                  <Text key={'dm-err-' + segment.content.slice(0, 20)} style={{ color: 'var(--dracula-red)' }}>
                     Math render error
                   </Text>
                 );
@@ -240,7 +240,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
                   const isTopLevelHeading = /^(theorem|section|appendix)/i.test(headingMatch[1]);
                   rendered.push(
                     <Stack key={j} gap={1}>
-                      <Heading level={isTopLevelHeading ? 2 : 3}>
+                      <Heading level={isTopLevelHeading ? 2 : 3} style={{ color: 'var(--dracula-pink)' }}>
                         {headingMatch[1]}:
                       </Heading>
                       {headingMatch[2] && <Text as="p"><InlineMath text={headingMatch[2]} /></Text>}

@@ -10,6 +10,7 @@ import { Grid } from '@astryxdesign/core/Grid';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Heading } from '@astryxdesign/core/Heading';
+import { StatusDot } from '@astryxdesign/core/StatusDot';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
 import { RFC3526_GROUPS, generatePrivateKey, parseHex } from '../../utils/dhCrypto';
@@ -103,7 +104,7 @@ export function DHKeyExchangeTab() {
         {/* Alice panel */}
         <Card>
           <Stack direction="vertical" gap={1}>
-            <Heading level={5}>Alice</Heading>
+            <Heading level={5} style={{ color: 'var(--dracula-cyan)' }}>Alice</Heading>
             <Button label="Generate" variant="primary" width="100%" onClick={genAlice} />
             {alicePriv !== null && (
               <Stack direction="horizontal" gap={1} vAlign="start">
@@ -121,7 +122,7 @@ export function DHKeyExchangeTab() {
             {alicePub !== null && (
               <Stack direction="horizontal" gap={1} vAlign="start">
                 <Text type="supporting" wordBreak="break-all">
-                  Public: 0x{alicePub.toString(16)}
+                  Public: <Text style={{ color: 'var(--dracula-green)' }}>0x{alicePub.toString(16)}</Text>
                 </Text>
                 <IconButton
                   label="Copy Alice public key"
@@ -137,7 +138,7 @@ export function DHKeyExchangeTab() {
         {/* Bob panel */}
         <Card>
           <Stack direction="vertical" gap={1}>
-            <Heading level={5}>Bob</Heading>
+            <Heading level={5} style={{ color: 'var(--dracula-cyan)' }}>Bob</Heading>
             <Button label="Generate" variant="primary" width="100%" onClick={genBob} />
             {bobPriv !== null && (
               <Stack direction="horizontal" gap={1} vAlign="start">
@@ -155,7 +156,7 @@ export function DHKeyExchangeTab() {
             {bobPub !== null && (
               <Stack direction="horizontal" gap={1} vAlign="start">
                 <Text type="supporting" wordBreak="break-all">
-                  Public: 0x{bobPub.toString(16)}
+                  Public: <Text style={{ color: 'var(--dracula-green)' }}>0x{bobPub.toString(16)}</Text>
                 </Text>
                 <IconButton
                   label="Copy Bob public key"
@@ -172,7 +173,7 @@ export function DHKeyExchangeTab() {
       {/* Shared Secret panel */}
       <Card>
         <Stack direction="vertical" gap={1}>
-          <Heading level={5}>Shared Secret</Heading>
+          <Heading level={5} style={{ color: 'var(--dracula-cyan)' }}>Shared Secret</Heading>
           <Stack direction="horizontal" gap={1}>
             <Button label="Alice computes" variant="primary" width="100%" onClick={computeAlice} />
             <Button label="Bob computes" variant="primary" width="100%" onClick={computeBob} />
@@ -180,7 +181,7 @@ export function DHKeyExchangeTab() {
           {sharedAlice !== null && (
             <Stack direction="horizontal" gap={1} vAlign="start">
               <Text type="supporting" wordBreak="break-all">
-                Alice shared: 0x{sharedAlice.toString(16)}
+                Alice shared: <Text style={{ color: 'var(--dracula-green)' }}>0x{sharedAlice.toString(16)}</Text>
               </Text>
               <IconButton
                 label="Copy Alice shared secret"
@@ -193,7 +194,7 @@ export function DHKeyExchangeTab() {
           {sharedBob !== null && (
             <Stack direction="horizontal" gap={1} vAlign="start">
               <Text type="supporting" wordBreak="break-all">
-                Bob shared: 0x{sharedBob.toString(16)}
+                Bob shared: <Text style={{ color: 'var(--dracula-green)' }}>0x{sharedBob.toString(16)}</Text>
               </Text>
               <IconButton
                 label="Copy Bob shared secret"
@@ -204,7 +205,10 @@ export function DHKeyExchangeTab() {
             </Stack>
           )}
           {sharedAlice !== null && sharedBob !== null && (
-            <Text>{sharedAlice === sharedBob ? '✓ Shared secrets match!' : '✗ Shared secrets differ!'}</Text>
+            <Text style={{ color: sharedAlice === sharedBob ? 'var(--dracula-green)' : 'var(--dracula-red)' }}>
+              <StatusDot variant={sharedAlice === sharedBob ? 'success' : 'error'} label={sharedAlice === sharedBob ? 'Shared secrets match' : 'Shared secrets differ'} />{' '}
+              {sharedAlice === sharedBob ? '✓ Shared secrets match!' : '✗ Shared secrets differ!'}
+            </Text>
           )}
         </Stack>
       </Card>

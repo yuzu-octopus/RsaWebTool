@@ -153,7 +153,7 @@ export default function ProofOfWorkTab() {
       {/* Run / Stop morphing button */}
       <Button
         label={running ? 'Stop' : 'Run'}
-        variant="secondary"
+        variant={running ? 'destructive' : 'primary'}
         width="100%"
         onClick={running ? handleStop : () => { void handleRun(); }}
         isDisabled={!difficultyValid}
@@ -167,15 +167,15 @@ export default function ProofOfWorkTab() {
             value={progress}
             max={100}
             hasValueLabel
-            variant="accent"
+            variant="warning"
           />
           {progressDetail && (
-            <Text type="supporting" justify="center">
+            <Text type="supporting" justify="center" style={{ color: 'var(--dracula-orange)' }}>
               {progressDetail}
             </Text>
           )}
           {eta && (
-            <Text type="supporting" justify="center">
+            <Text type="supporting" justify="center" style={{ color: 'var(--dracula-orange)' }}>
               ETA: {eta}
             </Text>
           )}

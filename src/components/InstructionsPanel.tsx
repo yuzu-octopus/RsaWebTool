@@ -59,7 +59,7 @@ export function InstructionsPanel() {
     <Stack>
       <Stack hAlign="center" padding={2}>
         <Stack width="100%" maxWidth={640}>
-          <Heading level={3}>Instructions</Heading>
+          <Heading level={3} color="accent">Instructions</Heading>
         </Stack>
       </Stack>
 
@@ -69,7 +69,7 @@ export function InstructionsPanel() {
         <Stack width="100%" maxWidth={640} gap={2} padding={2}>
           {SECTIONS.map((section) => (
             <Stack key={section.title} gap={1}>
-              <Heading level={5}>
+              <Heading level={5} style={{ color: 'var(--dracula-cyan)' }}>
                 {section.title}
               </Heading>
 

@@ -109,6 +109,7 @@ function statusColor(status: MagicJob['status']) {
   if (status === 'success') return c.green;
   if (status === 'error') return c.red;
   if (status === 'cancelled') return c.orange;
+  if (status === 'aborted') return c.comment;
   return c.orange;
 }
 

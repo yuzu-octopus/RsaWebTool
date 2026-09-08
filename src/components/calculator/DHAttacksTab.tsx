@@ -211,7 +211,7 @@ except Exception as e:
         isLoading={isRunning}
       />
       {isRunning && (
-        <Text role="status" aria-live="polite">
+        <Text type="supporting" role="status" aria-live="polite">
           Running attack…
         </Text>
       )}

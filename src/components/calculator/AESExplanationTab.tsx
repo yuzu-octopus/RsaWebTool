@@ -6,7 +6,7 @@ import { AES_PROOF } from '../../data/attackExplanations/aes';
 export function AESExplanationTab() {
   return (
     <Stack direction="vertical" gap={1}>
-      <Heading level={4}>AES Block Cipher Reference</Heading>
+      <Heading level={4} style={{ color: 'var(--dracula-cyan)' }}>AES Block Cipher Reference</Heading>
       <Stack direction="vertical" isScrollable>
         <ProofRenderer latex={AES_PROOF} />
       </Stack>

@@ -52,9 +52,9 @@ export function ResultBox({
     <Stack direction="vertical" gap={1}>
       {(label || showCopy) && (
         <Stack direction="horizontal" gap={1} vAlign="center">
-          <Text type="label">{label}</Text>
+          <Text type="label" style={{ color: 'var(--dracula-green)' }}>{label}</Text>
           {copied && showCopy && (
-            <Text type="supporting" role="status" aria-live="polite" aria-atomic="true">
+            <Text type="supporting" role="status" aria-live="polite" aria-atomic="true" style={{ color: 'var(--dracula-green)' }}>
               Copied!
             </Text>
           )}

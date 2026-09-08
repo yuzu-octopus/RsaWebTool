@@ -31,10 +31,10 @@ const PROTOCOL_DIAGRAM = `Alice                              Bob
 export function DHExplanationTab() {
   return (
     <Stack direction="vertical" gap={2}>
-      <Heading level={4}>Diffie-Hellman Key Exchange</Heading>
+      <Heading level={4} style={{ color: 'var(--dracula-cyan)' }}>Diffie-Hellman Key Exchange</Heading>
       <Stack direction="vertical" gap={2} isScrollable>
         <Stack direction="vertical" gap={1}>
-          <Heading level={5}>Protocol</Heading>
+          <Heading level={5} style={{ color: 'var(--dracula-pink)' }}>Protocol</Heading>
           <Text>
             Diffie-Hellman (DH) key exchange allows two parties to establish a shared secret over an insecure channel.
             Security relies on the Computational Diffie-Hellman (CDH) assumption and the Discrete Logarithm Problem (DLP).
@@ -44,7 +44,7 @@ export function DHExplanationTab() {
         <CodeBlock code={PROTOCOL_DIAGRAM} language="plaintext" hasCopyButton={false} width="100%" />
 
         <Stack direction="vertical" gap={1}>
-          <Heading level={5}>Security</Heading>
+          <Heading level={5} style={{ color: 'var(--dracula-pink)' }}>Security</Heading>
           <Text>
             The security of DH depends on the difficulty of computing discrete logarithms in the group Z_p*.
             Standardized MODP groups (RFC 3526) use safe primes p = 2q + 1 to prevent Pohlig-Hellman attacks.
@@ -52,7 +52,7 @@ export function DHExplanationTab() {
         </Stack>
 
         <Stack direction="vertical" gap={1}>
-          <Heading level={5}>RFC 3526 MODP Groups</Heading>
+          <Heading level={5} style={{ color: 'var(--dracula-pink)' }}>RFC 3526 MODP Groups</Heading>
           <Table
             data={RFC_GROUPS}
             columns={[
@@ -65,7 +65,7 @@ export function DHExplanationTab() {
         </Stack>
 
         <Stack direction="vertical" gap={1}>
-          <Heading level={5}>Limitations</Heading>
+          <Heading level={5} style={{ color: 'var(--dracula-pink)' }}>Limitations</Heading>
           <Text>
             Raw DH provides no authentication and is vulnerable to man-in-the-middle (MITM) attacks.
             In practice, DH is combined with digital signatures (e.g., IKE, TLS) or used in

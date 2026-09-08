@@ -9,12 +9,20 @@ import { IconButton } from '@astryxdesign/core/IconButton';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Card } from '@astryxdesign/core/Card';
 import { Banner } from '@astryxdesign/core/Banner';
+import { Badge } from '@astryxdesign/core/Badge';
 import { Tooltip } from '@astryxdesign/core/Tooltip';
 import { ProgressBar } from '@astryxdesign/core/ProgressBar';
 import { CodeBlock } from '@astryxdesign/core/CodeBlock';
 import { useAppContext } from '../hooks/useAppContext';
 import { parsePEM, decryptPEM } from '../utils/pemParser';
 import type { ParsedPEM } from '../utils/pemParser';
+
+// Dracula brand tokens (verbatim kit names — never raw hex).
+const c = {
+  purple: 'var(--dracula-purple)',
+  green: 'var(--dracula-green)',
+  orange: 'var(--dracula-orange)',
+};
 
 /** Truncate a hex string for display: show first keepLen + "..." + last keepLen chars */
 function truncateHex(hex: string, keepLen = 16): string {
@@ -97,7 +105,7 @@ export function PemDecryptor() {
     <Stack>
       <Stack hAlign="center" padding={2}>
         <Stack width="100%" maxWidth={640} gap={2}>
-          <Heading level={3}>PEM Key Decryptor</Heading>
+          <Heading level={3} color="accent">PEM Key Decryptor</Heading>
 
           <Text type="supporting">
             Parse and decrypt PEM private keys in PKCS#1 and PKCS#8 formats
@@ -166,7 +174,7 @@ export function PemDecryptor() {
 
           {decrypting && (
             <Stack gap={1}>
-              <ProgressBar label="Decrypting key" isIndeterminate />
+              <ProgressBar label="Decrypting key" isIndeterminate variant="success" />
               <Text type="supporting">
                 Decrypting key...
               </Text>
@@ -178,9 +186,10 @@ export function PemDecryptor() {
             <Card>
               <Stack gap={2}>
                 <Stack direction="horizontal" gap={1} vAlign="center">
-                  <Text weight="semibold">
+                  <Text weight="semibold" style={{ color: parsed.encrypted ? c.orange : c.green }}>
                     {parsed.format}
                   </Text>
+                  <Badge variant={parsed.encrypted ? 'warning' : 'success'} label={parsed.encrypted ? 'Encrypted' : 'Decrypted'} />
                   {parsed.encryptionAlgorithm && (
                     <Text type="supporting">
                       ({parsed.encryptionAlgorithm})
@@ -200,7 +209,7 @@ export function PemDecryptor() {
                           gap={1}
                           vAlign="center"
                         >
-                          <Text type="label" weight="semibold">
+                          <Text type="label" weight="semibold" style={{ color: c.purple }}>
                             {key}:
                           </Text>
                           <Tooltip content={value}>

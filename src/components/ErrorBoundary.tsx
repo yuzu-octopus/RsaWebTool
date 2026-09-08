@@ -38,10 +38,10 @@ export class ErrorBoundary extends Component<Props, State> {
       if (this.props.fallback) return this.props.fallback;
       return (
         <Stack hAlign="center" vAlign="center" gap={2} padding={4} height="100%">
-          <Heading level={2}>
+          <Heading level={2} style={{ color: 'var(--dracula-red)' }}>
             This part of the workspace could not load
           </Heading>
-          <Text justify="center">
+          <Text type="supporting" justify="center">
             Try again. If this keeps happening, reload the page.
           </Text>
           <Button label="Try again" variant="secondary" onClick={this.handleReset} />

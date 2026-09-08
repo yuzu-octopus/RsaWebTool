@@ -220,9 +220,9 @@ export default function LengthExtensionTab() {
         <Stack direction="horizontal" gap={2} vAlign="center">
           <Text type="label">Secret Length:</Text>
           {secretUnknown ? (
-            <Text type="supporting">Brute-force 1 – {secretRangeEnd} bytes</Text>
+            <Text type="supporting" style={{ color: 'var(--dracula-orange)' }}>Brute-force 1 – {secretRangeEnd} bytes</Text>
           ) : (
-            <Text type="supporting">{secretLen} bytes</Text>
+            <Text type="supporting" style={{ color: 'var(--dracula-cyan)' }}>{secretLen} bytes</Text>
           )}
           <Button
             label={secretUnknown ? 'Fixed' : 'Unknown'}

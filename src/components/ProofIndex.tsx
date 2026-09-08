@@ -63,7 +63,7 @@ export function ProofIndex() {
     <Stack>
       <Stack hAlign="center" padding={2}>
         <Stack width="100%" maxWidth={640} gap={2}>
-          <Heading level={3}>Attack Index</Heading>
+          <Heading level={3} color="accent">Attack Index</Heading>
 
           <TextInput
             label="Search proofs"

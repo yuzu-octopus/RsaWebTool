@@ -191,7 +191,7 @@ export function CommandPalette() {
     if (aux.kind === 'view') {
       chips.push({ label: 'Module', variant: 'neutral' });
     } else if (aux.kind === 'calculator-tab') {
-      chips.push({ label: 'Calculator', variant: 'blue' });
+      chips.push({ label: 'Calculator', variant: 'cyan' });
     } else if (aux.attack) {
       secondary = aux.attack.id;
       chips.push({ label: aux.attack.category, variant: CATEGORY_BADGE_VARIANTS[aux.attack.category] });

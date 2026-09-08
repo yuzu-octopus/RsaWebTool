@@ -36,7 +36,7 @@ export function FormatConverter() {
     <Stack>
       <Stack hAlign="center" padding={2}>
         <Stack width="100%" maxWidth={640} gap={2}>
-          <Heading level={3}>Format Converter</Heading>
+          <Heading level={3} color="accent">Format Converter</Heading>
 
           <Text type="supporting">
             Convert between Hex, Decimal, Base64, and Text

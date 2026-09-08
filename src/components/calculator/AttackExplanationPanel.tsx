@@ -15,19 +15,19 @@ export interface AttackExplanationData {
 export function AttackExplanationPanel({ data }: { data: AttackExplanationData }) {
   return (
     <Stack direction="vertical" gap={2} isScrollable>
-      <Heading level={4}>{data.title}</Heading>
+      <Heading level={4} style={{ color: 'var(--dracula-pink)' }}>{data.title}</Heading>
 
       <Text>{data.description}</Text>
 
       <Stack direction="vertical" gap={1}>
-        <Text type="label" weight="semibold">
+        <Text type="label" weight="semibold" style={{ color: 'var(--dracula-cyan)' }}>
           When to use
         </Text>
         <Text>{data.whenToUse}</Text>
       </Stack>
 
       <Stack direction="vertical" gap={1}>
-        <Text type="label" weight="semibold">
+        <Text type="label" weight="semibold" style={{ color: 'var(--dracula-cyan)' }}>
           Algorithm
         </Text>
         <CodeBlock
@@ -40,7 +40,7 @@ export function AttackExplanationPanel({ data }: { data: AttackExplanationData }
       </Stack>
 
       <Stack direction="vertical" gap={1}>
-        <Text type="label" weight="semibold">
+        <Text type="label" weight="semibold" style={{ color: 'var(--dracula-cyan)' }}>
           Python Script
         </Text>
         <CodeBlock
