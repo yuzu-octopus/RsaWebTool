@@ -203,21 +203,29 @@ function AttackPanel({ attack }: { attack: Attack }) {
           {attack.usageGuide && (
             <>
               <Divider />
-              <Heading level={5} style={{ color: c.cyan }}>
-                How to Use
-              </Heading>
-              <Text type="code" style={{ whiteSpace: 'pre-wrap' }}>
-                {attack.usageGuide}
-              </Text>
+              <Stack hAlign="center" width="100%">
+                <Stack width="100%" maxWidth="72ch" gap={2} padding={2}>
+                  <Heading level={5} style={{ color: c.cyan }}>
+                    How to Use
+                  </Heading>
+                  <Text type="code" style={{ whiteSpace: 'pre-wrap' }}>
+                    {attack.usageGuide}
+                  </Text>
+                </Stack>
+              </Stack>
             </>
           )}
-          <Stack direction="horizontal">
-            <Button
-              label="Continue to Input"
-              variant="ghost"
-              onClick={() => setTab(1)}
-              endContent={<Icon icon={ChevronRight} size="sm" />}
-            />
+          <Stack hAlign="center" width="100%">
+            <Stack width="100%" maxWidth="72ch" padding={2}>
+              <Stack direction="horizontal" hAlign="start">
+                <Button
+                  label="Continue to Input"
+                  variant="ghost"
+                  onClick={() => setTab(1)}
+                  endContent={<Icon icon={ChevronRight} size="sm" />}
+                />
+              </Stack>
+            </Stack>
           </Stack>
         </Stack>
       )}
