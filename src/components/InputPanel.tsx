@@ -16,6 +16,7 @@ import { CodeBlock } from '@astryxdesign/core/CodeBlock';
 import { dracula } from '@astryxdesign/core/theme/syntax';
 import { Dices, ChevronRight } from 'lucide-react';
 import { useAppContext } from '../hooks/useAppContext';
+import { attacks } from '../attacks';
 import { useSageMath } from '../hooks/useSageMath';
 import { useWorkerPool } from '../hooks/useWorkerPool';
 import { useAttackExecution } from '../hooks/useAttackExecution';
@@ -38,14 +39,27 @@ const c = {
 const flexFill = { flex: 1, minWidth: 0, minHeight: 0 } as const;
 
 export function InputPanel() {
-  const { selectedAttack, viewMode } = useAppContext();
+  const { selectedAttack, viewMode, setViewMode, setCalculatorMode, setSelectedAttack } = useAppContext();
 
   if (viewMode !== 'attack') return null;
 
   if (!selectedAttack) {
     return (
       <Stack direction="vertical" hAlign="center" vAlign="center" style={flexFill}>
-        <EmptyState title="Select an attack from the sidebar" padding={4} />
+        <EmptyState title="Start cracking" hint="Pick a path — no setup needed.">
+          <Stack direction="vertical" gap={2} style={{ marginTop: 'var(--space-gap)' }}>
+            <Button label="Open Magic Cracker" variant="primary" onClick={() => setViewMode('magic')} />
+            <Button label="Try Hastad Broadcast" variant="secondary" onClick={() => {
+              const hb = attacks.find(a => a.id === 'hastad-broadcast');
+              if (hb) setSelectedAttack(hb);
+              setViewMode('attack');
+            }} />
+            <Button label="Open RSA Calculator" variant="secondary" onClick={() => {
+              setCalculatorMode('rsa');
+              setViewMode('calculator');
+            }} />
+          </Stack>
+        </EmptyState>
       </Stack>
     );
   }
