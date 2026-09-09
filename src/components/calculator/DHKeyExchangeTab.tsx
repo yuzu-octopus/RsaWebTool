@@ -106,15 +106,15 @@ export function DHKeyExchangeTab() {
         </Stack>
       )}
 
-      <Grid columns={{ minWidth: 280 }} gap={2}>
+      <Grid columns={{ minWidth: 280, max: 2 }} gap={2}>
         {/* Alice panel */}
-        <Card>
+        <Card padding={4}>
           <Stack direction="vertical" gap={1}>
             <Heading level={5} style={{ color: 'var(--dracula-cyan)' }}>Alice</Heading>
             <Button label="Generate" variant="primary" width="100%" onClick={genAlice} />
             {alicePriv !== null && (
               <Stack direction="horizontal" gap={1} vAlign="start">
-                <Text type="supporting" wordBreak="break-all">
+                <Text type="code" wordBreak="break-all" hasTabularNumbers>
                   Private: 0x{alicePriv.toString(16)}
                 </Text>
                 <IconButton
@@ -127,8 +127,8 @@ export function DHKeyExchangeTab() {
             )}
             {alicePub !== null && (
               <Stack direction="horizontal" gap={1} vAlign="start">
-                <Text type="supporting" wordBreak="break-all">
-                  Public: <Text style={{ color: 'var(--dracula-green)' }}>0x{alicePub.toString(16)}</Text>
+                <Text type="code" wordBreak="break-all" hasTabularNumbers>
+                  Public: <Text type="code" style={{ color: 'var(--dracula-green)' }}>0x{alicePub.toString(16)}</Text>
                 </Text>
                 <IconButton
                   label="Copy Alice public key"
@@ -142,13 +142,13 @@ export function DHKeyExchangeTab() {
         </Card>
 
         {/* Bob panel */}
-        <Card>
+        <Card padding={4}>
           <Stack direction="vertical" gap={1}>
             <Heading level={5} style={{ color: 'var(--dracula-cyan)' }}>Bob</Heading>
             <Button label="Generate" variant="primary" width="100%" onClick={genBob} />
             {bobPriv !== null && (
               <Stack direction="horizontal" gap={1} vAlign="start">
-                <Text type="supporting" wordBreak="break-all">
+                <Text type="code" wordBreak="break-all" hasTabularNumbers>
                   Private: 0x{bobPriv.toString(16)}
                 </Text>
                 <IconButton
@@ -161,8 +161,8 @@ export function DHKeyExchangeTab() {
             )}
             {bobPub !== null && (
               <Stack direction="horizontal" gap={1} vAlign="start">
-                <Text type="supporting" wordBreak="break-all">
-                  Public: <Text style={{ color: 'var(--dracula-green)' }}>0x{bobPub.toString(16)}</Text>
+                <Text type="code" wordBreak="break-all" hasTabularNumbers>
+                  Public: <Text type="code" style={{ color: 'var(--dracula-green)' }}>0x{bobPub.toString(16)}</Text>
                 </Text>
                 <IconButton
                   label="Copy Bob public key"
@@ -177,7 +177,7 @@ export function DHKeyExchangeTab() {
       </Grid>
 
       {/* Shared Secret panel */}
-      <Card>
+      <Card padding={4}>
         <Stack direction="vertical" gap={1}>
           <Heading level={5} style={{ color: 'var(--dracula-cyan)' }}>Shared Secret</Heading>
           <Stack direction="horizontal" gap={1}>
@@ -186,8 +186,8 @@ export function DHKeyExchangeTab() {
           </Stack>
           {sharedAlice !== null && (
             <Stack direction="horizontal" gap={1} vAlign="start">
-              <Text type="supporting" wordBreak="break-all">
-                Alice shared: <Text style={{ color: 'var(--dracula-green)' }}>0x{sharedAlice.toString(16)}</Text>
+              <Text type="code" wordBreak="break-all" hasTabularNumbers>
+                Alice shared: <Text type="code" style={{ color: 'var(--dracula-green)' }}>0x{sharedAlice.toString(16)}</Text>
               </Text>
               <IconButton
                 label="Copy Alice shared secret"
@@ -199,8 +199,8 @@ export function DHKeyExchangeTab() {
           )}
           {sharedBob !== null && (
             <Stack direction="horizontal" gap={1} vAlign="start">
-              <Text type="supporting" wordBreak="break-all">
-                Bob shared: <Text style={{ color: 'var(--dracula-green)' }}>0x{sharedBob.toString(16)}</Text>
+              <Text type="code" wordBreak="break-all" hasTabularNumbers>
+                Bob shared: <Text type="code" style={{ color: 'var(--dracula-green)' }}>0x{sharedBob.toString(16)}</Text>
               </Text>
               <IconButton
                 label="Copy Bob shared secret"

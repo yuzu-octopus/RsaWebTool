@@ -32,7 +32,7 @@ export function DHExplanationTab() {
   return (
     <Stack direction="vertical" gap={2}>
       <Heading level={4} style={{ color: 'var(--dracula-cyan)' }}>Diffie-Hellman Key Exchange</Heading>
-      <Stack direction="vertical" gap={2} isScrollable>
+      <Stack direction="vertical" gap={2}>
         <Stack direction="vertical" gap={1}>
           <Heading level={5} style={{ color: 'var(--dracula-pink)' }}>Protocol</Heading>
           <Text>
@@ -57,11 +57,17 @@ export function DHExplanationTab() {
           <Table
             data={RFC_GROUPS}
             columns={[
-              { key: 'id', header: 'Group', width: pixel(80) },
-              { key: 'bits', header: 'Bits', width: proportional(1) },
+              { key: 'id', header: 'Group', width: pixel(80), renderCell: (row) => (
+                <Text type="code" hasTabularNumbers>{String(row.id)}</Text>
+              ) },
+              { key: 'bits', header: 'Bits', width: proportional(1), renderCell: (row) => (
+                <Text type="code" hasTabularNumbers>{String(row.bits)}</Text>
+              ) },
               { key: 'strength', header: 'Strength', width: proportional(1) },
             ]}
             idKey="id"
+            density="balanced"
+            hasHover
           />
         </Stack>
 

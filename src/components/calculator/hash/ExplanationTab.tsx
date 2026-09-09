@@ -35,7 +35,7 @@ export default function ExplanationTab() {
           <Tab key={t.id} value={t.id} label={t.label} />
         ))}
       </TabList>
-      <Stack direction="vertical" isScrollable>
+      <Stack direction="vertical">
         <ProofRenderer latex={TAB_CONTENT[tab] ?? ''} />
       </Stack>
     </Stack>

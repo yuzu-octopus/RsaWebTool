@@ -57,7 +57,7 @@ function ExplanationTab() {
   return (
     <Stack direction="vertical" gap={1}>
       <Heading level={4} style={{ color: 'var(--dracula-cyan)' }}>RSA Reference</Heading>
-      <Stack direction="vertical" isScrollable>
+      <Stack direction="vertical">
         <ProofRenderer latex={EXPLANATION_LATEX} />
       </Stack>
     </Stack>

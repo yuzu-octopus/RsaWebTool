@@ -266,7 +266,7 @@ export function DHAttacksTab() {
 
       {DH_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={DH_ATTACK_EXPLANATIONS[attack]} />}
 
-      <Text type="supporting">
+      <Text type="body" color="secondary">
         Confinement and Lim–Lee recovery need a static victim key plus unvalidated peer keys; ephemeral
         keys and subgroup validation stop them. Inputs: p/y are hex, g is decimal (0x hex also accepted).
       </Text>

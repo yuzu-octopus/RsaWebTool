@@ -119,7 +119,7 @@ export default function ProofOfWorkTab() {
   /* ---- render ---- */
   return (
     <Stack direction="vertical" gap={2}>
-      <Text type="supporting">
+      <Text type="body" color="secondary">
         {hashAlgo} Proof of Work: find a nonce where {hashAlgo}(challenge + nonce) satisfies your check function.
       </Text>
 
@@ -170,12 +170,12 @@ export default function ProofOfWorkTab() {
             variant="warning"
           />
           {progressDetail && (
-            <Text type="supporting" justify="center" style={{ color: 'var(--dracula-orange)' }}>
+            <Text type="supporting" justify="center" style={{ color: 'var(--dracula-orange)' }} hasTabularNumbers>
               {progressDetail}
             </Text>
           )}
           {eta && (
-            <Text type="supporting" justify="center" style={{ color: 'var(--dracula-orange)' }}>
+            <Text type="supporting" justify="center" style={{ color: 'var(--dracula-orange)' }} hasTabularNumbers>
               ETA: {eta}
             </Text>
           )}

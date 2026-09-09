@@ -177,7 +177,7 @@ function ModeFields(p: ModeFieldsProps) {
         />
       )}
       {p.mode === 'GCM' && p.op === 'decrypt' && (
-        <Text type="supporting">Paste the full CT||TAG wire value to decrypt.</Text>
+        <Text type="body" color="secondary">Paste the full CT||TAG wire value to decrypt.</Text>
       )}
     </>
   );
@@ -255,7 +255,7 @@ export function AESEncryptDecryptTab() {
   return (
     <Stack direction="vertical" gap={2}>
       <Selector label="Mode" options={[...AES_MODES]} value={mode} onChange={set('mode')} width="100%" />
-      <Text type="supporting">{spec.note}</Text>
+      <Text type="body" color="secondary">{spec.note}</Text>
       <TextInput
         label={keyLabel}
         value={keyHex}

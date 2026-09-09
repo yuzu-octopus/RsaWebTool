@@ -119,7 +119,7 @@ export function RsaDecryptTab() {
 
   return (
     <Stack direction="vertical" gap={2}>
-      <Text type="supporting">Enter every value as decimal or with a 0x hexadecimal prefix.</Text>
+      <Text type="body" color="secondary">Enter every value as decimal or with a 0x hexadecimal prefix.</Text>
       <Stack direction="vertical" gap={2}>
         <Text type="label" weight="semibold">
           Ciphertext and modulus
@@ -143,7 +143,7 @@ export function RsaDecryptTab() {
         <Text type="label" weight="semibold">
           Private exponent or key factors
         </Text>
-        <Text type="supporting">Provide d directly, or provide p, q, and e so d can be derived.</Text>
+        <Text type="body" color="secondary">Provide d directly, or provide p, q, and e so d can be derived.</Text>
         <TextInput
           label="d (private exponent)"
           description="Optional when p, q, and e are provided."
@@ -171,7 +171,7 @@ export function RsaDecryptTab() {
           onChange={v => setForm(prev => ({ ...prev, e: v }))}
           width="100%"
         />
-        <Text type="supporting">Optional CRT parameters (dp, dq, qinv) decrypt via Garner instead of d.</Text>
+        <Text type="body" color="secondary">Optional CRT parameters (dp, dq, qinv) decrypt via Garner instead of d.</Text>
         <Stack direction="horizontal" gap={1}>
           <TextInput
             label="dp (d mod p-1)"

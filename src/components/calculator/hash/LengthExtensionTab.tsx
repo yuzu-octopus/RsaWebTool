@@ -220,9 +220,9 @@ export default function LengthExtensionTab() {
         <Stack direction="horizontal" gap={2} vAlign="center">
           <Text type="label">Secret Length:</Text>
           {secretUnknown ? (
-            <Text type="supporting" style={{ color: 'var(--dracula-orange)' }}>Brute-force 1 – {secretRangeEnd} bytes</Text>
+            <Text type="supporting" style={{ color: 'var(--dracula-orange)' }} hasTabularNumbers>Brute-force 1 – {secretRangeEnd} bytes</Text>
           ) : (
-            <Text type="supporting" style={{ color: 'var(--dracula-cyan)' }}>{secretLen} bytes</Text>
+            <Text type="supporting" style={{ color: 'var(--dracula-cyan)' }} hasTabularNumbers>{secretLen} bytes</Text>
           )}
           <Button
             label={secretUnknown ? 'Fixed' : 'Unknown'}
@@ -275,16 +275,21 @@ export default function LengthExtensionTab() {
           />
           {results.length > 1 && (
             <Stack direction="vertical" gap={1}>
-              <Text type="label">All candidates ({results.length} lengths):</Text>
+              <Text type="label" hasTabularNumbers>All candidates ({results.length} lengths):</Text>
               <Table<CandidateRow>
                 data={results}
                 columns={[
-                  { key: 'secretLen', header: 'Len', width: pixel(80) },
-                  { key: 'hash', header: 'Hash', width: proportional(1) },
+                  { key: 'secretLen', header: 'Len', width: pixel(80), renderCell: (row) => (
+                    <Text type="code" hasTabularNumbers>{String(row.secretLen)}</Text>
+                  ) },
+                  { key: 'hash', header: 'Hash', width: proportional(1), renderCell: (row) => (
+                    <Text type="code">{String(row.hash)}</Text>
+                  ) },
                 ]}
                 idKey="secretLen"
                 density="compact"
                 textOverflow="truncate"
+                hasHover
               />
             </Stack>
           )}

@@ -66,7 +66,7 @@ export function CalculatorHeader(props: CalculatorHeaderProps) {
       <Stack direction="vertical" gap={2} width="100%" maxWidth={640}>
         <Stack direction="vertical" gap={1}>
           <Heading level={3} color="accent">{title}</Heading>
-          {subtitle && <Text type="supporting">{subtitle}</Text>}
+          {subtitle && <Text type="body" color="secondary">{subtitle}</Text>}
         </Stack>
         {tabs && activeTab !== undefined && onTabChange && (
           <CalculatorSubTabs tabs={tabs} activeTab={activeTab} onChange={onTabChange} />

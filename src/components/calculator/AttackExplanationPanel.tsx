@@ -14,7 +14,7 @@ export interface AttackExplanationData {
 
 export function AttackExplanationPanel({ data }: { data: AttackExplanationData }) {
   return (
-    <Stack direction="vertical" gap={2} isScrollable>
+    <Stack direction="vertical" gap={2}>
       <Heading level={4} style={{ color: 'var(--dracula-pink)' }}>{data.title}</Heading>
 
       <Text>{data.description}</Text>
