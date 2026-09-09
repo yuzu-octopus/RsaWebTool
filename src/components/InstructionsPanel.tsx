@@ -1,5 +1,6 @@
 import { Stack } from '@astryxdesign/core/Stack';
 import { Heading } from '@astryxdesign/core/Heading';
+import { Kbd } from '@astryxdesign/core/Kbd';
 import { Text } from '@astryxdesign/core/Text';
 import { Divider } from '@astryxdesign/core/Divider';
 import { useAppContext } from '../hooks/useAppContext';
@@ -50,6 +51,20 @@ const SECTIONS: Section[] = [
   },
 ];
 
+// Mirrors src/hooks/useKeyboardShortcuts.ts exactly: mod is Cmd on macOS,
+// Ctrl elsewhere. Bindings other than the palette toggle are ignored while
+// the palette is open or focus is in an editable field.
+const SHORTCUTS: { keys: string; label: string }[] = [
+  { keys: 'mod+k', label: 'Toggle the command palette (works everywhere)' },
+  { keys: 'mod+enter', label: 'Run the current attack (attack view)' },
+  { keys: 'mod+1', label: 'Switch to tab 1 (attack or calculator tabs)' },
+  { keys: 'mod+2', label: 'Switch to tab 2 (attack or calculator tabs)' },
+  { keys: 'mod+3', label: 'Switch to tab 3 (attack or calculator tabs)' },
+  { keys: 'mod+4', label: 'Switch to calculator tab 4 (calculator view only)' },
+  { keys: 'mod+5', label: 'Switch to calculator tab 5 (calculator view only)' },
+  { keys: 'mod+shift+c', label: 'Copy attack output (attack view)' },
+];
+
 export function InstructionsPanel() {
   const { viewMode } = useAppContext();
 
@@ -82,6 +97,19 @@ export function InstructionsPanel() {
               </Stack>
             </Stack>
           ))}
+          <Stack gap={1}>
+            <Heading level={4} style={{ color: 'var(--dracula-cyan)' }}>
+              Keyboard Shortcuts
+            </Heading>
+
+            <Stack gap={1}>
+              {SHORTCUTS.map((shortcut) => (
+                <Text key={shortcut.keys} type="large" as="p">
+                  <Kbd keys={shortcut.keys} /> {shortcut.label}
+                </Text>
+              ))}
+            </Stack>
+          </Stack>
         </Stack>
       </Stack>
     </Stack>

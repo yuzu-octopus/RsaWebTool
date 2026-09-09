@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode, type SVGProps } from 'react';
 import { SideNav, SideNavHeading, SideNavItem } from '@astryxdesign/core/SideNav';
 import { MobileNav } from '@astryxdesign/core/MobileNav';
 import { Badge } from '@astryxdesign/core/Badge';
+import { Kbd } from '@astryxdesign/core/Kbd';
 import { Text } from '@astryxdesign/core/Text';
 import { Link } from '@astryxdesign/core/Link';
 import { Divider } from '@astryxdesign/core/Divider';
@@ -164,6 +165,19 @@ const nativeTitle = (title: string) => ({ title });
 // the kit's own selected tint is near-invisible on `--dracula-bg-dark`.
 const selectedStyle = { backgroundColor: 'var(--dracula-selection)' } as const;
 
+// Unstyled button reset so the footer palette hint reads as one supporting line.
+const paletteHintStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  background: 'none',
+  border: 0,
+  padding: 0,
+  cursor: 'pointer',
+  color: 'inherit',
+  font: 'inherit',
+} as const;
+
 interface SidebarProps {
   mobileOpen: boolean;
   onMobileClose: () => void;
@@ -174,7 +188,7 @@ function focusWorkspace() {
 }
 
 export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
-  const { selectedAttack, setSelectedAttack, setViewMode, viewMode, calculatorMode, setCalculatorMode } = useAppContext();
+  const { selectedAttack, setSelectedAttack, setViewMode, viewMode, calculatorMode, setCalculatorMode, setCommandPaletteOpen } = useAppContext();
   const isMobile = useIsMobile();
   const [expandedCats, setExpandedCats] = useState<Set<string>>(() => new Set());
 
@@ -211,6 +225,16 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const footer = (
     <Stack direction="vertical" gap={1} padding={3}>
       <Divider />
+      <button
+        type="button"
+        data-testid="sidebar-palette-hint"
+        aria-label="Open command palette"
+        onClick={() => setCommandPaletteOpen(true)}
+        style={paletteHintStyle}
+      >
+        <Kbd keys="mod+k" />
+        <Text type="supporting">Search</Text>
+      </button>
       <Text type="supporting">© 2026 yuzu-octopus</Text>
       <Text type="supporting">
         Powered by{' '}
