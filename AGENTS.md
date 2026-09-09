@@ -83,7 +83,7 @@ scripts/            Test scripts
 - Astryx components only (Card/Text/Link/Stack/Grid/…) — no raw div/span/a for layout
 - Brand tokens verbatim (`var(--color-*)`, `var(--dracula-*)`) — no raw hex, no `:root` overrides
 - Scrollbar: kit dracula scrollbars (tokens.css)
-- Sidebar: 220px fixed, currentLine bg
+- Sidebar: 264px fixed, selection bg, native title tooltips on all nav labels
 - OutputPanel: 200-600px drag-resize, viewport-aware max width (`Math.min(600, window.innerWidth - 620)`, re-evaluated on resize), localStorage persisted
 - Snackbar toast: top-center, 3s auto-dismiss, Dracula bg + 2px colored border per severity
 - ErrorBoundary: class component wrapping all content panels, Dracula fallback UI
@@ -98,6 +98,9 @@ scripts/            Test scripts
 - Consistent content width: all panels use `maxWidth: 640` for readable line lengths
 - Stop/cleanup: `handleStop()` unified in `finally` block, `isRunning = loading && progress < 100`
 - Sidebar: all items highlighted on select, centering scroll, `pl: 4` padding
+- Empty states: launchpad with entry actions (Magic/attack/calculator); viewport-aware copy + drawer button on mobile
+- Focus: kit `:focus-visible` ring verified via real keyboard Tab (no app overrides)
+- ProofRenderer: heading titles through escape renderer; math-split remnants stripped (see escapes test)
 - "Attack Index" (was "Proofs Index")
 - Input handling: all numeric inputs strip ALL whitespace (not just trim) at every entry point via `.replace(/\s/g, '')`. Covers InputPanel form vals, MagicPanel extractParams, and FormatConverter detectFormat. `BigInt()` throws on internal whitespace like `"123 456"` — `.replace(/\s/g, '')` is required over `.trim()`.
 
@@ -171,7 +174,7 @@ TESTCASE_BITS: `{ p: 512, q: 512 }` → n ≈ 1024-bit.
 - `ResultBox` — output display with copy-to-clipboard, 4 size variants
 - `AttackExplanationPanel` — reusable attack explanation panel with CodeBlock highlighting
 - `CalculatorSubTabs` — shared sub-tab navigation bar
-- `EmptyState` — standard empty-state placeholder for all panels
+- `EmptyState` — launchpad placeholder (title/hint/children actions) for all panels
 
 ## Hooks
 
