@@ -257,6 +257,11 @@ def padding_oracle_decrypt(oracle, iv: bytes, ct: bytes) -> bytes:
                 if pad == 1:
                     probe[14] ^= 0x01  # dodge an accidental valid padding
                 if oracle(bytes(probe), curr):
+                    if pad == 1:
+                        confirm = bytearray(probe)
+                        confirm[14] ^= 0x03  # second flip: a true 01 stays valid, a 02-02 dies
+                        if not oracle(bytes(confirm), curr):
+                            continue
                     intermediate[idx] = guess ^ pad
                     break
 

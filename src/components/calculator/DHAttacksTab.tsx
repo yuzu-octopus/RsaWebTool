@@ -114,8 +114,9 @@ export function DHAttacksTab() {
       if (attack === 'x25519-weak-key') {
         const peer = yVal.trim().replace(/\s/g, '').replace(/^0x/i, '');
         if (isAllZeroX25519Peer(yVal)) {
-          const reason =
-            peer.length !== 64 ? `malformed peer key (need 32 bytes hex, got ${peer.length / 2} bytes)` : 'all-zero u-coordinate';
+          let reason = 'all-zero u-coordinate';
+          if (!/^[0-9a-fA-F]*$/.test(peer)) reason = 'malformed peer key (not hex)';
+          else if (peer.length !== 64) reason = `malformed peer key (need 32 bytes hex, got ${peer.length} hex chars)`;
           out.dispatch(
             `X25519 peer key: REJECT (${reason})\nRFC 7748 section 6.1 MAY-level minimum enforced; low-order-point checks (e.g. u = 1) are stricter SHOULD-level hygiene.\nMETHOD=TYPESCRIPT`,
             'DH Attack: x25519-weak-key',

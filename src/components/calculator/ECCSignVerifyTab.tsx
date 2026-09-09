@@ -55,7 +55,7 @@ export function ECCSignVerifyTab() {
           const valid = ed.verify(sig, mbytes, pub);
           // Ed25519 nonces are deterministic (RFC 8032) — there is no
           // random-k reuse class, and S is verified strictly (S+L rejected).
-          const result = `h = int(SHA256(msg)) = 0x${h.toString(16)}\n`
+          const result = `h = int(SHA256(msg)) = 0x${h.toString(16)} (informational only — unused: Ed25519 nonces use SHA-512 per RFC 8032, not this hash)\n`
             + `Signature (64-byte hex): ${bytesToHex(sig)}\n\nPublic key: ${bytesToHex(pub)}\n`
             + `Verify: ${valid ? 'MATCH' : 'MISMATCH'}\n\nNote: Ed25519 enforces strict verification — non-canonical S >= L (e.g. S+L malleations accepted by ZIP-215 verifiers) is rejected here.`;
           out.dispatch(result, 'ECC Sign/Verify');

@@ -1,4 +1,4 @@
-import { bitLength, exactNthRoot, gcd, iroot } from '../utils/bigint';
+import { bitLength, gcd } from '../utils/bigint';
 
 // Exact bit length, re-exported here so attack files import helpers from one place.
 export { bitLength };
@@ -76,25 +76,6 @@ export function gcdSetScan(n: bigint, candidates: bigint[]): { factor: bigint; i
     if (g > 1n && g < n) return { factor: g, index: i };
   }
   return null;
-}
-
-/**
- * Exact integer e-th root of v with verification that m^e = c (mod n).
- * Thin wrapper over the shared iroot so call sites stop hand-rolling
- * Newton loops; falls back to exactNthRoot's binary correction on mismatch.
- */
-export function verifiedRoot(v: bigint, e: bigint, n: bigint, c: bigint): bigint | null {
-  const m = iroot(v, e);
-  if (m ** e !== v) return exactNthRoot(v, e);
-  let check = 1n;
-  let base = m % n;
-  let exp = e;
-  while (exp > 0n) {
-    if (exp & 1n) check = (check * base) % n;
-    exp >>= 1n;
-    base = (base * base) % n;
-  }
-  return check === c ? m : null;
 }
 
 /**

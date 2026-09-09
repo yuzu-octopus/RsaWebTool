@@ -233,7 +233,7 @@ p, q &= \\frac{s \\pm \\sqrt{\\Delta}}{2} \\qed
 
 \\textbf{Explanation:} Given both $n = pq$ and $\\phi(n) = (p-1)(q-1)$, we know both the sum $p+q = n - \\phi(n) + 1$ and the product $pq = n$. By Vieta's formulas, $p$ and $q$ are the roots of $x^2 - (p+q)x + pq = 0$. Computing the discriminant $\\Delta = (p+q)^2 - 4n = (p-q)^2$ and taking its square root yields $p$ and $q$ directly via the quadratic formula. This is a single-shot deterministic attack with no iteration.
 
-\\textbf{Scope:} If $\\Delta = 0$ then $p = q = s/2$ with $n$ a perfect square, returned directly via $\\sqrt{n}$. A non-square $\\Delta$ means $\\phi(n)$ is inconsistent with a two-prime $n$ (wrong leak or multi-prime modulus): the attack reports FAILED rather than guessing. Recovering factors from a mere multiple of $\\phi(n)$ needs Miller-Rabin-style randomized factoring, which is not implemented here.
+\\textbf{Scope:} If $\\Delta = 0$ then $p = q = s/2$ with $n$ a perfect square, returned directly via $\\sqrt{n}$. A non-square $\\Delta$ means $\\phi(n)$ is inconsistent with a two-prime $n$ (wrong leak or multi-prime modulus): the attack reports FAILED rather than guessing. Recovering factors from a mere multiple of $\\phi(n)$ uses the implemented Miller-Rabin-style randomized splitting mode — provide $d$ plus $e$ instead of $\\phi(n)$ ($ed - 1 = 2^s \\cdot t$).
 
 \\textbf{References:} Rivest, Shamir, Adleman, "A Method for Obtaining Digital Signatures and Public-Key Cryptosystems", 1978; Menezes et al., "Handbook of Applied Cryptography", Section 8.2.2`,
   priority: 'high',

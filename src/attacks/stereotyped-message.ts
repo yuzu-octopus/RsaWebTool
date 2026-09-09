@@ -1,5 +1,4 @@
 import type { Attack } from '../types';
-import {  } from './_rsaHelpers';
 import { generateKeyPair, randomPrime } from '../utils/testcases/core';
 import { exactNthRoot, modPow } from '../utils/bigint';
 import { wrapSageTemplate, validateNumeric } from './guard';
