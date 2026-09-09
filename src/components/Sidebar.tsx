@@ -160,6 +160,10 @@ const CATEGORY_BADGE_VARIANTS: Record<string, 'green' | 'purple' | 'cyan' | 'ora
 // Native `title` fallback for truncated rows: kit BaseProps omits `title`, but SideNavItem spreads `...rest` onto the button (as `id`/`data-testid` prove).
 const nativeTitle = (title: string) => ({ title });
 
+// Bright selected pill readable on the dark rail (old currentLine behaviour);
+// the kit's own selected tint is near-invisible on `--dracula-bg-dark`.
+const selectedStyle = { backgroundColor: 'var(--dracula-selection)' } as const;
+
 interface SidebarProps {
   mobileOpen: boolean;
   onMobileClose: () => void;
@@ -247,6 +251,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                 {...nativeTitle(attack.name)}
                 size="sm"
                 isSelected={isAttackActive(attack.id)}
+                style={isAttackActive(attack.id) ? selectedStyle : undefined}
                 onClick={() => handleAttackClick(attack)}
               />
             ))}
@@ -271,6 +276,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
             {...nativeTitle(item.label)}
             icon={calcGlyph(item.calculatorMode)}
             isSelected={viewMode === 'calculator' && calculatorMode === item.calculatorMode}
+            style={viewMode === 'calculator' && calculatorMode === item.calculatorMode ? selectedStyle : undefined}
             onClick={() => {
               setViewMode('calculator');
               setCalculatorMode(item.calculatorMode);
@@ -288,6 +294,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           label={mod.label}
           icon={modGlyph(mod.id)}
           isSelected={isViewActive(mod.mode)}
+          style={isViewActive(mod.mode) ? selectedStyle : undefined}
           onClick={() => {
             setViewMode(mod.mode as 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter' | 'instructions' | 'pem');
             if (isMobile) onMobileClose();
