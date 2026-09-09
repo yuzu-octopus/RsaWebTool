@@ -30,7 +30,6 @@ import { getAttackSource, extractFrontendCheck, dedent } from '../attacks/rawSou
 // resolves through the theme `color` prop.
 const c = {
   orange: 'var(--dracula-orange)',
-  cyan: 'var(--dracula-cyan)',
 };
 
 const flexFill = { flex: 1, minWidth: 0, minHeight: 0 } as const;
