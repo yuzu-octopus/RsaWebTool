@@ -19,7 +19,6 @@ import type { ParsedPEM } from '../utils/pemParser';
 
 // Dracula brand tokens (verbatim kit names — never raw hex).
 const c = {
-  purple: 'var(--dracula-purple)',
   green: 'var(--dracula-green)',
   orange: 'var(--dracula-orange)',
 };
@@ -107,7 +106,7 @@ export function PemDecryptor() {
         <Stack width="100%" maxWidth={640} gap={2}>
           <Heading level={3} color="accent">PEM Key Decryptor</Heading>
 
-          <Text type="supporting">
+          <Text type="body" color="secondary">
             Parse and decrypt PEM private keys in PKCS#1 and PKCS#8 formats
           </Text>
 
@@ -174,7 +173,7 @@ export function PemDecryptor() {
 
           {decrypting && (
             <Stack gap={1}>
-              <ProgressBar label="Decrypting key" isIndeterminate variant="success" />
+              <ProgressBar label="Decrypting key" isIndeterminate />
               <Text type="supporting">
                 Decrypting key…
               </Text>
@@ -209,7 +208,7 @@ export function PemDecryptor() {
                           gap={1}
                           vAlign="center"
                         >
-                          <Text type="label" weight="semibold" style={{ color: c.purple }}>
+                          <Text type="label" weight="semibold">
                             {key}:
                           </Text>
                           <Tooltip content={value}>

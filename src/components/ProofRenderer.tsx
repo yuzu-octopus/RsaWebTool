@@ -188,7 +188,9 @@ export function ProofRenderer({ latex }: { latex: string }) {
                 <ul key={'list-' + segment.content.slice(0, 20)}>
                   {items.map((item) => (
                     <li key={'li-' + item.slice(0, 20).replace(/\s+/g, '_')}>
-                      <InlineMath text={item} />
+                      <Text type="large">
+                        <InlineMath text={item} />
+                      </Text>
                     </li>
                   ))}
                 </ul>
@@ -217,12 +219,12 @@ export function ProofRenderer({ latex }: { latex: string }) {
                         {/* SAFE: see renderInlineText note above. */}
                         <span dangerouslySetInnerHTML={{ __html: renderInlineText(headingMatch[1] + ':') }} />
                       </Heading>
-                      {headingMatch[2] && <Text as="p"><InlineMath text={headingMatch[2]} /></Text>}
+                      {headingMatch[2] && <Text type="large" as="p"><InlineMath text={headingMatch[2]} /></Text>}
                     </Stack>
                   );
                 } else {
                   rendered.push(
-                    <Text key={j} as="p">
+                    <Text key={j} type="large" as="p">
                       <InlineMath text={para} />
                     </Text>
                   );

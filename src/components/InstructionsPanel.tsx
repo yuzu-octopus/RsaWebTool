@@ -69,13 +69,13 @@ export function InstructionsPanel() {
         <Stack width="100%" maxWidth={640} gap={2} padding={2}>
           {SECTIONS.map((section) => (
             <Stack key={section.title} gap={1}>
-              <Heading level={5} style={{ color: 'var(--dracula-cyan)' }}>
+              <Heading level={4} style={{ color: 'var(--dracula-cyan)' }}>
                 {section.title}
               </Heading>
 
               <Stack gap={1}>
-                {section.content.map((line, i) => (
-                  <Text key={i} as="p">
+                {section.content.map((line) => (
+                  <Text key={line.slice(0, 48)} type="large" as="p">
                     {line}
                   </Text>
                 ))}

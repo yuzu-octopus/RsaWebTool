@@ -38,7 +38,7 @@ export function FormatConverter() {
         <Stack width="100%" maxWidth={640} gap={2}>
           <Heading level={3} color="accent">Format Converter</Heading>
 
-          <Text type="supporting">
+          <Text type="body" color="secondary">
             Convert between Hex, Dec, Base64, and Text
           </Text>
 

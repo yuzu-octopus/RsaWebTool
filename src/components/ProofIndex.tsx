@@ -20,7 +20,11 @@ function AttackListItem({
   return (
     <ListItem
       label={attack.name}
-      description={`[${attack.category}] ${attack.description}`}
+      description={
+        <Text type="body" maxLines={2}>
+          {`[${attack.category}] ${attack.description}`}
+        </Text>
+      }
       endContent={
         <Badge
           variant={attack.frontendCheck ? 'green' : 'orange'}
@@ -45,16 +49,16 @@ export function ProofIndex() {
     [search]
   );
 
-  const handleClick = useCallback((attack: typeof attacks[0]) => {
+  const handleSelectAttack = useCallback((attack: typeof attacks[0]) => {
     setSelectedAttack(attack);
     setViewMode('attack');
   }, [setSelectedAttack, setViewMode]);
 
   const attackItems = useMemo(() =>
     filtered.map(attack => (
-      <AttackListItem key={attack.id} attack={attack} onClick={handleClick} />
+      <AttackListItem key={attack.id} attack={attack} onClick={handleSelectAttack} />
     )),
-    [filtered, handleClick],
+    [filtered, handleSelectAttack],
   );
 
   if (viewMode !== 'proofs') return null;
@@ -76,7 +80,7 @@ export function ProofIndex() {
             width="100%"
           />
 
-          <Text type="supporting">
+          <Text type="supporting" hasTabularNumbers>
             {filtered.length} of {attacks.length} attacks
           </Text>
         </Stack>
