@@ -1,0 +1,156 @@
+var e=`import type { Attack } from '../types';
+import { rsaNeeds } from './_rsaHelpers';
+import { generateHastadTestcase, generateKeyPair, randomPrime } from '../utils/testcases/core';
+import { modPow, exactNthRoot } from '../utils/bigint';
+import { wrapSageTemplate, validateNumeric} from './guard';
+
+export const attack: Attack = {
+  id: 'coppersmith-short-pad',
+  name: 'Small Message Recovery (e-th Root)',
+  category: 'Partial Key / Lattice',
+  description: 'Recovers small messages m1, m2 from ciphertexts by integer e-th root (degenerate case where m^e < n). NOT the full Coppersmith lattice-based short pad attack — use when m^e < n (no modular wrap-around), typically e=3.',
+  inputs: [
+    { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
+    { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
+    { name: 'c1', label: 'c1 (first ciphertext)', placeholder: 'Enter ciphertext c1...', multiline: true, rows: 3 },
+    { name: 'c2', label: 'c2 (second ciphertext)', placeholder: 'Enter ciphertext c2...', multiline: true, rows: 3 },
+  ],
+  sageTemplate: (vals: Record<string, string>) => {
+    if (!vals.n || !vals.e || !vals.c1 || !vals.c2) {
+      return 'print("ERROR: Missing required inputs (n, e, c1, c2)")\\nprint("COPPERSMITH_SHORT_PAD=FAILED")';
+    }
+    return wrapSageTemplate({
+      token: 'COPPERSMITH_SHORT_PAD',
+      body: \`        n = Integer(\${validateNumeric(vals.n, 'n')})
+        e = Integer(\${validateNumeric(vals.e, 'e')})
+        e_int = int(e)
+        c1 = Integer(\${validateNumeric(vals.c1, 'c1')})
+        c2 = Integer(\${validateNumeric(vals.c2, 'c2')})
+        m1_val = None
+        m2_val = None
+        found = False
+        # Method 1: Sage's built-in nth_root
+        try:
+            m1_t, exact1 = c1.nth_root(e_int, truncate_mode=True)
+            m2_t, exact2 = c2.nth_root(e_int, truncate_mode=True)
+            if exact1 and exact2:
+                m1_val = Integer(m1_t)
+                m2_val = Integer(m2_t)
+        except Exception:
+            pass
+        # Method 3: If only one found, brute-force delta (range covers testcase)
+        if m1_val is None and m2_val is not None:
+            for d in range(1, 4096):
+                if (m2_val - d)**e_int == c1:
+                    m1_val = m2_val - d
+                    break
+        if m2_val is None and m1_val is not None:
+            for d in range(1, 4096):
+                if (m1_val + d)**e_int == c2:
+                    m2_val = m1_val + d
+                    break
+        if m1_val is not None and m2_val is not None:
+            if pow(int(m1_val), e_int, int(n)) == c1 and pow(int(m2_val), e_int, int(n)) == c2:
+                delta_val = m2_val - m1_val
+                out.append("Small Message Recovery (e-th Root)")
+                out.append(f"n = {n}")
+                out.append(f"e = {e}")
+                out.append(f"c1 = {c1}")
+                out.append(f"c2 = {c2}")
+                out.append("")
+                out.append("Results:")
+                out.append(f"m1 = {m1_val}")
+                out.append(f"m2 = {m2_val}")
+                out.append(f"delta = {delta_val}")
+                out.append("")
+                out.append("Verification: messages recovered via integer e-th root")
+                out.append("")
+                out.append("COPPERSMITH_SHORT_PAD=SUCCESS")
+                found = True
+        if not found:
+            out.append("Could not recover messages.")
+            out.append("COPPERSMITH_SHORT_PAD=FAILED")\`,
+      useGuard: false,
+    });
+  },
+  frontendCheck: (vals: Record<string, string>) => {
+    if (!vals.n || !vals.e || !vals.c1 || !vals.c2) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const e = BigInt(vals.e);
+      const c1 = BigInt(vals.c1);
+      const c2 = BigInt(vals.c2);
+      // Degenerate integer-root case only: exact roots or nothing (plus the
+      // small-delta brute force below); no lattice is attempted here.
+      let m1: bigint | null = exactNthRoot(c1, e);
+      let m2: bigint | null = exactNthRoot(c2, e);
+      if (m1 === null && m2 !== null) {
+        for (let d = 1n; d < 4096n; d++) {
+          if ((m2 - d) ** e === c1) {
+            m1 = m2 - d;
+            break;
+          }
+        }
+      }
+      if (m2 === null && m1 !== null) {
+        for (let d = 1n; d < 4096n; d++) {
+          if ((m1 + d) ** e === c2) {
+            m2 = m1 + d;
+            break;
+          }
+        }
+      }
+      if (m1 !== null && m2 !== null) {
+        if (modPow(m1, e, n) === c1 && modPow(m2, e, n) === c2) {
+          return Promise.resolve(\`Small Message Recovery (e-th Root)\\nn = \${n}\\ne = \${e}\\nc1 = \${c1}\\nc2 = \${c2}\\n\\nResults:\\nm1 = \${m1}\\nm2 = \${m2}\\ndelta = \${m2 - m1}\\n\\nVerification: messages recovered via integer e-th root\\n\\nCOPPERSMITH_SHORT_PAD=SUCCESS\`);
+        }
+      }
+      return Promise.resolve(null);
+    } catch (e) { console.warn('[coppersmith-short-pad] frontendCheck error:', e); return Promise.resolve(null); }
+  },
+  proof: \`\\\\textbf{Theorem:} Given two ciphertexts $c_1 \\\\equiv m_1^e \\\\pmod{n}$, $c_2 \\\\equiv m_2^e \\\\pmod{n}$ where $e$ is small (e.g. $e = 3, 5$), recover $m$ via integer root extraction in the degenerate case $m_i^e < n$ (no modular wrap-around). The Coppersmith lattice for $|m| < n^{1/e^2}$ is NOT implemented here.
+
+\\\\textbf{Setup:}
+\\\\begin{itemize}
+\\\\item $c_1 \\\\equiv m_1^e \\\\pmod{n}$, $c_2 \\\\equiv m_2^e \\\\pmod{n}$
+\\\\item $m_1, m_2 < n^{1/e}$ (padded messages are small enough that $m_i^e < n$; no modular reduction)
+\\\\item $r_1, r_2$ are short random pads
+\\\\end{itemize}
+
+\\\\textbf{Direct e-th Root (when $m^e < n$, no modular reduction):}
+\\\\begin{align*}
+m_1 &= \\\\lfloor\\\\sqrt[e]{c_1}\\\\rfloor,\\\\quad m_2 = \\\\lfloor\\\\sqrt[e]{c_2}\\\\rfloor \\\\\\\\
+\\\\Delta &= m_2 - m_1 = r_2 - r_1 \\\\\\\\
+m &= m_1 - r_1 = m_2 - r_2
+\\\\qed\\\\\\\\
+\\\\end{align*}
+
+\\\\textbf{Explanation:} When $m^e < n$, the ciphertext is an exact $e$-th power in the integers (no modular wrap-around). Integer $e$-th root directly recovers $m_1$ and $m_2$. If only one root is found, brute-force the small pad difference $\\\\Delta$ (at most 4096, matching the implemented delta bound). The full Coppersmith short-pad attack using polynomial resultants handles the general case where $m^e \\\\ge n$ and $|\\\\Delta| < n^{1/e^2}$, but requires lattice reduction and is NOT implemented here: this attack covers only the degenerate integer-root case above.
+
+\\\\textbf{References:} D. Coppersmith, "Finding a Small Root of a Bivariate Integer Equation", J. Cryptology, 1997; D. Boneh, "Twenty Years of Attacks on RSA", 1999\`,
+  usageGuide: 'Recovers small messages via integer e-th root (degenerate case where m^e < n). NOT the full Coppersmith lattice attack.\\n\\nHow to use:\\n1. You have two ciphertexts c1, c2 of the same plaintext m with small pads r1, r2\\n2. The pads are small (|r1|, |r2| < n^(1/e)) so m^e < n (no modular wrap-around)\\n3. Provide n, e, c1, c2\\n4. The attack uses integer e-th root to recover the messages and pads\\n\\nTip: Works best with e=3 and small messages. For convenience, paste into Magic Mode which auto-detects. See also: Stereotyped Message (the true Coppersmith lattice attack for known-prefix messages), Small Public Exponent and Hastad\\'s Broadcast (integer-root siblings).',
+  priority: 'medium',
+  applicableCheck: rsaNeeds.nEC1C2,
+};
+
+export const generateTestcase = (): Record<string, string> => {
+  // Use the shared Hastad generator for the (e, m) pair (small e, small m),
+  // then build n at 256-bit primes (512-bit n) so m1^e < n holds for the
+  // integer e-th root attack. Using kp.n from generateHastadTestcase would
+  // give a 1024-bit n that times out in L2b testing.
+  const kp = generateHastadTestcase();
+  const e = kp.e;
+  const { n } = generateKeyPair(256, 256);
+  // m must be small enough that m^e < n (no modular wrap-around).
+  // For 512-bit n and e=3: m < n^(1/3) ≈ 170 bits.
+  const m = randomPrime(80); // 80-bit m, m^3 ≈ 240 bits, well within 512-bit n
+  const maxPad = 2 ** 12;
+  const r1 = BigInt(Math.floor(Math.random() * maxPad));
+  const r2 = BigInt(Math.floor(Math.random() * maxPad));
+  const m1 = (m << 20n) | r1;
+  const m2 = (m << 20n) | r2;
+  const c1 = modPow(m1, e, n);
+  const c2 = modPow(m2, e, n);
+  return { n: n.toString(), e: e.toString(), c1: c1.toString(), c2: c2.toString() };
+};
+`;export{e as default};
