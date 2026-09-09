@@ -33,7 +33,7 @@ const SECTIONS: Section[] = [
     content: [
       'Magic Panel: Paste any text — auto-detect RSA parameters and run all applicable attacks in parallel.',
       'RSA Calculator: Key generation, encryption, and decryption with custom exponents.',
-      'Format Converter: Convert between hex, decimal, Base64, and text representations.',
+      'Format Converter: Convert between hex, dec, Base64, and text representations.',
       'PEM Key Decryptor: Parse and decrypt PEM private keys in PKCS#1 and PKCS#8 formats.',
       'Source Code View: View the actual TypeScript or Python implementation of any attack.',
       'Proof Viewer: Mathematical proofs rendered with KaTeX for every attack.',

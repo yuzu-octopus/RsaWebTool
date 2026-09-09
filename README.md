@@ -29,7 +29,7 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 ### Interface
 
 - **Calculator Switcher Tabs** — 5-tab bar (RSA / AES / ECC / Hash / DH) with icons, keyboard shortcuts (⌘1-⌘5), scrollable on narrow screens
-- **Format Converter** — live Hex / Decimal / Base64 / Text conversion
+- **Format Converter** — live Hex / Dec / Base64 / Text conversion
 - **Attack Index** — searchable catalog of all 51 attack proofs with KaTeX rendering
 - **METHOD indicator** — every output shows `METHOD=TYPESCRIPT` or `METHOD=SAGEMATHCELL`
 - **Standardized output format** — all attacks produce consistent `Attack Name → Inputs → Results → Verification → TOKEN → METHOD` output
@@ -187,7 +187,7 @@ Pure JS hash computation via @noble/hashes. 14 algorithms including SHA-2/3, BLA
 Diffie-Hellman key exchange with RFC 3526 standard groups (group1/group5/group14) or custom p/g parameters. Generates private/public keys, computes shared secrets. 3 sub-tabs: Explanation, Key Exchange, Attacks (discrete log attacks).
 
 ### Format Converter
-Live conversion between hex, decimal, base64, and text.
+Live conversion between hex, dec, base64, and text.
 
 ### Command Palette
 Press `⌘K` (Mac) or `Ctrl+K` (Windows/Linux) to open. Fuzzy-search across all attacks, calculators, and views. Arrow keys to navigate, Enter to select.

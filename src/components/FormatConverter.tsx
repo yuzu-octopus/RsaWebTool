@@ -39,7 +39,7 @@ export function FormatConverter() {
           <Heading level={3} color="accent">Format Converter</Heading>
 
           <Text type="supporting">
-            Convert between Hex, Decimal, Base64, and Text
+            Convert between Hex, Dec, Base64, and Text
           </Text>
 
           <SegmentedControl

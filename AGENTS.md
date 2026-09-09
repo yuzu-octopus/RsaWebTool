@@ -232,7 +232,7 @@ TESTCASE_BITS: `{ p: 512, q: 512 }` → n ≈ 1024-bit.
 | CommandPalette | CommandPalette.tsx | 395 | ⌘/Ctrl+K fuzzy search modal |
 | InstructionsPanel | InstructionsPanel.tsx | 117 | Always-visible reference guide |
 | PemDecryptor | PemDecryptor.tsx | 413 | PEM key decryptor: PKCS#1/PKCS#8/encrypted, Feed buttons |
-| FormatConverter | FormatConverter.tsx | 181 | Hex/decimal/base64/text converter |
+| FormatConverter | FormatConverter.tsx | 181 | Hex/dec/base64/text converter |
 | ErrorBoundary | ErrorBoundary.tsx | 46 | Class component, Dracula fallback UI |
 | EmptyState | _shared/EmptyState.tsx | 99 | Standard empty-state placeholder for all panels |
 
