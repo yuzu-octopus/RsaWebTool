@@ -54,7 +54,7 @@ export function ResultBox({
         <Stack direction="horizontal" gap={1} vAlign="center">
           <Text type="label" style={{ color: 'var(--dracula-green)' }}>{label}</Text>
           {copied && showCopy && (
-            <Text type="supporting" role="status" aria-live="polite" aria-atomic="true" style={{ color: 'var(--dracula-green)' }}>
+            <Text type="body" role="status" aria-live="polite" aria-atomic="true" style={{ color: 'var(--dracula-green)' }}>
               Copied!
             </Text>
           )}

@@ -170,12 +170,12 @@ export default function ProofOfWorkTab() {
             variant="warning"
           />
           {progressDetail && (
-            <Text type="supporting" justify="center" style={{ color: 'var(--dracula-orange)' }} hasTabularNumbers>
+            <Text type="body" justify="center" style={{ color: 'var(--dracula-orange)' }} hasTabularNumbers>
               {progressDetail}
             </Text>
           )}
           {eta && (
-            <Text type="supporting" justify="center" style={{ color: 'var(--dracula-orange)' }} hasTabularNumbers>
+            <Text type="body" justify="center" style={{ color: 'var(--dracula-orange)' }} hasTabularNumbers>
               ETA: {eta}
             </Text>
           )}

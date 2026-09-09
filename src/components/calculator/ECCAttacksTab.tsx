@@ -632,7 +632,7 @@ print('\\n'.join(out)); print('TOKEN=SUCCESS')`;
         isLoading={isRunning}
       />
       {isRunning && (
-        <Text type="supporting" role="status" aria-live="polite">
+        <Text type="body" role="status" aria-live="polite">
           Running attack…
         </Text>
       )}
