@@ -139,7 +139,7 @@ function escapeHtml(text: string): string {
 /**
  * Converts LaTeX text commands to HTML for rendering.
  */
-function renderInlineText(text: string): string {
+export function renderInlineText(text: string): string {
   let html = escapeHtml(text);
   // Process LaTeX command wrappers before escape sequences
   html = html.replace(/\\texttt\{([^}]*)\}/g, '<code>$1</code>');
@@ -152,6 +152,11 @@ function renderInlineText(text: string): string {
   html = html.replace(/\\#/g, '#');
   html = html.replace(/\\%/g, '%');
   html = html.replace(/\\'/g, "'");
+  // Strip math-split remnants: unbalanced openers and orphan closers.
+  // Math never reaches here (InlineMath routes $...$/\(...\) to KaTeX),
+  // so leftover braces are split artifacts, not content.
+  html = html.replace(/\\(textbf|textit|emph|texttt|underline|text)\{/g, '');
+  html = html.replace(/\}/g, '');
   return html;
 }
 
@@ -241,7 +246,10 @@ export function ProofRenderer({ latex }: { latex: string }) {
                   rendered.push(
                     <Stack key={j} gap={1}>
                       <Heading level={isTopLevelHeading ? 2 : 3} style={{ color: 'var(--dracula-pink)' }}>
-                        {headingMatch[1]}:
+                        {/* SAFE: renderInlineText only emits a fixed set of HTML
+                            wrappers around captured groups. Input is bundled
+                            LaTeX proof text (not user input). */}
+                        <span dangerouslySetInnerHTML={{ __html: renderInlineText(headingMatch[1] + ':') }} />
                       </Heading>
                       {headingMatch[2] && <Text as="p"><InlineMath text={headingMatch[2]} /></Text>}
                     </Stack>
