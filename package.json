@@ -30,6 +30,7 @@
     "astryx-dracula": "^0.1.5",
     "bigint-gcd": "^1.0.46",
     "katex": "^0.17.0",
+    "lucide-react": "^1.43.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
