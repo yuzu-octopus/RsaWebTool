@@ -246,7 +246,7 @@ function AttackPanel({ attack }: { attack: Attack }) {
       {tab === 1 && (
         <Stack direction="vertical" hAlign="center" padding={2} isScrollable role="tabpanel" id="attack-tabpanel-1" aria-labelledby="attack-tab-1" style={flexFill}>
           <Stack direction="vertical" gap={2} width="100%" style={{ maxWidth: '40rem' }}>
-            <Heading level={3}>
+            <Heading level={3} color="accent">
               {attack.name}
             </Heading>
             <Text type="supporting" color="secondary">

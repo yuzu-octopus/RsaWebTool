@@ -116,7 +116,7 @@ export function OutputPanel() {
       )}
 
       <Stack direction="vertical" gap={2} padding={2} isScrollable style={isNarrow ? {} : { flex: 1, minHeight: 0, paddingLeft: 'var(--space-gap)' }}>
-        <Heading level={3}>
+        <Heading level={3} color="accent">
           Results
         </Heading>
 

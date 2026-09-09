@@ -290,7 +290,7 @@ export function MagicPanel() {
     <Stack direction="vertical" style={flexFill}>
       <Stack direction="vertical" hAlign="center" padding={2} isScrollable style={flexFill}>
         <Stack direction="vertical" gap={2} width="100%" style={{ maxWidth: '40rem' }}>
-          <Heading level={3}>
+          <Heading level={3} color="accent">
             <Icon icon={Sparkles} size="sm" /> Magic Cracker
           </Heading>
           <Text type="body" color="secondary">
