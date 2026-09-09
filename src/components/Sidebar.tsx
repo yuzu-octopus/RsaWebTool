@@ -157,6 +157,16 @@ const CATEGORY_BADGE_VARIANTS: Record<string, 'green' | 'purple' | 'cyan' | 'ora
   Advanced: 'yellow',
 };
 
+/**
+ * Native `title` fallback for truncated nav labels. The kit's BaseProps
+ * deliberately omits `title`, so it is threaded through a spread — a direct
+ * `title={...}` prop is a type error — while at runtime SideNavItem spreads
+ * `...rest` onto the underlying button (as `id`/`data-testid` already prove).
+ * The kit Tooltip only covers the collapsed rail; expanded truncated rows
+ * need this native fallback.
+ */
+const nativeTitle = (title: string) => ({ title });
+
 interface SidebarProps {
   mobileOpen: boolean;
   onMobileClose: () => void;
@@ -231,6 +241,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
           <SideNavItem
             key={cat}
             label={cat}
+            {...nativeTitle(cat)}
             collapsible={{
               isCollapsed: !activeExpandedCats.has(cat),
               onCollapsedChange: collapsed => setCatCollapsed(cat, collapsed),
@@ -243,6 +254,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                 id={`sidebar-attack-${attack.id}`}
                 data-testid={`attack-${attack.id}`}
                 label={attack.name}
+                {...nativeTitle(attack.name)}
                 size="sm"
                 isSelected={isAttackActive(attack.id)}
                 onClick={() => handleAttackClick(attack)}
@@ -254,6 +266,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 
       <SideNavItem
         label="Calculators"
+        {...nativeTitle('Calculators')}
         collapsible={{
           isCollapsed: !expandedCats.has('Calculators'),
           onCollapsedChange: collapsed => setCatCollapsed('Calculators', collapsed),
@@ -265,6 +278,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
             key={item.id}
             id={`sidebar-calc-${item.calculatorMode}`}
             label={item.label}
+            {...nativeTitle(item.label)}
             icon={calcGlyph(item.calculatorMode)}
             isSelected={viewMode === 'calculator' && calculatorMode === item.calculatorMode}
             onClick={() => {
