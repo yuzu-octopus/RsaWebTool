@@ -91,7 +91,8 @@ export function OutputPanel() {
   return (
     <Stack
       direction="vertical"
-      style={isNarrow ? { width: '100%' } : { width: outputWidth, flexShrink: 0, overflow: 'hidden', position: 'relative' }}
+      isScrollable
+      style={isNarrow ? { width: '100%' } : { width: outputWidth, flexShrink: 0, minHeight: 0, position: 'relative' }}
     >
       {!isNarrow && (
         <Stack

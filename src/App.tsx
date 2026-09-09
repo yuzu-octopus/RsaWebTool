@@ -97,16 +97,18 @@ function AppContent() {
         <Stack direction="horizontal" gap={0} width="100%" height="100%">
           <Sidebar mobileOpen={mobileNavOpen} onMobileClose={() => setMobileNavOpen(false)} />
           <StackItem size="fill">
-            <Stack as="main" id="main-workspace" tabIndex={-1} direction={isMobile ? 'vertical' : 'horizontal'} gap={0} width="100%" height="100%" isScrollable>
-              <ErrorBoundary>
-                <InputPanel />
-                <Calculator />
-                <MagicPanel />
-                <ProofIndex />
-                <FormatConverter />
-                <InstructionsPanel />
-                <PemDecryptor />
-              </ErrorBoundary>
+            <Stack as="main" id="main-workspace" tabIndex={-1} direction={isMobile ? 'vertical' : 'horizontal'} gap={0} width="100%" height="100%" isScrollable={isMobile}>
+              <StackItem size="fill" isScrollable>
+                <ErrorBoundary>
+                  <InputPanel />
+                  <Calculator />
+                  <MagicPanel />
+                  <ProofIndex />
+                  <FormatConverter />
+                  <InstructionsPanel />
+                  <PemDecryptor />
+                </ErrorBoundary>
+              </StackItem>
               <ErrorBoundary>
                 <OutputPanel />
               </ErrorBoundary>

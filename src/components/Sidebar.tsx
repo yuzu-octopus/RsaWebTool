@@ -331,6 +331,9 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         // measured 15px overflow of 'Partial Key / Lattice' is fixed by width.
         width: 280,
         flexShrink: 0,
+        // Lets the rail keep its own scrollbar: SideNav's middle zone already
+        // scrolls, it only needs a flex bound so it cannot grow the page.
+        minHeight: 0,
         backgroundColor: 'var(--dracula-bg-dark)',
         borderRight: '1px solid var(--dracula-selection)',
       }}
