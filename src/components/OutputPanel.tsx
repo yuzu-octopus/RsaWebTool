@@ -3,6 +3,8 @@ import { Stack } from '@astryxdesign/core/Stack';
 import { Text } from '@astryxdesign/core/Text';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Button } from '@astryxdesign/core/Button';
+import { Banner } from '@astryxdesign/core/Banner';
+import { StatusDot } from '@astryxdesign/core/StatusDot';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { Icon } from '@astryxdesign/core/Icon';
 import { List, ListItem } from '@astryxdesign/core/List';
@@ -24,6 +26,117 @@ const c = {
   cyan: 'var(--dracula-cyan)',
   currentLine: 'var(--dracula-current-line)',
 };
+
+/**
+ * Verdict parsed from an attack result's trailing TOKEN=SUCCESS / TOKEN=FAILED
+ * marker (bare =SUCCESS /=FAILED completion markers included). Last marker
+ * wins; prose without a marker yields null (no banner).
+ */
+function parseVerdict(result: string | null | undefined): 'success' | 'error' | null {
+  if (!result) return null;
+  const tokenMarks = [...result.matchAll(/[A-Z][A-Z0-9_]*=(SUCCESS|FAILED)\b/g)];
+  const marks = tokenMarks.length > 0 ? tokenMarks : [...result.matchAll(/=(SUCCESS|FAILED)\b/g)];
+  if (marks.length === 0) return null;
+  return marks[marks.length - 1][1] === 'SUCCESS' ? 'success' : 'error';
+}
+
+type SageStatus = 'ready' | 'unreachable' | 'unknown';
+
+const SAGE_META: Record<SageStatus, { variant: 'success' | 'error' | 'neutral'; label: string; text: string; tooltip: string }> = {
+  ready: {
+    variant: 'success',
+    label: 'SageMath ready',
+    text: 'Sage ready',
+    tooltip: 'SageMathCell is reachable — Sage-dependent attacks can run.',
+  },
+  unreachable: {
+    variant: 'error',
+    label: 'SageMath unreachable',
+    text: 'Sage unreachable',
+    tooltip: 'SageMathCell is unreachable — Sage-dependent attacks will fail.',
+  },
+  unknown: {
+    variant: 'neutral',
+    label: 'SageMath status unknown',
+    text: 'Sage unknown',
+    tooltip: 'Still checking whether SageMathCell is reachable.',
+  },
+};
+
+// Module-level cache: the reachability probe runs once per session, never per
+// mount, so the CDN sees a single lightweight HEAD request at most.
+let cachedSageStatus: SageStatus | null = null;
+
+const SAGECELL_SCRIPT_URL = 'https://sagecell.sagemath.org/static/embedded_sagecell.js';
+
+function isSageCellLoaded(): boolean {
+  // `sagecell` is declared on Window by useSageMath; the `in` guard keeps the
+  // read checked for the window before the deferred CDN script has run.
+  return typeof window !== 'undefined' && 'sagecell' in window && Boolean(window.sagecell);
+}
+
+// Single-flight CDN reachability ping. An opaque no-cors success means the
+// path is alive but says nothing about the script itself (callers keep polling
+// `window.sagecell`); a rejection means the CDN is unreachable.
+let sageProbePromise: Promise<boolean> | null = null;
+function probeSageCellOnce(): Promise<boolean> {
+  if (!sageProbePromise) {
+    sageProbePromise = fetch(SAGECELL_SCRIPT_URL, { method: 'HEAD', mode: 'no-cors', cache: 'no-store' }).then(
+      () => true,
+      () => false,
+    );
+  }
+  return sageProbePromise;
+}
+
+/**
+ * Three-state SageMathCell reachability without hammering the CDN: the
+ * deferred script flag is polled locally (no network traffic), a single cached
+ * ping detects an unreachable CDN, and errors from the existing Sage
+ * session/stall state (useSageMath) surface here via outputError.
+ */
+function useSageStatus(outputError: string | null): SageStatus {
+  const [probed, setProbed] = useState<SageStatus>(() => {
+    if (cachedSageStatus) return cachedSageStatus;
+    if (isSageCellLoaded()) {
+      cachedSageStatus = 'ready';
+      return 'ready';
+    }
+    return 'unknown';
+  });
+
+  useEffect(() => {
+    if (cachedSageStatus === 'ready') return;
+    let cancelled = false;
+    const poll = window.setInterval(() => {
+      if (cancelled) return;
+      if (isSageCellLoaded()) {
+        cachedSageStatus = 'ready';
+        setProbed('ready');
+        window.clearInterval(poll);
+      }
+    }, 1000);
+    void probeSageCellOnce().then((reachable) => {
+      if (cancelled) return;
+      if (isSageCellLoaded()) {
+        cachedSageStatus = 'ready';
+        setProbed('ready');
+      } else if (!reachable && !cachedSageStatus) {
+        cachedSageStatus = 'unreachable';
+        setProbed((prev) => (prev === 'ready' ? prev : 'unreachable'));
+      }
+    });
+    return () => {
+      cancelled = true;
+      window.clearInterval(poll);
+    };
+  }, []);
+
+  // Derived during render (no cascading render): an error from the existing
+  // Sage session/stall state forces unreachable without extra probing.
+  if (outputError && /sagecell|\bsage\b|kernel|stall/i.test(outputError)) return 'unreachable';
+  return probed;
+}
 
 function HistoryListItem({ entry, isSelected, onClick }: { entry: HistoryEntry; isSelected: boolean; onClick: () => void }) {
   return (
@@ -54,6 +167,10 @@ export function OutputPanel() {
     if (!ui.historySelectedKey) return outputResult;
     return history.find(h => h.id === ui.historySelectedKey)?.result ?? null;
   }, [ui.historySelectedKey, history, outputResult]);
+
+  const verdict = useMemo(() => parseVerdict(displayResult), [displayResult]);
+  const sageStatus = useSageStatus(outputError);
+  const sage = SAGE_META[sageStatus];
 
   const handleHistoryClick = useCallback((key: string) => {
     setUi(prev => ({ ...prev, historySelectedKey: key }));
@@ -117,9 +234,15 @@ export function OutputPanel() {
       )}
 
       <Stack direction="vertical" gap={2} padding={4} isScrollable style={isNarrow ? {} : { flex: 1, minHeight: 0, paddingLeft: 'var(--space-gap)' }}>
-        <Heading level={3} color="accent">
-          Results
-        </Heading>
+        <Stack direction="horizontal" gap={1} vAlign="center">
+          <Heading level={3} color="accent">
+            Results
+          </Heading>
+          <StatusDot variant={sage.variant} label={sage.label} tooltip={sage.tooltip} data-testid="sage-status" />
+          <Text type="supporting">
+            {sage.text}
+          </Text>
+        </Stack>
 
         {ui.historySelectedKey && (
           <Stack direction="horizontal" gap={1} vAlign="center">
@@ -139,6 +262,13 @@ export function OutputPanel() {
 
         {displayResult && (
           <>
+            {verdict && (
+              <Banner
+                status={verdict}
+                title={verdict === 'success' ? 'Attack succeeded' : 'Attack failed'}
+                data-testid="verdict-banner"
+              />
+            )}
             <CodeBlock
               code={displayResult}
               language="plaintext"
@@ -180,7 +310,14 @@ export function OutputPanel() {
         )}
 
         {!displayResult && !outputError && !ui.historySelectedKey && (
-          <EmptyState title="Run an attack to see results here" />
+          sageStatus === 'unreachable' ? (
+            <EmptyState
+              title="SageMath is unreachable — Sage-dependent attacks will fail"
+              hint="Check your network connection, then reload. Attacks with a local check still work."
+            />
+          ) : (
+            <EmptyState title="Run an attack to see results here" />
+          )
         )}
       </Stack>
 
