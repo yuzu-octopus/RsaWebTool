@@ -38,7 +38,7 @@ Trivial tasks (single-line fix, simple question, build+commit) can skip this wor
 | Code Highlighting | CodeBlock dracula preset (theme-bundled) |
 | External API | FactorDB (Cloudflare Worker CORS proxy) |
 | Hosting | GitHub Pages |
-| CI | GitHub Actions (lint → build → deploy) |
+| CI | GitHub Actions (lint → build → deploy). Always `bun run build` + commit `docs/` with pushes — Pages serves the branch bundle, CI alone doesn't refresh it |
 | Crypto | @noble/ciphers 2.2, @noble/curves 2.2, @noble/hashes 2.2 |
 | Integer Math | bigint-gcd 1.0 (Lehmer's GCD) |
 
