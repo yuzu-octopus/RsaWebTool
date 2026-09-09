@@ -37,6 +37,10 @@ export function useDragResize(params: UseDragResizeParams): [number, (e: React.M
   const [dragging, setDragging] = useState(false);
   const startPos = useRef(0);
   const startVal = useRef(0);
+  // Value at drag start (after clamp-sync). Persist on mouseup only if the
+  // drag actually moved it, so a press-without-move in a narrowed window
+  // never overwrites the wide-window preference in storage.
+  const dragStartVal = useRef(0);
 
   // Synchronously-updated ref for the current drag value.
   // Used to persist the final value on mouseup without writing on every pixel.
@@ -65,7 +69,7 @@ export function useDragResize(params: UseDragResizeParams): [number, (e: React.M
       document.removeEventListener('mouseup', handleMouseUp);
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
-      if (storageKey) {
+      if (storageKey && currentValueRef.current !== dragStartVal.current) {
         try {
           localStorage.setItem(storageKey, String(currentValueRef.current));
         } catch {
@@ -90,10 +94,19 @@ export function useDragResize(params: UseDragResizeParams): [number, (e: React.M
     (e: React.MouseEvent) => {
       e.preventDefault();
       startPos.current = axis === 'x' ? e.clientX : e.clientY;
-      startVal.current = valueRef.current;
+      // Sync to the rendered (clamped) width first: after the window narrows,
+      // stored state can exceed max, and dragging from it would walk through
+      // invisible slack before anything moves on screen.
+      const synced = Math.min(max, Math.max(min, valueRef.current));
+      if (synced !== valueRef.current) {
+        setValue(synced);
+        currentValueRef.current = synced;
+      }
+      startVal.current = synced;
+      dragStartVal.current = synced;
       setDragging(true);
     },
-    [axis],
+    [axis, min, max],
   );
 
   return [value, handleMouseDown];
