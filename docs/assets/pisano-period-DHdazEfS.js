@@ -56,7 +56,7 @@ export const attack: Attack = {
 How to use:
 1. Provide n (the modulus)
 2. The attack finds the multiplicative order ord = ord_n(2) by iterating 2^i mod n (capped at 200000 steps)
-3. When ord is even, gcd(2^{ord/2} - 1, n) and gcd(2^{ord/2} + 1, n) split n whenever the orders mod p and mod q differ in 2-adicity; otherwise candidate phi multiples are tried as before
+3. When ord is even, $gcd(2^{ord/2} - 1, n)$ and $gcd(2^{ord/2} + 1, n)$ split n whenever the orders mod p and mod q differ in 2-adicity; otherwise candidate phi multiples are tried as before
 
 Tip: Fast for small moduli. For larger numbers, use Pollard's rho, ECM, or other general-purpose methods.\`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({

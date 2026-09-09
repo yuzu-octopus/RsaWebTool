@@ -111,7 +111,7 @@ m' \\\\cdot r^{-1} &\\\\equiv mr \\\\cdot r^{-1} \\\\equiv m \\\\pmod{n} \\\\\\\
 How to use (blind / query / unblind):
 1. Blind: pick random r coprime to n, send c' = c·r^e mod n to the oracle
 2. Query: the oracle returns m' = (c')^d mod n = m·r mod n
-3. Unblind: provide n, e, c, r, m_blind (= m'); the tool checks m'^e = c' and outputs m = m'·r^{-1} mod n, verified by m^e = c
+3. Unblind: provide n, e, c, r, m_blind (= m'); the tool checks m'^e = c' and outputs m = m'·$r^{-1}$ mod n, verified by m^e = c
 
 Query-generator snippet (offline simulation against a known key):
   r = random coprime to n; c_blind = c * pow(r, e, n) % n; m_blind = pow(c_blind, d, n)

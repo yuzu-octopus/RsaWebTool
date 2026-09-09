@@ -479,7 +479,7 @@ How to use:
 2. The algorithm uses Brent's cycle detection with batched GCD for efficiency
 3. Multiple random starting points are tried for robustness
 
-Tip: Expected runtime is O(n^{1/4}) per factor. Good for factors up to ~30 digits. For larger factors, try ECM.`,sageTemplate:e=>G({token:`POLLARD_RHO`,n:q(e.n,`n`),imports:[`import math`],useGuard:!0,body:`        out.append("Pollard's Rho (Brent variant)")
+Tip: Expected runtime is $O(n^{1/4})$ per factor. Good for factors up to ~30 digits. For larger factors, try ECM.`,sageTemplate:e=>G({token:`POLLARD_RHO`,n:q(e.n,`n`),imports:[`import math`],useGuard:!0,body:`        out.append("Pollard's Rho (Brent variant)")
         out.append(f"n = {n}")
         out.append("")
         # Brent's cycle detection with batched GCD (primefac-style, BIT 1980)
@@ -1868,10 +1868,10 @@ m &= B + x_0 \\qed
 How to use:
 1. Write m = (prefix << k) + x with the known high bits as the integer prefix
 2. Provide n, e, c, prefix, and k_bits (the unknown low-bit count)
-3. Sage runs Coppersmith small_roots on f(x) = (prefix<<k + x)^e - c with |x| < n^{1/e}
+3. Sage runs Coppersmith small_roots on f(x) = (prefix<<k + x)^e - c with $|x| < n^{1/e}$
 4. The browser covers the degenerate case (m^e < n via integer root) plus a bounded x scan to 2^20
 
-Tip: Needs |x| < n^{1/e} (e.g. k <= ~170 for 512-bit n with e=3). Larger unknown parts need a lattice with more shifts or a different attack. See also Small Message Recovery for the pure integer-root case.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.prefix&&!!e.k_bits},Ae={id:`simple-lattice`,name:`Simple Lattice`,category:`Partial Key / Lattice`,description:`Recovers p from an approximate value nearp using Coppersmith's lattice when |nearp - p| < n^(1/4). Use when a close approximation of p is known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`nearp`,label:`nearp (approximate p)`,placeholder:`Enter approximate p value...`,multiline:!0,rows:3}],sageTemplate:e=>G({token:`SIMPLE_LATTICE`,useGuard:!1,body:`        n = Integer(${q(e.n,`n`)})
+Tip: Needs $|x| < n^{1/e}$ (e.g. k <= ~170 for 512-bit n with e=3). Larger unknown parts need a lattice with more shifts or a different attack. See also Small Message Recovery for the pure integer-root case.`,priority:`medium`,applicableCheck:e=>!!e.n&&!!e.e&&!!e.c&&!!e.prefix&&!!e.k_bits},Ae={id:`simple-lattice`,name:`Simple Lattice`,category:`Partial Key / Lattice`,description:`Recovers p from an approximate value nearp using Coppersmith's lattice when |nearp - p| < n^(1/4). Use when a close approximation of p is known.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`nearp`,label:`nearp (approximate p)`,placeholder:`Enter approximate p value...`,multiline:!0,rows:3}],sageTemplate:e=>G({token:`SIMPLE_LATTICE`,useGuard:!1,body:`        n = Integer(${q(e.n,`n`)})
         nearp = Integer(${q(e.nearp,`nearp`)})
         found = False
         if n <= 0 or nearp <= 0:
@@ -2533,7 +2533,7 @@ How to use:
 2. Provide n and k
 3. The attack solves the quadratic equation k*p^2 + δ*p - n = 0 to recover p
 
-Crossover: the direct loop covers |delta| < 10^6; beyond that Sage tries a Coppersmith lattice on k*(p0+x)^2 - n (needs p within ~n^{1/8} of sqrt(n/k)), else use Partial p/q Bits (known MSBs) or ECM. Tip: This is common in CTF challenges or badly generated keys. Setting k=1 gives the classic twin-prime case (p = q + δ). For p = a*q + b form, try inverting the relationship.`,priority:`medium`,applicableCheck:V.nEK},Re={id:`dependent-prime`,name:`Dependent-Prime RSA`,category:`Partial Key / Lattice`,description:`Factors n when q is derived from e (q·e ≡ 1 mod p) via quadratic discriminant. Use when q = e^{-1} mod p as in some embedded RSA implementations.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>G({token:`DEPENDENT_PRIME`,n:q(e.n,`n`),imports:[`import math`],useGuard:!0,body:`        e = Integer(${q(e.e,`e`)})
+Crossover: the direct loop covers |delta| < 10^6; beyond that Sage tries a Coppersmith lattice on k*(p0+x)^2 - n (needs p within ~$n^{1/8}$ of sqrt(n/k)), else use Partial p/q Bits (known MSBs) or ECM. Tip: This is common in CTF challenges or badly generated keys. Setting k=1 gives the classic twin-prime case (p = q + δ). For p = a*q + b form, try inverting the relationship.`,priority:`medium`,applicableCheck:V.nEK},Re={id:`dependent-prime`,name:`Dependent-Prime RSA`,category:`Partial Key / Lattice`,description:`Factors n when q is derived from e (q·e ≡ 1 mod p) via quadratic discriminant. Use when q = e^{-1} mod p as in some embedded RSA implementations.`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3},{name:`e`,label:`e (public exponent)`,placeholder:`Enter public exponent e...`,multiline:!0,rows:3}],sageTemplate:e=>G({token:`DEPENDENT_PRIME`,n:q(e.n,`n`),imports:[`import math`],useGuard:!0,body:`        e = Integer(${q(e.e,`e`)})
         if e < 2:
             out.append("DEPENDENT_PRIME=FAILED: e must be >= 2")
         else:
@@ -3422,7 +3422,7 @@ m' \\cdot r^{-1} &\\equiv mr \\cdot r^{-1} \\equiv m \\pmod{n} \\\\
 How to use (blind / query / unblind):
 1. Blind: pick random r coprime to n, send c' = c·r^e mod n to the oracle
 2. Query: the oracle returns m' = (c')^d mod n = m·r mod n
-3. Unblind: provide n, e, c, r, m_blind (= m'); the tool checks m'^e = c' and outputs m = m'·r^{-1} mod n, verified by m^e = c
+3. Unblind: provide n, e, c, r, m_blind (= m'); the tool checks m'^e = c' and outputs m = m'·$r^{-1}$ mod n, verified by m^e = c
 
 Query-generator snippet (offline simulation against a known key):
   r = random coprime to n; c_blind = c * pow(r, e, n) % n; m_blind = pow(c_blind, d, n)
@@ -5035,14 +5035,14 @@ From the identity $(a-c)(a+c) = (d-b)(d+b)$, the GCD combinations recover the pr
 \\item \\textbf{Mod-16 perfect square pre-filter:} Checks $n - a^2 \\equiv 0, 1, 4, 9 \\pmod{16}$ before computing $\\sqrt{n - a^2}$, rejecting $\\sim 80\\%$ of candidates without an isqrt call.
 \\end{itemize}
 
-\\textbf{References:} Euler, 1749`,priority:`medium`,applicableCheck:V.n},{id:`pollard-strassen`,name:`Pollard-Strassen's Algorithm`,category:`Factorization`,description:`Factors n in O(n^(1/4)) by computing GCD of interval products over [1, n^(1/4)] to find a small factor. Use when n has a factor ≤ n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],usageGuide:`Use when n has a factor no larger than n^{1/4}.
+\\textbf{References:} Euler, 1749`,priority:`medium`,applicableCheck:V.n},{id:`pollard-strassen`,name:`Pollard-Strassen's Algorithm`,category:`Factorization`,description:`Factors n in O(n^(1/4)) by computing GCD of interval products over [1, n^(1/4)] to find a small factor. Use when n has a factor ≤ n^(1/4).`,inputs:[{name:`n`,label:`n (modulus)`,placeholder:`Enter modulus n...`,multiline:!0,rows:3}],usageGuide:`Use when n has a factor no larger than $n^{1/4}$.
 
 How to use:
 1. Provide n (the modulus)
 2. The algorithm computes products of integers in intervals and takes GCD with n
-3. If a factor ≤ n^{1/4} exists, it is found
+3. If a factor ≤ $n^{1/4}$ exists, it is found
 
-Tip: Faster than trial division for finding small factors. The n^{1/4} bound means a 1024-bit n can have factors up to 256 bits.`,sageTemplate:e=>G({token:`POLLARD_STRASSEN`,n:q(e.n,`n`),imports:[`import math`],useGuard:!0,body:`        out.append("Pollard-Strassen's Algorithm")
+Tip: Faster than trial division for finding small factors. The $n^{1/4}$ bound means a 1024-bit n can have factors up to 256 bits.`,sageTemplate:e=>G({token:`POLLARD_STRASSEN`,n:q(e.n,`n`),imports:[`import math`],useGuard:!0,body:`        out.append("Pollard-Strassen's Algorithm")
         out.append(f"n = {n}")
         out.append("")
         c = int(floor(RR(n) ** (1/4))) + 1
@@ -5113,7 +5113,7 @@ Compute each $P_i$ incrementally and take $\\gcd(P_i, n)$. When a match is found
 How to use:
 1. Provide n (the modulus)
 2. The attack finds the multiplicative order ord = ord_n(2) by iterating 2^i mod n (capped at 200000 steps)
-3. When ord is even, gcd(2^{ord/2} - 1, n) and gcd(2^{ord/2} + 1, n) split n whenever the orders mod p and mod q differ in 2-adicity; otherwise candidate phi multiples are tried as before
+3. When ord is even, $gcd(2^{ord/2} - 1, n)$ and $gcd(2^{ord/2} + 1, n)$ split n whenever the orders mod p and mod q differ in 2-adicity; otherwise candidate phi multiples are tried as before
 
 Tip: Fast for small moduli. For larger numbers, use Pollard's rho, ECM, or other general-purpose methods.`,sageTemplate:e=>G({token:`PISANO_PERIOD`,n:q(e.n,`n`),imports:[`import math`],useGuard:!0,body:`        out.append("Pisano Period Factorization")
         out.append(f"n = {n}")
