@@ -25,27 +25,9 @@ export interface EmptyStateProps {
   padding?: number;
 }
 
-/**
- * Standard empty-state placeholder. Replaces the inconsistent
- * "italic body text" messages scattered across panels.
- *
- * @example
- *   // Simple:
- *   <EmptyState title="Select an attack from the sidebar" />
- *
- *   // With icon and hint:
- *   <EmptyState
- *     icon={HourglassEmpty}
- *     title="Run an attack to see results here"
- *     hint="Or try the Magic Panel to auto-detect parameters"
- *   />
- *
- *   // With rich example content (MagicPanel-style):
- *   <EmptyState title="Paste any of these formats:">
- *     <Text type="code">n = 0x1234...</Text>
- *     <Text type="code">e = 65537</Text>
- *   </EmptyState>
- */
+// Standard empty-state placeholder; replaces the scattered italic body-text messages.
+// Accepts an icon, title, string-or-rich hint, rich children, and numeric padding.
+// Call sites: InputPanel, OutputPanel, ProofIndex.
 export function EmptyState({
   icon: Icon,
   title,

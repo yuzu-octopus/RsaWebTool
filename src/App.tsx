@@ -39,7 +39,7 @@ const skipLinkHiddenStyle = {
 } as const;
 
 function AppContent() {
-  const { notification, mobileNavOpen: mobileNavigationOpen, setMobileNavOpen: setMobileNavigationOpen } = useAppContext();
+  const { notification, mobileNavOpen, setMobileNavOpen } = useAppContext();
   const [skipLinkFocused, setSkipLinkFocused] = useState(false);
   const isMobile = useIsMobile();
   const showToast = useToast();
@@ -86,14 +86,14 @@ function AppContent() {
               label="Open navigation"
               variant="ghost"
               icon={<Icon icon="menu" />}
-              onClick={() => setMobileNavigationOpen(true)}
+              onClick={() => setMobileNavOpen(true)}
             />
           }
         />
       )}
       <StackItem size="fill">
         <Stack direction="horizontal" gap={0} width="100%" height="100%">
-          <Sidebar mobileOpen={mobileNavigationOpen} onMobileClose={() => setMobileNavigationOpen(false)} />
+          <Sidebar mobileOpen={mobileNavOpen} onMobileClose={() => setMobileNavOpen(false)} />
           <StackItem size="fill">
             <Stack as="main" id="main-workspace" tabIndex={-1} direction={isMobile ? 'vertical' : 'horizontal'} gap={0} width="100%" height="100%" isScrollable>
               <ErrorBoundary>

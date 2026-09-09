@@ -19,10 +19,8 @@ describe('renderInlineText escapes', () => {
   test('legit prose untouched', () => {
     expect(renderInlineText('plain words & symbols')).toBe('plain words &amp; symbols');
   });
-  test('escaped open brace becomes literal', () => {
+  test('escaped braces become literals', () => {
     expect(renderInlineText('set \\{a, b\\} done')).toBe('set {a, b} done');
-  });
-  test('escaped close brace becomes literal', () => {
     expect(renderInlineText('value \\} end')).toBe('value } end');
   });
 });

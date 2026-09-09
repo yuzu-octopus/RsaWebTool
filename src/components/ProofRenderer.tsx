@@ -15,6 +15,23 @@ const displayMathRegex = /\\begin\{(align\*|equation\*|gather\*|aligned)\}([\s\S
 const itemizeRegex = /\\begin\{itemize\}([\s\S]*?)\\end\{itemize\}/g;
 const inlineMathRegex = /\$([^$]+)\$|\\\(([^)]+)\\\)/g;
 
+// Single source for the LaTeX text commands rendered as inline wrappers,
+// shared by balanced `\cmd{...}` conversion and unbalanced-opener stripping.
+const TEXT_COMMANDS = ['texttt', 'text', 'emph', 'underline', 'textbf', 'textit'] as const;
+const TEXT_COMMAND_HTML: Record<(typeof TEXT_COMMANDS)[number], [string, string]> = {
+  texttt: ['<code>', '</code>'],
+  text: ['<span>', '</span>'],
+  emph: ['<em>', '</em>'],
+  underline: ['<u>', '</u>'],
+  textbf: ['<strong>', '</strong>'],
+  textit: ['<em>', '</em>'],
+};
+const balancedWrapperRegexes: Array<[RegExp, string]> = TEXT_COMMANDS.map((cmd) => [
+  new RegExp(`\\\\${cmd}\\{([^}]*)\\}`, 'g'),
+  `${TEXT_COMMAND_HTML[cmd][0]}$1${TEXT_COMMAND_HTML[cmd][1]}`,
+]);
+const unbalancedOpenerRegex = new RegExp(`\\\\(${TEXT_COMMANDS.join('|')})\\{`, 'g');
+
 /**
  * Parses a LaTeX proof string into segments.
  */
@@ -142,12 +159,7 @@ function escapeHtml(text: string): string {
 export function renderInlineText(text: string): string {
   let html = escapeHtml(text);
   // Process LaTeX command wrappers before escape sequences
-  html = html.replace(/\\texttt\{([^}]*)\}/g, '<code>$1</code>');
-  html = html.replace(/\\text\{([^}]*)\}/g, '<span>$1</span>');
-  html = html.replace(/\\emph\{([^}]*)\}/g, '<em>$1</em>');
-  html = html.replace(/\\underline\{([^}]*)\}/g, '<u>$1</u>');
-  html = html.replace(/\\textbf\{([^}]*)\}/g, '<strong>$1</strong>');
-  html = html.replace(/\\textit\{([^}]*)\}/g, '<em>$1</em>');
+  for (const [re, replacement] of balancedWrapperRegexes) html = html.replace(re, replacement);
   html = html.replace(/\\&/g, '&');
   html = html.replace(/\\#/g, '#');
   html = html.replace(/\\%/g, '%');
@@ -158,7 +170,7 @@ export function renderInlineText(text: string): string {
   // supported starred display envs), so a leftover opener/orphan closer
   // is a split artifact, not content. Unsupported forms (\(...\) with an
   // inner ')', \[...\], non-starred envs) can still arrive as text.
-  html = html.replace(/\\(textbf|textit|emph|texttt|underline|text)\{/g, '');
+  html = html.replace(unbalancedOpenerRegex, '');
   // Spare escaped closers: \{ and \} become literals below, so only
   // strip unescaped orphans (converting first would re-expose \} as a
   // fresh orphan and eat it again).
@@ -195,9 +207,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
                 return (
                   <Stack key={'dm-' + segment.content.slice(0, 20)} gap={1}>
                     <Stack isScrollable>
-                      {/* SAFE: katex.renderToString produces sanitized HTML (KaTeX
-                          escapes user input internally). Input is bundled proof
-                          LaTeX. */}
+                      {/* SAFE: see KaTeX note above. */}
                       <span dangerouslySetInnerHTML={{ __html: html }} />
                     </Stack>
                     {hasQed && (
@@ -254,9 +264,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
                   rendered.push(
                     <Stack key={j} gap={1}>
                       <Heading level={isTopLevelHeading ? 2 : 3} style={{ color: 'var(--dracula-pink)' }}>
-                        {/* SAFE: renderInlineText only emits a fixed set of HTML
-                            wrappers around captured groups. Input is bundled
-                            LaTeX proof text (not user input). */}
+                        {/* SAFE: see renderInlineText note above. */}
                         <span dangerouslySetInnerHTML={{ __html: renderInlineText(headingMatch[1] + ':') }} />
                       </Heading>
                       {headingMatch[2] && <Text as="p"><InlineMath text={headingMatch[2]} /></Text>}

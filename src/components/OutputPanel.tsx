@@ -181,7 +181,7 @@ export function OutputPanel() {
         )}
 
         {!displayResult && !outputError && !ui.historySelectedKey && (
-          <EmptyState title="Run an attack to see results here" padding={4} />
+          <EmptyState title="Run an attack to see results here" />
         )}
       </Stack>
 

@@ -157,14 +157,7 @@ const CATEGORY_BADGE_VARIANTS: Record<string, 'green' | 'purple' | 'cyan' | 'ora
   Advanced: 'yellow',
 };
 
-/**
- * Native `title` fallback for truncated nav labels. The kit's BaseProps
- * deliberately omits `title`, so it is threaded through a spread — a direct
- * `title={...}` prop is a type error — while at runtime SideNavItem spreads
- * `...rest` onto the underlying button (as `id`/`data-testid` already prove).
- * The kit Tooltip only covers the collapsed rail; expanded truncated rows
- * need this native fallback.
- */
+// Native `title` fallback for truncated rows: kit BaseProps omits `title`, but SideNavItem spreads `...rest` onto the button (as `id`/`data-testid` prove).
 const nativeTitle = (title: string) => ({ title });
 
 interface SidebarProps {
