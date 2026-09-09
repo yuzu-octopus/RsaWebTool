@@ -5,6 +5,7 @@ import { IconButton } from '@astryxdesign/core/IconButton';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Link } from '@astryxdesign/core/Link';
 import { useToast } from '@astryxdesign/core/Toast';
+import { ToastViewport } from '@astryxdesign/core/Toast';
 import { Sidebar, useIsMobile } from './components/Sidebar';
 import { AppProvider } from './context/AppContext';
 import { InputPanel } from './components/InputPanel';
@@ -66,6 +67,7 @@ function AppContent() {
   }, [notification, showToast]);
 
   return (
+    <ToastViewport position="bottomEnd" maxVisible={3}>
     <Stack direction="vertical" gap={0} width="100%" height="100vh" style={{ backgroundColor: 'var(--color-background)' }}>
       <Link
         href="#main-workspace"
@@ -113,6 +115,7 @@ function AppContent() {
         </Stack>
       </StackItem>
     </Stack>
+    </ToastViewport>
   );
 }
 
