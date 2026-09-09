@@ -172,10 +172,7 @@ function focusWorkspace() {
 export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const { selectedAttack, setSelectedAttack, setViewMode, viewMode, calculatorMode, setCalculatorMode } = useAppContext();
   const isMobile = useIsMobile();
-  const [expandedCats, setExpandedCats] = useState<Set<string>>(() => new Set([CATEGORIES[0], 'Calculators']));
-  const activeExpandedCats = selectedAttack
-    ? new Set(expandedCats).add(selectedAttack.category)
-    : expandedCats;
+  const [expandedCats, setExpandedCats] = useState<Set<string>>(() => new Set());
 
   const setCatCollapsed = (cat: string, collapsed: boolean) => {
     setExpandedCats(prev => {
@@ -236,7 +233,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
             label={cat}
             {...nativeTitle(cat)}
             collapsible={{
-              isCollapsed: !activeExpandedCats.has(cat),
+              isCollapsed: !expandedCats.has(cat),
               onCollapsedChange: collapsed => setCatCollapsed(cat, collapsed),
             }}
             endContent={<Badge label={catAttacks.length} variant={CATEGORY_BADGE_VARIANTS[cat] ?? 'neutral'} />}

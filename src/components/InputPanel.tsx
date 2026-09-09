@@ -11,7 +11,6 @@ import { TextInput } from '@astryxdesign/core/TextInput';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { ProgressBar } from '@astryxdesign/core/ProgressBar';
 import { Spinner } from '@astryxdesign/core/Spinner';
-import { Divider } from '@astryxdesign/core';
 import { CodeBlock } from '@astryxdesign/core/CodeBlock';
 import { dracula } from '@astryxdesign/core/theme/syntax';
 import { Dices, ChevronRight } from 'lucide-react';
@@ -224,19 +223,16 @@ function AttackPanel({ attack }: { attack: Attack }) {
           )}
 
           {attack.usageGuide && (
-            <>
-              <Divider />
-              <Stack hAlign="center" width="100%">
-                <Stack width="100%" maxWidth="72ch" gap={2} padding={2}>
-                  <Heading level={5} style={{ color: c.cyan }}>
-                    How to Use
-                  </Heading>
-                  <Text type="code" style={{ whiteSpace: 'pre-wrap' }}>
-                    {attack.usageGuide}
-                  </Text>
-                </Stack>
+            <Stack hAlign="center" width="100%">
+              <Stack width="100%" maxWidth="72ch" gap={2} padding={2} isScrollable style={{ maxHeight: '40vh' }}>
+                <Heading level={5} style={{ color: c.cyan }}>
+                  How to Use
+                </Heading>
+                <Text type="code" style={{ whiteSpace: 'pre-wrap' }}>
+                  {attack.usageGuide}
+                </Text>
               </Stack>
-            </>
+            </Stack>
           )}
           <Stack hAlign="center" width="100%">
             <Stack width="100%" maxWidth="72ch" padding={2}>
