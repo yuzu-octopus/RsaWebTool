@@ -16,7 +16,7 @@ import { attack as phiLeak } from '../phi-leak';
 import { attack as coppersmithShortPad } from '../coppersmith-short-pad';
 import { attack as dpdqLeak } from '../dp-dq-leak';
 import { rsaNeeds } from '../_rsaHelpers';
-import { extractParams } from '../../components/MagicPanel';
+import { extractParams } from '../../components/_shared/extractParams';
 
 const requiredBlankCases = [
   [biasedLsb, { n: '', e: '', c: '', oracle_runs: '' }, 'BIASED_LSB'],

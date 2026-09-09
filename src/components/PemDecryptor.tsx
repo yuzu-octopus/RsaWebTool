@@ -176,7 +176,7 @@ export function PemDecryptor() {
             <Stack gap={1}>
               <ProgressBar label="Decrypting key" isIndeterminate variant="success" />
               <Text type="supporting">
-                Decrypting key...
+                Decrypting key…
               </Text>
             </Stack>
           )}
@@ -234,7 +234,7 @@ export function PemDecryptor() {
                   </Stack>
                 ) : (
                   <Text type="supporting">
-                    No parameters extracted (encrypted key — decrypt first)
+                    No parameters extracted (encrypted key, decrypt first)
                   </Text>
                 )}
               </Stack>
