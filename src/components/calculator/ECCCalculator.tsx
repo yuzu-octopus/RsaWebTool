@@ -32,7 +32,7 @@ export default function ECCCalculator() {
       activeTab={tab}
       onTabChange={handleTabChange}
     >
-      {tab === 'explanation' && <ECCExplanationTab />}
+      {tab === 'explanation' && <ECCExplanationTab onContinue={() => handleTabChange('keyops')} />}
       {tab === 'keyops' && <ECCKeyOpsTab />}
       {tab === 'signverify' && <ECCSignVerifyTab />}
       {tab === 'attacks' && <ECCAttacksTab />}

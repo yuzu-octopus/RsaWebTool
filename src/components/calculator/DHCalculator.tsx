@@ -30,7 +30,7 @@ export default function DHCalculator() {
       activeTab={tab}
       onTabChange={handleTabChange}
     >
-      {tab === 'explanation' && <DHExplanationTab />}
+      {tab === 'explanation' && <DHExplanationTab onContinue={() => handleTabChange('keyexchange')} />}
       {tab === 'keyexchange' && <DHKeyExchangeTab />}
       {tab === 'attacks' && <DHAttacksTab />}
     </CalculatorHeader>

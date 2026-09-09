@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Stack } from '@astryxdesign/core/Stack';
 import { Heading } from '@astryxdesign/core/Heading';
+import { Button } from '@astryxdesign/core/Button';
+import { Icon } from '@astryxdesign/core/Icon';
+import { ChevronRight } from 'lucide-react';
 import { TabList, Tab } from '@astryxdesign/core/TabList';
 import { ProofRenderer } from '../../ProofRenderer';
 
@@ -24,7 +27,7 @@ const TAB_CONTENT: Record<string, string> = {
   pow: '\\textbf{Proof of Work:} Find $x$ such that $H(\\text{prefix} \\parallel x) < T$.\n\nDifficulty: $d$ leading zero bits requires $\\sim 2^d$ attempts.\n\nBitcoin: SHA-256d (double hash). ASIC resistance: scrypt, Equihash, RandomX.',
 };
 
-export default function ExplanationTab() {
+export default function ExplanationTab({ onContinue }: { onContinue: () => void }) {
   const [tab, setTab] = useState('properties');
 
   return (
@@ -37,6 +40,14 @@ export default function ExplanationTab() {
       </TabList>
       <Stack direction="vertical">
         <ProofRenderer latex={TAB_CONTENT[tab] ?? ''} />
+      </Stack>
+      <Stack direction="horizontal" hAlign="start">
+        <Button
+          label="Continue to Hash Functions"
+          variant="ghost"
+          onClick={onContinue}
+          endContent={<Icon icon={ChevronRight} size="sm" />}
+        />
       </Stack>
     </Stack>
   );

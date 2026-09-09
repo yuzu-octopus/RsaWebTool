@@ -30,7 +30,7 @@ export default function AESCalculator() {
       activeTab={tab}
       onTabChange={handleTabChange}
     >
-      {tab === 'explanation' && <AESExplanationTab />}
+      {tab === 'explanation' && <AESExplanationTab onContinue={() => handleTabChange('encrypt-decrypt')} />}
       {tab === 'encrypt-decrypt' && <AESEncryptDecryptTab />}
       {tab === 'attacks' && <AESAttacksTab />}
     </CalculatorHeader>

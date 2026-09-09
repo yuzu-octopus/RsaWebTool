@@ -34,7 +34,7 @@ export default function HashCalculator() {
       activeTab={activeTab}
       onTabChange={handleTabChange}
     >
-      {activeTab === 'explanation' && <ExplanationTab />}
+      {activeTab === 'explanation' && <ExplanationTab onContinue={() => handleTabChange('hash-functions')} />}
       {activeTab === 'hash-functions' && <HashFunctionsTab />}
       {activeTab === 'hmac' && <HMACTab />}
       {activeTab === 'length-ext' && <LengthExtensionTab />}

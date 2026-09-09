@@ -1,6 +1,9 @@
 import { useState, useCallback } from 'react';
 import { Stack } from '@astryxdesign/core/Stack';
 import { Heading } from '@astryxdesign/core/Heading';
+import { Button } from '@astryxdesign/core/Button';
+import { Icon } from '@astryxdesign/core/Icon';
+import { ChevronRight } from 'lucide-react';
 import { CalculatorHeader } from './_shared/CalculatorHeader';
 import { RsaKeyGenTab } from './RsaKeyGenTab';
 import { RsaEncryptTab } from './RsaEncryptTab';
@@ -53,12 +56,20 @@ const EXPLANATION_LATEX =
 '\\item \\textbf{Coppersmith:} Partial knowledge of $p$ ($|x| < n^{1/4}$ unknown, see Partial Key Exposure / Partial p/q Bits) or small roots $|x_0| < n^{1/e}$ of $f(x) \\equiv 0 \\pmod{n}$ (see Stereotyped Message) using LLL/Howgrave-Graham. Broadcast $m^e < \\prod n_i$ recovers by CRT integer root (see Hastad\'s Broadcast, Small Public Exponent).\n' +
 '\\end{itemize}';
 
-function ExplanationTab() {
+function ExplanationTab({ onContinue }: { onContinue: () => void }) {
   return (
     <Stack direction="vertical" gap={1}>
       <Heading level={4} style={{ color: 'var(--dracula-cyan)' }}>RSA Reference</Heading>
       <Stack direction="vertical">
         <ProofRenderer latex={EXPLANATION_LATEX} />
+      </Stack>
+      <Stack direction="horizontal" hAlign="start">
+        <Button
+          label="Continue to Key Gen"
+          variant="ghost"
+          onClick={onContinue}
+          endContent={<Icon icon={ChevronRight} size="sm" />}
+        />
       </Stack>
     </Stack>
   );
@@ -83,7 +94,7 @@ export default function RSACalculator() {
       activeTab={activeTab}
       onTabChange={handleTabChange}
     >
-      {activeTab === 'explanation' && <ExplanationTab />}
+      {activeTab === 'explanation' && <ExplanationTab onContinue={() => handleTabChange('key-gen')} />}
       {activeTab === 'key-gen' && <RsaKeyGenTab />}
       {activeTab === 'encrypt' && <RsaEncryptTab />}
       {activeTab === 'decrypt' && <RsaDecryptTab />}

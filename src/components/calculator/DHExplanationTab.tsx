@@ -1,5 +1,8 @@
 import { Stack } from '@astryxdesign/core/Stack';
 import { Heading } from '@astryxdesign/core/Heading';
+import { Button } from '@astryxdesign/core/Button';
+import { Icon } from '@astryxdesign/core/Icon';
+import { ChevronRight } from 'lucide-react';
 import { Text } from '@astryxdesign/core/Text';
 import { CodeBlock } from '@astryxdesign/core/CodeBlock';
 import { Table, proportional, pixel } from '@astryxdesign/core/Table';
@@ -28,7 +31,7 @@ const PROTOCOL_DIAGRAM = `Alice                              Bob
   s = B^a mod p                     s = A^b mod p
   s = g^(ab) mod p                  s = g^(ab) mod p`;
 
-export function DHExplanationTab() {
+export function DHExplanationTab({ onContinue }: { onContinue: () => void }) {
   return (
     <Stack direction="vertical" gap={2}>
       <Heading level={4} style={{ color: 'var(--dracula-cyan)' }}>Diffie-Hellman Key Exchange</Heading>
@@ -140,6 +143,14 @@ export function DHExplanationTab() {
             additionally enable confinement-style recovery when validation is missing.
           </Text>
         </Stack>
+      </Stack>
+      <Stack direction="horizontal" hAlign="start">
+        <Button
+          label="Continue to Key Exchange"
+          variant="ghost"
+          onClick={onContinue}
+          endContent={<Icon icon={ChevronRight} size="sm" />}
+        />
       </Stack>
     </Stack>
   );
