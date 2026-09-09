@@ -6,7 +6,6 @@ import { Button } from '@astryxdesign/core/Button';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { Icon } from '@astryxdesign/core/Icon';
 import { List, ListItem } from '@astryxdesign/core/List';
-import { Divider } from '@astryxdesign/core';
 import { Dialog, DialogHeader } from '@astryxdesign/core/Dialog';
 import { CodeBlock } from '@astryxdesign/core/CodeBlock';
 import { dracula } from '@astryxdesign/core/theme/syntax';
@@ -184,8 +183,6 @@ export function OutputPanel() {
           <EmptyState title="Run an attack to see results here" />
         )}
       </Stack>
-
-      <Divider />
 
       <Stack direction="vertical" padding={2} paddingBlockStart={0}>
         <Button
