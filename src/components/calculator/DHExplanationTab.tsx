@@ -48,7 +48,7 @@ export function DHExplanationTab() {
           <Text>
             The security of DH depends on the difficulty of computing discrete logarithms in the group Z_p*.
             Pohlig-Hellman applies whenever p-1 is smooth, so safe primes p = 2q + 1 only remove the easy
-            smooth case — the large subgroup order q must still be big enough on its own.
+            smooth case: the large subgroup order q must still be big enough on its own.
           </Text>
         </Stack>
 
@@ -69,7 +69,7 @@ export function DHExplanationTab() {
           <Heading level={5} style={{ color: 'var(--dracula-pink)' }}>Strength Notes</Heading>
           <Text>
             Strengths follow NIST SP 800-57 Part 1: 2048-bit finite-field DH is the 112-bit floor for
-            new use. Group 5 (1536-bit) is legacy — below the floor, do not deploy. The Key Exchange
+            new use. Group 5 (1536-bit) is legacy, below the floor, so do not deploy. The Key Exchange
             tab also offers RFC 2412 Group 1 (768-bit, labelled BREAKABLE) for demo only.
           </Text>
         </Stack>
@@ -78,7 +78,7 @@ export function DHExplanationTab() {
           <Heading level={5} style={{ color: 'var(--dracula-pink)' }}>Logjam / Export Downgrade</Heading>
           <Text>
             Logjam (Adrian et al., 2015) downgraded TLS to 512-bit export DHE, ran one NFS
-            precomputation per widely-shared group, then broke individual sessions cheaply — amortising
+            precomputation per widely-shared group, then broke individual sessions cheaply, amortising
             one expensive sieving step over millions of connections. Lesson: group size and group
             freshness both matter; shared small groups turn one break into many. See the
             Logjam entry in the Attacks tab.
@@ -98,10 +98,10 @@ export function DHExplanationTab() {
         <Stack direction="vertical" gap={1}>
           <Heading level={5} style={{ color: 'var(--dracula-pink)' }}>Bounded Keys & DSA Parameters</Heading>
           <Text>
-            When the secret is known to lie in an interval [a, b) — e.g. a biased RNG — Pollard&apos;s
+            When the secret is known to lie in an interval [a, b) (e.g. a biased RNG), Pollard&apos;s
             kangaroo finds it in O(sqrt(b-a)) jumps (try the bounded-DLP demo). Finite-field DSA
             (FIPS 186) instead works in a validated prime-order subgroup: q prime (N ≥ 224 bits),
-            q dividing p-1, g^q = 1 mod p — the dsa-params entry checks exactly this.
+            q dividing p-1, g^q = 1 mod p: the dsa-params entry checks exactly this.
           </Text>
         </Stack>
 
@@ -109,7 +109,7 @@ export function DHExplanationTab() {
           <Heading level={5} style={{ color: 'var(--dracula-pink)' }}>Parameters You Didn&apos;t Validate</Heading>
           <Text>
             A composite modulus p breaks the field assumptions every attack here relies on (factor p
-            and each factor leaks key material — a different, easier game than DLP mod prime), and
+            and each factor leaks key material, a different, easier game than DLP mod prime), and
             server-supplied or trapdoored (p, g) that skip validation are a known attack direction.
             Never trust group parameters you did not check: Miller-Rabin p, then the subgroup tests.
           </Text>
@@ -121,7 +121,7 @@ export function DHExplanationTab() {
             The Lim–Lee demo pairs with this lesson: a raw confirmation oracle (MAC verify, finished
             message) that answers &quot;is this guess the secret?&quot; turns small-subgroup confinement
             into full key recovery against static keys. Always run DH output through a KDF, use
-            ephemeral keys, and validate peer keys — confirmation must not become a decision oracle.
+            ephemeral keys, and validate peer keys: confirmation must not become a decision oracle.
           </Text>
         </Stack>
 

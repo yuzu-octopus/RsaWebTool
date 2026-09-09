@@ -120,7 +120,7 @@ export default function ProofOfWorkTab() {
   return (
     <Stack direction="vertical" gap={2}>
       <Text type="supporting">
-        {hashAlgo} Proof of Work — find a nonce where {hashAlgo}(challenge + nonce) satisfies your check function.
+        {hashAlgo} Proof of Work: find a nonce where {hashAlgo}(challenge + nonce) satisfies your check function.
       </Text>
 
       {/* Hash Algorithm dropdown */}
