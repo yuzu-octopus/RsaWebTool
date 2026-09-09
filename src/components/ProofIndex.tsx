@@ -27,7 +27,7 @@ function AttackListItem({
       }
       endContent={
         <Badge
-          variant={attack.frontendCheck ? 'green' : 'orange'}
+          variant={attack.frontendCheck ? 'blue' : 'purple'}
           label={attack.frontendCheck ? 'Local' : 'SageMath'}
         />
       }
