@@ -36,6 +36,8 @@ export function AttackExplanationPanel({ data }: { data: AttackExplanationData }
           hasCopyButton={false}
           isWrapped
           width="100%"
+          // Prose steps wrap on words: kit isWrapped is break-all (verified in built CSS).
+          style={{ overflowWrap: 'break-word', wordBreak: 'normal' }}
         />
       </Stack>
 

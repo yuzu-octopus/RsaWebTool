@@ -10,7 +10,7 @@ import type { Format } from '../utils/converters';
 
 const FORMATS: { value: Format; label: string }[] = [
   { value: 'hex', label: 'Hex' },
-  { value: 'dec', label: 'Decimal' },
+  { value: 'dec', label: 'Dec' },
   { value: 'base64', label: 'Base64' },
   { value: 'text', label: 'Text' },
 ];

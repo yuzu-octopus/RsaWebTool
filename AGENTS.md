@@ -1,6 +1,6 @@
 # RSA Web Tool — Agent Instructions
 
-Browser-only RSA CTF tool on GitHub Pages. 48 attacks across 5 categories, with browser-side frontend checks (32) and SageMathCell backstop (42 attacks) for math-heavy computation. Features 5 calculators (RSA/AES/ECC/Hash/DH), command palette (⌘K), keyboard shortcuts, PEM key decryptor, instructions panel, source tab, and console env config (window.env).
+Browser-only RSA CTF tool on GitHub Pages. 51 attacks across 5 categories, with browser-side frontend checks (37) and SageMathCell backstop (44 attacks) for math-heavy computation. Features 5 calculators (RSA/AES/ECC/Hash/DH), command palette (⌘K), keyboard shortcuts, PEM key decryptor, instructions panel, source tab, and console env config (window.env).
 
 ## Commands
 
@@ -46,9 +46,9 @@ Trivial tasks (single-line fix, simple question, build+commit) can skip this wor
 
 ```
 src/
-  attacks/          48 attack files + guard.ts + index.ts + rawSources.ts + _rsaHelpers.ts
-  components/       40 .tsx files (11 top-level + 1 _shared + 21 calculator/ + 2 calculator/_shared + 5 calculator/hash)
-    _shared/        EmptyState.tsx
+  attacks/          51 attack files + guard.ts + index.ts + rawSources.ts + _rsaHelpers.ts
+  components/       41 .tsx files (11 top-level + 2 _shared + 21 calculator/ + 2 calculator/_shared + 5 calculator/hash)
+    _shared/        EmptyState.tsx, LogoIcon.tsx
     calculator/     21 files: 5 calculator shells + sub-tabs + shared components
       _shared/      CalculatorHeader.tsx, ResultBox.tsx
       hash/         ExplanationTab, HashFunctionsTab, HMACTab, LengthExtensionTab, ProofOfWorkTab
@@ -83,7 +83,7 @@ scripts/            Test scripts
 - Astryx components only (Card/Text/Link/Stack/Grid/…) — no raw div/span/a for layout
 - Brand tokens verbatim (`var(--color-*)`, `var(--dracula-*)`) — no raw hex, no `:root` overrides
 - Scrollbar: kit dracula scrollbars (tokens.css)
-- Sidebar: 264px fixed, selection bg, native title tooltips on all nav labels
+- Sidebar: 280px fixed, selection bg, native title tooltips on all nav labels
 - OutputPanel: 200-600px drag-resize, viewport-aware max width (`Math.min(600, window.innerWidth - 620)`, re-evaluated on resize), localStorage persisted
 - Snackbar toast: top-center, 3s auto-dismiss, Dracula bg + 2px colored border per severity
 - ErrorBoundary: class component wrapping all content panels, Dracula fallback UI
@@ -91,7 +91,7 @@ scripts/            Test scripts
 - Stall detection: 30s stall timeout in useSageMath.ts polls stdout text — if unchanged for 30s, kernel is presumed dead and error is surfaced
 - METHOD indicator: `METHOD=TYPESCRIPT` / `METHOD=SAGEMATHCELL` appended to all output results to clearly distinguish execution path
 - Standardized output format: all attacks output consistent sections — n/E/c values, algorithm explanation, intermediate values, p/q factors, verification, `=SUCCESS`/`=FAILED` token
-- Command Palette: ⌘/Ctrl+K to open, centered modal, `#282a36` bg, fuzzy search across 48 attacks + 7 view modules (5 calculator tabs + other views)
+- Command Palette: ⌘/Ctrl+K to open, centered modal, `#282a36` bg, fuzzy search across 51 attacks + 7 view modules (5 calculator tabs + other views)
 - Keyboard shortcuts: ⌘K (palette), ⌘Enter (run), ⌘1-5 (calculator tabs), ⌘Shift+C (copy output), Tab/Shift+Tab (sidebar cycle, follows category order)
 - InputPanel: side-by-side Generate + Run buttons, hourglass⏳ spinner, orange progress bar with EWMA ETA, "Continue to Input" CTA button from explanation tab
 - Calculator switcher: 5-tab bar (RSA/AES/ECC/Hash/DH) with icons, scrollable on narrow screens
@@ -115,7 +115,7 @@ type Attack = {
   description: string;
   category: AttackCategory; // literal union
   inputs: InputField[];
-  sageTemplate?: (vals: Record<string, string>) => string;  // optional — 6 pure-JS attacks omit it
+  sageTemplate?: (vals: Record<string, string>) => string;  // optional — 7 pure-TS attacks use noopSageTemplate
   proof: string;
   usageGuide?: string;  // optional usage hints
   frontendCheck?: (vals: Record<string, string>, onProgress?: (pct: number, detail?: string) => void) => MaybePromise<string | null>;
@@ -124,17 +124,17 @@ type Attack = {
 };
 ```
 
-**32 attacks have `frontendCheck`** — run fully in browser (BigInt), no SageCell needed. `rawSources.ts` provides lazy Vite glob imports for raw source fetching and `extractFrontendCheck()` for extracting frontendCheck function bodies from source.
+**37 attacks have `frontendCheck`** — run fully in browser (BigInt), no SageCell needed. `rawSources.ts` provides lazy Vite glob imports for raw source fetching and `extractFrontendCheck()` for extracting frontendCheck function bodies from source.
 
-**42 attacks use `wrapSageTemplate()`** — a boilerplate generator in `guard.ts` that wraps attack-specific Python code with standard SageMath execution scaffolding: `def _attack()` wrapper, outer `try:` with `out = []`, optional `sageGuardBlock()`, triple try/except error handling, and automatic `print()` of results.
+**44 attacks use `wrapSageTemplate()`** — a boilerplate generator in `guard.ts` that wraps attack-specific Python code with standard SageMath execution scaffolding: `def _attack()` wrapper, outer `try:` with `out = []`, optional `sageGuardBlock()`, triple try/except error handling, and automatic `print()` of results.
 
-**6 attacks are pure-TypeScript** (no sageTemplate) using `noopSageTemplate` from `_rsaHelpers.ts`: batch-gcd, common-prime-rsa, factordb-lookup, implicit-key-exposure, multi-prime-gcd.
+**7 attacks are pure-TypeScript** (`noopSageTemplate` from `_rsaHelpers.ts`): batch-gcd, common-prime-rsa, factordb-lookup, implicit-key-exposure, multi-prime-gcd, sig-param-forgery, small-prime-crt.
 
-**48 total attacks** across 5 categories:
+**51 total attacks** across 5 categories:
 - Factorization (20)
-- Partial Key / Lattice (11)
-- Message / Protocol (9)
-- Oracle (4)
+- Partial Key / Lattice (12)
+- Message / Protocol (10)
+- Oracle (5)
 - Advanced (4)
 
 TESTCASE_BITS: `{ p: 512, q: 512 }` → n ≈ 1024-bit.
@@ -195,7 +195,7 @@ TESTCASE_BITS: `{ p: 512, q: 512 }` → n ≈ 1024-bit.
 
 `src/attacks/guard.ts` exports `wrapSageTemplate` (public) and uses `sageGuardBlock` (private, internal helper):
 
-- **`wrapSageTemplate(opts)`** — boilerplate generator used by 42 sageTemplate attacks. Wraps attack-specific Python code with: top-level imports, `def _attack()` wrapper, outer `try:` / `out = []`, optional `sageGuardBlock()`, triple try/except error handling, and automatic `print("\\n".join(out))` with `TOKEN=SUCCESS`/`TOKEN=FAILED` markers.
+- **`wrapSageTemplate(opts)`** — boilerplate generator used by 44 sageTemplate attacks. Wraps attack-specific Python code with: top-level imports, `def _attack()` wrapper, outer `try:` / `out = []`, optional `sageGuardBlock()`, triple try/except error handling, and automatic `print("\\n".join(out))` with `TOKEN=SUCCESS`/`TOKEN=FAILED` markers.
 - **`sageGuardBlock(token, indent?)`** — generates the standard 4-guard Python block (n<2, n%2, is_prime, is_square) with consistent two-line p/q output.
 
 ## Dependencies
@@ -210,7 +210,6 @@ TESTCASE_BITS: `{ p: 512, q: 512 }` → n ≈ 1024-bit.
 | @noble/curves | ^2.2.0 | Elliptic curve ops, ECDSA, ECDH (secp256k1, P-256, P-384, P-521, Ed25519, X25519) |
 | @noble/hashes | ^2.2.0 | 14 hash algorithms, HMAC, SHAKE, Keccak, BLAKE2/3 |
 | bigint-gcd | ^1.0.46 | Lehmer's GCD for BigInt |
-| prismjs | ^1.30.0 | Syntax highlighting |
 | katex | ^0.17.0 | Math rendering |
 | typescript | ~6.0.3 | Type system |
 | vite | ^8.0.14 | Build tool |
@@ -229,21 +228,21 @@ TESTCASE_BITS: `{ p: 512, q: 512 }` → n ≈ 1024-bit.
 | MagicPanel | MagicPanel.tsx | 469 | Paste-all auto-detect parallel execution |
 | OutputPanel | OutputPanel.tsx | ~290 | Results display + copy + useReducer + history (cap 50), viewport-aware max width |
 | ProofRenderer | ProofRenderer.tsx | 277 | KaTeX parser: display math, inline math, itemize, heading detection |
-| ProofIndex | ProofIndex.tsx | 124 | Searchable list of all 48 attack proofs |
+| ProofIndex | ProofIndex.tsx | 124 | Searchable list of all 51 attack proofs |
 | CommandPalette | CommandPalette.tsx | 395 | ⌘/Ctrl+K fuzzy search modal |
 | InstructionsPanel | InstructionsPanel.tsx | 117 | Always-visible reference guide |
 | PemDecryptor | PemDecryptor.tsx | 413 | PEM key decryptor: PKCS#1/PKCS#8/encrypted, Feed buttons |
-| FormatConverter | FormatConverter.tsx | 181 | Hex/base64/binary/decimal converter |
+| FormatConverter | FormatConverter.tsx | 181 | Hex/decimal/base64/text converter |
 | ErrorBoundary | ErrorBoundary.tsx | 46 | Class component, Dracula fallback UI |
 | EmptyState | _shared/EmptyState.tsx | 99 | Standard empty-state placeholder for all panels |
 
 ## Current State
 
 - WORKER_POOL_SIZE: 3 (configured via env.workerPoolSize)
-- 48 attacks: 32 frontendCheck, 42 wrapSageTemplate, 6 pure-TypeScript
+- 51 attacks: 37 frontendCheck, 44 wrapSageTemplate, 7 pure-TypeScript
 - 5 calculator modes: RSA / AES / ECC / Hash / DH
-- 40 component .tsx files (11 top-level + 1 _shared + 21 calculator/ + 2 calculator/_shared + 5 calculator/hash)
-- 11 hooks (useCommandPalette inlined into useKeyboardShortcuts)
+- 41 component .tsx files (11 top-level + 2 _shared + 21 calculator/ + 2 calculator/_shared + 5 calculator/hash)
+- 10 hooks
 - 2 Web Workers: attack-worker.ts, pow-worker.ts
 - 7 view modes: attack, magic, proofs, calculator, format-converter, instructions, pem
 - Test runner: bun test (unit), CI runs tests before build

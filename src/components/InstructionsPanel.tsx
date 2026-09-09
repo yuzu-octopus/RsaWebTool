@@ -13,7 +13,7 @@ const SECTIONS: Section[] = [
   {
     title: 'Getting Started',
     content: [
-      'RSA Web Tool is a browser-only toolkit for RSA CTF challenges with 48 attacks across 5 categories.',
+      'RSA Web Tool is a browser-only toolkit for RSA CTF challenges with 51 attacks across 5 categories.',
       'To use it: select an attack from the sidebar, fill in the required inputs, then click Run (or Generate for test data).',
       'Output shows SUCCESS or FAILED markers. On success, factors are auto-submitted to FactorDB and decryption is attempted automatically.',
     ],
@@ -21,10 +21,10 @@ const SECTIONS: Section[] = [
   {
     title: 'Attack Categories',
     content: [
-      'Factorization (19): Factor n into p×q using batch-GCD, Pollard, ECM, and other algorithms.',
-      'Partial Key / Lattice (11): Recover private key from partial information using Coppersmith and lattice reduction.',
-      'Message / Protocol (9): Exploit protocol weaknesses like Hastad broadcast, Bleichenbacher oracle, and CRT faults.',
-      'Oracle (4): Side-channel attacks including LSB oracle and padding oracle.',
+      'Factorization (20): Factor n into p×q using batch-GCD, Pollard, ECM, and other algorithms.',
+      'Partial Key / Lattice (12): Recover private key from partial information using Coppersmith and lattice reduction.',
+      'Message / Protocol (10): Exploit protocol weaknesses like Hastad broadcast, Bleichenbacher oracle, and CRT faults.',
+      'Oracle (5): Side-channel attacks including LSB oracle and padding oracle.',
       'Advanced (4): ROCA, Nitros, FactorDB lookup, and small public exponent attacks.',
     ],
   },

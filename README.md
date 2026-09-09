@@ -1,6 +1,6 @@
 # RSA Web Tool
 
-A browser-only RSA CTF tool with 48 cryptographic attacks across 5 categories, plus 5 built-in calculators (RSA, AES, ECC, Hash, DH).
+A browser-only RSA CTF tool with 51 cryptographic attacks across 5 categories, plus 5 built-in calculators (RSA, AES, ECC, Hash, DH).
 
 **Live at:** [yuzu-octopus.github.io/RsaWebTool](https://yuzu-octopus.github.io/RsaWebTool/)
 
@@ -10,10 +10,10 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 
 ### Cryptographic Attacks
 
-- **48 attacks** — Factorization (20), Lattice/Partial Key (11), Message/Protocol (9), Oracle (4), and Advanced (4) categories
-- **32 browser-side checks** — instant results via native BigInt (no SageCell needed), with live progress bars showing iteration variable + count on longer-running attacks
+- **51 attacks** — Factorization (20), Partial Key / Lattice (12), Message/Protocol (10), Oracle (5), and Advanced (4) categories
+- **37 browser-side checks** — instant results via native BigInt (no SageCell needed), with live progress bars showing iteration variable + count on longer-running attacks
 - **3 concurrent Web Workers** — parallel frontendCheck execution across attacks
-- **SageMathCell integration** — 42 attacks with SageMath backstop (6 are pure-JS only), 3 concurrent slots, 30s stall detection, immediate error element reporting
+- **SageMathCell integration** — 44 attacks with SageMath backstop (7 are pure-JS only), 3 concurrent slots, 30s stall detection, immediate error element reporting
 - **FactorDB lookup** — auto-queries FactorDB and auto-submits discovered factorizations
 - **Magic Panel** — paste all RSA parameters at once, auto-detect applicable attacks, parallel execution (3 concurrent) with early-stop on first true success
 - **Console Environment** — `window.env` exposes all config (workers, timeouts, FactorDB proxy) with localStorage persistence; `env.reset()` clears all stored state
@@ -29,11 +29,11 @@ No server needed — everything runs in your browser via JavaScript BigInt and e
 ### Interface
 
 - **Calculator Switcher Tabs** — 5-tab bar (RSA / AES / ECC / Hash / DH) with icons, keyboard shortcuts (⌘1-⌘5), scrollable on narrow screens
-- **Format Converter** — live Hex / Decimal / Base64 / Binary conversion
-- **Attack Index** — searchable catalog of all 48 attack proofs with KaTeX rendering
+- **Format Converter** — live Hex / Decimal / Base64 / Text conversion
+- **Attack Index** — searchable catalog of all 51 attack proofs with KaTeX rendering
 - **METHOD indicator** — every output shows `METHOD=TYPESCRIPT` or `METHOD=SAGEMATHCELL`
 - **Standardized output format** — all attacks produce consistent `Attack Name → Inputs → Results → Verification → TOKEN → METHOD` output
-- **Command Palette** — ⌘/Ctrl+K fuzzy search across all 48 attacks + calculators + views
+- **Command Palette** — ⌘/Ctrl+K fuzzy search across all 51 attacks + calculators + views
 - **Keyboard Shortcuts** — ⌘Enter (run), ⌘1-5 (calculator tabs), ⌘Shift+C (copy), Tab/Shift+Tab (cycle)
 - **PEM Decryptor** — Parse and decrypt PKCS#1/PKCS#8/encrypted PEM keys, feed params to Calculator or Attacks
 - **Instructions Panel** — Always-visible reference guide
@@ -79,7 +79,7 @@ Open `http://localhost:5173` in your browser.
 | squfof | SQUFOF algorithm | — |
 | williams-p1 | Williams' p+1 factorization | — |
 
-### Partial Key / Lattice (11)
+### Partial Key / Lattice (12)
 
 | Attack | Description | Frontend |
 |--------|-------------|----------|
@@ -94,8 +94,9 @@ Open `http://localhost:5173` in your browser.
 | phi-leak | Decrypt from leaked φ(n) | ✓ |
 | simple-lattice | Simple lattice attack | — |
 | small-crt-exp | Recover p via n % pCandidate from small CRT exponent | ✓ |
+| stereotyped-message | Coppersmith recovery from known message prefix | ✓ |
 
-### Message / Protocol (9)
+### Message / Protocol (10)
 
 | Attack | Description | Frontend |
 |--------|-------------|----------|
@@ -103,18 +104,20 @@ Open `http://localhost:5173` in your browser.
 | common-modulus | Extended GCD + Bezout recovery | ✓ |
 | related-message | Related message recovery (e=3/e=5) | ✓ |
 | hastad-broadcast | CRT recovery from e identical ciphertexts | ✓ |
-| hastad-linear-pad | Hastad's broadcast with linear padding | — |
+| hastad-linear-pad | Hastad's broadcast with linear padding | ✓ |
 | homomorphic-forgery | RSA multiplicative homomorphism signature forge | ✓ |
 | known-plaintext | Integer e-th root + known-prefix brute-force | ✓ |
 | non-coprime-exp | Attack when e and φ(n) share a factor | — |
 | rsa-crt-fault | Recover p from faulty CRT signature | ✓ |
+| sig-param-forgery | Signature forgery via e=1 / crafted n | ✓ |
 
-### Oracle (4)
+### Oracle (5)
 
 | Attack | Description | Frontend |
 |--------|-------------|----------|
 | biased-lsb | Majority-vote LSB oracle + binary fraction recovery | ✓ |
 | bleichenbacher | Full PKCS#1 v1.5 padding oracle (interval narrowing) | ✓ |
+| blinding-decryption-bypass | Decrypt via blinded signing oracle | ✓ |
 | lsb-oracle | Binary fraction recovery of m from LSB oracle | ✓ |
 | manger | Manger oracle attack | ✓ |
 
@@ -184,7 +187,7 @@ Pure JS hash computation via @noble/hashes. 14 algorithms including SHA-2/3, BLA
 Diffie-Hellman key exchange with RFC 3526 standard groups (group1/group5/group14) or custom p/g parameters. Generates private/public keys, computes shared secrets. 3 sub-tabs: Explanation, Key Exchange, Attacks (discrete log attacks).
 
 ### Format Converter
-Live conversion between hex, decimal, base64, binary, and text.
+Live conversion between hex, decimal, base64, and text.
 
 ### Command Palette
 Press `⌘K` (Mac) or `Ctrl+K` (Windows/Linux) to open. Fuzzy-search across all attacks, calculators, and views. Arrow keys to navigate, Enter to select.
@@ -239,18 +242,17 @@ env.reset()              // clears env config from localStorage + reloads
 
 ```
 src/
-  attacks/           48 attack files + guard.ts + index.ts + rawSources.ts + _rsaHelpers.ts
-  components/        React components (40 .tsx files)
-    _shared/         EmptyState.tsx
+  attacks/           51 attack files + guard.ts + index.ts + rawSources.ts + _rsaHelpers.ts
+  components/        React components (41 .tsx files)
+    _shared/         EmptyState.tsx, LogoIcon.tsx
     calculator/      Calculator shell + 5 calculators with sub-tabs (21 files)
       _shared/       CalculatorHeader.tsx, ResultBox.tsx
       hash/          ExplanationTab, HashFunctionsTab, HMACTab, LengthExtensionTab, ProofOfWorkTab
   config/            env.ts (console-accessible Env class), sidebarItems.ts
   context/           AppContext provider (includes AppContext create)
-  hooks/             12 hooks: useAppContext, useAttackExecution, useCalculatorOutput,
-                     useCommandPalette, useCopyToClipboard, useDragResize,
-                     useKeyboardShortcuts, useMagicExecution, useNotepad,
-                     useSageMath, useTimer, useWorkerPool
+  hooks/             10 hooks: useAppContext, useAttackExecution, useCalculatorOutput,
+                     useCopyToClipboard, useDragResize, useKeyboardShortcuts,
+                     useMagicExecution, useSageMath, useTimer, useWorkerPool
   theme/             brand entry only (main.tsx wraps app in Astryx Theme; tokens live in astryx-dracula kit)
   types/             index.ts — Attack (sageTemplate optional, usageGuide optional),
                      InputField, HistoryEntry, NotificationState,
