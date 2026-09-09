@@ -39,7 +39,7 @@ export function EmptyState({
   const description = typeof hint === 'string' ? hint : undefined;
   const richHint = typeof hint === 'string' ? undefined : hint;
   return (
-    <Stack hAlign="center" vAlign="center" height="100%" gap={1} padding={2}>
+    <Stack hAlign="center" vAlign="center" height="100%" gap={1} padding={3}>
       <AstryxEmptyState
         title={title}
         description={description}

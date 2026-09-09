@@ -65,7 +65,7 @@ export function ProofIndex() {
 
   return (
     <Stack>
-      <Stack hAlign="center" padding={2}>
+      <Stack hAlign="center" padding={4}>
         <Stack width="100%" maxWidth={640} gap={2}>
           <Heading level={3} color="accent">Attack Index</Heading>
 
@@ -80,7 +80,7 @@ export function ProofIndex() {
             width="100%"
           />
 
-          <Text type="supporting" hasTabularNumbers>
+          <Text type="body" color="secondary" hasTabularNumbers>
             {filtered.length} of {attacks.length} attacks
           </Text>
         </Stack>
@@ -95,7 +95,7 @@ export function ProofIndex() {
             hint="Try a different search term or clear the search field"
           />
         ) : (
-          <Stack width="100%" maxWidth={640} padding={2}>
+          <Stack width="100%" maxWidth={640} padding={3}>
             <List hasDividers>
               {attackItems}
             </List>

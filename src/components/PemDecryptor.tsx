@@ -102,7 +102,7 @@ export function PemDecryptor() {
 
   return (
     <Stack>
-      <Stack hAlign="center" padding={2}>
+      <Stack hAlign="center" padding={4}>
         <Stack width="100%" maxWidth={640} gap={2}>
           <Heading level={3} color="accent">PEM Key Decryptor</Heading>
 
@@ -174,7 +174,7 @@ export function PemDecryptor() {
           {decrypting && (
             <Stack gap={1}>
               <ProgressBar label="Decrypting key" isIndeterminate />
-              <Text type="supporting">
+              <Text type="body">
                 Decrypting key…
               </Text>
             </Stack>
@@ -182,7 +182,7 @@ export function PemDecryptor() {
 
           {/* Extracted Parameters */}
           {parsed && (
-            <Card>
+            <Card padding={3}>
               <Stack gap={2}>
                 <Stack direction="horizontal" gap={1} vAlign="center">
                   <Text weight="semibold" style={{ color: parsed.encrypted ? c.orange : c.green }}>
@@ -232,7 +232,7 @@ export function PemDecryptor() {
                     })}
                   </Stack>
                 ) : (
-                  <Text type="supporting">
+                  <Text type="body" color="secondary">
                     No parameters extracted (encrypted key, decrypt first)
                   </Text>
                 )}

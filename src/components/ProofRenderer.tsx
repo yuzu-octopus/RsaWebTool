@@ -139,7 +139,7 @@ export function ProofRenderer({ latex }: { latex: string }) {
   return (
     <Stack isScrollable>
       <Stack hAlign="center">
-        <Stack width="100%" maxWidth="72ch" gap={2} padding={2}>
+        <Stack width="100%" maxWidth="72ch" gap={2} padding={3}>
           {segments.map((segment) => {
             if (segment.type === 'displayMath') {
               // Re-wrap content in the original environment for proper alignment parsing
