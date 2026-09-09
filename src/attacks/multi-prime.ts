@@ -1,13 +1,13 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { generateMultiPrimeTestcase } from '../utils/testcases/core';
+import { randomPrime } from '../utils/testcases/core';
 import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'multi-prime',
   name: 'Multi-Prime RSA',
   category: 'Factorization',
-  description: 'Factors n with k >= 3 prime factors using trial division and Sage factor(). Use for multi-prime RSA moduli.',
+  description: 'Factors multi-prime n = p1...pk (k >= 3) via trial division to 10^4 then Sage factor() (ECM/QS). Practical in SageCell to <~60 digits; each factor ~n^{1/k} bits.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -70,7 +70,7 @@ Tip: Multi-prime RSA uses CRT for faster decryption but is weaker against factor
             out.append("MULTI_PRIME=FAILED")`,
     useGuard: true,
   }),
-  proof: `\\textbf{Theorem:} Multi-prime RSA uses $n = \\prod_{i=1}^{k} p_i$ with $k \\geq 3$, reducing each factor's bit size and enabling easier factorization.
+  proof: `\\textbf{Size proposition:} Multi-prime RSA uses $n = \\prod_{i=1}^{k} p_i$ with $k \\geq 3$, so each factor is $p_i \\approx n^{1/k}$ bits (for $k=3$, 512-bit $n$ gives $p_i \\approx 170$ bits vs 256 for standard RSA), making ECM/Pollard-rho exponentially faster per factor.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -89,7 +89,7 @@ p_i &\\approx n^{1/k} \\text{ (each prime is smaller than in 2-prime RSA)} \\\\
 &\\text{(vs } 256 \\text{ bits for standard RSA), making ECM/Pollard's rho exponentially faster} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} Multi-prime RSA (also called "RSA Multiprime") uses three or more primes for a fixed modulus size, making each prime factor smaller and easier to find via generic factorization algorithms. The attack uses trial division up to 10,000 followed by Sage's factor() for complete factorization.
+\\textbf{Explanation:} Multi-prime RSA (also called "RSA Multiprime") uses three or more primes for a fixed modulus size, making each prime factor smaller and easier to find via generic factorization algorithms. The attack trial-divides to 10,000 (honest note: this only catches small factors itself) and then delegates the cofactor to Sage's factor() (ECM/quadratic sieve), which is what does the real work — practical in SageCell to <~60 digits.
 
 \\textbf{References:} G. J. Simmons and M. J. Norris, "Preliminary Comments on the MIT Public Key Cryptosystem", Cryptologia, 1976; D. Boneh, "Twenty Years of Attacks on RSA", Notices of the AMS, 1999`,
   priority: 'medium',
@@ -97,6 +97,18 @@ p_i &\\approx n^{1/k} \\text{ (each prime is smaller than in 2-prime RSA)} \\\\
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const kp = generateMultiPrimeTestcase();
+  // Small-case sizing (3x64-bit primes, n ~192-bit): ECM-solvable in SageCell
+  // in seconds, unlike the 768-bit production shape. The cofactor path
+  // (trial division to 10^4, then factor()) is identical at any size.
+  const kp = generateSmallMultiPrimeForTest();
   return { n: kp.n.toString(), e: kp.e.toString() };
+};
+
+function generateSmallMultiPrimeForTest(): { n: bigint; e: bigint } {
+  const p = randomPrime(64);
+  let q = randomPrime(64);
+  while (q === p) q = randomPrime(64);
+  let r = randomPrime(64);
+  while (r === p || r === q) r = randomPrime(64);
+  return { n: p * q * r, e: 65537n };
 };

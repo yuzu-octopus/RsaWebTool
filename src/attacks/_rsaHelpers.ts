@@ -1,3 +1,102 @@
+import { bitLength, exactNthRoot, gcd, iroot } from '../utils/bigint';
+
+// Exact bit length, re-exported here so attack files import helpers from one place.
+export { bitLength };
+
+/**
+ * Trivial-factor fast path for even moduli. Returns 2n when n is even and
+ * greater than 2, null otherwise. Replaces the copied even-n early returns
+ * in the small-factor attacks.
+ */
+export function trivialFactor(n: bigint): bigint | null {
+  if (n <= 2n || n % 2n !== 0n) return null;
+  return 2n;
+}
+
+/**
+ * Scan k in [kMin, kMax] for an exact integer e-th root of c + k*n.
+ * Warm-start Newton (seeded from the previous candidate's root, guarded to
+ * start above the true root) with a +-1 correction per candidate, plus an
+ * optional residue pre-filter to skip hopeless candidates before rooting.
+ * Returns { m, k } on the first exact hit, null when the window is exhausted.
+ */
+export function integerRootScan(
+  c: bigint,
+  n: bigint,
+  e: bigint,
+  kMax: bigint,
+  opts?: {
+    kMin?: bigint;
+    accept?: (candidate: bigint) => boolean;
+    onProgress?: (done: bigint, total: bigint) => void;
+  },
+): { m: bigint; k: bigint } | null {
+  const kMin = opts?.kMin ?? 0n;
+  const total = kMax - kMin + 1n;
+  // Hoisted seed width: every candidate is <= c + kMax*n, so one bit-length
+  // covers all Newton seeds (no per-candidate string conversion).
+  const seedBits = Math.ceil(bitLength(c + kMax * n) / Number(e));
+  let root = 1n;
+  const rootOf = (value: bigint, prevRoot: bigint): bigint => {
+    let x =
+      prevRoot > 1n && (prevRoot + 2n) ** e >= value
+        ? prevRoot
+        : 1n << BigInt(seedBits);
+    while (true) {
+      const xEm1 = x ** (e - 1n);
+      const next = ((e - 1n) * x * xEm1 + value) / (e * xEm1);
+      if (next >= x) break;
+      x = next;
+    }
+    return x;
+  };
+  for (let k = kMin; k <= kMax; k++) {
+    if (opts?.onProgress && total > 1000n && (k - kMin) % 1000n === 0n) {
+      opts.onProgress(k - kMin, total);
+    }
+    const candidate = c + k * n;
+    if (opts?.accept && !opts.accept(candidate)) continue;
+    root = rootOf(candidate, root);
+    if (root ** e === candidate) return { m: root, k };
+    if ((root + 1n) ** e === candidate) return { m: root + 1n, k };
+    if (root > 0n && (root - 1n) ** e === candidate) return { m: root - 1n, k };
+  }
+  return null;
+}
+
+/**
+ * First nontrivial gcd(guest, n) over a candidate list. Returns the factor
+ * and its index, or null when every candidate is coprime to n (or a multiple
+ * of n). Consolidates the per-base/per-candidate gcd loops in dp-dq-leak,
+ * small-crt-exp's batch rescan, and rsa-crt-fault.
+ */
+export function gcdSetScan(n: bigint, candidates: bigint[]): { factor: bigint; index: number } | null {
+  for (let i = 0; i < candidates.length; i++) {
+    const g = gcd(candidates[i], n);
+    if (g > 1n && g < n) return { factor: g, index: i };
+  }
+  return null;
+}
+
+/**
+ * Exact integer e-th root of v with verification that m^e = c (mod n).
+ * Thin wrapper over the shared iroot so call sites stop hand-rolling
+ * Newton loops; falls back to exactNthRoot's binary correction on mismatch.
+ */
+export function verifiedRoot(v: bigint, e: bigint, n: bigint, c: bigint): bigint | null {
+  const m = iroot(v, e);
+  if (m ** e !== v) return exactNthRoot(v, e);
+  let check = 1n;
+  let base = m % n;
+  let exp = e;
+  while (exp > 0n) {
+    if (exp & 1n) check = (check * base) % n;
+    exp >>= 1n;
+    base = (base * base) % n;
+  }
+  return check === c ? m : null;
+}
+
 /**
  * Common applicableCheck patterns for RSA attacks.
  * Centralized to avoid 20+ duplicate inline checks across attack files.

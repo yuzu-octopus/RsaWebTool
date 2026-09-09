@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
-import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
+import { gcdSetScan, rsaNeeds } from './_rsaHelpers';
+import { randomPrime, isPrimeMR } from '../utils/testcases/core';
 import { gcd, modPow } from '../utils/bigint';
 import { wrapSageTemplate, validateNumeric} from './guard';
 
@@ -19,6 +19,8 @@ export const attack: Attack = {
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'SMALL_CRT_EXP',
     imports: ['import math'],
+    // Deliberately unguarded (unlike the Wiener/phi-leak siblings): the scan is
+    // an incremental O(bound) loop the guard's step budget would abort mid-batch.
     useGuard: false,
     body: `        n = Integer(${validateNumeric(vals.n, 'n')})
         e = Integer(${validateNumeric(vals.e, 'e')})
@@ -45,8 +47,9 @@ export const attack: Attack = {
                         cur_scan = pow(step_int, batch_start, n_int)
                         for d in range(batch_start, dp + 1):
                             x_scan = (cur_scan - 2) % n_int
-                            if math.gcd(x_scan, n_int) > 1:
-                                p_sage = Integer(g)
+                            g_scan = math.gcd(x_scan, n_int)
+                            if 1 < g_scan < n_int:
+                                p_sage = Integer(g_scan)
                                 q_sage = n // p_sage
                                 out.append("Small CRT Exponent")
                                 out.append(f"n = {n}")
@@ -69,7 +72,35 @@ export const attack: Attack = {
                     batch_start = dp + 1
                 current_int = (current_int * step_int) % n_int
             if not found:
+                # Fallback: dp = d whenever d < p - 1, so a dp beyond the scan
+                # bound with a small d is still caught by Wiener convergents.
+                cf = continued_fraction(QQ(e)/QQ(n))
+                for conv in cf.convergents():
+                    k, d = conv.numerator(), conv.denominator()
+                    if k == 0:
+                        continue
+                    if (e * d - 1) % k == 0:
+                        phi = (e * d - 1) // k
+                        s_q = n - phi + 1
+                        disc = s_q ** 2 - 4 * n
+                        if disc > 0 and disc.is_square():
+                            t = isqrt(disc)
+                            if (s_q + t) % 2 == 0:
+                                p_w = (s_q - t) // 2
+                                q_w = (s_q + t) // 2
+                                if p_w * q_w == n and p_w > 1:
+                                    out.append("Small CRT Exponent (Wiener fallback: dp = d beyond bound)")
+                                    out.append(f"p = {p_w}")
+                                    out.append(f"q = {q_w}")
+                                    out.append("")
+                                    out.append(f"Verification: p * q = {p_w * q_w}")
+                                    out.append("")
+                                    out.append("SMALL_CRT_EXP=SUCCESS")
+                                    found = True
+                                    break
+            if not found:
                 out.append("No small dp found within bound.")
+                out.append("Crossover: dp beyond this bound needs a lattice approach -- try dp/dq Leak with the exact dp value, or Boneh-Durfee when d itself is small (d < n^0.26). By dp/dq symmetry the same scan covers a small dq (it splits q instead of p).")
                 out.append("SMALL_CRT_EXP=FAILED")`,
   }),
   frontendCheck: (vals, onProgress) => {
@@ -104,18 +135,22 @@ export const attack: Attack = {
         if (isLastInBatch) {
           const g = gcd(product, n);
           if (g > 1n && g < n) {
-            // Factor found — linear scan within this batch
+            // Factor found — rescan the batch, reporting the per-candidate
+            // gcd (not the batch product gcd g) with its exact dp.
             const batchEnd = dp;
+            const cands: bigint[] = [];
             let curScan = modPow(step, batchStart, n);
-            for (let dpScan = batchStart; dpScan <= batchEnd; dpScan++) {
-              const xScan = (curScan - 2n + n) % n;
-              if (gcd(xScan, n) > 1n) {
-                const p0 = g;
-                const q0 = n / g;
-                onProgress?.(100);
-                return Promise.resolve(`Small CRT Exponent\nn = ${n}\ne = ${e}\nbound = ${bound}\n\nResults:\np = ${p0}\nq = ${q0}\ndp = ${dpScan}\n\nVerification: p * q = ${p0 * q0}\n\nSMALL_CRT_EXP=SUCCESS`);
-              }
+            for (let d = batchStart; d <= batchEnd; d++) {
+              cands.push((curScan - 2n + n) % n);
               curScan = (curScan * step) % n;
+            }
+            const split = gcdSetScan(n, cands);
+            if (split) {
+              const p0 = split.factor;
+              const q0 = n / p0;
+              const dpScan = batchStart + BigInt(split.index);
+              onProgress?.(100);
+              return Promise.resolve(`Small CRT Exponent\nn = ${n}\ne = ${e}\nbound = ${bound}\n\nResults:\np = ${p0}\nq = ${q0}\ndp = ${dpScan}\n\nVerification: p * q = ${p0 * q0}\n\nSMALL_CRT_EXP=SUCCESS`);
             }
           }
           // Reset batch
@@ -157,16 +192,18 @@ export const attack: Attack = {
 \\textbf{Optimizations:}
 \\begin{itemize}
 \\item \\textbf{Batched GCD product accumulation:} Accumulates $(2^{e \\cdot d_p} - 2) \\bmod n$ as a product over $BATCH\\_SIZE = 5000$ candidates per GCD, reducing GCD calls by $\\sim 5000\\times$. Backtracks linearly within the winning batch to isolate the exact $d_p$.
-\\item \\textbf{k-based FLT approach (frontendCheck):} For $e \\leq 10^6$, directly computes $n \\bmod pCandidate$ which is $\\sim 400\\times$ cheaper than GCD (0.095 $\\mu$s vs 39 $\\mu$s). The modular reduction $2^{e \\cdot d_p} - 2 \\equiv 0 \\pmod{p}$ is equivalent to $p \\mid (2^{e \\cdot d_p} - 2)$.
+\\item \\textbf{Single-exponent scan:} The scan advances $2^{e \\cdot d_p}$ by one multiplication per step (no per-step exponentiation); cost is linear in the bound with one GCD per 5000-step batch.
 \\end{itemize}
 
 \\textbf{References:} Boneh \\textit{et al.}, "Cryptanalysis of RSA with Small CRT Exponents", CRYPTO 1998; Cohn & Heninger, ePrint 2011/436`,
-   usageGuide: 'This attack recovers the private key when either dp or dq (the CRT exponents) is small.\n\nHow to use:\n1. You have n, e, and know that dp (d mod p-1) is small (< bound)\n2. The attack uses Fermat\'s Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p\n3. A batched GCD approach (product tree) accelerates the linear scan ~5000x by reducing gcd calls via product accumulation\n4. Provide n, e, and optionally bound         (max dp to try, default 5000000)\n\nTip: Works for any e (no e-size limit) since the iteration count depends only on bound. Default bound 5000000 runs in ~900ms for 1024-bit n.',
+   usageGuide: 'This attack recovers the private key when either dp or dq (the CRT exponents) is small.\n\nHow to use:\n1. You have n, e, and know that dp (d mod p-1) is small (< bound)\n2. The attack uses Fermat\'s Little Theorem: for the correct dp, gcd(2^(e*dp) - 2, n) = p\n3. A batched GCD approach (product tree) accelerates the linear scan ~5000x by reducing gcd calls via product accumulation\n4. Provide n, e, and optionally bound         (max dp to try, default 5000000)\n\nTip: Works for any e (no e-size limit) since the iteration count depends only on bound. By dp/dq symmetry a small dq is found the same way (the scan splits q instead of p). Beyond the bound, use dp/dq Leak (exact dp) or Boneh-Durfee (small d).',
   priority: 'medium',
   applicableCheck: rsaNeeds.nE,
 };
 
 export const generateTestcase = (): Record<string, string> => {
+  // Small-case sizing (q ~128-bit, dp ~17-bit): the dp scan is O(bound)
+  // BigInt mults, and the dp-search loop below is bit-size agnostic.
   const e = 65537n;
   // Keep the generated browser testcase small enough for CI and the default UI bound.
   const startDp = 100000n;
@@ -176,7 +213,7 @@ export const generateTestcase = (): Record<string, string> => {
       if (num % k !== 0n) continue;
       const p = num / k + 1n;
       if (p > 2n && isPrimeMR(p)) {
-        const q = randomPrime(TESTCASE_BITS.q);
+        const q = randomPrime(128);
         return { n: (p * q).toString(), e: e.toString(), bound: dp.toString() };
       }
     }

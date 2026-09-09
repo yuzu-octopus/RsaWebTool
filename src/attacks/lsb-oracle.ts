@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { bitLength, rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 import { wrapSageTemplate, sanitizePython, validateNumeric} from './guard';
@@ -8,7 +8,7 @@ export const attack: Attack = {
   id: 'lsb-oracle',
   name: 'LSB Oracle Attack',
   category: 'Oracle',
-  description: 'Recovers plaintext m using an exact LSB oracle in log2(n) queries via binary fraction accumulation. Use when a side channel reveals the LSB of the decrypted ciphertext.',
+  description: 'Recovers plaintext m using an exact LSB oracle in at most ceil(log2 n)+O(1) queries via binary fraction accumulation. Use when a side channel reveals the LSB of the decrypted ciphertext.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: '65537', multiline: false, required: false },
@@ -78,10 +78,10 @@ export const attack: Attack = {
             out.append("LSB_ORACLE=FAILED")`,
     }),
   frontendCheck: (vals) => {
-    if (!vals.n || !vals.e || !vals.c || !vals.oracle_responses) return Promise.resolve(null);
+    if (!vals.n || !vals.c || !vals.oracle_responses) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
-      const e = BigInt(vals.e);
+      const e = BigInt((vals.e || '').trim() || '65537');
       const c = BigInt(vals.c);
       const bits = vals.oracle_responses.split(',').map(x => x.trim() === '1');
       const k = BigInt(bits.length);
@@ -112,7 +112,7 @@ export const attack: Attack = {
       return Promise.resolve(null);
     } catch (e) { console.warn('[lsb-oracle] frontendCheck error:', e); return Promise.resolve(null); }
   },
-  proof: `\\textbf{Theorem:} An exact LSB oracle recovers $m$ in exactly $\\log_2 n$ queries via binary fraction accumulation.
+  proof: `\\textbf{Theorem:} An exact LSB oracle recovers $m$ in at most $\\lceil\\log_2 n\\rceil + O(1)$ queries via binary fraction accumulation.
 
 \\textbf{Setup:}
 \\begin{itemize}
@@ -140,7 +140,7 @@ m &= \\left\\lceil \\frac{q \\cdot n}{2^k} \\right\\rceil \\quad (k \\geq \\log_
 \\textbf{Explanation:} The key insight is that multiplying $m$ by 2 modulo $n$ either doubles it (if $2m < n$) or wraps around ($2m - n$). The LSB tells us which happened: LSB=1 means $2m \\geq n$ (wrapped), LSB=0 means $2m < n$ (didn't wrap). This is exactly a binary search: each LSB response halves the interval containing $m$. After $\\log_2 n$ queries, the interval width is less than 1, pinpointing $m$. The binary fraction formulation is more efficient for batch computation.
 
 \\textbf{References:} S. Goldwasser, S. Micali, "Probabilistic Encryption", JCSS 1984; M. Ben-Or et al., "A Hard-Core Predicate for all One-Way Functions", STOC 1988`,
-  usageGuide: 'This attack requires oracle_responses \u2014 a comma-separated list of LSB bits obtained by querying an oracle that reveals the least significant bit of the decrypted ciphertext.\n\nHow to use:\n1. Set up an LSB oracle function that returns LSB(decrypt(c)) for any ciphertext c\n2. For each query i: compute c\' = c * 2^(i*e) mod n, call the oracle, record the bit\n3. Provide n, e, c, and the full list of oracle bits (from query 0 to query log2(n))\n4. The attack accumulates bits into a binary fraction to recover the message\n\nTip: You need roughly n.bit_length() oracle responses for full recovery. Each bit halves the uncertainty.',
+  usageGuide: 'This attack requires oracle_responses \u2014 a comma-separated list of LSB bits obtained by querying an oracle that reveals the least significant bit of the decrypted ciphertext.\n\nHow to use:\n1. Set up an LSB oracle function that returns LSB(decrypt(c)) for any ciphertext c\n2. For each query i: compute c\' = c * 2^(i*e) mod n, call the oracle, record the bit\n3. Provide n, e, c, and the full list of oracle bits (from query 0 to query log2(n))\n4. The attack accumulates bits into a binary fraction to recover the message\n\nExternal-query recipe (query-generator snippet): for i in 0..nbits: c\' = c * pow(2, i*e, n) % n; responses.append(LSB(oracle_decrypt(c\'))). The i-th bit is bit i of the binary fraction m/n.\n\nTip: You need roughly n.bit_length() oracle responses for full recovery (at most ceil(log2 n)+O(1)). Each bit halves the uncertainty. e defaults to 65537 when omitted.',
   priority: 'medium',
   applicableCheck: rsaNeeds.nCOracleResponses,
 };
@@ -156,7 +156,7 @@ export const generateTestcase = (): Record<string, string> => {
   // LSB(2*m mod n) = 1 iff 2*m >= n (since n is odd) iff m >= mid
   let lower = 0n, upper = n;
   let curC = c;
-  const nBits = n.toString(2).length;
+  const nBits = bitLength(n);
   for (let i = 0; i < nBits; i++) {
     const mid = (lower + upper) / 2n;
     // Blind: curC = curC * 2^e mod n

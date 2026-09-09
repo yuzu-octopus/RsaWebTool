@@ -32,6 +32,11 @@ Tip: Try increasing B1 if stage 1 fails. RSA key generators sometimes use weak R
         B2 = int(Integer(${validateNumeric(vals.B2 || '0', 'B2')}))
         if B2 < 0:
             B2 = 0
+        if B1 > 5000000 or B2 > 5000000:
+            out.append("ERROR: B1/B2 exceed the 5000000 cap (hang guard)")
+            out.append("POLLARD_P1=FAILED")
+            print("\n".join(out))
+            return
         out.append("Pollard's p-1 Method")
         out.append(f"n = {n}")
         out.append(f"B = {B1}")
@@ -144,6 +149,12 @@ H &= a^M,\\; H^{q_0} \\equiv 1 \\pmod{p} \\\\
       const B1 = parseInt(vals.B) || 10000;
       const B2 = parseInt(vals.B2) || 0;
       if (B1 < 2) return Promise.resolve(null);
+      if (!Number.isSafeInteger(B1) || !Number.isSafeInteger(B2)) {
+        return Promise.resolve('ERROR: B1/B2 must be safe integers\nPOLLARD_P1=FAILED');
+      }
+      if (B1 > 5000000 || B2 > 5000000) {
+        return Promise.resolve('ERROR: B1/B2 exceed the 5000000 cap (sieve hang guard)\nPOLLARD_P1=FAILED');
+      }
 
       const limit = Math.max(B1, B2);
       const sieve = new Uint8Array(limit + 1);

@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { rsaNeeds, coppersmithLatticePython } from './_rsaHelpers';
+import { bitLength, rsaNeeds, coppersmithLatticePython } from './_rsaHelpers';
 import { generateKeyPair } from '../utils/testcases/core';
 import { wrapSageTemplate, validateNumeric, sanitizePython} from './guard';
 
@@ -109,7 +109,7 @@ ${nestedLattice('x + (knownBits * inv2m % n)', '(2**m) * r + knownBits')}
 \\text{Verify } p \\mid n,\\quad &q = n/p \\qed
 \\end{align*}
 
-\\textbf{Explanation:} This attack applies Coppersmith's univariate modular root-finding method. MSB inputs use the shifted p_msb convention (unknown low bits zeroed), matching Partial Key Exposure. The LSB polynomial is made monic as $x + p_{known} 2^{-m} \\bmod n$ (same small root); $p$ is then recovered via the original form $2^m x_0 + p_{known}$. The lattice uses $m=5$ polynomial shifts of decreasing $n$ powers and $t=5$ shifts of the highest-degree polynomial times $x^k$. Because Sage's $\\texttt{small\\_roots}$ only examines row 0 of the reduced basis (which fails for degree-1 polynomials), the manual lattice checks all $m+t$ rows for two-term candidates $a_0 + a_1 x$ whose root rounds to a valid factor.
+\\textbf{Explanation:} This attack applies Coppersmith's univariate modular root-finding method. MSB inputs use the shifted p_msb convention (unknown low bits zeroed), matching Partial Key Exposure (see its guide for the shifted-MSB worked example). The LSB polynomial is made monic as $x + p_{known} 2^{-m} \\bmod n$ (same small root); $p$ is then recovered via the original form $2^m x_0 + p_{known}$. The lattice uses $m=5$ polynomial shifts of decreasing $n$ powers and $t=5$ shifts of the highest-degree polynomial times $x^k$. Because Sage's $\\texttt{small\\_roots}$ only examines row 0 of the reduced basis (which fails for degree-1 polynomials), the manual lattice checks all $m+t$ rows for two-term candidates $a_0 + a_1 x$ whose root rounds to a valid factor.
 
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Univariate Modular Equation", EUROCRYPT 1996; N. Howgrave-Graham, "Approximate Integer Common Divisors", 1997`,
   usageGuide: 'This attack recovers a prime factor when a fraction of its bits are known (e.g., from side-channel leakage).\n\nHow to use:\n1. You know some bits of p (or q) and need to recover the full prime\n2. Provide n, knownBits, and bitPosition ("msb" or "lsb"). For msb, knownBits must be shifted like p_msb (unknown low bits zeroed, e.g. clear the low k bits); for lsb, knownBits is the integer value of the known low bits\n3. The attack uses Coppersmith\\\'s method to find the missing bits\n\nTip: This is inherently probabilistic — the lattice may fail even with the right inputs. Try with more known bits if it fails. bitPosition=msb = known high bits (shifted), lsb = known low bits. The LSB lattice uses the monic form x + knownBits*inv(2^m) mod n internally.',
@@ -119,7 +119,7 @@ ${nestedLattice('x + (knownBits * inv2m % n)', '(2**m) * r + knownBits')}
 
 export const generateTestcase = (): Record<string, string> => {
   const { p, n } = generateKeyPair(256, 256);
-  const bitLen = p.toString(2).length;
+  const bitLen = bitLength(p);
   // Keep ≥ 86% of bits for degree-2 lattice (needs unknown < n^0.075 ≈ 2^38)
   const keepBits = Math.ceil(bitLen * 0.9);
   const isLsb = Math.random() < 0.5;

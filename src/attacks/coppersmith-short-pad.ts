@@ -26,20 +26,6 @@ export const attack: Attack = {
         e_int = int(e)
         c1 = Integer(${validateNumeric(vals.c1, 'c1')})
         c2 = Integer(${validateNumeric(vals.c2, 'c2')})
-        # Pure Python integer e-th root via binary search
-        # Avoids SageCell's flaky nth_root when possible
-        def integer_root(val, exp):
-            low = Integer(0)
-            high = Integer(1)
-            while high**exp < val:
-                high *= 2
-            while low < high:
-                mid = (low + high + 1) // 2
-                if mid**exp <= val:
-                    low = mid
-                else:
-                    high = mid - 1
-            return low
         m1_val = None
         m2_val = None
         found = False
@@ -52,15 +38,6 @@ export const attack: Attack = {
                 m2_val = Integer(m2_t)
         except Exception:
             pass
-        # Method 2: Pure Python binary search (avoids Sage nth_root bugs)
-        if m1_val is None:
-            cand = integer_root(c1, e_int)
-            if cand**e_int == c1:
-                m1_val = cand
-        if m2_val is None:
-            cand = integer_root(c2, e_int)
-            if cand**e_int == c2:
-                m2_val = cand
         # Method 3: If only one found, brute-force delta (range covers testcase)
         if m1_val is None and m2_val is not None:
             for d in range(1, 4096):
@@ -151,7 +128,7 @@ m &= m_1 - r_1 = m_2 - r_2
 \\textbf{Explanation:} When $m^e < n$, the ciphertext is an exact $e$-th power in the integers (no modular wrap-around). Integer $e$-th root directly recovers $m_1$ and $m_2$. If only one root is found, brute-force the small pad difference $\\Delta$ (at most 4096, matching the implemented delta bound). The full Coppersmith short-pad attack using polynomial resultants handles the general case where $m^e \\ge n$ and $|\\Delta| < n^{1/e^2}$, but requires lattice reduction and is NOT implemented here: this attack covers only the degenerate integer-root case above.
 
 \\textbf{References:} D. Coppersmith, "Finding a Small Root of a Bivariate Integer Equation", J. Cryptology, 1997; D. Boneh, "Twenty Years of Attacks on RSA", 1999`,
-  usageGuide: 'Recovers small messages via integer e-th root (degenerate case where m^e < n). NOT the full Coppersmith lattice attack.\n\nHow to use:\n1. You have two ciphertexts c1, c2 of the same plaintext m with small pads r1, r2\n2. The pads are small (|r1|, |r2| < n^(1/e)) so m^e < n (no modular wrap-around)\n3. Provide n, e, c1, c2\n4. The attack uses integer e-th root to recover the messages and pads\n\nTip: Works best with e=3 and small messages. For convenience, paste into Magic Mode which auto-detects.',
+  usageGuide: 'Recovers small messages via integer e-th root (degenerate case where m^e < n). NOT the full Coppersmith lattice attack.\n\nHow to use:\n1. You have two ciphertexts c1, c2 of the same plaintext m with small pads r1, r2\n2. The pads are small (|r1|, |r2| < n^(1/e)) so m^e < n (no modular wrap-around)\n3. Provide n, e, c1, c2\n4. The attack uses integer e-th root to recover the messages and pads\n\nTip: Works best with e=3 and small messages. For convenience, paste into Magic Mode which auto-detects. See also: Stereotyped Message (the true Coppersmith lattice attack for known-prefix messages), Small Public Exponent and Hastad\'s Broadcast (integer-root siblings).',
   priority: 'medium',
   applicableCheck: rsaNeeds.nEC1C2,
 };

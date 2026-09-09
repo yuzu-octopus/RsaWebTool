@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { trivialFactor, rsaNeeds } from './_rsaHelpers';
 import { isqrt } from '../utils/bigint';
 import { generateFermatTestcase } from '../utils/testcases/core';
 import { wrapSageTemplate, validateNumeric} from './guard';
@@ -17,7 +17,7 @@ export const attack: Attack = {
 How to use:
 1. Provide n (the modulus)
 2. Fermat's method tries to express n as a difference of squares: n = a^2 - b^2
-3. If Fermat iteration doesn't converge quickly, Londahl's BSGS fallback is used
+3. If Fermat iteration doesn't converge quickly, Londahl's BSGS fallback is used (SageMath template only — the browser runs Fermat iteration to 10^6 steps, then falls through to Sage)
 
 Tip: Very fast when primes are close (|p-q| < 2^20). Common in CTF challenges where p and q are generated with similar bit-lengths and close values.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
@@ -105,9 +105,10 @@ Tip: Very fast when primes are close (|p-q| < 2^20). Common in CTF challenges wh
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
-      if (n % 2n === 0n) {
-        const half = n / 2n;
-        return Promise.resolve(`Close-prime\nn = ${n}\n\nResults:\np = 2\nq = ${half}\n\nVerification: p * q = ${n}\n|p - q| = ${half - 2n}\nIterations: 0\n\nCLOSE_PRIME=SUCCESS`);
+      const tfactor = trivialFactor(n);
+      if (tfactor) {
+        const half = n / tfactor;
+        return Promise.resolve(`Close-prime\nn = ${n}\n\nResults:\np = ${tfactor}\nq = ${half}\n\nVerification: p * q = ${n}\n|p - q| = ${half - tfactor}\nIterations: 0\n\nCLOSE_PRIME=SUCCESS`);
       }
       // Incremental Fermat: b2 = a^2 - n, updated as b2 += 2*a + 1 each step
       // This avoids repeated a*a - n (a BigInt multiplication)

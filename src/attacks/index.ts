@@ -20,6 +20,7 @@ import { attack as closePrime, generateTestcase as genClosePrime } from './close
 import { attack as noveltyPrimes, generateTestcase as genNoveltyPrimes } from './novelty-primes';
 import { attack as relatedMessage, generateTestcase as genRelatedMessage } from './related-message';
 
+import { attack as stereotypedMessage, generateTestcase as genStereotypedMessage } from './stereotyped-message';
 import { attack as simpleLattice, generateTestcase as genSimpleLattice } from './simple-lattice';
 import { attack as partialD, generateTestcase as genPartialD } from './partial-d';
 import { attack as partialPqBits, generateTestcase as genPartialPqBits } from './partial-pq-bits';
@@ -37,6 +38,8 @@ import { attack as rsaCrtFault, generateTestcase as genRsaCrtFault } from './rsa
 import { attack as nonCoprimeExp, generateTestcase as genNonCoprimeExp } from './non-coprime-exp';
 
 import { attack as homomorphicForgery, generateTestcase as genHomomorphicForgery } from './homomorphic-forgery';
+import { attack as blindingBypass, generateTestcase as genBlindingBypass } from './blinding-bypass';
+import { attack as sigParamForgery, generateTestcase as genSigParamForgery } from './sig-param-forgery';
 import { attack as bleichenbacherSig, generateTestcase as genBleichenbacherSig } from './bleichenbacher-sig';
 
 import { attack as bleichenbacher, generateTestcase as genBleichenbacher } from './bleichenbacher';
@@ -66,11 +69,11 @@ export const attacks: Attack[] = [
   bonehDurfee, ecm2, pollardP1, pollardRho, williamsP1,
   quadraticSieve, squfof, binaryPolyFactor, smallFraction, batchGcd, multiPrime, smallPrimeCrt,
   gimmickyPrimes, closePrime, noveltyPrimes, euler, pollardStrassen, pisanoPeriod,
-  simpleLattice, partialD, partialPqBits, smallCrtExp, dpDqLeak,
+  simpleLattice, stereotypedMessage, partialD, partialPqBits, smallCrtExp, dpDqLeak,
   linearlyRelatedPrimes, dependentPrime,
   commonModulus, coppersmithShortPad, hastadLinearPad,
   lsbOracle, rsaCrtFault, nonCoprimeExp,
-  homomorphicForgery, bleichenbacherSig,
+  homomorphicForgery, blindingBypass, sigParamForgery, bleichenbacherSig,
   bleichenbacher, manger, biasedLsb,
   roca, nitros, factordbLookup, knownPlaintext, smallPublicExp,
   multiPrimeGcd, phiLeak,
@@ -95,6 +98,7 @@ export const testcaseGenerators: Record<string, () => Record<string, string>> = 
   'close-prime': genClosePrime,
   'novelty-primes': genNoveltyPrimes,
   'simple-lattice': genSimpleLattice,
+  'stereotyped-message': genStereotypedMessage,
   'partial-d': genPartialD,
   'partial-pq-bits': genPartialPqBits,
   'small-crt-exp': genSmallCrtExp,
@@ -109,6 +113,8 @@ export const testcaseGenerators: Record<string, () => Record<string, string>> = 
   'non-coprime-exp': genNonCoprimeExp,
   'related-message': genRelatedMessage,
   'homomorphic-forgery': genHomomorphicForgery,
+  'blinding-decryption-bypass': genBlindingBypass,
+  'sig-param-forgery': genSigParamForgery,
   'bleichenbacher-sig': genBleichenbacherSig,
   bleichenbacher: genBleichenbacher,
   manger: genManger,

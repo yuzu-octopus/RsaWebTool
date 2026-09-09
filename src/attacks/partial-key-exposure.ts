@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { rsaNeeds, coppersmithLatticePython } from './_rsaHelpers';
+import { bitLength, rsaNeeds, coppersmithLatticePython } from './_rsaHelpers';
 import { generateKeyPair } from '../utils/testcases/core';
 import { wrapSageTemplate, validateNumeric} from './guard';
 
@@ -15,11 +15,11 @@ export const attack: Attack = {
   usageGuide: `Use when you know the upper half or more of one prime factor p.
 
 How to use:
-1. Provide n and the known high bits of p (MSBs)
-2. Coppersmith's method finds the remaining low bits using lattice reduction
-3. Requires knowing at least n/4 bits of p for the lattice to succeed
+1. Provide n and the known high bits of p (MSBs), SHIFTED: clear (zero) the unknown low k bits, e.g. for p = 0b11010111 with the low 3 bits unknown, pass p_msb = 0b11010000 (= 208, not 215)
+2. Example: n = p*q with p = 104729 (17 bits); 12 known high bits -> p_msb = (104729 >> 5) << 5 = 104704; the attack recovers x = 25 via f(x) = p_msb + x
+3. Coppersmith's method finds the remaining low bits using lattice reduction (needs the unknown part < n^1/4)
 
-Tip: This exploits the fact that small roots of polynomials mod p can be found efficiently. Side-channel attacks that leak partial key information make this practical.`,
+Tip: This exploits the fact that small roots of polynomials mod p can be found efficiently. Side-channel attacks that leak partial key information make this practical. See also Partial p/q Bits (same shifted-MSB convention, plus LSB mode).`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'PARTIAL_KEY_EXPOSURE',
     n: validateNumeric(vals.n, 'n'),
@@ -98,7 +98,7 @@ p &= p_{\\text{msb}} + x_0,\\quad q = n/p \\qed
 
 export const generateTestcase = (): Record<string, string> => {
   const { p, n } = generateKeyPair(512, 512);
-  const pBits = p.toString(2).length;
+  const pBits = bitLength(p);
   // Must keep ≥ 86% of bits (degree-2 bound: unknown < n^0.075 ≈ 2^77 for 1024-bit n)
   const keepBits = Math.floor(pBits * 0.9);
   const shift = BigInt(pBits - keepBits);

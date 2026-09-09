@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { trivialFactor, rsaNeeds } from './_rsaHelpers';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { wrapSageTemplate, validateNumeric} from './guard';
 
@@ -11,7 +11,7 @@ export const attack: Attack = {
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  usageGuide: `Use for CTF challenges with primes from well-known families.
+  usageGuide: `See also: Novelty Primes (same crafted-prime family). Use for CTF challenges with primes from well-known families.
 
 How to use:
 1. Provide n (the modulus)
@@ -149,7 +149,8 @@ Tip: Broadest special-form detector. Try this early in CTFs when the challenge h
     try {
       const n = BigInt(vals.n);
       if (n < 2n) return Promise.resolve(null);
-      if (n % 2n === 0n) return Promise.resolve(`Gimmicky Primes\nn = ${n}\n\nResults:\np = 2\nq = ${n / 2n}\n\nVerification: p * q = ${n}\n\nGIMMICKY_PRIMES=SUCCESS`);
+      const tfactor = trivialFactor(n);
+      if (tfactor) return Promise.resolve(`Gimmicky Primes\nn = ${n}\n\nResults:\np = ${tfactor}\nq = ${n / tfactor}\n\nVerification: p * q = ${n}\n\nGIMMICKY_PRIMES=SUCCESS`);
 
       type Found = { type: string; detail: string; p: bigint } | null;
       let found: Found = null;

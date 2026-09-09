@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { trivialFactor, rsaNeeds } from './_rsaHelpers';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { wrapSageTemplate, validateNumeric} from './guard';
 
@@ -10,15 +10,16 @@ export const attack: Attack = {
   description: 'Detects primes near powers of two or mathematical constants via windowed trial division. Use for CTF moduli with novelty-crafted primes.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
+    { name: 'center', label: 'center (user-supplied search center, optional)', placeholder: 'e.g. 2^512 as decimal...', required: false, multiline: true, rows: 3 },
   ],
-  usageGuide: `Use for CTF challenges where primes are crafted near known constants.
+  usageGuide: `See also: Gimmicky Primes (same crafted-prime family). Use for CTF challenges where primes are crafted near known constants.
 
 How to use:
 1. Provide n (the modulus)
 2. The attack tests divisibility by primes near powers of 2 (±1000) and constants like e, π, φ
 3. If a factor is near a recognizable number, it is found quickly
 
-Tip: Common CTF trope — primes like 2^512 + k for small k. Check this early if the challenge hints at "novelty" or "special" primes.`,
+Tip: Pass center (decimal integer) to search around your own structured value (e.g. 2^512 or challenge constants) instead of the fixed centers. Common CTF trope — primes like 2^512 + k for small k. Check this early if the challenge hints at "novelty" or "special" primes.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'NOVELTY_PRIMES',
     n: validateNumeric(vals.n, 'n'),
@@ -27,7 +28,26 @@ Tip: Common CTF trope — primes like 2^512 + k for small k. Check this early if
         out.append("")
         found = False
         n_int = int(n)
-        out.append("Checking primes near powers of 2...")
+        center_str = "${validateNumeric(vals.center || '', 'center')}".strip()
+        if center_str:
+            center = Integer(center_str)
+            out.append("Checking primes near supplied center...")
+            for delta in range(-1000, 1001):
+                candidate = center + delta
+                if candidate > 1 and n_int % candidate == 0:
+                    if is_prime(candidate):
+                        p_sage = Integer(candidate)
+                        q_sage = n // p_sage
+                        out.append("Results:")
+                        out.append(f"p = {p_sage}")
+                        out.append(f"q = {q_sage}")
+                        out.append("type = prime near supplied center")
+                        out.append("")
+                        out.append(f"Verification: p * q = {p_sage * q_sage}")
+                        found = True
+                        break
+        if not found:
+            out.append("Checking primes near powers of 2...")
         for bits in [64, 128, 256, 512]:
             target = 1 << bits
             for delta in range(-1000, 1001):
@@ -81,8 +101,23 @@ Tip: Common CTF trope — primes like 2^512 + k for small k. Check this early if
     try {
       const n = BigInt(vals.n);
       if (n < 2n) return Promise.resolve(null);
-      if (n % 2n === 0n) {
-        return Promise.resolve(`Novelty Primes\nn = ${n}\n\nResults:\np = 2\nq = ${n / 2n}\n\nVerification: p * q = ${n}\n\nNOVELTY_PRIMES=SUCCESS`);
+      const tfactor = trivialFactor(n);
+      if (tfactor) {
+        return Promise.resolve(`Novelty Primes\nn = ${n}\n\nResults:\np = ${tfactor}\nq = ${n / tfactor}\n\nVerification: p * q = ${n}\n\nNOVELTY_PRIMES=SUCCESS`);
+      }
+      // User-supplied center: windowed trial division around an arbitrary
+      // structured value (covers fixed-center limits for novel constants).
+      const centerRaw = (vals.center || '').trim();
+      if (centerRaw) {
+        const center = BigInt(centerRaw);
+        for (let delta = -1000; delta <= 1000; delta++) {
+          const candidate = center + BigInt(delta);
+          if (candidate <= 1n) continue;
+          if ((candidate & 1n) === 0n) continue;
+          if (n % candidate === 0n && isPrimeMR(candidate)) {
+            return Promise.resolve('Novelty Primes\n' + 'n = ' + n + '\n\nResults:\np = ' + candidate + '\nq = ' + (n / candidate) + '\ntype = prime near supplied center\n\nVerification: p * q = ' + n + '\n\nNOVELTY_PRIMES=SUCCESS');
+          }
+        }
       }
       // Check primes near powers of 2
       for (const bits of [64, 128, 256, 512]) {

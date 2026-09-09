@@ -22,7 +22,7 @@ How to use:
 2. The attack computes gcd(n_i, product_of_others) for each modulus
 3. Any gcd > 1 reveals a shared prime factor
 
-Tip: More efficient than pairwise GCD for large sets. O(k) GCD operations instead of O(k^2). Common in mass-key-generation failure scenarios.`,
+Tip: One product plus k divisions replaces O(k^2) pairwise GCDs with O(k) GCD operations (though O(k^2)-bit arithmetic — a remainder tree wins for very large sets). See also Common Prime RSA and Multi-Prime GCD for the two-modulus variants. Common in mass-key-generation failure scenarios.`,
   frontendCheck: (vals: Record<string, string>) => {
     try {
       const raw = (vals.n_values || '').trim();
@@ -107,13 +107,13 @@ g_i > 1 &\\implies g_i \\text{ is a shared prime factor} \\\\
 \\text{Naive product: } O(k) &\\text{ vs } O(k^2) \\text{ for pairwise GCD}
 \\qed\\\\
 \\end{align*}
-The product $\\prod_{j \\neq i} n_j$ is computed by first multiplying all moduli together, then dividing each out: $\\prod_{j \\neq i} n_j = (\\prod_j n_j) / n_i$, giving $O(k)$ total time rather than $O(k^2)$ pairwise GCDs.
+The product $\\prod_{j \\neq i} n_j$ is computed by first multiplying all moduli together, then dividing each out (one product, $k$ divisions, $k$ GCDs: $O(k)$ GCD operations but $O(k^2)$-bit intermediate arithmetic — a remainder tree (Bernstein 2004) is asymptotically superior for large batches): $\\prod_{j \\neq i} n_j = (\\prod_j n_j) / n_i$, giving $O(k)$ total time rather than $O(k^2)$ pairwise GCDs.
 
 \\textbf{Explanation:} When RSA keys are generated with insufficient randomness, two moduli may share a common prime factor. Computing the GCD of each modulus against the product of all others efficiently catches this. In practice, this attack found real-world weak keys — the 2012 "Mining Your Ps and Qs" study found 0.2\\% of TLS certificates shared factors.
 
 \\textbf{Optimizations:}
 \\begin{itemize}
-\\item \\textbf{Product method:} Multiplying all $k$ moduli together then dividing each back out computes $\\prod_{j \\neq i} n_j$ in $O(k)$ total time — much faster than $O(k^2)$ pairwise GCDs.
+\\item \\textbf{Product method:} Multiplying all $k$ moduli together then dividing each back out computes $\\prod_{j \\neq i} n_j$ in $O(k)$ GCD operations — but the product itself is $O(k^2)$ bits, so this is only a constant-factor win over pairwise GCD, not an asymptotic one; a remainder tree is asymptotically superior for large batches. See also Common Prime RSA (two-modulus case) and Multi-Prime GCD.
 \\end{itemize}
 
 \\textbf{References:} Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012; Bernstein, "How to Find Small Factors of Products", 2004`,

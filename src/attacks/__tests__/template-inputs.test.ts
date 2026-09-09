@@ -125,8 +125,12 @@ describe('attack template numeric input handling', () => {
     expect(lsbOracle.applicableCheck({ n: '3233', c: '42', oracle_responses: '1,0' })).toBe(true);
   });
 
-  test('phi input is required', () => {
-    expect(phiLeak.inputs.find((i) => i.name === 'phi')?.required).toBe(true);
+  test('phi-leak accepts phi or (d, e)', () => {
+    expect(phiLeak.inputs.find((i) => i.name === 'phi')?.required).not.toBe(true);
+    expect(phiLeak.inputs.find((i) => i.name === 'd')?.required).not.toBe(true);
+    expect(phiLeak.applicableCheck({ n: '15', phi: '8' })).toBe(true);
+    expect(phiLeak.applicableCheck({ n: '15', d: '3', e: '7' })).toBe(true);
+    expect(phiLeak.applicableCheck({ n: '15' })).toBe(false);
   });
 
   test('coppersmith-short-pad template defines n once', () => {

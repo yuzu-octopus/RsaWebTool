@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { bitLength, rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 import { wrapSageTemplate, sanitizePython, validateNumeric} from './guard';
@@ -171,14 +171,14 @@ m &= \\left\\lceil \\frac{q \\cdot n}{2^k} \\right\\rceil \\quad \\text{(verify 
 \\textbf{Explanation:} The LSB of $2^i m \\bmod n$ equals the $i$-th bit of the binary fraction $m/n$. Each oracle call is noisy (correct with probability $p$), but by taking $k$ repeated queries per position and majority-voting, we amplify the effective accuracy. The Hoeffding bound shows that error decays exponentially in $k(p-1/2)^2$. Once we have $k > \\log_2 n$ reliable bits, the binary fraction $q/2^k$ approximates $m/n$ within $1/2^k$, so $m = \\lceil q \\cdot n / 2^k \\rceil$ uniquely.
 
 \\textbf{References:} S. Goldwasser, S. Micali, "Probabilistic Encryption", JCSS 1984; J. Håstad et al., "A Pseudorandom Generator from any One-Way Function", SIAM J. Comp. 1999`,
-  usageGuide: 'This attack is for when your LSB oracle is noisy \u2014 instead of a single correct bit per query, you have multiple responses and use majority voting.\n\nHow to use:\n1. Query the oracle multiple times per blinding value to get multiple response strings\n2. Provide n, e, c, and oracle_runs \u2014 one response per line, each line being comma-separated 0/1 bits\n3. The attack uses majority voting per bit position, then accumulates voted bits into binary fraction m/n\n4. The final m is computed as ceil(q * n / 2^k) where q is the accumulated voted bits\n\nTip: More runs per position increases accuracy. With 31 runs and 90% accuracy per bit, majority voting gives >99.9% confidence per bit position after 31 runs.',
+  usageGuide: 'This attack is for when your LSB oracle is noisy \u2014 instead of a single correct bit per query, you have multiple responses and use majority voting.\n\nHow to use:\n1. Query the oracle multiple times per blinding value to get multiple response strings\n2. Provide n, e, c, and oracle_runs \u2014 one response per line, each line being comma-separated 0/1 bits\n3. The attack uses majority voting per bit position, then accumulates voted bits into binary fraction m/n\n4. The final m is computed as ceil(q * n / 2^k) where q is the accumulated voted bits\n\nExternal-query recipe (query-generator snippet): same blinding as the exact LSB oracle (c\' = c * pow(2, i*e, n) % n) but query each blinding value k times (one oracle_runs line per repetition); majority vote per position denoises the bits before binary-fraction accumulation.\n\nTip: More runs per position increases accuracy. With 31 runs and 90% accuracy per bit, majority voting gives >99.9% confidence per bit position after 31 runs.',
   priority: 'low',
   applicableCheck: rsaNeeds.nEOracleRuns,
 };
 
 export const generateTestcase = (): Record<string, string> => {
   const { n, e, d } = generateKeyPair(32, 32);
-  const nBits = n.toString(2).length;
+  const nBits = bitLength(n);
   const m = BigInt('0x' + Array.from(crypto.getRandomValues(new Uint8Array(Math.ceil(nBits / 8))))
     .map(b => b.toString(16).padStart(2, '0')).join('')) % (n / 2n);
   const c = encrypt(m, n, e);

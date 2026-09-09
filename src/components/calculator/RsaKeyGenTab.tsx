@@ -4,6 +4,7 @@ import { TextInput } from '@astryxdesign/core/TextInput';
 import { Button } from '@astryxdesign/core/Button';
 import { Banner } from '@astryxdesign/core/Banner';
 import { modInverse } from '../../utils/bigint';
+import { isPrimeMR } from '../../utils/testcases/core';
 import { parseBigInt } from '../../utils/rsaCalc';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { ResultBox } from './_shared/ResultBox';
@@ -36,10 +37,15 @@ export function RsaKeyGenTab() {
     const n = pn * qn;
     const phi = (pn - 1n) * (qn - 1n);
     const d = modInverse(en, phi);
+    const warns: string[] = [];
+    if (!isPrimeMR(pn)) warns.push('warning: p is not prime (Miller-Rabin)');
+    if (!isPrimeMR(qn)) warns.push('warning: q is not prime (Miller-Rabin)');
+    if (pn === qn) warns.push('warning: p == q, so n is a square (trivially factorable)');
 
     let outputText = `n  = ${n}\n`;
     outputText += `phi = ${phi}\n`;
     outputText += d !== null ? `d  = ${d}` : 'd  = undefined (e and phi not coprime)';
+    if (warns.length > 0) outputText += '\n' + warns.join('\n');
     out.dispatch(outputText, 'RSA Key Gen');
   };
 

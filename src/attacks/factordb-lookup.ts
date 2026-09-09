@@ -77,7 +77,7 @@ Tip: Always try this first — it's instant if the factorization is already know
       return `FactorDB Lookup\n\nERROR: ${e instanceof Error ? e.message : String(e)}\n\nFACTORDB_LOOKUP=FAILED`;
     }
   },
-  proof: `\\textbf{Theorem:} FactorDB provides instant factorization for any previously factored modulus via a public API.
+  proof: `\\textbf{Procedure:} FactorDB provides instant factorization for any previously factored modulus via a public API.
 
 \\textbf{Setup:}
 \\begin{itemize}

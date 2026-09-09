@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { rsaNeeds, noopSageTemplate } from './_rsaHelpers';
+import { bitLength, rsaNeeds, noopSageTemplate } from './_rsaHelpers';
 import { isPrimeMR, randomPrime } from '../utils/testcases/core';
 import { crtRSA, gcd, modInverse, modPow } from '../utils/bigint';
 
@@ -85,12 +85,19 @@ Tip: Prime powers p^k are handled as single CRT moduli with phi p^k - p^(k-1). I
         return 'ERROR: Require 1 < n, 1 < e, and 0 <= c < n\nSMALL_PRIME_CRT=FAILED';
       }
       let bound = DEFAULT_FACTOR_BOUND;
+      let clampNote = '';
       if ((vals.factorBound || '').trim()) {
         bound = Number(vals.factorBound);
         if (!Number.isInteger(bound) || bound < 2) {
           return 'ERROR: factorBound must be an integer >= 2\nSMALL_PRIME_CRT=FAILED';
         }
-        bound = Math.min(bound, MAX_FACTOR_BOUND);
+        if (!Number.isSafeInteger(bound)) {
+          return 'ERROR: factorBound exceeds Number precision (hang guard); use an integer <= ' + MAX_FACTOR_BOUND + '\nSMALL_PRIME_CRT=FAILED';
+        }
+        if (bound > MAX_FACTOR_BOUND) {
+          clampNote = ` (clamped to ${MAX_FACTOR_BOUND}, hang guard)`;
+          bound = MAX_FACTOR_BOUND;
+        }
       }
 
       const factors = trialFactor(n, bound);
@@ -103,6 +110,7 @@ Tip: Prime powers p^k are handled as single CRT moduli with phi p^k - p^(k-1). I
         `n = ${n}`,
         `e = ${e}`,
         `c = ${c}`,
+        ...(clampNote ? [`note: factorBound${clampNote}`] : []),
         ``,
         `Results:`,
       ];
@@ -177,7 +185,7 @@ export const generateTestcase = (): Record<string, string> => {
   const phi = list.reduce((a, p) => a * (p - 1n), 1n);
   let e = 65537n;
   while (gcd(e, phi) !== 1n) e += 2n;
-  const nBits = n.toString(2).length;
+  const nBits = bitLength(n);
   let m: bigint;
   do {
     const bytes = new Uint8Array(Math.ceil(nBits / 8));

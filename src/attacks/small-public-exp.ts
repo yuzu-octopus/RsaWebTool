@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { integerRootScan, rsaNeeds } from './_rsaHelpers';
 import { generateHastadTestcase } from '../utils/testcases/core';
 import { wrapSageTemplate, validateNumeric} from './guard';
 
@@ -9,7 +9,7 @@ export const attack: Attack = {
   id: 'small-public-exp',
   name: 'Small Public Exponent',
   category: 'Advanced',
-  description: 'Recovers plaintext m via integer e-th root (m = (c + k*n)^(1/e)) with modular residue pre-filter. Use when e is small (e.g., 3, 5, 17).',
+  description: 'Recovers plaintext m via integer e-th root (m = (c + k*n)^(1/e)) with modular residue pre-filter. Precondition: m < (n*(k_bound+1))^{1/e} so the true k lands in the window. Use when e is small (e.g., 3, 5, 17).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: '3', required: false },
@@ -126,23 +126,6 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
       }
     }
 
-    // Warm-started Newton for integer e-th root
-    const rootOf = (value: bigint, prevRoot: bigint): bigint => {
-      // Only warm-start from prevRoot if it's >= the true root (prevRoot^e >= value).
-      // Starting below the root causes Newton's first jump to overshoot and immediately
-      // trigger the convergence break (next >= x), returning the wrong root.
-      let x = (prevRoot > 1n && (prevRoot + 2n) ** e >= value)
-        ? prevRoot
-        : 1n << BigInt(Math.ceil(value.toString(2).length / Number(e)));
-      while (true) {
-        const x_em1 = x ** (e - 1n);
-        const next = ((e - 1n) * x * x_em1 + value) / (e * x_em1);
-        if (next >= x) break;
-        x = next;
-      }
-      return x;
-    };
-
     const fmtResult = (m: bigint, k: bigint): string => {
       const mHex = m.toString(16);
       const mHexPadded = mHex.length % 2 ? '0' + mHex : mHex;
@@ -156,34 +139,20 @@ print("SMALL_PUBLIC_EXP=FAILED")`;
       } catch { /* keep default */ }
       return `Small Public Exponent\nn = ${n}\nc = ${c}\n\nResults:\nm = ${m}\nk = ${k}\nm as hex: ${mHexPadded}\nm as text: ${mText}\n\nVerification: m^e mod n = ${c}\n\nSMALL_PUBLIC_EXP=SUCCESS`;
     };
-    let root = 1n;
-    for (let k = 0n; k <= kBound; k++) {
-      if (onProgress && kBound > 1000n && k % 1000n === 0n) {
-        const pct = Number(k * 100n / kBound);
-        onProgress(pct, `k = ${k.toString()} / ${kBound.toString()}`);
-      }
-      const candidate = c + k * n;
-      // Modular pre-filter: skip candidates that can't be perfect e-th powers
-      if (residues && !residues.has(candidate % filterMod)) continue;
-      if (k === 0n) {
-        root = rootOf(candidate, 1n);
-      } else {
-        root = rootOf(candidate, root);
-      }
-      if (root ** e === candidate) {
-        onProgress?.(100);
-        return Promise.resolve(fmtResult(root, k));
-      }
-      if ((root + 1n) ** e === candidate) {
-        onProgress?.(100);
-        return Promise.resolve(fmtResult(root + 1n, k));
-      }
-      if (root > 0n && (root - 1n) ** e === candidate) {
-        onProgress?.(100);
-        return Promise.resolve(fmtResult(root - 1n, k));
-      }
-    }
-    return Promise.resolve(null);
+    // Shared warm-start Newton scan over k (see _rsaHelpers.integerRootScan):
+    // the residue filter skips hopeless candidates before any rooting, and the
+    // Newton seed width is hoisted from the top candidate once.
+    const hit = integerRootScan(c, n, e, kBound, {
+      accept: residues ? (candidate: bigint) => residues.has(candidate % filterMod) : undefined,
+      onProgress: onProgress
+        ? (done, total) => {
+            onProgress(Number((done * 100n) / total), `k = ${done.toString()} / ${total.toString()}`);
+          }
+        : undefined,
+    });
+    if (hit === null) return Promise.resolve(null);
+    onProgress?.(100);
+    return Promise.resolve(fmtResult(hit.m, hit.k));
   },
   proof: `\\textbf{Theorem:} For any RSA ciphertext, $m^e = c + k \\cdot n$ for some $k \\geq 0$. When $m^e < n$, $k=0$ and $m = \\sqrt[e]{c}$ directly. When $k > 0$, brute-force $k$ until $\\sqrt[e]{c + k \\cdot n}$ is integer.
 
@@ -211,7 +180,7 @@ m^e &= c + k \\cdot n \\quad\\text{for some } k \\in \\mathbb{Z}_{\\geq 0} \\\\
 \\end{itemize}
 
 \\textbf{References:} D. Boneh et al., "Twenty Years of Attacks on the RSA Cryptosystem", Notices AMS 1999`,
-  usageGuide: 'Recovers plaintext m by iterating k and checking whether c + k·n is an exact e-th power.\n\nHow to use:\n1. Provide n (modulus), e (small public exponent, default 3), and c (ciphertext)\n2. Optionally set a custom k_bound (default 100000) to limit the search space\n3. The attack searches k = 0, 1, ..., k_bound for c + k·n that yields an exact e-th root\n\nOptimizations: Modular residue pre-filter (for e ≤ 100) skips ~67% of candidates for e=3 by checking if c+k·n is a perfect cube mod 9 before attempting the e-th root. Warm-start Newton uses the previous k\'s root as seed for the next k\'s root computation, avoiding restarting Newton from scratch.\n\nTips: This attack works best for e ≤ 17 where k_bound is small and the pre-filter is most effective. For e > 1000, the attack delegates to Sage. Use the frontendCheck for instant e=3 results.',
+  usageGuide: 'Recovers plaintext m by iterating k and checking whether c + k·n is an exact e-th power.\n\nHow to use:\n1. Provide n (modulus), e (small public exponent, default 3), and c (ciphertext)\n2. Optionally set a custom k_bound (default 100000) to limit the search space\n3. The attack searches k = 0, 1, ..., k_bound for c + k·n that yields an exact e-th root\n\nOptimizations: Modular residue pre-filter (for e ≤ 100) skips ~67% of candidates for e=3 by checking if c+k·n is a perfect cube mod 9 before attempting the e-th root. Warm-start Newton uses the previous k\'s root as seed for the next k\'s root computation, avoiding restarting Newton from scratch.\n\nSee also: Small Message Recovery (integer-root pair case), Hastad\'s Broadcast (CRT integer-root case), Stereotyped Message (Coppersmith small-root case).\n\nTips: This attack works best for e ≤ 17 where k_bound is small and the pre-filter is most effective. For e > 1000, the attack delegates to Sage. Use the frontendCheck for instant e=3 results.',
   priority: 'high',
   applicableCheck: rsaNeeds.nC,
 };

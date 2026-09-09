@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { trivialFactor, rsaNeeds } from './_rsaHelpers';
 import { isqrt, gcd } from '../utils/bigint';
 import { randomPrime } from '../utils/testcases/core';
 import { wrapSageTemplate, validateNumeric} from './guard';
@@ -8,9 +8,10 @@ export const attack: Attack = {
   id: 'euler',
   name: 'Euler Factorization',
   category: 'Factorization',
-  description: "Factors n by finding two distinct representations as a sum of squares a^2+b^2 = c^2+d^2 = n. Use when both primes are ≡ 1 (mod 4).",
+  description: "Factors n by finding two distinct representations as a sum of squares a^2+b^2 = c^2+d^2 = n. Precondition: both primes are 1 mod 4 (else n has no sum-of-squares representation). Use when both primes are ≡ 1 (mod 4).",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
+    { name: 'bound', label: 'bound (search iterations, default 20000000)', placeholder: '20000000', required: false, multiline: false },
   ],
   usageGuide: `Use when both prime factors are ≡ 1 (mod 4).
 
@@ -32,7 +33,8 @@ Tip: Only works when both primes ≡ 1 (mod 4). If either prime ≡ 3 (mod 4), u
         solutions = []
         a = 0
         a_sq = 0
-        max_iter = 20000000
+        bound_in = "${validateNumeric(vals.bound || '', 'bound')}".strip()
+        max_iter = int(bound_in) if bound_in.strip() else 20000000
         found = False
         while a < end and len(solutions) < 2:
             if a > max_iter:
@@ -85,12 +87,15 @@ Tip: Only works when both primes ≡ 1 (mod 4). If either prime ≡ 3 (mod 4), u
     try {
       const n = BigInt(vals.n);
       if (n < 2n) return Promise.resolve(null);
-      if (n % 2n === 0n) {
-        return Promise.resolve(`Euler Factorization\nn = ${n}\n\nResults:\np = 2\nq = ${n / 2n}\n\nVerification: p * q = ${n}\n\nEULER=SUCCESS`);
+      const tfactor = trivialFactor(n);
+      if (tfactor) {
+        return Promise.resolve(`Euler Factorization\nn = ${n}\n\nResults:\np = ${tfactor}\nq = ${n / tfactor}\n\nVerification: p * q = ${n}\n\nEULER=SUCCESS`);
       }
       const end = isqrt(n);
       const solutions: bigint[][] = [];
-      const maxIter = 20000000n;
+      const boundRaw = (vals.bound || '').trim();
+      const maxIter = boundRaw ? BigInt(boundRaw) : 20000000n;
+      if (maxIter < 1n || maxIter > 1000000000n) return Promise.resolve(null);
       let a2 = 0n; // tracks a^2 via recurrence: (a+1)^2 = a^2 + 2a + 1
       for (let a = 0n; a < end && solutions.length < 2; a++) {
         if (onProgress && a % 100000n === 0n) {

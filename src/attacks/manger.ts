@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { bitLength, rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 import { wrapSageTemplate, sanitizePython, validateNumeric} from './guard';
@@ -121,14 +121,14 @@ export const attack: Attack = {
 \\begin{itemize}
 \\item $c = m^e \\bmod n$ with OAEP padding; first byte must be $0x00$
 \\item Oracle $\\mathcal{O}(c') = 1$ iff plaintext's first byte is NOT $0x00$ (i.e., $m \\geq B$)
-\\item $B = 2^{8(k-1)} \\approx n/256$, where $k = \\lceil n/8 \\rceil$
+\\item $B = 2^{8(k-1)} \\approx n/256$, where $k = \\lceil \\log_{256} n \\rceil$
 \\end{itemize}
 
 \\textbf{Proof:}
 \\begin{align*}
 \\mathcal{O}(c) = 1 &\\iff m \\ge B = n/256 \\\\
-\\mathcal{O}(c \\cdot s^e) = 1 &\\implies m \\cdot s - rn < B \\quad \\text{for some } r \\\\
-m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{rn+B}{s} \\right) \\\\
+\\mathcal{O}(c \\cdot s^e) = 1 &\\implies m \\cdot s - rn \\ge B \\quad \\text{for some } r \\\\
+m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn+B}{s}, \\frac{rn+n}{s} \\right) \\\\
 \\text{Step 1: } &\\text{Find } f_1 = 2^t \\text{ with } \\mathcal{O}(c \\cdot f_1^e) = 1 \\\\
 \\text{Step 2: } &\\text{Find } f_2 \\text{ where } (f_2 \\cdot m \\bmod n) < B \\text{ (below OAEP boundary B)} \\\\
 \\text{Step 3: } &\\text{Binary search: } [a_{i+1}, b_{i+1}] \\subset [a_i, b_i] \\\\
@@ -138,7 +138,7 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{rn+B}{s} \\right) \\\
 \\textbf{Explanation:} Manger's attack has three phases. Step 1 doubles a multiplier $f$ until the blinded message $f \\cdot m \\bmod n$ exceeds $B$ (first byte nonzero). Step 2 adds $f/2$ increments until the value wraps past $n$ and falls below $B$ again. Step 3 performs a binary search, narrowing the interval by checking whether $f \\cdot m \\bmod n \\geq B$. The key insight is that the boundary $B$ partitions $[0, n)$ into exactly two contiguous segments, making this a textbook binary search problem. Unlike Bleichenbacher's attack which requires ~$2^{17}$ queries, Manger needs only $O(\\log n)$ queries.
 
 \\textbf{References:} J. Manger, "A Chosen Ciphertext Attack on RSA Optimal Asymmetric Encryption Padding (OAEP) as Standardized in PKCS#1 v2.0", CRYPTO 2001`,
-  usageGuide: 'This requires oracle_responses \u2014 a comma-separated list from an oracle that reveals whether the decrypted plaintext\'s first byte is NOT 0x00 (i.e., plaintext >= B where B = 2^(8*(k-1)), k = ceil(n.nbits()/8)).\n\nHow to use:\n1. Set up an oracle that returns 1 if decrypt(c\') has first byte NOT 0x00 (plaintext >= B), 0 otherwise\n2. Query the oracle for successive blinding values\n3. Provide n, e, c, and oracle_responses as comma-separated bits\n4. The attack narrows the message interval with each query\n\nTip: Manger\'s attack requires O(log n) oracle queries \u2014 significantly fewer than Bleichenbacher. The oracle boundary is B = 2^(8*(k-1)) \u2248 n/256, NOT n/2.',
+  usageGuide: 'This requires oracle_responses \u2014 a comma-separated list from an oracle that reveals whether the decrypted plaintext\'s first byte is NOT 0x00 (i.e., plaintext >= B where B = 2^(8*(k-1)), k = ceil(n.nbits()/8)).\n\nHow to use:\n1. Set up an oracle that returns 1 if decrypt(c\') has first byte NOT 0x00 (plaintext >= B), 0 otherwise\n2. Query the oracle for successive blinding values\n3. Provide n, e, c, and oracle_responses as comma-separated bits\n4. The attack narrows the message interval with each query\n\nExternal-query recipe (query-generator snippet): for successive blinding values f, send c\' = c * pow(f, e, n) % n and record oracle(c\') (1 = first byte NOT 0x00). Start f = 2, 4, 8, ... until the first 1 (Step 1), then follow Steps 2-3 from the proof panel, appending one bit per query.\n\nTip: Manger\'s attack requires O(log n) oracle queries \u2014 significantly fewer than Bleichenbacher. The oracle boundary is B = 2^(8*(k-1)) \u2248 n/256, NOT n/2.',
   frontendCheck: (vals: Record<string, string>): Promise<string | null> => {
     if (!vals.n || !vals.e || !vals.c || !vals.oracle_responses) return Promise.resolve(null);
     try {
@@ -149,7 +149,7 @@ m &\\in \\bigcup_{r=0}^{s-1} \\left[ \\frac{rn}{s}, \\frac{rn+B}{s} \\right) \\\
       const oracleBits: boolean[] = raw.map(x => x === '1');
       if (oracleBits.length === 0) return Promise.resolve(null);
 
-      const nBits = n.toString(2).length;
+      const nBits = bitLength(n);
       const k = Math.ceil(nBits / 8);
       const B = 1n << BigInt(8 * (k - 1));
       const twoB = 2n * B;
@@ -214,7 +214,7 @@ export const generateTestcase = (): Record<string, string> => {
   // Use small primes (12-bit → n ≈ 24 bits) so the attack completes in SageMathCell's 120s timeout.
   const { n, e, d } = generateKeyPair(12, 12);
   // k = byte length, B = 2^(8*(k-1))
-  const k = Math.ceil(Number(n.toString(2).length) / 8);
+  const k = Math.ceil(bitLength(n) / 8);
   const B = BigInt(2) ** BigInt(8 * (k - 1));
 
   // m must be < B (OAEP format: first byte 0x00)

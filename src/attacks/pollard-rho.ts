@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { trivialFactor, rsaNeeds } from './_rsaHelpers';
 import { gcd } from '../utils/bigint';
 import { randomPrime } from '../utils/testcases/core';
 import { wrapSageTemplate, validateNumeric} from './guard';
@@ -87,8 +87,9 @@ Tip: Expected runtime is O(n^{1/4}) per factor. Good for factors up to ~30 digit
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
-      if (n % 2n === 0n) {
-        return Promise.resolve(`Pollard's Rho (Brent variant)\nn = ${n}\n\nResults:\np = 2\nq = ${n / 2n}\n\nVerification: p * q = ${n}\n\nPOLLARD_RHO=SUCCESS`);
+      const tfactor = trivialFactor(n);
+      if (tfactor) {
+        return Promise.resolve(`Pollard's Rho (Brent variant)\nn = ${n}\n\nResults:\np = ${tfactor}\nq = ${n / tfactor}\n\nVerification: p * q = ${n}\n\nPOLLARD_RHO=SUCCESS`);
       }
       let totalProgressCalls = 0;
       for (let c = 1n; c < 10n; c++) {

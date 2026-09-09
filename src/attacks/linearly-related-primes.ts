@@ -1,6 +1,6 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
-import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
+import { randomPrime, isPrimeMR } from '../utils/testcases/core';
 import { isqrt } from '../utils/bigint';
 import { wrapSageTemplate, validateNumeric} from './guard';
 
@@ -54,7 +54,43 @@ export const attack: Attack = {
                             found = True
                             break
             if not found:
-                out.append("LINEARLY_RELATED_PRIMES=FAILED: no valid factorization found")`,
+                # Coppersmith fallback for |delta| >= 10^6: p ~= sqrt(n/k), so
+                # write p = p0 + x with p0 = isqrt(n/k). Then f(x) = k*(p0+x)^2 - n
+                # has the small root x0 = p - p0 modulo p (approximate-divisor
+                # Coppersmith, beta = 1/2). Covers offsets far beyond the loop.
+                try:
+                    p0 = Integer(n // k).isqrt()
+                    Rlr = PolynomialRing(Zmod(n))
+                    xlr = Rlr.gen()
+                    f_lr = k * (p0 + xlr) ** 2 - n
+                    try:
+                        f_lr = f_lr.monic()
+                    except Exception:
+                        pass
+                    X_lr = Integer(n).nth_root(8, truncate_mode=True)[0] + 1
+                    for r_lr in f_lr.small_roots(X=X_lr, beta=0.5, epsilon=0.05):
+                        p_cand = int(p0 + r_lr)
+                        if p_cand > 1 and n_int % p_cand == 0:
+                            p_sage = Integer(p_cand)
+                            q_sage = n // p_sage
+                            out.append("Linearly Related Primes (Coppersmith fallback)")
+                            out.append(f"n = {n}")
+                            out.append(f"k = {k}")
+                            out.append("")
+                            out.append("Results:")
+                            out.append(f"p = {p_sage}")
+                            out.append(f"q = {q_sage}")
+                            out.append("")
+                            out.append(f"Verification: p * q = {p_sage * q_sage}")
+                            out.append("")
+                            out.append("LINEARLY_RELATED_PRIMES=SUCCESS")
+                            found = True
+                            break
+                except Exception as ex_lr:
+                    out.append(f"Coppersmith fallback failed: {ex_lr}")
+            if not found:
+                out.append("LINEARLY_RELATED_PRIMES=FAILED: no valid factorization found")
+                out.append("Crossover: |delta| >= 10^6 needs p within n^{1/8} of sqrt(n/k) for the lattice above; otherwise use Partial p/q Bits (known MSBs) or ECM.")`,
   }),
   frontendCheck: (vals, onProgress) => {
     if (!vals.n || !vals.k) return Promise.resolve(null);
@@ -112,13 +148,16 @@ p &= \\frac{-\\delta + \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
 \\end{itemize}
 
 \\textbf{References:} A. Nitaj, "Cryptanalysis of RSA with Constrained Primes", 1999`,
-  usageGuide: 'This attack factors n when the two primes are linearly related: q = k*p + δ for known k.\n\nHow to use:\n1. You know that n = p*q where q = k*p + δ for some known multiplier k and small unknown δ\n2. Provide n and k\n3. The attack solves the quadratic equation k*p^2 + δ*p - n = 0 to recover p\n\nTip: This is common in CTF challenges or badly generated keys. Setting k=1 gives the classic twin-prime case (p = q + δ). For p = a*q + b form, try inverting the relationship.',
+  usageGuide: 'This attack factors n when the two primes are linearly related: q = k*p + δ for known k.\n\nHow to use:\n1. You know that n = p*q where q = k*p + δ for some known multiplier k and small unknown δ\n2. Provide n and k\n3. The attack solves the quadratic equation k*p^2 + δ*p - n = 0 to recover p\n\nCrossover: the direct loop covers |delta| < 10^6; beyond that Sage tries a Coppersmith lattice on k*(p0+x)^2 - n (needs p within ~n^{1/8} of sqrt(n/k)), else use Partial p/q Bits (known MSBs) or ECM. Tip: This is common in CTF challenges or badly generated keys. Setting k=1 gives the classic twin-prime case (p = q + δ). For p = a*q + b form, try inverting the relationship.',
   priority: 'medium',
   applicableCheck: rsaNeeds.nEK,
 };
 
 export const generateTestcase = (): Record<string, string> => {
-  const p = randomPrime(TESTCASE_BITS.p);
+  // Small-case sizing (p ~96-bit): the browser delta scan is +-10^6 isqrt
+  // steps, ~50x cheaper per step here than at 512-bit. k and the delta shape
+  // match the full-size attack; only the prime width is reduced.
+  const p = randomPrime(96);
   // Vary k to test general linear relationship: q = k·p + δ
   const r = Math.random();
   const k = r < 0.4 ? 1n : r < 0.7 ? 2n : 3n;

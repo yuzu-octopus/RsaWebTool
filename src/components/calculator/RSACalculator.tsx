@@ -26,7 +26,7 @@ const EXPLANATION_LATEX =
 'Public key: $(e, n)$ \u00a0 Private key: $(d, n)$.\n\n' +
 '\\textbf{Encryption:}\n\n' +
 '$c \\equiv m^e \\pmod{n}$\n\n' +
-'$m$ is the plaintext as an integer $0 < m < n$.\n\n' +
+'$m$ is the plaintext as an integer $0 \\leq m < n$ (any residue class mod $n$; $\\gcd(m, n) = 1$ is needed only for decryption via Euler\'s theorem to round-trip through $\\varphi(n)$).\n\n' +
 '\\textbf{Decryption:}\n\n' +
 '$m \\equiv c^d \\pmod{n}$\n\n' +
 'This works because $e \\cdot d \\equiv 1 \\pmod{\\varphi(n)}$, so $m^{e \\cdot d} \\equiv m \\pmod{n}$ by Euler\'s theorem.\n\n' +
@@ -50,7 +50,7 @@ const EXPLANATION_LATEX =
 '\\item \\textbf{Common Modulus:} Same $n$, different $e_1, e_2$. If $\\gcd(e_1, e_2) = 1$, find $a e_1 + b e_2 = 1$ via extended GCD, then $m = c_1^a \\cdot c_2^b \\bmod n$.\n' +
 '\\item \\textbf{Wiener\'s Attack:} When $d < \\frac{1}{3} n^{1/4}$, continued fractions on $e/n$ recover $d$ directly.\n' +
 '\\item \\textbf{Hastad\'s Broadcast:} Same $m$ encrypted to $k \\geq e$ recipients with the same $e$ — CRT recovers $m^e$, then take $e$th root.\n' +
-'\\item \\textbf{Coppersmith:} Partial knowledge of $p$ or small roots of $f(x) \\equiv 0 \\pmod{p}$ using LLL/Howgrave-Graham.\n' +
+'\\item \\textbf{Coppersmith:} Partial knowledge of $p$ ($|x| < n^{1/4}$ unknown, see Partial Key Exposure / Partial p/q Bits) or small roots $|x_0| < n^{1/e}$ of $f(x) \\equiv 0 \\pmod{n}$ (see Stereotyped Message) using LLL/Howgrave-Graham. Broadcast $m^e < \\prod n_i$ recovers by CRT integer root (see Hastad\'s Broadcast, Small Public Exponent).\n' +
 '\\end{itemize}';
 
 function ExplanationTab() {

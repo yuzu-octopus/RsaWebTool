@@ -35,6 +35,10 @@ print("HOMOMORPHIC_FORGERY=FAILED")`;
             if not pairs_str:
                 out.append("ERROR: Empty oracle_pairs")
                 found = False
+            elif len([p for p in pairs_str.split(';') if p.strip()]) > 30:
+                out.append("ERROR: oracle_pairs exceeds the 30-pair cap (meet-in-the-middle is 2^(n/2) per half)")
+                out.append("HOMOMORPHIC_FORGERY=FAILED")
+                found = False
             else:
                 oracle_pairs = []
                 for pair in pairs_str.split(';'):
@@ -232,7 +236,7 @@ s^* &= s_1 \\cdot s_2 \\bmod n \\\\
 \\end{itemize}
 
 \\textbf{References:} Rivest, Shamir, Adleman, 1978; Boneh, "Twenty Years of Attacks on RSA," 1999`,
-  usageGuide: 'This attack exploits RSA\'s multiplicative homomorphism to forge signatures from known oracle pairs.\n\nHow to use:\n1. Obtain oracle pairs (m_i, s_i) where s_i is a valid signature on m_i under the target public key\n2. Provide n, e, target_m (message to forge), and oracle_pairs formatted as "m1,s1;m2,s2;..."\n3. The attack uses meet-in-the-middle: split oracle pairs into two halves, build a product hash map for the right half, then search the left half for matching complements. This reduces the 2^n search to 2^(n/2+1) operations.\n\nTip: The more oracle pairs you have, the more likely you can factor target_m into a subset product. Up to 30 pairs supported (2^15 + 2^15 ≈ 65K operations). Modern RSA with OAEP/PSS padding prevents this attack.',
+  usageGuide: 'This attack exploits RSA\'s multiplicative homomorphism to forge signatures from known oracle pairs.\n\nHow to use:\n1. Obtain oracle pairs (m_i, s_i) where s_i is a valid signature on m_i under the target public key\n2. Provide n, e, target_m (message to forge), and oracle_pairs formatted as "m1,s1;m2,s2;..."\n3. The attack uses meet-in-the-middle: split oracle pairs into two halves, build a product hash map for the right half, then search the left half for matching complements. This reduces the 2^n search to 2^(n/2+1) operations.\n\nTip: The more oracle pairs you have, the more likely you can factor target_m into a subset product. Up to 30 pairs supported in both browser and Sage (2^15 + 2^15 ≈ 65K operations); larger sets are rejected with HOMOMORPHIC_FORGERY=FAILED. See also Blinding Decryption Bypass (chosen-ciphertext decryption via a signing oracle) and Signature-Parameter Forgery (degenerate e=1/crafted-n parameters). Modern RSA with OAEP/PSS padding prevents this attack.',
   priority: 'low',
   applicableCheck: rsaNeeds.nETargetMOraclePairs,
 };

@@ -7,7 +7,7 @@ export const attack: Attack = {
   id: 'squfof',
   name: 'SQUFOF',
   category: 'Factorization',
-  description: "Factors n by finding a square form in the cycle of reduced binary quadratic forms. Use for n < 10^14 (faster than trial division for medium-sized factors).",
+  description: "Factors n with a small factor fast: batched trial division to 200000 catches any small factor of any n; the SQUFOF square-form core covers ~47-bit balanced semiprimes.",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
@@ -18,7 +18,7 @@ How to use:
 2. SQUFOF searches for a square form in the cycle of reduced binary quadratic forms
 3. Very fast for its range — no lattice or smoothness search needed
 
-Tip: Limited to n < 10^14. For larger numbers, use Pollard's rho or ECM. Works best when factors are roughly equal in size.`,
+Tip: Any factor <= 200000 is caught by the batched trial-division preamble regardless of n size; the SQUFOF core itself handles balanced semiprimes to ~47 bits (n < 10^14). For larger balanced n, use Pollard's rho or ECM.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'SQUFOF',
     n: validateNumeric(vals.n, 'n'),

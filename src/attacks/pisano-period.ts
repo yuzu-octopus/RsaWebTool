@@ -1,6 +1,7 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { modPow, gcd, isqrt } from '../utils/bigint';
+import { trivialFactor } from './_rsaHelpers';
 import { randomPrime } from '../utils/testcases/core';
 import { wrapSageTemplate, validateNumeric} from './guard';
 
@@ -44,23 +45,24 @@ function lcm(a: bigint, b: bigint): bigint {
 
 export const attack: Attack = {
   id: 'pisano-period',
-  name: 'Pisano Period Factorization',
+  name: 'Multiplicative Order',
   category: 'Factorization',
-  description: 'Factors n via birthday collision on 2^x mod n using multiplicative period search. Use for small moduli under 64 bits.',
+  description: 'Factors n via the multiplicative order ord_n(2), splitting with gcd(2^{ord/2} +/- 1, n) when ord is even. Use for small moduli (practical while ord_2(n) <= ~2·10^5, roughly <= 40-bit n).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  usageGuide: `Use for small moduli (under 64 bits) when other methods are overkill.
+  usageGuide: `Use for small moduli (roughly <= 40 bits, or any n with ord_2(n) <= ~200000) when other methods are overkill.
 
 How to use:
 1. Provide n (the modulus)
-2. The attack finds the multiplicative order of 2 mod n via birthday collision
-3. The period reveals factor information through GCD
+2. The attack finds the multiplicative order ord = ord_n(2) by iterating 2^i mod n (capped at 200000 steps)
+3. When ord is even, gcd(2^{ord/2} - 1, n) and gcd(2^{ord/2} + 1, n) split n whenever the orders mod p and mod q differ in 2-adicity; otherwise candidate phi multiples are tried as before
 
 Tip: Fast for small moduli. For larger numbers, use Pollard's rho, ECM, or other general-purpose methods.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'PISANO_PERIOD',
     n: validateNumeric(vals.n, 'n'),
+    imports: ['import math'],
     useGuard: true,
     body: `        out.append("Pisano Period Factorization")
         out.append(f"n = {n}")
@@ -74,7 +76,26 @@ Tip: Fast for small moduli. For larger numbers, use Pollard's rho, ECM, or other
             pow_val = (pow_val * 2) % n_int  # recurrence instead of pow(2, i, n)
             val = (pow_val - 1) % n_int
             if val == 0:
-                phi_guess = i + 1
+                ord_n = i + 1
+                if ord_n % 2 == 0:
+                    half = pow(2, ord_n // 2, n_int)
+                    for g in (math.gcd(half - 1, n_int), math.gcd(half + 1, n_int)):
+                        if 1 < g < n_int:
+                            p_factor = Integer(g)
+                            q_factor = n // p_factor
+                            out.append("Results:")
+                            out.append(f"p = {p_factor}")
+                            out.append(f"q = {q_factor}")
+                            out.append("")
+                            out.append(f"Verification: p * q = {p_factor * q_factor}")
+                            out.append(f"Multiplicative order ord_n(2): {ord_n}")
+                            out.append("")
+                            out.append("PISANO_PERIOD=SUCCESS")
+                            found = True
+                            break
+                    if found:
+                        break
+                phi_guess = ord_n
                 if phi_guess % 2 == 0:
                     s = n - phi_guess + 1
                     disc = s*s - 4*n
@@ -132,8 +153,9 @@ Tip: Fast for small moduli. For larger numbers, use Pollard's rho, ECM, or other
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
-      if (n % 2n === 0n) {
-        return Promise.resolve(`Pisano Period Factorization\nn = ${n}\n\nResults:\np = 2\nq = ${n / 2n}\n\nVerification: p * q = ${n}\n\nPISANO_PERIOD=SUCCESS`);
+      const tf = trivialFactor(n);
+      if (tf) {
+        return Promise.resolve(`Multiplicative Order\nn = ${n}\n\nResults:\np = ${tf}\nq = ${n / tf}\n\nVerification: p * q = ${n}\n\nPISANO_PERIOD=SUCCESS`);
       }
       const seen = new Map<bigint, bigint>();
       let pow_val = 1n;
@@ -145,6 +167,20 @@ Tip: Fast for small moduli. For larger numbers, use Pollard's rho, ECM, or other
         }
         const val = pow_val === 0n ? n - 1n : pow_val - 1n;
         if (val === 0n && i > 0n) {
+          // Full period found: ord_n(2) = i. When even, 2^{ord/2} is a
+          // square root of 1 mod n that is +/-1 mod p but not mod q (when
+          // the mod-p and mod-q orders differ in 2-adicity), so the gcds split n.
+          if (i % 2n === 0n) {
+            const half = modPow(2n, i / 2n, n);
+            for (const g of [gcd(half - 1n, n), gcd(half + 1n, n)]) {
+              if (g > 1n && g < n) {
+                const p = g < n / g ? g : n / g;
+                const q = n / p;
+                onProgress?.(100);
+                return Promise.resolve(`Multiplicative Order\nn = ${n}\n\nResults:\np = ${p}\nq = ${q}\n\nVerification: p * q = ${p * q}\nMultiplicative order ord_n(2): ${i}\n\nPISANO_PERIOD=SUCCESS`);
+              }
+            }
+          }
           const s = n - i + 1n;
           const disc = s * s - 4n * n;
           if (disc >= 0n) {
@@ -154,7 +190,7 @@ Tip: Fast for small moduli. For larger numbers, use Pollard's rho, ECM, or other
               const q = (s + t) / 2n;
               if (p > 1n && q > 1n && p * q === n) {
                 onProgress?.(100);
-                return Promise.resolve(`Pisano Period Factorization\nn = ${n}\n\nResults:\np = ${p}\nq = ${q}\n\nVerification: p * q = ${p * q}\nPeriod length: ${i}\n\nPISANO_PERIOD=SUCCESS`);
+                return Promise.resolve(`Multiplicative Order\nn = ${n}\n\nResults:\np = ${p}\nq = ${q}\n\nVerification: p * q = ${p * q}\nPeriod length: ${i}\n\nPISANO_PERIOD=SUCCESS`);
               }
             }
           }
@@ -175,7 +211,7 @@ Tip: Fast for small moduli. For larger numbers, use Pollard's rho, ECM, or other
               const q = (s + t) / 2n;
               if (p > 1n && q > 1n && p * q === n) {
                 onProgress?.(100);
-                return Promise.resolve(`Pisano Period Factorization\nn = ${n}\n\nResults:\np = ${p}\nq = ${q}\n\nVerification: p * q = ${p * q}\nPeriod length: ${period}\n\nPISANO_PERIOD=SUCCESS`);
+                return Promise.resolve(`Multiplicative Order\nn = ${n}\n\nResults:\np = ${p}\nq = ${q}\n\nVerification: p * q = ${p * q}\nPeriod length: ${period}\n\nPISANO_PERIOD=SUCCESS`);
               }
             }
           }
@@ -190,6 +226,7 @@ Tip: Fast for small moduli. For larger numbers, use Pollard's rho, ECM, or other
 
 \\textbf{Setup:}
 \\begin{itemize}
+\\item $\\operatorname{ord}_n(2)$ is the least $t > 0$ with $2^t \\equiv 1 \\pmod{n}$ (exists iff $\\gcd(2,n)=1$); order-finding is capped at $2 \\cdot 10^5$ steps (practical to roughly 40-bit $n$)
 \\item Let $f(x) = 2^x - 1 \\pmod{n}$ for $x = 0, 1, 2, \\ldots$
 \\item Birthday paradox: collision $f(i) = f(j)$ expected in $O(\\sqrt{\\operatorname{ord}_n(2)})$ steps
 \\end{itemize}
@@ -203,7 +240,7 @@ f(i) = f(j) &\\implies 2^i \\equiv 2^j \\pmod{n} \\\\
 p,q &= \\frac{n - \\phi + 1 \\pm \\sqrt{(n - \\phi + 1)^2 - 4n}}{2} \\qed
 \\end{align*}
 
-\\textbf{Explanation:} The Pisano period attack tracks $2^i \\bmod n$ via recurrence ($v_{i+1} = 2 \\cdot v_i \\bmod n$). When a value repeats, the index difference is a multiple of the multiplicative order of 2 modulo $n$, which divides $\\lambda(n)$. Each candidate $\\phi$ is tested by checking whether the quadratic discriminant is a perfect square.
+\\textbf{Explanation:} The multiplicative-order attack tracks; when the full period is even, gcd(2^{ord/2} +- 1, n) splits n whenever the mod-p and mod-q orders differ in 2-adicity. Otherwise the period attack tracks $2^i \\bmod n$ via recurrence ($v_{i+1} = 2 \\cdot v_i \\bmod n$). When a value repeats, the index difference is a multiple of the multiplicative order of 2 modulo $n$, which divides $\\lambda(n)$. Each candidate $\\phi$ is tested by checking whether the quadratic discriminant is a perfect square.
 
 \\textbf{References:} Wuliangshun, "Integer Factorization With Pisano Period", IEEE Access, 2019`,
   priority: 'medium',

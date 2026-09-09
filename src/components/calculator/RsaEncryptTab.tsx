@@ -18,7 +18,9 @@ export function RsaEncryptTab() {
     out.clear();
     const mn = parseBigInt(m);
     const nn = parseBigInt(n);
-    const en = parseBigInt(e) || 65537n;
+    // Magic auto-detect: blank e defaults to 65537; an explicit e=0 must hit
+    // validation below (hence ??, not || — 0n is falsy but meaningful).
+    const en = parseBigInt(e) ?? 65537n;
 
     if (mn === null || nn === null) {
       out.dispatchError('m and n must be valid numbers (e defaults to 65537)');

@@ -17,7 +17,7 @@ export const attack: Attack = {
   inputs: [
     { name: 'n_values', label: 'Moduli (one per line)', placeholder: 'Enter multiple moduli, one per line...', multiline: true, rows: 6 },
   ],
-  usageGuide: `Use when you need to find which specific pairs of moduli share prime factors.
+  usageGuide: `See also: Batch GCD and Common Prime RSA (same shared-prime family). Use when you need to find which specific pairs of moduli share prime factors.
 
 How to use:
 1. Enter multiple moduli, one per line

@@ -10,7 +10,7 @@ import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { ResultBox } from './_shared/ResultBox';
 
 export function RsaDecryptTab() {
-  const [form, setForm] = useState({ c: '', n: '', d: '', p: '', q: '', e: '' });
+  const [form, setForm] = useState({ c: '', n: '', d: '', p: '', q: '', e: '', dp: '', dq: '', qinv: '' });
   const out = useCalculatorOutput({ category: 'calculator-rsa' });
 
   useEffect(() => {
@@ -29,6 +29,9 @@ export function RsaDecryptTab() {
     let nn = parseBigInt(form.n);
     let pn = parseBigInt(form.p);
     let qn = parseBigInt(form.q);
+    const dpn = parseBigInt(form.dp);
+    const dqn = parseBigInt(form.dq);
+    const qinvn = parseBigInt(form.qinv);
     const en = parseBigInt(form.e);
     const dn = parseBigInt(form.d);
 
@@ -40,10 +43,23 @@ export function RsaDecryptTab() {
     // Derive missing n, p, or q from the other two (any 2 of p, q, n)
     if (nn === null && pn !== null && qn !== null) {
       nn = pn * qn;
-    } else if (qn === null && nn !== null && pn !== null && nn % pn === 0n) {
+    } else if (qn === null && nn !== null && pn !== null) {
+      if (pn === 0n || nn % pn !== 0n) {
+        out.dispatchError('p does not divide n (p·q != n)');
+        return;
+      }
       qn = nn / pn;
-    } else if (pn === null && nn !== null && qn !== null && nn % qn === 0n) {
+    } else if (pn === null && nn !== null && qn !== null) {
+      if (qn === 0n || nn % qn !== 0n) {
+        out.dispatchError('q does not divide n (p·q != n)');
+        return;
+      }
       pn = nn / qn;
+    }
+    // Triple validation: when all three are present they must agree.
+    if (nn !== null && pn !== null && qn !== null && pn * qn !== nn) {
+      out.dispatchError('p·q != n: the provided factors disagree with the modulus');
+      return;
     }
 
     if (nn === null) {
@@ -61,8 +77,23 @@ export function RsaDecryptTab() {
 
     let m: bigint | null = null;
 
-    if (dn !== null && dn > 0n) {
+    if (dn !== null) {
+      if (dn <= 0n) {
+        out.dispatchError('d must be positive (got d <= 0)');
+        return;
+      }
       m = modPow(cn, dn, nn);
+    }
+
+    // CRT path: dp/dq/qinv with p, q (Garner: m = mq + q·(qinv·(mp − mq) mod p)).
+    if (m === null && pn !== null && qn !== null && dpn !== null && dqn !== null && qinvn !== null) {
+      if (dpn <= 0n || dqn <= 0n) {
+        out.dispatchError('dp and dq must be positive');
+        return;
+      }
+      const mp = modPow(cn % pn, dpn, pn);
+      const mq = modPow(cn % qn, dqn, qn);
+      m = (mq + qn * (((qinvn * (mp - mq)) % pn + pn) % pn)) % nn;
     }
 
     if (m === null && pn !== null && qn !== null && en !== null && en > 0n) {
@@ -140,6 +171,27 @@ export function RsaDecryptTab() {
           onChange={v => setForm(prev => ({ ...prev, e: v }))}
           width="100%"
         />
+        <Text type="supporting">Optional CRT parameters (dp, dq, qinv) decrypt via Garner instead of d.</Text>
+        <Stack direction="horizontal" gap={1}>
+          <TextInput
+            label="dp (d mod p-1)"
+            value={form.dp}
+            onChange={v => setForm(prev => ({ ...prev, dp: v }))}
+            width="100%"
+          />
+          <TextInput
+            label="dq (d mod q-1)"
+            value={form.dq}
+            onChange={v => setForm(prev => ({ ...prev, dq: v }))}
+            width="100%"
+          />
+          <TextInput
+            label="qinv (q^-1 mod p)"
+            value={form.qinv}
+            onChange={v => setForm(prev => ({ ...prev, qinv: v }))}
+            width="100%"
+          />
+        </Stack>
       </Stack>
       <Button
         label="Decrypt"

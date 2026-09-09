@@ -82,8 +82,11 @@ export function encrypt(m: bigint, n: bigint, e: bigint): bigint {
   return modPow(m, e, n);
 }
 
-// Testcase generation defaults — change here to affect ALL attacks
-export const TESTCASE_BITS = { p: 512, q: 512 }; // n ≈ 1024-bit (crackable in ~hours with GNFS, but realistic for CTF/test)
+// Testcase generation defaults — change here to affect ALL attacks.
+// 1024-bit n is representative of real RSA sizing (not of real RSA security
+// practice); per-attack generators below use smaller sizes where the browser
+// or SageCell needs tractability, documented at each site.
+export const TESTCASE_BITS = { p: 512, q: 512 };
 
 
 // ─── Edge-case testcase generators ──────────────────────────────────────

@@ -1,13 +1,14 @@
 import type { Attack } from '../types';
 import { rsaNeeds } from './_rsaHelpers';
 import { generateWienerTestcase } from '../utils/testcases/core';
+import { wienerAttack } from '../utils/bigint';
 import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
   id: 'boneh-durfee',
-  name: 'Boneh-Durfee Attack',
+  name: 'Boneh-Durfee Attack (d < n^0.26)',
   category: 'Factorization',
-  description: 'Recovers d when d < n^0.292 via Wiener continued fractions (d < n^0.25) or the Boneh-Durfee lattice heuristic (implemented escalation targets d < n^0.260). Use for unbalanced private exponents.',
+  description: 'Recovers d when d < n^0.26 via Wiener continued fractions (d < n^0.25) or the Boneh-Durfee lattice heuristic (theory to d < n^0.292; implemented (m, t) escalation targets d < n^0.260). Use for unbalanced private exponents.',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
@@ -210,6 +211,38 @@ p,q &= \\frac{(p+q) \\pm \\sqrt{(p+q)^2 - 4n}}{2}
 \\end{itemize}
 
 \\textbf{References:} M. Wiener, CRYPTO 1990; D. Boneh, G. Durfee, CRYPTO 1999`,
+  frontendCheck: (vals) => {
+    if (!vals.n || !vals.e) return Promise.resolve(null);
+    try {
+      const n = BigInt(vals.n);
+      const e = BigInt(vals.e);
+      if (n <= 0n || e < 2n) return Promise.resolve(null);
+      // Phase 1 in the browser: Wiener continued fractions cover d < n^0.25
+      // instantly. Anything larger falls through (null) to the Sage lattice.
+      const hit = wienerAttack(n, e);
+      if (!hit) return Promise.resolve(null);
+      const { p, q, d } = hit;
+      return Promise.resolve(
+        [
+          'Boneh-Durfee Attack (Wiener phase)',
+          `n = ${n}`,
+          `e = ${e}`,
+          '',
+          'Results:',
+          `p = ${p}`,
+          `q = ${q}`,
+          '',
+          `Verification: p * q = ${p * q}`,
+          `d = ${d}`,
+          '',
+          'BONEH_DURFEE=SUCCESS',
+        ].join('\n'),
+      );
+    } catch (err) {
+      console.warn('[boneh-durfee] frontendCheck error:', err);
+      return Promise.resolve(null);
+    }
+  },
   priority: 'high',
   applicableCheck: rsaNeeds.nE,
 };

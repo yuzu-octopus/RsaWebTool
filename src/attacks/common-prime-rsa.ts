@@ -22,7 +22,7 @@ How to use:
 2. The attack computes gcd(n1, n2) to find the shared prime
 3. Both moduli are then fully factored
 
-Tip: This happens when RNG failures cause the same prime to be reused across key generations. Very fast — a single GCD call.`,
+See also: Batch GCD (many-moduli product method) and Multi-Prime GCD. Tip: This happens when RNG failures cause the same prime to be reused across key generations. Very fast — a single GCD call.`,
   proof: `\\textbf{Theorem:} If $n_1 = p \\cdot q_1$ and $n_2 = p \\cdot q_2$ share a prime $p$, then $\\gcd(n_1, n_2) = p$.
 
 \\textbf{Setup:}
@@ -41,7 +41,7 @@ The GCD extracts the shared prime directly — no factorization of either modulu
 
 \\textbf{Explanation:} This is a simpler, two-modulus variant of the Batch GCD attack. When two RSA keys were generated on the same machine or with a shared entropy source, they may share a prime factor. Computing the GCD of the two moduli instantly recovers the shared prime, fully factoring both keys.
 
-\\textbf{References:} A. K. Lenstra et al., "Ron was wrong, Whit is right" (2012) — found 0.2\\% of RSA keys shared factors`,
+\\textbf{References:} N. Heninger et al., "Mining Your Ps and Qs: Detection of Widespread Weak Keys in Network Devices", USENIX Security 2012 — found 0.2\\% of RSA keys shared factors`,
   priority: 'high',
   applicableCheck: rsaNeeds.n1N2,
   frontendCheck: (vals: Record<string, string>) => {

@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { gcdSetScan, rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, TESTCASE_BITS } from '../utils/testcases/core';
-import { gcd, modPow } from '../utils/bigint';
+import { modInverse, modPow } from '../utils/bigint';
 import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
@@ -14,6 +14,7 @@ export const attack: Attack = {
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
     { name: 'dp', label: 'dp (d mod p-1)', placeholder: 'Enter dp value...', multiline: true, rows: 3 },
     { name: 'dq', label: 'dq (d mod q-1, optional)', placeholder: 'Enter dq value...', required: false, multiline: true, rows: 3 },
+    { name: 'qinv', label: 'qinv (q^-1 mod p, optional)', placeholder: 'Enter qinv value...', required: false, multiline: true, rows: 3 },
   ],
   frontendCheck: (vals: Record<string, string>) => {
     try {
@@ -29,14 +30,8 @@ export const attack: Attack = {
         if (dp > 0n) {
           const exp = e * dp - 1n;
           if (exp > 0n) {
-            for (const base of bases) {
-              const x = modPow(base, exp, n);
-              const p = gcd(x - 1n, n);
-              if (p > 1n && p < n) {
-                const q = n / p;
-                return `DP-DQ Leak\nn = ${n.toString()}\ne = ${e.toString()}\ndp = ${dp.toString()}\n\nResults:\np = ${p.toString()}\nq = ${q.toString()}\n\nVerification: p * q = ${(p * q).toString()}\n\nDP_DQ_LEAK=SUCCESS`;
-              }
-            }
+            const split = gcdSetScan(n, bases.map((base) => modPow(base, exp, n) - 1n));
+            if (split) return dpDqSuccess(n, e, vals, split.factor, n / split.factor);
           }
         }
       }
@@ -46,14 +41,26 @@ export const attack: Attack = {
         if (dq > 0n) {
           const exp = e * dq - 1n;
           if (exp > 0n) {
-            for (const base of bases) {
-              const x = modPow(base, exp, n);
-              const q = gcd(x - 1n, n);
-              if (q > 1n && q < n) {
-                const p = n / q;
-                return `DP-DQ Leak\nn = ${n.toString()}\ne = ${e.toString()}\ndq = ${dq.toString()}\n\nResults:\np = ${p.toString()}\nq = ${q.toString()}\n\nVerification: p * q = ${(p * q).toString()}\n\nDP_DQ_LEAK=SUCCESS`;
-              }
-            }
+            const split = gcdSetScan(n, bases.map((base) => modPow(base, exp, n) - 1n));
+            if (split) return dpDqSuccess(n, e, vals, n / split.factor, split.factor);
+          }
+        }
+      }
+
+      // Partial-dp k-iteration primality mode: when every FLT base gives the
+      // trivial gcd, e*dp - 1 = k*(p-1) still yields p = (e*dp-1)/k + 1 for the
+      // true k. Scan k = 1..min(e, 10^6), testing primality-divisibility.
+      const kCap = e < 1000000n ? e : 1000000n;
+      for (const key of ['dp', 'dq']) {
+        if (!vals[key]) continue;
+        const dval = BigInt(vals[key]);
+        if (dval <= 0n) continue;
+        const num = e * dval - 1n;
+        for (let k = 1n; k <= kCap; k++) {
+          if (num % k !== 0n) continue;
+          const pCand = num / k + 1n;
+          if (pCand > 1n && pCand < n && n % pCand === 0n) {
+            return dpDqSuccess(n, e, vals, pCand, n / pCand);
           }
         }
       }
@@ -109,6 +116,8 @@ export const attack: Attack = {
                         if 1 < q_candidate < n_int:
                             p_val = n // Integer(q_candidate)
                             q_sage = Integer(q_candidate)
+                            p_sage = p_val
+                            q_val = q_sage
                             out.append("DP-DQ Leak")
                             out.append(f"n = {n}")
                             out.append(f"e = {e}")
@@ -134,6 +143,47 @@ export const attack: Attack = {
             n_int = int(n)
             e_int = int(e)
             found = False${dpBlock}${dqBlock}
+            if not found:
+                # Partial-dp k-iteration primality mode: e*dval - 1 = k*(p-1).
+                k_cap = min(e_int, 1000000)
+                for key in ('dp', 'dq'):
+                    if found:
+                        break
+                    d_str = "${validateNumeric(vals.dp || '', 'dp')}" if key == 'dp' else "${validateNumeric(vals.dq || '', 'dq')}"
+                    if not d_str.strip():
+                        continue
+                    d_val = int(Integer(d_str))
+                    if d_val <= 0:
+                        continue
+                    num = e_int * d_val - 1
+                    for k_cand in range(1, k_cap + 1):
+                        if num % k_cand != 0:
+                            continue
+                        p_cand = num // k_cand + 1
+                        if 1 < p_cand < n_int and n_int % p_cand == 0:
+                            p_sage = Integer(p_cand)
+                            q_val = n // p_sage
+                            out.append("DP-DQ Leak (k-iteration fallback)")
+                            out.append(f"n = {n}")
+                            out.append(f"e = {e}")
+                            out.append(f"{key} = {d_val}")
+                            out.append("")
+                            out.append("Results:")
+                            out.append(f"p = {p_sage}")
+                            out.append(f"q = {q_val}")
+                            out.append("")
+                            out.append(f"Verification: p * q = {p_sage * q_val}")
+                            out.append("")
+                            out.append("DP_DQ_LEAK=SUCCESS")
+                            found = True
+                            break
+            qinv_str = "${validateNumeric(vals.qinv || '', 'qinv')}".strip()
+            if found and qinv_str:
+                try:
+                    qinv_chk = Integer(qinv_str)
+                    out.append(f"qinv cross-check: {(q_val * qinv_chk) % p_sage}")
+                except Exception:
+                    pass
         if not found:
             out.append("DP_DQ_LEAK=FAILED")`,
       useGuard: true,
@@ -163,14 +213,36 @@ q &\\nmid b^{e d_p - 1} - 1 \\quad \\text{(in general, with high probability)} \
 \\end{itemize}
 
 \\textbf{References:} Standard RSA-CRT analysis; M. Campagna, A. Sethi, "Key Recovery Method for CRT Implementation of RSA"`,
-  usageGuide: 'This attack factors n using leaked CRT parameters dp and dq.\n\nHow to use:\n1. You have modulus n, public exponent e, and the CRT exponent dp (= d mod p-1)\n2. Optionally provide dq (= d mod q-1) as well\n3. The attack computes p from dp via gcd(pow(base, e*dp - 1, n) - 1, n), trying base = 2, 3, 5 until the gcd splits n (one base can yield the trivial gcd n)\n4. q = n / p gives the factorization\n\nTip: dp and dq are often stored alongside the private key. This attack runs entirely in your browser — no server computation needed.',
+  usageGuide: 'This attack factors n using leaked CRT parameters dp and dq.\n\nHow to use:\n1. You have modulus n, public exponent e, and the CRT exponent dp (= d mod p-1)\n2. Optionally provide dq (= d mod q-1) as well\n3. The attack computes p from dp via gcd(pow(base, e*dp - 1, n) - 1, n), trying base = 2, 3, 5 until the gcd splits n (one base can yield the trivial gcd n). If every base is trivial, a bounded k-iteration fallback (k <= min(e, 10^6)) tests p = (e*dp-1)/k + 1 for divisibility (partial-dp primality mode). Optional qinv is cross-checked as (q*qinv) mod p = 1\n4. q = n / p gives the factorization\n\nTip: dp and dq are often stored alongside the private key. This attack runs entirely in your browser — no server computation needed.',
   priority: 'high',
   applicableCheck: rsaNeeds.nDpDq,
 };
+
+/** Shared SUCCESS renderer; cross-checks optional qinv (q*qinv = 1 mod p). */
+function dpDqSuccess(
+  n: bigint,
+  e: bigint,
+  vals: Record<string, string>,
+  p: bigint,
+  q: bigint,
+): string {
+  const leaked = vals.dp ? `dp = ${vals.dp}` : `dq = ${vals.dq}`;
+  let qinvLine = '';
+  if (vals.qinv) {
+    try {
+      const qinv = BigInt(vals.qinv);
+      qinvLine = (q * qinv) % p === 1n ? `\nqinv cross-check: (q*qinv) mod p = 1 OK` : `\nWARNING: (q*qinv) mod p != 1 (qinv inconsistent)`;
+    } catch {
+      qinvLine = '\nWARNING: qinv unparsable';
+    }
+  }
+  return `DP-DQ Leak\nn = ${n.toString()}\ne = ${e.toString()}\n${leaked}\n\nResults:\np = ${p.toString()}\nq = ${q.toString()}${qinvLine}\n\nVerification: p * q = ${(p * q).toString()}\n\nDP_DQ_LEAK=SUCCESS`;
+}
 
 export const generateTestcase = (): Record<string, string> => {
   const { p, q, n, e, d } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q);
   const dp = d % (p - 1n);
   const dq = d % (q - 1n);
-  return { n: n.toString(), e: e.toString(), dp: dp.toString(), dq: dq.toString() };
+  const qinv = modInverse(q % p, p)!;
+  return { n: n.toString(), e: e.toString(), dp: dp.toString(), dq: dq.toString(), qinv: qinv.toString() };
 };

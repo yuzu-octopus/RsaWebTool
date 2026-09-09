@@ -154,6 +154,61 @@ print("HASTAD_LINEAR_PAD=FAILED")`;
                     out.append("HASTAD_LINEAR_PAD=FAILED")`,
     });
   },
+  frontendCheck: (vals: Record<string, string>, onProgress?: (pct: number, detail?: string) => void) => {
+    if (!vals.triples || !vals.e) return Promise.resolve(null);
+    try {
+      const e = BigInt(vals.e.trim());
+      // Browser covers e = 3 only (Horner bounded scan, ported from the Sage
+      // template): larger e delegates to Sage (null fall-through).
+      if (e !== 3n) return Promise.resolve(null);
+      const triples = vals.triples
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0)
+        .map((l) => {
+          const parts = l.split(',');
+          if (parts.length < 4) throw new Error('bad triple');
+          return parts.map((x) => BigInt(x.trim()));
+        });
+      if (triples.length < 3) return Promise.resolve(null);
+      // Precompute Horner coefficients for (a*m + b)^3 - c mod n:
+      // A*m^3 + B*m^2 + C*m + D with A = a^3, B = 3a^2b, C = 3ab^2, D = b^3 - c.
+      const coeffs = triples.map(([n, c, a, b]) => {
+        const A = (a * a * a) % n;
+        const B = ((3n * a * a) % n * b) % n;
+        const C = ((3n * a) % n * ((b * b) % n)) % n;
+        const D = (((b * b) % n * b) % n - c % n + n) % n;
+        return { n, c, a, b, A, B, C, D };
+      });
+      const limit = 500000;
+      for (let m = 0; m < limit; m++) {
+        if (onProgress && m % 25000 === 0) {
+          onProgress(Math.round((m * 100) / limit), `m = ${m} / ${limit}`);
+        }
+        const mb = BigInt(m);
+        let ok = true;
+        for (const cf of coeffs) {
+          let v = (cf.A * mb + cf.B) % cf.n;
+          v = (v * mb + cf.C) % cf.n;
+          v = (v * mb + cf.D) % cf.n;
+          if (v !== 0n) {
+            ok = false;
+            break;
+          }
+        }
+        if (ok) {
+          onProgress?.(100);
+          return Promise.resolve(
+            `Hastad's Attack with Linear Padding\nNumber of ciphertexts: ${triples.length}\nPublic exponent: e = 3\n\nResults:\nm = ${m}\n\nVerification: (a*m+b)^e mod n = c\n\nHASTAD_LINEAR_PAD=SUCCESS`,
+          );
+        }
+      }
+      return Promise.resolve(null);
+    } catch (err) {
+      console.warn('[hastad-linear-pad] frontendCheck error:', err);
+      return Promise.resolve(null);
+    }
+  },
   usageGuide: 'This attack recovers m from k >= e ciphertexts encrypted with the same small public exponent (typically e = 3) but different moduli, each with its own affine padding.\n\nHow to use:\n1. Obtain k >= e ciphertexts c_i = (a_i*m + b_i)^e mod n_i (different modulus for each)\n2. Enter the triples in the format: n1,c1,a1,b1 (one per line)\n3. Provide the public exponent e\n4. The attack uses CRT to combine polynomials, then Coppersmith\'s method to find the small root m\n\nTips: Each line must have exactly 4 comma-separated values (n_i, c_i, a_i, b_i). For standard Hastad (no padding), use a_i=1, b_i=0. The exploit includes an e=3 brute-force fallback with Horner evaluation for fast searching when Coppersmith fails.',
   proof: `\\textbf{Theorem:} Given $k \\geq e$ ciphertexts $c_i \\equiv (a_i m + b_i)^e \\pmod{n_i}$ with pairwise coprime moduli, recover $m$ by CRT-combining the polynomials and applying Coppersmith small roots.
 

@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { trivialFactor, rsaNeeds } from './_rsaHelpers';
 import { randomPrime, isPrimeMR, TESTCASE_BITS } from '../utils/testcases/core';
 import { isqrt } from '../utils/bigint';
 import { wrapSageTemplate, validateNumeric} from './guard';
@@ -23,6 +23,8 @@ export const attack: Attack = {
   description: "Factors n when p/q approximates a small rational a/b using parity-optimized trial division over the search window. Use when p/q is close to a simple fraction with denominator ≤ 100.",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
+    { name: 'b_max', label: 'b_max (max denominator, default 100)', placeholder: '100', required: false, multiline: false },
+    { name: 'delta', label: 'delta (search window, default 2000)', placeholder: '2000', required: false, multiline: false },
   ],
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'SMALL_FRACTION',
@@ -35,8 +37,8 @@ export const attack: Attack = {
         out.append(f"n = {n}")
         out.append("")
         found = False
-        max_den = 100
-        trial_window = 2000
+        max_den = int(${validateNumeric(vals.b_max || '100', 'b_max')}) if "${validateNumeric(vals.b_max || '', 'b_max')}".strip() else 100
+        trial_window = int(${validateNumeric(vals.delta || '2000', 'delta')}) if "${validateNumeric(vals.delta || '', 'delta')}".strip() else 2000
         pairs_tried = 0
         divs_tried = 0
         n_int = int(n)
@@ -98,6 +100,7 @@ export const attack: Attack = {
                     break
             if found:
                 break
+        out.append(f"pairs_tried = {pairs_tried}, divs_tried = {divs_tried}")
         if not found:
             out.append("Results:")
             out.append("")
@@ -105,28 +108,39 @@ export const attack: Attack = {
 `,
     imports: ['import math'],
   }),
-  frontendCheck: (vals, onProgress) => {
+  frontendCheck: async (vals, onProgress) => {
     if (!vals.n) return Promise.resolve(null);
     try {
       const n = BigInt(vals.n);
-      if (n % 2n === 0n) {
-        return Promise.resolve(`Small Fraction Attack\nn = ${n}\n\nResults:\np = 2\nq = ${n / 2n}\n\nVerification: p * q = ${n}\n\nSMALL_FRACTION=SUCCESS`);
+      const tfactor = trivialFactor(n);
+      if (tfactor) {
+        return Promise.resolve(`Small Fraction Attack\nn = ${n}\n\nResults:\np = ${tfactor}\nq = ${n / tfactor}\n\nVerification: p * q = ${n}\n\nSMALL_FRACTION=SUCCESS`);
       }
 
       // n is odd (product of odd primes) — skip even q candidates
       const isOdd = (x: bigint): boolean => (x & 1n) !== 0n;
 
-      for (let b = 1; b <= 100; b++) {
+      const bMaxRaw = (vals.b_max || '').trim();
+      const bMax = bMaxRaw ? Math.min(parseInt(bMaxRaw, 10) || 100, 10000) : 100;
+      const deltaRaw = (vals.delta || '').trim();
+      const deltaWin = deltaRaw ? Math.min(parseInt(deltaRaw, 10) || 2000, 100000) : 2000;
+      if (!(bMax >= 1) || !(deltaWin >= 0)) return null;
+      for (let b = 1; b <= bMax; b++) {
         if (onProgress) {
-          const pct = Math.round((b - 1) * 100 / 100);
-          onProgress(pct, `b = ${b} / 100`);
+          const pct = Math.round(((b - 1) * 100) / bMax);
+          onProgress(pct, `b = ${b} / ${bMax}`);
         }
+        // Chunked yield: keep the UI responsive across millions of divisions.
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        // Bounded window slice of the precomputed offsets; skip even q (n odd).
+        const win = Math.min(deltaWin, DELTA_WINDOW);
         for (let a = 1; a <= b; a++) {
           if (numGcd(a, b) !== 1) continue;
           const q0 = isqrt(n * BigInt(b) / BigInt(a));
           if (q0 <= 1n) continue;
-          // Use precomputed offsets + skip even q (n is odd, can't have even divisor)
-          for (const offset of offsets) {
+          // Bounded window slice of the precomputed offsets; skip even q (n odd).
+          for (let oi = DELTA_WINDOW - win; oi <= DELTA_WINDOW + win; oi++) {
+            const offset = offsets[oi];
             const q = q0 + offset;
             if (isOdd(q) && n % q === 0n) {
               const p = n / q;

@@ -1,5 +1,5 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
+import { bitLength, rsaNeeds } from './_rsaHelpers';
 import { generateKeyPair, encrypt } from '../utils/testcases/core';
 import { modPow } from '../utils/bigint';
 import { wrapSageTemplate, sanitizePython, validateNumeric} from './guard';
@@ -125,7 +125,7 @@ export const attack: Attack = {
       const e = BigInt(vals.e);
       const c = BigInt(vals.c);
       const responses = vals.oracle_responses.split(',').map(x => x.trim() === '1');
-      const nBits = n.toString(2).length;
+      const nBits = bitLength(n);
       const k = Math.ceil(nBits / 8);
       const B = 1n << BigInt(8 * (k - 2));
       const twoB = 2n * B;
@@ -195,7 +195,7 @@ export const attack: Attack = {
 \\begin{itemize}
 \\item $c = m^e \\bmod n$, with $m$ having valid PKCS#1 v1.5 padding: $m = 0x00\\,0x02\\,PS\\,0x00\\,M$
 \\item Oracle $\\mathcal{O}(c') = 1$ iff $\\text{decrypt}(c')$ has valid PKCS#1 v1.5 padding
-\\item $B = 2^{8(k-2)}$ where $k = \\lceil n/8 \\rceil$ is the byte length; valid messages lie in $[2B, 3B)$
+\\item $B = 2^{8(k-2)}$ where $k = \\lceil \\log_{256} n \\rceil$ is the byte length; valid messages lie in $[2B, 3B)$
 \\item Multiplying ciphertext: $(c \\cdot s^e)^d \\equiv m \\cdot s \\pmod{n}$
 \\end{itemize}
 
@@ -211,7 +211,7 @@ b - a \\to 0 &\\implies m = a \\qed
 \\textbf{Explanation:} Bleichenbacher's attack works by blinding the ciphertext: $c' = c \\cdot s^e \\bmod n$ decrypts to $m \\cdot s \\bmod n$. When the oracle says the decryption has valid PKCS#1 v1.5 padding, we know $m \\cdot s \\bmod n \\in [2B, 3B)$. For each valid $s$, this constrains $m$ to a set of intervals (one per wrap-around $r$). Intersecting intervals across multiple $s$ values progressively narrows the candidate range. With roughly 20 valid $s$ values, the interval collapses to a single integer -- the original message $m$.
 
 \\textbf{References:} D. Bleichenbacher, "Chosen Ciphertext Attacks Against Protocols Based on the RSA Encryption Standard PKCS#1", CRYPTO 1998`,
-  usageGuide: 'This requires oracle_responses \u2014 a comma-separated list of 1s (valid padding) and 0s (invalid) from a PKCS#1 v1.5 padding oracle.\n\nHow to use:\n1. Set up an oracle that returns 1 if decrypt(c\') has valid PKCS#1 v1.5 padding, 0 otherwise\n2. For s = 1, 2, 3, ... query the oracle with c\' = c * s^e mod n\n3. Record the responses as comma-separated bits: 1,0,0,1,0,0,... (1 = valid padding)\n4. Provide n, e, c, and the full oracle_responses string\n\nTip: s=1 always returns 1 (the original ciphertext has valid padding). You need roughly 20 valid responses to narrow the interval.',
+  usageGuide: 'This requires oracle_responses \u2014 a comma-separated list of 1s (valid padding) and 0s (invalid) from a PKCS#1 v1.5 padding oracle. Query count is key-size-dependent (~10K queries for toy keys up to ~1M for real sizes; classically ~2^17 for 1024-bit). Transcript model: the bundled testcase uses toy keys so the full s-list fits in one transcript; for real keys collect responses offline and paste them.\n\nHow to use:\n1. Set up an oracle that returns 1 if decrypt(c\') has valid PKCS#1 v1.5 padding, 0 otherwise\n2. For s = 1, 2, 3, ... query the oracle with c\' = c * s^e mod n\n3. Record the responses as comma-separated bits: 1,0,0,1,0,0,... (1 = valid padding)\n4. Provide n, e, c, and the full oracle_responses string\n\nExternal-query recipe (query-generator snippet):\n  for s in 1..MAX: c\' = c * pow(s, e, n) % n; responses.append(oracle(c\') ? 1 : 0)\n\nTip: s=1 always returns 1 (the original ciphertext has valid padding). Paste the whole valid-s list at once — you need roughly 20 valid responses to narrow the interval.',
   priority: 'medium',
   applicableCheck: rsaNeeds.nECOracleResponses,
 };
@@ -221,7 +221,7 @@ export const generateTestcase = (): Record<string, string> => {
   // and the template converges within SageMathCell's 120s timeout.
   // B = 2^(8*(k-2)) where k = ceil(nbits/8). For n≈20 bits: k=3, B=256.
   const { n, e } = generateKeyPair(10, 10);
-  const k = Math.ceil(n.toString(2).length / 8);
+  const k = Math.ceil(bitLength(n) / 8);
   const B = 256n ** BigInt(k - 2);
   const lower = 2n * B;
   const upper = 3n * B;

@@ -1,7 +1,7 @@
 import type { Attack } from '../types';
-import { rsaNeeds } from './_rsaHelpers';
 import { generateSmallDTestcase } from '../utils/testcases/core';
 import { isqrt } from '../utils/bigint';
+import { bitLength } from './_rsaHelpers';
 import { wrapSageTemplate, validateNumeric} from './guard';
 
 export const attack: Attack = {
@@ -13,6 +13,7 @@ export const attack: Attack = {
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: 'Enter public exponent e...', multiline: true, rows: 3 },
     { name: 'dLow', label: 'dLow (low bits of d)', placeholder: 'Enter known low bits of d...', multiline: true, rows: 3 },
+    { name: 'dHigh', label: 'dHigh (known high bits of d, MSB mode)', placeholder: 'Enter known high bits of d...', required: false, multiline: true, rows: 3 },
     { name: 'm', label: 'm (known low-bit count)', placeholder: 'e.g. 20 (optional; defaults to dLow bit-length)', required: false, multiline: false },
   ],
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
@@ -35,13 +36,59 @@ export const attack: Attack = {
             if m < 1 or dLow_int >= (1 << m):
                 out.append("PARTIAL_D=FAILED: m must be positive with dLow < 2^m")
                 m = 0
-            kBound = 1 << min(m + 2, 24) if m > 0 else 0
+            kBound = min(1 << min(m + 2, 24), e_int) if m > 0 else 0
+            found = False
+            # MSB branch (Boneh-Durfee-Frankel): d = dHigh + x with x < 2^t unknown.
+            # f(x) = e*(dHigh + x) - 1 has root x0 mod 2^m; small_roots recovers
+            # it when the unknown low part fits, then the quadratic verifies d.
+            # Beyond this scope (large unknown part) use Boneh-Durfee lattice.
+            dHigh_str = "${validateNumeric(vals.dHigh || '', 'dHigh')}".strip()
+            if not found and dHigh_str:
+                dHigh = Integer(dHigh_str)
+                mm = m if m > 0 else dHigh.nbits()
+                Rmsb.<x> = PolynomialRing(Zmod(2**mm))
+                try:
+                    f_msb = e * (dHigh + x) - 1
+                    for r in f_msb.small_roots(beta=1.0):
+                        d_cand = int(dHigh + r)
+                        if d_cand > 0:
+                            for k_cand in range(1, min(e_int, 1000000) + 1):
+                                if (e_int * d_cand - 1) % k_cand != 0:
+                                    continue
+                                d_phi = (e_int * d_cand - 1) // k_cand
+                                s_q = n_int - d_phi + 1
+                                disc_q = s_q * s_q - 4 * n_int
+                                if disc_q >= 0:
+                                    sq = math.isqrt(disc_q)
+                                    if sq * sq == disc_q:
+                                        p_c = (s_q - sq) // 2
+                                        if p_c > 1 and n_int % p_c == 0:
+                                            p_sage = Integer(p_c)
+                                            q_sage = n // p_sage
+                                            out.append("Partial d (MSB branch)")
+                                            out.append(f"n = {n}")
+                                            out.append(f"e = {e}")
+                                            out.append("")
+                                            out.append("Results:")
+                                            out.append(f"p = {p_sage}")
+                                            out.append(f"q = {q_sage}")
+                                            out.append("")
+                                            out.append(f"Verification: p * q = {p_sage * q_sage}")
+                                            out.append("")
+                                            out.append("PARTIAL_D=SUCCESS")
+                                            found = True
+                                            break
+                                if found:
+                                    break
+                except Exception as ex_msb:
+                    out.append(f"MSB branch failed: {ex_msb}")
+            if found:
+                kBound = 0
             # Incremental d_approx update (avoid BigInt division per iteration)
             q = n_int // e_int
             r = n_int % e_int
             d_approx = (n_int + 1) // e_int
             rem = (n_int + 1) % e_int
-            found = False
             for k in range(1, kBound + 1):
                 if (d_approx & ((1 << m) - 1)) == dLow_int:
                     d_phi = (e_int * d_approx - 1) // k
@@ -90,9 +137,11 @@ export const attack: Attack = {
       // Known-bit count m: explicit input when dLow has leading zeros (its
       // bit-length would then undercount); defaults to dLow bit-length.
       const rawM = (vals.m || '').trim();
-      const m = rawM ? BigInt(rawM) : BigInt(dLow.toString(2).length);
+      const m = rawM ? BigInt(rawM) : BigInt(bitLength(dLow));
       if (m < 1n || m > 1024n || dLow >= (1n << m)) return Promise.resolve(null);
-      const kBound = 1n << BigInt(Math.min(Number(m) + 2, 24)); // bound at ~16M max
+      const eCap = e < (1n << 24n) ? e : (1n << 24n);
+      const want = 1n << BigInt(Math.min(Number(m) + 2, 24)); // bound at ~16M max
+      const kBound = want < eCap ? want : eCap; // k < e always (k = (ed-1)/phi)
       const mask = (1n << m) - 1n;
 
       // Precompute once
@@ -164,9 +213,9 @@ x^2 - (n - \\varphi + 1)x + n &= 0 \\\\implies p,q \\qed
 \\textbf{Scope:} LSB-only: $dLow = d \\bmod 2^m$ must be the low $m$ bits of $d$. The $k$-iteration reaches $k < 2^{m+2}$ (capped at $\\sim 16\\times 10^6$); full-size $d$ needs the Boneh-Durfee-Frankel lattice (Coppersmith on the key equation mod $2^m$), which is not implemented here.
 
 \\textbf{References:} D. Boneh, G. Durfee, Y. Frankel, "An Attack on RSA Given a Small Fraction of the Private Key Bits", ASIACRYPT 1998`,
-  usageGuide: 'This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.\n\nHow to use:\n1. You have modulus n, public exponent e, and dLow (the low-order bits of d)\n2. Provide n, e, dLow, and m (the known low-bit count; optional when dLow has no leading zeros)\n3. The attack iterates k in ed = kphi(n) + 1, checking if d_approx has matching low bits\n4. For each matching candidate, it computes phi(n) and solves the quadratic for p,q\n\nTip: The attack works best when e is small (smaller k search space). The kBound is 2^(m+2) (max ~16M iterations). LSB-only scope: only low bits are supported — full-size d needs a Coppersmith lattice (Boneh-Durfee-Frankel), not implemented here. Uses incremental d_approx update (avoiding BigInt division per iteration) for performance.',
+  usageGuide: 'This attack recovers the full private key d from leaked low-order bits by iterating k in the key equation.\n\nHow to use:\n1. You have modulus n, public exponent e, and dLow (the low-order bits of d)\n2. Provide n, e, dLow, and m (the known low-bit count; optional when dLow has no leading zeros)\n3. The attack iterates k in ed = kphi(n) + 1, checking if d_approx has matching low bits\n4. For each matching candidate, it computes phi(n) and solves the quadratic for p,q\n\nMSB mode: provide dHigh (known high bits of d) with m = unknown low-bit count (defaults to dHigh bit-length); Sage solves e·(dHigh+x) - 1 = 0 mod 2^m via small_roots (Boneh-Durfee-Frankel) and verifies each root through the key-equation quadratic. See also Boneh-Durfee (full small-d lattice) and Partial p/q Bits (prime-MSB lattice).\n\nTip: The attack works best when e is small (smaller k search space). The kBound is 2^(m+2) (max ~16M iterations). LSB-only scope: only low bits are supported — full-size d needs a Coppersmith lattice (Boneh-Durfee-Frankel), not implemented here. Uses incremental d_approx update (avoiding BigInt division per iteration) for performance.',
   priority: 'high',
-  applicableCheck: rsaNeeds.nEDLow,
+  applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && (!!p.dLow || !!p.dHigh),
 };
 
 export const generateTestcase = (): Record<string, string> => {

@@ -7,11 +7,11 @@ export const attack: Attack = {
   id: 'quadratic-sieve',
   name: 'Quadratic Sieve',
   category: 'Factorization',
-  description: "Factors n by finding congruent squares via smoothness over a factor base. Use for medium-sized semiprimes (< 100 digits) with similar-sized factors.",
+  description: "Factors n by finding congruent squares via smoothness over a factor base. Use for medium-sized semiprimes (<~60 digits practical in SageCell) with similar-sized factors.",
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
   ],
-  usageGuide: `Use for semiprimes up to about 100 digits with roughly equal-sized factors.
+  usageGuide: `Use for semiprimes up to about 60 digits (SageCell-practical) with roughly equal-sized factors.
 
 How to use:
 1. Provide n (the RSA modulus)
@@ -27,9 +27,9 @@ Tip: For numbers larger than 100 digits, try ECM or other methods. For very smal
         out.append("Quadratic Sieve")
         out.append(f"n = {n}")
         out.append("")
-        if bits > 330:
+        if bits > 200:
             out.append(f"WARNING: n has {bits} bits ({bits / 3.32:.0f} digits)")
-            out.append("Quadratic Sieve is effective up to ~100 digits (330 bits)")
+            out.append("Quadratic Sieve is effective up to <~60 digits practical in SageCell (~200 bits)")
             out.append("For larger numbers, try ECM, Pollard's p-1, or other methods")
             out.append("")
         found = False

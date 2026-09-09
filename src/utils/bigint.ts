@@ -24,6 +24,41 @@ export function gcd(a: bigint, b: bigint): bigint {
 }
 
 /**
+ * Exact bit length of an integer (0n -> 0). Hex-based: cheaper than a
+ * base-2 string conversion and shared with the RSA attack helpers.
+ */
+export function bitLength(n: bigint): number {
+  if (n < 0n) n = -n;
+  if (n === 0n) return 0;
+  const hex = n.toString(16);
+  let bits = (hex.length - 1) * 4;
+  let top = parseInt(hex[0], 16);
+  while (top > 0) {
+    bits++;
+    top >>= 1;
+  }
+  return bits;
+}
+
+// Bounded memo for exact integer powers used by Newton's method below.
+// Pure function of (base, exp); FIFO eviction at 512 entries keeps memory flat.
+const powCache = new Map<string, bigint>();
+
+/** Exact base**exp with a bounded memo across Newton iterations and calls. */
+export function cachedPow(base: bigint, exp: bigint): bigint {
+  const key = base.toString(36) + ':' + exp.toString(36);
+  const hit = powCache.get(key);
+  if (hit !== undefined) return hit;
+  const value = base ** exp;
+  if (powCache.size >= 512) {
+    const oldest = powCache.keys().next();
+    if (!oldest.done) powCache.delete(oldest.value);
+  }
+  powCache.set(key, value);
+  return value;
+}
+
+/**
  * Integer square root (floor) via Newton's method with Horwat initial guess.
  * Returns the largest n such that n^2 <= x.
  */
@@ -31,10 +66,10 @@ export function isqrt(x: bigint): bigint {
   if (x < 0n) throw new RangeError('isqrt: negative input');
   if (x < 2n) return x;
 
-  // Horwat initial guess: 1 << (bitLength >> 1)
-  // Approximate bit length via hex characters (faster than toString(2))
-  const bitLen = BigInt(x.toString(16).length) * 4n;
-  let n = 1n << (bitLen >> 1n);
+  // Horwat initial guess: 1 << ceil(bitLength / 2). The ceiling keeps the
+  // guess above the root so Newton converges monotonically downward.
+  const bitLen = BigInt(bitLength(x));
+  let n = 1n << ((bitLen + 1n) >> 1n);
   let n1 = (n + x / n) >> 1n;
   while (n1 < n) {
     n = n1;
@@ -110,25 +145,26 @@ export function iroot(n: bigint, k: bigint): bigint {
   if (n < 2n || k === 1n) return n;
   if (k === 2n) return isqrt(n);
 
-  // Approximate bit length (rounded up to nearest 4)
-  const bitLen = BigInt(n.toString(16).length) * 4n;
+  // Exact bit length via shared bitLength (never overestimates)
+  const bitLen = BigInt(bitLength(n));
   if (bitLen < k) return 1n;
 
-  // Fast pow helper for small k (avoids binary exponentiation overhead)
+  // Fast pow helper for small k (avoids binary exponentiation overhead),
+  // memoized across Newton iterations and calls via cachedPow.
   const pow = (v: bigint): bigint => {
     if (k === 3n) return v * v * v;
     if (k === 5n) { const v2 = v * v; return v2 * v2 * v; }
-    return v ** k;
+    return cachedPow(v, k);
   };
 
   // Newton's method with initial guess ≈ n^(1/k)
-  let x = 1n << (bitLen / k);
+  let x = 1n << ((bitLen + k - 1n) / k);
   if (x < 2n) x = 2n;
   const k1 = k - 1n;
-  let x1 = ((x * k1) + (n / (x ** k1))) / k;
+  let x1 = ((x * k1) + (n / cachedPow(x, k1))) / k;
   while (x1 < x) {
     x = x1;
-    x1 = ((x * k1) + (n / (x ** k1))) / k;
+    x1 = ((x * k1) + (n / cachedPow(x, k1))) / k;
   }
   // After Newton converges (x1 >= x):
   //   x = value at or below the true root

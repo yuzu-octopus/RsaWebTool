@@ -8,7 +8,7 @@ export const attack: Attack = {
   id: 'related-message',
   name: 'Franklin-Reiter Related Message Attack',
   category: 'Message / Protocol',
-  description: 'Recovers m from two ciphertexts with arbitrary linear relations via polynomial GCD. Use when c1 = (a₁·m + b₁)^e and c2 = (a₂·m + b₂)^e mod n with known a₁,b₁,a₂,b₂. Defaults: a₁=1, b₁=0 (standard Franklin-Reiter).',
+  description: 'Recovers m from two ciphertexts with arbitrary linear relations via polynomial GCD. Use when c1 = (a₁·m + b₁)^e and c2 = (a₂·m + b₂)^e mod n with known a₁,b₁,a₂,b₂. Defaults: a₁=1, b₁=0, a₂=1, b₂=1 (so c₂ = (m+1)^e by default).',
   inputs: [
     { name: 'n', label: 'n (modulus)', placeholder: 'Enter modulus n...', multiline: true, rows: 3 },
     { name: 'e', label: 'e (public exponent)', placeholder: '65537', multiline: false, required: false },
@@ -37,9 +37,9 @@ print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")`;
         b1_val = "${validateNumeric(vals.b1 || '', 'b1')}".strip()
         b1 = Integer(b1_val) if b1_val else Integer(0)
         a2_val = "${validateNumeric(vals.a2 || '', 'a2')}".strip()
-        a2 = Integer(a2_val) if a2_val else Integer(2)
+        a2 = Integer(a2_val) if a2_val else Integer(1)
         b2_val = "${validateNumeric(vals.b2 || '', 'b2')}".strip()
-        b2 = Integer(b2_val) if b2_val else Integer(0)
+        b2 = Integer(b2_val) if b2_val else Integer(1)
         found = True
         if n < 2 or e < 2 or c1 < 0 or c2 < 0:
             out.append("Invalid input")
@@ -178,11 +178,20 @@ print("FRANKLIN_REITER_RELATED_MESSAGE=FAILED")`;
       const rawB1 = (vals.b1 || '').trim();
       const b1 = rawB1 ? BigInt(rawB1) : 0n;
       const rawA2 = (vals.a2 || '').trim();
-      const a2 = rawA2 ? BigInt(rawA2) : 2n;
+      const a2 = rawA2 ? BigInt(rawA2) : 1n;
       const rawB2 = (vals.b2 || '').trim();
-      const b2 = rawB2 ? BigInt(rawB2) : 0n;
+      const b2 = rawB2 ? BigInt(rawB2) : 1n;
 
       if (n < 2n || e < 2n || c1 < 0n || c2 < 0n) return Promise.resolve(null);
+      // Ciphertext/modulus pre-checks (any e): a ciphertext sharing a factor
+      // with n exposes it directly, before any polynomial work.
+      for (const [tag, cc] of [['c1', c1], ['c2', c2]] as const) {
+        const g = gcd(cc, n);
+        if (g > 1n && g < n) {
+          const other = n / g;
+          return Promise.resolve(`Franklin-Reiter Related Message Attack\nn = ${n}\ne = ${e}\n\nPre-check: gcd(${tag}, n) = ${g} splits n.\n\nResults:\np = ${g}\nq = ${other}\n\nVerification: p * q = ${g * other}\n\nFRANKLIN_REITER_RELATED_MESSAGE=SUCCESS`);
+        }
+      }
       // Only supports e=3 in frontendCheck (polynomial GCD over composite n is not feasible in JS)
       if (e !== 3n) return Promise.resolve(null);
 
@@ -316,7 +325,7 @@ m &= -g[0] \\cdot g[1]^{-1} \\pmod{n}
 \\textbf{Explanation:} Both polynomials share $m$ as a root modulo $n$. The polynomial GCD extracts their common linear factor $(x - m)$. For $e = 3$, a closed-form algebraic elimination is available. When $a_1$ is not invertible modulo $n$, $\\gcd(a_1, n)$ immediately reveals a factor of $n$. When $b_1 = b_2 = 0$ with proportional equations, or when the $e = 3$ resultant denominator vanishes or shares a factor with $n$, the browser path reports the diagnosis (and any factors found) instead of a wrong $m$.
 
 \\textbf{References:} Franklin & Reiter, 1996; Boneh, "Twenty Years of Attacks on RSA," 1999`,
-  usageGuide: 'This attack recovers m when two ciphertexts of the SAME message under different linear transforms are encrypted with the same public key.\n\nHow to use:\n1. You have two ciphertexts c1, c2 encrypted under the same (n, e)\n2. The plaintexts are: m1 = a1*m + b1, m2 = a2*m + b2 for known a1,b1,a2,b2\n3. Provide n, e, c1, c2, a1, b1, a2, and b2\n4. The attack computes gcd((a1*x+b1)^e - c1, (a2*x+b2)^e - c2) to recover m\n\nDefaults: a1=1, b1=0 (standard Franklin-Reiter where c1 = m^e)\n\nTip: The attack requires e = 3 for reliable algebraic recovery in the browser; e = 5 or higher uses SageMathCell (may timeout). If a1 shares a factor with n, the attack immediately factors n. For convenience, paste into Magic Mode which auto-detects the parameters. Proportional inputs (b1=b2=0 with a2^e*c1 == a1^e*c2) are diagnosed as unrecoverable, and a resultant denominator sharing a factor with n reports the factors.',
+  usageGuide: 'This attack recovers m when two ciphertexts of the SAME message under different linear transforms are encrypted with the same public key.\n\nHow to use:\n1. You have two ciphertexts c1, c2 encrypted under the same (n, e)\n2. The plaintexts are: m1 = a1*m + b1, m2 = a2*m + b2 for known a1,b1,a2,b2\n3. Provide n, e, c1, c2, a1, b1, a2, and b2\n4. The attack computes gcd((a1*x+b1)^e - c1, (a2*x+b2)^e - c2) to recover m\n\nDefaults: a1=1, b1=0 (standard Franklin-Reiter where c1 = m^e)\n\nTip: The attack requires e = 3 for reliable algebraic recovery in the browser; e = 5 or higher uses SageMathCell polynomial GCD, which may timeout there — keep n small (toy keys) and prefer e = 3. If a1 shares a factor with n, the attack immediately factors n. For convenience, paste into Magic Mode which auto-detects the parameters. Proportional inputs (b1=b2=0 with a2^e*c1 == a1^e*c2) are diagnosed as unrecoverable, and a resultant denominator sharing a factor with n reports the factors.',
   priority: 'high',
   applicableCheck: rsaNeeds.nC1C2,
 };
@@ -326,13 +335,14 @@ export const generateTestcase = (): Record<string, string> => {
   const { n } = generateKeyPair(TESTCASE_BITS.p, TESTCASE_BITS.q, e);
   const m = BigInt(Math.floor(Math.random() * 10000) + 42);
   let a1: bigint, b1: bigint, a2: bigint, b2: bigint;
-  // Ensure (a1,b1) ≠ (a2,b2) — identical transforms make the attack fail (same polynomial)
+  // Constrain b1 != b2 (hence (a1,b1) != (a2,b2)): equal offsets with
+  // proportional equations make m unrecoverable (same polynomial up to scale).
   do {
     a1 = BigInt(Math.floor(Math.random() * 5) + 1);  // 1-5
     b1 = BigInt(Math.floor(Math.random() * 5));       // 0-4
     a2 = BigInt(Math.floor(Math.random() * 5) + 1);  // 1-5
     b2 = BigInt(Math.floor(Math.random() * 5));       // 0-4
-  } while (a1 === a2 && b1 === b2);
+  } while (b1 === b2);
   const am1_b1 = (a1 * m + b1) % n;
   const am2_b2 = (a2 * m + b2) % n;
   return {
