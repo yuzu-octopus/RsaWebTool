@@ -6,12 +6,12 @@ import { ProofRenderer } from '../../ProofRenderer';
 
 const TABS = [
   { id: 'properties', label: 'Properties' },
-  { id: 'md', label: 'Merkle-Damgård' },
-  { id: 'sha2', label: 'SHA-256 Internals' },
-  { id: 'sponge', label: 'Sponge / SHA-3' },
+  { id: 'md', label: 'Merkle' },
+  { id: 'sha2', label: 'SHA-256' },
+  { id: 'sponge', label: 'SHA-3' },
   { id: 'hmac', label: 'HMAC' },
-  { id: 'password', label: 'Password Hashing' },
-  { id: 'pow', label: 'Proof of Work' },
+  { id: 'password', label: 'Passwords' },
+  { id: 'pow', label: 'PoW' },
 ];
 
 const TAB_CONTENT: Record<string, string> = {
@@ -30,7 +30,7 @@ export default function ExplanationTab() {
   return (
     <Stack direction="vertical" gap={2}>
       <Heading level={4} style={{ color: 'var(--dracula-cyan)' }}>Hash Function Reference</Heading>
-      <TabList value={tab} onChange={setTab} hasDivider>
+      <TabList value={tab} onChange={setTab} hasDivider layout="fill">
         {TABS.map(t => (
           <Tab key={t.id} value={t.id} label={t.label} />
         ))}
