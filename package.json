@@ -27,7 +27,7 @@
     "@noble/ciphers": "^2.2.0",
     "@noble/curves": "^2.2.0",
     "@noble/hashes": "^2.2.0",
-    "astryx-dracula": "^0.1.2",
+    "astryx-dracula": "^0.1.3",
     "bigint-gcd": "^1.0.46",
     "katex": "^0.17.0",
     "react": "^19.2.6",

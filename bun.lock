@@ -9,7 +9,7 @@
         "@noble/ciphers": "^2.2.0",
         "@noble/curves": "^2.2.0",
         "@noble/hashes": "^2.2.0",
-        "astryx-dracula": "^0.1.2",
+        "astryx-dracula": "^0.1.3",
         "bigint-gcd": "^1.0.46",
         "katex": "^0.17.0",
         "react": "^19.2.6",
@@ -383,7 +383,7 @@
 
     "ajv-formats": ["ajv-formats@3.0.1", "", { "dependencies": { "ajv": "^8.0.0" } }, "sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ=="],
 
-    "astryx-dracula": ["astryx-dracula@0.1.2", "", { "dependencies": { "@astryxdesign/core": "^0.3.0", "@stylexjs/stylex": "^0.19.0", "lucide-react": "^1.33.0", "react": "^19.2.8", "react-dom": "^19.2.8" } }, "sha512-zdm6eq9g4CAtGQkToEuYLGoUTlOFDonB1xN2ZkHFSSoYlR/h27owmgU4KUORuPzcZO56Hf3CHu97eY3N1m2IfQ=="],
+    "astryx-dracula": ["astryx-dracula@0.1.3", "", { "dependencies": { "@astryxdesign/core": "^0.3.0", "@stylexjs/stylex": "^0.19.0", "lucide-react": "^1.33.0", "react": "^19.2.8", "react-dom": "^19.2.8" } }, "sha512-IClHQJRt9VGoZtn9Y3NvM0UbAPy1l6zfAiVDAywehjc3gz/UNdmnDU7XGFvOz74lFWLW1d5GhfiljGedTL8ylQ=="],
 
     "atomically": ["atomically@2.1.1", "", { "dependencies": { "stubborn-fs": "^2.0.0", "when-exit": "^2.1.4" } }, "sha512-P4w9o2dqARji6P7MHprklbfiArZAWvo07yW7qs3pdljb3BWr12FIB7W+p0zJiuiVsUpRO0iZn1kFFcpPegg0tQ=="],
 
