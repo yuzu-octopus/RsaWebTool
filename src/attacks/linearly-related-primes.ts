@@ -148,7 +148,7 @@ p &= \\frac{-\\delta + \\sqrt{\\delta^2 + 4kn}}{2k} \\\\
 \\end{itemize}
 
 \\textbf{References:} A. Nitaj, "Cryptanalysis of RSA with Constrained Primes", 1999`,
-  usageGuide: 'This attack factors n when the two primes are linearly related: q = k*p + δ for known k.\n\nHow to use:\n1. You know that n = p*q where q = k*p + δ for some known multiplier k and small unknown δ\n2. Provide n and k\n3. The attack solves the quadratic equation k*p^2 + δ*p - n = 0 to recover p\n\nCrossover: the direct loop covers |delta| < 10^6; beyond that Sage tries a Coppersmith lattice on k*(p0+x)^2 - n (needs p within ~n^{1/8} of sqrt(n/k)), else use Partial p/q Bits (known MSBs) or ECM. Tip: This is common in CTF challenges or badly generated keys. Setting k=1 gives the classic twin-prime case (p = q + δ). For p = a*q + b form, try inverting the relationship.',
+  usageGuide: 'This attack factors n when the two primes are linearly related: q = k*p + δ for known k.\n\nHow to use:\n1. You know that n = p*q where q = k*p + δ for some known multiplier k and small unknown δ\n2. Provide n and k\n3. The attack solves the quadratic equation k*p^2 + δ*p - n = 0 to recover p\n\nCrossover: the direct loop covers |delta| < 10^6; beyond that Sage tries a Coppersmith lattice on k*(p0+x)^2 - n (needs p within ~$n^{1/8}$ of sqrt(n/k)), else use Partial p/q Bits (known MSBs) or ECM. Tip: This is common in CTF challenges or badly generated keys. Setting k=1 gives the classic twin-prime case (p = q + δ). For p = a*q + b form, try inverting the relationship.',
   priority: 'medium',
   applicableCheck: rsaNeeds.nEK,
 };

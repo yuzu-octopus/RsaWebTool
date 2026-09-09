@@ -20,6 +20,10 @@ const inlineMathRegex = /\$([^$]+)\$|\\\(([^)]+)\\\)/g;
  * Parses a LaTeX proof string into segments.
  */
 function parseProof(latex: string): ProofSegment[] {
+  // Module-global regexes are stateful: reset before each parse, otherwise
+  // matches start mid-string after navigating between attacks.
+  displayMathRegex.lastIndex = 0;
+  itemizeRegex.lastIndex = 0;
   // Normalize $$...$$ display math blocks to \begin{equation*}...\end{equation*}
   // for consistent handling by the existing displayMathRegex
   const text = latex.replace(/\$\$((?:\\.|[^$])+)\$\$/g, (_match, inner) => `\\begin{equation*}${inner}\\end{equation*}`);

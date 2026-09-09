@@ -219,13 +219,9 @@ function AttackPanel({ attack }: { attack: Attack }) {
           )}
 
           {attack.usageGuide && (
-            <Stack hAlign="center" width="100%">
-              <Stack width="100%" maxWidth="72ch" gap={2} padding={3}>
-                <Text type="code" style={{ whiteSpace: 'pre-wrap' }}>
-                  {attack.usageGuide}
-                </Text>
-              </Stack>
-            </Stack>
+            <ProofRenderer
+              latex={attack.usageGuide.replace(/^How to use:\n/gm, '').replace(/\\'/g, "'")}
+            />
           )}
           <Stack hAlign="center" width="100%">
             <Stack width="100%" maxWidth="72ch" padding={3}>

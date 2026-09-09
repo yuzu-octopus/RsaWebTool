@@ -136,10 +136,10 @@ m &= B + x_0 \\qed
 How to use:
 1. Write m = (prefix << k) + x with the known high bits as the integer prefix
 2. Provide n, e, c, prefix, and k_bits (the unknown low-bit count)
-3. Sage runs Coppersmith small_roots on f(x) = (prefix<<k + x)^e - c with |x| < n^{1/e}
+3. Sage runs Coppersmith small_roots on f(x) = (prefix<<k + x)^e - c with $|x| < n^{1/e}$
 4. The browser covers the degenerate case (m^e < n via integer root) plus a bounded x scan to 2^20
 
-Tip: Needs |x| < n^{1/e} (e.g. k <= ~170 for 512-bit n with e=3). Larger unknown parts need a lattice with more shifts or a different attack. See also Small Message Recovery for the pure integer-root case.`,
+Tip: Needs $|x| < n^{1/e}$ (e.g. k <= ~170 for 512-bit n with e=3). Larger unknown parts need a lattice with more shifts or a different attack. See also Small Message Recovery for the pure integer-root case.`,
   priority: 'medium',
   applicableCheck: (p: Record<string, string>) => !!p.n && !!p.e && !!p.c && !!p.prefix && !!p.k_bits,
 };

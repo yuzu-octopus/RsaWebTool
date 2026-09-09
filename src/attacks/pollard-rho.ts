@@ -19,7 +19,7 @@ How to use:
 2. The algorithm uses Brent's cycle detection with batched GCD for efficiency
 3. Multiple random starting points are tried for robustness
 
-Tip: Expected runtime is O(n^{1/4}) per factor. Good for factors up to ~30 digits. For larger factors, try ECM.`,
+Tip: Expected runtime is $O(n^{1/4})$ per factor. Good for factors up to ~30 digits. For larger factors, try ECM.`,
   sageTemplate: (vals: Record<string, string>) => wrapSageTemplate({
     token: 'POLLARD_RHO',
     n: validateNumeric(vals.n, 'n'),
