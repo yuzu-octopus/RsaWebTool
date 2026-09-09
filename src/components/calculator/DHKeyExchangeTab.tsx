@@ -13,7 +13,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { StatusDot } from '@astryxdesign/core/StatusDot';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { useCopyToClipboard } from '../../hooks/useCopyToClipboard';
-import { RFC3526_GROUPS, generatePrivateKey, parseHex } from '../../utils/dhCrypto';
+import { RFC3526_GROUPS, RFC2412_GROUP1, generatePrivateKey, parseGenerator, parseHex, peerKeyIssues } from '../../utils/dhCrypto';
 import { modPow } from '../../utils/bigint';
 
 export function DHKeyExchangeTab() {
@@ -31,12 +31,13 @@ export function DHKeyExchangeTab() {
 
   const currentGroup = useMemo(() => {
     if (group === 'custom') return null;
+    if (group === 'group1') return RFC2412_GROUP1;
     const idx = group === 'group5' ? 0 : group === 'group14' ? 1 : 2;
     return RFC3526_GROUPS[idx];
   }, [group]);
 
   const p = useMemo(() => currentGroup?.p ?? (parseHex(customP) || 0n), [currentGroup, customP]);
-  const g = useMemo(() => currentGroup?.g ?? (parseHex(customG) || 0n), [currentGroup, customG]);
+  const g = useMemo(() => currentGroup?.g ?? (parseGenerator(customG) || 0n), [currentGroup, customG]);
 
   const genAlice = useCallback(() => {
     out.clear();
@@ -64,6 +65,8 @@ export function DHKeyExchangeTab() {
     out.clear();
     if (alicePriv === null || bobPub === null) { out.dispatchError('Alice private key or Bob public key missing'); return; }
     if (p <= 1n) { out.dispatchError('Invalid group parameters'); return; }
+    const peerIssues = peerKeyIssues(bobPub, p);
+    if (peerIssues.length > 0) { out.dispatchError(`Refusing to complete with Bob's key: ${peerIssues.join('; ')}`); return; }
     const s = modPow(bobPub, alicePriv, p);
     setSharedAlice(s);
     out.dispatch(`Shared secret (Alice): 0x${s.toString(16)}\nMETHOD=TYPESCRIPT`, 'DH Key Exchange');
@@ -73,6 +76,8 @@ export function DHKeyExchangeTab() {
     out.clear();
     if (bobPriv === null || alicePub === null) { out.dispatchError('Bob private key or Alice public key missing'); return; }
     if (p <= 1n) { out.dispatchError('Invalid group parameters'); return; }
+    const peerIssues = peerKeyIssues(alicePub, p);
+    if (peerIssues.length > 0) { out.dispatchError(`Refusing to complete with Alice's key: ${peerIssues.join('; ')}`); return; }
     const s = modPow(alicePub, bobPriv, p);
     setSharedBob(s);
     out.dispatch(`Shared secret (Bob): 0x${s.toString(16)}\nMETHOD=TYPESCRIPT`, 'DH Key Exchange');
@@ -86,6 +91,7 @@ export function DHKeyExchangeTab() {
           { value: 'group5', label: 'RFC 3526 Group 5 (1536-bit)' },
           { value: 'group14', label: 'RFC 3526 Group 14 (2048-bit)' },
           { value: 'group16', label: 'RFC 3526 Group 16 (4096-bit)' },
+          { value: 'group1', label: 'RFC 2412 Group 1 (768-bit, BREAKABLE — demo only)' },
           { value: 'custom', label: 'Custom' },
         ]}
         value={group}
