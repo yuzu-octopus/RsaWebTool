@@ -162,6 +162,10 @@ interface SidebarProps {
   onMobileClose: () => void;
 }
 
+function focusWorkspace() {
+  requestAnimationFrame(() => document.getElementById('main-workspace')?.focus());
+}
+
 export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const { selectedAttack, setSelectedAttack, setViewMode, viewMode, calculatorMode, setCalculatorMode } = useAppContext();
   const isMobile = useIsMobile();
@@ -180,10 +184,6 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       }
       return next;
     });
-  };
-
-  const focusWorkspace = () => {
-    requestAnimationFrame(() => document.getElementById('main-workspace')?.focus());
   };
 
   const handleAttackClick = (attack: Attack) => {
@@ -243,6 +243,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                 id={`sidebar-attack-${attack.id}`}
                 data-testid={`attack-${attack.id}`}
                 label={attack.name}
+                size="sm"
                 isSelected={isAttackActive(attack.id)}
                 onClick={() => handleAttackClick(attack)}
               />
@@ -314,7 +315,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       header={heading}
       footer={footer}
       style={{
-        width: 220,
+        width: 264,
         flexShrink: 0,
         backgroundColor: 'var(--dracula-selection)',
         borderRight: '1px solid var(--dracula-comment)',
