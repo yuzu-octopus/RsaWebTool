@@ -153,10 +153,18 @@ export function renderInlineText(text: string): string {
   html = html.replace(/\\%/g, '%');
   html = html.replace(/\\'/g, "'");
   // Strip math-split remnants: unbalanced openers and orphan closers.
-  // Math never reaches here (InlineMath routes $...$/\(...\) to KaTeX),
-  // so leftover braces are split artifacts, not content.
+  // Supported math never reaches here (InlineMath routes $...$ and
+  // \(...\) without an inner ')' to KaTeX; parseProof extracts the
+  // supported starred display envs), so a leftover opener/orphan closer
+  // is a split artifact, not content. Unsupported forms (\(...\) with an
+  // inner ')', \[...\], non-starred envs) can still arrive as text.
   html = html.replace(/\\(textbf|textit|emph|texttt|underline|text)\{/g, '');
-  html = html.replace(/\}/g, '');
+  // Spare escaped closers: \{ and \} become literals below, so only
+  // strip unescaped orphans (converting first would re-expose \} as a
+  // fresh orphan and eat it again).
+  html = html.replace(/(?<!\\)\}/g, '');
+  html = html.replace(/\\\{/g, '{');
+  html = html.replace(/\\\}/g, '}');
   return html;
 }
 
