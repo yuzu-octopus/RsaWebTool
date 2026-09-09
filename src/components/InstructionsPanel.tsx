@@ -56,7 +56,7 @@ export function InstructionsPanel() {
   if (viewMode !== 'instructions') return null;
 
   return (
-    <Stack>
+    <Stack style={{ flex: 1, minWidth: 0, minHeight: 0 }}>
       <Stack hAlign="center" padding={4}>
         <Stack width="100%" maxWidth={640}>
           <Heading level={3} color="accent">Instructions</Heading>
