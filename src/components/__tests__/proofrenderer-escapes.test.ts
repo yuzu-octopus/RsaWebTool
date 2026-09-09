@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { renderInlineText } from '../ProofRenderer';
+import { renderInlineText } from '../../utils/latexText';
 
 describe('renderInlineText escapes', () => {
   test('hash escape in heading text', () => {
