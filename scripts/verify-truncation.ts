@@ -50,14 +50,29 @@ async function main() {
       document.querySelectorAll('[data-testid^="attack-"] span')
     ).filter(el => getComputedStyle(el).textOverflow === 'ellipsis'
       && (el as HTMLElement).scrollWidth > (el as HTMLElement).clientWidth + 1).length);
-    // Allowance 7: measured with every category expanded (see loop above).
-    // These 7 labels ellipsize at the 264px rail, which is acceptable because
-    // every attack/category/calculator row now carries a native `title`
-    // fallback (see nativeTitle in src/components/Sidebar.tsx) — the kit
-    // Tooltip only covers the collapsed rail, so the title covers the
-    // expanded truncated rows. Raise this number only after re-measuring.
-    if (clipped > 7) throw new Error(`${clipped} nav labels still truncated`);
-    console.log(`OK: ${clipped} clipped nav labels (within allowance of 7)`);
+    // Category/calculator headers: the collapsible toggle buttons
+    // (button[aria-expanded]) — their inner ellipsis label span must never
+    // clip. Fixed by widening the rail 264→280 (the measured overflow of
+    // 'Partial Key / Lattice' was 15px); SideNavItem's label is string-only
+    // with no wrap prop, so width is the only kit-supported remedy.
+    const clippedHeaders: string[] = await page.evaluate(() => Array.from(
+      document.querySelectorAll('button[aria-expanded] span')
+    ).filter(el => getComputedStyle(el).textOverflow === 'ellipsis'
+      && (el as HTMLElement).scrollWidth > (el as HTMLElement).clientWidth + 1)
+      .map(el => (el.textContent ?? '').trim()).filter(Boolean));
+    if (clippedHeaders.length > 0) throw new Error(`header labels truncated: ${clippedHeaders.join(' | ')}`);
+    // Allowance 10: measured 2026-09-09 at 1440px viewport / 280px rail with
+    // every category expanded (see loop above). These 10 attack labels still
+    // ellipsize, which is acceptable because every attack/category/calculator
+    // row now carries a native `title` fallback (see nativeTitle in
+    // src/components/Sidebar.tsx) — the kit Tooltip only covers the collapsed
+    // rail, so the title covers the expanded truncated rows. Raise this
+    // number only after re-measuring. (Format Converter segments measured
+    // clean at 1440px — scrollWidth == clientWidth on all 8 radios — and
+    // SegmentedControl offers no scroll/wrap prop, so there is nothing to fix
+    // or cover there.)
+    if (clipped > 10) throw new Error(`${clipped} nav labels still truncated`);
+    console.log(`OK: ${clipped} clipped nav labels (within allowance of 10), 0 clipped headers`);
   } finally {
     await browser.close();
     server.kill();

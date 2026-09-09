@@ -307,6 +307,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         }}
         header={heading}
         label="Navigation"
+        style={{ backgroundColor: 'var(--dracula-bg-dark)' }}
       >
         {navContent}
         {footer}
@@ -319,10 +320,12 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       header={heading}
       footer={footer}
       style={{
-        width: 264,
+        // 280 (max): SideNavItem's label is string-only with no wrap prop, so the
+        // measured 15px overflow of 'Partial Key / Lattice' is fixed by width.
+        width: 280,
         flexShrink: 0,
-        backgroundColor: 'var(--dracula-selection)',
-        borderRight: '1px solid var(--dracula-comment)',
+        backgroundColor: 'var(--dracula-bg-dark)',
+        borderRight: '1px solid var(--dracula-selection)',
       }}
     >
       {navContent}
