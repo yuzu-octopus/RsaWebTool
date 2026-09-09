@@ -25,15 +25,11 @@ import { useIsMobile } from './Sidebar';
 import { EmptyState } from './_shared/EmptyState';
 import { getAttackSource, extractFrontendCheck, dedent } from '../attacks/rawSources';
 
-// Dracula brand tokens (verbatim kit names — never raw hex).
+// Dracula brand token (verbatim kit name — never raw hex). Kept for the live
+// run-status lines, which use the orange attention vocabulary; all other text
+// resolves through the theme `color` prop.
 const c = {
-  purple: 'var(--dracula-purple)',
-  green: 'var(--dracula-green)',
-  red: 'var(--dracula-red)',
   orange: 'var(--dracula-orange)',
-  cyan: 'var(--dracula-cyan)',
-  pink: 'var(--dracula-pink)',
-  comment: 'var(--dracula-comment)',
 };
 
 const flexFill = { flex: 1, minWidth: 0, minHeight: 0 } as const;
@@ -217,7 +213,7 @@ function AttackPanel({ attack }: { attack: Attack }) {
           {attack.proof ? (
             <ProofRenderer latex={attack.proof} />
           ) : (
-            <Text type="body" style={{ color: c.comment, fontStyle: 'italic' }}>
+            <Text type="body" color="secondary" style={{ fontStyle: 'italic' }}>
               No proof available.
             </Text>
           )}
@@ -250,13 +246,13 @@ function AttackPanel({ attack }: { attack: Attack }) {
       {tab === 1 && (
         <Stack direction="vertical" hAlign="center" padding={2} isScrollable role="tabpanel" id="attack-tabpanel-1" aria-labelledby="attack-tab-1" style={flexFill}>
           <Stack direction="vertical" gap={2} width="100%" style={{ maxWidth: '40rem' }}>
-            <Heading level={3} style={{ color: c.purple }}>
+            <Heading level={3}>
               {attack.name}
             </Heading>
-            <Text type="supporting" style={{ color: c.pink }}>
+            <Text type="supporting" color="secondary">
               {attack.frontendCheck ? 'Runs locally in browser' : 'Executed via SageMathCell'}
             </Text>
-            <Text type="body" style={{ color: c.comment }}>
+            <Text type="body" color="secondary">
               {attack.description}
             </Text>
 
@@ -329,7 +325,7 @@ function AttackPanel({ attack }: { attack: Attack }) {
             {isRunning ? (
               <Stack direction="horizontal" gap={1} hAlign="center" vAlign="center">
                 <Spinner size="sm" data-testid="loading-spinner" aria-label="Attack running" />
-                <Text type="body" style={{ color: c.orange }}>
+                <Text type="body" hasTabularNumbers style={{ color: c.orange }}>
                   Running… {timer.formatted}
                 </Text>
               </Stack>

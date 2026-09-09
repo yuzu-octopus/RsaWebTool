@@ -210,13 +210,13 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       <Text type="supporting">© 2026 yuzu-octopus</Text>
       <Text type="supporting">
         Powered by{' '}
-        <Link href="https://pages.github.com" target="_blank" rel="noopener">
+        <Link href="https://pages.github.com" target="_blank" rel="noopener" type="inherit">
           GitHub Pages
         </Link>
       </Text>
       <Text type="supporting">
         Made with{' '}
-        <Link href="https://vite.dev" target="_blank" rel="noopener">
+        <Link href="https://vite.dev" target="_blank" rel="noopener" type="inherit">
           Vite
         </Link>
       </Text>

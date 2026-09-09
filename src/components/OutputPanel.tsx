@@ -22,7 +22,6 @@ const c = {
   red: 'var(--dracula-red)',
   purple: 'var(--dracula-purple)',
   cyan: 'var(--dracula-cyan)',
-  comment: 'var(--dracula-comment)',
   currentLine: 'var(--dracula-current-line)',
 };
 
@@ -33,12 +32,12 @@ function HistoryListItem({ entry, isSelected, onClick }: { entry: HistoryEntry; 
       onClick={onClick}
       startContent={<Icon icon={entry.success ? 'success' : 'error'} color={entry.success ? 'success' : 'error'} size="sm" />}
       label={
-        <Text type="code" style={{ color: entry.success ? c.green : c.red }}>
+        <Text type="body" style={{ color: entry.success ? c.green : c.red }}>
           {entry.attackName}
         </Text>
       }
       description={
-        <Text type="supporting">
+        <Text type="supporting" hasTabularNumbers>
           Preview · {entry.timestamp.toLocaleTimeString()}
         </Text>
       }
@@ -117,14 +116,14 @@ export function OutputPanel() {
       )}
 
       <Stack direction="vertical" gap={2} padding={2} isScrollable style={isNarrow ? {} : { flex: 1, minHeight: 0, paddingLeft: 'var(--space-gap)' }}>
-        <Heading level={5} style={{ color: c.purple }}>
+        <Heading level={3}>
           Results
         </Heading>
 
         {ui.historySelectedKey && (
           <Stack direction="horizontal" gap={1} vAlign="center">
             <Icon icon={History} size="sm" color="accent" />
-            <Text type="code" style={{ color: c.cyan }}>
+            <Text type="body" style={{ color: c.cyan }}>
               Preview: {history.find(h => h.id === ui.historySelectedKey)?.attackName ?? ''}
             </Text>
             <Button
@@ -151,7 +150,7 @@ export function OutputPanel() {
             />
 
             {ui.historySelectedKey && (
-              <Text id="history-preview-guidance" type="supporting" style={{ color: c.comment }}>
+              <Text id="history-preview-guidance" type="supporting" color="secondary">
                 Preview only. Select original inputs and rerun this attack to view complete output.
               </Text>
             )}
@@ -231,7 +230,7 @@ export function OutputPanel() {
           onOpenChange={(open) => setUi(prev => ({ ...prev, confirmOpen: open }))}
         />
         <Stack direction="vertical" gap={2} padding={2}>
-          <Text type="body" style={{ color: c.comment }}>
+          <Text type="body" color="secondary" hasTabularNumbers>
             This will permanently delete all {history.length} history entries.
           </Text>
           <Stack direction="horizontal" gap={1} hAlign="end">

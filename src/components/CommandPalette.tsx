@@ -209,7 +209,7 @@ export function CommandPalette() {
         data-testid={`command-palette-option-${item.id}`}
       >
         <Stack direction="vertical" gap={1}>
-          <Text type="code">{item.label}</Text>
+          <Text type="body">{item.label}</Text>
           {secondary && <Text type="supporting">{secondary}</Text>}
         </Stack>
         <Stack direction="horizontal" gap={1} vAlign="center">

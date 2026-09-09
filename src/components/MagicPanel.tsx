@@ -20,9 +20,9 @@ import { attacks } from '../attacks';
 import { extractParams } from './_shared/extractParams';
 import type { Attack } from '../types';
 
-// Dracula brand tokens (verbatim kit names — never raw hex).
+// Dracula brand tokens (verbatim kit names — never raw hex). Purple is absent
+// on purpose: nothing here is tappable, so nothing may be purple.
 const c = {
-  purple: 'var(--dracula-purple)',
   green: 'var(--dracula-green)',
   red: 'var(--dracula-red)',
   orange: 'var(--dracula-orange)',
@@ -75,7 +75,7 @@ const JobListItem = memo(function JobListItem({
     <>
       <ListItem
         label={
-          <Text type="code" style={{ color: statusColor(job.status) }}>
+          <Text type="body" style={{ color: statusColor(job.status) }}>
             {job.attackName}
           </Text>
         }
@@ -123,9 +123,9 @@ const ExtractedParams = memo(function ExtractedParams({
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
 
   return (
-    <Card variant="muted">
+    <Card variant="muted" padding={3}>
       <Stack direction="vertical" gap={1}>
-        <Text type="code" style={{ color: c.comment }}>
+        <Text type="label" color="secondary">
           Extracted parameters
         </Text>
         {Object.entries(params).map(([key, value]) => {
@@ -135,7 +135,7 @@ const ExtractedParams = memo(function ExtractedParams({
           return (
             <Stack key={key} direction="vertical" gap={0}>
               <Stack direction="horizontal" gap={1} vAlign="center">
-                <Text type="code" style={{ color: c.purple }}>{key}</Text>
+                <Text type="code">{key}</Text>
                 <Text type="code">=</Text>
                 <Text type="code" maxLines={1} style={{ flex: 1, minWidth: 0 }}>
                   {value}
@@ -160,7 +160,7 @@ const ExtractedParams = memo(function ExtractedParams({
                 />
               </Stack>
               {isPreview && (
-                <Text type="supporting" style={{ color: c.comment }}> preview</Text>
+                <Text type="supporting" color="secondary"> preview</Text>
               )}
               {isPreview && isExpanded && (
                 <Text id={contentId} type="code" textWrap="wrap" wordBreak="break-all">
@@ -180,12 +180,12 @@ const ApplicableList = memo(function ApplicableList({ byCategory }: { byCategory
     <Stack direction="vertical" gap={1}>
       {Object.entries(byCategory).map(([cat, catAttacks]) => (
         <Stack key={cat} direction="vertical" gap={0}>
-          <Text type="code" style={{ color: c.cyan }}>
+          <Text type="body" weight="semibold">
             {cat}
           </Text>
           {catAttacks.map(a => (
-            <Text key={a.id} type="code">
-              {a.name} <Text style={{ color: c.comment }}>({a.priority})</Text>
+            <Text key={a.id} type="body">
+              {a.name} <Text type="supporting" color="secondary">({a.priority})</Text>
             </Text>
           ))}
         </Stack>
@@ -196,12 +196,12 @@ const ApplicableList = memo(function ApplicableList({ byCategory }: { byCategory
 
 const ErrorInsightBox = memo(function ErrorInsightBox({ insights }: { insights: string }) {
   return (
-    <Card variant="muted">
+    <Card variant="muted" padding={3}>
       <Stack direction="vertical" gap={1}>
-        <Text type="code" style={{ color: c.orange }}>
+        <Text type="body" style={{ color: c.orange }}>
           No attack succeeded: {insights}
         </Text>
-        <Text type="code" style={{ color: c.comment }}>
+        <Text type="body" color="secondary">
           Try checking parameter names, using a PEM key, or selecting a specific attack from the sidebar
         </Text>
       </Stack>
@@ -290,10 +290,10 @@ export function MagicPanel() {
     <Stack direction="vertical" style={flexFill}>
       <Stack direction="vertical" hAlign="center" padding={2} isScrollable style={flexFill}>
         <Stack direction="vertical" gap={2} width="100%" style={{ maxWidth: '40rem' }}>
-          <Heading level={3} style={{ color: c.purple }}>
+          <Heading level={3}>
             <Icon icon={Sparkles} size="sm" /> Magic Cracker
           </Heading>
-          <Text type="body" style={{ color: c.comment }}>
+          <Text type="body" color="secondary">
             Paste everything you have: we&apos;ll figure out which attacks to try
           </Text>
 
@@ -307,9 +307,9 @@ export function MagicPanel() {
 
           {/* Empty state — show format examples */}
           {!rawInput.trim() && !running && jobs.length === 0 && (
-            <Card variant="muted">
+            <Card variant="muted" padding={3}>
               <Stack direction="vertical" gap={1}>
-                <Text type="code" style={{ color: c.comment }}>
+                <Text type="label" color="secondary">
                   Paste any of these formats:
                 </Text>
                 <Stack direction="vertical" gap={0}>
@@ -332,7 +332,7 @@ export function MagicPanel() {
           )}
 
           {rawInput.trim() && !running && (
-            <Text role="status" aria-live="polite" type="code" style={{ color: canCrack ? c.green : c.comment }}>
+            <Text role="status" aria-live="polite" type="body" hasTabularNumbers style={{ color: canCrack ? c.green : c.comment }}>
               {!extractedParams
                 ? 'No supported parameters found. Use n = …, a PEM RSA key, hex/decimal n, or JSON such as {"n":"…","e":65537}.'
                 : applicablePreview.length === 0
@@ -403,7 +403,7 @@ export function MagicPanel() {
               />
               <Stack direction="horizontal" gap={1} hAlign="center" vAlign="center" role="status" aria-live="polite">
                 <Spinner size="sm" aria-label="Cracking in progress" />
-                <Text type="body" style={{ color: c.purple }}>
+                <Text type="body" hasTabularNumbers>
                   Elapsed: {timer.formatted} / {jobs.filter(j => j.status !== 'running').length}/{jobs.length} completed
                 </Text>
               </Stack>
@@ -418,7 +418,7 @@ export function MagicPanel() {
 
           {/* Results summary */}
           {!running && jobs.length > 0 && (
-            <Text type="body" justify="center" style={{ color: c.comment }}>
+            <Text type="body" justify="center" color="secondary" hasTabularNumbers>
               <Text style={{ color: c.green }}>{jobs.filter(j => j.status === 'success').length} succeeded</Text>
               {', '}
               <Text style={{ color: c.red }}>{jobs.filter(j => j.status === 'error').length} failed</Text>
