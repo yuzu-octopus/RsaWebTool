@@ -22,6 +22,7 @@ import { useWorkerPool } from '../hooks/useWorkerPool';
 import { useAttackExecution } from '../hooks/useAttackExecution';
 import { useCopyToClipboard } from '../hooks/useCopyToClipboard';
 import { ProofRenderer } from './ProofRenderer';
+import { useIsMobile } from './Sidebar';
 import { EmptyState } from './_shared/EmptyState';
 import { getAttackSource, extractFrontendCheck, dedent } from '../attacks/rawSources';
 
@@ -39,26 +40,34 @@ const c = {
 const flexFill = { flex: 1, minWidth: 0, minHeight: 0 } as const;
 
 export function InputPanel() {
-  const { selectedAttack, viewMode, setViewMode, setCalculatorMode, setSelectedAttack } = useAppContext();
+  const { selectedAttack, viewMode, setViewMode, setCalculatorMode, setSelectedAttack, setMobileNavOpen } = useAppContext();
+  const isMobile = useIsMobile();
 
   if (viewMode !== 'attack') return null;
 
   if (!selectedAttack) {
     return (
       <Stack direction="vertical" hAlign="center" vAlign="center" style={flexFill}>
-        <EmptyState title="Start cracking" hint="Pick a path — no setup needed.">
-          <Stack direction="vertical" gap={2} style={{ marginTop: 'var(--space-gap)' }}>
-            <Button label="Open Magic Cracker" variant="primary" onClick={() => setViewMode('magic')} />
-            <Button label="Try Hastad Broadcast" variant="secondary" onClick={() => {
-              const hb = attacks.find(a => a.id === 'hastad-broadcast');
-              if (hb) setSelectedAttack(hb);
-              setViewMode('attack');
-            }} />
-            <Button label="Open RSA Calculator" variant="secondary" onClick={() => {
-              setCalculatorMode('rsa');
-              setViewMode('calculator');
-            }} />
-          </Stack>
+        <EmptyState
+          title={isMobile ? 'Tap the menu above to choose an attack' : 'Start cracking'}
+          hint={isMobile ? undefined : 'Pick a path — no setup needed.'}
+        >
+          {isMobile
+            ? <Button label="Choose an attack" variant="primary" onClick={() => setMobileNavOpen(true)} />
+            : (
+              <Stack direction="vertical" gap={2} style={{ marginTop: 'var(--space-gap)' }}>
+                <Button label="Open Magic Cracker" variant="primary" onClick={() => setViewMode('magic')} />
+                <Button label="Try Hastad Broadcast" variant="secondary" onClick={() => {
+                  const hb = attacks.find(a => a.id === 'hastad-broadcast');
+                  if (hb) setSelectedAttack(hb);
+                  setViewMode('attack');
+                }} />
+                <Button label="Open RSA Calculator" variant="secondary" onClick={() => {
+                  setCalculatorMode('rsa');
+                  setViewMode('calculator');
+                }} />
+              </Stack>
+            )}
         </EmptyState>
       </Stack>
     );

@@ -39,8 +39,7 @@ const skipLinkHiddenStyle = {
 } as const;
 
 function AppContent() {
-  const { notification } = useAppContext();
-  const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false);
+  const { notification, mobileNavOpen: mobileNavigationOpen, setMobileNavOpen: setMobileNavigationOpen } = useAppContext();
   const [skipLinkFocused, setSkipLinkFocused] = useState(false);
   const isMobile = useIsMobile();
   const showToast = useToast();

@@ -69,4 +69,6 @@ export interface AppContextType {
   showNotification: (message: string, severity?: 'success' | 'error' | 'info') => void;
   commandPaletteOpen: boolean;
   setCommandPaletteOpen: (open: SetStateAction<boolean>) => void;
+  mobileNavOpen: boolean;
+  setMobileNavOpen: (open: boolean) => void;
 }

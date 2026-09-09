@@ -37,6 +37,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   });
   const [notification, setNotification] = useState<NotificationState | null>(null);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const keyCounter = useRef(0);
 
   const addToHistory = useCallback((attackId: string, attackName: string, result: string, success: boolean) => {
@@ -84,10 +85,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setOutputSource: (v: AppContextType['outputSource']) => setApp(prev => ({ ...prev, outputSource: v })),
     history, addToHistory, clearHistory, notification, showNotification,
     commandPaletteOpen, setCommandPaletteOpen,
+    mobileNavOpen, setMobileNavOpen,
   }), [
     app.selectedAttack, app.viewMode, app.calculatorMode, app.outputResult, app.outputError, app.outputSource,
     history, addToHistory, clearHistory, notification, showNotification,
     commandPaletteOpen, setCommandPaletteOpen,
+    mobileNavOpen, setMobileNavOpen,
   ]);
 
   return (
