@@ -210,7 +210,7 @@ export function CommandPalette() {
       >
         <Stack direction="vertical" gap={1}>
           <Text type="body">{item.label}</Text>
-          {secondary && <Text type="supporting">{secondary}</Text>}
+          {secondary && <Text type="body">{secondary}</Text>}
         </Stack>
         <Stack direction="horizontal" gap={1} vAlign="center">
           {chips.map(chip => (

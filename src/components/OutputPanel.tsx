@@ -115,7 +115,7 @@ export function OutputPanel() {
         </Stack>
       )}
 
-      <Stack direction="vertical" gap={2} padding={2} isScrollable style={isNarrow ? {} : { flex: 1, minHeight: 0, paddingLeft: 'var(--space-gap)' }}>
+      <Stack direction="vertical" gap={2} padding={4} isScrollable style={isNarrow ? {} : { flex: 1, minHeight: 0, paddingLeft: 'var(--space-gap)' }}>
         <Heading level={3} color="accent">
           Results
         </Heading>
@@ -150,7 +150,7 @@ export function OutputPanel() {
             />
 
             {ui.historySelectedKey && (
-              <Text id="history-preview-guidance" type="supporting" color="secondary">
+              <Text id="history-preview-guidance" type="body">
                 Preview only. Select original inputs and rerun this attack to view complete output.
               </Text>
             )}
@@ -164,7 +164,7 @@ export function OutputPanel() {
                 icon={<Icon icon="copy" size="sm" />}
               />
               {copied && (
-                <Text type="supporting" aria-live="polite" style={{ color: c.green }}>
+                <Text type="body" aria-live="polite" style={{ color: c.green }}>
                   Copied to clipboard!
                 </Text>
               )}
@@ -183,7 +183,7 @@ export function OutputPanel() {
         )}
       </Stack>
 
-      <Stack direction="vertical" padding={2} paddingBlockStart={0}>
+      <Stack direction="vertical" padding={4} paddingBlockStart={0}>
         <Button
           label={`History (${history.length})`}
           variant="ghost"
@@ -229,7 +229,7 @@ export function OutputPanel() {
           title="Clear History?"
           onOpenChange={(open) => setUi(prev => ({ ...prev, confirmOpen: open }))}
         />
-        <Stack direction="vertical" gap={2} padding={2}>
+        <Stack direction="vertical" gap={2} padding={3}>
           <Text type="body" color="secondary" hasTabularNumbers>
             This will permanently delete all {history.length} history entries.
           </Text>

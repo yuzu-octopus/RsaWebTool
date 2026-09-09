@@ -30,6 +30,7 @@ import { getAttackSource, extractFrontendCheck, dedent } from '../attacks/rawSou
 // resolves through the theme `color` prop.
 const c = {
   orange: 'var(--dracula-orange)',
+  cyan: 'var(--dracula-cyan)',
 };
 
 const flexFill = { flex: 1, minWidth: 0, minHeight: 0 } as const;
@@ -209,7 +210,7 @@ function AttackPanel({ attack }: { attack: Attack }) {
 
       {/* Explanation tab - left aligned */}
       {tab === 0 && (
-        <Stack direction="vertical" gap={2} padding={2} isScrollable role="tabpanel" id="attack-tabpanel-0" aria-labelledby="attack-tab-0" style={flexFill}>
+        <Stack direction="vertical" gap={2} padding={4} isScrollable role="tabpanel" id="attack-tabpanel-0" aria-labelledby="attack-tab-0" style={flexFill}>
           {attack.proof ? (
             <ProofRenderer latex={attack.proof} />
           ) : (
@@ -220,7 +221,7 @@ function AttackPanel({ attack }: { attack: Attack }) {
 
           {attack.usageGuide && (
             <Stack hAlign="center" width="100%">
-              <Stack width="100%" maxWidth="72ch" gap={2} padding={2}>
+              <Stack width="100%" maxWidth="72ch" gap={2} padding={3}>
                 <Text type="code" style={{ whiteSpace: 'pre-wrap' }}>
                   {attack.usageGuide}
                 </Text>
@@ -228,7 +229,7 @@ function AttackPanel({ attack }: { attack: Attack }) {
             </Stack>
           )}
           <Stack hAlign="center" width="100%">
-            <Stack width="100%" maxWidth="72ch" padding={2}>
+            <Stack width="100%" maxWidth="72ch" padding={3}>
               <Stack direction="horizontal" hAlign="start">
                 <Button
                   label="Continue to Input"
@@ -244,12 +245,12 @@ function AttackPanel({ attack }: { attack: Attack }) {
 
       {/* Input tab - center aligned */}
       {tab === 1 && (
-        <Stack direction="vertical" hAlign="center" padding={2} isScrollable role="tabpanel" id="attack-tabpanel-1" aria-labelledby="attack-tab-1" style={flexFill}>
+        <Stack direction="vertical" hAlign="center" padding={4} isScrollable role="tabpanel" id="attack-tabpanel-1" aria-labelledby="attack-tab-1" style={flexFill}>
           <Stack direction="vertical" gap={2} width="100%" style={{ maxWidth: '40rem' }}>
             <Heading level={3} color="accent">
               {attack.name}
             </Heading>
-            <Text type="supporting" color="secondary">
+            <Text type="body" style={{ color: c.cyan }}>
               {attack.frontendCheck ? 'Runs locally in browser' : 'Executed via SageMathCell'}
             </Text>
             <Text type="body" color="secondary">
@@ -345,7 +346,7 @@ function AttackPanel({ attack }: { attack: Attack }) {
                   formatValueLabel={(v) => `${v}%${progressDetail ? ` — ${progressDetail}` : ''}`}
                 />
                 {eta && (
-                  <Text type="supporting" justify="center" style={{ color: c.orange }}>
+                  <Text type="body" justify="center" style={{ color: c.orange }}>
                     {eta} remaining
                   </Text>
                 )}
@@ -357,7 +358,7 @@ function AttackPanel({ attack }: { attack: Attack }) {
 
       {/* Source tab */}
       {tab === 2 && (
-        <Stack direction="vertical" gap={2} padding={2} isScrollable role="tabpanel" id="attack-tabpanel-2" aria-labelledby="attack-tab-2" style={flexFill}>
+        <Stack direction="vertical" gap={2} padding={4} isScrollable role="tabpanel" id="attack-tabpanel-2" aria-labelledby="attack-tab-2" style={flexFill}>
           <Stack direction="horizontal" gap={1}>
             {hasSage && (
               <Button

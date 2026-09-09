@@ -185,7 +185,7 @@ const ApplicableList = memo(function ApplicableList({ byCategory }: { byCategory
           </Text>
           {catAttacks.map(a => (
             <Text key={a.id} type="body">
-              {a.name} <Text type="supporting" color="secondary">({a.priority})</Text>
+              {a.name} <Text type="body" color="secondary">({a.priority})</Text>
             </Text>
           ))}
         </Stack>
@@ -288,7 +288,7 @@ export function MagicPanel() {
 
   return (
     <Stack direction="vertical" style={flexFill}>
-      <Stack direction="vertical" hAlign="center" padding={2} isScrollable style={flexFill}>
+      <Stack direction="vertical" hAlign="center" padding={4} isScrollable style={flexFill}>
         <Stack direction="vertical" gap={2} width="100%" style={{ maxWidth: '40rem' }}>
           <Heading level={3} color="accent">
             <Icon icon={Sparkles} size="sm" /> Magic Cracker

@@ -209,7 +209,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   );
 
   const footer = (
-    <Stack direction="vertical" gap={1} padding={2}>
+    <Stack direction="vertical" gap={1} padding={3}>
       <Divider />
       <Text type="supporting">© 2026 yuzu-octopus</Text>
       <Text type="supporting">
