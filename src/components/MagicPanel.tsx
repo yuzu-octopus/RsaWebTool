@@ -184,9 +184,10 @@ const ApplicableList = memo(function ApplicableList({ byCategory }: { byCategory
             {cat}
           </Text>
           {catAttacks.map(a => (
-            <Text key={a.id} type="body">
-              {a.name} <Text type="body" color="secondary">({a.priority})</Text>
-            </Text>
+            <Stack key={a.id} direction="horizontal" gap={1}>
+              <Text type="body">{a.name}</Text>
+              <Text type="body" color="secondary">({a.priority})</Text>
+            </Stack>
           ))}
         </Stack>
       ))}

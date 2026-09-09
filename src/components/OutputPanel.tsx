@@ -150,7 +150,7 @@ export function OutputPanel() {
             />
 
             {ui.historySelectedKey && (
-              <Text id="history-preview-guidance" type="body">
+              <Text id="history-preview-guidance" type="body" color="secondary">
                 Preview only. Select original inputs and rerun this attack to view complete output.
               </Text>
             )}

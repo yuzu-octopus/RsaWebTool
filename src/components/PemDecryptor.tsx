@@ -174,7 +174,7 @@ export function PemDecryptor() {
           {decrypting && (
             <Stack gap={1}>
               <ProgressBar label="Decrypting key" isIndeterminate />
-              <Text type="body">
+              <Text type="body" color="secondary">
                 Decrypting key…
               </Text>
             </Stack>

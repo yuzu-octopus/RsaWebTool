@@ -250,7 +250,7 @@ function AttackPanel({ attack }: { attack: Attack }) {
             <Heading level={3} color="accent">
               {attack.name}
             </Heading>
-            <Text type="body" style={{ color: c.cyan }}>
+            <Text type="body" color="secondary">
               {attack.frontendCheck ? 'Runs locally in browser' : 'Executed via SageMathCell'}
             </Text>
             <Text type="body" color="secondary">

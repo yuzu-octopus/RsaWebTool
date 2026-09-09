@@ -108,7 +108,7 @@ export function DHKeyExchangeTab() {
 
       <Grid columns={{ minWidth: 280, max: 2 }} gap={2}>
         {/* Alice panel */}
-        <Card padding={4}>
+        <Card padding={3}>
           <Stack direction="vertical" gap={1}>
             <Heading level={5} style={{ color: 'var(--dracula-cyan)' }}>Alice</Heading>
             <Button label="Generate" variant="primary" width="100%" onClick={genAlice} />
@@ -142,7 +142,7 @@ export function DHKeyExchangeTab() {
         </Card>
 
         {/* Bob panel */}
-        <Card padding={4}>
+        <Card padding={3}>
           <Stack direction="vertical" gap={1}>
             <Heading level={5} style={{ color: 'var(--dracula-cyan)' }}>Bob</Heading>
             <Button label="Generate" variant="primary" width="100%" onClick={genBob} />
@@ -177,7 +177,7 @@ export function DHKeyExchangeTab() {
       </Grid>
 
       {/* Shared Secret panel */}
-      <Card padding={4}>
+      <Card padding={3}>
         <Stack direction="vertical" gap={1}>
           <Heading level={5} style={{ color: 'var(--dracula-cyan)' }}>Shared Secret</Heading>
           <Stack direction="horizontal" gap={1}>
