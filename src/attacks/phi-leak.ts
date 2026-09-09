@@ -108,7 +108,7 @@ Tip: Instant factorization once φ(n) is known. φ(n) can leak from CRT-based im
         # Solve quadratic: x^2 - sum_pq * x + n = 0
         discriminant = sum_pq**2 - 4*n
         if discriminant < 0:
-            out.append("PHI_LEAK=FAILED: Negative discriminant. phi(n) is inconsistent with n (phi-multiple Miller-Rabin-style randomized factoring is not implemented here).")
+            out.append("PHI_LEAK=FAILED: Negative discriminant. phi(n) is inconsistent with n (for a multiple of phi, provide d to use the randomized MR-splitting mode).")
             out.append("PHI_LEAK=FAILED")
         elif discriminant == 0:
             # Square discriminant: p = q = sum_pq / 2 with n a perfect square.
@@ -145,7 +145,7 @@ Tip: Instant factorization once φ(n) is known. φ(n) can leak from CRT-based im
                 out.append("PHI_LEAK=SUCCESS")
                 found = True
             else:
-                out.append(f"PHI_LEAK=FAILED: discriminant is not a perfect square (phi may belong to a multi-prime n or be inconsistent; phi-multiple Miller-Rabin-style randomized factoring is not implemented here)")
+                out.append(f"PHI_LEAK=FAILED: discriminant is not a perfect square (phi may belong to a multi-prime n or be inconsistent; for a multiple of phi, provide d to use the randomized MR-splitting mode)")
                 out.append("PHI_LEAK=FAILED")
         if not found:
             out.append("PHI_LEAK=FAILED")`,
@@ -169,7 +169,7 @@ Tip: Instant factorization once φ(n) is known. φ(n) can leak from CRT-based im
           `phi = ${phi}`,
           ``,
           `No factorization: negative discriminant, so phi(n) is inconsistent with n.`,
-          `A phi-multiple Miller-Rabin-style randomized factorisation is not implemented here.`,
+          `For a multiple of phi, provide d to use the randomized MR-splitting mode.`,
           ``,
           `PHI_LEAK=FAILED`,
         ].join('\n');
@@ -183,8 +183,8 @@ Tip: Instant factorization once φ(n) is known. φ(n) can leak from CRT-based im
           `phi = ${phi}`,
           ``,
           `No factorization: discriminant ${discriminant} is not a perfect square.`,
-          `phi may belong to a multi-prime n or be inconsistent; phi-multiple`,
-          `Miller-Rabin-style randomized factoring is not implemented here.`,
+          `phi may belong to a multi-prime n or be inconsistent; for a multiple`,
+          `of phi, provide d to use the randomized MR-splitting mode.`,
           ``,
           `PHI_LEAK=FAILED`,
         ].join('\n');
