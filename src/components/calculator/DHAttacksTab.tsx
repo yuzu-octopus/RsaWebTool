@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef} from 'react';
 import { Stack } from '@astryxdesign/core/Stack';
 import { Text } from '@astryxdesign/core/Text';
 import { TextInput } from '@astryxdesign/core/TextInput';
@@ -95,8 +95,8 @@ function pushCrtTail(p: bigint, g: bigint, y: bigint, remainders: bigint[], modu
   lines.push(`Match: ${verify === y ? '✓' : '✗ (partial recovery — key known only mod the smooth part)'}`);
 }
 
-export function DHAttacksTab() {
-  const [attack, setAttack] = useState('small-subgroup');
+export function DHAttacksTab({ selectedAttack }: { selectedAttack?: string } = {}) {
+  const [attack, setAttack] = useState(selectedAttack ?? 'small-subgroup');
   const [pVal, setPVal] = useState('');
   const [gVal, setGVal] = useState('');
   const [yVal, setYVal] = useState('');
@@ -255,6 +255,7 @@ export function DHAttacksTab() {
 
   return (
     <Stack direction="vertical" gap={2}>
+      {!selectedAttack && (
       <Selector
         label="Attack"
         options={DH_ATTACKS.map(a => ({ value: a.value, label: a.label }))}
@@ -263,6 +264,7 @@ export function DHAttacksTab() {
         width="100%"
         isDisabled={isRunning}
       />
+      )}
 
       {DH_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={DH_ATTACK_EXPLANATIONS[attack]} />}
 

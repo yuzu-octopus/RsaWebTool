@@ -17,7 +17,7 @@ function LearnExplanation() {
   return <ECCExplanationTab onContinue={() => switchWorkspaceTab('operations')} />;
 }
 
-export default function ECCCalculator({ attacksOnly = false, learnOnly = false }: { attacksOnly?: boolean; learnOnly?: boolean } = {}) {
+export default function ECCCalculator({ attacksOnly = false, learnOnly = false, selectedAttack }: { attacksOnly?: boolean; learnOnly?: boolean; selectedAttack?: string } = {}) {
   const [tab, setTab] = useState('keyops');
   const { setOutputResult, setOutputError, setOutputSource } = useAppContext();
 
@@ -33,7 +33,7 @@ export default function ECCCalculator({ attacksOnly = false, learnOnly = false }
   }
 
   if (attacksOnly) {
-    return <ECCAttacksTab />;
+    return <ECCAttacksTab selectedAttack={selectedAttack} />;
   }
 
   return (

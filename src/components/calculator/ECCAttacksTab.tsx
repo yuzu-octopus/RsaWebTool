@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef} from 'react';
 import { Stack } from '@astryxdesign/core/Stack';
 import { Text } from '@astryxdesign/core/Text';
 import { TextInput } from '@astryxdesign/core/TextInput';
@@ -38,8 +38,8 @@ import { bytesToHex } from '@noble/curves/utils.js';
 
 const SECP256K1_ORDER_HEX = 'fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141';
 
-export function ECCAttacksTab() {
-  const [attack, setAttack] = useState('nonce-reuse');
+export function ECCAttacksTab({ selectedAttack }: { selectedAttack?: string } = {}) {
+  const [attack, setAttack] = useState(selectedAttack ?? 'nonce-reuse');
   const [h1, setH1] = useState('');
   const [h2, setH2] = useState('');
   const [r1, setR1] = useState('');
@@ -613,6 +613,7 @@ print('\\n'.join(out)); print('TOKEN=SUCCESS')`;
 
   return (
     <Stack direction="vertical" gap={2}>
+      {!selectedAttack && (
       <Selector
         label="Attack"
         options={ECC_ATTACKS.map(a => ({ value: a.value, label: a.label }))}
@@ -621,6 +622,7 @@ print('\\n'.join(out)); print('TOKEN=SUCCESS')`;
         width="100%"
         isDisabled={isRunning}
       />
+      )}
       {ECC_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={ECC_ATTACK_EXPLANATIONS[attack]} />}
       {attackFields}
       <Button

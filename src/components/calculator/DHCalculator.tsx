@@ -15,7 +15,7 @@ function LearnExplanation() {
   return <DHExplanationTab onContinue={() => switchWorkspaceTab('operations')} />;
 }
 
-export default function DHCalculator({ attacksOnly = false, learnOnly = false }: { attacksOnly?: boolean; learnOnly?: boolean } = {}) {
+export default function DHCalculator({ attacksOnly = false, learnOnly = false, selectedAttack }: { attacksOnly?: boolean; learnOnly?: boolean; selectedAttack?: string } = {}) {
   const [tab, setTab] = useState('keyexchange');
   const { setOutputResult, setOutputError, setOutputSource } = useAppContext();
 
@@ -31,7 +31,7 @@ export default function DHCalculator({ attacksOnly = false, learnOnly = false }:
   }
 
   if (attacksOnly) {
-    return <DHAttacksTab />;
+    return <DHAttacksTab selectedAttack={selectedAttack} />;
   }
 
   return (

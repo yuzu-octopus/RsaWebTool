@@ -62,7 +62,7 @@ export function CalculatorHeader(props: CalculatorHeaderProps) {
   const activeTab = 'activeTab' in props ? props.activeTab : undefined;
   const onTabChange = 'onTabChange' in props ? props.onTabChange : undefined;
   return (
-    <Stack direction="vertical" hAlign="center" padding={4} style={{ flex: 1, minWidth: 0, minHeight: 0 }}>
+    <Stack direction="vertical" hAlign="center" style={{ flex: 1, minWidth: 0, minHeight: 0 }}>
       <Stack direction="vertical" gap={2} width="100%" maxWidth={640}>
         <Stack direction="vertical" gap={1}>
           <Heading level={3} color="accent">{title}</Heading>

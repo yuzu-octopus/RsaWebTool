@@ -15,7 +15,7 @@ function LearnExplanation() {
   return <AESExplanationTab onContinue={() => switchWorkspaceTab('operations')} />;
 }
 
-export default function AESCalculator({ attacksOnly = false, learnOnly = false }: { attacksOnly?: boolean; learnOnly?: boolean } = {}) {
+export default function AESCalculator({ attacksOnly = false, learnOnly = false, selectedAttack }: { attacksOnly?: boolean; learnOnly?: boolean; selectedAttack?: string } = {}) {
   const [tab, setTab] = useState('encrypt-decrypt');
   const { setOutputResult, setOutputError, setOutputSource } = useAppContext();
 
@@ -31,7 +31,7 @@ export default function AESCalculator({ attacksOnly = false, learnOnly = false }
   }
 
   if (attacksOnly) {
-    return <AESAttacksTab />;
+    return <AESAttacksTab selectedAttack={selectedAttack} />;
   }
 
   return (

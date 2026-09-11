@@ -9,7 +9,7 @@ import { Stack } from '@astryxdesign/core/Stack';
 import type { SearchableItem, SearchSource } from '@astryxdesign/core/Typeahead';
 import { useAppContext } from '../hooks/useAppContext';
 import { attacks } from '../attacks';
-import { ALL_SIDEBAR_ITEMS, CATEGORY_BADGE_VARIANTS } from '../config/sidebarItems';
+import { ALL_SIDEBAR_ITEMS, CATEGORY_BADGE_VARIANTS, CIPHER_ATTACK_GROUPS } from '../config/sidebarItems';
 import type { Attack } from '../types';
 
 
@@ -18,10 +18,11 @@ type ViewMode = typeof VIEW_MODES[number];
 
 interface PaletteAux {
   group: 'Modules' | 'Ciphers' | 'Attacks';
-  kind: 'view' | 'attack';
+  kind: 'view' | 'attack' | 'cipher-attack';
   mode?: string;
   moduleId?: string;
   attack?: Attack;
+  cipherAttack?: string;
   keywords: string[];
 }
 
@@ -60,6 +61,21 @@ function buildEntries(): { bootstrap: PaletteEntry[]; sidebar: PaletteEntry[] } 
           mode: item.id,
           moduleId: item.id,
           keywords: [item.id, item.label],
+        },
+      });
+    } else if (item.type === 'cipher-attack') {
+      const group = CIPHER_ATTACK_GROUPS.find(g => g.cipher === item.cipher);
+      const label = group?.attacks.find(a => a.id === item.id)?.label ?? item.id;
+      entries.push({
+        id: `${item.cipher}-${item.id}`,
+        label,
+        auxiliaryData: {
+          group: 'Ciphers',
+          kind: 'cipher-attack',
+          mode: item.cipher,
+          moduleId: item.cipher,
+          cipherAttack: item.id,
+          keywords: [item.id, label, item.cipher],
         },
       });
     } else {
@@ -155,6 +171,11 @@ export function CommandPalette() {
       const aux = entry.auxiliaryData;
       if (aux.kind === 'view' && aux.mode) selectView(aux.mode);
       else if (aux.kind === 'attack' && aux.attack) selectAttack(aux.attack);
+      else if (aux.kind === 'cipher-attack' && aux.mode && aux.cipherAttack) {
+        setViewMode(aux.mode as ViewMode);
+        window.dispatchEvent(new CustomEvent('cipher-attack-select', { detail: aux.cipherAttack }));
+        window.dispatchEvent(new CustomEvent('cipher-workspace-tab', { detail: 'attacks' }));
+      }
     },
     [entryById, selectView, selectAttack],
   );

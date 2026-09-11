@@ -19,14 +19,23 @@ const OPERATIONS = { rsa: RSACalculator, aes: AESCalculator, ecc: ECCCalculator,
 export function Calculator() {
   const { viewMode } = useAppContext();
   const [tab, setTab] = useState<CipherWorkspaceTab>('operations');
+  const [cipherAttack, setCipherAttack] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent<CipherWorkspaceTab>).detail;
       if (detail === 'operations' || detail === 'attacks' || detail === 'learn') setTab(detail);
     };
+    const attackHandler = (e: Event) => {
+      const detail = (e as CustomEvent<string>).detail;
+      if (typeof detail === 'string') { setCipherAttack(detail); setTab('attacks'); }
+    };
     window.addEventListener('cipher-workspace-tab', handler);
-    return () => window.removeEventListener('cipher-workspace-tab', handler);
+    window.addEventListener('cipher-attack-select', attackHandler);
+    return () => {
+      window.removeEventListener('cipher-workspace-tab', handler);
+      window.removeEventListener('cipher-attack-select', attackHandler);
+    };
   }, []);
 
   if (!isCipherId(viewMode)) return null;
@@ -38,7 +47,7 @@ export function Calculator() {
       tab={tab}
       onTabChange={setTab}
       operations={(() => { const C = OPERATIONS[viewMode]; return <C />; })()}
-      attacks={viewMode === 'rsa' ? <InputPanel /> : (() => { const C = OPERATIONS[viewMode] as (p: { attacksOnly?: boolean }) => React.JSX.Element; return <C attacksOnly />; })()}
+      attacks={viewMode === 'rsa' ? <InputPanel /> : (() => { const C = OPERATIONS[viewMode] as (p: { attacksOnly?: boolean; selectedAttack?: string }) => React.JSX.Element; return <C key={cipherAttack ?? 'default'} attacksOnly selectedAttack={cipherAttack} />; })()}
       learn={(() => { const C = OPERATIONS[viewMode] as (p: { learnOnly?: boolean }) => React.JSX.Element; return <C learnOnly />; })()}
     />
   );

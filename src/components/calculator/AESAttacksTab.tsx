@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { Stack } from '@astryxdesign/core/Stack';
 import { Text } from '@astryxdesign/core/Text';
 import { TextInput } from '@astryxdesign/core/TextInput';
@@ -295,8 +295,11 @@ function formReducer(state: AttackForm, action: { key: keyof AttackForm; value: 
   return state[action.key] === action.value ? state : { ...state, [action.key]: action.value };
 }
 
-export function AESAttacksTab() {
-  const [form, dispatchForm] = useReducer(formReducer, INITIAL_FORM);
+export function AESAttacksTab({ selectedAttack }: { selectedAttack?: string } = {}) {
+  const [form, dispatchForm] = useReducer(formReducer, { ...INITIAL_FORM, attack: selectedAttack ?? INITIAL_FORM.attack });
+  useEffect(() => {
+    if (selectedAttack) dispatchForm({ key: 'attack', value: selectedAttack });
+  }, [selectedAttack]);
   const set = useCallback(
     (key: keyof AttackForm) => (value: string) => dispatchForm({ key, value }),
     [],
@@ -425,6 +428,7 @@ export function AESAttacksTab() {
 
   return (
     <Stack direction="vertical" gap={2}>
+      {!selectedAttack && (
       <Selector
         label="Attack"
         options={AES_ATTACKS.map(a => ({ value: a.value, label: a.label }))}
@@ -433,6 +437,7 @@ export function AESAttacksTab() {
         width="100%"
         isDisabled={isRunning}
       />
+      )}
       {AES_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={AES_ATTACK_EXPLANATIONS[attack]} />}
       {attackFields}
       <Button

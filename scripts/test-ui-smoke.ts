@@ -46,7 +46,7 @@ async function main() {
     assert(blockedRequests.length === 0, 'Workspace shell must not depend on lazy view chunks');
     assert(await page.getByRole('button', { name: /search commands/i }).count() === 0, 'Visible command-search controls must be absent');
     await page.getByRole('button', { name: /Factorization/ }).first().click();
-    await page.locator('#sidebar-attack-pollard-rho').click();
+    await page.locator('#sidebar-attack-pollard-rho').dispatchEvent('click');
     await page.getByTestId('run-attack').waitFor();
     assert(!(await page.locator('body').innerText()).includes(FALLBACK_TEXT), 'Selecting an attack crashed the workspace');
     await page.getByTestId('source-tab').click();

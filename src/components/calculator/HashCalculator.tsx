@@ -1,4 +1,4 @@
-import { use, useState, useCallback } from 'react';
+import { use, useState, useCallback} from 'react';
 import { CalculatorHeader } from './_shared/CalculatorHeader';
 import HashFunctionsTab from './hash/HashFunctionsTab';
 import HMACTab from './hash/HMACTab';
@@ -20,8 +20,8 @@ function LearnExplanation() {
   return <ExplanationTab onContinue={() => switchWorkspaceTab('operations')} />;
 }
 
-export default function HashCalculator({ attacksOnly = false, learnOnly = false }: { attacksOnly?: boolean; learnOnly?: boolean } = {}) {
-  const [activeTab, setActiveTab] = useState('hash-functions');
+export default function HashCalculator({ attacksOnly = false, learnOnly = false, selectedAttack }: { attacksOnly?: boolean; learnOnly?: boolean; selectedAttack?: string } = {}) {
+  const [activeTab, setActiveTab] = useState(selectedAttack ?? 'hash-functions');
   const { setOutputResult, setOutputError, setOutputSource } = useAppContext();
 
   const handleTabChange = useCallback((tabId: string) => {

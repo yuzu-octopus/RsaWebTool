@@ -2,15 +2,9 @@ import { useEffect, useState, type ReactNode, type SVGProps } from 'react';
 import { SideNav, SideNavHeading, SideNavItem } from '@astryxdesign/core/SideNav';
 import { MobileNav } from '@astryxdesign/core/MobileNav';
 import { Badge } from '@astryxdesign/core/Badge';
-import { Icon } from '@astryxdesign/core/Icon';
-import { Kbd } from '@astryxdesign/core/Kbd';
-import { Text } from '@astryxdesign/core/Text';
-import { Link } from '@astryxdesign/core/Link';
-import { Divider } from '@astryxdesign/core/Divider';
-import { Stack } from '@astryxdesign/core/Stack';
 import { LogoIcon } from './_shared/LogoIcon';
 import { CATEGORIES, attacksByCategory } from '../attacks';
-import { CIPHER_ITEMS, MAGIC_ITEM } from '../config/sidebarItems';
+import { CIPHER_ITEMS, MAGIC_ITEM, CIPHER_ATTACK_GROUPS } from '../config/sidebarItems';
 import type { Attack } from '../types';
 import { useAppContext } from '../hooks/useAppContext';
 
@@ -130,18 +124,6 @@ const nativeTitle = (title: string) => ({ title });
 // the kit's own selected tint is near-invisible on `--dracula-bg-dark`.
 const selectedStyle = { backgroundColor: 'var(--dracula-selection)' } as const;
 
-// Unstyled button reset so the footer palette hint reads as one supporting line.
-const paletteHintStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 8,
-  background: 'none',
-  border: 0,
-  padding: 0,
-  cursor: 'pointer',
-  color: 'inherit',
-  font: 'inherit',
-} as const;
 
 interface SidebarProps {
   mobileOpen: boolean;
@@ -153,9 +135,11 @@ function focusWorkspace() {
 }
 
 export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
-  const { selectedAttack, setSelectedAttack, setViewMode, viewMode, setCommandPaletteOpen } = useAppContext();
+  const { selectedAttack, setSelectedAttack, setViewMode, viewMode } = useAppContext();
   const isMobile = useIsMobile();
-  const [expandedCats, setExpandedCats] = useState<Set<string>>(() => new Set());
+  const [expandedCats, setExpandedCats] = useState<Set<string>>(
+    () => new Set(['cipher:rsa', 'Factorization', 'cipher:aes', 'cipher:ecc', 'cipher:dh', 'cipher:hash']),
+  );
 
   const setCatCollapsed = (cat: string, collapsed: boolean) => {
     setExpandedCats(prev => {
@@ -181,84 +165,122 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 
   const heading = (
     <SideNavHeading
-      heading="RSA CTF Tool"
+      heading="Workbench"
       subheading="SageMath Powered"
-      icon={<LogoIcon size={32} />}
+      icon={<LogoIcon size={28} />}
     />
   );
 
-  const footer = (
-    <Stack direction="vertical" gap={1} padding={3}>
-      <Divider />
-      <button
-        type="button"
-        data-testid="sidebar-palette-hint"
-        aria-label="Open command palette"
-        onClick={() => setCommandPaletteOpen(true)}
-        style={paletteHintStyle}
-      >
-        <Kbd keys="mod+k" />
-        <Text type="supporting">Search</Text>
-      </button>
-      <Text type="supporting">© 2026 yuzu-octopus</Text>
-      <Text type="supporting">
-        Powered by{' '}
-        <Link href="https://pages.github.com" target="_blank" rel="noopener" type="inherit">
-          GitHub Pages
-        </Link>
-      </Text>
-      <Text type="supporting">
-        Made with{' '}
-        <Link href="https://vite.dev" target="_blank" rel="noopener" type="inherit">
-          Vite
-        </Link>
-      </Text>
-    </Stack>
-  );
 
   const navContent = (
     <>
-      {CIPHER_ITEMS.map(item => (
-        <SideNavItem
-          key={item.id}
-          id={`sidebar-view-${item.id}`}
-          label={item.label}
-          {...nativeTitle(item.label)}
-          icon={calcGlyph(item.id)}
-          isSelected={viewMode === item.id}
-          style={viewMode === item.id ? selectedStyle : undefined}
-          onClick={() => {
-            setViewMode(item.id);
-            if (isMobile) onMobileClose();
-            focusWorkspace();
-          }}
-        />
-      ))}
+      <SideNavItem
+        key="rsa"
+        id="sidebar-view-rsa"
+        label="RSA"
+        {...nativeTitle('RSA')}
+        icon={calcGlyph('rsa')}
+        isSelected={viewMode === 'rsa' && !selectedAttack}
+        style={viewMode === 'rsa' && !selectedAttack ? selectedStyle : undefined}
+        onClick={() => {
+          setViewMode('rsa');
+          window.dispatchEvent(new CustomEvent('cipher-workspace-tab', { detail: 'operations' }));
+          if (isMobile) onMobileClose();
+          focusWorkspace();
+        }}
+        collapsible={{
+          isCollapsed: !expandedCats.has('cipher:rsa'),
+          onCollapsedChange: collapsed => setCatCollapsed('cipher:rsa', collapsed),
+        }}
+        endContent={<Badge label={CATEGORIES.reduce((n, c) => n + (attacksByCategory.get(c) ?? []).length, 0)} variant="neutral" />}
+      >
+        {CATEGORIES.map(cat => {
+          const catAttacks = attacksByCategory.get(cat) ?? [];
+          return (
+            <SideNavItem
+              key={cat}
+              label={cat}
+              {...nativeTitle(cat)}
+              collapsible={{
+                isCollapsed: !expandedCats.has(cat),
+                onCollapsedChange: collapsed => setCatCollapsed(cat, collapsed),
+              }}
+              endContent={<Badge label={catAttacks.length} variant={CATEGORY_BADGE_VARIANTS[cat] ?? 'neutral'} />}
+            >
+              {catAttacks.map(attack => (
+                <SideNavItem
+                  key={attack.id}
+                  id={`sidebar-attack-${attack.id}`}
+                  data-testid={`attack-${attack.id}`}
+                  label={attack.name}
+                  {...nativeTitle(attack.name)}
+                  size="sm"
+                  isSelected={isAttackActive(attack.id)}
+                  style={isAttackActive(attack.id) ? selectedStyle : undefined}
+                  onClick={() => handleAttackClick(attack)}
+                />
+              ))}
+            </SideNavItem>
+          );
+        })}
+      </SideNavItem>
 
-      {CATEGORIES.map(cat => {
-        const catAttacks = attacksByCategory.get(cat) ?? [];
+      {CIPHER_ITEMS.filter(item => item.id !== 'rsa').map(item => {
+        const group = CIPHER_ATTACK_GROUPS.find(g => g.cipher === item.id);
+        if (!group) {
+          return (
+            <SideNavItem
+              key={item.id}
+              id={`sidebar-view-${item.id}`}
+              label={item.label}
+              {...nativeTitle(item.label)}
+              icon={calcGlyph(item.id)}
+              isSelected={viewMode === item.id}
+              style={viewMode === item.id ? selectedStyle : undefined}
+              onClick={() => {
+                setViewMode(item.id);
+                if (isMobile) onMobileClose();
+                focusWorkspace();
+              }}
+            />
+          );
+        }
         return (
           <SideNavItem
-            key={cat}
-            label={cat}
-            {...nativeTitle(cat)}
-            collapsible={{
-              isCollapsed: !expandedCats.has(cat),
-              onCollapsedChange: collapsed => setCatCollapsed(cat, collapsed),
+            key={item.id}
+            id={`sidebar-view-${item.id}`}
+            label={item.label}
+            {...nativeTitle(item.label)}
+            icon={calcGlyph(item.id)}
+            isSelected={viewMode === item.id}
+            style={viewMode === item.id ? selectedStyle : undefined}
+            onClick={() => {
+              setViewMode(item.id);
+              window.dispatchEvent(new CustomEvent('cipher-workspace-tab', { detail: 'operations' }));
+              if (isMobile) onMobileClose();
+              focusWorkspace();
             }}
-            endContent={<Badge label={catAttacks.length} variant={CATEGORY_BADGE_VARIANTS[cat] ?? 'neutral'} />}
+            collapsible={{
+              isCollapsed: !expandedCats.has(`cipher:${item.id}`),
+              onCollapsedChange: collapsed => setCatCollapsed(`cipher:${item.id}`, collapsed),
+            }}
+            endContent={<Badge label={group.attacks.length} variant="neutral" />}
           >
-            {catAttacks.map(attack => (
+            {group.attacks.map(a => (
               <SideNavItem
-                key={attack.id}
-                id={`sidebar-attack-${attack.id}`}
-                data-testid={`attack-${attack.id}`}
-                label={attack.name}
-                {...nativeTitle(attack.name)}
+                key={`${item.id}-${a.id}`}
+                id={`sidebar-attack-${item.id}-${a.id}`}
+                data-testid={`attack-${item.id}-${a.id}`}
+                label={a.label}
+                {...nativeTitle(a.label)}
                 size="sm"
-                isSelected={isAttackActive(attack.id)}
-                style={isAttackActive(attack.id) ? selectedStyle : undefined}
-                onClick={() => handleAttackClick(attack)}
+                onClick={() => {
+                  setViewMode(item.id);
+                  window.dispatchEvent(new CustomEvent('cipher-attack-select', { detail: a.id }));
+                  window.dispatchEvent(new CustomEvent('cipher-workspace-tab', { detail: 'attacks' }));
+                  if (isMobile) onMobileClose();
+                  focusWorkspace();
+                }}
               />
             ))}
           </SideNavItem>
@@ -282,20 +304,6 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
     </>
   );
 
-  // footerIcons renders at `sm` size; a native button keeps the
-  // `sidebar-palette-hint` testid verbatim (kit buttons don't take it).
-  const paletteFooterIcon = (
-    <button
-      type="button"
-      data-testid="sidebar-palette-hint"
-      aria-label="Open command palette"
-      title="Open command palette (⌘K)"
-      onClick={() => setCommandPaletteOpen(true)}
-      style={paletteHintStyle}
-    >
-      <Icon icon="search" />
-    </button>
-  );
 
   if (isMobile) {
     return (
@@ -309,7 +317,6 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         style={{ backgroundColor: 'var(--dracula-bg-dark)' }}
       >
         {navContent}
-        {footer}
       </MobileNav>
     );
   }
@@ -317,8 +324,6 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   return (
     <SideNav
       header={heading}
-      footer={footer}
-      footerIcons={paletteFooterIcon}
       collapsible
       resizable={{ defaultWidth: 280, minWidth: 200, maxWidth: 480, autoSaveId: 'navPanelWidth' }}
       style={{
