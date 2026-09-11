@@ -4,18 +4,12 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Badge } from '@astryxdesign/core/Badge';
 import { LayoutHeader } from '@astryxdesign/core/Layout';
 import { TabList, Tab } from '@astryxdesign/core/TabList';
+import { CIPHER_ITEMS } from '../../config/sidebarItems';
 
 export type CipherId = 'rsa' | 'aes' | 'ecc' | 'hash' | 'dh';
 
 export type CipherWorkspaceTab = 'operations' | 'attacks' | 'learn';
 
-const CIPHER_NAMES: Record<CipherId, string> = {
-  rsa: 'RSA',
-  aes: 'AES',
-  ecc: 'ECC',
-  hash: 'Hash',
-  dh: 'DH',
-};
 
 const WORKSPACE_TABS: { id: CipherWorkspaceTab; label: string }[] = [
   { id: 'operations', label: 'Operations' },
@@ -78,7 +72,7 @@ export function CipherWorkspace({
     <Stack direction="vertical" gap={0} width="100%" height="100%">
       <LayoutHeader hasDivider>
         <Stack direction="horizontal" gap={2} vAlign="center" width="100%">
-          <Heading level={3}>{CIPHER_NAMES[cipher]}</Heading>
+          <Heading level={3}>{CIPHER_ITEMS.find(c => c.id === cipher)?.label ?? cipher}</Heading>
           {badge && <Badge variant="info" label={badge} />}
           {actions && (
             <Stack direction="horizontal" gap={1} hAlign="end" style={{ flex: 1 }}>

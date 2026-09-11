@@ -19,6 +19,8 @@ export interface SidebarModuleItem {
 
 export type SidebarItem = SidebarCipherItem | SidebarAttackItem | SidebarModuleItem;
 
+export const CIPHER_IDS = ['rsa', 'aes', 'ecc', 'hash', 'dh'] as const;
+
 export const CIPHER_ITEMS: SidebarCipherItem[] = [
   { type: 'cipher', id: 'rsa', label: 'RSA' },
   { type: 'cipher', id: 'aes', label: 'AES' },
@@ -36,3 +38,15 @@ export const ALL_SIDEBAR_ITEMS: SidebarItem[] = [
   )),
   MAGIC_ITEM,
 ];
+
+/** Tinted count badges per attack category (brand: tinted tags, never solid status). */
+export const CATEGORY_BADGE_VARIANTS: Record<string, 'green' | 'purple' | 'cyan' | 'orange' | 'yellow' | 'pink'> = {
+  Factorization: 'green',
+  'Partial Key / Lattice': 'purple',
+  'Message / Protocol': 'cyan',
+  Oracle: 'orange',
+  Advanced: 'yellow',
+  Symmetric: 'pink',
+  Hash: 'cyan',
+  ECC: 'purple',
+};

@@ -121,14 +121,7 @@ function calcGlyph(mode: string) {
   }
 }
 
-/** Tinted count badges per attack category (mirrors the command palette). */
-const CATEGORY_BADGE_VARIANTS: Record<string, 'green' | 'purple' | 'cyan' | 'orange' | 'yellow'> = {
-  Factorization: 'green',
-  'Partial Key / Lattice': 'purple',
-  'Message / Protocol': 'cyan',
-  Oracle: 'orange',
-  Advanced: 'yellow',
-};
+import { CATEGORY_BADGE_VARIANTS } from '../config/sidebarItems';
 
 // Native `title` fallback for truncated rows: kit BaseProps omits `title`, but SideNavItem spreads `...rest` onto the button (as `id`/`data-testid` prove).
 const nativeTitle = (title: string) => ({ title });

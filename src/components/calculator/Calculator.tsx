@@ -8,11 +8,13 @@ import ECCCalculator from './ECCCalculator';
 import HashCalculator from './HashCalculator';
 import DHCalculator from './DHCalculator';
 
-const CIPHER_IDS: CipherId[] = ['rsa', 'aes', 'ecc', 'hash', 'dh'];
+import { CIPHER_IDS } from '../../config/sidebarItems';
 
 function isCipherId(mode: string): mode is CipherId {
-  return (CIPHER_IDS as string[]).includes(mode);
+  return (CIPHER_IDS as readonly string[]).includes(mode);
 }
+
+const OPERATIONS = { rsa: RSACalculator, aes: AESCalculator, ecc: ECCCalculator, hash: HashCalculator, dh: DHCalculator } as const;
 
 export function Calculator() {
   const { viewMode } = useAppContext();
@@ -20,7 +22,7 @@ export function Calculator() {
 
   useEffect(() => {
     const handler = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
+      const detail = (e as CustomEvent<CipherWorkspaceTab>).detail;
       if (detail === 'operations' || detail === 'attacks' || detail === 'learn') setTab(detail);
     };
     window.addEventListener('cipher-workspace-tab', handler);
@@ -35,27 +37,9 @@ export function Calculator() {
       cipher={viewMode}
       tab={tab}
       onTabChange={setTab}
-      operations={
-        viewMode === 'rsa' ? <RSACalculator /> :
-        viewMode === 'aes' ? <AESCalculator /> :
-        viewMode === 'ecc' ? <ECCCalculator /> :
-        viewMode === 'hash' ? <HashCalculator /> :
-        <DHCalculator />
-      }
-      attacks={
-        viewMode === 'rsa' ? <InputPanel /> :
-        viewMode === 'aes' ? <AESCalculator attacksOnly /> :
-        viewMode === 'ecc' ? <ECCCalculator attacksOnly /> :
-        viewMode === 'hash' ? <HashCalculator attacksOnly /> :
-        <DHCalculator attacksOnly />
-      }
-      learn={
-        viewMode === 'rsa' ? <RSACalculator learnOnly /> :
-        viewMode === 'aes' ? <AESCalculator learnOnly /> :
-        viewMode === 'ecc' ? <ECCCalculator learnOnly /> :
-        viewMode === 'hash' ? <HashCalculator learnOnly /> :
-        <DHCalculator learnOnly />
-      }
+      operations={(() => { const C = OPERATIONS[viewMode]; return <C />; })()}
+      attacks={viewMode === 'rsa' ? <InputPanel /> : (() => { const C = OPERATIONS[viewMode] as (p: { attacksOnly?: boolean }) => React.JSX.Element; return <C attacksOnly />; })()}
+      learn={(() => { const C = OPERATIONS[viewMode] as (p: { learnOnly?: boolean }) => React.JSX.Element; return <C learnOnly />; })()}
     />
   );
 }

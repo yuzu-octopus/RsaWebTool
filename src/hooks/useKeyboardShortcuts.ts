@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useAppContext } from './useAppContext';
 
-const CIPHER_MODES = ['rsa', 'aes', 'ecc', 'hash', 'dh'] as const;
+import { CIPHER_IDS } from '../config/sidebarItems';
 
 export function useKeyboardShortcuts() {
   const { viewMode, setViewMode, commandPaletteOpen, setCommandPaletteOpen } = useAppContext();
@@ -33,7 +33,7 @@ export function useKeyboardShortcuts() {
         case '5': {
           e.preventDefault();
           const idx = Number(e.key) - 1;
-          setViewMode(CIPHER_MODES[idx]);
+          setViewMode(CIPHER_IDS[idx]);
           break;
         }
         case 'enter':

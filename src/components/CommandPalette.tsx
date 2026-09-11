@@ -9,22 +9,9 @@ import { Stack } from '@astryxdesign/core/Stack';
 import type { SearchableItem, SearchSource } from '@astryxdesign/core/Typeahead';
 import { useAppContext } from '../hooks/useAppContext';
 import { attacks } from '../attacks';
-import { ALL_SIDEBAR_ITEMS } from '../config/sidebarItems';
-import type { Attack, AttackCategory } from '../types';
+import { ALL_SIDEBAR_ITEMS, CATEGORY_BADGE_VARIANTS } from '../config/sidebarItems';
+import type { Attack } from '../types';
 
-// Badge color variants follow brand semantics: tinted color variants for
-// category tags, never the loud solid status variants (success/warning/error
-// are reserved for system state demanding attention).
-const CATEGORY_BADGE_VARIANTS: Record<AttackCategory, 'green' | 'purple' | 'cyan' | 'orange' | 'yellow' | 'pink'> = {
-  Factorization: 'green',
-  'Partial Key / Lattice': 'purple',
-  'Message / Protocol': 'cyan',
-  Oracle: 'orange',
-  Advanced: 'yellow',
-  Symmetric: 'pink',
-  Hash: 'cyan',
-  ECC: 'purple',
-};
 
 const VIEW_MODES = ['rsa', 'aes', 'ecc', 'hash', 'dh', 'magic'] as const;
 type ViewMode = typeof VIEW_MODES[number];
