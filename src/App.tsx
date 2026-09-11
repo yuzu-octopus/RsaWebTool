@@ -20,10 +20,8 @@ import { InputPanel } from './components/InputPanel';
 import { OutputPanel, SAGE_META, useSageStatus } from './components/OutputPanel';
 import { Calculator } from './components/calculator/Calculator';
 import { MagicPanel } from './components/MagicPanel';
-import { ProofIndex } from './components/ProofIndex';
-import { FormatConverter } from './components/FormatConverter';
-import { InstructionsPanel } from './components/InstructionsPanel';
-import { PemDecryptor } from './components/PemDecryptor';
+import { FormatConverterDialog } from './components/FormatConverter';
+import { PemDecryptorDialog } from './components/PemDecryptor';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { CommandPalette } from './components/CommandPalette';
 import { setFactorDBProxy } from './utils/factordb';
@@ -60,6 +58,8 @@ function AppContent() {
   const { notification, mobileNavOpen, setMobileNavOpen, setCommandPaletteOpen, outputError } = useAppContext();
   const sage = SAGE_META[useSageStatus(outputError)];
   const [skipLinkFocused, setSkipLinkFocused] = useState(false);
+  const [formatOpen, setFormatOpen] = useState(false);
+  const [pemOpen, setPemOpen] = useState(false);
   const isMobile = useIsMobile();
   const showToast = useToast();
   const results = useResizable({ ...RESULTS_RESIZABLE, direction: 'horizontal' });
@@ -106,7 +106,20 @@ function AppContent() {
       }
       endContent={
         <>
-          {/* Palette trigger cluster — Task 5 slots Format/PEM dialog buttons here. */}
+          <IconButton
+            label="Open format converter"
+            tooltip="Format converter"
+            variant="ghost"
+            icon={<Icon icon="arrowsUpDown" />}
+            onClick={() => setFormatOpen(true)}
+          />
+          <IconButton
+            label="Open PEM decryptor"
+            tooltip="PEM decryptor"
+            variant="ghost"
+            icon={<Icon icon="wrench" />}
+            onClick={() => setPemOpen(true)}
+          />
           <Button
             label="Command palette"
             variant="ghost"
@@ -138,16 +151,14 @@ function AppContent() {
           Skip navigation
         </Link>
         <CommandPalette />
+        <FormatConverterDialog isOpen={formatOpen} onOpenChange={setFormatOpen} />
+        <PemDecryptorDialog isOpen={pemOpen} onOpenChange={setPemOpen} />
         <Sidebar mobileOpen={mobileNavOpen} onMobileClose={() => setMobileNavOpen(false)} />
         <Layout height="fill" content={<LayoutContent padding={0}>
           <ErrorBoundary>
             <InputPanel />
             <Calculator />
             <MagicPanel />
-            <ProofIndex />
-            <FormatConverter />
-            <InstructionsPanel />
-            <PemDecryptor />
           </ErrorBoundary>
           <ErrorBoundary>
             <OutputPanel />
@@ -171,6 +182,8 @@ function AppContent() {
           Skip navigation
         </Link>
         <CommandPalette />
+        <FormatConverterDialog isOpen={formatOpen} onOpenChange={setFormatOpen} />
+        <PemDecryptorDialog isOpen={pemOpen} onOpenChange={setPemOpen} />
         <Layout
           height="fill"
           start={<Sidebar mobileOpen={mobileNavOpen} onMobileClose={() => setMobileNavOpen(false)} />}
@@ -181,10 +194,6 @@ function AppContent() {
                   <InputPanel />
                   <Calculator />
                   <MagicPanel />
-                  <ProofIndex />
-                  <FormatConverter />
-                  <InstructionsPanel />
-                  <PemDecryptor />
                 </ErrorBoundary>
               </div>
             </LayoutContent>

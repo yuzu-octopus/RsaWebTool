@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Stack, StackItem } from '@astryxdesign/core/Stack';
-import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
+import { Dialog, DialogHeader } from '@astryxdesign/core/Dialog';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { TextInput } from '@astryxdesign/core/TextInput';
 import { Button } from '@astryxdesign/core/Button';
@@ -33,8 +33,8 @@ const PEM_EXAMPLE = `-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEA...
 -----END RSA PRIVATE KEY-----`;
 
-export function PemDecryptor() {
-  const { viewMode, setViewMode, setCalculatorMode, showNotification } = useAppContext();
+export function PemDecryptorDialog({ isOpen, onOpenChange }: { isOpen: boolean; onOpenChange: (open: boolean) => void }) {
+  const { setViewMode, showNotification } = useAppContext();
   const [pemInput, setPemInput] = useState('');
   const [parsed, setParsed] = useState<ParsedPEM | null>(null);
   const [passphrase, setPassphrase] = useState('');
@@ -96,19 +96,14 @@ export function PemDecryptor() {
       detail: { n, e: parsed.keyParams.e }
     }));
     showNotification('Prefilled Magic Panel with n/e', 'success');
-  }, [parsed, setViewMode, showNotification]);
-
-  if (viewMode !== 'pem') return null;
+    onOpenChange(false);
+  }, [parsed, setViewMode, showNotification, onOpenChange]);
 
   return (
-    <Stack style={{ flex: 1, minWidth: 0, minHeight: 0 }}>
-      <Stack hAlign="center" padding={4}>
-        <Stack width="100%" maxWidth={640} gap={2}>
-          <Heading level={3} color="accent">PEM Key Decryptor</Heading>
-
-          <Text type="body" color="secondary">
-            Parse and decrypt PEM private keys in PKCS#1 and PKCS#8 formats
-          </Text>
+    <Dialog isOpen={isOpen} onOpenChange={onOpenChange} width={600}>
+      <DialogHeader title="PEM Key Decryptor" subtitle="Parse and decrypt PEM private keys in PKCS#1 and PKCS#8 formats" onOpenChange={onOpenChange} />
+      <Stack padding={3}>
+        <Stack width="100%" gap={2}>
 
           {/* PEM Input */}
           <TextArea
@@ -251,17 +246,17 @@ export function PemDecryptor() {
               />
 
               <Button
-                label="Switch to Calculator"
+                label="Open in RSA View"
                 variant="ghost"
                 onClick={() => {
                   const { n: nVal, e: eVal } = parsed.keyParams!;
                   if (!nVal || nVal === '0') return;
-                  setViewMode('calculator');
-                  setCalculatorMode('rsa');
+                  setViewMode('rsa');
                   window.dispatchEvent(new CustomEvent('calculator-prefill', {
                     detail: { n: nVal, e: eVal }
                   }));
-                  showNotification('Prefilled RSA Calculator with key parameters', 'success');
+                  showNotification('Prefilled RSA view with key parameters', 'success');
+                  onOpenChange(false);
                 }}
               />
 
@@ -274,8 +269,8 @@ export function PemDecryptor() {
           )}
         </Stack>
       </Stack>
-    </Stack>
+    </Dialog>
   );
 }
 
-export default PemDecryptor;
+export default PemDecryptorDialog;

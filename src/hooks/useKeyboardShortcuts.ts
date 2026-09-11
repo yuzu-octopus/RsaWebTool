@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { useAppContext } from './useAppContext';
 
+const CIPHER_MODES = ['rsa', 'aes', 'ecc', 'hash', 'dh'] as const;
+
 export function useKeyboardShortcuts() {
-  const { viewMode, commandPaletteOpen, setCommandPaletteOpen } = useAppContext();
+  const { viewMode, setViewMode, commandPaletteOpen, setCommandPaletteOpen } = useAppContext();
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.isComposing) return;
@@ -25,49 +27,23 @@ export function useKeyboardShortcuts() {
 
       switch (e.key.toLowerCase()) {
         case '1':
-          e.preventDefault();
-          if (viewMode === 'calculator') {
-            window.dispatchEvent(new CustomEvent('calculator-switch-tab', { detail: 0 }));
-          } else {
-            window.dispatchEvent(new CustomEvent('rsa-switch-tab', { detail: 0 }));
-          }
-          break;
         case '2':
-          e.preventDefault();
-          if (viewMode === 'calculator') {
-            window.dispatchEvent(new CustomEvent('calculator-switch-tab', { detail: 1 }));
-          } else {
-            window.dispatchEvent(new CustomEvent('rsa-switch-tab', { detail: 1 }));
-          }
-          break;
         case '3':
-          e.preventDefault();
-          if (viewMode === 'calculator') {
-            window.dispatchEvent(new CustomEvent('calculator-switch-tab', { detail: 2 }));
-          } else {
-            window.dispatchEvent(new CustomEvent('rsa-switch-tab', { detail: 2 }));
-          }
-          break;
         case '4':
+        case '5': {
           e.preventDefault();
-          if (viewMode === 'calculator') {
-            window.dispatchEvent(new CustomEvent('calculator-switch-tab', { detail: 3 }));
-          }
+          const idx = Number(e.key) - 1;
+          setViewMode(CIPHER_MODES[idx]);
           break;
-        case '5':
-          e.preventDefault();
-          if (viewMode === 'calculator') {
-            window.dispatchEvent(new CustomEvent('calculator-switch-tab', { detail: 4 }));
-          }
-          break;
+        }
         case 'enter':
-          if (viewMode === 'attack') {
+          if (viewMode === 'attack' || viewMode === 'rsa') {
             e.preventDefault();
             window.dispatchEvent(new CustomEvent('rsa-run-attack'));
           }
           break;
         case 'c':
-          if (e.shiftKey && viewMode === 'attack') {
+          if (e.shiftKey && (viewMode === 'attack' || viewMode === 'rsa')) {
             e.preventDefault();
             window.dispatchEvent(new CustomEvent('rsa-copy-output'));
           }
@@ -79,5 +55,5 @@ export function useKeyboardShortcuts() {
 
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [viewMode, commandPaletteOpen, setCommandPaletteOpen]);
+  }, [viewMode, setViewMode, commandPaletteOpen, setCommandPaletteOpen]);
 }

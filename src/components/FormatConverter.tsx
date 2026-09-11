@@ -1,10 +1,8 @@
 import { useState, useMemo } from 'react';
 import { Stack } from '@astryxdesign/core/Stack';
-import { Heading } from '@astryxdesign/core/Heading';
-import { Text } from '@astryxdesign/core/Text';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
-import { useAppContext } from '../hooks/useAppContext';
+import { Dialog, DialogHeader } from '@astryxdesign/core/Dialog';
 import { convertFormat } from '../utils/converters';
 import type { Format } from '../utils/converters';
 
@@ -15,8 +13,7 @@ const FORMATS: { value: Format; label: string }[] = [
   { value: 'text', label: 'Text' },
 ];
 
-export function FormatConverter() {
-  const { viewMode } = useAppContext();
+export function FormatConverterDialog({ isOpen, onOpenChange }: { isOpen: boolean; onOpenChange: (open: boolean) => void }) {
   const [inputText, setInputText] = useState('');
   const [inputFormat, setInputFormat] = useState<Format>('hex');
   const [outputFormat, setOutputFormat] = useState<Format>('text');
@@ -30,17 +27,11 @@ export function FormatConverter() {
     }
   }, [inputText, inputFormat, outputFormat]);
 
-  if (viewMode !== 'format-converter') return null;
-
   return (
-    <Stack style={{ flex: 1, minWidth: 0, minHeight: 0 }}>
-      <Stack hAlign="center" padding={4}>
-        <Stack width="100%" maxWidth={640} gap={2}>
-          <Heading level={3} color="accent">Format Converter</Heading>
-
-          <Text type="body" color="secondary">
-            Convert between Hex, Dec, Base64, and Text
-          </Text>
+    <Dialog isOpen={isOpen} onOpenChange={onOpenChange} width={560}>
+      <DialogHeader title="Format Converter" subtitle="Convert between Hex, Dec, Base64, and Text" onOpenChange={onOpenChange} />
+      <Stack padding={3}>
+        <Stack width="100%" gap={2}>
 
           <SegmentedControl
             label="Input format"
@@ -84,8 +75,8 @@ export function FormatConverter() {
           />
         </Stack>
       </Stack>
-    </Stack>
+    </Dialog>
   );
 }
 
-export default FormatConverter;
+export default FormatConverterDialog;

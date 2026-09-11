@@ -175,23 +175,33 @@ const ExtractedParams = memo(function ExtractedParams({
   );
 });
 
-const ApplicableList = memo(function ApplicableList({ byCategory }: { byCategory: Record<string, Attack[]> }) {
+const ApplicableList = memo(function ApplicableList({ jobs, byCategory }: { jobs: MagicJob[]; byCategory: Record<string, Attack[]> }) {
+  const statusById = useMemo(() => new Map(jobs.map(j => [j.attackId, j.status])), [jobs]);
   return (
-    <Stack direction="vertical" gap={1}>
-      {Object.entries(byCategory).map(([cat, catAttacks]) => (
-        <Stack key={cat} direction="vertical" gap={0}>
-          <Text type="body" weight="semibold">
-            {cat}
-          </Text>
-          {catAttacks.map(a => (
-            <Stack key={a.id} direction="horizontal" gap={1}>
-              <Text type="body">{a.name}</Text>
-              <Text type="body" color="secondary">({a.priority})</Text>
-            </Stack>
-          ))}
-        </Stack>
-      ))}
-    </Stack>
+    <List density="compact">
+      {Object.entries(byCategory).flatMap(([cat, catAttacks]) =>
+        catAttacks.map(a => {
+          const status = statusById.get(a.id);
+          return (
+            <ListItem
+              key={a.id}
+              label={a.name}
+              description={
+                <Text type="body" color="secondary">
+                  {cat} · {a.priority}
+                </Text>
+              }
+              startContent={status ? statusIcon(status) : undefined}
+              endContent={
+                <Text type="body" color="secondary" hasTabularNumbers>
+                  {status ?? 'queued'}
+                </Text>
+              }
+            />
+          );
+        }),
+      )}
+    </List>
   );
 });
 
@@ -214,7 +224,6 @@ const ErrorInsightBox = memo(function ErrorInsightBox({ insights }: { insights: 
 export function MagicPanel() {
   const { viewMode, showNotification } = useAppContext();
   const [rawInput, setRawInput] = useState('');
-  const [showApplicable, setShowApplicable] = useState(false);
 
   // Compute raw params once, share between applicablePreview and extractedParams
   const paramsFromInput = useMemo(() => {
@@ -342,19 +351,13 @@ export function MagicPanel() {
             </Text>
           )}
 
-          {/* Applicable preview */}
-          {rawInput.trim() && !running && (
-            <Stack direction="vertical" gap={0}>
-              <Button
-                label={`${applicablePreview.length} attacks applicable`}
-                variant="ghost"
-                width="100%"
-                onClick={() => setShowApplicable(!showApplicable)}
-                endContent={<Icon icon={showApplicable ? 'arrowUp' : 'chevronDown'} size="sm" />}
-              />
-              {showApplicable && (
-                <ApplicableList byCategory={applicableByCategory} />
-              )}
+          {/* Applicable attacks as rows with per-row status */}
+          {rawInput.trim() && applicablePreview.length > 0 && (
+            <Stack direction="vertical" gap={1}>
+              <Text type="label" color="secondary" hasTabularNumbers>
+                {applicablePreview.length} attacks applicable
+              </Text>
+              <ApplicableList jobs={jobs} byCategory={applicableByCategory} />
             </Stack>
           )}
 

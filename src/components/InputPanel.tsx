@@ -35,7 +35,7 @@ const c = {
 const flexFill = { flex: 1, minWidth: 0, minHeight: 0 } as const;
 
 export function InputPanel() {
-  const { selectedAttack, viewMode, setViewMode, setCalculatorMode, setSelectedAttack, setMobileNavOpen } = useAppContext();
+  const { selectedAttack, viewMode, setViewMode, setSelectedAttack, setMobileNavOpen } = useAppContext();
   const isMobile = useIsMobile();
 
   if (viewMode !== 'attack') return null;
@@ -58,8 +58,7 @@ export function InputPanel() {
                   setViewMode('attack');
                 }} />
                 <Button label="Open RSA Calculator" variant="secondary" onClick={() => {
-                  setCalculatorMode('rsa');
-                  setViewMode('calculator');
+                  setViewMode('rsa');
                 }} />
               </Stack>
             )}
