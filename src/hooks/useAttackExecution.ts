@@ -1,4 +1,4 @@
-import { useState, useReducer, useRef, useEffect } from 'react';
+import { useState, useReducer, useRef, useEffect, useSyncExternalStore } from 'react';
 import { useAppContext } from './useAppContext';
 import { useTimer } from './useTimer';
 import { DEFAULT_SAGE_TIMEOUT, type SageResult } from './useSageMath';
@@ -43,6 +43,41 @@ type CancelRunFn = () => void;
 
 export function shouldContinueRun(runId: number, currentRunId: number, signal: AbortSignal): boolean {
   return runId === currentRunId && !signal.aborted;
+}
+
+export type RunVerdict = 'success' | 'failed' | null;
+
+/**
+ * Structured verdict for the latest InputPanel run, keyed by the exact
+ * display string published alongside it. Module-local (not context) so only
+ * the verdict call site re-reads it; string output stays byte-identical and
+ * the OutputPanel Banner can prefer it with regex fallback.
+ */
+interface VerdictEntry {
+  result: string;
+  verdict: Exclude<RunVerdict, null>;
+}
+
+let latestVerdict: VerdictEntry | null = null;
+const verdictListeners = new Set<() => void>();
+
+function setLatestVerdict(entry: VerdictEntry | null): void {
+  latestVerdict = entry;
+  for (const listener of verdictListeners) listener();
+}
+
+/** Re-reads the structured run verdict when it changes (null until a run publishes one). */
+export function useRunVerdict(): VerdictEntry | null {
+  return useSyncExternalStore(
+    (listener) => {
+      verdictListeners.add(listener);
+      return () => {
+        verdictListeners.delete(listener);
+      };
+    },
+    () => latestVerdict,
+    () => null,
+  );
 }
 
 export function useAttackExecution(
@@ -124,6 +159,7 @@ export function useAttackExecution(
     setEta(null);
     timer.start();
     setOutputResult(null);
+    setLatestVerdict(null);
     setOutputError(null);
     ownershipRef.current = 'input';
     setOutputSource('input');
@@ -174,6 +210,7 @@ export function useAttackExecution(
           if (!mountedRef.current) return;
           if (ownershipRef.current !== 'input') return;
           setOutputResult(displayPreResult);
+          setLatestVerdict({ result: displayPreResult, verdict: isActualSuccess(preResult) ? 'success' : 'failed' });
           if (!mountedRef.current) return;
           addToHistory(attack.id, attack.name, preResult, isActualSuccess(preResult));
           const preSuccess = isActualSuccess(preResult);
@@ -206,6 +243,7 @@ export function useAttackExecution(
         if (!mountedRef.current) return;
         if (ownershipRef.current !== 'input') return;
         setOutputResult(displayStdout);
+        setLatestVerdict({ result: displayStdout, verdict: isActualSuccess(result.stdout) ? 'success' : 'failed' });
         if (!mountedRef.current) return;
         addToHistory(attack.id, attack.name, result.stdout, isActualSuccess(result.stdout));
         const runSuccess = isActualSuccess(result.stdout);

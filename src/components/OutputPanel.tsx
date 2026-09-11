@@ -13,6 +13,7 @@ import { dracula } from '@astryxdesign/core/theme/syntax';
 import { History } from 'lucide-react';
 import type { HistoryEntry } from '../types';
 import { useAppContext } from '../hooks/useAppContext';
+import { useRunVerdict } from '../hooks/useAttackExecution';
 import { useCopyToClipboard } from '../hooks/useCopyToClipboard';
 import { EmptyState } from './_shared/EmptyState';
 
@@ -26,11 +27,15 @@ const c = {
 };
 
 /**
- * Verdict parsed from an attack result's trailing TOKEN=SUCCESS / TOKEN=FAILED
- * marker (bare =SUCCESS /=FAILED completion markers included). Last marker
- * wins; prose without a marker yields null (no banner).
+ * Verdict for an attack result: prefers the structured verdict threaded
+ * through from the run (non-null only when keyed to this exact string),
+ * falls back to the trailing TOKEN=SUCCESS / TOKEN=FAILED marker
+ * (bare =SUCCESS /=FAILED completion markers included). Last marker wins;
+ * prose without a marker yields null (no banner).
  */
-function parseVerdict(result: string | null | undefined): 'success' | 'error' | null {
+function parseVerdict(result: string | null | undefined, structuredVerdict?: 'success' | 'failed' | null): 'success' | 'error' | null {
+  if (structuredVerdict === 'success') return 'success';
+  if (structuredVerdict === 'failed') return 'error';
   if (!result) return null;
   const tokenMarks = [...result.matchAll(/[A-Z][A-Z0-9_]*=(SUCCESS|FAILED)\b/g)];
   const marks = tokenMarks.length > 0 ? tokenMarks : [...result.matchAll(/=(SUCCESS|FAILED)\b/g)];
@@ -166,7 +171,9 @@ export function OutputPanel() {
     return history.find(h => h.id === ui.historySelectedKey)?.result ?? null;
   }, [ui.historySelectedKey, history, outputResult]);
 
-  const verdict = useMemo(() => parseVerdict(displayResult), [displayResult]);
+  const runVerdict = useRunVerdict();
+  const structuredVerdict = runVerdict && displayResult !== null && runVerdict.result === displayResult ? runVerdict.verdict : null;
+  const verdict = useMemo(() => parseVerdict(displayResult, structuredVerdict), [displayResult, structuredVerdict]);
   const sageStatus = useSageStatus(outputError);
   const sage = SAGE_META[sageStatus];
 

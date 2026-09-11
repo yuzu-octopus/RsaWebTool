@@ -56,26 +56,23 @@ async function main() {
     assert(!(await page.locator('body').innerText()).includes(FALLBACK_TEXT), 'Opening Sage source crashed the workspace');
 
     await page.getByTestId('input-tab').click();
-    const modulusInput = page.locator('textarea').first();
+    const modulusInput = page.locator('#attack-tabpanel-1 textarea').first();
     await modulusInput.waitFor();
     await page.getByTestId('generate-testcase').click();
-    await page.waitForFunction(() => Boolean(document.querySelector('textarea')?.value));
+    await page.waitForFunction(() => Boolean(document.querySelector('#attack-tabpanel-1 textarea')?.value));
     await page.getByTestId('run-attack').click();
     await page.getByText(/POLLARD_RHO=SUCCESS/).waitFor({ timeout: 30_000 });
 
 
-    for (const [mode, heading] of [
-      ['instructions', 'Instructions'],
-      ['magic', 'Magic Cracker'],
-      ['proofs', 'Attack Index'],
-      ['format-converter', 'Format Converter'],
-      ['pem', 'PEM Key Decryptor'],
-    ] as const) {
+    for (const mode of ['rsa', 'aes', 'ecc', 'hash', 'dh'] as const) {
       await page.locator(`#sidebar-view-${mode}`).click();
-      await page.getByRole('heading', { name: heading }).waitFor();
+      await page.getByTestId(`cipher-workspace-${mode}-operations`).waitFor();
       const text = await page.locator('body').innerText();
       assert(!text.includes(FALLBACK_TEXT), `${mode} crashed the workspace`);
     }
+    await page.locator('#sidebar-view-magic').click();
+    await page.getByRole('heading', { name: 'Magic Cracker' }).waitFor();
+    assert(!(await page.locator('body').innerText()).includes(FALLBACK_TEXT), 'magic crashed the workspace');
   } finally {
     await browser.close();
     server.kill();
