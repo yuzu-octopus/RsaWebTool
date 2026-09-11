@@ -14,8 +14,6 @@ export interface InputField {
 
 export type AttackCategory = 'Factorization' | 'Partial Key / Lattice' | 'Message / Protocol' | 'Oracle' | 'Advanced' | 'Symmetric' | 'Hash' | 'ECC';
 
-export type CalculatorMode = 'rsa' | 'aes' | 'ecc' | 'hash' | 'dh';
-
 /** A value that may be either synchronous or wrapped in a Promise. */
 export type MaybePromise<T> = T | Promise<T>;
 
