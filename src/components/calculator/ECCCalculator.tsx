@@ -1,20 +1,24 @@
-import { useState, useCallback } from 'react';
+import { use, useState, useCallback } from 'react';
 import { useAppContext } from '../../hooks/useAppContext';
 import { CalculatorHeader } from './_shared/CalculatorHeader';
 import { ECCExplanationTab } from './ECCExplanationTab';
 import { ECCKeyOpsTab } from './ECCKeyOpsTab';
 import { ECCSignVerifyTab } from './ECCSignVerifyTab';
 import { ECCAttacksTab } from './ECCAttacksTab';
+import { CipherWorkspaceTabContext } from '../cipher/CipherWorkspace';
 
-const TABS = [
-  { id: 'explanation', label: 'Explanation' },
+const OPERATION_TABS = [
   { id: 'keyops', label: 'Key Operations' },
   { id: 'signverify', label: 'Sign / Verify' },
-  { id: 'attacks', label: 'Attacks' },
 ];
 
-export default function ECCCalculator() {
-  const [tab, setTab] = useState('explanation');
+function LearnExplanation() {
+  const switchWorkspaceTab = use(CipherWorkspaceTabContext);
+  return <ECCExplanationTab onContinue={() => switchWorkspaceTab('operations')} />;
+}
+
+export default function ECCCalculator({ attacksOnly = false, learnOnly = false }: { attacksOnly?: boolean; learnOnly?: boolean } = {}) {
+  const [tab, setTab] = useState('keyops');
   const { setOutputResult, setOutputError, setOutputSource } = useAppContext();
 
   const handleTabChange = useCallback((tabId: string) => {
@@ -24,18 +28,24 @@ export default function ECCCalculator() {
     setOutputSource(null);
   }, [setOutputResult, setOutputError, setOutputSource]);
 
+  if (learnOnly) {
+    return <LearnExplanation />;
+  }
+
+  if (attacksOnly) {
+    return <ECCAttacksTab />;
+  }
+
   return (
     <CalculatorHeader
       title="ECC Calculator"
       subtitle="Elliptic curve operations, ECDSA, ECDH, and attacks — powered by @noble/curves"
-      tabs={TABS}
+      tabs={OPERATION_TABS}
       activeTab={tab}
       onTabChange={handleTabChange}
     >
-      {tab === 'explanation' && <ECCExplanationTab onContinue={() => handleTabChange('keyops')} />}
       {tab === 'keyops' && <ECCKeyOpsTab />}
       {tab === 'signverify' && <ECCSignVerifyTab />}
-      {tab === 'attacks' && <ECCAttacksTab />}
     </CalculatorHeader>
   );
 }

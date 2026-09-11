@@ -1,37 +1,54 @@
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { useAppContext } from '../../hooks/useAppContext';
-import type { CalculatorMode } from '../../types';
+import { InputPanel } from '../InputPanel';
+import { CipherWorkspace, type CipherId, type CipherWorkspaceTab } from '../cipher/CipherWorkspace';
 import RSACalculator from './RSACalculator';
 import AESCalculator from './AESCalculator';
 import ECCCalculator from './ECCCalculator';
 import HashCalculator from './HashCalculator';
 import DHCalculator from './DHCalculator';
 
-const MODE_BY_INDEX: CalculatorMode[] = ['rsa', 'aes', 'ecc', 'hash', 'dh'];
+const CIPHER_IDS: CipherId[] = ['rsa', 'aes', 'ecc', 'hash', 'dh'];
 
-const COMPONENTS = [RSACalculator, AESCalculator, ECCCalculator, HashCalculator, DHCalculator];
+function isCipherId(mode: string): mode is CipherId {
+  return (CIPHER_IDS as string[]).includes(mode);
+}
 
 export function Calculator() {
-  const { viewMode, calculatorMode, setCalculatorMode } = useAppContext();
+  const { viewMode } = useAppContext();
+  const [tab, setTab] = useState<CipherWorkspaceTab>('operations');
 
-  // Keyboard shortcuts for calculator sub-tabs (⌘1-⌘5) — must be before early return
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent).detail as number;
-      if (detail >= 0 && detail < MODE_BY_INDEX.length) {
-        setCalculatorMode(MODE_BY_INDEX[detail]);
+  if (!isCipherId(viewMode)) return null;
+
+  return (
+    <CipherWorkspace
+      key={viewMode}
+      cipher={viewMode}
+      tab={tab}
+      onTabChange={setTab}
+      operations={
+        viewMode === 'rsa' ? <RSACalculator /> :
+        viewMode === 'aes' ? <AESCalculator /> :
+        viewMode === 'ecc' ? <ECCCalculator /> :
+        viewMode === 'hash' ? <HashCalculator /> :
+        <DHCalculator />
       }
-    };
-    window.addEventListener('calculator-switch-tab', handler);
-    return () => window.removeEventListener('calculator-switch-tab', handler);
-  }, [setCalculatorMode]);
-
-  if (viewMode !== 'calculator') return null;
-
-  const tabIndex = MODE_BY_INDEX.indexOf(calculatorMode);
-  const ActiveComponent = COMPONENTS[tabIndex];
-
-  return <ActiveComponent />;
+      attacks={
+        viewMode === 'rsa' ? <InputPanel /> :
+        viewMode === 'aes' ? <AESCalculator attacksOnly /> :
+        viewMode === 'ecc' ? <ECCCalculator attacksOnly /> :
+        viewMode === 'hash' ? <HashCalculator attacksOnly /> :
+        <DHCalculator attacksOnly />
+      }
+      learn={
+        viewMode === 'rsa' ? <RSACalculator learnOnly /> :
+        viewMode === 'aes' ? <AESCalculator learnOnly /> :
+        viewMode === 'ecc' ? <ECCCalculator learnOnly /> :
+        viewMode === 'hash' ? <HashCalculator learnOnly /> :
+        <DHCalculator learnOnly />
+      }
+    />
+  );
 }
 
 export default Calculator;

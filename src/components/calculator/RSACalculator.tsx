@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { use, useState, useCallback } from 'react';
 import { Stack } from '@astryxdesign/core/Stack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Button } from '@astryxdesign/core/Button';
@@ -10,6 +10,7 @@ import { RsaEncryptTab } from './RsaEncryptTab';
 import { RsaDecryptTab } from './RsaDecryptTab';
 import { ProofRenderer } from '../ProofRenderer';
 import { useAppContext } from '../../hooks/useAppContext';
+import { CipherWorkspaceTabContext } from '../cipher/CipherWorkspace';
 
 const SUB_TABS = [
   { id: 'explanation', label: 'Explanation' },
@@ -75,8 +76,13 @@ function ExplanationTab({ onContinue }: { onContinue: () => void }) {
   );
 }
 
-export default function RSACalculator() {
-  const [activeTab, setActiveTab] = useState('explanation');
+function LearnExplanation() {
+  const switchWorkspaceTab = use(CipherWorkspaceTabContext);
+  return <ExplanationTab onContinue={() => switchWorkspaceTab('operations')} />;
+}
+
+export default function RSACalculator({ learnOnly = false }: { learnOnly?: boolean } = {}) {
+  const [activeTab, setActiveTab] = useState(learnOnly ? 'explanation' : 'key-gen');
   const { setOutputResult, setOutputError, setOutputSource } = useAppContext();
 
   const handleTabChange = useCallback((tabId: string) => {
@@ -86,15 +92,18 @@ export default function RSACalculator() {
     setOutputSource(null);
   }, [setOutputResult, setOutputError, setOutputSource]);
 
+  if (learnOnly) {
+    return <LearnExplanation />;
+  }
+
   return (
     <CalculatorHeader
       title="RSA Calculator"
       subtitle="RSA encryption, decryption, and key generation reference"
-      tabs={SUB_TABS}
+      tabs={SUB_TABS.filter(t => t.id !== 'explanation')}
       activeTab={activeTab}
       onTabChange={handleTabChange}
     >
-      {activeTab === 'explanation' && <ExplanationTab onContinue={() => handleTabChange('key-gen')} />}
       {activeTab === 'key-gen' && <RsaKeyGenTab />}
       {activeTab === 'encrypt' && <RsaEncryptTab />}
       {activeTab === 'decrypt' && <RsaDecryptTab />}

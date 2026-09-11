@@ -1,18 +1,22 @@
-import { useState, useCallback } from 'react';
+import { use, useState, useCallback } from 'react';
 import { useAppContext } from '../../hooks/useAppContext';
 import { CalculatorHeader } from './_shared/CalculatorHeader';
 import { DHExplanationTab } from './DHExplanationTab';
 import { DHKeyExchangeTab } from './DHKeyExchangeTab';
 import { DHAttacksTab } from './DHAttacksTab';
+import { CipherWorkspaceTabContext } from '../cipher/CipherWorkspace';
 
-const TABS = [
-  { id: 'explanation', label: 'Explanation' },
+const OPERATION_TABS = [
   { id: 'keyexchange', label: 'Key Exchange' },
-  { id: 'attacks', label: 'Attacks' },
 ];
 
-export default function DHCalculator() {
-  const [tab, setTab] = useState('explanation');
+function LearnExplanation() {
+  const switchWorkspaceTab = use(CipherWorkspaceTabContext);
+  return <DHExplanationTab onContinue={() => switchWorkspaceTab('operations')} />;
+}
+
+export default function DHCalculator({ attacksOnly = false, learnOnly = false }: { attacksOnly?: boolean; learnOnly?: boolean } = {}) {
+  const [tab, setTab] = useState('keyexchange');
   const { setOutputResult, setOutputError, setOutputSource } = useAppContext();
 
   const handleTabChange = useCallback((tabId: string) => {
@@ -22,17 +26,23 @@ export default function DHCalculator() {
     setOutputSource(null);
   }, [setOutputResult, setOutputError, setOutputSource]);
 
+  if (learnOnly) {
+    return <LearnExplanation />;
+  }
+
+  if (attacksOnly) {
+    return <DHAttacksTab />;
+  }
+
   return (
     <CalculatorHeader
       title="DH Calculator"
       subtitle="Diffie-Hellman key exchange simulation and discrete log attacks"
-      tabs={TABS}
+      tabs={OPERATION_TABS}
       activeTab={tab}
       onTabChange={handleTabChange}
     >
-      {tab === 'explanation' && <DHExplanationTab onContinue={() => handleTabChange('keyexchange')} />}
       {tab === 'keyexchange' && <DHKeyExchangeTab />}
-      {tab === 'attacks' && <DHAttacksTab />}
     </CalculatorHeader>
   );
 }
