@@ -47,7 +47,7 @@ async function main() {
     assert(await page.getByRole('button', { name: /search commands/i }).count() === 0, 'Visible command-search controls must be absent');
     await page.getByRole('button', { name: /Factorization/ }).first().click();
     await page.locator('#sidebar-attack-pollard-rho').click();
-    await page.getByTestId('input-tab').waitFor();
+    await page.getByTestId('run-attack').waitFor();
     assert(!(await page.locator('body').innerText()).includes(FALLBACK_TEXT), 'Selecting an attack crashed the workspace');
     await page.getByTestId('source-tab').click();
     const sagePreview = page.locator('#attack-tabpanel-2 pre');
@@ -64,8 +64,11 @@ async function main() {
     await page.getByText(/POLLARD_RHO=SUCCESS/).waitFor({ timeout: 30_000 });
 
 
+    // NOTE: clicking a cipher keeps the last workspace tab (attacks/learn persist across ciphers).
+    // Reset to Operations via the tab strip before asserting.
     for (const mode of ['rsa', 'aes', 'ecc', 'hash', 'dh'] as const) {
       await page.locator(`#sidebar-view-${mode}`).click();
+      await page.getByRole('tab', { name: 'Operations' }).click();
       await page.getByTestId(`cipher-workspace-${mode}-operations`).waitFor();
       const text = await page.locator('body').innerText();
       assert(!text.includes(FALLBACK_TEXT), `${mode} crashed the workspace`);
