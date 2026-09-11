@@ -52,10 +52,8 @@ export interface NotificationState {
 export interface AppContextType {
   selectedAttack: Attack | null;
   setSelectedAttack: (attack: Attack | null) => void;
-  viewMode: 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter' | 'instructions' | 'pem';
-  setViewMode: (mode: 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter' | 'instructions' | 'pem') => void;
-  calculatorMode: CalculatorMode;
-  setCalculatorMode: (mode: CalculatorMode) => void;
+  viewMode: 'rsa' | 'aes' | 'ecc' | 'hash' | 'dh' | 'attack' | 'magic';
+  setViewMode: (mode: 'rsa' | 'aes' | 'ecc' | 'hash' | 'dh' | 'attack' | 'magic') => void;
   outputResult: string | null;
   setOutputResult: (result: string | null) => void;
   outputError: string | null;
