@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode, type SVGProps } from 'react';
 import { SideNav, SideNavHeading, SideNavItem } from '@astryxdesign/core/SideNav';
 import { MobileNav } from '@astryxdesign/core/MobileNav';
 import { Badge } from '@astryxdesign/core/Badge';
+import { Icon } from '@astryxdesign/core/Icon';
 import { Kbd } from '@astryxdesign/core/Kbd';
 import { Text } from '@astryxdesign/core/Text';
 import { Link } from '@astryxdesign/core/Link';
@@ -9,7 +10,7 @@ import { Divider } from '@astryxdesign/core/Divider';
 import { Stack } from '@astryxdesign/core/Stack';
 import { LogoIcon } from './_shared/LogoIcon';
 import { CATEGORIES, attacksByCategory } from '../attacks';
-import { CALCULATOR_ITEMS, SIDEBAR_MODULES } from '../config/sidebarItems';
+import { CIPHER_ITEMS, MAGIC_ITEM } from '../config/sidebarItems';
 import type { Attack } from '../types';
 import { useAppContext } from '../hooks/useAppContext';
 
@@ -60,24 +61,10 @@ function makeGlyph(paths: ReactNode) {
   };
 }
 
-const BookGlyph = makeGlyph(
-  <>
-    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13z" />
-    <path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5" />
-  </>,
-);
 const SparklesGlyph = makeGlyph(
   <>
     <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" />
     <path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z" />
-  </>,
-);
-const SwapGlyph = makeGlyph(
-  <>
-    <path d="M8 3L4 7l4 4" />
-    <path d="M4 7h16" />
-    <path d="M16 21l4-4-4-4" />
-    <path d="M20 17H4" />
   </>,
 );
 const KeyGlyph = makeGlyph(
@@ -116,22 +103,7 @@ const ShieldGlyph = makeGlyph(
   </>,
 );
 
-function modGlyph(id: string) {
-  switch (id) {
-    case 'instructions':
-    case 'proofs':
-      return BookGlyph;
-    case 'magic':
-      return SparklesGlyph;
-    case 'format-converter':
-      return SwapGlyph;
-    case 'pem':
-      return KeyGlyph;
-    default:
-      return BookGlyph;
-  }
-}
-
+/** Icon per cipher id; reused for the cipher nav rows. */
 function calcGlyph(mode: string) {
   switch (mode) {
     case 'rsa':
@@ -188,7 +160,7 @@ function focusWorkspace() {
 }
 
 export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
-  const { selectedAttack, setSelectedAttack, setViewMode, viewMode, calculatorMode, setCalculatorMode, setCommandPaletteOpen } = useAppContext();
+  const { selectedAttack, setSelectedAttack, setViewMode, viewMode, setCommandPaletteOpen } = useAppContext();
   const isMobile = useIsMobile();
   const [expandedCats, setExpandedCats] = useState<Set<string>>(() => new Set());
 
@@ -212,7 +184,6 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   };
 
   const isAttackActive = (id: string) => viewMode === 'attack' && selectedAttack?.id === id;
-  const isViewActive = (mode: string) => viewMode === mode;
 
   const heading = (
     <SideNavHeading
@@ -253,6 +224,23 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 
   const navContent = (
     <>
+      {CIPHER_ITEMS.map(item => (
+        <SideNavItem
+          key={item.id}
+          id={`sidebar-view-${item.id}`}
+          label={item.label}
+          {...nativeTitle(item.label)}
+          icon={calcGlyph(item.id)}
+          isSelected={viewMode === item.id}
+          style={viewMode === item.id ? selectedStyle : undefined}
+          onClick={() => {
+            setViewMode(item.id);
+            if (isMobile) onMobileClose();
+            focusWorkspace();
+          }}
+        />
+      ))}
+
       {CATEGORIES.map(cat => {
         const catAttacks = attacksByCategory.get(cat) ?? [];
         return (
@@ -284,49 +272,35 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       })}
 
       <SideNavItem
-        label="Calculators"
-        {...nativeTitle('Calculators')}
-        collapsible={{
-          isCollapsed: !expandedCats.has('Calculators'),
-          onCollapsedChange: collapsed => setCatCollapsed('Calculators', collapsed),
+        key={MAGIC_ITEM.id}
+        id={`sidebar-view-${MAGIC_ITEM.id}`}
+        label={MAGIC_ITEM.label}
+        {...nativeTitle(MAGIC_ITEM.label)}
+        icon={SparklesGlyph}
+        isSelected={viewMode === MAGIC_ITEM.id}
+        style={viewMode === MAGIC_ITEM.id ? selectedStyle : undefined}
+        onClick={() => {
+          setViewMode(MAGIC_ITEM.id);
+          if (isMobile) onMobileClose();
+          focusWorkspace();
         }}
-        endContent={<Badge label={CALCULATOR_ITEMS.length} variant="blue" />}
-      >
-        {CALCULATOR_ITEMS.map(item => (
-          <SideNavItem
-            key={item.id}
-            id={`sidebar-calc-${item.calculatorMode}`}
-            label={item.label}
-            {...nativeTitle(item.label)}
-            icon={calcGlyph(item.calculatorMode)}
-            isSelected={viewMode === 'calculator' && calculatorMode === item.calculatorMode}
-            style={viewMode === 'calculator' && calculatorMode === item.calculatorMode ? selectedStyle : undefined}
-            onClick={() => {
-              setViewMode('calculator');
-              setCalculatorMode(item.calculatorMode);
-              if (isMobile) onMobileClose();
-              focusWorkspace();
-            }}
-          />
-        ))}
-      </SideNavItem>
-
-      {SIDEBAR_MODULES.map(mod => (
-        <SideNavItem
-          key={mod.id}
-          id={`sidebar-view-${mod.mode}`}
-          label={mod.label}
-          icon={modGlyph(mod.id)}
-          isSelected={isViewActive(mod.mode)}
-          style={isViewActive(mod.mode) ? selectedStyle : undefined}
-          onClick={() => {
-            setViewMode(mod.mode as 'attack' | 'magic' | 'proofs' | 'calculator' | 'format-converter' | 'instructions' | 'pem');
-            if (isMobile) onMobileClose();
-            focusWorkspace();
-          }}
-        />
-      ))}
+      />
     </>
+  );
+
+  // footerIcons renders at `sm` size; a native button keeps the
+  // `sidebar-palette-hint` testid verbatim (kit buttons don't take it).
+  const paletteFooterIcon = (
+    <button
+      type="button"
+      data-testid="sidebar-palette-hint"
+      aria-label="Open command palette"
+      title="Open command palette (⌘K)"
+      onClick={() => setCommandPaletteOpen(true)}
+      style={paletteHintStyle}
+    >
+      <Icon icon="search" />
+    </button>
   );
 
   if (isMobile) {
@@ -350,10 +324,10 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
     <SideNav
       header={heading}
       footer={footer}
+      footerIcons={paletteFooterIcon}
+      collapsible
+      resizable={{ defaultWidth: 280, minWidth: 200, maxWidth: 480, autoSaveId: 'navPanelWidth' }}
       style={{
-        // 280 (max): SideNavItem's label is string-only with no wrap prop, so the
-        // measured 15px overflow of 'Partial Key / Lattice' is fixed by width.
-        width: 280,
         flexShrink: 0,
         // Lets the rail keep its own scrollbar: SideNav's middle zone already
         // scrolls, it only needs a flex bound so it cannot grow the page.
