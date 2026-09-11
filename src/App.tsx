@@ -16,7 +16,6 @@ import { ToastViewport } from '@astryxdesign/core/Toast';
 import { Sidebar, useIsMobile } from './components/Sidebar';
 import { LogoIcon } from './components/_shared/LogoIcon';
 import { AppProvider } from './context/AppContext';
-import { InputPanel } from './components/InputPanel';
 import { OutputPanel, SAGE_META, useSageStatus } from './components/OutputPanel';
 import { Calculator } from './components/calculator/Calculator';
 import { MagicPanel } from './components/MagicPanel';
@@ -51,6 +50,8 @@ const RESULTS_RESIZABLE = {
   defaultSize: 340,
   minSizePx: 240,
   maxSizePx: 600,
+  collapsible: true,
+  collapsedSize: 50,
   autoSaveId: 'outputPanelWidth',
 } as const;
 
@@ -155,14 +156,15 @@ function AppContent() {
         <PemDecryptorDialog isOpen={pemOpen} onOpenChange={setPemOpen} />
         <Sidebar mobileOpen={mobileNavOpen} onMobileClose={() => setMobileNavOpen(false)} />
         <Layout height="fill" content={<LayoutContent padding={0}>
+          <div id="main-workspace" tabIndex={-1}>
           <ErrorBoundary>
-            <InputPanel />
             <Calculator />
             <MagicPanel />
           </ErrorBoundary>
           <ErrorBoundary>
             <OutputPanel />
           </ErrorBoundary>
+          </div>
         </LayoutContent>} />
       </AppShell>
       </ToastViewport>
@@ -191,8 +193,7 @@ function AppContent() {
             <LayoutContent padding={0}>
               <div id="main-workspace" tabIndex={-1}>
                 <ErrorBoundary>
-                  <InputPanel />
-                  <Calculator />
+                        <Calculator />
                   <MagicPanel />
                 </ErrorBoundary>
               </div>
@@ -203,7 +204,7 @@ function AppContent() {
               <ResizeHandle direction="horizontal" isReversed resizable={results.props} label="Resize results" />
               <LayoutPanel resizable={results.props} label="Results" hasDivider>
                 <ErrorBoundary>
-                  <OutputPanel />
+                  <OutputPanel onCollapseResults={results.collapse} />
                 </ErrorBoundary>
               </LayoutPanel>
             </>

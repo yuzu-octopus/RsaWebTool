@@ -37,13 +37,13 @@ export function useKeyboardShortcuts() {
           break;
         }
         case 'enter':
-          if (viewMode === 'attack' || viewMode === 'rsa') {
+          if (viewMode === 'rsa') {
             e.preventDefault();
             window.dispatchEvent(new CustomEvent('rsa-run-attack'));
           }
           break;
         case 'c':
-          if (e.shiftKey && (viewMode === 'attack' || viewMode === 'rsa')) {
+          if (e.shiftKey && viewMode === 'rsa') {
             e.preventDefault();
             window.dispatchEvent(new CustomEvent('rsa-copy-output'));
           }

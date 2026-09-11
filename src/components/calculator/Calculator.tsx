@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAppContext } from '../../hooks/useAppContext';
 import { InputPanel } from '../InputPanel';
 import { CipherWorkspace, type CipherId, type CipherWorkspaceTab } from '../cipher/CipherWorkspace';
@@ -17,6 +17,15 @@ function isCipherId(mode: string): mode is CipherId {
 export function Calculator() {
   const { viewMode } = useAppContext();
   const [tab, setTab] = useState<CipherWorkspaceTab>('operations');
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail === 'operations' || detail === 'attacks' || detail === 'learn') setTab(detail);
+    };
+    window.addEventListener('cipher-workspace-tab', handler);
+    return () => window.removeEventListener('cipher-workspace-tab', handler);
+  }, []);
 
   if (!isCipherId(viewMode)) return null;
 

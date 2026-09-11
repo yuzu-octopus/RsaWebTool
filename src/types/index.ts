@@ -50,8 +50,8 @@ export interface NotificationState {
 export interface AppContextType {
   selectedAttack: Attack | null;
   setSelectedAttack: (attack: Attack | null) => void;
-  viewMode: 'rsa' | 'aes' | 'ecc' | 'hash' | 'dh' | 'attack' | 'magic';
-  setViewMode: (mode: 'rsa' | 'aes' | 'ecc' | 'hash' | 'dh' | 'attack' | 'magic') => void;
+  viewMode: 'rsa' | 'aes' | 'ecc' | 'hash' | 'dh' | 'magic';
+  setViewMode: (mode: 'rsa' | 'aes' | 'ecc' | 'hash' | 'dh' | 'magic') => void;
   outputResult: string | null;
   setOutputResult: (result: string | null) => void;
   outputError: string | null;

@@ -161,7 +161,7 @@ function HistoryListItem({ entry, isSelected, onClick }: { entry: HistoryEntry; 
   );
 }
 
-export function OutputPanel() {
+export function OutputPanel({ onCollapseResults }: { onCollapseResults?: () => void } = {}) {
   const { outputResult, outputError, history, clearHistory, showNotification } = useAppContext();
   const [ui, setUi] = useState({ historySelectedKey: null as string | null, historyOpen: false, confirmOpen: false });
   const { copied, copy } = useCopyToClipboard();
@@ -206,6 +206,15 @@ export function OutputPanel() {
           <Heading level={3} color="accent">
             Results
           </Heading>
+          {onCollapseResults && (
+            <IconButton
+              label="Collapse results"
+              variant="ghost"
+              size="sm"
+              icon={<Icon icon="chevronRight" size="sm" />}
+              onClick={onCollapseResults}
+            />
+          )}
           <Text type="supporting">
             {sage.text}
           </Text>

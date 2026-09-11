@@ -179,11 +179,12 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const handleAttackClick = (attack: Attack) => {
     if (isMobile) onMobileClose();
     setSelectedAttack(attack);
-    setViewMode('attack');
+    setViewMode('rsa');
+    window.dispatchEvent(new CustomEvent('cipher-workspace-tab', { detail: 'attacks' }));
     focusWorkspace();
   };
 
-  const isAttackActive = (id: string) => viewMode === 'attack' && selectedAttack?.id === id;
+  const isAttackActive = (id: string) => viewMode === 'rsa' && selectedAttack?.id === id;
 
   const heading = (
     <SideNavHeading

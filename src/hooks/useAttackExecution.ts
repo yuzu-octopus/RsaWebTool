@@ -116,9 +116,9 @@ export function useAttackExecution(
     };
   }, []);
 
-  // Abort execution when user navigates away from attack view
+  // Abort execution when user navigates away from the RSA attack view
   useEffect(() => {
-    if (viewMode !== 'attack') {
+    if (viewMode !== 'rsa') {
       abortControllerRef.current?.abort();
     }
   }, [viewMode]);

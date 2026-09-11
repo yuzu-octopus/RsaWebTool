@@ -26,7 +26,7 @@ const CATEGORY_BADGE_VARIANTS: Record<AttackCategory, 'green' | 'purple' | 'cyan
   ECC: 'purple',
 };
 
-const VIEW_MODES = ['rsa', 'aes', 'ecc', 'hash', 'dh', 'attack', 'magic'] as const;
+const VIEW_MODES = ['rsa', 'aes', 'ecc', 'hash', 'dh', 'magic'] as const;
 type ViewMode = typeof VIEW_MODES[number];
 
 interface PaletteAux {
@@ -155,7 +155,8 @@ export function CommandPalette() {
   const selectAttack = useCallback(
     (attack: Attack) => {
       setSelectedAttack(attack);
-      setViewMode('attack');
+      setViewMode('rsa');
+      window.dispatchEvent(new CustomEvent('cipher-workspace-tab', { detail: 'attacks' }));
     },
     [setSelectedAttack, setViewMode],
   );

@@ -14,7 +14,7 @@ function toHistoryPreview(result: string): string {
 export function AppProvider({ children }: { children: ReactNode }) {
   const [app, setApp] = useState({
     selectedAttack: null as AppContextType['selectedAttack'],
-    viewMode: 'attack' as AppContextType['viewMode'],
+    viewMode: 'rsa' as AppContextType['viewMode'],
     outputResult: null as string | null,
     outputError: null as string | null,
     outputSource: null as AppContextType['outputSource'],

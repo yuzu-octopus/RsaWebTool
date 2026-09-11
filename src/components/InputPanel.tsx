@@ -38,7 +38,7 @@ export function InputPanel() {
   const { selectedAttack, viewMode, setViewMode, setSelectedAttack, setMobileNavOpen } = useAppContext();
   const isMobile = useIsMobile();
 
-  if (viewMode !== 'attack') return null;
+  if (viewMode !== 'rsa') return null;
 
   if (!selectedAttack) {
     return (
@@ -55,7 +55,7 @@ export function InputPanel() {
                 <Button label="Try Hastad Broadcast" variant="secondary" onClick={() => {
                   const hb = attacks.find(a => a.id === 'hastad-broadcast');
                   if (hb) setSelectedAttack(hb);
-                  setViewMode('attack');
+                  setViewMode('rsa');
                 }} />
                 <Button label="Open RSA Calculator" variant="secondary" onClick={() => {
                   setViewMode('rsa');
@@ -73,7 +73,7 @@ export function InputPanel() {
 function AttackPanel({ attack }: { attack: Attack }) {
   const { viewMode, outputResult, setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification } = useAppContext();
   const { execute } = useSageMath();
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState(1);
   const [sourceMode, setSourceMode] = useState<'sage' | 'frontend'>('sage');
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -116,12 +116,12 @@ function AttackPanel({ attack }: { attack: Attack }) {
 
   // Keyboard shortcut: ⌘+Enter to run attack, ⌘+Shift+C to copy output
   const runShortcut = useEffectEvent(() => {
-    if (viewMode === 'attack' && !isRunning) {
+    if (viewMode === 'rsa' && !isRunning) {
       handleValidatedRun(inputValues);
     }
   });
   const copyShortcut = useEffectEvent(() => {
-    if (viewMode === 'attack' && outputResult) {
+    if (viewMode === 'rsa' && outputResult) {
       void handleCopy(outputResult);
     }
   });
