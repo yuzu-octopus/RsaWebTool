@@ -1,15 +1,23 @@
 import { useEffect, useState } from 'react';
-import { Stack, StackItem } from '@astryxdesign/core/Stack';
+import { AppShell } from '@astryxdesign/core/AppShell';
 import { TopNav, TopNavHeading } from '@astryxdesign/core/TopNav';
+import { Layout, LayoutContent, LayoutPanel } from '@astryxdesign/core/Layout';
+import { useResizable } from '@astryxdesign/core/Resizable';
+import { ResizeHandle } from '@astryxdesign/core/Resizable';
+import { StatusDot } from '@astryxdesign/core/StatusDot';
+import { Text } from '@astryxdesign/core/Text';
+import { Button } from '@astryxdesign/core/Button';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { Icon } from '@astryxdesign/core/Icon';
+import { Kbd } from '@astryxdesign/core/Kbd';
 import { Link } from '@astryxdesign/core/Link';
 import { useToast } from '@astryxdesign/core/Toast';
 import { ToastViewport } from '@astryxdesign/core/Toast';
 import { Sidebar, useIsMobile } from './components/Sidebar';
+import { LogoIcon } from './components/_shared/LogoIcon';
 import { AppProvider } from './context/AppContext';
 import { InputPanel } from './components/InputPanel';
-import { OutputPanel } from './components/OutputPanel';
+import { OutputPanel, SAGE_META, useSageStatus } from './components/OutputPanel';
 import { Calculator } from './components/calculator/Calculator';
 import { MagicPanel } from './components/MagicPanel';
 import { ProofIndex } from './components/ProofIndex';
@@ -39,11 +47,22 @@ const skipLinkHiddenStyle = {
   borderStyle: 'none',
 } as const;
 
+// Resize contract for the results rail (spec §1): kit-owned width persisted
+// under the existing `outputPanelWidth` key.
+const RESULTS_RESIZABLE = {
+  defaultSize: 340,
+  minSizePx: 240,
+  maxSizePx: 600,
+  autoSaveId: 'outputPanelWidth',
+} as const;
+
 function AppContent() {
-  const { notification, mobileNavOpen, setMobileNavOpen } = useAppContext();
+  const { notification, mobileNavOpen, setMobileNavOpen, setCommandPaletteOpen, outputError } = useAppContext();
+  const sage = SAGE_META[useSageStatus(outputError)];
   const [skipLinkFocused, setSkipLinkFocused] = useState(false);
   const isMobile = useIsMobile();
   const showToast = useToast();
+  const results = useResizable({ ...RESULTS_RESIZABLE, direction: 'horizontal' });
 
   useEffect(() => {
     if (env.factordbProxyUrl) {
@@ -66,39 +85,98 @@ function AppContent() {
     }
   }, [notification, showToast]);
 
+  const topNav = (
+    <TopNav
+      label="Application navigation"
+      heading={
+        <TopNavHeading
+          logo={<LogoIcon size={28} />}
+          heading="RSA CTF Tool"
+        />
+      }
+      startContent={
+        isMobile ? (
+          <IconButton
+            label="Open navigation"
+            variant="ghost"
+            icon={<Icon icon="menu" />}
+            onClick={() => setMobileNavOpen(true)}
+          />
+        ) : undefined
+      }
+      endContent={
+        <>
+          {/* Palette trigger cluster — Task 5 slots Format/PEM dialog buttons here. */}
+          <Button
+            label="Command palette"
+            variant="ghost"
+            size="sm"
+            onClick={() => setCommandPaletteOpen(true)}
+            icon={<Icon icon="search" size="sm" />}
+            endContent={<Kbd keys="mod+k" />}
+          />
+          <StatusDot variant={sage.variant} label={sage.label} tooltip={sage.tooltip} data-testid="sage-status" />
+          <Text type="supporting">
+            {sage.text}
+          </Text>
+        </>
+      }
+    />
+  );
+
+  if (isMobile) {
+    return (
+      <ToastViewport position="bottomEnd" maxVisible={3}>
+      <AppShell topNav={topNav} mobileNav={false}>
+        <Link
+          href="#main-workspace"
+          isStandalone
+          onFocus={() => setSkipLinkFocused(true)}
+          onBlur={() => setSkipLinkFocused(false)}
+          style={skipLinkFocused ? undefined : skipLinkHiddenStyle}
+        >
+          Skip navigation
+        </Link>
+        <CommandPalette />
+        <Sidebar mobileOpen={mobileNavOpen} onMobileClose={() => setMobileNavOpen(false)} />
+        <Layout height="fill" content={<LayoutContent padding={0}>
+          <ErrorBoundary>
+            <InputPanel />
+            <Calculator />
+            <MagicPanel />
+            <ProofIndex />
+            <FormatConverter />
+            <InstructionsPanel />
+            <PemDecryptor />
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <OutputPanel />
+          </ErrorBoundary>
+        </LayoutContent>} />
+      </AppShell>
+      </ToastViewport>
+    );
+  }
+
   return (
     <ToastViewport position="bottomEnd" maxVisible={3}>
-    <Stack direction="vertical" gap={0} width="100%" height="100vh" style={{ backgroundColor: 'var(--color-background)' }}>
-      <Link
-        href="#main-workspace"
-        isStandalone
-        onFocus={() => setSkipLinkFocused(true)}
-        onBlur={() => setSkipLinkFocused(false)}
-        style={skipLinkFocused ? undefined : skipLinkHiddenStyle}
-      >
-        Skip navigation
-      </Link>
-      <CommandPalette />
-      {isMobile && (
-        <TopNav
-          label="Mobile navigation"
-          heading={<TopNavHeading heading="RSA CTF Tool" />}
-          startContent={
-            <IconButton
-              label="Open navigation"
-              variant="ghost"
-              icon={<Icon icon="menu" />}
-              onClick={() => setMobileNavOpen(true)}
-            />
-          }
-        />
-      )}
-      <StackItem size="fill">
-        <Stack direction="horizontal" gap={0} width="100%" height="100%">
-          <Sidebar mobileOpen={mobileNavOpen} onMobileClose={() => setMobileNavOpen(false)} />
-          <StackItem size="fill">
-            <Stack as="main" id="main-workspace" tabIndex={-1} direction={isMobile ? 'vertical' : 'horizontal'} gap={0} width="100%" height="100%" isScrollable={isMobile}>
-              <StackItem size="fill" isScrollable>
+      <AppShell topNav={topNav} mobileNav={false} contentPadding={0}>
+        <Link
+          href="#main-workspace"
+          isStandalone
+          onFocus={() => setSkipLinkFocused(true)}
+          onBlur={() => setSkipLinkFocused(false)}
+          style={skipLinkFocused ? undefined : skipLinkHiddenStyle}
+        >
+          Skip navigation
+        </Link>
+        <CommandPalette />
+        <Layout
+          height="fill"
+          start={<Sidebar mobileOpen={mobileNavOpen} onMobileClose={() => setMobileNavOpen(false)} />}
+          content={
+            <LayoutContent padding={0}>
+              <div id="main-workspace" tabIndex={-1}>
                 <ErrorBoundary>
                   <InputPanel />
                   <Calculator />
@@ -108,15 +186,21 @@ function AppContent() {
                   <InstructionsPanel />
                   <PemDecryptor />
                 </ErrorBoundary>
-              </StackItem>
-              <ErrorBoundary>
-                <OutputPanel />
-              </ErrorBoundary>
-            </Stack>
-          </StackItem>
-        </Stack>
-      </StackItem>
-    </Stack>
+              </div>
+            </LayoutContent>
+          }
+          end={
+            <>
+              <ResizeHandle direction="horizontal" isReversed resizable={results.props} label="Resize results" />
+              <LayoutPanel resizable={results.props} label="Results" hasDivider>
+                <ErrorBoundary>
+                  <OutputPanel />
+                </ErrorBoundary>
+              </LayoutPanel>
+            </>
+          }
+        />
+      </AppShell>
     </ToastViewport>
   );
 }
