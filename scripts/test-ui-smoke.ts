@@ -30,7 +30,10 @@ function assert(condition: unknown, message: string): asserts condition {
 
 async function main() {
   const server = await startServer();
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({
+    headless: true,
+    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  });
 
   try {
     const page = await browser.newPage();

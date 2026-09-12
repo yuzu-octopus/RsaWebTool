@@ -1,14 +1,11 @@
-import { useState, useCallback, useMemo, useRef} from 'react';
+import { useState, useCallback, useRef} from 'react';
 import { Stack } from '@astryxdesign/core/Stack';
-import { Text } from '@astryxdesign/core/Text';
-import { TextInput } from '@astryxdesign/core/TextInput';
-import { TextArea } from '@astryxdesign/core/TextArea';
-import { Button } from '@astryxdesign/core/Button';
 import { Selector } from '@astryxdesign/core/Selector';
 import { Banner } from '@astryxdesign/core/Banner';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { useSageMath, DEFAULT_SAGE_TIMEOUT } from '../../hooks/useSageMath';
 import { AttackExplanationPanel } from './AttackExplanationPanel';
+import { SharedAttackPanel, type SharedAttackField } from '../attacks/SharedAttackPanel';
 import { ResultBox } from './_shared/ResultBox';
 import { ECC_ATTACKS, ECC_ATTACK_EXPLANATIONS } from '../../data/attackExplanations/ecc';
 import {
@@ -32,73 +29,288 @@ import {
   X25519_LOW_ORDER_PEERS,
   x25519Legendre,
 } from '../../utils/eccCurves';
+import { modPow } from '../../utils/bigint';
 import { secp256k1 } from '@noble/curves/secp256k1.js';
 import { x25519 } from '@noble/curves/ed25519.js';
 import { bytesToHex } from '@noble/curves/utils.js';
 
 const SECP256K1_ORDER_HEX = 'fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141';
 
+/* ─── Phase-0 mock: shared-panel demo helpers for nonce-reuse ─── */
+
+// Pure runner extracted from the tab's `run` switch so the mock panel and the
+// old UI share one code path.
+function runNonceReuse(h1v: string, h2v: string, rv: string, s1v: string, s2v: string, nHexv: string): string {
+  if (!h1v.trim() || !h2v.trim() || !rv.trim() || !s1v.trim() || !s2v.trim()) throw new Error('All fields required');
+  // Hex-labelled inputs parse as hex ('ff' -> 255n), never decimal.
+  const n = parseHexField(nHexv, 'curve order n');
+  const hash1 = parseHexField(h1v, 'h1');
+  const hash2 = parseHexField(h2v, 'h2');
+  const rr = parseHexField(rv, 'r');
+  const ss1 = parseHexField(s1v, 's1');
+  const ss2 = parseHexField(s2v, 's2');
+  const k = recoverNonce(hash1, hash2, ss1, ss2, n);
+  const d = recoverPrivKey(ss1, k, hash1, rr, n);
+  const lines = [
+    `k (nonce): 0x${k.toString(16)}`,
+    `Private key d: 0x${d.toString(16)}`,
+    '',
+  ];
+  if (n === curveOrder(secp256k1)) {
+    // Real verification: recompute k·G and compare its x-coordinate.
+    const R = secp256k1.Point.BASE.multiply(k).toAffine();
+    const match = (R.x % n) === (rr % n);
+    lines.push(`Verification: k·G x-coord ${match ? 'MATCHES' : 'MISMATCHES'} r (0x${rr.toString(16)})`);
+  } else {
+    lines.push('Verification: k·G check skipped (n is not the secp256k1 order)');
+    lines.push(`  r = 0x${rr.toString(16)}`);
+  }
+  return lines.join('\n');
+}
+
+// Valid secp256k1 vector (verified: k·G x-coord MATCHES r) so Generate + Run
+// demonstrates the full recovery in the mock panel.
+function generateNonceReuseDemo(): Record<string, string> {
+  return {
+    n: SECP256K1_ORDER_HEX,
+    h1: '00a1b2c3d4e5f60718293a4b5c6d7e8f90102030405060708090a0b0c0d0e0f1',
+    h2: '00f1e2d3c4b5a69788796a5b4c3d2e1f00112233445566778899aabbccddeeff',
+    r: 'b0ee15f11c1b03eead8f90107b203d40f4e75bc0fb1176c132e81751333bfb5f',
+    s1: '538b6722665ca159a72acb5ded1906b3fc74f65101269e910236d0d3671dc15b',
+    s2: 'bb8d4b93e1e1be6f4cad36152ac9af3d25967a465071fcdf93c0061151c34233',
+  };
+}
+
+/* ─── Per-attack sample generators (one-liners for the shared panel) ─── */
+
+const SECP256K1_P_HEX = 'fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f';
+
+function randBig(bits: number): bigint {
+  const bytes = crypto.getRandomValues(new Uint8Array(Math.ceil(bits / 8)));
+  let v = 0n;
+  for (const b of bytes) v = (v << 8n) + BigInt(b);
+  return v;
+}
+
+function generatePointValidationDemo(): Record<string, string> {
+  // y^2 = x^3 + 2x + 2 over F_17; (5, 1) is on the curve (1 = 125+10+2 = 1 mod 17).
+  return { a: '2', b: '2', p: '11', x: '5', y: '1' };
+}
+
+function generateEcPhDemo(): Record<string, string> {
+  const Q = ecMul({ x: 5n, y: 1n }, 7n, 2n, 0x11n);
+  if (!Q) throw new Error('Demo curve arithmetic failed');
+  return { a: '2', b: '2', p: '11', gx: '5', gy: '1', qx: Q.x.toString(16), qy: Q.y.toString(16) };
+}
+
+function generateSigMalleabilityDemo(): Record<string, string> {
+  const priv = crypto.getRandomValues(new Uint8Array(32));
+  priv[0] &= 0x0f;
+  priv[31] |= 0x01;
+  return { malCurve: 'secp256k1', malMsg: 'malleate-me', malPriv: bytesToHex(priv) };
+}
+
+function generateX25519TwistDemo(): Record<string, string> {
+  return { peerVal: `01${'00'.repeat(31)}` };
+}
+
+function generateBiasedNonceDemo(): Record<string, string> {
+  const n = BigInt(`0x${SECP256K1_ORDER_HEX}`);
+  const d = (randBig(256) % (n - 1n)) + 1n;
+  const rows: string[] = [];
+  while (rows.length < 4) {
+    const k = (randBig(64) % ((1n << 64n) - 1n)) + 1n;
+    const R = secp256k1.Point.BASE.multiply(k).toAffine();
+    const r = R.x % n;
+    if (r === 0n) continue;
+    const h = randBig(256) % n;
+    const s = (modPow(k, n - 2n, n) * (h + d * r)) % n;
+    if (s === 0n) continue;
+    rows.push(`${r.toString(16)},${s.toString(16)},${h.toString(16)}`);
+  }
+  return { n: SECP256K1_ORDER_HEX, kbits: '64', pairs: rows.join('\n') };
+}
+
+function generateInvalidCurveDemo(): Record<string, string> {
+  return { a: '0', b: '7', p: SECP256K1_P_HEX };
+}
+
+function generateMovDemo(): Record<string, string> {
+  // y^2 = x^3 + x over F_19: supersingular, #E = 20, embedding degree k = 2.
+  return { a: '1', b: '0', p: '13' };
+}
+
+function generateAnomalousDemo(): Record<string, string> {
+  // y^2 = x^3 + 3x + 2 over F_5 has order 5 = p (trace 1); Q = 3·(1,1) = (2,4).
+  return { a: '3', b: '2', p: '5', qx: '2', qy: '4' };
+}
+
+function generateSingularDemo(): Record<string, string> {
+  return { a: '0', b: '0', p: 'b' };
+}
+
+/* ─── Shared-panel definitions: fields + generate + source (runs stay in place) ─── */
+
+const MAL_CURVE_OPTIONS = CURVES.filter(c => c.hasSign && c.instance).map(c => ({ value: c.id, label: c.label }));
+
+interface ECCAttackDef {
+  fields: SharedAttackField[];
+  generate: () => Record<string, string>;
+  source: string;
+  sourceLanguage: string;
+}
+
+const ECC_DEFS: Record<string, ECCAttackDef> = {
+  'nonce-reuse': {
+    fields: [
+      { name: 'n', label: 'Curve order n (hex)', placeholder: 'secp256k1 order' },
+      { name: 'h1', label: 'Hash 1 (hex)', placeholder: 'h1' },
+      { name: 'h2', label: 'Hash 2 (hex)', placeholder: 'h2' },
+      { name: 'r', label: 'r (hex)', placeholder: 'r' },
+      { name: 's1', label: 's1 (hex)', placeholder: 's1' },
+      { name: 's2', label: 's2 (hex)', placeholder: 's2' },
+    ],
+    generate: generateNonceReuseDemo,
+    source: runNonceReuse.toString(),
+    sourceLanguage: 'typescript',
+  },
+  'point-validation': {
+    fields: [
+      { name: 'a', label: 'a (hex)', placeholder: 'a param' },
+      { name: 'b', label: 'b (hex)', placeholder: 'b param' },
+      { name: 'p', label: 'p (prime, hex)', placeholder: 'Field prime' },
+      { name: 'x', label: 'x (hex)', placeholder: 'x coord' },
+      { name: 'y', label: 'y (hex)', placeholder: 'y coord' },
+    ],
+    generate: generatePointValidationDemo,
+    source: ECC_ATTACK_EXPLANATIONS['point-validation'].python,
+    sourceLanguage: 'python',
+  },
+  'ec-ph': {
+    fields: [
+      { name: 'a', label: 'a (hex)', placeholder: 'a param' },
+      { name: 'b', label: 'b (hex)', placeholder: 'b param' },
+      { name: 'p', label: 'p (prime, hex — small enough to enumerate locally)', placeholder: 'Field prime' },
+      { name: 'gx', label: 'Gx (hex)', placeholder: 'Base point x' },
+      { name: 'gy', label: 'Gy (hex)', placeholder: 'Base point y' },
+      { name: 'qx', label: 'Qx (hex)', placeholder: 'Target point x' },
+      { name: 'qy', label: 'Qy (hex)', placeholder: 'Target point y' },
+    ],
+    generate: generateEcPhDemo,
+    source: ECC_ATTACK_EXPLANATIONS['ec-ph'].python,
+    sourceLanguage: 'python',
+  },
+  'sig-malleability': {
+    fields: [
+      { name: 'malCurve', label: 'Curve', kind: 'select', options: MAL_CURVE_OPTIONS },
+      { name: 'malMsg', label: 'Message (text or even-length hex)', placeholder: 'Message to sign' },
+      { name: 'malPriv', label: 'Private key (hex)', placeholder: 'Hex private key' },
+    ],
+    generate: generateSigMalleabilityDemo,
+    source: ECC_ATTACK_EXPLANATIONS['sig-malleability'].python,
+    sourceLanguage: 'python',
+  },
+  'x25519-twist': {
+    fields: [
+      { name: 'peerVal', label: 'Peer key (32-byte hex, little-endian u)', placeholder: 'Peer x-coordinate' },
+    ],
+    generate: generateX25519TwistDemo,
+    source: ECC_ATTACK_EXPLANATIONS['x25519-twist'].python,
+    sourceLanguage: 'python',
+  },
+  'biased-nonce': {
+    fields: [
+      { name: 'n', label: 'Curve order n (hex)', placeholder: 'secp256k1 order' },
+      { name: 'kbits', label: 'kbits (unknown nonce bits)', placeholder: '64' },
+      { name: 'pairs', label: 'Signature pairs (r,s,h hex, one per line)', placeholder: 'r1,s1,h1', kind: 'textarea' },
+    ],
+    generate: generateBiasedNonceDemo,
+    source: ECC_ATTACK_EXPLANATIONS['biased-nonce'].python,
+    sourceLanguage: 'python',
+  },
+  'invalid-curve': {
+    fields: [
+      { name: 'a', label: 'a (hex)', placeholder: 'a param' },
+      { name: 'b', label: 'b (hex)', placeholder: 'b param' },
+      { name: 'p', label: 'p (prime, hex)', placeholder: 'Field prime' },
+    ],
+    generate: generateInvalidCurveDemo,
+    source: ECC_ATTACK_EXPLANATIONS['invalid-curve'].python,
+    sourceLanguage: 'python',
+  },
+  'mov': {
+    fields: [
+      { name: 'a', label: 'a (hex)', placeholder: 'a param' },
+      { name: 'b', label: 'b (hex)', placeholder: 'b param' },
+      { name: 'p', label: 'p (prime, hex)', placeholder: 'Field prime' },
+    ],
+    generate: generateMovDemo,
+    source: ECC_ATTACK_EXPLANATIONS['mov'].python,
+    sourceLanguage: 'python',
+  },
+  'anomalous': {
+    fields: [
+      { name: 'a', label: 'a (hex)', placeholder: 'a param' },
+      { name: 'b', label: 'b (hex)', placeholder: 'b param' },
+      { name: 'p', label: 'p (prime, hex)', placeholder: 'Field prime' },
+      { name: 'qx', label: 'Qx (hex, required)', placeholder: 'Target point x' },
+      { name: 'qy', label: 'Qy (hex, required)', placeholder: 'Target point y' },
+    ],
+    generate: generateAnomalousDemo,
+    source: ECC_ATTACK_EXPLANATIONS['anomalous'].python,
+    sourceLanguage: 'python',
+  },
+  'singular': {
+    fields: [
+      { name: 'a', label: 'a (hex)', placeholder: 'a param' },
+      { name: 'b', label: 'b (hex)', placeholder: 'b param' },
+      { name: 'p', label: 'p (prime, hex)', placeholder: 'Field prime' },
+    ],
+    generate: generateSingularDemo,
+    source: ECC_ATTACK_EXPLANATIONS['singular'].python,
+    sourceLanguage: 'python',
+  },
+};
+
 export function ECCAttacksTab({ selectedAttack }: { selectedAttack?: string } = {}) {
   const [attack, setAttack] = useState(selectedAttack ?? 'nonce-reuse');
-  const [h1, setH1] = useState('');
-  const [h2, setH2] = useState('');
-  const [r1, setR1] = useState('');
-  const [s1, setS1] = useState('');
-  const [s2, setS2] = useState('');
-  const [nHex, setNHex] = useState(SECP256K1_ORDER_HEX);
-  const [aVal, setAVal] = useState('');
-  const [bVal, setBVal] = useState('');
-  const [pVal, setPVal] = useState('');
-  const [xVal, setXVal] = useState('');
-  const [yVal, setYVal] = useState('');
-  const [gxVal, setGxVal] = useState('');
-  const [gyVal, setGyVal] = useState('');
-  const [pxVal, setPxVal] = useState('');
-  const [pyVal, setPyVal] = useState('');
-  const [pairsMultiline, setPairsMultiline] = useState('');
-  const [kbitsVal, setKbitsVal] = useState('64');
-  const [malCurve, setMalCurve] = useState('secp256k1');
-  const [malMsg, setMalMsg] = useState('');
-  const [malPriv, setMalPriv] = useState('');
-  const [peerVal, setPeerVal] = useState('00'.repeat(32));
-  const [isRunning, setIsRunning] = useState(false);
   const runningRef = useRef(false);
   const out = useCalculatorOutput({ category: 'calculator-ecc' });
   const { execute } = useSageMath();
+  const def = ECC_DEFS[attack] ?? ECC_DEFS['nonce-reuse'];
+  const explanation = ECC_ATTACK_EXPLANATIONS[attack] ?? ECC_ATTACK_EXPLANATIONS['nonce-reuse'];
 
-  const run = useCallback(async () => {
+  const handleRun = useCallback(async (vals: Record<string, string>) => {
     if (runningRef.current) return;
     runningRef.current = true;
-    setIsRunning(true);
     out.clear();
+    // Panel-owned field values, mapped onto the legacy input names the
+    // per-attack runners below were written against.
+    const h1 = vals.h1 ?? '';
+    const h2 = vals.h2 ?? '';
+    const r1 = vals.r ?? '';
+    const s1 = vals.s1 ?? '';
+    const s2 = vals.s2 ?? '';
+    const nHex = vals.n ?? SECP256K1_ORDER_HEX;
+    const aVal = vals.a ?? '';
+    const bVal = vals.b ?? '';
+    const pVal = vals.p ?? '';
+    const xVal = vals.x ?? '';
+    const yVal = vals.y ?? '';
+    const gxVal = vals.gx ?? '';
+    const gyVal = vals.gy ?? '';
+    const pxVal = vals.qx ?? '';
+    const pyVal = vals.qy ?? '';
+    const pairsMultiline = vals.pairs ?? '';
+    const kbitsVal = vals.kbits ?? '64';
+    const malCurve = vals.malCurve ?? 'secp256k1';
+    const malMsg = vals.malMsg ?? '';
+    const malPriv = vals.malPriv ?? '';
+    const peerVal = vals.peerVal ?? '';
     try {
       switch (attack) {
         case 'nonce-reuse': {
-          if (!h1.trim() || !h2.trim() || !r1.trim() || !s1.trim() || !s2.trim()) throw new Error('All fields required');
-          // Hex-labelled inputs parse as hex ('ff' -> 255n), never decimal.
-          const n = parseHexField(nHex, 'curve order n');
-          const hash1 = parseHexField(h1, 'h1');
-          const hash2 = parseHexField(h2, 'h2');
-          const rr = parseHexField(r1, 'r');
-          const ss1 = parseHexField(s1, 's1');
-          const ss2 = parseHexField(s2, 's2');
-          const k = recoverNonce(hash1, hash2, ss1, ss2, n);
-          const d = recoverPrivKey(ss1, k, hash1, rr, n);
-          const lines = [
-            `k (nonce): 0x${k.toString(16)}`,
-            `Private key d: 0x${d.toString(16)}`,
-            '',
-          ];
-          if (n === curveOrder(secp256k1)) {
-            // Real verification: recompute k·G and compare its x-coordinate.
-            const R = secp256k1.Point.BASE.multiply(k).toAffine();
-            const match = (R.x % n) === (rr % n);
-            lines.push(`Verification: k·G x-coord ${match ? 'MATCHES' : 'MISMATCHES'} r (0x${rr.toString(16)})`);
-          } else {
-            lines.push('Verification: k·G check skipped (n is not the secp256k1 order)');
-            lines.push(`  r = 0x${rr.toString(16)}`);
-          }
-          out.dispatch(lines.join('\n'), `ECC Attack: ${attack}`);
+          out.dispatch(runNonceReuse(h1, h2, r1, s1, s2, nHex), `ECC Attack: ${attack}`);
           break;
         }
         case 'point-validation': {
@@ -474,172 +686,38 @@ print('\\n'.join(out)); print('TOKEN=SUCCESS')`;
       out.dispatchError(e instanceof Error ? e.message : String(e));
     } finally {
       runningRef.current = false;
-      setIsRunning(false);
     }
-  }, [attack, h1, h2, r1, s1, s2, nHex, aVal, bVal, pVal, xVal, yVal, gxVal, gyVal, pxVal, pyVal, pairsMultiline, kbitsVal, malCurve, malMsg, malPriv, peerVal, execute, out]);
-
-  const malCurves = useMemo(() => CURVES.filter(c => c.hasSign && c.instance), []);
-
-  const attackFields = useMemo(() => {
-    switch (attack) {
-      case 'nonce-reuse': return (
-        <Stack direction="vertical" gap={2}>
-          <TextInput label="Curve order n (hex)" value={nHex} onChange={setNHex} placeholder="secp256k1 order" width="100%" isDisabled={isRunning} />
-          <Stack direction="horizontal" gap={1}>
-            <TextInput label="Hash 1 (hex)" value={h1} onChange={setH1} placeholder="h1" width="100%" isDisabled={isRunning} />
-            <TextInput label="Hash 2 (hex)" value={h2} onChange={setH2} placeholder="h2" width="100%" isDisabled={isRunning} />
-          </Stack>
-          <Stack direction="horizontal" gap={1}>
-            <TextInput label="r (hex)" value={r1} onChange={setR1} placeholder="r" width="100%" isDisabled={isRunning} />
-            <TextInput label="s1 (hex)" value={s1} onChange={setS1} placeholder="s1" width="100%" isDisabled={isRunning} />
-            <TextInput label="s2 (hex)" value={s2} onChange={setS2} placeholder="s2" width="100%" isDisabled={isRunning} />
-          </Stack>
-        </Stack>
-      );
-      case 'point-validation': return (
-        <Stack direction="vertical" gap={2}>
-          <Stack direction="horizontal" gap={1}>
-            <TextInput label="a (hex)" value={aVal} onChange={setAVal} placeholder="a param" width="100%" isDisabled={isRunning} />
-            <TextInput label="b (hex)" value={bVal} onChange={setBVal} placeholder="b param" width="100%" isDisabled={isRunning} />
-          </Stack>
-          <TextInput label="p (prime, hex)" value={pVal} onChange={setPVal} placeholder="Field prime" width="100%" isDisabled={isRunning} />
-          <Stack direction="horizontal" gap={1}>
-            <TextInput label="x (hex)" value={xVal} onChange={setXVal} placeholder="x coord" width="100%" isDisabled={isRunning} />
-            <TextInput label="y (hex)" value={yVal} onChange={setYVal} placeholder="y coord" width="100%" isDisabled={isRunning} />
-          </Stack>
-        </Stack>
-      );
-      case 'ec-ph': return (
-        <Stack direction="vertical" gap={2}>
-          <Stack direction="horizontal" gap={1}>
-            <TextInput label="a (hex)" value={aVal} onChange={setAVal} placeholder="a param" width="100%" isDisabled={isRunning} />
-            <TextInput label="b (hex)" value={bVal} onChange={setBVal} placeholder="b param" width="100%" isDisabled={isRunning} />
-          </Stack>
-          <TextInput label="p (prime, hex — small enough to enumerate locally)" value={pVal} onChange={setPVal} placeholder="Field prime" width="100%" isDisabled={isRunning} />
-          <Stack direction="horizontal" gap={1}>
-            <TextInput label="Gx (hex)" value={gxVal} onChange={setGxVal} placeholder="Base point x" width="100%" isDisabled={isRunning} />
-            <TextInput label="Gy (hex)" value={gyVal} onChange={setGyVal} placeholder="Base point y" width="100%" isDisabled={isRunning} />
-          </Stack>
-          <Stack direction="horizontal" gap={1}>
-            <TextInput label="Qx (hex)" value={pxVal} onChange={setPxVal} placeholder="Target point x" width="100%" isDisabled={isRunning} />
-            <TextInput label="Qy (hex)" value={pyVal} onChange={setPyVal} placeholder="Target point y" width="100%" isDisabled={isRunning} />
-          </Stack>
-        </Stack>
-      );
-      case 'sig-malleability': return (
-        <Stack direction="vertical" gap={2}>
-          <Selector
-            label="Curve"
-            options={malCurves.map(c => ({ value: c.id, label: c.label }))}
-            value={malCurve}
-            onChange={setMalCurve}
-            width="100%"
-            isDisabled={isRunning}
-          />
-          <TextInput label="Message (text or even-length hex)" value={malMsg} onChange={setMalMsg} placeholder="Message to sign" width="100%" isDisabled={isRunning} />
-          <TextInput label="Private key (hex)" value={malPriv} onChange={setMalPriv} placeholder="Hex private key" width="100%" isDisabled={isRunning} />
-        </Stack>
-      );
-      case 'x25519-twist': return (
-        <Stack direction="vertical" gap={2}>
-          <TextInput label="Peer key (32-byte hex, little-endian u)" value={peerVal} onChange={setPeerVal} placeholder="Peer x-coordinate" width="100%" isDisabled={isRunning} />
-        </Stack>
-      );
-      case 'biased-nonce': return (
-        <Stack direction="vertical" gap={2}>
-          <TextInput label="Curve order n (hex)" value={nHex} onChange={setNHex} placeholder="secp256k1 order" width="100%" isDisabled={isRunning} />
-          <TextInput
-            label="kbits (unknown nonce bits)"
-            description="Lower = easier (e.g., kbits=64 means k < 2^64)"
-            value={kbitsVal}
-            onChange={setKbitsVal}
-            placeholder="64"
-            width="100%"
-            isDisabled={isRunning}
-          />
-          <TextArea
-            label="Signature pairs (r,s,h hex, one per line)"
-            value={pairsMultiline}
-            onChange={setPairsMultiline}
-            rows={4}
-            placeholder={'r1,s1,h1\nr2,s2,h2\n...'}
-            isDisabled={isRunning}
-          />
-        </Stack>
-      );
-      case 'invalid-curve': return (
-        <Stack direction="vertical" gap={2}>
-          <Stack direction="horizontal" gap={1}>
-            <TextInput label="a (hex)" value={aVal} onChange={setAVal} placeholder="a param" width="100%" isDisabled={isRunning} />
-            <TextInput label="b (hex)" value={bVal} onChange={setBVal} placeholder="b param" width="100%" isDisabled={isRunning} />
-          </Stack>
-          <TextInput label="p (prime, hex)" value={pVal} onChange={setPVal} placeholder="Field prime" width="100%" isDisabled={isRunning} />
-        </Stack>
-      );
-      case 'mov': return (
-        <Stack direction="vertical" gap={2}>
-          <Stack direction="horizontal" gap={1}>
-            <TextInput label="a (hex)" value={aVal} onChange={setAVal} placeholder="a param" width="100%" isDisabled={isRunning} />
-            <TextInput label="b (hex)" value={bVal} onChange={setBVal} placeholder="b param" width="100%" isDisabled={isRunning} />
-          </Stack>
-          <TextInput label="p (prime, hex)" value={pVal} onChange={setPVal} placeholder="Field prime" width="100%" isDisabled={isRunning} />
-        </Stack>
-      );
-      case 'anomalous': return (
-        <Stack direction="vertical" gap={2}>
-          <Stack direction="horizontal" gap={1}>
-            <TextInput label="a (hex)" value={aVal} onChange={setAVal} placeholder="a param" width="100%" isDisabled={isRunning} />
-            <TextInput label="b (hex)" value={bVal} onChange={setBVal} placeholder="b param" width="100%" isDisabled={isRunning} />
-          </Stack>
-          <TextInput label="p (prime, hex)" value={pVal} onChange={setPVal} placeholder="Field prime" width="100%" isDisabled={isRunning} />
-          <Stack direction="horizontal" gap={1}>
-            <TextInput label="Qx (hex, required)" value={pxVal} onChange={setPxVal} placeholder="Target point x" width="100%" isDisabled={isRunning} />
-            <TextInput label="Qy (hex, required)" value={pyVal} onChange={setPyVal} placeholder="Target point y" width="100%" isDisabled={isRunning} />
-          </Stack>
-        </Stack>
-      );
-      case 'singular': return (
-        <Stack direction="vertical" gap={2}>
-          <Stack direction="horizontal" gap={1}>
-            <TextInput label="a (hex)" value={aVal} onChange={setAVal} placeholder="a param" width="100%" isDisabled={isRunning} />
-            <TextInput label="b (hex)" value={bVal} onChange={setBVal} placeholder="b param" width="100%" isDisabled={isRunning} />
-          </Stack>
-          <TextInput label="p (prime, hex)" value={pVal} onChange={setPVal} placeholder="Field prime" width="100%" isDisabled={isRunning} />
-        </Stack>
-      );
-      default: return null;
-    }
-  }, [attack, h1, h2, r1, s1, s2, nHex, aVal, bVal, pVal, xVal, yVal, gxVal, gyVal, pxVal, pyVal, pairsMultiline, kbitsVal, malCurve, malMsg, malPriv, peerVal, malCurves, isRunning]);
+  }, [attack, execute, out]);
 
   return (
     <Stack direction="vertical" gap={2}>
       {!selectedAttack && (
-      <Selector
-        label="Attack"
-        options={ECC_ATTACKS.map(a => ({ value: a.value, label: a.label }))}
-        value={attack}
-        onChange={setAttack}
-        width="100%"
-        isDisabled={isRunning}
-      />
+        <Selector
+          label="Attack"
+          options={ECC_ATTACKS.map(a => ({ value: a.value, label: a.label }))}
+          value={attack}
+          onChange={setAttack}
+          width="100%"
+        />
       )}
-      {ECC_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={ECC_ATTACK_EXPLANATIONS[attack]} />}
-      {attackFields}
-      <Button
-        label={isRunning ? 'Running attack…' : 'Run Attack'}
-        variant="primary"
-        width="100%"
-        onClick={() => { void run(); }}
-        isDisabled={isRunning}
-        isLoading={isRunning}
+      <SharedAttackPanel
+        key={attack}
+        title={explanation.title}
+        description={explanation.description}
+        explanationNode={<AttackExplanationPanel data={explanation} />}
+        fields={def.fields}
+        generateLabel="Generate"
+        onGenerate={def.generate}
+        onRun={(vals) => { void handleRun(vals); }}
+        sourceCode={def.source}
+        sourceLanguage={def.sourceLanguage}
+        resultNode={(
+          <>
+            {out.result && <ResultBox value={out.result} label="Result" variant="medium" />}
+            {out.error && <Banner status="error" title={out.error} />}
+          </>
+        )}
       />
-      {isRunning && (
-        <Text type="body" role="status" aria-live="polite">
-          Running attack…
-        </Text>
-      )}
-      {out.result && <ResultBox value={out.result} label="Result" variant="medium" />}
-      {out.error && <Banner status="error" title={out.error} />}
     </Stack>
   );
 }

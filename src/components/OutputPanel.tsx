@@ -175,7 +175,6 @@ export function OutputPanel({ onCollapseResults }: { onCollapseResults?: () => v
   const structuredVerdict = runVerdict && displayResult !== null && runVerdict.result === displayResult ? runVerdict.verdict : null;
   const verdict = useMemo(() => parseVerdict(displayResult, structuredVerdict), [displayResult, structuredVerdict]);
   const sageStatus = useSageStatus(outputError);
-  const sage = SAGE_META[sageStatus];
 
   const handleHistoryClick = useCallback((key: string) => {
     setUi(prev => ({ ...prev, historySelectedKey: key }));
@@ -215,9 +214,6 @@ export function OutputPanel({ onCollapseResults }: { onCollapseResults?: () => v
               onClick={onCollapseResults}
             />
           )}
-          <Text type="supporting">
-            {sage.text}
-          </Text>
         </Stack>
 
         {ui.historySelectedKey && (

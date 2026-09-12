@@ -1,14 +1,12 @@
 import { useState, useCallback, useRef} from 'react';
 import { Stack } from '@astryxdesign/core/Stack';
-import { Text } from '@astryxdesign/core/Text';
-import { TextInput } from '@astryxdesign/core/TextInput';
-import { Button } from '@astryxdesign/core/Button';
 import { Selector } from '@astryxdesign/core/Selector';
 import { Banner } from '@astryxdesign/core/Banner';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { useSageMath, DEFAULT_SAGE_TIMEOUT } from '../../hooks/useSageMath';
 import { ResultBox } from './_shared/ResultBox';
 import { AttackExplanationPanel } from './AttackExplanationPanel';
+import { SharedAttackPanel, type SharedAttackField } from '../attacks/SharedAttackPanel';
 import { DH_ATTACKS, DH_ATTACK_EXPLANATIONS } from '../../data/attackExplanations/dh';
 import {
   SMOOTH_BOUND,
@@ -95,21 +93,130 @@ function pushCrtTail(p: bigint, g: bigint, y: bigint, remainders: bigint[], modu
   lines.push(`Match: ${verify === y ? '✓' : '✗ (partial recovery — key known only mod the smooth part)'}`);
 }
 
+/* ─── Per-attack sample generators (one-liners for the shared panel) ─── */
+
+function generateSmoothTriple(): Record<string, string> {
+  // p = 257 (Fermat prime, p-1 = 2^8), g = 3 is primitive mod 257.
+  // x in [1,127] keeps y = 3^x clear of the rejected y = 1 / y = p-1 values.
+  const x = 1n + BigInt(Math.floor(Math.random() * 127));
+  return { p: '101', g: '3', y: modPow(3n, x, 257n).toString(16) };
+}
+
+function generateLimLeeDemo(): Record<string, string> {
+  // The runner simulates a fresh static victim key; y is ignored.
+  return { p: '101', g: '3' };
+}
+
+function generateBoundedDemo(): Record<string, string> {
+  // Skip x with 3^x = 1 or p-1 mod 257 — peer validation rejects those.
+  let x = 1 + Math.floor(Math.random() * ((1 << 20) - 1));
+  if (x % 256 === 0 || x % 256 === 128) x += 1;
+  return { p: '101', g: '3', y: modPow(3n, BigInt(x), 257n).toString(16) };
+}
+
+function generateX25519Demo(): Record<string, string> {
+  return { y: '00'.repeat(32) };
+}
+
+function generateDsaDemo(): Record<string, string> {
+  // p = 23, q = 11 divides p-1, g = 2 with 2^11 = 1 mod 23: fully VALID.
+  return { p: '17', g: '2', y: 'b' };
+}
+
+/* ─── Shared-panel definitions: fields + generate + source (runs stay in place) ─── */
+
+const DH_PGY_FIELDS: SharedAttackField[] = [
+  { name: 'p', label: 'p (prime, hex)', placeholder: 'Prime modulus' },
+  { name: 'g', label: 'g (decimal)', placeholder: 'Generator' },
+  { name: 'y', label: 'y (Alice public, hex)', placeholder: 'y = g^a mod p' },
+];
+
+const DH_SMOOTH_SOURCE = `${recoverSmoothResidues.toString()}\n\n${pushCrtTail.toString()}`;
+
+interface DHAttackDef {
+  fields: SharedAttackField[];
+  generate: () => Record<string, string>;
+  source: string;
+  sourceLanguage: string;
+}
+
+const DH_DEFS: Record<string, DHAttackDef> = {
+  'small-subgroup': {
+    fields: DH_PGY_FIELDS,
+    generate: generateSmoothTriple,
+    source: DH_SMOOTH_SOURCE,
+    sourceLanguage: 'typescript',
+  },
+  'pohlig-hellman': {
+    fields: DH_PGY_FIELDS,
+    generate: generateSmoothTriple,
+    source: DH_SMOOTH_SOURCE,
+    sourceLanguage: 'typescript',
+  },
+  'lim-lee': {
+    fields: [
+      { name: 'p', label: 'p (prime, hex)', placeholder: 'Prime modulus' },
+      { name: 'g', label: 'g (decimal)', placeholder: 'Generator' },
+    ],
+    generate: generateLimLeeDemo,
+    source: DH_ATTACK_EXPLANATIONS['lim-lee'].python,
+    sourceLanguage: 'python',
+  },
+  'bounded-dlp': {
+    fields: DH_PGY_FIELDS,
+    generate: generateBoundedDemo,
+    source: DH_ATTACK_EXPLANATIONS['bounded-dlp'].python,
+    sourceLanguage: 'python',
+  },
+  'x25519-weak-key': {
+    fields: [
+      { name: 'y', label: 'peer key u (32 bytes, hex)', placeholder: 'Peer u-coordinate' },
+    ],
+    generate: generateX25519Demo,
+    source: DH_ATTACK_EXPLANATIONS['x25519-weak-key'].python,
+    sourceLanguage: 'python',
+  },
+  'logjam-downgrade': {
+    fields: [],
+    generate: () => ({}),
+    source: DH_ATTACK_EXPLANATIONS['logjam-downgrade'].python,
+    sourceLanguage: 'python',
+  },
+  'dsa-params': {
+    fields: [
+      { name: 'p', label: 'p (prime, hex)', placeholder: 'Prime modulus' },
+      { name: 'g', label: 'g (decimal)', placeholder: 'Generator' },
+      { name: 'y', label: 'q (subgroup order, hex)', placeholder: 'Subgroup order' },
+    ],
+    generate: generateDsaDemo,
+    source: DH_ATTACK_EXPLANATIONS['dsa-params'].python,
+    sourceLanguage: 'python',
+  },
+  'general-dlp': {
+    fields: DH_PGY_FIELDS,
+    generate: generateSmoothTriple,
+    source: DH_ATTACK_EXPLANATIONS['general-dlp'].python,
+    sourceLanguage: 'python',
+  },
+};
+
 export function DHAttacksTab({ selectedAttack }: { selectedAttack?: string } = {}) {
   const [attack, setAttack] = useState(selectedAttack ?? 'small-subgroup');
-  const [pVal, setPVal] = useState('');
-  const [gVal, setGVal] = useState('');
-  const [yVal, setYVal] = useState('');
-  const [isRunning, setIsRunning] = useState(false);
   const runningRef = useRef(false);
   const out = useCalculatorOutput({ category: 'calculator-dh' });
   const { execute } = useSageMath();
+  const def = DH_DEFS[attack] ?? DH_DEFS['small-subgroup'];
+  const explanation = DH_ATTACK_EXPLANATIONS[attack] ?? DH_ATTACK_EXPLANATIONS['small-subgroup'];
 
-  const run = useCallback(async () => {
+  const handleRun = useCallback(async (vals: Record<string, string>) => {
     if (runningRef.current) return;
     runningRef.current = true;
-    setIsRunning(true);
     out.clear();
+    // Panel-owned field values, mapped onto the legacy input names the
+    // per-attack runners below were written against.
+    const pVal = vals.p ?? '';
+    const gVal = vals.g ?? '';
+    const yVal = vals.y ?? '';
     try {
       if (attack === 'x25519-weak-key') {
         const peer = yVal.trim().replace(/\s/g, '').replace(/^0x/i, '');
@@ -249,65 +356,38 @@ export function DHAttacksTab({ selectedAttack }: { selectedAttack?: string } = {
       out.dispatchError(e instanceof Error ? e.message : String(e));
     } finally {
       runningRef.current = false;
-      setIsRunning(false);
     }
-  }, [attack, pVal, gVal, yVal, execute, out]);
+  }, [attack, execute, out]);
 
   return (
     <Stack direction="vertical" gap={2}>
       {!selectedAttack && (
-      <Selector
-        label="Attack"
-        options={DH_ATTACKS.map(a => ({ value: a.value, label: a.label }))}
-        value={attack}
-        onChange={setAttack}
-        width="100%"
-        isDisabled={isRunning}
-      />
-      )}
-
-      {DH_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={DH_ATTACK_EXPLANATIONS[attack]} />}
-
-      <Text type="body" color="secondary">
-        Confinement and Lim–Lee recovery need a static victim key plus unvalidated peer keys; ephemeral
-        keys and subgroup validation stop them. Inputs: p/y are hex, g is decimal (0x hex also accepted).
-      </Text>
-
-      <TextInput label="p (prime, hex)" value={pVal} onChange={setPVal} placeholder="Prime modulus" width="100%" isDisabled={isRunning} />
-      <Stack direction="horizontal" gap={1}>
-        <TextInput label="g (decimal)" value={gVal} onChange={setGVal} placeholder="Generator" width="100%" isDisabled={isRunning} />
-        <TextInput
-          label={
-            attack === 'dsa-params'
-              ? 'q (subgroup order, hex)'
-              : attack === 'x25519-weak-key'
-                ? 'peer key u (32 bytes, hex)'
-                : 'y (Alice public, hex)'
-          }
-          value={yVal}
-          onChange={setYVal}
-          placeholder="y = g^a mod p"
+        <Selector
+          label="Attack"
+          options={DH_ATTACKS.map(a => ({ value: a.value, label: a.label }))}
+          value={attack}
+          onChange={setAttack}
           width="100%"
-          isDisabled={isRunning}
         />
-      </Stack>
-
-      <Button
-        label={isRunning ? 'Running attack…' : 'Run Attack'}
-        variant="primary"
-        width="100%"
-        onClick={() => { void run(); }}
-        isDisabled={isRunning}
-        isLoading={isRunning}
-      />
-      {isRunning && (
-        <Text type="body" role="status" aria-live="polite">
-          Running attack…
-        </Text>
       )}
-
-      {out.result && <ResultBox value={out.result} label="Result" variant="medium" />}
-      {out.error && <Banner status="error" title={out.error} />}
+      <SharedAttackPanel
+        key={attack}
+        title={explanation.title}
+        description={explanation.description}
+        explanationNode={<AttackExplanationPanel data={explanation} />}
+        fields={def.fields}
+        generateLabel="Generate"
+        onGenerate={def.generate}
+        onRun={(vals) => { void handleRun(vals); }}
+        sourceCode={def.source}
+        sourceLanguage={def.sourceLanguage}
+        resultNode={(
+          <>
+            {out.result && <ResultBox value={out.result} label="Result" variant="medium" />}
+            {out.error && <Banner status="error" title={out.error} />}
+          </>
+        )}
+      />
     </Stack>
   );
 }

@@ -12,7 +12,10 @@ import { sha256, sha512 } from '@noble/hashes/sha2.js';
 import { sha1, md5 } from '@noble/hashes/legacy.js';
 import { bytesToHex } from '@noble/hashes/utils.js';
 import { useAppContext } from '../../../hooks/useAppContext';
+import { useCalculatorOutput } from '../../../hooks/useCalculatorOutput';
 import { ResultBox } from '../_shared/ResultBox';
+import { AttackExplanationPanel, type AttackExplanationData } from '../AttackExplanationPanel';
+import { SharedAttackPanel } from '../../attacks/SharedAttackPanel';
 
 interface AlgInfo {
   value: string;
@@ -297,5 +300,102 @@ export default function LengthExtensionTab() {
       )}
       {error && <Banner status="error" title={error} />}
     </Stack>
+  );
+}
+
+/* ─── Shared-panel attack wrapper (attacks pane; operations keeps the full tab) ─── */
+
+const LENGTH_EXTENSION_EXPLANATION: AttackExplanationData = {
+  title: 'Length Extension Attack',
+  description:
+    'Merkle-Damgard hashes (MD5, SHA-1, SHA-256, SHA-512) output their full internal state. ' +
+    'Given H(secret || message) — without the secret — forge H(secret || message || glue_padding || suffix) ' +
+    'by injecting the digest as the hash state and continuing from the padded length.',
+  whenToUse:
+    'The target verifies H(secret || message) with a secret prefix (API signing, download tokens). ' +
+    'You know the message and its hash, and know or can guess the secret length.',
+  algorithm: [
+    'Read the original hash as the internal state words (big- or little-endian per algorithm)',
+    'Recompute the Merkle-Damgard glue padding for (secret_len + len(message)) bytes',
+    'Set total-processed to the padded length, inject the state, then hash your suffix',
+    'Forged message = message || glue_padding || suffix; forged hash = the continued digest',
+  ],
+  python: `import hashlib
+
+# Merkle-Damgard hashes output their full internal state, so
+# H(secret || message) can be continued without the secret:
+#   1. glue = padding for (secret_len + len(message)) bytes
+#   2. state = digest bytes of H(secret || message)
+#   3. forged = message + glue + suffix
+#   4. H(secret || forged) = compress_from(state, suffix)
+# (hashlib cannot inject state, so this tab runs the equivalent
+# state-injection locally in TypeScript — see the Source tab.)`,
+};
+
+function generateLengthExtensionDemo(): Record<string, string> {
+  const secret = crypto.getRandomValues(new Uint8Array(8));
+  const message = 'Hello, world!';
+  const hash = HASH_CREATORS['sha256']();
+  hash.update(secret);
+  hash.update(new TextEncoder().encode(message));
+  return {
+    algorithm: 'sha256',
+    originalHash: bytesToHex(hash.digest()),
+    originalMessage: message,
+    secretLen: '8',
+    appendData: '&admin=true',
+  };
+}
+
+function runLengthExtensionAttack(vals: Record<string, string>): string {
+  const alg = ALGORITHMS.find(a => a.value === (vals.algorithm ?? 'sha256')) ?? ALGORITHMS[0];
+  const sLen = Number((vals.secretLen ?? '').trim());
+  if (!Number.isInteger(sLen) || sLen < 1 || sLen > 256) {
+    throw new Error(`Secret length must be an integer in 1..256 (got "${vals.secretLen ?? ''}")`);
+  }
+  const out = lengthExtend(
+    alg,
+    vals.originalHash ?? '',
+    decodeMsg(vals.originalMessage ?? ''),
+    sLen,
+    decodeMsg(vals.appendData ?? ''),
+  );
+  return `Extended Message (hex): ${bytesToHex(out.extendedMessage)}\nNew Hash: ${out.newHash}`;
+}
+
+export function LengthExtensionAttackPanel() {
+  const out = useCalculatorOutput({ category: 'calculator-hash' });
+  const handleRun = useCallback((vals: Record<string, string>) => {
+    out.clear();
+    try {
+      out.dispatch(runLengthExtensionAttack(vals), 'Hash Attack: length-extension');
+    } catch (e) {
+      out.dispatchError(e instanceof Error ? e.message : String(e));
+    }
+  }, [out]);
+  return (
+    <SharedAttackPanel
+      title={LENGTH_EXTENSION_EXPLANATION.title}
+      description={LENGTH_EXTENSION_EXPLANATION.description}
+      explanationNode={<AttackExplanationPanel data={LENGTH_EXTENSION_EXPLANATION} />}
+      fields={[
+        { name: 'algorithm', label: 'Algorithm', kind: 'select', options: ALGORITHMS.map(a => ({ value: a.value, label: a.label })) },
+        { name: 'originalHash', label: 'Original hash (hex)', placeholder: 'H(secret || message)' },
+        { name: 'originalMessage', label: 'Original message (known part)', placeholder: 'Hex or plaintext', kind: 'textarea' },
+        { name: 'secretLen', label: 'Secret length (bytes)', placeholder: '8' },
+        { name: 'appendData', label: 'Data to append', placeholder: 'Hex or plaintext', kind: 'textarea' },
+      ]}
+      generateLabel="Generate"
+      onGenerate={generateLengthExtensionDemo}
+      onRun={handleRun}
+      sourceCode={lengthExtend.toString()}
+      sourceLanguage="typescript"
+      resultNode={(
+        <>
+          {out.result && <ResultBox value={out.result} label="Result" variant="medium" />}
+          {out.error && <Banner status="error" title={out.error} />}
+        </>
+      )}
+    />
   );
 }

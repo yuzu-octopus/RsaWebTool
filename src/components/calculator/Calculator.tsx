@@ -28,13 +28,26 @@ export function Calculator() {
     };
     const attackHandler = (e: Event) => {
       const detail = (e as CustomEvent<string>).detail;
-      if (typeof detail === 'string') { setCipherAttack(detail); setTab('attacks'); }
+      if (typeof detail === 'string') {
+        setCipherAttack(detail);
+        setTab('attacks');
+        window.dispatchEvent(new CustomEvent('cipher-attack-active', { detail }));
+      }
+    };
+    const opsHandler = (e: Event) => {
+      const detail = (e as CustomEvent<string>).detail;
+      if (typeof detail === 'string') {
+        setCipherAttack(detail);
+        setTab('operations');
+      }
     };
     window.addEventListener('cipher-workspace-tab', handler);
     window.addEventListener('cipher-attack-select', attackHandler);
+    window.addEventListener('cipher-ops-select', opsHandler);
     return () => {
       window.removeEventListener('cipher-workspace-tab', handler);
       window.removeEventListener('cipher-attack-select', attackHandler);
+      window.removeEventListener('cipher-ops-select', opsHandler);
     };
   }, []);
 
@@ -46,7 +59,7 @@ export function Calculator() {
       cipher={viewMode}
       tab={tab}
       onTabChange={setTab}
-      operations={(() => { const C = OPERATIONS[viewMode]; return <C />; })()}
+      operations={(() => { const C = OPERATIONS[viewMode]; return <C key={cipherAttack ?? 'default'} selectedAttack={cipherAttack} />; })()}
       attacks={viewMode === 'rsa' ? <InputPanel /> : (() => { const C = OPERATIONS[viewMode] as (p: { attacksOnly?: boolean; selectedAttack?: string }) => React.JSX.Element; return <C key={cipherAttack ?? 'default'} attacksOnly selectedAttack={cipherAttack} />; })()}
       learn={(() => { const C = OPERATIONS[viewMode] as (p: { learnOnly?: boolean }) => React.JSX.Element; return <C learnOnly />; })()}
     />

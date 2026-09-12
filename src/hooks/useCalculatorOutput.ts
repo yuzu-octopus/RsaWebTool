@@ -43,7 +43,7 @@ export function useCalculatorOutput({
 }: UseCalculatorOutputOptions): CalculatorOutputApi {
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { setOutputResult, setOutputError, setOutputSource, addToHistory } = useAppContext();
+  const { setOutputResult, setOutputError, setOutputSource, addToHistory, showNotification } = useAppContext();
 
   const dispatch = useCallback(
     (text: string, label: string) => {
@@ -53,6 +53,7 @@ export function useCalculatorOutput({
       setOutputError(null);
       if (setSource) setOutputSource('calculator');
       addToHistory(category, label, text, true);
+      showNotification(`${label}: success`, 'success');
     },
     [category, setSource, setOutputResult, setOutputError, setOutputSource, addToHistory],
   );
@@ -64,6 +65,7 @@ export function useCalculatorOutput({
       setOutputResult(null);
       setOutputError(msg);
       if (setSource) setOutputSource('calculator');
+      showNotification(msg, 'error');
     },
     [setSource, setOutputResult, setOutputError, setOutputSource],
   );
