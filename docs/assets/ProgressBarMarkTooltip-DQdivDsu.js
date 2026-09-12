@@ -1,0 +1,1 @@
+import{b as e}from"./padding.stylex-BZ6M9-tR.js";import{r as t}from"./index-BOZVSG34.js";var n=e();function r({content:e,children:r}){return(0,n.jsx)(t,{content:e,placement:`above`,focusTrigger:`always`,children:r})}export{r as default};
