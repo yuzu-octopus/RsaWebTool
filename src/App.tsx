@@ -13,6 +13,8 @@ import { Kbd } from '@astryxdesign/core/Kbd';
 import { Link } from '@astryxdesign/core/Link';
 import { useToast } from '@astryxdesign/core/Toast';
 import { ToastViewport } from '@astryxdesign/core/Toast';
+import type { ToastContentRenderProps } from '@astryxdesign/core/Toast';
+import { Stack } from '@astryxdesign/core/Stack';
 import { Sidebar, useIsMobile } from './components/Sidebar';
 import { LogoIcon } from './components/_shared/LogoIcon';
 import { AppProvider } from './context/AppContext';
@@ -55,6 +57,26 @@ const RESULTS_RESIZABLE = {
   autoSaveId: 'outputPanelWidth',
 } as const;
 
+// Toast only has info/error types, so success keeps type info and gets a
+// Banner-success look (green border + check icon + message) via
+// renderContent. The kit keeps the card, live region, and auto-hide.
+function renderSuccessToast({ body }: ToastContentRenderProps) {
+  return (
+    <Stack
+      direction="horizontal"
+      gap={2}
+      vAlign="center"
+      width="100%"
+      padding={2}
+      style={{ border: '1px solid var(--dracula-green)', borderRadius: 8 }}
+      data-testid="toast-success"
+    >
+      <Icon icon="check" size="sm" color="success" />
+      <Text type="body">{body}</Text>
+    </Stack>
+  );
+}
+
 function AppContent() {
   const { notification, mobileNavOpen, setMobileNavOpen, setCommandPaletteOpen, outputError } = useAppContext();
   const sage = SAGE_META[useSageStatus(outputError)];
@@ -74,7 +96,10 @@ function AppContent() {
   useKeyboardShortcuts();
 
   // Snackbar re-expressed as a Toast: Toast only has info/error types, so
-  // success maps to info. The toast self-dismisses; nothing to clear.
+  // success maps to info with a Banner-styled renderContent. The toast
+  // self-dismisses; nothing to clear.
+  // ToastPosition has no top-center (corners only), so the viewport stays
+  // at bottomEnd.
   useEffect(() => {
     if (notification?.message) {
       showToast({
@@ -82,6 +107,7 @@ function AppContent() {
         type: notification.severity === 'error' ? 'error' : 'info',
         autoHideDuration: 3000,
         uniqueID: String(notification.key),
+        ...(notification.severity === 'success' ? { renderContent: renderSuccessToast } : {}),
       });
     }
   }, [notification, showToast]);

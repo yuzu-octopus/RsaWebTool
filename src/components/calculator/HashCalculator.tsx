@@ -2,7 +2,7 @@ import { use, useState, useCallback} from 'react';
 import { CalculatorHeader } from './_shared/CalculatorHeader';
 import HashFunctionsTab from './hash/HashFunctionsTab';
 import HMACTab from './hash/HMACTab';
-import LengthExtensionTab from './hash/LengthExtensionTab';
+import LengthExtensionTab, { LengthExtensionAttackPanel } from './hash/LengthExtensionTab';
 import ExplanationTab from './hash/ExplanationTab';
 import ProofOfWorkTab from './hash/ProofOfWorkTab';
 import { useAppContext } from '../../hooks/useAppContext';
@@ -36,7 +36,7 @@ export default function HashCalculator({ attacksOnly = false, learnOnly = false,
   }
 
   if (attacksOnly) {
-    return <LengthExtensionTab />;
+    return <LengthExtensionAttackPanel />;
   }
 
   return (

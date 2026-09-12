@@ -6,10 +6,11 @@ import {
 import { Badge } from '@astryxdesign/core/Badge';
 import { Text } from '@astryxdesign/core/Text';
 import { Stack } from '@astryxdesign/core/Stack';
+import { Icon } from '@astryxdesign/core/Icon';
 import type { SearchableItem, SearchSource } from '@astryxdesign/core/Typeahead';
 import { useAppContext } from '../hooks/useAppContext';
 import { attacks } from '../attacks';
-import { ALL_SIDEBAR_ITEMS, CATEGORY_BADGE_VARIANTS, CIPHER_ATTACK_GROUPS } from '../config/sidebarItems';
+import { ALL_SIDEBAR_ITEMS, CATEGORY_BADGE_VARIANTS, CIPHER_ATTACK_GROUPS, CIPHER_ITEMS } from '../config/sidebarItems';
 import type { Attack } from '../types';
 
 
@@ -113,10 +114,29 @@ export function CommandPalette() {
   const {
     commandPaletteOpen,
     setCommandPaletteOpen,
+    viewMode,
     setViewMode,
+    selectedAttack,
     setSelectedAttack,
   } = useAppContext();
   const [query, setQuery] = useState('');
+
+  // Mirror Sidebar: Calculator reports the live cipher attack via
+  // 'cipher-attack-active' so the current mark stays correct no matter
+  // which surface (sidebar or palette) selected it.
+  const [activeCipherAttack, setActiveCipherAttack] = useState<string | null>(null);
+  useEffect(() => {
+    const onActive = (e: Event) => {
+      const detail = (e as CustomEvent<string>).detail;
+      if (typeof detail === 'string') setActiveCipherAttack(detail);
+    };
+    window.addEventListener('cipher-attack-active', onActive);
+    window.addEventListener('cipher-attack-select', onActive);
+    return () => {
+      window.removeEventListener('cipher-attack-active', onActive);
+      window.removeEventListener('cipher-attack-select', onActive);
+    };
+  }, []);
 
   // Reset the query when the palette opens.
   useEffect(() => {
@@ -127,8 +147,15 @@ export function CommandPalette() {
     }
   }, [commandPaletteOpen]);
 
-  const { bootstrap, sidebar } = useMemo(() => buildEntries(), []);
+  // Rebuild when the attack registry changes so newly added attacks appear.
+  const { bootstrap, sidebar } = useMemo(() => buildEntries(), [attacks]);
   const entryById = useMemo(() => new Map(sidebar.map(e => [e.id, e])), [sidebar]);
+
+  // Entry id matching the current workspace: RSA attack, active cipher
+  // attack, or cipher/module view. Passed as the controlled value so the
+  // kit marks the current row (aria-selected + our check mark).
+  const currentValue = selectedAttack?.id
+    ?? (activeCipherAttack ? `${viewMode}-${activeCipherAttack}` : `view-${viewMode}`);
 
   // Custom source (instead of createStaticSource) to preserve the previous
   // ordering contract: grouped modules/ciphers/attacks when empty,
@@ -149,6 +176,7 @@ export function CommandPalette() {
   const selectView = useCallback(
     (mode: string) => {
       if (VIEW_MODES.includes(mode as ViewMode)) {
+        setActiveCipherAttack(null);
         setViewMode(mode as ViewMode);
       }
     },
@@ -157,6 +185,7 @@ export function CommandPalette() {
 
   const selectAttack = useCallback(
     (attack: Attack) => {
+      setActiveCipherAttack(null);
       setSelectedAttack(attack);
       setViewMode('rsa');
       window.dispatchEvent(new CustomEvent('cipher-workspace-tab', { detail: 'attacks' }));
@@ -172,15 +201,17 @@ export function CommandPalette() {
       if (aux.kind === 'view' && aux.mode) selectView(aux.mode);
       else if (aux.kind === 'attack' && aux.attack) selectAttack(aux.attack);
       else if (aux.kind === 'cipher-attack' && aux.mode && aux.cipherAttack) {
+        setActiveCipherAttack(aux.cipherAttack);
+        setSelectedAttack(null);
         setViewMode(aux.mode as ViewMode);
         window.dispatchEvent(new CustomEvent('cipher-attack-select', { detail: aux.cipherAttack }));
         window.dispatchEvent(new CustomEvent('cipher-workspace-tab', { detail: 'attacks' }));
       }
     },
-    [entryById, selectView, selectAttack],
+    [entryById, selectView, selectAttack, setSelectedAttack, setViewMode],
   );
 
-  const renderItem = useCallback((item: PaletteEntry) => {
+  const renderItem = useCallback((item: PaletteEntry, isSelected: boolean) => {
     const aux = item.auxiliaryData!;
     const chips: { label: string; variant: 'neutral' | 'blue' | 'cyan' | 'green' | 'orange' | 'pink' | 'purple' | 'yellow' }[] = [];
     let secondary: string | undefined;
@@ -195,6 +226,14 @@ export function CommandPalette() {
         label: aux.attack.frontendCheck ? 'Local' : 'SageMath',
         variant: aux.attack.frontendCheck ? 'green' : 'orange',
       });
+    } else if (aux.kind === 'cipher-attack' && aux.mode && aux.cipherAttack) {
+      secondary = aux.cipherAttack;
+      const cipherLabel = CIPHER_ITEMS.find(c => c.id === aux.mode)?.label ?? aux.mode;
+      chips.push({ label: cipherLabel, variant: CATEGORY_BADGE_VARIANTS[cipherLabel] ?? 'neutral' });
+      // Cipher attack lists mark Sage-backed entries with a "— SageCell"
+      // suffix; everything else runs locally in the browser.
+      const isSage = item.label.includes('SageCell');
+      chips.push({ label: isSage ? 'SageMath' : 'Local', variant: isSage ? 'orange' : 'green' });
     }
     return (
       <Stack
@@ -213,6 +252,7 @@ export function CommandPalette() {
             <Badge key={chip.label} label={chip.label} variant={chip.variant} />
           ))}
         </Stack>
+        {isSelected && <Icon icon="check" size="sm" color="success" />}
       </Stack>
     );
   }, []);
@@ -235,6 +275,7 @@ export function CommandPalette() {
       label="Command palette"
       width={480}
       maxHeight={400}
+      value={currentValue}
       onValueChange={handleValueChange}
     />
   );

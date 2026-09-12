@@ -1,9 +1,5 @@
-import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
+import { useCallback, useState } from 'react';
 import { Stack } from '@astryxdesign/core/Stack';
-import { Text } from '@astryxdesign/core/Text';
-import { TextInput } from '@astryxdesign/core/TextInput';
-import { TextArea } from '@astryxdesign/core/TextArea';
-import { Button } from '@astryxdesign/core/Button';
 import { Selector } from '@astryxdesign/core/Selector';
 import { Banner } from '@astryxdesign/core/Banner';
 import {
@@ -25,11 +21,12 @@ import {
 } from '../../utils/aesCrypto';
 import { useCalculatorOutput } from '../../hooks/useCalculatorOutput';
 import { AttackExplanationPanel } from './AttackExplanationPanel';
+import { SharedAttackPanel, type SharedAttackField } from '../attacks/SharedAttackPanel';
 import { ResultBox } from './_shared/ResultBox';
 import { AES_ATTACKS, AES_ATTACK_EXPLANATIONS } from '../../data/attackExplanations/aes';
 import { bytesToHex } from '@noble/ciphers/utils.js';
 import { randomBytes } from '@noble/ciphers/utils.js';
-import { ecb, cbc } from '@noble/ciphers/aes.js';
+import { ctr, ecb, cbc, gcm } from '@noble/ciphers/aes.js';
 
 function decodeText(b: Uint8Array): string {
   try {
@@ -38,6 +35,237 @@ function decodeText(b: Uint8Array): string {
     return '(non-UTF8 bytes)';
   }
 }
+
+/* ─── Phase-0 mock: sample generator for the shared-panel CTR demo ─── */
+
+function generateCtrNonceDemo(): Record<string, string> {
+  const key = randomBytes(16);
+  const nonce = randomBytes(16);
+  const pt1 = new TextEncoder().encode('the quick brown fox jumps over the lazy dog');
+  const pt2 = new TextEncoder().encode('pack my box with five dozen liquor jugs!');
+  const ct1 = ctr(key, nonce).encrypt(pt1);
+  const ct2 = ctr(key, nonce).encrypt(pt2);
+  return { ct1: bytesToHex(ct1), ct2: bytesToHex(ct2), knownPt: bytesToHex(pt1) };
+}
+
+/* ─── Per-attack sample generators (one-liners for the shared panel) ─── */
+
+function generateCbcBitflipDemo(): Record<string, string> {
+  const key = randomBytes(16);
+  const iv = randomBytes(16);
+  const p0 = new TextEncoder().encode('0123456789abcdef');
+  const p1 = new TextEncoder().encode('AAAAAAAAAAAAAAAA');
+  const ct = cbc(key, iv).encrypt(new Uint8Array([...p0, ...p1]));
+  return {
+    ct1: bytesToHex(ct),
+    ivHex: bytesToHex(iv),
+    blockIdx: '1',
+    currentPtHex: bytesToHex(p1),
+    targetText: 'admin=true!!!!!!',
+  };
+}
+
+function generateEcbDetectDemo(): Record<string, string> {
+  const key = randomBytes(16);
+  const dup = ecb(key).encrypt(new TextEncoder().encode('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'));
+  const noc = ctr(randomBytes(16), randomBytes(16)).encrypt(
+    new TextEncoder().encode('BBBBBBBBBBBBBBBBCCCCCCCCCCCCCCCC'),
+  );
+  return { cts: `${bytesToHex(dup)}\n${bytesToHex(noc)}` };
+}
+
+function generateEcbCutpasteDemo(): Record<string, string> {
+  const key = randomBytes(16);
+  const cookie = new TextEncoder().encode(
+    'user=guest......role=user........id=000001........pad=xxxxxxxxxxxx',
+  );
+  return { ct1: bytesToHex(ecb(key).encrypt(cookie)), blockOrder: '' };
+}
+
+function generateEcbByteDemo(): Record<string, string> {
+  return { ecbSecret: `flag{demo_${bytesToHex(randomBytes(4))}}` };
+}
+
+function generateCbcPaddingDemo(): Record<string, string> {
+  return { cbcPaddingPt: 'hello padding!!' };
+}
+
+function generateGcmNonceDemo(): Record<string, string> {
+  const key = randomBytes(16);
+  const nonce = randomBytes(12);
+  const pt1 = new TextEncoder().encode('GCM-message-one!');
+  const pt2 = new TextEncoder().encode('GCM-message-two?');
+  const o1 = gcm(key, nonce).encrypt(pt1);
+  const o2 = gcm(key, nonce).encrypt(pt2);
+  return {
+    gcmCt1: bytesToHex(o1.subarray(0, o1.length - 16)),
+    gcmPt1: bytesToHex(pt1),
+    gcmCt2: bytesToHex(o2.subarray(0, o2.length - 16)),
+    gcmTag1: bytesToHex(o1.subarray(o1.length - 16)),
+    gcmTag2: bytesToHex(o2.subarray(o2.length - 16)),
+    gcmAad: '',
+    gcmForgeCt: '',
+  };
+}
+
+function generateKeyScheduleDemo(): Record<string, string> {
+  const w = expandKey(randomBytes(16));
+  const last = new Uint8Array(16);
+  for (let j = 0; j < 4; j++) {
+    const v = w[40 + j];
+    last[4 * j] = (v >>> 24) & 0xff;
+    last[4 * j + 1] = (v >>> 16) & 0xff;
+    last[4 * j + 2] = (v >>> 8) & 0xff;
+    last[4 * j + 3] = v & 0xff;
+  }
+  return { scheduleKey: bytesToHex(last) };
+}
+
+function generateCbcIvDemo(): Record<string, string> {
+  const key = randomBytes(16);
+  const iv = randomBytes(16);
+  const p1 = new TextEncoder().encode('shared-first-blk');
+  const enc = (tail: string): string =>
+    bytesToHex(cbc(key, iv).encrypt(new Uint8Array([...p1, ...new TextEncoder().encode(tail)])));
+  return {
+    ivHex: bytesToHex(iv),
+    cts: `${enc('message-one-0001')}\n${enc('message-two-0002')}\n${enc('other-first-block')}`,
+  };
+}
+
+function generateStreamBitflipDemo(): Record<string, string> {
+  const key = randomBytes(16);
+  const nonce = new Uint8Array(16);
+  const cookie = new TextEncoder().encode('user=guest;role=user');
+  return {
+    ct1: bytesToHex(ctr(key, nonce).encrypt(cookie)),
+    blockIdx: '5',
+    currentPtHex: bytesToHex(new TextEncoder().encode('guest')),
+    targetText: 'admin',
+  };
+}
+
+function generateCbcKeyIvDemo(): Record<string, string> {
+  return { currentPtHex: bytesToHex(new TextEncoder().encode('known-plaintext!')) };
+}
+
+/* ─── Shared-panel definitions: fields + generate + run-in-place + TS source ─── */
+
+interface AESAttackDef {
+  fields: SharedAttackField[];
+  generate: () => Record<string, string>;
+  run: (vals: Record<string, string>) => string;
+  source: string;
+}
+
+const AES_DEFS: Record<string, AESAttackDef> = {
+  'ctr-nonce': {
+    fields: [
+      { name: 'ct1', label: 'Ciphertext 1 (hex)', placeholder: 'Hex CT1' },
+      { name: 'ct2', label: 'Ciphertext 2 (hex)', placeholder: 'Hex CT2' },
+      { name: 'knownPt', label: 'Known PT for CT1 (hex, optional — leave empty for crib-dragging)', placeholder: 'Known plaintext window, ≥1 byte' },
+      { name: 'cribInput', label: 'Cribs, comma-separated (optional)', placeholder: 'the , and , password (defaults built in)' },
+    ],
+    generate: generateCtrNonceDemo,
+    run: v => runCtrNonce(v.ct1 ?? '', v.ct2 ?? '', v.knownPt ?? '', v.cribInput ?? ''),
+    source: runCtrNonce.toString(),
+  },
+  'cbc-bitflip': {
+    fields: [
+      { name: 'ct1', label: 'Ciphertext (hex)', placeholder: 'Hex CT' },
+      { name: 'ivHex', label: 'IV (hex)', placeholder: 'Hex IV' },
+      { name: 'blockIdx', label: 'Block index', placeholder: '0' },
+      { name: 'currentPtHex', label: 'Current plaintext block (hex)', placeholder: 'Current plaintext block in hex' },
+      { name: 'targetText', label: 'Target text (≤16 bytes)', placeholder: 'Desired plaintext (≤16 bytes)' },
+    ],
+    generate: generateCbcBitflipDemo,
+    run: v => runCbcBitflip(v.ct1 ?? '', v.ivHex ?? '', v.blockIdx ?? '0', v.targetText ?? '', v.currentPtHex ?? ''),
+    source: runCbcBitflip.toString(),
+  },
+  'ecb-detect': {
+    fields: [
+      { name: 'cts', label: 'Ciphertexts (one hex per line)', placeholder: 'Hex CT per line', kind: 'textarea' },
+    ],
+    generate: generateEcbDetectDemo,
+    run: v => runEcbDetect(v.cts ?? ''),
+    source: runEcbDetect.toString(),
+  },
+  'ecb-cutpaste': {
+    fields: [
+      { name: 'ct1', label: 'Ciphertext (hex)', placeholder: 'Multiples of 16 bytes' },
+      { name: 'blockOrder', label: 'Block order (optional)', placeholder: 'e.g. 2,1,0,3' },
+    ],
+    generate: generateEcbCutpasteDemo,
+    run: v => runEcbCutpaste(v.ct1 ?? '', v.blockOrder ?? ''),
+    source: runEcbCutpaste.toString(),
+  },
+  'ecb-byte': {
+    fields: [
+      { name: 'ecbSecret', label: 'Secret (optional — blank runs the embedded demo secret)', placeholder: 'Custom secret to recover' },
+    ],
+    generate: generateEcbByteDemo,
+    run: v => runEcbByteDemo(v.ecbSecret ?? ''),
+    source: runEcbByteDemo.toString(),
+  },
+  'cbc-padding': {
+    fields: [
+      { name: 'cbcPaddingPt', label: 'Plaintext to encrypt-then-break (optional)', placeholder: 'Defaults to demo message' },
+    ],
+    generate: generateCbcPaddingDemo,
+    run: v => runCbcPaddingDemo(v.cbcPaddingPt ?? ''),
+    source: runCbcPaddingDemo.toString(),
+  },
+  'gcm-nonce': {
+    fields: [
+      { name: 'gcmCt1', label: 'CT1 (raw hex — split the 16-byte tag off)', placeholder: 'CT1 hex' },
+      { name: 'gcmPt1', label: 'PT1 (hex)', placeholder: 'PT1 hex' },
+      { name: 'gcmCt2', label: 'CT2 (hex)', placeholder: 'CT2 hex' },
+      { name: 'gcmTag1', label: 'TAG1 (hex, optional — enables H recovery)', placeholder: '16-byte tag hex' },
+      { name: 'gcmTag2', label: 'TAG2 (hex, optional)', placeholder: '16-byte tag hex' },
+      { name: 'gcmAad', label: 'AAD (hex, optional — must be shared)', placeholder: 'Shared additional data' },
+      { name: 'gcmForgeCt', label: 'Target CT to forge a tag for (hex, optional)', placeholder: 'Same nonce + AAD' },
+    ],
+    generate: generateGcmNonceDemo,
+    run: v => runGcmNonce(v.gcmCt1 ?? '', v.gcmPt1 ?? '', v.gcmCt2 ?? '', v.gcmTag1 ?? '', v.gcmTag2 ?? '', v.gcmAad ?? '', v.gcmForgeCt ?? ''),
+    source: runGcmNonce.toString(),
+  },
+  'key-schedule': {
+    fields: [
+      { name: 'scheduleKey', label: 'Last round key (hex)', placeholder: '32 hex chars (AES-128)' },
+    ],
+    generate: generateKeyScheduleDemo,
+    run: v => runKeySchedule(v.scheduleKey ?? ''),
+    source: runKeySchedule.toString(),
+  },
+  'cbc-iv': {
+    fields: [
+      { name: 'ivHex', label: 'Shared IV (hex)', placeholder: '16-byte IV reused across messages' },
+      { name: 'cts', label: 'Ciphertexts (one hex per line)', placeholder: 'Hex CT per line', kind: 'textarea' },
+    ],
+    generate: generateCbcIvDemo,
+    run: v => runCbcIvDup(v.ivHex ?? '', v.cts ?? ''),
+    source: runCbcIvDup.toString(),
+  },
+  'stream-bitflip': {
+    fields: [
+      { name: 'ct1', label: 'Ciphertext (hex)', placeholder: 'CTR/CFB/OFB ciphertext' },
+      { name: 'blockIdx', label: 'Byte offset', placeholder: '0' },
+      { name: 'currentPtHex', label: 'Current plaintext window (hex)', placeholder: 'Known bytes at offset' },
+      { name: 'targetText', label: 'Target text (same length)', placeholder: 'Desired bytes (same length)' },
+    ],
+    generate: generateStreamBitflipDemo,
+    run: v => runStreamBitflip(v.ct1 ?? '', v.blockIdx ?? '0', v.currentPtHex ?? '', v.targetText ?? ''),
+    source: runStreamBitflip.toString(),
+  },
+  'cbc-keyiv': {
+    fields: [
+      { name: 'currentPtHex', label: 'Known P1 (hex, 16 bytes)', placeholder: 'Known first plaintext block' },
+    ],
+    generate: generateCbcKeyIvDemo,
+    run: v => runCbcKeyIv(v.currentPtHex ?? ''),
+    source: runCbcKeyIv.toString(),
+  },
+};
 
 /* ─── Per-attack runners (pure: inputs in, result text out) ─── */
 
@@ -242,219 +470,50 @@ function runCbcKeyIv(p1Hex: string): string {
   return `Offline CBC key-as-IV simulation (hidden random key, known P1 = ${bytesToHex(p1)}):\nVictim C1 (IV = key): ${bytesToHex(victimC1)}\nZero-IV oracle answer D(C1): ${bytesToHex(dC1)}\nK = D(C1) XOR P1: ${bytesToHex(kRec)}\nRe-encryption check under IV = recovered key: ${check ? 'MATCHES ✓ — key recovered' : 'MISMATCH ✗'}\n\nReal attack: capture C1 + known P1, ask a decryption oracle once with IV = 0. Unknown bytes elsewhere? Drag cribs with the CTR scorer.`;
 }
 
-/** Every attack-form field in one object — 20+ useState calls tripped prefer-useReducer. */
-interface AttackForm {
-  attack: string;
-  ct1: string;
-  ct2: string;
-  knownPt: string;
-  cribInput: string;
-  ivHex: string;
-  blockIdx: string;
-  blockOrder: string;
-  targetText: string;
-  currentPtHex: string;
-  cts: string;
-  gcmCt1: string;
-  gcmPt1: string;
-  gcmCt2: string;
-  gcmTag1: string;
-  gcmTag2: string;
-  gcmAad: string;
-  gcmForgeCt: string;
-  ecbSecret: string;
-  cbcPaddingPt: string;
-  scheduleKey: string;
-}
-
-const INITIAL_FORM: AttackForm = {
-  attack: 'ctr-nonce',
-  ct1: '',
-  ct2: '',
-  knownPt: '',
-  cribInput: '',
-  ivHex: '',
-  blockIdx: '0',
-  blockOrder: '',
-  targetText: '',
-  currentPtHex: '',
-  cts: '',
-  gcmCt1: '',
-  gcmPt1: '',
-  gcmCt2: '',
-  gcmTag1: '',
-  gcmTag2: '',
-  gcmAad: '',
-  gcmForgeCt: '',
-  ecbSecret: '',
-  cbcPaddingPt: '',
-  scheduleKey: '',
-};
-
-function formReducer(state: AttackForm, action: { key: keyof AttackForm; value: string }): AttackForm {
-  return state[action.key] === action.value ? state : { ...state, [action.key]: action.value };
-}
-
 export function AESAttacksTab({ selectedAttack }: { selectedAttack?: string } = {}) {
-  const [form, dispatchForm] = useReducer(formReducer, { ...INITIAL_FORM, attack: selectedAttack ?? INITIAL_FORM.attack });
-  useEffect(() => {
-    if (selectedAttack) dispatchForm({ key: 'attack', value: selectedAttack });
-  }, [selectedAttack]);
-  const set = useCallback(
-    (key: keyof AttackForm) => (value: string) => dispatchForm({ key, value }),
-    [],
-  );
-  const {
-    attack, ct1, ct2, knownPt, cribInput, ivHex, blockIdx, blockOrder, targetText,
-    currentPtHex, cts, gcmCt1, gcmPt1, gcmCt2, gcmTag1, gcmTag2, gcmAad, gcmForgeCt,
-    ecbSecret, cbcPaddingPt, scheduleKey,
-  } = form;
-  const [loading, dispatchLoading] = useReducer((_s: boolean, action: 'start' | 'stop') => action === 'start', false);
-  const isRunning = loading;
+  const [attack, setAttack] = useState(selectedAttack ?? 'ctr-nonce');
   const out = useCalculatorOutput({ category: 'calculator-aes' });
-  const runningRef = useRef(false);
+  const def = AES_DEFS[attack] ?? AES_DEFS['ctr-nonce'];
+  const explanation = AES_ATTACK_EXPLANATIONS[attack] ?? AES_ATTACK_EXPLANATIONS['ctr-nonce'];
 
-  const run = useCallback(async () => {
-    if (runningRef.current) return;
-    runningRef.current = true;
-    dispatchLoading('start');
-    await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+  const handleRun = useCallback((vals: Record<string, string>) => {
     out.clear();
     try {
-      switch (attack) {
-        case 'ctr-nonce': out.dispatch(runCtrNonce(ct1, ct2, knownPt, cribInput), `AES Attack: ${attack}`); break;
-        case 'cbc-bitflip': out.dispatch(runCbcBitflip(ct1, ivHex, blockIdx, targetText, currentPtHex), `AES Attack: ${attack}`); break;
-        case 'ecb-detect': out.dispatch(runEcbDetect(cts), `AES Attack: ${attack}`); break;
-        case 'ecb-cutpaste': out.dispatch(runEcbCutpaste(ct1, blockOrder), `AES Attack: ${attack}`); break;
-        case 'ecb-byte': out.dispatch(runEcbByteDemo(ecbSecret), 'AES Attack: ECB Byte-at-a-Time'); break;
-        case 'cbc-padding': out.dispatch(runCbcPaddingDemo(cbcPaddingPt), 'AES Attack: CBC Padding Oracle'); break;
-        case 'gcm-nonce': out.dispatch(runGcmNonce(gcmCt1, gcmPt1, gcmCt2, gcmTag1, gcmTag2, gcmAad, gcmForgeCt), `AES Attack: ${attack}`); break;
-        case 'key-schedule': out.dispatch(runKeySchedule(scheduleKey), `AES Attack: ${attack}`); break;
-        case 'cbc-iv': out.dispatch(runCbcIvDup(ivHex, cts), `AES Attack: ${attack}`); break;
-        case 'stream-bitflip': out.dispatch(runStreamBitflip(ct1, blockIdx, currentPtHex, targetText), `AES Attack: ${attack}`); break;
-        case 'cbc-keyiv': out.dispatch(runCbcKeyIv(currentPtHex), `AES Attack: ${attack}`); break;
-        default: throw new Error(`Unknown attack "${attack}"`);
-      }
+      out.dispatch(def.run(vals), `AES Attack: ${attack}`);
     } catch (e) {
       out.dispatchError(e instanceof Error ? e.message : String(e));
-    } finally {
-      runningRef.current = false;
-      dispatchLoading('stop');
     }
-  }, [attack, ct1, ct2, knownPt, cribInput, ivHex, blockIdx, blockOrder, targetText, currentPtHex, cts, gcmCt1, gcmPt1, gcmCt2, gcmTag1, gcmTag2, gcmAad, gcmForgeCt, ecbSecret, cbcPaddingPt, scheduleKey, out]);
-
-  const attackFields = useMemo(() => {
-    switch (attack) {
-      case 'ctr-nonce': return (
-        <>
-          <TextInput label="Ciphertext 1 (hex)" value={ct1} onChange={set('ct1')} placeholder="Hex CT1" width="100%" isDisabled={isRunning} />
-          <TextInput label="Ciphertext 2 (hex)" value={ct2} onChange={set('ct2')} placeholder="Hex CT2" width="100%" isDisabled={isRunning} />
-          <TextInput label="Known PT for CT1 (hex, optional — leave empty for crib-dragging)" value={knownPt} onChange={set('knownPt')} placeholder="Known plaintext window, ≥1 byte" width="100%" isDisabled={isRunning} />
-          <TextInput label="Cribs, comma-separated (optional)" value={cribInput} onChange={set('cribInput')} placeholder="the , and , password (defaults built in)" width="100%" isDisabled={isRunning} />
-        </>
-      );
-      case 'cbc-bitflip': return (
-        <>
-          <TextInput label="Ciphertext (hex)" value={ct1} onChange={set('ct1')} placeholder="Hex CT" width="100%" isDisabled={isRunning} />
-          <TextInput label="IV (hex)" value={ivHex} onChange={set('ivHex')} placeholder="Hex IV" width="100%" isDisabled={isRunning} />
-          <TextInput label="Block index" value={blockIdx} onChange={set('blockIdx')} placeholder="0" width="100%" isDisabled={isRunning} />
-          <TextInput label="Current Plaintext (hex)" value={currentPtHex} onChange={set('currentPtHex')} placeholder="Current plaintext block in hex" width="100%" isDisabled={isRunning} />
-          <TextInput label="Target text" value={targetText} onChange={set('targetText')} placeholder="Desired plaintext (≤16 bytes)" width="100%" isDisabled={isRunning} />
-        </>
-      );
-      case 'ecb-detect': return (
-        <TextArea label="Ciphertexts (one hex/line)" value={cts} onChange={set('cts')} rows={3} placeholder="Hex CT per line" isDisabled={isRunning} />
-      );
-      case 'ecb-cutpaste': return (
-        <>
-          <TextInput label="Ciphertext (hex)" value={ct1} onChange={set('ct1')} placeholder="Multiples of 16 bytes" width="100%" isDisabled={isRunning} />
-          <TextInput label="Block order (optional)" value={blockOrder} onChange={set('blockOrder')} placeholder="e.g. 2,1,0,3" width="100%" isDisabled={isRunning} />
-        </>
-      );
-      case 'ecb-byte': return (
-        <>
-          <Banner
-            status="info"
-            title="Live oracle optional"
-            description="Runs an offline simulation below (embedded secret, fresh key). For a live target, use the Python template in the Explanation tab."
-          />
-          <TextInput label="Secret (optional — defaults to embedded demo secret)" value={ecbSecret} onChange={set('ecbSecret')} placeholder="Custom secret to recover" width="100%" isDisabled={isRunning} />
-        </>
-      );
-      case 'cbc-padding': return (
-        <>
-          <Banner
-            status="info"
-            title="Live oracle optional"
-            description="Runs an offline simulation below (random key/IV, local boolean oracle). For a live target, configure the Python template's status code + match string."
-          />
-          <TextInput label="Plaintext to encrypt-then-break (optional)" value={cbcPaddingPt} onChange={set('cbcPaddingPt')} placeholder="Defaults to demo message" width="100%" isDisabled={isRunning} />
-        </>
-      );
-      case 'gcm-nonce': return (
-        <>
-          <TextInput label="CT1 (raw hex — split the 16-byte tag off)" value={gcmCt1} onChange={set('gcmCt1')} placeholder="CT1 hex" width="100%" isDisabled={isRunning} />
-          <TextInput label="PT1" value={gcmPt1} onChange={set('gcmPt1')} placeholder="PT1 hex" width="100%" isDisabled={isRunning} />
-          <TextInput label="CT2" value={gcmCt2} onChange={set('gcmCt2')} placeholder="CT2 hex" width="100%" isDisabled={isRunning} />
-          <TextInput label="TAG1 (hex, optional — enables H recovery)" value={gcmTag1} onChange={set('gcmTag1')} placeholder="16-byte tag hex" width="100%" isDisabled={isRunning} />
-          <TextInput label="TAG2 (hex, optional)" value={gcmTag2} onChange={set('gcmTag2')} placeholder="16-byte tag hex" width="100%" isDisabled={isRunning} />
-          <TextInput label="AAD (hex, optional — must be shared)" value={gcmAad} onChange={set('gcmAad')} placeholder="Shared additional data" width="100%" isDisabled={isRunning} />
-          <TextInput label="Target CT to forge a tag for (hex, optional)" value={gcmForgeCt} onChange={set('gcmForgeCt')} placeholder="Same nonce + AAD" width="100%" isDisabled={isRunning} />
-        </>
-      );
-      case 'key-schedule': return (
-        <TextInput label="Last round key (hex)" value={scheduleKey} onChange={set('scheduleKey')} placeholder="32 hex chars (AES-128)" width="100%" isDisabled={isRunning} />
-      );
-      case 'cbc-iv': return (
-        <>
-          <TextInput label="Shared IV (hex)" value={ivHex} onChange={set('ivHex')} placeholder="16-byte IV reused across messages" width="100%" isDisabled={isRunning} />
-          <TextArea label="Ciphertexts (one hex/line)" value={cts} onChange={set('cts')} rows={3} placeholder="Hex CT per line" isDisabled={isRunning} />
-        </>
-      );
-      case 'stream-bitflip': return (
-        <>
-          <TextInput label="Ciphertext (hex)" value={ct1} onChange={set('ct1')} placeholder="CTR/CFB/OFB ciphertext" width="100%" isDisabled={isRunning} />
-          <TextInput label="Byte offset" value={blockIdx} onChange={set('blockIdx')} placeholder="0" width="100%" isDisabled={isRunning} />
-          <TextInput label="Current plaintext window (hex)" value={currentPtHex} onChange={set('currentPtHex')} placeholder="Known bytes at offset" width="100%" isDisabled={isRunning} />
-          <TextInput label="Target text" value={targetText} onChange={set('targetText')} placeholder="Desired bytes (same length)" width="100%" isDisabled={isRunning} />
-        </>
-      );
-      case 'cbc-keyiv': return (
-        <TextInput label="Known P1 (hex, 16 bytes)" value={currentPtHex} onChange={set('currentPtHex')} placeholder="Known first plaintext block" width="100%" isDisabled={isRunning} />
-      );
-      default: return null;
-    }
-  }, [attack, ct1, ct2, knownPt, cribInput, ivHex, blockIdx, blockOrder, targetText, currentPtHex, cts, gcmCt1, gcmPt1, gcmCt2, gcmTag1, gcmTag2, gcmAad, gcmForgeCt, ecbSecret, cbcPaddingPt, scheduleKey, set, isRunning]);
+  }, [out, def, attack]);
 
   return (
     <Stack direction="vertical" gap={2}>
       {!selectedAttack && (
-      <Selector
-        label="Attack"
-        options={AES_ATTACKS.map(a => ({ value: a.value, label: a.label }))}
-        value={attack}
-        onChange={set('attack')}
-        width="100%"
-        isDisabled={isRunning}
-      />
+        <Selector
+          label="Attack"
+          options={AES_ATTACKS.map(a => ({ value: a.value, label: a.label }))}
+          value={attack}
+          onChange={setAttack}
+          width="100%"
+        />
       )}
-      {AES_ATTACK_EXPLANATIONS[attack] && <AttackExplanationPanel data={AES_ATTACK_EXPLANATIONS[attack]} />}
-      {attackFields}
-      <Button
-        label={isRunning ? 'Running attack…' : 'Run Attack'}
-        variant="primary"
-        width="100%"
-        onClick={() => { void run(); }}
-        isDisabled={isRunning}
-        isLoading={isRunning}
+      <SharedAttackPanel
+        key={attack}
+        title={explanation.title}
+        description={explanation.description}
+        explanationNode={<AttackExplanationPanel data={explanation} />}
+        fields={def.fields}
+        generateLabel="Generate"
+        onGenerate={def.generate}
+        onRun={handleRun}
+        sourceCode={def.source}
+        sourceLanguage="typescript"
+        resultNode={(
+          <>
+            {out.result && <ResultBox value={out.result} label="Result" variant="medium" />}
+            {out.error && <Banner status="error" title={out.error} />}
+          </>
+        )}
       />
-      {isRunning && (
-        <Text type="body" role="status" aria-live="polite">
-          Running attack…
-        </Text>
-      )}
-      {out.result && <ResultBox value={out.result} label="Result" variant="medium" />}
-      {out.error && <Banner status="error" title={out.error} />}
     </Stack>
   );
 }

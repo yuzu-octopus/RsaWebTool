@@ -1,8 +1,7 @@
 import { useEffect, useState, type ReactNode, type SVGProps } from 'react';
-import { SideNav, SideNavHeading, SideNavItem } from '@astryxdesign/core/SideNav';
+import { SideNav, SideNavItem } from '@astryxdesign/core/SideNav';
 import { MobileNav } from '@astryxdesign/core/MobileNav';
 import { Badge } from '@astryxdesign/core/Badge';
-import { LogoIcon } from './_shared/LogoIcon';
 import { CATEGORIES, attacksByCategory } from '../attacks';
 import { CIPHER_ITEMS, MAGIC_ITEM, CIPHER_ATTACK_GROUPS } from '../config/sidebarItems';
 import type { Attack } from '../types';
@@ -120,10 +119,6 @@ import { CATEGORY_BADGE_VARIANTS } from '../config/sidebarItems';
 // Native `title` fallback for truncated rows: kit BaseProps omits `title`, but SideNavItem spreads `...rest` onto the button (as `id`/`data-testid` prove).
 const nativeTitle = (title: string) => ({ title });
 
-// Bright selected pill readable on the dark rail (old currentLine behaviour);
-// the kit's own selected tint is near-invisible on `--dracula-bg-dark`.
-const selectedStyle = { backgroundColor: 'var(--dracula-selection)' } as const;
-
 
 interface SidebarProps {
   mobileOpen: boolean;
@@ -155,6 +150,7 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 
   const handleAttackClick = (attack: Attack) => {
     if (isMobile) onMobileClose();
+    setActiveCipherAttack(null);
     setSelectedAttack(attack);
     setViewMode('rsa');
     window.dispatchEvent(new CustomEvent('cipher-workspace-tab', { detail: 'attacks' }));
@@ -163,13 +159,27 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 
   const isAttackActive = (id: string) => viewMode === 'rsa' && selectedAttack?.id === id;
 
-  const heading = (
-    <SideNavHeading
-      heading="Workbench"
-      subheading="SageMath Powered"
-      icon={<LogoIcon size={28} />}
-    />
-  );
+  // Phase-0 mock: Calculator reports the live cipher attack via
+  // 'cipher-attack-active' so leaves can light without a context slot.
+  const [activeCipherAttack, setActiveCipherAttack] = useState<string | null>(null);
+  useEffect(() => {
+    const onActive = (e: Event) => {
+      const detail = (e as CustomEvent<string>).detail;
+      if (typeof detail === 'string') setActiveCipherAttack(detail);
+    };
+    const onSelect = (e: Event) => {
+      const detail = (e as CustomEvent<string>).detail;
+      if (typeof detail === 'string') setActiveCipherAttack(detail);
+    };
+    window.addEventListener('cipher-attack-active', onActive);
+    window.addEventListener('cipher-attack-select', onSelect);
+    return () => {
+      window.removeEventListener('cipher-attack-active', onActive);
+      window.removeEventListener('cipher-attack-select', onSelect);
+    };
+  }, []);
+  const isCipherAttackActive = (cipher: string, id: string) =>
+    viewMode === cipher && activeCipherAttack === id;
 
 
   const navContent = (
@@ -181,8 +191,8 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         {...nativeTitle('RSA')}
         icon={calcGlyph('rsa')}
         isSelected={viewMode === 'rsa' && !selectedAttack}
-        style={viewMode === 'rsa' && !selectedAttack ? selectedStyle : undefined}
         onClick={() => {
+          setSelectedAttack(null);
           setViewMode('rsa');
           window.dispatchEvent(new CustomEvent('cipher-workspace-tab', { detail: 'operations' }));
           if (isMobile) onMobileClose();
@@ -216,7 +226,6 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                   {...nativeTitle(attack.name)}
                   size="sm"
                   isSelected={isAttackActive(attack.id)}
-                  style={isAttackActive(attack.id) ? selectedStyle : undefined}
                   onClick={() => handleAttackClick(attack)}
                 />
               ))}
@@ -236,7 +245,6 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
               {...nativeTitle(item.label)}
               icon={calcGlyph(item.id)}
               isSelected={viewMode === item.id}
-              style={viewMode === item.id ? selectedStyle : undefined}
               onClick={() => {
                 setViewMode(item.id);
                 if (isMobile) onMobileClose();
@@ -252,11 +260,11 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
             label={item.label}
             {...nativeTitle(item.label)}
             icon={calcGlyph(item.id)}
-            isSelected={viewMode === item.id}
-            style={viewMode === item.id ? selectedStyle : undefined}
+            isSelected={viewMode === item.id && activeCipherAttack === null}
             onClick={() => {
               setViewMode(item.id);
-              window.dispatchEvent(new CustomEvent('cipher-workspace-tab', { detail: 'operations' }));
+              setActiveCipherAttack(null);
+              window.dispatchEvent(new CustomEvent('cipher-workspace-tab', { detail: 'attacks' }));
               if (isMobile) onMobileClose();
               focusWorkspace();
             }}
@@ -274,10 +282,21 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
                 label={a.label}
                 {...nativeTitle(a.label)}
                 size="sm"
+                isSelected={isCipherAttackActive(item.id, a.id)}
                 onClick={() => {
+                  setSelectedAttack(null);
                   setViewMode(item.id);
-                  window.dispatchEvent(new CustomEvent('cipher-attack-select', { detail: a.id }));
-                  window.dispatchEvent(new CustomEvent('cipher-workspace-tab', { detail: 'attacks' }));
+                  if (item.id === 'hash' && a.id !== 'length-ext') {
+                    // HMAC / PoW are calculators, not attacks — land on the
+                    // operations sub-tab instead of the attacks panel.
+                    setActiveCipherAttack(null);
+                    window.dispatchEvent(new CustomEvent('cipher-ops-select', { detail: a.id }));
+                    window.dispatchEvent(new CustomEvent('cipher-workspace-tab', { detail: 'operations' }));
+                  } else {
+                    setActiveCipherAttack(a.id);
+                    window.dispatchEvent(new CustomEvent('cipher-attack-select', { detail: a.id }));
+                    window.dispatchEvent(new CustomEvent('cipher-workspace-tab', { detail: 'attacks' }));
+                  }
                   if (isMobile) onMobileClose();
                   focusWorkspace();
                 }}
@@ -294,7 +313,6 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         {...nativeTitle(MAGIC_ITEM.label)}
         icon={SparklesGlyph}
         isSelected={viewMode === MAGIC_ITEM.id}
-        style={viewMode === MAGIC_ITEM.id ? selectedStyle : undefined}
         onClick={() => {
           setViewMode(MAGIC_ITEM.id);
           if (isMobile) onMobileClose();
@@ -312,7 +330,6 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
         onOpenChange={open => {
           if (!open) onMobileClose();
         }}
-        header={heading}
         label="Navigation"
         style={{ backgroundColor: 'var(--dracula-bg-dark)' }}
       >
@@ -323,7 +340,6 @@ export function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 
   return (
     <SideNav
-      header={heading}
       collapsible
       resizable={{ defaultWidth: 280, minWidth: 200, maxWidth: 480, autoSaveId: 'navPanelWidth' }}
       style={{
